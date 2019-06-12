@@ -1,18 +1,17 @@
 {
 	"info": {
-		"_postman_id": "1a31c131-eda0-40d3-b649-2aacee47a242",
+		"_postman_id": "a12f8986-af48-4271-a7ab-5f505984bf8f",
 		"name": "Set task context",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Login - Set Task Context",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "304a6227-9f54-4260-8509-381625cc96ae",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
@@ -29,7 +28,8 @@
 							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
 							"    ",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -50,12 +50,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -144,10 +144,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
 					"host": [
@@ -257,9 +253,8 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list?",
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list",
 					"host": [
 						"{{host}}"
 					],
@@ -306,10 +301,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
 					"host": [
@@ -357,9 +348,8 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/event/listEventsAndBundles?",
+					"raw": "{{host}}/tdstm/ws/event/listEventsAndBundles",
 					"host": [
 						"{{host}}"
 					],
@@ -479,10 +469,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
 					"host": [
@@ -598,10 +584,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{recipeVersion}}",
 					"host": [

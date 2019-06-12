@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "a8eb1501-bac4-4663-83ae-207badaa2b66",
+		"_postman_id": "488945f5-5187-4f6e-be81-eb642c1ffe66",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Login",
+			"name": "Login - Datascript",
 			"event": [
 				{
 					"listen": "test",
@@ -17,13 +17,6 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"User Dashboard page\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"User Dashboard for TDS Admin\");",
-							"});",
-							"",
-							"pm.test(\"TDS Login\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
-							"}); ",
 							"",
 							"pm.test(\"User Menu is displayed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
@@ -59,12 +52,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -112,10 +105,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/list",
 					"host": [
@@ -166,10 +155,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/dataingestion/datascript/{{datascriptID}}",
 					"host": [

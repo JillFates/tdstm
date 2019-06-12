@@ -38,7 +38,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[title]="tooltip || button.tooltip || titleButton"
 			[ngClass]="buttonClasses">
 				<div class="tds-action-button-container">
-					<i class="{{iconPrefixVendor + (icon || button.icon)}}"></i>
+					<i class="{{configuredIconPrefixVendor + (icon || button.icon)}}"></i>
 					<span class="title">{{titleButton}}</span>
 				</div>
 				<ng-content></ng-content>
@@ -57,11 +57,13 @@ export class TDSActionButton implements OnInit, OnChanges {
 	@Input() disabled = false;
 	@Input() isIconButton = false;
 	@Input() permissions: string[];
+	@Input() iconPrefixVendor = '';
 	button: TDSButton;
 	titleButton: string;
 	hostClasses: any = [];
 	hasAllPermissions: boolean;
 	private buttonSelectorName: string;
+	private defaultIconPrefixVendor = 'fa fa-fw fa-';
 
 	constructor(
 		private elementRef: ElementRef,
@@ -98,8 +100,8 @@ export class TDSActionButton implements OnInit, OnChanges {
 	/**
 	 * Get the prefix used by font awesome icons
 	 */
-	get iconPrefixVendor() {
-		return 'fa fa-fw fa-';
+	get configuredIconPrefixVendor() {
+		return this.iconPrefixVendor !== '' ? this.iconPrefixVendor : this.defaultIconPrefixVendor;
 	}
 
 	/**

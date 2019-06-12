@@ -1,0 +1,91 @@
+<div class="content body">
+	<tds-report-toggle-filters 
+		[hideFilters]="hideFilters" 
+		[disabled]="!generatedReport"
+		(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+	<div class="box-body">
+		<div class="box box-primary">
+			<div class="box-header"></div>
+			<div>
+				<div class="database-conflicts">
+					<form class="formly form-horizontal">
+						<div class="filters-wrapper" [hidden]="hideFilters">
+							<tds-database-filters [filters]="filters" (generateReport)="openReport($event)"></tds-database-filters>
+						</div>
+					</form>
+					<div class="container" *ngIf="isDisplayingReport">
+						<div class="header">
+							<div class="main-title">{{reportProject}}: {{reportBundle}} - Includes databases matching: {{reportTitle}}</div>
+							<div class="sub-title">This analysis was performed on {{ reportDate | date: dateFormatTime}} for {{userContext ? userContext.person.firstName : ''}}.</div>
+						</div>
+						<div class="results">
+							<div class="report-output">
+								<div class="container database-container" *ngFor="let item of databaseConflicts">
+									<div class="row database-header" >
+										<div class="col-sm-12 pull-left">
+											<a (click)="onOpenLinkAsset(item.entity.id, item.entity.assetClass)" class="inlineLink">{{item.entity.name}}</a> ({{item.bundle.name}}) - Supports {{item.supports.length}}, Depends on {{item.dependencies.length}} <span class="field-error">{{item.header}}</span>
+										</div>
+									</div>
+						
+									<div class="row support-header" *ngIf="item.supports.length">
+										<div class="col-sm-2 title">Supports ({{item.supports.length}} issues)</div>
+										<div class="col-sm-10"></div>
+									</div>
+						
+									<div class="row item-header" *ngIf="item.supports.length">
+											<div class="col-sm-1"></div>
+											<div class="col-sm-1">Type</div>
+											<div class="col-sm-1">Class</div>
+											<div class="col-sm-3">Name</div>
+											<div class="col-sm-2">Frequency</div>
+											<div class="col-sm-2">Bundle</div>
+											<div class="col-sm-2">Status</div>
+									</div>
+						
+									<div class="row" 
+										*ngFor="let support of item.supports; let even = even; let odd = odd;"
+										[ngClass]="{ odd: odd, even: even }">
+											<div class="col-sm-1"></div>
+											<div class="col-sm-1 data-item">{{support.type}}</div>
+											<div class="col-sm-1 data-item">{{support.class}}</div>
+											<div class="col-sm-3 data-item">{{support.name}}</div>
+											<div class="col-sm-2 data-item">{{support.frequency}}</div>
+											<div class="col-sm-2 data-item" [ngClass]="{'field-error': support.bundle !== item.bundle.name}">{{support.bundle}}</div>
+											<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(support.status)}">{{support.status}}</div>
+									</div>
+						
+									<div class="row dependency-header" *ngIf="item.dependencies.length">
+											<div class="col-sm-2 title">Dependencies ({{item.dependencies.length}} issues)</div>
+											<div class="col-sm-10"></div>
+									</div>
+						
+									<div class="row item-header" *ngIf="item.dependencies.length">
+											<div class="col-sm-1"></div>
+											<div class="col-sm-1">Type</div>
+											<div class="col-sm-1">Class</div>
+											<div class="col-sm-3">Name</div>
+											<div class="col-sm-2">Frequency</div>
+											<div class="col-sm-2">Bundle</div>
+											<div class="col-sm-2">Status</div>
+									</div>
+						
+									<div class="row" *ngFor="let dependency of item.dependencies; let even = even; let odd = odd;" 
+										[ngClass]="{ odd: odd, even: even }">
+											<div class="col-sm-1"></div>
+											<div class="col-sm-1 data-item">{{dependency.type}}</div>
+											<div class="col-sm-1 data-item">{{dependency.class}}</div>
+											<div class="col-sm-3 data-item">{{dependency.name}}</div>
+											<div class="col-sm-2 data-item">{{dependency.frequency}}</div>
+											<div class="col-sm-2 data-item" [ngClass]="{'field-error': dependency.bundle !== item.bundle.name}">{{dependency.bundle}}</div>
+											<div class="col-sm-2 data-item" [ngClass]="{'field-error': invalidStatusList.includes(dependency.status)}">{{dependency.status}}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>

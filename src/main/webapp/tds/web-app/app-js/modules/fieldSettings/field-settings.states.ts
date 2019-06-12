@@ -25,7 +25,7 @@ export const FieldSettingsRoute: Routes = [
 			page: {
 				title: 'FIELD_SETTINGS.ASSET_FIELD_SETTING',
 				instruction: '',
-				menu: ['FIELD_SETTINGS.PROJECT_LIST', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
+				menu: ['FIELD_SETTINGS.PROJECT', 'FIELD_SETTINGS.ASSET_FIELD_SETTING']
 			},
 			requiresAuth: true,
 			requiresPermission: Permission.ProjectFieldSettingsView,

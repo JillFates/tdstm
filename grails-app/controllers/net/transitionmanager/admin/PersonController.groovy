@@ -39,8 +39,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.TaskService
 import org.springframework.jdbc.core.JdbcTemplate
 
-import grails.plugin.springsecurity.annotation.Secured
-
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class PersonController implements ControllerMethods, PaginationMethods {
 
@@ -271,9 +269,11 @@ class PersonController implements ControllerMethods, PaginationMethods {
 			companyId = NumberUtil.toLong(params.company)
 		}
 
-		def errMsg
-		def person
-		def duplicatePersonId
+		String errorMessage
+		String duplicateErrorMessage
+		Person person
+		Integer duplicatePersonId
+
 		try {
 			person = personService.savePerson(personCommand, params, companyId, project, true)
 		} catch (DomainUpdateException e) {
@@ -281,25 +281,29 @@ class PersonController implements ControllerMethods, PaginationMethods {
 			log.error(exceptionMsg, e)
 			// The line below is a hack to avoid querying the database.
 			duplicatePersonId = exceptionMsg.substring(exceptionMsg.indexOf(":") + 1).toInteger()
-			errMsg = "A person with the same first and last name already exists for this Company."
+			duplicateErrorMessage = "A person with the same first and last name already exists for this Company."
 		} catch (e) {
 			log.error "save() failed : ${ExceptionUtil.stackTraceToString(e)}"
-			errMsg = e.message
+			errorMessage = e.message
 		}
 
 		if (isAjaxCall) {
-			def map = errMsg ? [errMsg : errMsg] :
+			def map = errorMessage ? [errMsg : duplicateErrorMessage ?: errorMessage] :
 				[id: person.id, name:person.toString(), isExistingPerson: false, fieldName:params.fieldName]
+
 			render map as JSON
 		} else {
-			if (errMsg) {
-				errMsg += " Click <a href=\"javascript:Person.showPersonDialog($duplicatePersonId,'generalInfoShow')\"> here </a>"//e.message
-				errMsg += "to view the person."
-				flash.message = errMsg
+			if (duplicateErrorMessage) {
+				duplicateErrorMessage += " Click <a href=\"javascript:Person.showPersonDialog($duplicatePersonId,'generalInfoShow')\"> here </a>"//e.message
+				duplicateErrorMessage += "to view the person."
+				flash.message = duplicateErrorMessage
+			} else if(errorMessage) {
+				flash.message = errorMessage
 			} else {
 				// Just add a message for the form submission to know that the person was created
 				flash.message = "A record for $person was created"
 			}
+
 			redirect(action:"list", params:[ companyId:companyId ])
 		}
 	}

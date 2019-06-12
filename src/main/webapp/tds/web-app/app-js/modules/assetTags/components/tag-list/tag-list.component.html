@@ -36,7 +36,7 @@
                     </ng-template>
 
                     <!-- Action -->
-                    <kendo-grid-command-column [width]="150" [locked]="true">
+                    <kendo-grid-command-column [width]="85" [locked]="true">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="text-center">
                                 <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -44,18 +44,18 @@
                         </ng-template>
                         <ng-template kendoGridCellTemplate let-dataItem let-isNew="isNew">
                             <div class="tds-action-button-set">
-                                <tds-button-edit kendoGridEditCommand *ngIf="canEdit()" class="btn btn-action btn-default">
+                                <tds-button-edit kendoGridEditCommand *ngIf="canEdit()" class="tds-action-button">
                                 </tds-button-edit>
-                                <tds-button-delete kendoGridRemoveCommand *ngIf="canDelete()" class="btn btn-action btn-default" >
+                                <tds-button-delete kendoGridRemoveCommand *ngIf="canDelete()" class="tds-action-button" >
                                 </tds-button-delete>
                                 <tds-button-save kendoGridSaveCommand *ngIf="canCreate() || canEdit()"
-                                        class="btn btn-action btn-default" [disabled]="myForm.invalid || duplicateName">
+                                        class="tds-action-button" [disabled]="myForm.invalid || duplicateName">
                                 </tds-button-save>
-                                <tds-button-cancel kendoGridCancelCommand class="btn-action">
+                                <tds-button-cancel kendoGridCancelCommand class="tds-action-button">
                                 </tds-button-cancel>
                                 <tds-button-custom *ngIf="((!isNew && !editedTag) || (editedTag && editedTag.id !== dataItem.id)) && canMerge()"
                                         (click)="onMerge(dataItem)" title="Merge"
-                                        class="btn btn-action btn-default" [icon]="'exchange'">
+                                        class="tds-action-button" [icon]="'exchange'">
                                 </tds-button-custom>
                             </div>
                         </ng-template>

@@ -8,4 +8,12 @@ export class WindowService {
 	getWindow() {
 		return window;
 	}
+
+	/**
+	 * Navigate to routes not handled by the Angular router
+	 * @param uri
+	 */
+	navigateTo(uri: string) {
+		this.getWindow().location.assign(uri);
+	}
 }

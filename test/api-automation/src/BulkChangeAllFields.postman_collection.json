@@ -1,12 +1,12 @@
 {
 	"info": {
-		"_postman_id": "d37b004e-70e5-4e6e-84eb-1ce5b6c24ef6",
+		"_postman_id": "355ea823-2097-4887-b3d3-51815222eda1",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Login - Bulk Change",
 			"event": [
 				{
 					"listen": "test",
@@ -38,12 +38,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -90,10 +90,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
 					"host": [
@@ -274,10 +270,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag",
 					"host": [
@@ -378,10 +370,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
@@ -506,10 +494,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/assetExplorer/views",
 					"host": [
@@ -623,10 +607,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset1}}",
 					"host": [
@@ -690,10 +670,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset2}}",
 					"host": [
@@ -800,10 +776,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset1}}",
 					"host": [
@@ -867,10 +839,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset2}}",
 					"host": [
@@ -973,10 +941,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset1}}",
 					"host": [
@@ -1027,10 +991,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset2}}",
 					"host": [
@@ -1146,10 +1106,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/tag/asset/{{asset1}}",
 					"host": [
@@ -1368,10 +1324,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -1422,10 +1374,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -1529,10 +1477,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -1584,10 +1528,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -1692,10 +1632,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -1748,10 +1684,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -1857,10 +1789,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -1914,10 +1842,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2023,10 +1947,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2080,10 +2000,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2189,10 +2105,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2246,10 +2158,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2354,10 +2262,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2410,10 +2314,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2518,10 +2418,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2574,10 +2470,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2682,10 +2574,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2738,10 +2626,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -2846,10 +2730,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -2902,10 +2782,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3010,10 +2886,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3066,10 +2938,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3174,10 +3042,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3230,10 +3094,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3338,10 +3198,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3395,10 +3251,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3502,10 +3354,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3558,10 +3406,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3665,10 +3509,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3721,10 +3561,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3829,10 +3665,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -3885,10 +3717,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -3992,10 +3820,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -4048,10 +3872,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [
@@ -4155,10 +3975,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset1}}",
 					"host": [
@@ -4211,10 +4027,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/asset/{{asset2}}",
 					"host": [

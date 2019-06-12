@@ -9,8 +9,10 @@ export abstract class ReportComponent {
 	// Shared variables
 	hideFilters = false;
 	reportResult: SafeHtml;
+	loadingLists = false;
+	generatedReport = false;
 
-	constructor(protected reportsService: ReportsService, protected  dialogService: UIDialogService) {
+	constructor(protected reportsService: ReportsService, protected dialogService: UIDialogService) {
 		// Silence is golden.
 	}
 
@@ -28,7 +30,9 @@ export abstract class ReportComponent {
 	protected onAssetLinkClick(event: any): void {
 		if (event.target) {
 			const {assetClass, assetId} = event.target.dataset;
-			this.onOpenLinkAsset(assetId, assetClass);
+			if (assetClass && assetId) {
+				this.onOpenLinkAsset(assetId, assetClass);
+			}
 		}
 	}
 
@@ -51,5 +55,4 @@ export abstract class ReportComponent {
 	}
 
 	abstract onGenerateReport();
-
 }

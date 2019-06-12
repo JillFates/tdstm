@@ -1,0 +1,34 @@
+.notice-edit-content
+  .label-detail
+    text-align: left 
+    font-weight: normal
+  .form-control[readonly],
+  .readonly-control
+    background-color: unset
+    cursor: not-allowed
+  input[type='checkbox']
+    cursor: pointer
+  input[type='checkbox'].is-disabled
+    cursor: not-allowed
+  .vertical-label
+    margin-bottom: 4px
+  .locked-container
+    display: flex
+    flex-direction: row
+    align-items: center
+    label
+      margin-right: 10px
+    input.is-disabled
+      cursor: not-allowed
+  .k-dropdown
+    span
+      background-color: white
+  .k-dropdown.ng-invalid
+    span
+      color: unset
+      border: unset
+  .required-field::after
+    content: "*"
+    color: $color-message-error--red
+    margin-left: 4px
+

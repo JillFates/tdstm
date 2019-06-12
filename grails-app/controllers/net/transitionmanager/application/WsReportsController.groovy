@@ -1,12 +1,17 @@
 package net.transitionmanager.application
 
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.NumberUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
@@ -16,7 +21,9 @@ import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.command.reports.ApplicationConflictsCommand
 
 
 @Secured("isAuthenticated()")
@@ -85,12 +92,36 @@ class WsReportsController implements ControllerMethods {
         renderSuccessJson(moveBundleService.moveBundlesByProject(project))
     }
 
-    def smeList(Long moveBundleId) {
+    def smeList(String moveBundleId) {
         if ( !moveBundleId ) {
             log.warn "moveBundleId param missing"
             throw new InvalidParamException("moveBundleId param missing")
         }
-        renderSuccessJson(reportsService.getSmeList(moveBundleId, true).sort({it.lastName}))
+        renderSuccessJson(
+                reportsService.getSmeList(moveBundleId, true)
+                        .sort({it.lastName})
+                        .collect { entry -> [
+                            id: entry.id,
+                            firstName: entry.firstName,
+                            lastName: entry.lastName
+                        ]}
+        )
+    }
+
+    def appOwnerList(String moveBundleId) {
+        if ( !moveBundleId ) {
+            log.warn "moveBundleId param missing"
+            throw new InvalidParamException("moveBundleId param missing")
+        }
+        renderSuccessJson(
+                reportsService.getSmeList(moveBundleId, false)
+                        .sort({it.lastName})
+                        .collect { entry -> [
+                            id: entry.id,
+                            firstName: entry.firstName,
+                            lastName: entry.lastName
+                        ]}
+        )
     }
 
     /**
@@ -179,5 +210,114 @@ class WsReportsController implements ControllerMethods {
         ApplicationMigrationCommand command = populateCommandObject(ApplicationMigrationCommand)
         Map applicationMigrationMap = reportsService.generateApplicationMigration(project, command)
         render(view: "/reports/generateApplicationMigration" , model: applicationMigrationMap)
+    }
+
+    /**
+     * Create and return a map containing all the bundles for the user's current project, along
+     * with the id of the default bundle for the selector -- either the user preference or the
+     * first element in the list of bundles.
+     *
+     * @return a map with all the bundles for the user's project (id and name) and the default bundle.
+     */
+    def getMoveBundles() {
+        Project project = getProjectForWs()
+        List<Map> moveBundles = MoveBundle.findAllByProject(project).collect { MoveBundle bundle ->
+            [id: bundle.id, name: bundle.name]
+        }
+        String moveBundleId = (userPreferenceService.moveBundleId ?: moveBundles[0]?.id).toString()
+        renderSuccessJson(moveBundles: moveBundles, moveBundleId: moveBundleId)
+    }
+
+    /**
+     * Return a list with all the possible App Owners for the given bundle.
+     * @param moveBundleId
+     */
+    def getOwnersForMoveBundle(Long moveBundleId) {
+        List<Map> owners = reportsService.getSmeList(moveBundleId, false).collect { Person person ->
+            [id: person.id, fullName: person.toString()]
+        }
+        renderSuccessJson(owners: owners)
+    }
+
+     /**
+     * Find and return the map with the content for the Application Conflicts report.
+     *
+     * @return a map with the content for the Application Conflicts Report.
+     */
+    def getApplicationConflicts() {
+        Project project = getProjectForWs()
+        ApplicationConflictsCommand command = populateCommandObject(ApplicationConflictsCommand)
+        boolean useForPlanning = command.moveBundle == 'useForPlanning'
+        if (command.moveBundle && command.moveBundle != 'useForPlanning') {
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+            userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+        }
+
+        Map applicationConflictsMap = reportsService.genApplicationConflicts(project.id, command.moveBundle, command.bundleConflicts,
+            command.unresolvedDependencies, command.missingDependencies, useForPlanning, command.appOwner, command.maxAssets)
+
+        renderSuccessJson(applicationConflictsMap)
+
+    }
+
+    /**
+     * Fetch and return the information for the Database Conflicts Report.
+     * @return a map with the information for populating the report.
+     */
+    def getDatabaseConflicts() {
+        Project project = getProjectForWs()
+        DatabaseConflictsCommand command = populateCommandObject(DatabaseConflictsCommand)
+        if (command.moveBundle.isNumber()) {
+            MoveBundle moveBundle = fetchDomain(MoveBundle, [id: command.moveBundle], project)
+            if (moveBundle) {
+                userPreferenceService.setPreference(UserPreferenceEnum.MOVE_BUNDLE, command.moveBundle)
+            }
+        }
+        renderSuccessJson(reportsService.generateDatabaseConflictsMap(project, command))
+    }
+
+    /**
+     * Generates Application Profiles Report web output.
+     * @param moveBundle: The id of the move bundle selected value.
+     * @param sme: The id of the SME selected value.
+     * @param appOwner: The id of the SME selected value.
+     * @returns The rendered gsp view.
+     */
+    def generateApplicationProfiles() {
+        Project project = getProjectForWs()
+        ApplicationProfilesCommand command = populateCommandObject(ApplicationProfilesCommand)
+        Map model = reportsService.generateApplicationProfiles(project, command)
+        render(view: "/reports/generateApplicationProfiles" , model: model)
+    }
+
+    /**
+     * Returns the options lists of the Project Metrics Report.
+     * @return Returns the options lists of the Project Metrics Report.
+     */
+    def projectMetricsLists() {
+        List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+        Calendar start = Calendar.instance
+        start.set(Calendar.DATE, 1)
+        start.add(Calendar.MONTH, -2)
+        Date startDate = start.time
+        Date endDate = new Date()
+        renderSuccessJson(projects: userProjects.collect { entry -> [
+                id: entry.id,
+                name: entry.name
+        ]}, startDate: startDate, endDate: endDate)
+    }
+
+    /**
+     * Generates and returns the Project Activity Metrics report excel file.
+     * @param reportIds: The list of project ids.
+     * @param startDate: The start date range.
+     * @param endDate: The end date range.
+     * @param includeNonPlanning: Include NonPlanning flag.
+     * @returns The rendered gsp view.
+     */
+    def generateProjectMetrics() {
+        ActivityMetricsCommand command = populateCommandObject(ActivityMetricsCommand)
+        reportsService.generateProjectActivityMetrics(command, response)
     }
 }

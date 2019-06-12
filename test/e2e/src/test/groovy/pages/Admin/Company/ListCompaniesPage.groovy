@@ -10,7 +10,7 @@ class ListCompaniesPage extends Page{
         title == "Company List"
         pageHeaderName.text() == "Company List"
         createCompanyButton.displayed
-        nameFilter.displayed
+        waitFor (15) {nameFilter.displayed}
     }
 
     static content = {

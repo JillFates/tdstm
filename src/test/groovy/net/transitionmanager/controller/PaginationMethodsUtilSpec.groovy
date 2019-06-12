@@ -1,14 +1,17 @@
 package net.transitionmanager.controller
 
+import com.tdssrc.grails.GormUtil
+import grails.testing.web.controllers.ControllerUnitTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.InvalidParamException
-import org.grails.core.exceptions.GrailsDomainException
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
-class PaginationMethodsUtilSpec extends Specification {
+@ConfineMetaClassChanges([GormUtil])
+class PaginationMethodsUtilSpec extends Specification implements ControllerUnitTest<PaginationTestController> {
 
 	class PaginationTestController implements PaginationMethods {
 		Map params = [:]
@@ -18,6 +21,7 @@ class PaginationMethodsUtilSpec extends Specification {
 
 	void setup() {
 		testController = new PaginationTestController()
+		GormUtil.metaClass.static.isDomainProperty = {Class domainClass, String propertyName-> true}
 	}
 
 	@Unroll
@@ -81,15 +85,17 @@ class PaginationMethodsUtilSpec extends Specification {
 		when: 'the sort by params property is blank'
 			setParamsInTestCtrl(sortByParam, '')
 		and: 'a invalid default property is supplied to paginationOrderBy'
+			GormUtil.metaClass.static.isDomainProperty = {Class domainClass, String propertyName-> false}
 			testController.paginationOrderBy(Application, sortByParam, 'FUBAR')
 		then: 'a PAGINATION_INVALID_DEFAULT_ORDER_BY_EXCEPTION should be thrown'
 			def ex = thrown(RuntimeException)
 			ex.message == testController.PAGINATION_INVALID_DEFAULT_ORDER_BY_EXCEPTION.message
 
 		when: 'a invalid class is supplied'
+			GormUtil.metaClass.static.isDomainProperty = {Class domainClass, String propertyName-> false}
 			testController.paginationOrderBy(String, sortByParam, 'FUBAR')
 		then:
-			ex = thrown(GrailsDomainException)
+			ex = thrown(RuntimeException)
 	}
 
 	void 'test paginationOrderBy for missing sort param'() {
@@ -100,6 +106,7 @@ class PaginationMethodsUtilSpec extends Specification {
 			'assetName' == property
 
 		when: 'a invalid property is supplied'
+			GormUtil.metaClass.static.isDomainProperty = {Class domainClass, String propertyName-> false}
 			testController.paginationOrderBy(Application, sortByParam, 'FUBAR')
 		then:
 			def ex = thrown(RuntimeException)

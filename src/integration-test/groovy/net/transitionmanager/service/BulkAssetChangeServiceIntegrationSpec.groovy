@@ -1,7 +1,5 @@
 package net.transitionmanager.service
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
@@ -10,6 +8,8 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.BulkAssetChangeService
 import net.transitionmanager.bulk.change.BulkChangeDate
 import net.transitionmanager.bulk.change.BulkChangeInteger
@@ -19,24 +19,24 @@ import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
-import net.transitionmanager.command.DataviewUserParamsCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.Setting
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.DataviewService
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.Setting
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -45,7 +45,7 @@ import test.helper.PersonTestHelper
 
 @Integration
 @Rollback
-class BulkAssetChangeServiceIntegrationSpec extends  Specification{
+class BulkAssetChangeServiceIntegrationSpec extends  Specification implements AllAssetsFilterUnitTest {
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
 
@@ -188,12 +188,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 
 			now = TimeUtil.nowGMT().clearTime()
 
-			dataviewUserParamsCommand = [
-				sortDomain  : 'device',
-				sortProperty: 'id',
-				filters     : ['id': [1, 2, 3]]
-			] as DataviewUserParamsCommand
-
+			dataviewUserParamsCommand = new DataviewUserParamsCommand(allAssetsDataviewMap)
 			bulkChangeCommand = new BulkChangeCommand(
 				userParams: dataviewUserParamsCommand,
 				dataViewId: 1,
@@ -740,23 +735,5 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification{
 			1 * bulkAssetChangeService.bulkClassMapping['InList'].coerceBulkValue(project, editCommand.value)
 			1 * bulkAssetChangeService.bulkClassMapping['InList'].replace(Application, editCommand.value, 'validation', [], [query: query, params: params])
 	}
-
-	@Ignore //TODO we don't currently have a list field that we support clear for. When we add one we should update this test to test that field.
-	void 'Test bulkChange clear inList'() {
-		setup: 'given an edit command for replacing tags, and a bulk change command holding the edit'
-			setUpSpies()
-			EditCommand editCommand = new EditCommand(fieldName: 'validation', action: 'clear', value: null)
-			bulkChangeCommand.edits = [editCommand]
-			bulkAssetChangeService.bulkClassMapping.InList = bulkAssetChangeService.bulkClassMapping.List
-
-		when: 'bulk change is called with the bulk change command'
-			bulkAssetChangeService.bulkChange(project, bulkChangeCommand)
-
-		then: 'the bulkReplace function is invoked'
-			bulkChangeCommand.validate()
-			1 * bulkAssetChangeService.bulkClassMapping['InList'].coerceBulkValue(project, editCommand.value)
-			1 * bulkAssetChangeService.bulkClassMapping['InList'].clear(Application, editCommand.value, 'validation', [], [query: query, params: params])
-	}
-
 
 }

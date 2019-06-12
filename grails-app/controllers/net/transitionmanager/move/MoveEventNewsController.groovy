@@ -2,6 +2,7 @@ package net.transitionmanager.move
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
@@ -81,6 +82,8 @@ class MoveEventNewsController implements ControllerMethods {
 
 			totalComments = jdbcTemplate.queryForList(queryForCommentsList.toString())
 			totalComments.each {
+				it.text = HtmlUtil.escape(it.text)
+
 				if (maxLen) {
 					it.text = truncate(it.text, maxLen)
 				}

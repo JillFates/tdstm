@@ -2,7 +2,7 @@ package net.transitionmanager.imports
 
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.command.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.project.Project

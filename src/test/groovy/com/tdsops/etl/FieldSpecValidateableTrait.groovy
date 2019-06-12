@@ -2,17 +2,16 @@ package com.tdsops.etl
 
 import com.tdsops.tm.enums.domain.AssetClass
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.dataview.FieldSpecProject
 
 /**
  * <p>Implements {@code ETLFieldsValidator} construction for Test purposes.</p>
  * Use it:
  * <pre>
- * class ETLSpec extends Specification implements FieldSpecValidateableTrait {
- *
- *	....
- *	validator = createDomainClassFieldsValidator()
- * }
- *
+ * class ETLSpec extends Specification implements FieldSpecValidateableTrait {*
+ * 	....
+ * 	validator = createDomainClassFieldsValidator()
+ *}*
  * </pre>
  */
 trait FieldSpecValidateableTrait {
@@ -35,11 +34,35 @@ trait FieldSpecValidateableTrait {
 		return validator
 	}
 
+	FieldSpecProject createFieldSpecProject() {
+		List<Map<String, ?>> commonFieldsSpec = buildFieldSpecsFor(CustomDomainService.COMMON)
+		return new FieldSpecProject(
+			[
+				'COMMON'                       : [
+					fields: commonFieldsSpec
+				],
+				(AssetClass.APPLICATION.name()): [
+					fields: buildFieldSpecsFor(AssetClass.APPLICATION)
+				],
+				(AssetClass.DEVICE.name())     : [
+					fields: buildFieldSpecsFor(AssetClass.DEVICE)
+				],
+				(AssetClass.STORAGE.name())    : [
+					fields: buildFieldSpecsFor(AssetClass.STORAGE)
+				],
+				(AssetClass.DATABASE.name())   : [
+					fields: buildFieldSpecsFor(AssetClass.DATABASE)
+				]
+			]
+		)
+	}
+
+
 	/**
 	 * <p>It builds all the fields Spec definitions copied from database configuration </p>
 	 * <p>It returns a {@code List} of FieldSpec represented by a {@code Map} instance</p>
 	 * @param asset an instance of an asset class name
-	 * @return a {@code List} of Field Spec represented by a {@code Map}
+	 * @return a{@code List} of Field Spec represented by a {@code Map}
 	 */
 	List<Map<String, ?>> buildFieldSpecsFor(Object asset) {
 

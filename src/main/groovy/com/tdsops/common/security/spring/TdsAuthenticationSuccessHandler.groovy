@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.notice.NoticeService
@@ -40,7 +41,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 		try {
 			String redirectUri
-			String unacknowledgedNoticesUri = '/module/notice/list'
+			String unacknowledgedNoticesUri = '/module/notice'
 			Boolean hasUnacknowledgedNotices = false
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
 
@@ -77,7 +78,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
-				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNotices(userLogin.person)
+				Project project = securityService.userCurrentProject
+				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
 				if (hasUnacknowledgedNotices) {
 					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
 					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
@@ -105,7 +107,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				return '/projectUtil'
 			}
 			if (startPage == StartPageEnum.CURRENT_DASHBOARD.value || startPage == StartPageEnum.PLANNING_DASHBOARD.value) {
-				return securityService.hasPermission('BundleView') ? '/moveBundle/planningStats' : '/projectUtil'
+				return securityService.hasPermission('BundleView') ? '/module/planning/dashboard' : '/projectUtil'
 			}
 			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				return '/admin/home'

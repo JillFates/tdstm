@@ -96,11 +96,11 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'assets/images'
 
-	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo.png'
+	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
-	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogoManager.png'
+	static final String DEFAULT_LIC_MANAGER_LOGO = 'TMHeaderLogo_v4.7.png'
 
 	/**
 	 * Returns a list of projects that a person is assigned as staff
@@ -1008,7 +1008,8 @@ class ProjectService implements ServiceMethods {
 			fillUsersMetrics(metrics, projects, sqlSearchDate)
 
 			// Deletes any existing record
-			jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
+			ProjectDailyMetric.where{metricDate == searchDate}.deleteAll()
+			//jdbcTemplate.update("DELETE FROM project_daily_metric where metric_date = '$sqlSearchDate'")
 
 			metrics.each { metric ->
 				metric.save(flush:true)
@@ -1024,7 +1025,7 @@ class ProjectService implements ServiceMethods {
 	 * Search for the last date that the process had been executed.
 	 * If no date is found then it returns current date.
 	 */
-	private Date findProjectDailyMetricsLastRunDay() {
+	Date findProjectDailyMetricsLastRunDay() {
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList('SELECT max(metric_date) as last_date FROM project_daily_metric')
 		if (rows[0]['last_date'] == null) {
 			new Date()
@@ -1070,9 +1071,9 @@ class ProjectService implements ServiceMethods {
 			roleTypeCodeFrom.id == 'ROLE_PROJECT'
 			roleTypeCodeTo.id == 'ROLE_PARTNER'
 			partyIdFrom.id == projectId
-		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		}.projections {
+			property 'partyIdTo.id'
+		}.list()
 	}
 
 	/**
@@ -1104,9 +1105,9 @@ class ProjectService implements ServiceMethods {
 			roleTypeCodeFrom.id == 'ROLE_COMPANY'
 			roleTypeCodeTo.id == 'ROLE_STAFF'
 			partyIdFrom.id in partyGroupIds
-		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		}.projections {
+			property 'partyIdTo.id'
+		}.list()
 	}
 
 	/**
@@ -1153,29 +1154,38 @@ class ProjectService implements ServiceMethods {
 	 * @return
 	 */
 	List<Person> getAssociatedStaffByName(Project project, String nameFilter) {
+		List<Person> personList
+
 		// Fetch the ids of the staff associated with the project
 		List<Long> staffIds = getAssociatedStaffIds(project)
 
-		// Query that should retrieve all the invidividuals for this project matching the filter, if any.
-		String hqlQuery = "FROM Person p where id in (:staffIds)"
+		if( staffIds ) {
+			// Query that should retrieve all the invidividuals for this project matching the filter, if any.
+			String hqlQuery = "FROM Person p where id in (:staffIds)"
 
-		Map params = [staffIds: staffIds]
-		if (nameFilter && nameFilter.trim()) {
-			FieldSearchData fieldSearchData = new FieldSearchData([
-					column     : SqlUtil.personFullName(),
-					columnAlias: "personName",
-					domain     : Person,
-					filter     : nameFilter
-			])
+			Map params = [staffIds: staffIds]
+			if (nameFilter && nameFilter.trim()) {
+				FieldSearchData fieldSearchData = new FieldSearchData([
+						  column     : SqlUtil.personFullName(),
+						  columnAlias: "personName",
+						  domain     : Person,
+						  filter     : nameFilter
+				])
 
-			SqlUtil.parseParameter(fieldSearchData)
+				SqlUtil.parseParameter(fieldSearchData)
 
-			String nameCondition = fieldSearchData.sqlSearchExpression
-			params.putAll(fieldSearchData.sqlSearchParameters)
-			hqlQuery += " AND $nameCondition"
+				String nameCondition = fieldSearchData.sqlSearchExpression
+				params.putAll(fieldSearchData.sqlSearchParameters)
+				hqlQuery += " AND $nameCondition"
+			}
+
+			personList = Person.executeQuery ( hqlQuery, params )
+
+		} else {
+			personList = []
 		}
 
-		return Person.executeQuery ( hqlQuery, params )
+		return personList
 	}
 
 
@@ -1835,9 +1845,9 @@ class ProjectService implements ServiceMethods {
 		} else {
 			String filename
 			if (licenseCommonService.isManagerEnabled()) {
-				filename = DEFAULT_TRANSITIONMANAGER_LOGO
-			} else {
 				filename = DEFAULT_LIC_MANAGER_LOGO
+			} else {
+				filename = DEFAULT_TRANSITIONMANAGER_LOGO
 			}
 			logoUrl = atl.resource(dir: DEFAULT_PROJECT_LOGO_DIR, file: filename)
 		}

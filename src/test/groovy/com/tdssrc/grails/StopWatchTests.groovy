@@ -1,7 +1,6 @@
 package com.tdssrc.grails
 
 import groovy.time.TimeDuration
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class StopWatchTests extends Specification {
@@ -28,8 +27,6 @@ class StopWatchTests extends Specification {
 		!stopWatch.hasTag(tag)
 	}
 
-	//TODO: oluna ignored due to a long watch period, check later
-	@Ignore
 	void 'Exercise the StopWatch Class'() {
 		when:
 		StopWatch stopWatch = new StopWatch()

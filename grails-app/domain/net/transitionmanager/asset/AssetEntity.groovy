@@ -301,7 +301,6 @@ class AssetEntity {
 		maintExpDate sqltype: 'date'
 		modifiedBy column: 'modified_by'
 		moveBundle ignoreNotFound: true
-		os column: 'hinfo'
 		owner ignoreNotFound: true
 		rateOfChange sqltype: 'int(4)'
 		retireDate sqltype: 'date'

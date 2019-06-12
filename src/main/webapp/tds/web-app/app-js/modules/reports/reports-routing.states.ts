@@ -3,14 +3,18 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
-import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
+import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
+import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
+import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
+import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
+import { DatabaseConflictsComponent } from './components/database-conflicts/database-conflicts.component';
 
 /**
  * Top menu parent section class for all Reports module.
@@ -23,6 +27,9 @@ export class ReportStates {
 	public static readonly PRE_EVENT_CHECK_LIST = {
 		url: 'preEventCheckList'
 	};
+	public static readonly APPLICATION_CONFLICTS = {
+		url: 'applicationConflicts'
+	};
 	public static readonly TASK_REPORT = {
 		url: 'taskReport'
 	};
@@ -31,6 +38,15 @@ export class ReportStates {
 	};
 	public static readonly APPLICATION_EVENT_RESULTS = {
 		url: 'applicationEventResults'
+	};
+	public static readonly DATABASE_CONFLICTS_REPORT = {
+		url: 'databaseConflicts'
+	};
+	public static readonly APPLICATION_PROFILES = {
+		url: 'applicationProfiles'
+	};
+	public static readonly ACTIVITY_METRICS = {
+		url: 'projectActivityMetrics'
 	};
 }
 
@@ -53,6 +69,26 @@ export const ReportsRoute: Routes = [
 			ModuleResolveService
 		],
 		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.APPLICATION_CONFLICTS.url,
+		data: {
+			page: {
+				title: 'REPORTS.APPLICATION_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.APPLICATION_CONFLICTS'],
+				topMenu: { parent: 'menu-parent-reports', child: 'menu-reports-application-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ApplicationConflictsComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService],
+		resolve: {
+			tagList: TagsResolveService
+		},
 		runGuardsAndResolvers: 'always'
 	},
 	{
@@ -110,6 +146,62 @@ export const ReportsRoute: Routes = [
 			ModuleResolveService
 		],
 		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.DATABASE_CONFLICTS_REPORT.url,
+		data: {
+			page: {
+				title: 'REPORTS.DATABASE_CONFLICTS',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'REPORTS.DATABASE_CONFLICTS'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-database-conflicts', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: DatabaseConflictsComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.APPLICATION_PROFILES.url,
+		data: {
+			page: {
+				title: 'Application Profiles',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'Application Profiles'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-application-profiles', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ApplicationProfilesReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: ReportStates.ACTIVITY_METRICS.url,
+		data: {
+			page: {
+				title: 'Activity Metrics Report',
+				instruction: '',
+				menu: ['REPORTS.REPORTS', 'Activity Metrics'],
+				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-activity-metrics', subMenu: true }
+			},
+			requiresAuth: true,
+		},
+		component: ActivityMetricsReportComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
 		runGuardsAndResolvers: 'always'
 	}
 ];

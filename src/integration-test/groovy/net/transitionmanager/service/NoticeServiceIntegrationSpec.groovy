@@ -44,6 +44,9 @@ class NoticeServiceIntegrationSpec extends Specification {
 
 		project = projectHelper.createProject()
 
+		// Delete all notices
+		Notice.executeUpdate('delete from Notice')
+
 		whom = personHelper.createPerson()
 		user = personHelper.createUserLoginWithRoles(whom, [], project, false)
 
@@ -115,14 +118,14 @@ class NoticeServiceIntegrationSpec extends Specification {
 			Notice notice = noticeService.saveOrUpdate(createNoticeCommand(project, null, null, true, true))
 
 		then: 'person must have notices to acknowledge'
-			noticeService.hasUnacknowledgedNotices(whom)
+			noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 		when: 'notice is not active'
 			notice.active = false
 			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
-			!noticeService.hasUnacknowledgedNotices(whom)
+			!noticeService.hasUnacknowledgedNotices(project, null, whom)
 	}
 
 	void 'Test person unacknowledged notices with activation date'() {
@@ -133,14 +136,14 @@ class NoticeServiceIntegrationSpec extends Specification {
 			Notice notice = noticeService.saveOrUpdate(createNoticeCommand(project, activationDate, null, true, true))
 
 		then: 'person must have notices to acknowledge'
-			noticeService.hasUnacknowledgedNotices(whom)
+			noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 		when: 'activation date is future'
 			notice.activationDate = activationDate.plus(1)
 			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
-			!noticeService.hasUnacknowledgedNotices(whom)
+			!noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 	}
 
@@ -152,14 +155,14 @@ class NoticeServiceIntegrationSpec extends Specification {
 			Notice notice = noticeService.saveOrUpdate(createNoticeCommand(project, null, expirationDate, true, true))
 
 		then: 'person must have notices to acknowledge'
-			noticeService.hasUnacknowledgedNotices(whom)
+			noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 		when: 'expiration date is past'
 			notice.expirationDate = expirationDate.minus(1)
 			notice.save(flush: true)
 
 		then: 'person does not have notices to acknowledge'
-			!noticeService.hasUnacknowledgedNotices(whom)
+			!noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 	}
 
@@ -168,14 +171,14 @@ class NoticeServiceIntegrationSpec extends Specification {
 			Notice notice = noticeService.saveOrUpdate(createNoticeCommand(project, null, null, true, true))
 
 		then: 'person must have notices to acknowledge'
-			noticeService.hasUnacknowledgedNotices(whom)
+			noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 		when: 'person acknowledge a notice'
 			println(GormUtil.domainObjectToMap(user))
-			noticeService.ack(notice.id, user.username)
+			noticeService.acknowledge(project, null, notice.id, user.person) // cannot mock the session as we're not simulating the login and so the session won't have the required variables.
 
 		then: 'person does not have more notices to acknowledge'
-			!noticeService.hasUnacknowledgedNotices(whom)
+			!noticeService.hasUnacknowledgedNotices(project, null, whom)
 
 	}
 

@@ -13,6 +13,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;
+	private hasChanges: boolean;
 
 	constructor(
 		public field: FieldSettingsModel,
@@ -33,6 +34,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	 */
 	public validateModel(): void {
 		this.minIsValid = true;
+		this.hasChanges = true;
 		if (this.model.minSize > this.model.maxSize || this.model.minSize < 0) {
 			this.minIsValid = false;
 		}
@@ -43,7 +45,7 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	 */
 	public onSave(): void {
 		this.field.constraints = { ...this.model };
-		this.activeDialog.dismiss();
+		this.activeDialog.close(this.hasChanges);
 	}
 
 	/**

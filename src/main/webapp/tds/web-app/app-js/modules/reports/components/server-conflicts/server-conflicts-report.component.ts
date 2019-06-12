@@ -7,7 +7,9 @@ import {ReportComponent} from '../report.component';
 	selector: 'tds-server-conflicts-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
+																 (toggle)="toggleFilters($event)"
+																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -76,9 +78,9 @@ import {ReportComponent} from '../report.component';
 										<div class="col-sm-2 col-sm-offset-2 buttons">
 											<tds-button-custom class="btn-primary"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 										</div>
 									</div>
@@ -141,6 +143,7 @@ export class ServerConflictsReportComponent extends ReportComponent {
 					item.addEventListener('click', event => this.onAssetLinkClick(event));
 				})
 			}, 300);
+			this.generatedReport = true;
 		})
 	}
 }

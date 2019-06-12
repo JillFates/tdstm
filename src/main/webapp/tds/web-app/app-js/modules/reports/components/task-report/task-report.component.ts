@@ -8,7 +8,9 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 	selector: 'tds-task-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
+																 (toggle)="toggleFilters($event)"
+																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -59,9 +61,9 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 										<div class="col-sm-4 col-sm-offset-2 buttons">
 											<tds-button-custom class="btn-primary"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 											<tds-button-export
 												class="btn-primary"
@@ -129,6 +131,7 @@ export class TaskReportComponent extends ReportComponent {
 		this.generateReport('Generate Web').subscribe(result => {
 			this.hideFilters = true;
 			this.reportResult = this.reportsService.getSafeHtml(result);
+			this.generatedReport = true;
 		});
 	}
 

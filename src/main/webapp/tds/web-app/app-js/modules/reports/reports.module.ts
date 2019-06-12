@@ -16,16 +16,25 @@ import {InputsModule} from '@progress/kendo-angular-inputs';
 import { SortableModule } from '@progress/kendo-angular-sortable';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+// Components
+import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
+import {DatabaseConflictsComponent} from './components/database-conflicts/database-conflicts.component';
+import {DatabaseFiltersComponent} from './components/database-conflicts/components/database-filters.component';
+
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
+import { TagsResolveService } from '../assetManager/resolve/tags-resolve.service';
 // Services
 import {ReportsService} from './service/reports.service';
+import { TagService } from '../assetTags/service/tag.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {TaskReportComponent} from './components/task-report/task-report.component';
 import {ServerConflictsReportComponent} from './components/server-conflicts/server-conflicts-report.component';
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 import {ReportToggleFiltersComponent} from './components/report-toggle-filters.component';
+import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
+import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
 
 @NgModule({
 	imports: [
@@ -46,19 +55,31 @@ import {ReportToggleFiltersComponent} from './components/report-toggle-filters.c
 		ReportsRouteModule
 	],
 	declarations: [
+		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
+		DatabaseFiltersComponent,
 		PreEventCheckListSelectorComponent,
 		TaskReportComponent,
 		ServerConflictsReportComponent,
 		ApplicationEventResultsReportComponent,
+		ApplicationProfilesReportComponent,
 		ReportToggleFiltersComponent,
+		ActivityMetricsReportComponent
 	],
 	providers: [
-		ReportsService,
 		// Resolve
+		TagsResolveService,
 		ModuleResolveService,
+		// Services
+		ReportsService,
+		TagService,
 		TranslatePipe
 	],
-	exports: [PreEventCheckListSelectorComponent],
+	exports: [
+		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
+		PreEventCheckListSelectorComponent
+	],
 	entryComponents: []
 })
 

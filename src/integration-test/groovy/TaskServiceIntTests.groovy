@@ -1,7 +1,3 @@
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -12,17 +8,20 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.Provider
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.ServiceException
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
-import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
-import spock.lang.Ignore
 import spock.lang.See
 import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper
@@ -56,17 +55,16 @@ class TaskServiceIntTests extends Specification{
         sessionFactory = grailsApplication.getMainContext().getBean('sessionFactory')
     }
 
-    @Ignore
     void "test clean task data"() {
         setup:
             prepareMoveEventData()
             Person whom = personTestHelper.createPerson()
 
         when:
-            def listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull()
+            List<AssetComment> listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull([max: 10])
 
         then:
-            listAssetEntityNotNull.each { task ->
+            for(AssetComment task :listAssetEntityNotNull) {
                 task = taskService.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
                 task.actStart != null
                 task.assignedTo != null

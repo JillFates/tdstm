@@ -223,6 +223,11 @@ class UrlMappings {
 			action = [GET:"bundleData"]
 		}
 
+		"/ws/dashboard/getPlanningStats" {
+			controller = "wsDashboard"
+			action = [GET:"getDataForPlanningDashboard"]
+		}
+
 		"/ws/cookbook/recipe/list" {
 			controller = "wsCookbook"
 			action = [GET:"recipeList"]
@@ -377,6 +382,11 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/listTasks" {
+			controller = "wsTask"
+			action = [POST:"listTasks"]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
@@ -492,7 +502,7 @@ class UrlMappings {
 			action = [ GET: "modelForUserDashboard" ]
 		}
 
-		"/ws/user/assignedEvents" {
+		"/ws/user/assignedEvents/$project" {
 			controller = "wsUser"
 			action = [ GET: "getAssignedEvents" ]
 		}
@@ -626,6 +636,14 @@ class UrlMappings {
 		}
 
 		///// NOTICES API /////////
+
+		"/ws/notices/continue" {
+			controller = 'wsNotice'
+			action = [
+				GET: 'clearNoticesWhenNoMandatoryLeft'
+			]
+		}
+
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
@@ -643,14 +661,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/notices/$id/ack" {
+		"/ws/notices/$id/acknowledge" {
 			controller = "wsNotice"
 			action = [
 					POST: "acknowledge"
 			]
 		}
 
-		"/ws/notice/fetchPostNotices" {
+		"/ws/notices/fetchPostLoginNotices" {
 			controller = "wsNotice"
 			action = [
 					GET: "fetchPostLoginNotices"
@@ -1038,7 +1056,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateUnique/$name" {
+		"/ws/dataingestion/provider/validateUnique" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
@@ -1261,6 +1279,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/applicationConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getApplicationConflicts"
+			]
+		}
+
+		"/ws/reports/databaseConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getDatabaseConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [
@@ -1274,6 +1306,20 @@ class UrlMappings {
                     GET: "moveBundles"
             ]
         }
+
+		"/ws/reports/moveBundlesForSelection" {
+			controller = "wsReports"
+			action = [
+				GET: 'getMoveBundles'
+			]
+		}
+
+		"/ws/reports/appOwnersForBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+				GET: 'getOwnersForMoveBundle'
+			]
+		}
 
         "/ws/reports/generateServerConflicts" {
             controller = "wsReports"
@@ -1289,11 +1335,39 @@ class UrlMappings {
             ]
         }
 
+        "/ws/reports/appOwnerList/$moveBundleId" {
+            controller = "wsReports"
+            action = [
+                    GET: "appOwnerList"
+            ]
+        }
+
         "/ws/reports/generateApplicationMigration/$moveBundleId" {
             controller = "wsReports"
             action = [
                     GET: "applicationMigrationLists",
                     POST: "generateApplicationMigration"
+            ]
+        }
+
+        "/ws/reports/generateApplicationProfiles" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateApplicationProfiles"
+            ]
+        }
+
+        "/ws/reports/projectMetricsLists" {
+            controller = "wsReports"
+            action = [
+                    GET: "projectMetricsLists"
+            ]
+        }
+
+        "/ws/reports/generateProjectMetrics" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateProjectMetrics"
             ]
         }
 

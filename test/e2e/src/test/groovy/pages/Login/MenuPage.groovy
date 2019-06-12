@@ -13,13 +13,14 @@ import modules.PlanningMenuModule
 class MenuPage extends Page {
 
     static at = {
-        contextPath.value() == "/tdstm"
+        waitFor(5){menuModule.displayed}
     }
 
     static content = {
-        contextPath { $("input",id:"contextPath")}
+        waitFor{adminModule.displayed}
         menuModule { module MenuModule}
         adminModule { module AdminModule}
+        waitFor{projectsModule.displayed}
         projectsModule { module ProjectsMenuModule}
         assetsModule { module AssetsMenuModule}
         tasksModule { module TasksMenuModule}

@@ -47,27 +47,7 @@
 			$("#submitButton").click(function(e){
 				<g:if test="${noticeList && noticeList.size() > 0 && false}">
 					e.preventDefault();
-
-					$("#postLoginMessages").dialog({
-						resizable: false,
-						minWidth: 520,
-						modal: true,
-						position: ['center', 50]
-					});
-
-					$('#confirmAccess').click(function() {
-						$("#postLoginMessages").dialog('close');
-						$("#overlay").css('display', 'inline');
-						$("#submitButton").attr('disabled', true);
-						var form = $("form")[0];
-						form.submit();
-					});
-
-					$('#cancelAccess').click(function() {
-						$("#postLoginMessages").dialog('close');
-					});
-
-
+					
 					$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick" style="margin: -8px !important;"></span>');
 				</g:if>
 				<g:else>
@@ -149,7 +129,7 @@
 	<div class="login-box-body">
 		<div class="login-logo">
 			<a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
-				<asset:image src="images/TMLoginLogo.gif" border="0" alt="Learn more about TransitionManager" />
+				<asset:image src="images/TMLoginLogo_v4.7.png" border="0" alt="Learn more about TransitionManager" />
 			</a>
 		</div>
 		<g:if test="${preLoginList && preLoginList.size() > 0}">

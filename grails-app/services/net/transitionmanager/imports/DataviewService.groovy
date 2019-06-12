@@ -3,17 +3,6 @@
  */
 package net.transitionmanager.imports
 
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -23,20 +12,31 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.command.DataviewApiFilterParam
-import net.transitionmanager.command.DataviewApiParamsCommand
-import net.transitionmanager.command.DataviewNameValidationCommand
-import net.transitionmanager.command.DataviewUserParamsCommand
-import net.transitionmanager.dataview.FieldSpec
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.command.dataview.DataviewApiFilterParam
+import net.transitionmanager.command.dataview.DataviewApiParamsCommand
+import net.transitionmanager.command.dataview.DataviewNameValidationCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.dataview.FieldSpecProject
-import net.transitionmanager.imports.Dataview
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.FavoriteDataview
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.service.dataview.DataviewSpec
+import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
+import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
+import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
@@ -415,7 +415,8 @@ class DataviewService implements ServiceMethods {
             select $hqlColumns
               from AssetEntity AE
                 $hqlJoins
-             where AE.project = :project and $conditions
+             where AE.project = :project 
+			   and $conditions
 		  group by AE.id
           order by $hqlOrder
         """
@@ -662,106 +663,143 @@ class DataviewService implements ServiceMethods {
 	 * @param project
      * @return
      */
-	private Map hqlWhere(DataviewSpec dataviewSpec, Project project) {
+	private Map<String, ?> hqlWhere(DataviewSpec dataviewSpec, Project project) {
 
-		// List of conditions for the WHERE clause.
-		List whereConditions = []
-		// Params for the WHERE
-		Map whereParams = [project: project]
+		DataviewHqlWhereCollector whereCollector = new DataviewHqlWhereCollector()
+		whereCollector.addParams([project: project ])
 
 		if(!dataviewSpec.domains.isEmpty()){
-			whereConditions << "AE.assetClass in (:assetClasses)"
-			whereParams << ["assetClasses" : dataviewSpec.domains.findResults { AssetClass.safeValueOf(it.toUpperCase())}]
+			whereCollector.addCondition("AE.assetClass in (:assetClasses)")
+				.addParams([
+				"assetClasses": dataviewSpec.domains.findResults { AssetClass.safeValueOf(it.toUpperCase()) }
+			])
 		}
 
 		if (dataviewSpec.justPlanning != null) {
-			whereConditions << "AE.moveBundle in (:moveBundles)"
-			whereParams << [
-					moveBundles: MoveBundle.where {
-						project == project && useForPlanning == dataviewSpec.justPlanning
-					}.list()
-			]
+			whereCollector.addCondition("AE.moveBundle in (:moveBundles)")
+				.addParams([
+				moveBundles: MoveBundle.where {
+					project == project && useForPlanning == dataviewSpec.justPlanning
+				}.list()
+			])
 		}
 
 		// Populate this list with the mix fields that the user is using for filtering.
 		Map<String, List> mixedFieldsInfo = [:]
 
+		// Iterate over each column
+		dataviewSpec.columns.each { Map column ->
+			addColumnFilter(column, project, whereCollector, mixedFieldsInfo)
+		}
+
+		// There are 2 types of extra filters:
+		// 1) A simple extra filter like assetName == 'FOO', or application.appTech == 'Apple' or 'moveBundle.id' == '2323'
+		dataviewSpec.fieldNameExtraFilters?.each { FieldNameExtraFilter extraFilter ->
+			addColumnFilter(extraFilter.properties, project, whereCollector, mixedFieldsInfo)
+		}
+
+		// 2) Special extra filters resolved in {@code SpecialExtraFilter} class hierarchy
+		dataviewSpec.specialExtraFilters?.each { SpecialExtraFilter extraFilter ->
+			Map<String, ?> hqlExtraFilters = extraFilter.generateHQL(project)
+			whereCollector.addCondition(hqlExtraFilters.hqlExpression).addParams(hqlExtraFilters.hqlParams)
+		}
+
+		return [
+			conditions: whereCollector.conditions.join("\n\t\t\t   and "),
+			params: whereCollector.params,
+			mixedFields: mixedFieldsInfo
+		]
+	}
+
+	/**
+	 * <p>Add a column filter results in HSQL sentence.</p>
+	 * <p>It uses {@code DataviewHqlWhereCollector} </p>
+	 * @param column
+	 * @param project
+	 * @param whereCollector
+	 * @param mixedKeys
+	 * @param mixedFieldsInfo
+	 */
+	private void addColumnFilter(
+		Map<String, ?> column,
+		Project project,
+		DataviewHqlWhereCollector whereCollector,
+		Map<String, List> mixedFieldsInfo) {
+
 		// The keys for all the declared mixed fields.
 		Set mixedKeys = mixedFields.keySet()
 
-		Map additionalInfo = [:]
+		Class type = typeFor(column)
+		String filter = filterFor(column)
 
-		// Iterate over each column
-		dataviewSpec.columns.each { Map column ->
-
-			Class type = typeFor(column)
-			// Check if the user provided a filter expression.
+		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
 			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
-			if (StringUtil.isNotBlank(filterFor(column)) && !(type in [Date, Timestamp])) {
 
-				// Create a basic FieldSearchData with the info for filtering an individual field.
-				FieldSearchData fieldSearchData = new FieldSearchData([
-						column: propertyFor(column),
-						columnAlias: namedParameterFor(column),
-						domain: domainFor(column),
-						filter: filterFor(column),
-						type: type,
-						whereProperty: wherePropertyFor(column),
-						manyToManyQueries: manyToManyQueriesFor(column),
-						fieldSpec: column.fieldSpec
-				])
+			String property = propertyFor(column)
 
-				String property = propertyFor(column)
-				// Check if the current column requires special treatment (e.g. startupBy, etc.)
+			// Create a basic FieldSearchData with the info for filtering an individual field.
+			FieldSearchData fieldSearchData = new FieldSearchData([
+				column           : property,
+				columnAlias      : namedParameterFor(column),
+				domain           : domainFor(column),
+				filter           : filter,
+				type             : type,
+				whereProperty    : wherePropertyFor(column),
+				manyToManyQueries: manyToManyQueriesFor(column),
+				domainAlias: 	'AE',
+				referenceProperty: column.referenceProperty,
+				fieldSpec        : column.fieldSpec
+			])
 
-				if (property in mixedKeys) {
-					// Flag the fieldSearchData as mixed.
-					fieldSearchData.setMixed(true)
-					// Retrieve the additional results (e.g: persons matching the filter).
-					Closure sourceForField = sourceFor(property)
-					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
-					if (additionalResults) {
-						// Keep a copy of this results for later use.
-						mixedFieldsInfo[property] = additionalResults
-						// Add additional information for the query (e.g: the staff ids for IN clause).
-						Closure paramsInjector = injectWhereParamsFor(property)
-						paramsInjector(fieldSearchData, property, additionalResults)
-						// Add the sql where clause for including the additional fields in the query
-						Closure whereInjector = injectWhereClauseFor(property)
-						whereInjector(fieldSearchData, property)
-					} else {
-					// If no additional results, then unset the flag as no additional filtering should be required.
-						fieldSearchData.setMixed(false)
-					}
 
-				}
+			// Check if the current column requires special treatment (e.g. startupBy, etc.)
 
-				// Trigger the parsing of the parameter.
-				SqlUtil.parseParameter(fieldSearchData)
-
-				if (fieldSearchData.sqlSearchExpression) {
-					// Append the where clause to the list of conditions.
-					whereConditions << fieldSearchData.sqlSearchExpression
-				}
-
-				if (fieldSearchData.sqlSearchParameters) {
-					// Add the parameters required for this field.
-					whereParams += fieldSearchData.sqlSearchParameters
-				}
-
-			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
-			} else {
-				String property = propertyFor(column)
-				if (property in mixedKeys) {
-					Closure sourceForField = sourceFor(property)
-					Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
+			if (property in mixedKeys) {
+				// Flag the fieldSearchData as mixed.
+				fieldSearchData.setMixed(true)
+				// Retrieve the additional results (e.g: persons matching the filter).
+				Closure sourceForField = sourceFor(property)
+				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
+				if (additionalResults) {
 					// Keep a copy of this results for later use.
 					mixedFieldsInfo[property] = additionalResults
+					// Add additional information for the query (e.g: the staff ids for IN clause).
+					Closure paramsInjector = injectWhereParamsFor(property)
+					paramsInjector(fieldSearchData, property, additionalResults)
+					// Add the sql where clause for including the additional fields in the query
+					Closure whereInjector = injectWhereClauseFor(property)
+					whereInjector(fieldSearchData, property)
+				} else {
+					// If no additional results, then unset the flag as no additional filtering should be required.
+					fieldSearchData.setMixed(false)
 				}
 			}
-		}
 
-		return [conditions: whereConditions.join(" AND \n"), params: whereParams, mixedFields: mixedFieldsInfo]
+			// Trigger the parsing of the parameter.
+			SqlUtil.parseParameter(fieldSearchData)
+
+			if (fieldSearchData.sqlSearchExpression) {
+				// Append the where clause to the list of conditions.
+				// hqlWhereConditions << fieldSearchData.sqlSearchExpression
+				whereCollector.addCondition(fieldSearchData.sqlSearchExpression)
+			}
+
+			if (fieldSearchData.sqlSearchParameters) {
+				// Add the parameters required for this field.
+				// hqlWhereParams += fieldSearchData.sqlSearchParameters
+				whereCollector.addParams(fieldSearchData.sqlSearchParameters)
+			}
+
+			// If the filter for this column is empty, some logic/transformation might still be required for the mixed fields
+		} else {
+			String property = propertyFor(column)
+			if (property in mixedKeys) {
+				Closure sourceForField = sourceFor(property)
+				Map additionalResults = sourceForField(project, filterFor(column), mixedFieldsInfo)
+				// Keep a copy of this results for later use.
+				mixedFieldsInfo[property] = additionalResults
+			}
+		}
 	}
 
     /**
@@ -784,8 +822,18 @@ class DataviewService implements ServiceMethods {
 		return "${orderFor(dataviewSpec.order)} ${dataviewSpec.order.sort}"
     }
 
+	/**
+	 * Defines a named parameers
+	 * @param column
+	 * @return
+	 */
     private static String namedParameterFor(Map column) {
-		return transformations[column.property].namedParameter
+
+		if (column.referenceProperty) {
+			return column.property
+		} else {
+			return  transformations[column.property].namedParameter
+		}
     }
 
 	/**
@@ -795,11 +843,13 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String propertyFor(Map column) {
 
-		String property = transformations[column.property].property
-		FieldSpec fieldSpec = column.fieldSpec
-
-		if(fieldSpec?.isCustom()){
-			property = fieldSpec.getHibernateCastSentence(property)
+		String property
+		if (column.referenceProperty) {
+			property = 'AE.' + column.property + '.' + column.referenceProperty
+		} else if (column.fieldSpec?.isCustom()) {
+			property = column.fieldSpec.getHibernateCastSentence(column.property)
+		}  else {
+			property = transformations[column.property].property
 		}
 
 		return property
@@ -820,11 +870,13 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static Class typeFor(Map column) {
 
-		Class type = transformations[column.property].type
-		FieldSpec fieldSpec = column.fieldSpec
-
-		if (fieldSpec?.isCustom()) {
-			type = fieldSpec.getClassType()
+		Class type
+		if (column.referenceProperty) {
+			type = Long
+		} else if (column.fieldSpec?.isCustom()) {
+			type = column.fieldSpec.getClassType()
+		} else {
+			type = transformations[column.property].type
 		}
 
 		return type
@@ -909,6 +961,17 @@ class DataviewService implements ServiceMethods {
 	 */
 	private static String manyToManyParameterNameFor(Map column) {
 		return transformations[column.property].manyToManyParameterName
+	}
+
+
+	/**
+	 * Return the domain alias for the domain of the given field. This will be useful for handling special cases,
+	 * such as custom fields, where additional columns need to be queried.
+	 * @param column
+	 * @return
+	 */
+	private static domainAliasFor(Map column) {
+		return transformations[column.property].domainAlias
 	}
 
 
@@ -1162,7 +1225,7 @@ class DataviewService implements ServiceMethods {
 		],
 
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where", domainAlias: "AE"]
     }
 
 	/**
