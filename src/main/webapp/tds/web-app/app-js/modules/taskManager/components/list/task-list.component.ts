@@ -93,7 +93,10 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 						[filterable]="true"
 						(filterChange)="grid.filterChange($event)"
 						[resizable]="true"
-						[columnMenu]="true">
+						[columnMenu]="true"
+						[sort]="grid.state.sort"
+						[sortable]="{mode:'single'}"
+						(sortChange)="grid.sortChange($event)">
 						<!-- Column Menu -->
 						<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
 							<div class="k-column-list">
