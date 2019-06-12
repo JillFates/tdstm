@@ -30,7 +30,7 @@ class TagsPage extends Page{
         firstTagSaveButton { firstTagActions.find(".k-grid-save-command").find("button", title:"Save")}
         firstTagCancelButton { firstTagActions.find(".k-grid-cancel-command").find("button", title:"Cancel")}
         firstTagEditButton {$(class:"tds-action-button-set").find(class:"k-grid-edit-command").find("button", title:"Edit")}
-        firstTagRemoveButton { firstTagActions.find(".k-grid-remove-command")}
+        firstTagRemoveButton { firstTagActions.find(class:"tds-action-button-set").find("tds-button-delete").find("button", title:"Delete")}
         firstTagName { tagsGridDataRows.find("td", "aria-colindex": "2")[0]}
         firstTagDesc { tagsGridDataRows.find("td", "aria-colindex": "3")[0]}
         firstTagColor { tagsGridDataRows.find("td", "aria-colindex": "4")[0]}
