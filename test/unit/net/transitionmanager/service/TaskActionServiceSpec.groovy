@@ -180,7 +180,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus started'() {
 		setup:  'given a populated progress ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'started',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
@@ -199,7 +198,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus progress'() {
 		setup: 'given a populated progress ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'progress',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
@@ -218,7 +216,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus error'() {
 		setup: 'given a populated error ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'error',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
@@ -237,7 +234,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus success'() {
 		setup: 'given a populated success ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'success',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
@@ -257,7 +253,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus error with exception thrown in invokeReactionScript'() {
 			setup: 'given and error Action Command, where the invokeReactionScript will throw an exception.'
 				ActionCommand action = new ActionCommand(
-					state: 'error',
 					message: 'some message',
 					progress: 5,
 					stdout: 'output message',
@@ -294,7 +289,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript'() {
 			setup: 'given and success Action Command, where the invokeReactionScript will throw an exception.'
 				ActionCommand action = new ActionCommand(
-					state: 'success',
 					message: 'some message',
 					progress: 5,
 					stdout: 'output message',
@@ -331,7 +325,6 @@ class TaskActionServiceSpec extends Specification {
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript for success but not error reaction scripts'() {
 				setup: 'given and success Action Command, where the invokeReactionScript will throw an exception for success scripts only.'
 					ActionCommand action = new ActionCommand(
-						state: 'success',
 						message: 'some message',
 						progress: 5,
 						stdout: 'output message',
