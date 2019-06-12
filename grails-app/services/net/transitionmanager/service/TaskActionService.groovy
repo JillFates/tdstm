@@ -106,10 +106,6 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 */
 	private void addMessageToTaskNotes(String message, AssetComment task, Person currentPerson) {
-		if (!task.assetEntity) {
-			throw new InvalidParamException("The task $task.comment, is not associated with an asset.")
-		}
-
 		if (message) {
 			taskService.addNote(task, currentPerson, message)
 		}
