@@ -18,7 +18,10 @@ class TaskController implements ControllerMethods {
 
 
 	static allowedMethods = [
-		action: 'POST',
+		actionStarted: 'POST',
+		actionProgress: 'POST',
+		actionDone: 'POST',
+		actionError: 'POST',
 		delete: 'DELETE',
 		update: ['POST', 'PUT']
 	]
@@ -33,7 +36,6 @@ class TaskController implements ControllerMethods {
 	 * @return a success JSON if the status was updated.
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	@HasPermission(Permission.ActionRemoteAllowed)
 	def actionStarted(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
@@ -53,7 +55,6 @@ class TaskController implements ControllerMethods {
 	 * @return a success JSON if the status was updated.
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	@HasPermission(Permission.ActionRemoteAllowed)
 	def actionProgress(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
@@ -73,7 +74,6 @@ class TaskController implements ControllerMethods {
 	 * @return a success JSON if the status was updated.
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	@HasPermission(Permission.ActionRemoteAllowed)
 	def actionDone(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
@@ -93,7 +93,6 @@ class TaskController implements ControllerMethods {
 	 * @return a success JSON if the status was updated.
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	@HasPermission(Permission.ActionRemoteAllowed)
 	def actionError(Long id) {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
