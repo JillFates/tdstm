@@ -7,7 +7,6 @@ import grails.transaction.Transactional
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionThreadLocalVariable
 import net.transitionmanager.integration.ApiActionJob
@@ -16,7 +15,6 @@ import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.web.multipart.MultipartFile
-
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
  */
@@ -27,6 +25,7 @@ class TaskActionService implements ServiceMethods {
 	FileSystemService fileSystemService
 	ApiActionService  apiActionService
 	AssetService      assetService
+	SecurityService   securityService
 
 	/**
 	 * Handles updating the action status when the action was started.
@@ -35,10 +34,10 @@ class TaskActionService implements ServiceMethods {
 	 * @see net.transitionmanager.command.task.ActionCommand *
 	 * @param taskId The task that the action command it tied to.
 	 * @param currentPerson The currently logged in person.
-	 * @param currentProject The current project that the person belongs to.
 	 */
-	void actionStarted(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
-		AssetComment task = get(AssetComment, taskId, currentProject)
+	void actionStarted(ActionCommand action, Long taskId, Person currentPerson) {
+		securityService.hasAccessToProject(action.project)
+		AssetComment task = get(AssetComment, taskId, action.project)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		taskService.addNote(task, currentPerson, "${task?.apiAction?.name ?: ''} started at ${new Date().format(TimeUtil.FORMAT_DATE_ISO8601)}")
@@ -52,10 +51,10 @@ class TaskActionService implements ServiceMethods {
 	 * @see net.transitionmanager.command.task.ActionCommand *
 	 * @param taskId The task that the action command it tied to.
 	 * @param currentPerson The currently logged in person.
-	 * @param currentProject The current project that the person belongs to.
 	 */
-	void actionProgress(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
-		AssetComment task = get(AssetComment, taskId, currentProject)
+	void actionProgress(ActionCommand action, Long taskId, Person currentPerson) {
+		securityService.hasAccessToProject(action.project)
+		AssetComment task = get(AssetComment, taskId, action.project)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		task.apiActionPercentDone = action.progress
@@ -70,10 +69,10 @@ class TaskActionService implements ServiceMethods {
 	 * @see net.transitionmanager.command.task.ActionCommand *
 	 * @param taskId The task that the action command it tied to.
 	 * @param currentPerson The currently logged in person.
-	 * @param currentProject The current project that the person belongs to.
 	 */
-	void actionDone(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
-		AssetComment task = get(AssetComment, taskId, currentProject)
+	void actionDone(ActionCommand action, Long taskId, Person currentPerson) {
+		securityService.hasAccessToProject(action.project)
+		AssetComment task = get(AssetComment, taskId, action.project)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
@@ -89,10 +88,10 @@ class TaskActionService implements ServiceMethods {
 	 * @see net.transitionmanager.command.task.ActionCommand *
 	 * @param taskId The task that the action command it tied to.
 	 * @param currentPerson The currently logged in person.
-	 * @param currentProject The current project that the person belongs to.
 	 */
-	void actionError(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
-		AssetComment task = get(AssetComment, taskId, currentProject)
+	void actionError(ActionCommand action, Long taskId, Person currentPerson) {
+		securityService.hasAccessToProject(action.project)
+		AssetComment task = get(AssetComment, taskId, action.project)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
