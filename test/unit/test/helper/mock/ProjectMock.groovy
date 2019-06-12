@@ -22,16 +22,23 @@ class ProjectMock {
 		int completionDateMonth = DateBuilder.DECEMBER
 		int completionDateDay = 15
 		Date completionDate = newDate()
-				  .inYear(completionDateYear)
-				  .inMonth(completionDateMonth)
-				  .onDay(completionDateDay)
-				  .build()
+			.inYear(completionDateYear)
+			.inMonth(completionDateMonth)
+			.onDay(completionDateDay)
+			.build()
 		completionDate.clearTime()
+		String guid = '012345678901234567890123456789012345'
+		String workflowCode = 'workflow code 123'
+
 
 		Project project = new Project(
-				  name: projectName, projectCode: projectCode,
-				  completionDate: completionDate, description: projectDescription,
-				  client: new PartyGroup(name: projectClientName)
+			name: projectName,
+			projectCode: projectCode,
+			completionDate: completionDate,
+			description: projectDescription,
+			client: new PartyGroup(name: projectClientName),
+			guid: guid,
+			workflowCode: workflowCode
 		)
 
 		project.id = projectId
