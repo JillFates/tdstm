@@ -85,6 +85,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected httpMethodList = new Array<any>();
 	public agentCredentialList = new Array<CredentialModel>();
 	public providerCredentialList = new Array<CredentialModel>();
+	public transitionManagerCredentials = new Array<CredentialModel>();
 	public datascriptList = new Array<DataScriptModel>();
 	public providerDatascriptList = new Array<DataScriptModel>();
 	public parameterList: Array<any>;
@@ -106,6 +107,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected actionTypesList = [];
 	protected  remoteCredentials = [];
 	protected defaultItem = {id: '', value: 'Please Select'};
+	public SUPPLIED_CREDENTIAL = 'SUPPLIED';
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -302,6 +304,7 @@ export class APIActionViewEditComponent implements OnInit {
 					this.modifySignatureByProperty('credential');
 				}
 				this.agentCredentialList.push(...result);
+				this.transitionManagerCredentials = result.map((item) => ({id: item.id, value: item.name}));
 				this.getDataScripts();
 			},
 			(err) => console.log(err));
@@ -1048,5 +1051,14 @@ export class APIActionViewEditComponent implements OnInit {
 	*/
 	isRemote(): boolean {
 		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== 'WEB_API');
+	}
+
+	/**
+	 * Determine if the current credential type selected is Supplied by Transition Manager
+	*/
+	isSuppliedCredential(): boolean {
+		const id = R.pathOr('', ['remoteCredentialMethod', 'id'], this.apiActionModel);
+
+		return id === this.SUPPLIED_CREDENTIAL;
 	}
 }

@@ -194,6 +194,7 @@ export class APIActionModel {
 	eventReactions?: EventReaction[];
 	version?: number;
 	remoteCredentialMethod?: any;
+	providedCredential?: any;
 
 	constructor() {
 		this.name = '';
