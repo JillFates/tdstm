@@ -19,9 +19,9 @@ import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
-import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.Setting
@@ -31,13 +31,11 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.IgnoreRest
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
