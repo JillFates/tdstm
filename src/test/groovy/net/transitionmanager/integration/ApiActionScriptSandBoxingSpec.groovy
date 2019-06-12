@@ -1,12 +1,12 @@
 package net.transitionmanager.integration
 
-import com.tdsops.etl.ETLProcessor
+
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.security.ScriptExpressionChecker
 import net.transitionmanager.task.TaskFacade
-import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -145,26 +145,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			def executeExpressionChecker = { expression ->
-				if (expression instanceof MethodCallExpression) {
-					if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-						((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-						return false
-					}
-
-					if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-						!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-						return false
-					}
-
-				}
-
-				return true
-
-			} as SecureASTCustomizer.ExpressionChecker
-
-			secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
-
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -322,26 +303,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			def executeExpressionChecker = { expression ->
-				if (expression instanceof MethodCallExpression) {
-					if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-						((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-						return false
-					}
-
-					if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-						!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-						return false
-					}
-
-				}
-
-				return true
-
-			} as SecureASTCustomizer.ExpressionChecker
-
-			secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
-
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -451,26 +413,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			def executeExpressionChecker = { expression ->
-				if (expression instanceof MethodCallExpression) {
-					if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-						((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-						return false
-					}
-
-					if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-						!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-						return false
-					}
-
-				}
-
-				return true
-
-			} as SecureASTCustomizer.ExpressionChecker
-
-			secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
-
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -579,26 +522,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			def executeExpressionChecker = { expression ->
-				if (expression instanceof MethodCallExpression) {
-					if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-						((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-						return false
-					}
-
-					if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-						!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-						return false
-					}
-
-				}
-
-				return true
-
-			} as SecureASTCustomizer.ExpressionChecker
-
-			secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
-
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 //			customizer.addStaticStars('java.lang.Math')
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
@@ -679,25 +603,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			def executeExpressionChecker = { expression ->
-				if (expression instanceof MethodCallExpression) {
-					if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-						((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-						return false
-					}
-
-					if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-						!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-						return false
-					}
-
-				}
-
-				return true
-
-			} as SecureASTCustomizer.ExpressionChecker
-
-			secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
