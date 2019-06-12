@@ -185,6 +185,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
+		this.apiActionModel.isRemote = this.isRemote();
 
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
@@ -1033,11 +1034,19 @@ export class APIActionViewEditComponent implements OnInit {
 		if (language) {
 			this.codeMirror.mode = language
 		}
+		this.apiActionModel.isRemote = this.isRemote();
 	}
 
 	getClonedCodeMirrorSettings(properties: any): any {
 		const cloned =  Object.assign({}, this.codeMirror, properties);
 
 		return cloned;
+	}
+
+	/**
+	 * Based on the action type determines if the invocation is remote
+	*/
+	isRemote(): boolean {
+		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== 'WEB_API');
 	}
 }

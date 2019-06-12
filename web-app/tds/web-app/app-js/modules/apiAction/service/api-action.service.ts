@@ -240,6 +240,7 @@ export class APIActionService {
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
 			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
 			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
+			isRemote: model.isRemote
 		};
 
 		const actionType = (model.actionType && model.actionType.id) || '';

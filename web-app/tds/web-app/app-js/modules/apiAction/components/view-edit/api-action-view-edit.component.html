@@ -454,11 +454,12 @@
 											<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												       <!-- [checked]="isRemote()" -->
 												<input type="checkbox"
 												       id="simpleApiActionRemote"
 												       name="simpleApiActionRemote"
-												       tabindex="5"
-												       [checked]="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'"
+													   tabindex="5"
+													   [(ngModel)]="apiActionModel.isRemote"
 												       [disabled]="true"
 												       class="form-check-input aligned-checkbox" />
 
