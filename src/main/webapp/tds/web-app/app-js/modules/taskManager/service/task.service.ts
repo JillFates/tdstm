@@ -411,7 +411,16 @@ export class TaskService {
 			sord: 'asc',
 		}
 		return this.http.post(this.TASK_LIST_URL, request).pipe(
-			map((response: any) => response),
+			map((response: any) => {
+				if (response.rows) {
+					response.rows = response.rows.map( item => {
+						let newItem = {...item};
+						newItem.taskNumber = newItem.taskNumber.toString();
+						return newItem;
+					})
+				}
+				return response;
+			}),
 			catchError(error => {
 				console.error(error);
 				return error;

@@ -42,7 +42,7 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 							<label for="two">
 								<input
 									type="checkbox"
-									name="c"
+									name="two"
 									id="two"
 									[(ngModel)]="justMyTasks"
 									(ngModelChange)="onFiltersChange()">
@@ -89,6 +89,9 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 						[skip]="grid.state.skip"
 						[pageable]="{pageSizes: grid.defaultPageOptions, info: true}"
 						(pageChange)="grid.pageChange($event)"
+						[filter]="grid.state.filter"
+						[filterable]="true"
+						(filterChange)="grid.filterChange($event)"
 						[resizable]="true"
 						[columnMenu]="true">
 						<!-- Column Menu -->
@@ -148,6 +151,7 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 															 [class]="column.cellClass ? column.cellClass : ''"
 															 [style]="column.cellStyle ? column.cellStyle : ''"
 															 [width]="!column.width ? 100 : column.width"
+															 [filterable]=""
 															 [columnMenu]="column.columnMenu">
 							<!-- Header -->
 							<ng-template kendoGridHeaderTemplate>
@@ -162,6 +166,16 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 							<!-- status -->
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
 								<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
+							</ng-template>
+							<ng-template kendoGridFilterCellTemplate let-filter>
+								<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom:0px;">
+									<div *ngIf="column.type === 'text'; then stringFilter"></div>
+									<ng-template #stringFilter>
+										<input [(ngModel)]="column.filter" (keyup)="grid.onFilter(column)"
+													 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
+										<span *ngIf="column.filter" (click)="grid.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback"></span>
+									</ng-template>
+								</div>
 							</ng-template>
 						</kendo-grid-column>
 					</kendo-grid>

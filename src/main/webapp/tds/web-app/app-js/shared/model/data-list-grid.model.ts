@@ -30,6 +30,7 @@ export class GridColumnModel {
 	locked ? = false;
 	hidden ? = false;
 	filter?: any;
+	filterable ? = false;
 	headerStyle?: any;
 	headerClass?: Array<string>;
 	cellStyle?: any;

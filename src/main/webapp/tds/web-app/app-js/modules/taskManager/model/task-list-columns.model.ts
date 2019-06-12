@@ -4,16 +4,18 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
 		label: 'Task',
 		property: 'taskNumber',
-		type: 'number',
+		type: 'text',
 		width: 70,
-		locked: false
+		locked: false,
+		filterable: true
 	},
 	{
 		label: 'Description',
 		property: 'comment',
 		type: 'text',
 		width: 200,
-		locked: false
+		locked: false,
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol0',
@@ -21,7 +23,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 130,
 		locked: false,
-		columnMenu: true
+		columnMenu: true,
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol1',
@@ -29,7 +32,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 130,
 		locked: false,
-		columnMenu: true
+		columnMenu: true,
+		filterable: true
 	},
 	{
 		label: 'Updated',
@@ -52,7 +56,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 80,
 		locked: false,
-		cellClass: 'task-status'
+		cellClass: 'task-status',
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol2',
@@ -60,7 +65,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 130,
 		locked: false,
-		columnMenu: true
+		columnMenu: true,
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol3',
@@ -68,7 +74,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 130,
 		locked: false,
-		columnMenu: true
+		columnMenu: true,
+		filterable: true
 	},
 	{
 		label: 'userSelectedCol4',
@@ -76,12 +83,13 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 130,
 		locked: false,
-		columnMenu: true
+		columnMenu: true,
+		filterable: true
 	},
 	{
 		label: 'Suc.',
 		property: 'assetName',
-		type: 'text',
+		type: 'number',
 		width: 50,
 		locked: false
 	},
