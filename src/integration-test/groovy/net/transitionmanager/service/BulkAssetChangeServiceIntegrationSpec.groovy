@@ -37,6 +37,7 @@ import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.IgnoreRest
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
@@ -45,7 +46,7 @@ import test.helper.PersonTestHelper
 
 @Integration
 @Rollback
-class BulkAssetChangeServiceIntegrationSpec extends  Specification implements AllAssetsFilterUnitTest {
+class BulkAssetChangeServiceIntegrationSpec extends Specification {
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
 
@@ -188,7 +189,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification implements Al
 
 			now = TimeUtil.nowGMT().clearTime()
 
-			dataviewUserParamsCommand = new DataviewUserParamsCommand(allAssetsDataviewMap)
+			dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [ domains: [] ], sortDomain: 'device', sortProperty: 'id'])
 			bulkChangeCommand = new BulkChangeCommand(
 				userParams: dataviewUserParamsCommand,
 				dataViewId: 1,
