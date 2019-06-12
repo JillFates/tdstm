@@ -76,7 +76,7 @@ class TaskActionService implements ServiceMethods {
 		AssetComment task = get(AssetComment, taskId, currentProject)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
-		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.stdout, action.stderr, 1, action.data, action.datafile)
+		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
 		task.apiActionPercentDone = 100
 		task.save()
@@ -95,7 +95,7 @@ class TaskActionService implements ServiceMethods {
 		AssetComment task = get(AssetComment, taskId, currentProject)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 
-		invokeReactionScript(ReactionScriptCode.ERROR, task, action.stdout, action.stderr, 0)
+		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
 	}
 
 	/**
@@ -128,9 +128,10 @@ class TaskActionService implements ServiceMethods {
 	private void invokeReactionScript(
 		ReactionScriptCode code,
 		AssetComment task,
+		String message,
 		String stdout,
 		String stderr,
-		Integer status,
+		boolean successful,
 		JSONObject data = null,
 		List<MultipartFile> datafile = null) {
 
@@ -148,10 +149,10 @@ class TaskActionService implements ServiceMethods {
 			originalFilename: datafile ? datafile[0].originalFilename : null,
 			filename: filenames ? filenames[0] : null,
 			data: data,
-			output: stdout,
-			error: stderr,
-			status: status,
-			successful: status
+			message: message,
+			stdout: stdout,
+			stderr: stderr,
+			successful: successful
 		)
 
 		try {
