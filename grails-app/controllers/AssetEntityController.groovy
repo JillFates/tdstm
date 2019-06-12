@@ -1368,20 +1368,38 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	/**
 	 * Get assetColumn value based on field name. .
 	 */
-	private taskManagerValues(value, task) {
+	private taskManagerValues(String fieldName, AssetComment task) {
 		def result
-		switch (value) {
-			case 'assetName': result = task.assetEntity?.assetName; break
-			case 'assetType': result = task.assetEntity?.assetType; break
-			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
-			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
-			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
+		switch (fieldName) {
+			case 'apiAction':
+				result = task.apiAction?.toString()
+				break
+			case 'assetName':
+				result = task.assetEntity?.assetName
+				break
+			case 'assetType':
+				result = task.assetEntity?.assetType
+				break
+			case 'assignedTo':
+				result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: '')
+				break
+			case 'resolvedBy':
+				result = task.resolvedBy?.toString() ?: ''
+				break
+			case 'createdBy':
+				result = task.createdBy?.toString() ?: ''
+				break
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
-				result = TimeUtil.formatDateTime(task[value])
-			break
-			case "event": result = task.moveEvent?.name; break
-			case "bundle": result = task.assetEntity?.moveBundle?.name; break
-			default: result = task[value]
+				result = TimeUtil.formatDateTime(task[fieldName])
+				break
+			case "event":
+				result = task.moveEvent?.name
+				break
+			case "bundle":
+				result = task.assetEntity?.moveBundle?.name
+				break
+			default:
+				result = task[fieldName]
 		}
 		return result
 	}

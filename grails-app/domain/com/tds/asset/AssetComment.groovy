@@ -433,12 +433,13 @@ class AssetComment {
 
 	// task Manager column header names and its labels
 	static final Map<String, String> taskCustomizeFieldAndLabel = [
-		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
-		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
-		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',
-		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', lastUpdated: 'Last Updated', sendNotification: 'Send Notification',
-		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
-		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
+		actFinish: 'Actual Finish', actStart: 'Actual Start', apiAction: 'Action Name', apiActionPercentDone: 'Action Progress %',
+		assetName: 'Asset Name', assetType: 'Asset Type', assignedTo: 'Assigned To', category: 'Category',
+		bundle: 'Move Bundle', commentType: 'Comment Type', createdBy: 'Created By', dateCreated: 'Date Created',
+		dateResolved: 'Date Resolved', displayOption: 'Display Option', duration: 'Duration',
+		durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', event: 'Move Event',
+		hardAssigned: 'Hard Assignment', instructionsLink: 'Instructions Link', isPublished: 'Is Published', lastUpdated: 'Last Updated',
+		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team', sendNotification: 'Send Notification',
+		statusUpdated: 'Status Updated', taskPercentDone: 'Task Progress %', taskSpec: 'TaskSpec ID'
 	].asImmutable()
 }

@@ -427,6 +427,8 @@ class AssetCommentQueryBuilder {
 	 */
 	Map fieldsInfoMap = [
 		'actStart':             [property: 'ac.actStart', builder: likeBuilder, type: Date],
+		'apiAction':            [property: 'ac.apiAction.name', builder: likeBuilder],
+		'apiActionPercentDone': [property: 'ac.apiActionPercentDone', builder: eqBuilder, type: Integer],
 		'assetName':            [property: 'ac.assetEntity.assetName', builder: likeBuilder],
 		'assetType':            [property: 'ac.assetEntity.assetType', builder: likeBuilder],
 		'assignedTo':           [property: SqlUtil.personFullName('assignedTo','ac'), builder: likeBuilder],
@@ -463,6 +465,7 @@ class AssetCommentQueryBuilder {
 		'sendNotification':     [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status':               [property: 'ac.status', builder: likeBuilder],
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
+		'taskPercentDone':      [property: 'ac.taskPercentDone', builder: eqBuilder, type: Integer],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
 		'viewUnpublished':      [builder: viewUnpublishedBuilder],
