@@ -107,7 +107,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				return '/projectUtil'
 			}
 			if (startPage == StartPageEnum.CURRENT_DASHBOARD.value || startPage == StartPageEnum.PLANNING_DASHBOARD.value) {
-				return securityService.hasPermission('BundleView') ? '/moveBundle/planningStats' : '/projectUtil'
+				return securityService.hasPermission('BundleView') ? '/module/planning/dashboard' : '/projectUtil'
 			}
 			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				return '/admin/home'
