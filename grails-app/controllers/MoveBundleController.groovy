@@ -727,7 +727,7 @@ class MoveBundleController implements ControllerMethods {
 		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated",order:"desc"])?.lastUpdated
 		time = TimeUtil.formatDateTime(date, TimeUtil.FORMAT_DATE_TIME_8)
 
-		def today = new Date()
+		def today = new Date().clearTime()
 		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
 		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
 
