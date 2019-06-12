@@ -378,7 +378,7 @@ class AssetComment {
 			actionMap = [
 			    id: apiAction.id,
 				name: apiAction.name,
-				isRemote: false,
+				isRemote: apiAction.isRemote,
 				type: 'Api',
 				invokedAt: apiActionInvokedAt,
 				completedAt: apiActionCompletedAt

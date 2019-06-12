@@ -13,6 +13,7 @@ import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
+import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.LogicException
@@ -32,6 +33,7 @@ class WsTaskController implements ControllerMethods {
 	QzSignService qzSignService
 	TaskService taskService
 	ApiActionService apiActionService
+	CoreService coreService
 	CredentialService credentialService
 
 	/**
@@ -166,23 +168,32 @@ class WsTaskController implements ControllerMethods {
 	 * @return JSON object containing an ActionRequest context object
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
-	def fetchRemoteAction() {
+	def recordRemoteActionStarted() {
 
 		AssetComment task = fetchDomain(AssetComment, params)
 		Person whom = securityService.loadCurrentPerson()
 
 		task = taskService.recordRemoteActionStarted(task, whom)
 
-		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
+		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
 
 		Map<String,?> actionRequestMap = actionRequest.toMap()
+
+		// Store Callback information into the options
+		String url = coreService.getApplicationUrl()
+		Map jwt = securityService.generateJWT()
+		actionRequestMap.options.callback = [
+			siteUrl: url,
+			token: jwt.access_token,
+			refreshToken: jwt.refresh_token
+		]
 
 		// check if api action has credentials so to include credentials password unencrypted
 		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
 		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
 			// Need to create new map because credentials map originally is immutable
 			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
-			credentials.password = credentialService.decryptPassword(assetComment.apiAction.credential)
+			credentials.password = credentialService.decryptPassword(task.apiAction.credential)
 			actionRequestMap.options.credentials = credentials
 
 			// TODO : JM 6/19 : Encrypt the credentials appropriately using the publicKey

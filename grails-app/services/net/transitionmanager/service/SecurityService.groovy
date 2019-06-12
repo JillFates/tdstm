@@ -96,8 +96,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
 
 		return [
-			username       : userDetails.username,
-			roles          : userDetails.authorities*.toString(),
+			// username       : userDetails.username,
+			// roles          : userDetails.authorities*.toString(),
 			"token_type"   : "Bearer",
 			"access_token" : token.accessToken,
 			"expires_in"   : token.expiration,
