@@ -39,7 +39,7 @@ class TaskActionService implements ServiceMethods {
 	 */
 	void actionStarted(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
 		AssetComment task = get(AssetComment, taskId, currentProject)
-		updateTask(action.message, task, currentPerson, currentProject)
+		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		taskService.addNote(task, currentPerson, "${task?.apiAction?.name ?: ''} started at ${new Date().format(TimeUtil.FORMAT_DATE_ISO8601)}")
 
@@ -56,7 +56,7 @@ class TaskActionService implements ServiceMethods {
 	 */
 	void actionProgress(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
 		AssetComment task = get(AssetComment, taskId, currentProject)
-		updateTask(action.message, task, currentPerson, currentProject)
+		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		task.apiActionPercentDone = action.progress
 		task.save()
@@ -74,7 +74,7 @@ class TaskActionService implements ServiceMethods {
 	 */
 	void actionDone(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
 		AssetComment task = get(AssetComment, taskId, currentProject)
-		updateTask(action.message, task, currentPerson, currentProject)
+		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.stdout, action.stderr, 1, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
@@ -93,7 +93,7 @@ class TaskActionService implements ServiceMethods {
 	 */
 	void actionError(ActionCommand action, Long taskId, Person currentPerson, Project currentProject) {
 		AssetComment task = get(AssetComment, taskId, currentProject)
-		updateTask(action.message, task, currentPerson, currentProject)
+		addMessageToTaskNotes(action.message, task, currentPerson)
 
 		invokeReactionScript(ReactionScriptCode.ERROR, task, action.stdout, action.stderr, 0)
 	}
@@ -104,9 +104,8 @@ class TaskActionService implements ServiceMethods {
 	 * @param message the optional message
 	 * @param task the task to update
 	 * @param currentPerson The currently logged in person.
-	 * @param currentProject The current project that the person belongs to.
 	 */
-	private void updateTask(String message, AssetComment task, Person currentPerson, Project currentProject) {
+	private void addMessageToTaskNotes(String message, AssetComment task, Person currentPerson) {
 		if (!task.assetEntity) {
 			throw new InvalidParamException("The task $task.comment, is not associated with an asset.")
 		}
