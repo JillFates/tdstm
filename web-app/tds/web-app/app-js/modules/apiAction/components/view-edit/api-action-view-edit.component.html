@@ -769,7 +769,7 @@
 								</div>
 								<div class="row">
 									<div class="form-group">
-										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials type:</label>
+										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials Type:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 											<kendo-dropdownlist id="scriptCredentials"
 											                    name="scriptCredentials"
@@ -796,19 +796,18 @@
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 											<kendo-dropdownlist id="scriptCredentialsProvided"
 											                    name="scriptCredentialsProvided"
-											                    [defaultItem]="defaultItem"
 											                    class="form-control"
-											                    [data]="transitionManagerCredentials"
+											                    [data]="providerCredentialList"
 											                    required
 											                    requiredComplexValue propertyName="id"
-											                    [textField]="'value'"
+											                    [textField]="'name'"
 											                    [valueField]="'id'"
-											                    [(ngModel)]="apiActionModel.providedCredential">
+											                    [(ngModel)]="apiActionModel.credential">
 											</kendo-dropdownlist>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 											<label class="control-label label-detail">
-												{{apiActionModel.providedCredential && (apiActionModel.providedCredential.value || '')}}
+												{{apiActionModel.credential && (apiActionModel.credential.name || '')}}
 											</label>
 										</div>
 									</div>
