@@ -10,6 +10,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {AssetSummaryColumnModel} from '../../model/asset-summary-column.model';
 import {AssetSummaryService} from '../../service/asset-summary.service';
+import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: `tds-asset-summary-list`,
@@ -18,6 +19,7 @@ import {AssetSummaryService} from '../../service/asset-summary.service';
 export class AssetSummaryListComponent implements OnInit {
 
 	public assetSummaryColumnModel = new AssetSummaryColumnModel();
+	public justPlanning = false;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public gridData: any[] = [];
 	public total = {
@@ -54,17 +56,9 @@ export class AssetSummaryListComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.assetSummaryService.getSummaryTable().subscribe((data: any) => {
-			this.gridData = data;
-
-			// Get the list
-			this.gridData.forEach((item: any) => {
-				this.total.application.total += item.application.count;
-				this.total.server.total += item.server.count;
-				this.total.device.total += item.device.count;
-				this.total.database.total += item.database.count;
-				this.total.storage.total += item.storage.count;
-			});
+		this.preferenceService.getPreference(PREFERENCES_LIST.ASSET_JUST_PLANNING).subscribe((preferences: any) => {
+			this.justPlanning = (preferences[PREFERENCES_LIST.ASSET_JUST_PLANNING]) ? preferences[PREFERENCES_LIST.ASSET_JUST_PLANNING].toString() === 'true' : false;
+			this.getAssetSummaryData();
 		});
 	}
 
@@ -80,7 +74,35 @@ export class AssetSummaryListComponent implements OnInit {
 	}
 
 	public reloadData(): void {
-		console.log('--');
+		this.getAssetSummaryData();
+	}
+
+	/**
+	 * Change the preference and update the grid
+	 * @param isChecked
+	 */
+	public onChangeJustPlanning(isChecked = false): void {
+		this.preferenceService.setPreference(PREFERENCES_LIST.ASSET_JUST_PLANNING, isChecked.toString()).subscribe(() => {
+			this.reloadData();
+		});
+	}
+
+	/**
+	 * Get the Summary Data
+	 */
+	private getAssetSummaryData(): void {
+		this.assetSummaryService.getSummaryTable().subscribe((data: any) => {
+			this.gridData = data;
+
+			// Get the list
+			this.gridData.forEach((item: any) => {
+				this.total.application.total += item.application.count;
+				this.total.server.total += item.server.count;
+				this.total.device.total += item.device.count;
+				this.total.database.total += item.database.count;
+				this.total.storage.total += item.storage.count;
+			});
+		});
 	}
 
 }

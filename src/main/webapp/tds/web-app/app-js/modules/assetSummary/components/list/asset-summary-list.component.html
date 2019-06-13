@@ -7,6 +7,12 @@
                         [data]="gridData"
                         [resizable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
+                        <div class="checkbox just-planning">
+                            <label style="margin-left: 4px;">
+                                <input id="justPlanning" type="checkbox" [(ngModel)]="justPlanning" (change)="onChangeJustPlanning($event.currentTarget.checked)" name="justPlanning" class="component-action-just-planning">
+                                Just Planning
+                            </label>
+                        </div>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
                     <kendo-grid-column *ngFor="let column of assetSummaryColumnModel.columns" field="{{column.property}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">

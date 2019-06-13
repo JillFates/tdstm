@@ -1,4 +1,10 @@
 .asset-summary-list-component {
+  div.just-planning {
+    display: inline;
+    label {
+      margin-top: 2px;
+    }
+  }
   kendo-grid {
     thead {
       th:not(:first-child) {
