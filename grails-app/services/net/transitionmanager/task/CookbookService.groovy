@@ -1251,7 +1251,7 @@ class CookbookService implements ServiceMethods {
 							}
 							if (!msg && team != false && teamCodes && !teamCodes.contains(team)) {
 								log.debug 'validating team {}', team
-								msg = "$taskRef 'team' element references an invalid team name $task.team ${teamCodes.size()}"
+								msg = "$taskRef 'team' element references an invalid team name '$task.team'"
 							}
 						}
 						if (msg) {
