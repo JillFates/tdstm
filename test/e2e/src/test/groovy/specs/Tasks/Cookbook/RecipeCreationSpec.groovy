@@ -94,7 +94,7 @@ class RecipeCreationSpec extends GebReportingSpec {
             (recipeGridRows[0].find("div", "ng-repeat":"col in renderedColumns"))[1].text().contains("This is a Geb created recipe")
             recipeGridRowsCols.getAt(selectedRow*rowSize + 0).text().trim() == "Geb Recipe Test"
             recipeGridRowsCols.getAt(selectedRow*rowSize+1).text().trim() == "This is a Geb created recipe"
-            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "e2e user"
+            recipeGridRowsCols.getAt(selectedRow*rowSize+2).text().trim() == "e2e_test_user"
             // TODO next line will check dates for the new recipe. Verify actual local time
             // recipeGridRowsCols.getAt(selectedRow*rowSize+3).text().trim() == now()
             recipeGridRowsCols.getAt(selectedRow*rowSize+4).text().trim() == ""
