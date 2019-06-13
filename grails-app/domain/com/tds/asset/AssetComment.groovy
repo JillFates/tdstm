@@ -379,7 +379,10 @@ class AssetComment {
 			    id: apiAction.id,
 				name: apiAction.name,
 				isRemote: apiAction.isRemote,
+				// TODO : JPM 6/2019 : action.type should be changed to object with id/name appropriately
 				type: 'Api',
+				remoteCredentialMethod :
+					(apiAction.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
 				invokedAt: apiActionInvokedAt,
 				completedAt: apiActionCompletedAt
 			]
@@ -402,12 +405,13 @@ class AssetComment {
 				name: assignedTo.toString()
 			]
 		}
+
 		return [
-				id: id,
-				taskNumber: taskNumber,
-				title: comment,
-				status: status,
-				statusUpdated: statusUpdated,
+			id: id,
+			taskNumber: taskNumber,
+			title: comment,
+			status: status,
+			statusUpdated: statusUpdated,
 			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
 			lastUpdated: lastUpdated,
 			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),

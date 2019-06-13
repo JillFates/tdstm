@@ -571,7 +571,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
 
 			ApiAction apiAction = assetComment.apiAction
-			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+			Map apiActionMap = [
+				id: apiAction?.id,
+				name: apiAction?.name,
+				isRemote: apiAction?.isRemote,
+				remoteCredentialMethod :
+					(apiAction?.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null)
+			]
+
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
@@ -594,30 +601,32 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				]
 			}
 			commentList << [
-					assetComment:assetComment,
-					apiActionList:apiActionList,
-					priorityList: assetEntityService.getAssetPriorityOptions(),
-					durationScale:assetComment.durationScale.value(),
-					durationLocked: assetComment.durationLocked,
-					personCreateObj:personCreateObj,
-					personResolvedObj:personResolvedObj,
-					dtCreated:dtCreated ?: "",
-					dtResolved:dtResolved ?: "",
-					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
-					assetName:assetComment.assetEntity?.assetName ?: "",
-					eventName:assetComment.moveEvent?.name ?: "",
-					dueDate:dueDate,
-					etStart:etStart,
-					etFinish:etFinish,
-					atStart:atStart,
-					notes:notes,
-					workflow:workflow,
-					roles:roles?:'Unassigned',
-					predecessorTable:predecessorTable ?: '',
-					successorTable:successorTable ?: '',
-					cssForCommentStatus: cssForCommentStatus,
-					statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
-					successorsCount: successorsCount,
+				assetComment:assetComment,
+				apiActionList:apiActionList,
+				apiActionInvokedAt: assetComment.apiActionInvokedAt,
+				apiActionPercentDone: assetComment.apiActionPercentDone,
+				priorityList: assetEntityService.getAssetPriorityOptions(),
+				durationScale:assetComment.durationScale.value(),
+				durationLocked: assetComment.durationLocked,
+				personCreateObj:personCreateObj,
+				personResolvedObj:personResolvedObj,
+				dtCreated:dtCreated ?: "",
+				dtResolved:dtResolved ?: "",
+				assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
+				assetName:assetComment.assetEntity?.assetName ?: "",
+				eventName:assetComment.moveEvent?.name ?: "",
+				dueDate:dueDate,
+				etStart:etStart,
+				etFinish:etFinish,
+				atStart:atStart,
+				notes:notes,
+				workflow:workflow,
+				roles:roles?:'Unassigned',
+				predecessorTable:predecessorTable ?: '',
+				successorTable:successorTable ?: '',
+				cssForCommentStatus: cssForCommentStatus,
+				statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
+				successorsCount: successorsCount,
 				predecessorsCount: predecessorsCount,
 				taskSpecId: assetComment.taskSpec,
 				assetId: assetComment.assetEntity?.id ?: "",
@@ -630,7 +639,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				canEdit: canEdit,
 				apiAction:apiActionMap,
 				actionMode: actionMode,
+				// TODO : JPM 6/2019 : actionInvocable should be renamed to actionInvocableLocally
 				actionInvocable: assetComment.isActionInvocableLocally(),
+				actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
 				actionMode: actionMode,
 				lastUpdated: lastUpdated,
 				apiActionId: assetComment.apiAction?.id,

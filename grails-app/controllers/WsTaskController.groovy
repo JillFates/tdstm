@@ -18,6 +18,7 @@ import net.transitionmanager.service.CredentialService
 import net.transitionmanager.service.InvalidRequestException
 import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.QzSignService
+import net.transitionmanager.service.TaskActionService
 import net.transitionmanager.service.TaskService
 
 /**
@@ -29,12 +30,13 @@ import net.transitionmanager.service.TaskService
 @Slf4j
 class WsTaskController implements ControllerMethods {
 
-	CommentService commentService
-	QzSignService qzSignService
-	TaskService taskService
 	ApiActionService apiActionService
+	CommentService commentService
 	CoreService coreService
 	CredentialService credentialService
+	QzSignService qzSignService
+	TaskActionService taskActionService
+	TaskService taskService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -145,11 +147,8 @@ class WsTaskController implements ControllerMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	def invokeLocalAction() {
-		AssetComment task = fetchDomain(AssetComment, params)
-		Person whom = securityService.loadCurrentPerson()
-
-		task = taskService.invokeLocalAction(task, whom)
+	def invokeLocalAction(Long id) {
+		AssetComment task = taskActionService.invokeLocalAction(id, currentPerson())
 
 		Map results = [
 			assetComment: task,
@@ -168,41 +167,9 @@ class WsTaskController implements ControllerMethods {
 	 * @return JSON object containing an ActionRequest context object
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
-	def recordRemoteActionStarted() {
-
-		AssetComment task = fetchDomain(AssetComment, params)
-		Person whom = securityService.loadCurrentPerson()
-
-		task = taskService.recordRemoteActionStarted(task, whom)
-
-		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
-
-		Map<String,?> actionRequestMap = actionRequest.toMap()
-
-		// Store Callback information into the options
-		String url = coreService.getApplicationUrl()
-		Map jwt = securityService.generateJWT()
-		actionRequestMap.options.callback = [
-			siteUrl: url,
-			token: jwt.access_token,
-			refreshToken: jwt.refresh_token
-		]
-
-		// check if api action has credentials so to include credentials password unencrypted
-		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
-		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
-			// Need to create new map because credentials map originally is immutable
-			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
-			credentials.password = credentialService.decryptPassword(task.apiAction.credential)
-			actionRequestMap.options.credentials = credentials
-
-			// TODO : JM 6/19 : Encrypt the credentials appropriately using the publicKey
-			// Encrypt the credentials appropriately
-			// if (actionRequest.options.credentails.type == x) {
-			// }
-		}
-
-		renderAsJson([actionRequest: actionRequest.toMap()])
+	def recordRemoteActionStarted(Long id) {
+		Map actionRequest = taskActionService.recordRemoteActionStarted(id,  currentPerson())
+		renderAsJson([actionRequest: actionRequest])
 	}
 
 	/**
@@ -211,17 +178,10 @@ class WsTaskController implements ControllerMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.ActionReset)
-	def resetAction() {
-		AssetComment assetComment = fetchDomain(AssetComment, params)
-		if (assetComment) {
-			Person whom = securityService.loadCurrentPerson()
-			String status = taskService.resetAction(assetComment, whom)
-			renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
-		} else {
-			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
-			log.error "resetAction: $errorMsg"
-			renderErrorJson([errorMsg])
-		}
+	def resetAction(Long id) {
+		AssetComment task = fetchDomain(AssetComment, params)
+		String status = taskActionService.resetAction(id, currentPerson())
+		renderAsJson([assetComment: task, status: status, statusCss: taskService.getCssClassForStatus(task.status)])
 	}
 
 	/**
@@ -236,7 +196,7 @@ class WsTaskController implements ControllerMethods {
 		AssetComment assetComment = fetchDomain(AssetComment, params)
 		if (assetComment) {
 			Map requestParams = request.JSON
-			Person whom = securityService.loadCurrentPerson()
+			Person whom = currentPerson()
 			Boolean status = taskService.addNote(assetComment, whom, requestParams.note, 0)
 			if (!status) {
 				def errorMsg = " There was a problem when creating Note for Task whithz id - $params.id "
