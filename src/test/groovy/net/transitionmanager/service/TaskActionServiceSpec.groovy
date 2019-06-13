@@ -7,11 +7,11 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
-import net.transitionmanager.action.APIProducerService
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.action.Provider
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetService
@@ -28,6 +28,7 @@ import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.SecurityService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
@@ -37,7 +38,7 @@ import spock.lang.Specification
 import test.helper.ApiCatalogTestHelper
 import test.helper.mock.ProjectMock
 
-class APIProducerServiceSpec extends Specification implements ServiceUnitTest<APIProducerService>, DataTest, GrailsWebUnitTest {
+class TaskActionServiceSpec extends Specification implements ServiceUnitTest<TaskActionService>, DataTest, GrailsWebUnitTest {
 
 	@Shared
 	List<String> notes = []
@@ -173,22 +174,27 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 		service.assetService = [
 			getAssetFacade: {AssetEntity asset, boolean readonly-> null}
 		] as AssetService
+
+		service.securityService = [
+			hasAccessToProject: { Project project -> true }
+
+		] as SecurityService
 	}
 
 	void 'Test updateRemoteActionStatus started'() {
-		setup: 'given a populated started ActionCommand'
+		setup:  'given a populated progress ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'started',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
-		then: 'task notes are created'
+			service.actionStarted(action, assetComment.id, whom)
+		then: 'task notes are added and the apiActionPercentDone is updated'
 			notes.size() ==2
 			notes.contains('some message')
 			notes[1].startsWith('testAction started at')
@@ -197,17 +203,17 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 	void 'Test updateRemoteActionStatus progress'() {
 		setup: 'given a populated progress ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'progress',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
-		then: 'task notes are added and the apiActionPercentDone is updated'
+			service.actionProgress(action, assetComment.id, whom)
+		then:
 			notes.size() == 1
 			notes.contains('some message')
 			assetComment.apiActionPercentDone == 5
@@ -216,16 +222,16 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 	void 'Test updateRemoteActionStatus error'() {
 		setup: 'given a populated error ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'error',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
-		when:'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+		when: 'updating the action status'
+			service.actionError(action, assetComment.id, whom)
 		then: 'Task notes are added'
 			notes.size() == 2
 			notes.contains('some message')
@@ -235,16 +241,16 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 	void 'Test updateRemoteActionStatus success'() {
 		setup: 'given a populated success ActionCommand'
 			ActionCommand action = new ActionCommand(
-				state: 'success',
 				message: 'some message',
 				progress: 5,
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
-		when:'updating the action status'
-			service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+		when: 'updating the action status'
+			service.actionDone(action, assetComment.id, whom)
 		then: 'task node are added, and the apiActionPercentDone is set to 100'
 			notes.size() == 2
 			notes.contains('some message')
@@ -255,50 +261,13 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 	void 'Test updateRemoteActionStatus error with exception thrown in invokeReactionScript'() {
 			setup: 'given and error Action Command, where the invokeReactionScript will throw an exception.'
 				ActionCommand action = new ActionCommand(
-					state: 'error',
 					message: 'some message',
 					progress: 5,
 					stdout: 'output message',
 					stderr: 'error message',
 					data: [someKey: 'some data'],
-					datafile: null
-				)
-
-				service.apiActionService = [
-					createActionRequest: {ApiAction action2, Object object->
-						ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, JsonUtil.parseJson(reactionScripts))
-						return null
-					},
-					invokeReactionScript: {
-						ReactionScriptCode code,
-						String script,
-						ActionRequest request,
-						ApiActionResponse response,
-						TaskFacade task,
-						AssetFacade asset,
-						ApiActionJob job->
-						throw new Exception('api invocation exception')
-					}
-				] as ApiActionService
-			when:'updating the action status'
-				service.updateRemoteActionStatus(action, assetComment.id, whom, project)
-			then: 'Task notes are added'
-				notes.size() == 3
-				notes.contains('some message')
-				notes[1] == 'ERROR script failure: api invocation exception'
-				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
-		}
-
-	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript'() {
-			setup:'given and success Action Command, where the invokeReactionScript will throw an exception.'
-				ActionCommand action = new ActionCommand(
-					state: 'success',
-					message: 'some message',
-					progress: 5,
-					stdout: 'output message',
-					stderr: 'error message',
-					data: [someKey: 'some data'],
-					datafile: null
+					datafile: null,
+					project: project
 				)
 
 				service.apiActionService = [
@@ -318,7 +287,44 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 					}
 				] as ApiActionService
 			when: 'updating the action status'
-				service.updateRemoteActionStatus(action, assetComment.id, whom, project)
+				service.actionError(action, assetComment.id, whom)
+			then: 'Task notes are added'
+				notes.size() == 3
+				notes.contains('some message')
+				notes[1] == 'ERROR script failure: api invocation exception'
+				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
+		}
+
+	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript'() {
+			setup: 'given and success Action Command, where the invokeReactionScript will throw an exception.'
+				ActionCommand action = new ActionCommand(
+					message: 'some message',
+					progress: 5,
+					stdout: 'output message',
+					stderr: 'error message',
+					data: [someKey: 'some data'],
+					datafile: null,
+					project: project
+				)
+
+				service.apiActionService = [
+					createActionRequest: {ApiAction action2, Object object->
+						ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, JsonUtil.parseJson(reactionScripts))
+						return null
+					},
+					invokeReactionScript: {
+						ReactionScriptCode code,
+						String script,
+						ActionRequest request,
+						ApiActionResponse response,
+						TaskFacade task,
+						AssetFacade asset,
+						ApiActionJob job->
+						throw new Exception('api invocation exception')
+					}
+				] as ApiActionService
+			when: 'updating the action status'
+				service.actionDone(action, assetComment.id, whom)
 			then: 'Task notes are added'
 				notes.size() == 3
 				notes.contains('some message')
@@ -327,43 +333,43 @@ class APIProducerServiceSpec extends Specification implements ServiceUnitTest<AP
 		}
 
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript for success but not error reaction scripts'() {
-				setup: 'given and success Action Command, where the invokeReactionScript will throw an exception for success scripts only.'
-					ActionCommand action = new ActionCommand(
-						state: 'success',
-						message: 'some message',
-						progress: 5,
-						stdout: 'output message',
-						stderr: 'error message',
-						data: [someKey: 'some data'],
-						datafile: null
-					)
+		setup: 'given and success Action Command, where the invokeReactionScript will throw an exception for success scripts only.'
+			ActionCommand action = new ActionCommand(
+				message: 'some message',
+				progress: 5,
+				stdout: 'output message',
+				stderr: 'error message',
+				data: [someKey: 'some data'],
+				datafile: null,
+				project: project
+			)
 
-					service.apiActionService = [
-						createActionRequest: {ApiAction action2, Object object->
-							ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, JsonUtil.parseJson(reactionScripts))
-							return null
-						},
-						invokeReactionScript: {
-							ReactionScriptCode code,
-							String script,
-							ActionRequest request,
-							ApiActionResponse response,
-							TaskFacade task,
-							AssetFacade asset,
-							ApiActionJob job->
-							if(code == ReactionScriptCode.SUCCESS){
-								throw new Exception('api invocation exception')
-							} else{
-								notes << "Invoked $task.comment with status: ${code.name()}"
-								 return [:] as Map<String, ?>
-							}
-						 }
-					] as ApiActionService
-				when:'updating the action status'
-					service.updateRemoteActionStatus(action, assetComment.id, whom, project)
-				then: 'Task notes are added'
-					notes.size() == 2
-					notes.contains('some message')
-					notes[1] == 'Invoked Task with status: ERROR'
-			}
+			service.apiActionService = [
+				createActionRequest: {ApiAction action2, Object object->
+					ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS, JsonUtil.parseJson(reactionScripts))
+					return null
+				},
+				invokeReactionScript: {
+					ReactionScriptCode code,
+					String script,
+					ActionRequest request,
+					ApiActionResponse response,
+					TaskFacade task,
+					AssetFacade asset,
+					ApiActionJob job->
+					if(code == ReactionScriptCode.SUCCESS){
+						throw new Exception('api invocation exception')
+					} else{
+						notes << "Invoked $task.comment with status: ${code.name()}"
+						 return [:] as Map<String, ?>
+					}
+				 }
+			] as ApiActionService
+		when: 'updating the action status'
+			service.actionDone(action, assetComment.id, whom)
+		then: 'Task notes are added'
+			notes.size() == 2
+			notes.contains('some message')
+			notes[1] == 'Invoked Task with status: ERROR'
+	}
 }
