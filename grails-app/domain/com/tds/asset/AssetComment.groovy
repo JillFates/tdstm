@@ -380,7 +380,11 @@ class AssetComment {
 				name: apiAction.name,
 				isRemote: apiAction.isRemote,
 				// TODO : JPM 6/2019 : action.type should be changed to object with id/name appropriately
-				type: 'Api',
+				actionType: [
+					id: apiAction.actionType.name(),
+					name: apiAction.actionType.toString()
+				],
+				description: apiAction.description,
 				remoteCredentialMethod :
 					(apiAction.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
 				invokedAt: apiActionInvokedAt,
@@ -429,7 +433,7 @@ class AssetComment {
 			team: role ?: '',
 			isPublished: isPublished,
 			isActionInvocableLocally: isActionInvocableLocally(),
-			isActionInvocableRemotey: isActionInvocableRemotely(),
+			isActionInvocableRemotely: isActionInvocableRemotely(),
 			isAutomatic: isAutomatic(),
 		]
 
