@@ -286,7 +286,7 @@ export class APIActionService {
 			postRequest.credential = { id: model.credential.id };
 		} else if (model.providedCredential && model.providedCredential.id) {
 			const {id, value: name} = model.providedCredential;
-			postRequest.credential = {id, name};
+			postRequest.credential = {id};
 		}
 
 		if (!model.id) {

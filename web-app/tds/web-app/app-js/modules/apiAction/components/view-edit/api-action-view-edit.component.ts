@@ -1038,6 +1038,12 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirror.mode = language
 		}
 		this.apiActionModel.isRemote = this.isRemote();
+
+		// on create api action, set the default value for is remote action
+		if (this.modalType === ActionType.CREATE && this.apiActionModel.isRemote) {
+			this.setSelectEventReaction('SUCCESS', true);
+			this.setSelectEventReaction('ERROR', true);
+		}
 	}
 
 	getClonedCodeMirrorSettings(properties: any): any {
@@ -1060,5 +1066,15 @@ export class APIActionViewEditComponent implements OnInit {
 		const id = R.pathOr('', ['remoteCredentialMethod', 'id'], this.apiActionModel);
 
 		return id === this.SUPPLIED_CREDENTIAL;
+	}
+
+	/**
+	 * Get a specific event reaction searching by type and set its selected property
+	*/
+	setSelectEventReaction(type: string, selected: boolean): void {
+		const evenReaction = this.apiActionModel.eventReactions.find((item: EventReaction) => item.type === type);
+		if (evenReaction) {
+			evenReaction.selected = selected;
+		}
 	}
 }
