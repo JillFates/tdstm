@@ -21,7 +21,6 @@ import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.command.reports.ApplicationConflictsCommand
@@ -34,7 +33,6 @@ class WsReportsController implements ControllerMethods {
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
     CustomDomainService customDomainService
-	ProjectService projectService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the

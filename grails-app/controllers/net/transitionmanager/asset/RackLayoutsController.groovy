@@ -24,7 +24,6 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.project.ProjectService
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
@@ -37,7 +36,6 @@ class RackLayoutsController implements ControllerMethods {
 	TaskService           taskService
 	UserPreferenceService userPreferenceService
 	LinkGenerator         grailsLinkGenerator
-	ProjectService        projectService
 
 	/**
 	 * Used to generate the Rack Elevation criteria form that users access to generation elevations

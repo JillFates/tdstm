@@ -13,7 +13,6 @@ import net.transitionmanager.enums.controller.ImportBatchActionEnum
 import net.transitionmanager.enums.controller.ImportRecordActionEnum
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.Permission
 
 @Secured("isAuthenticated()")
@@ -22,7 +21,6 @@ class WsImportBatchController implements EventPublisher, ControllerMethods {
 
 	ImportBatchService importBatchService
 	DataImportService dataImportService
-	ProjectService projectService
 
 	/**
 	 * Return all the Import Batches for the current project

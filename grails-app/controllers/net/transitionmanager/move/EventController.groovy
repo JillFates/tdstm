@@ -8,13 +8,11 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.project.ProjectService
 
 @Secured('isAuthenticated()')
 class EventController implements ControllerMethods {
 
 	MoveEventService moveEventService
-	ProjectService projectService
 
 	/**
 	 * List all available Move Events for the user's current project including more detailed list of fields.

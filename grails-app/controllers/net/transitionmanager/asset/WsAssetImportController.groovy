@@ -14,7 +14,6 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.project.ProjectService 	
 import net.transitionmanager.exception.InvalidParamException
 import org.grails.web.json.JSONObject
 import com.tdssrc.grails.StopWatch
@@ -31,7 +30,6 @@ class WsAssetImportController implements ControllerMethods {
 	ApiActionService apiActionService
 	DataImportService dataImportService
 	FileSystemService fileSystemService
-	ProjectService projectService
 
 	// mock data to use until methods are integrated with database
 	static final List<Map> actions = [

@@ -27,7 +27,6 @@ import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.QzSignService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.project.ProjectService
 
 /**
  * Handles WS calls of the TaskService.
@@ -44,7 +43,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	ApiActionService apiActionService
 	CredentialService credentialService
     UserPreferenceService userPreferenceService
-	ProjectService projectService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before

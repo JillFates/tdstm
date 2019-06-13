@@ -91,7 +91,6 @@ class ProjectService implements ServiceMethods {
 	ProviderService            providerService
 	CredentialService          credentialService
 	DataScriptService          dataScriptService
-	ProjectService             projectService
 	LicenseCommonService       licenseCommonService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'

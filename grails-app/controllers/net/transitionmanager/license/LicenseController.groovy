@@ -3,14 +3,12 @@ package net.transitionmanager.license
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 
 @Secured('isAuthenticated()')
 class LicenseController implements ControllerMethods {
 
 	// IOC
 	LicenseAdminService licenseAdminService
-	ProjectService projectService
 
 	/**
 	 * Returns the licensing information for the project (id) or the user's current project if null
