@@ -1,8 +1,8 @@
 package net.transitionmanager.integration
 
-import com.tdsops.etl.ETLProcessor
+
 import groovy.transform.TimedInterrupt
-import org.codehaus.groovy.ast.expr.MethodCallExpression
+import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -29,7 +29,6 @@ import static org.codehaus.groovy.syntax.Types.PLUS
 import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
-
 /**
  * Evaluate and check API action scripts.
  *
@@ -98,26 +97,7 @@ class ApiActionScriptEvaluator {
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
-		def executeExpressionChecker = { expression ->
-			if (expression instanceof MethodCallExpression) {
-				if (((MethodCallExpression) expression)?.method?.type?.name == String.class.name &&
-					((MethodCallExpression) expression)?.method?.value in ETLProcessor.ProhibitedStringMethods) {
-					return false
-				}
-
-				if (((MethodCallExpression) expression)?.method?.type?.name == Object.class.name &&
-					!ETLProcessor.AllowedObjectMethods.contains(((MethodCallExpression) expression)?.method?.value)) {
-					return false
-				}
-
-			}
-
-			return true
-
-		} as SecureASTCustomizer.ExpressionChecker
-
-		secureASTCustomizer.addExpressionCheckers(executeExpressionChecker)
-
+		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
 		return configuration
