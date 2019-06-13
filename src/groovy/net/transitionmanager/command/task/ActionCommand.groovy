@@ -2,6 +2,7 @@ package net.transitionmanager.command.task
 
 import grails.validation.Validateable
 import net.transitionmanager.command.CommandObject
+import net.transitionmanager.domain.Project
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.springframework.web.multipart.MultipartFile
 
@@ -27,6 +28,11 @@ class ActionCommand implements CommandObject {
 	 * The standard error from running the action.
 	 */
 	String              stderr
+
+	/**
+	 * The project to be used for look ups sent in as an id, and auto looked up by the binding.
+	 */
+	Project project
 
 	/**
 	 * JSON context data sent back from running the action.
