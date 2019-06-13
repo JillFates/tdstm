@@ -122,8 +122,8 @@ class RSACodec {
 	 * @return The encrypted text.
 	 */
 	String encrypt(Key key, String text, String instance = cypherInstance) {
-		if (text == null) {
-			throw new InvalidParamException('Null Strings can not be encrypted.')
+		if (!text) {
+			throw new InvalidParamException('Null/Blank Strings can not be encrypted.')
 		}
 
 		Cipher cipher = Cipher.getInstance(instance)

@@ -80,22 +80,6 @@ class RSACodecTests extends Specification {
 	}
 
 	/*
-	 * Tests encryption works for blank text, by encrypting and decrypting, going from a private key to a public key.
-	 */
-	void 'test blank encrypt private to public'() {
-		setup:'Given pre generated public/private keys and some original text'
-			String originalText = ''
-			PublicKey keyPub = instance.getPublicKey(publicKey)
-			PrivateKey keyPri = instance.getPrivateKey(privateKey)
-		when: 'test encrypting and decrypting text with a private/public key'
-			String encryptedText = instance.encrypt(keyPri, originalText)
-			String decryptedText = instance.decrypt(keyPub, encryptedText)
-		then: 'The original text is not the same as the encrypted text, and the decrypted text is the same as the original text.'
-			originalText != encryptedText
-			originalText == decryptedText
-	}
-
-	/*
 	 * Tests encryption fails for null strings.
 	 */
 	void 'test null encryption fails with InvalidParamException'() {
@@ -135,6 +119,5 @@ class RSACodecTests extends Specification {
 			originalText != encryptedText
 			originalText == decryptedText
 	}
-
 
 }
