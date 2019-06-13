@@ -5,10 +5,8 @@ import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.TaskActionService
-
 /**
  * A controller for handling API remote action's status updates, and invoking reaction scripts.
  */
@@ -40,9 +38,8 @@ class TaskController implements ControllerMethods {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
 		Person currentPerson = currentPerson()
-		Project currentProject = projectForWs
 
-		taskActionService.actionStarted(action, id, currentPerson, currentProject)
+		taskActionService.actionStarted(action, id, currentPerson)
 
 		renderSuccessJson()
 	}
@@ -59,9 +56,8 @@ class TaskController implements ControllerMethods {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
 		Person currentPerson = currentPerson()
-		Project currentProject = projectForWs
 
-		taskActionService.actionProgress(action, id, currentPerson, currentProject)
+		taskActionService.actionProgress(action, id, currentPerson)
 
 		renderSuccessJson()
 	}
@@ -78,9 +74,8 @@ class TaskController implements ControllerMethods {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
 		Person currentPerson = currentPerson()
-		Project currentProject = projectForWs
 
-		taskActionService.actionDone(action, id, currentPerson, currentProject)
+		taskActionService.actionDone(action, id, currentPerson)
 
 		renderSuccessJson()
 	}
@@ -97,9 +92,8 @@ class TaskController implements ControllerMethods {
 		ActionCommand action = populateCommandObject(ActionCommand)
 		validateCommandObject(action)
 		Person currentPerson = currentPerson()
-		Project currentProject = projectForWs
 
-		taskActionService.actionError(action, id, currentPerson, currentProject)
+		taskActionService.actionError(action, id, currentPerson)
 
 		renderSuccessJson()
 	}

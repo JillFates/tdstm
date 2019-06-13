@@ -571,7 +571,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
 
 			ApiAction apiAction = assetComment.apiAction
-			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+
+			Map apiActionMap = [
+				id: apiAction?.id,
+				isRemote: apiAction?.isRemote,
+				name: apiAction?.name,
+				remoteCredentialMethod :
+					(apiAction?.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
+				script: apiAction.script,
+				type: apiAction.actionType.name()
+			]
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
@@ -595,11 +604,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				commentList << [
 					action: assetComment.apiAction?.name,
 					actionInvocable: assetComment.isActionInvocableLocally(),
-					actionMode: actionMode,
+					actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
 					actionMode: actionMode,
 					actualDuration: TimeUtil.formatDuration(actualDuration),
 					apiAction:apiActionMap,
 					apiActionId: assetComment.apiAction?.id,
+					apiActionInvokedAt: assetComment.apiActionInvokedAt,
 					apiActionList:apiActionList,
 					apiActionPercentDone: assetComment.apiActionPercentDone,
 					assetClass: assetComment.assetEntity?.assetClass?.toString(),

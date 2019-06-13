@@ -21,6 +21,8 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.plugin.springsecurity.rest.token.AccessToken
+import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.EmailDispatch
@@ -35,7 +37,6 @@ import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.RolePermissions
 import net.transitionmanager.domain.RoleType
 import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.security.Permission
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.beans.factory.InitializingBean
@@ -50,7 +51,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import static net.transitionmanager.domain.Permissions.Roles.ADMIN
 import static net.transitionmanager.domain.Permissions.Roles.USER
-
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
@@ -81,6 +81,29 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	private long forgotMyPasswordResetTTL = 0
 	private long accountActivationTTL = 0
+
+
+	TokenGenerator tokenGenerator
+
+	/**
+	 * Generates a Map that contains the JWT token for the current user.
+	 * This is comparable to logging in using the /api url, using spring security rest.
+	 *
+	 * @return A Map that contains the JWT token, refresh token, username, roles, token type, and expiration in seconds.
+	 */
+	Map generateJWT (){
+		UserDetails userDetails = springSecurityService.getPrincipal()
+		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
+
+		return [
+			// username       : userDetails.username,
+			// roles          : userDetails.authorities*.toString(),
+			"token_type"   : "Bearer",
+			"access_token" : token.accessToken,
+			"expires_in"   : token.expiration,
+			"refresh_token": token.refreshToken
+		]
+	}
 
 	void afterPropertiesSet() {
 
