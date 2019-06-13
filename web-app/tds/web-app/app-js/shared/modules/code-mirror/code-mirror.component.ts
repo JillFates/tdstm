@@ -46,6 +46,7 @@ export class CodeMirrorComponent implements OnInit {
 	public setDisabled(disable: boolean): void {
 		if (this.instance && this.instance.options) {
 			this.instance.options.disableInput = disable;
+			this.instance.options.readOnly = disable;
 		}
 	}
 
