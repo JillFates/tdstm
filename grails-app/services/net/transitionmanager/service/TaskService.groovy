@@ -50,14 +50,12 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
-import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -70,6 +68,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -95,8 +94,6 @@ class TaskService implements ServiceMethods {
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
 	private static final List<String> statusList = ACS.list
-
-	private static final List<String> ACTIONABLE_STATUSES = [ACS.READY, ACS.STARTED]
 
 	// The RoleTypes for Staff (populated in init())
 	private static List staffingRoles
@@ -422,187 +419,7 @@ class TaskService implements ServiceMethods {
 	}
 	*/
 
-	/**
-	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
-	 * plan to set the status to HOLD and add a note to the task.
-	 * @param task - the Task to invoke the method on
-	 * @return The status that the task should be set to
-	 */
-	@Transactional(noRollbackFor=[Throwable])
-	AssetComment invokeLocalAction(AssetComment task, Person whom) {
-		log.debug "invokeLocalAction() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
-		markActionStarted(task.id, whom, true)
-
-		// Try running the action
-		apiActionService.invoke(task.apiAction, task)
-
-		return task
-	}
-
-	/**
-	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
-	 * plan to set the status to HOLD and add a note to the task.
-	 * @param task - the Task to invoke the method on
-	 * @return the updated task
-	 */
-	@Transactional(noRollbackFor=[Throwable])
-	AssetComment recordRemoteActionStarted(AssetComment task, Person whom) {
-		log.debug "recordRemoteActionStarted() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
-
-		markActionStarted(task.id, whom, false)
-
-		return task
-	}
-
-	/**
-	 * Try to mark a task as started by locking it before, if lock fails
-	 * or if the task was already started by another user, thows an exception
-	 * indicating it so
-	 * @param taskId - the id of the task to mark as started
-	 * @param whom - the id whos invoking the action
-	 * @param invokingLocally - Flag to indicate if the intent is to invoke the action local (true) or remotely (false)
-	 */
-	@Transactional(noRollbackFor=[Throwable])
-	private void markActionStarted(Long taskId, Person whom, Boolean invokingLocally) {
-		log.debug "markActionStarted() Attempting to mark action as started for task.id={}", taskId
-		String errMsg
-		AssetComment taskWithLock
-
-		try {
-			taskWithLock = AssetComment.lock(taskId)
-			log.debug 'Locked out AssetComment: {}', taskWithLock
-
-			if (! taskWithLock.status) {
-				throw new EmptyResultException('Task was not found')
-			}
-
-			if (! ACTIONABLE_STATUSES.contains(taskWithLock.status)) {
-				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
-			}
-
-			if (!taskWithLock.hasAction()) {
-				throwException(InvalidRequestException, 'apiAction.task.message.noAction', 'Task has not associated action')
-			}
-
-			if (taskWithLock.apiActionInvokedAt != null) {
-				throwException(ApiActionException, 'apiAction.task.message.alreadyInvoked', 'The action has already been invoked')
-			}
-
-			// if (taskWithLock.apiAction.isAsync()) {
-			// 	throwException(ApiActionException, 'apiAction.task.message.asyncActionNotSupported', 'Asynchronous actions are not yet supported')
-			// }
-
-			// Attempting to invoke a remote action locally?
-			if (invokingLocally && taskWithLock.isActionInvocableRemotely()) {
-				throwException(ApiActionException, 'apiAction.task.message.notLocalAction', 'Attempted to invoke a remote action as local, which is not allowed')
-			}
-
-			// Attempting to invoke a local action remotely?
-			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
-				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attepted to invoke a local action as remote, which is not allowed')
-			}
-
-			// Make sure the use has permission to invoke the action
-			if ( !securityService.hasPermission(whom, Permission.ActionInvoke) ||
-				( ! invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) ) {
-				throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
-			}
-
-			// Prevent action from occuring if the reaction scripts are invalid
-			if (!taskWithLock.apiAction.reactionScriptsValid == 1) {
-				throwException(ApiActionException, 'apiAction.task.message.invalidReactionScript', 'The Action Reaction script(s) appear to have errors that need to be resolved before invoking action')
-			}
-			// Update the task so that the we track that the action was invoked
-			taskWithLock.apiActionInvokedAt = new Date()
-
-			// Update the task so that we track the task started at
-			taskWithLock.actStart = taskWithLock.apiActionInvokedAt
-
-			// Make sure that the status is STARTED instead
-			if (taskWithLock.status != AssetCommentStatus.STARTED) {
-				setTaskStatus(taskWithLock, AssetCommentStatus.STARTED, whom)
-			}
-			taskWithLock.save(flush: true, failOnError: true)
-
-			// Note to the task indicating that the action was being invoked
-			addNote(taskWithLock, whom, "Invoked action ${taskWithLock.apiAction.name} (${ invokingLocally ? 'Server' : 'Desktop' })")
-
-		// Catch the Exceptions that the error message can be used directly
-		} catch (EmptyResultException e) {
-			errMsg = e.getMessage()
-		} catch (InvalidRequestException e) {
-			errMsg = e.getMessage()
-		} catch (InvalidConfigurationException e) {
-			errMsg = e.getMessage()
-		} catch (CannotAcquireLockException e) {
-			errMsg = e.getMessage()
-		} catch (ApiActionException e) {
-			errMsg = e.getMessage()
-
-		} catch (e) {
-			errMsg = 'A runtime error occurred while attempting to process the action'
-			log.error ExceptionUtil.stackTraceToString('invokeLocalAction() failed ', e)
-		}
-
-		if (errMsg) {
-			if (! taskWithLock) {
-				// The task might not be assigned if there was a lock failure so let's get it now
-				taskWithLock = AssetComment.get(taskId)
-			}
-
-			if (taskWithLock) {
-				addNote(taskWithLock, whom, "Invoke action ${taskWithLock.apiAction.name} failed : $errMsg")
-				setTaskStatus(taskWithLock, AssetCommentStatus.HOLD, whom)
-			}
-
-			// TODO : JPM 6/2019 : We should have a general TM exception that we know the message can displayed to the user
-			throw new InvalidParamException(errMsg)
-		}
-	}
-
-	/**
-	 * Reset an action so it can be invoked again
-	 * @param task
-	 * @param whom
-	 * @return
-	 */
-	String resetAction(AssetComment task, Person whom) {
-		String status = task.status
-		if (task.hasAction() && !task.isAutomatic() && status == AssetCommentStatus.HOLD) {
-			String errMsg
-			try {
-				// Update the task so it can be invoked again
-				task.apiActionInvokedAt = null
-				task.apiActionCompletedAt = null
-				task.actStart = null
-				task.dateResolved = null
-
-				// Log a note that the API Action was reset
-				addNote(task, whom, "Reset action ${task.apiAction.name}")
-
-				// Make sure that the status is READY instead
-				status = AssetCommentStatus.READY
-				task.status = status
-
-			} catch (InvalidRequestException e) {
-				errMsg = e.getMessage()
-			} catch (InvalidConfigurationException e) {
-				errMsg = e.getMessage()
-			} catch (e) {
-				errMsg = 'A runtime error occurred while attempting to process the action'
-				log.error ExceptionUtil.stackTraceToString('resetAction() failed ', e)
-			}
-
-			if (errMsg) {
-				log.info "resetAction() error $errMsg"
-				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
-				status = ACS.HOLD
-				task.status = status
-			}
-		}
-		return status
-	}
 
 	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
@@ -651,7 +468,7 @@ class TaskService implements ServiceMethods {
 
 		// Trigger the action if it is automatic and the action is local
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally()) {
-			if (ACTIONABLE_STATUSES.contains(status) ) {
+			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
@@ -792,6 +609,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
@@ -801,6 +619,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForRackStatus(String status) {
 		ACS.list.contains(status) ? 'rack_task_' + status.toLowerCase() : 'task_na'
 	}

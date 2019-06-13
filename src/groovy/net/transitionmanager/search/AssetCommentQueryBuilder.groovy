@@ -454,7 +454,7 @@ class AssetCommentQueryBuilder {
 		'isPublished':          [property: 'ac.isPublished', builder: boolEqBuilder],
 		'isResolved':           [property: 'ac.dateResolved', builder: zeroIsNullBuilder ],
 		'hardAssigned':         [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
-		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.actionableStatusList],
+		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.ActionableStatusCodes],
 		'justMyTasks':          [builder: justMyTasksBuilder],
 		'justRemaining':        [property: 'ac.status', builder: notEqIfSetBuilder, value:AssetCommentStatus.COMPLETED],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],

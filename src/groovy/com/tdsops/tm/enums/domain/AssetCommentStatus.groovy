@@ -23,6 +23,13 @@ class AssetCommentStatus {
 
 	static final List<String> topStatusList = [PENDING, READY, STARTED, HOLD, COMPLETED].asImmutable()
 
-	static final List<String> actionableStatusList = [READY, STARTED].asImmutable()
-	
+	/**
+	 * The statuses of tasks that the invocation of actions are allowed
+	 */
+	static final List<String> ActionableStatusCodes = [READY, STARTED].asImmutable()
+
+	/**
+	 * The statuses of tasks that the resetting of actions are allowed
+	 */
+	static final List<String> AllowedStatusesToResetAction = [READY, STARTED, COMPLETED]
 }
