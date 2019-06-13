@@ -21,11 +21,26 @@ export class AssetSummaryListComponent implements OnInit {
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public gridData: any[] = [];
 	public total = {
-		application: 0,
-		server: 0,
-		device: 0,
-		database: 0,
-		storage: 0
+		application: {
+			total: 0,
+			viewId: 7
+		},
+		server: {
+			total: 0,
+			viewId: 4
+		},
+		device: {
+			total: 0,
+			viewId: 3
+		},
+		database: {
+			total: 0,
+			viewId: 2
+		},
+		storage: {
+			total: 0,
+			viewId: 6
+		}
 	};
 
 	constructor(
@@ -44,11 +59,11 @@ export class AssetSummaryListComponent implements OnInit {
 
 			// Get the list
 			this.gridData.forEach((item: any) => {
-				this.total.application += item.application.count;
-				this.total.server += item.server.count;
-				this.total.device += item.device.count;
-				this.total.database += item.database.count;
-				this.total.storage += item.storage.count;
+				this.total.application.total += item.application.count;
+				this.total.server.total += item.server.count;
+				this.total.device.total += item.device.count;
+				this.total.database.total += item.database.count;
+				this.total.storage.total += item.storage.count;
 			});
 		});
 	}
