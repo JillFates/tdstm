@@ -932,9 +932,9 @@ class ProjectService implements ServiceMethods {
 			}
 
 			userPreferenceService.setCurrentProjectId(projectInstance.id)
-
+			
 			//Will create a bundle name TBD and set it as default bundle for project
-			projectService.getDefaultBundle(projectInstance)
+			getDefaultBundle(projectInstance)
 
 			return [message: "Project $projectInstance created", success: true, imageId: image.id]
 		} else {
