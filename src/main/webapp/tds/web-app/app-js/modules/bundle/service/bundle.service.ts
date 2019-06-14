@@ -46,6 +46,16 @@ export class BundleService {
 
 	}
 
+	getModelForBundleEdit(id) {
+		return this.http.get(`../ws/reports/editBundle/${id}`)
+			.map((response: any) => {
+				response.data.moveBundleInstance.completionTime = ((response.data.moveBundleInstance.completionTime) ? new Date(response.data.moveBundleInstance.completionTime) : '');
+				response.data.moveBundleInstance.startTime = ((response.data.moveBundleInstance.startTime) ? new Date(response.data.moveBundleInstance.startTime) : '');
+				return response;
+			})
+			.catch((error: any) => error);
+	}
+
 	getModelForBundleCreate() {
 		return this.http.get(`../ws/reports/createBundleModel`)
 			.map((response: any) => {
@@ -67,12 +77,12 @@ export class BundleService {
 		let postRequest = {
 			name: model.name,
 			description: model.description,
-			fromId: model.fromId,
-			toId: model.toId,
+			sourceRoom: model.fromId,
+			targetRoom: model.toId,
 			startTime: model.startTime,
 			completionTime: model.completionTime,
-			projectManagerId: model.projectManagerId,
-			moveManagerId: model.moveManagerId,
+			projectManager: model.projectManagerId,
+			moveManager: model.moveManagerId,
 			operationalOrder: model.operationalOrder,
 			workflowCode: model.workflowCode,
 			useForPlanning: model.useForPlanning
@@ -82,6 +92,30 @@ export class BundleService {
 					return response;
 				})
 				.catch((error: any) => error);
+	}
+
+	updateBundle(id, model): Observable<any> {
+
+		let postRequest = {
+			id: id,
+			name: model.name,
+			description: model.description,
+			sourceRoom: model.sourceRoom.id,
+			targetRoom: model.targetRoom.id,
+			startTime: model.startTime,
+			completionTime: model.completionTime,
+			projectManager: model.projectManagerId,
+			moveManager: model.moveManagerId,
+			operationalOrder: model.operationalOrder,
+			workflowCode: model.workflowCode,
+			useForPlanning: model.useForPlanning,
+			dashboardSteps: model.dashboardSteps
+		};
+		return this.http.post(`../ws/reports/updateBundle/${id}`, JSON.stringify(postRequest))
+			.map((response: any) => {
+				return response;
+			})
+			.catch((error: any) => error);
 	}
 
 	deleteBundleAndAssets(id) {

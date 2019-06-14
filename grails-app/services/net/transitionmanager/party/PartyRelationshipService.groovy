@@ -270,7 +270,7 @@ class PartyRelationshipService implements ServiceMethods {
 				from PartyRelationship
 				where partyRelationshipType = :relationshipType
 				  and partyIdFrom.id = :partyIdFromId
-				  and partyIdTo.id = :partyIdTo
+				  and partyIdTo.id = :partyIdToId
 				  and roleTypeCodeFrom = :roleTypeIdFrom
 				  and roleTypeCodeTo = :roleTypeIdTo
 			''', [relationshipType: relationshipType, roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo,

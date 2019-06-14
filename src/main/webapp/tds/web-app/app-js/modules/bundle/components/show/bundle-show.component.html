@@ -1,7 +1,7 @@
 <div class="bundle-show-component">
     <div class="nav" style="border: 1px solid #CCCCCC; width: 300px; margin:9px 14px 0px">
         <span class="menuButton"><a href="bundle/list"><input type="submit" name="_action_List" value="Bundle List" class="list"></a></span>
-        <span *ngIf="canCreateBundle" class="menuButton"><input type="submit" name="_action_Create" value="Create Bundle" class="create"></span>
+        <span *ngIf="canCreateBundle" class="menuButton"><a href="bundle/create"><input type="submit" name="_action_Create" value="Create Bundle" class="create"></a></span>
     </div>
 
     <div class="body" style="width: 330px; float: left">
@@ -30,14 +30,14 @@
                 <tr class="prop">
                     <td valign="top" class="name">From:</td>
 
-                    <td valign="top" class="value">{{moveBundleInstance?.sourceRoom}}</td>
+                    <td valign="top" class="value"><span *ngIf="moveBundleInstance?.sourceRoom != 'null'">{{moveBundleInstance?.sourceRoom}}</span></td>
 
                 </tr>
 
                 <tr class="prop">
                     <td valign="top" class="name">To:</td>
 
-                    <td valign="top" class="value">{{moveBundleInstance?.targetRoom}}</td>
+                    <td valign="top" class="value"><span *ngIf="moveBundleInstance?.targetRoom != 'null'">{{moveBundleInstance?.targetRoom}}</span></td>
 
                 </tr>
 
@@ -59,7 +59,7 @@
                     <td valign="top" class="name">Project Manager:</td>
 
                     <td valign="top" class="value">
-                        <span *ngIf="projectManager">partyIdTo?.lastNameFirstAndTitle</span>
+                        <span *ngIf="projectManager">{{projectManager}}</span>
                     </td>
 
                 </tr>
@@ -68,7 +68,7 @@
                     <td valign="top" class="name">Event Manager:</td>
 
                     <td valign="top" class="value">
-                        <span *ngIf="moveManager">moveManager?.partyIdTo?.lastNameFirstAndTitle</span>
+                        <span *ngIf="moveManager">{{moveManager}}</span>
                     </td>
 
                 </tr>
@@ -76,7 +76,7 @@
                     <td valign="top" class="name">Event:</td>
 
                     <td valign="top" class="value">
-                        <li><a href="/tdstm/moveEvent/show/{{moveBundleInstance?.moveEvent.id}}">{{moveBundleInstance?.moveEvent.name}}</a></li>
+                        <a href="/tdstm/moveEvent/show/{{moveBundleInstance?.moveEvent.id}}">{{moveBundleInstance?.moveEvent.name}}</a>
                     </td>
 
                 </tr>
@@ -110,7 +110,7 @@
         <div class="buttons" style="float: left;">
             <input type="hidden" name="id" value="id"/>
             <input type="hidden" name="projectId" value="projectId"/>
-            <span class="button"><input type="submit" name="_action_Edit" value="Edit" class="edit"></span>
+            <span class="button"><a href="bundle/{{bundleId}}/edit"><input type="submit" name="_action_Edit" value="Edit" class="edit"></a></span>
             <span *ngIf="!isDefaultBundle" class="button"><input type="submit" (click)="deleteBundle()" name="_action_Delete" value="Delete" class="delete"></span>
             <span class="button"><input type="submit" (click)="deleteBundleAndAssets()" name="_action_deleteBundleAndAssets" value="Delete Bundle & Assets" class="delete"></span>
         </div>

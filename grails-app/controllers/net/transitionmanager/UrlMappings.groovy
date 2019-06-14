@@ -1289,10 +1289,17 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/editBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleEdit"
+			]
+		}
+
 		"/ws/reports/createBundleModel" {
 			controller = "wsReports"
 			action = [
-					GET: "getModelForBundleCreate"
+					GET: "modelForBundleCreate"
 			]
 		}
 
@@ -1300,6 +1307,13 @@ class UrlMappings {
 			controller = "wsReports"
 			action = [
 					POST: "saveBundle"
+			]
+		}
+
+		"/ws/reports/updateBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					POST: "updateBundle"
 			]
 		}
 

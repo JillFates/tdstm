@@ -81,7 +81,7 @@ class MoveBundle extends Party {
 			startTime: startTime,
 			completionTime: completionTime,
 			operationalOrder: operationalOrder,
-			moveEvent: [id: moveEvent.id, name: moveEvent.name],
+			moveEvent: [id: moveEvent?.id, name: moveEvent?.name],
 			workflowCode: workflowCode,
 			useForPlanning: useForPlanning,
 			sourceRoom: sourceRoom.toString(),

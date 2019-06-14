@@ -10,6 +10,7 @@ import {BundleListComponent} from './components/list/bundle-list.component';
 import {BundleResolveService} from './resolve/bundle-resolve.service';
 import {BundleShowComponent} from './components/show/bundle-show.component';
 import {BundleCreateComponent} from './components/create/bundle-create.component';
+import {BundleEditComponent} from './components/edit/bundle-edit.component';
 
 /**
  * Asset Explorer Route States
@@ -22,6 +23,9 @@ export class BundleStates {
 	}
 	public static readonly BUNDLE_SHOW = {
 		url: ':id/show'
+	}
+	public static readonly BUNDLE_EDIT = {
+		url: ':id/edit'
 	}
 	public static readonly BUNDLE_CREATE = {
 		url: 'create'
@@ -64,7 +68,23 @@ export const BundleRoute: Routes = [
 		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
 	},
-
+	{
+		path: BundleStates.BUNDLE_EDIT.url,
+		data: {
+			page: {
+				title: 'BUNDLES.EDIT',
+				instruction: '',
+				menu: ['BUNDLES.BUNDLES', 'BUNDLES.EDIT'],
+			},
+			requiresAuth: true
+		},
+		component: BundleEditComponent,
+		resolve: {
+			bundles: BundleResolveService
+		},
+		canActivate: [AuthGuardService, ModuleResolveService],
+		runGuardsAndResolvers: 'always'
+	},
 	{
 		path: BundleStates.BUNDLE_CREATE.url,
 		data: {
