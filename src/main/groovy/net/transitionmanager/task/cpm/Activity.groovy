@@ -32,7 +32,21 @@ class Activity {
 	 */
 	Boolean isCriticalPath = false
 
-	Set<Activity> successors = []
-	Set<Activity> predecessors = []
+	Set<Activity> successors = new HashSet<>()
+	Set<Activity> predecessors = new HashSet<>()
+
+	/**
+	 *
+	 * @param successor
+	 */
+	void addSuccessor(Activity successor) {
+		this.successors.add(successor)
+		successor.predecessors.add(this)
+	}
+
+	void addPredecessor(Activity predecessor) {
+		this.predecessors.add(predecessor)
+		predecessor.successors.add(this)
+	}
 
 }
