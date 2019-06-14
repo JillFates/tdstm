@@ -67,7 +67,8 @@ export const en_DICTIONARY: Object = {
 			'TASKS' : 'Tasks',
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
-		}
+		},
+		'TOTAL': 'Total'
 	},
 	'ASSETS': {
 		'APPLICATION': 'Application',
@@ -133,6 +134,10 @@ export const en_DICTIONARY: Object = {
 				'REMOVE': 'Remove these'
 			}
 		}
+	},
+	'ASSET_SUMMARY': {
+		'ASSET_SUMMARY': 'Asset Summary',
+		'SUMMARY': 'Summary'
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
