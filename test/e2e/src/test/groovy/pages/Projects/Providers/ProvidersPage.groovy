@@ -25,7 +25,7 @@ class ProvidersPage extends Page{
         firstProviderDate(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[2]}
         firstProviderName(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[0]}
         firstProviderDesc(wait:true) { firstProviderTable.find("tbody").find("tr").find("td")[1]}
-        firstProviderDeleteButton(wait:true) {$("div", class:"tds-action-button-set").find("tds-button-delete")}
+        firstProviderDeleteButton(wait:true) {$("div", class:"tds-action-button-set")[0].find("tds-button-delete")}
         firstProviderEditPencilBtn(wait:true) {$("div", class: "tds-action-button-set").find("tds-button-edit")}
         noRecordsRow {$('.k-grid-norecords')}
         noRecordsMessage {noRecordsRow.find("td")}
@@ -64,7 +64,7 @@ class ProvidersPage extends Page{
     /**
      * The objective of this method is to cleanup the records on the Providers List.
      * We need at least 3 providers to play with, which is why you'll see that no providers are deleted if 3 or less
-     * are the only ones displayed.
+     * are displayed.
      * Also, we will delete a max of 8 records per run.
      * @author Alvaro Navarro
      */
@@ -82,9 +82,8 @@ class ProvidersPage extends Page{
             while(providersToDelete!=0)
             {
                 clickOnFirstProviderDeleteActionButton()
-                commonsModule.waitForPromptModalDisplayed()
-                commonsModule.clickOnDeleteYesPromptModal()
-                commonsModule.waitForPromptModalHidden()
+                waitFor(30){deleteConfirmationModal.isDisplayed()}
+                waitFor(30){deleteConfirmationYesBtn.click()}
                 providersToDelete--
             }
         }

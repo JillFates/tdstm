@@ -20,6 +20,7 @@ class MenuPage extends Page {
         waitFor{adminModule.displayed}
         menuModule { module MenuModule}
         adminModule { module AdminModule}
+        waitFor{projectsModule.displayed}
         projectsModule { module ProjectsMenuModule}
         assetsModule { module AssetsMenuModule}
         tasksModule { module TasksMenuModule}

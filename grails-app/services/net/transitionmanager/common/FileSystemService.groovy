@@ -31,8 +31,7 @@ import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
-
-
+import org.springframework.web.multipart.MultipartFile
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
@@ -40,6 +39,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 class FileSystemService implements ServiceMethods {
 	public static final String ETL_SAMPLE_DATA_PREFIX = 'EtlSampleData_'
 	public static final String ETL_SOURCE_DATA_PREFIX = 'EtlSourceData_'
+	public static final String TMD_PREFIX = 'TMD_Data_'
 
 	/*
      * These are the accepted file extensions when uploading ETL files
@@ -376,29 +376,42 @@ class FileSystemService implements ServiceMethods {
         return filename
     }
 
-    /**
-     * Copy an uploaded file to the temporary directory.
-     *
-     * @param uploadFileCommand
-     * @param prefix for the uploaded file name
-     * @return
-     */
+	/**
+	 * Copy an uploaded file to the temporary directory.
+	 *
+	 * @param file, the file to be written to a temporary file
+	 * @param prefix for the uploaded file name
+	 *
+	 * @return The name of the temporary file.
+	 */
     private String writeFileFromCommand(UploadFileCommand uploadFileCommand, String prefix = '') {
-        String extension = FileSystemUtil.getFileExtension(uploadFileCommand.file.getOriginalFilename())
-        OutputStream os
-        String temporaryFileName
-        try {
-            (temporaryFileName, os) = createTemporaryFile(prefix, extension)
-            os.write(uploadFileCommand.file.getBytes())
-            os.close()
-        } catch (Exception e) {
-            log.error(e.getMessage())
-            deleteTemporaryFile(temporaryFileName)
-            throw new InvalidParamException(e.getMessage())
-        }
-
-        return temporaryFileName
+        return writeFile(uploadFileCommand.file, prefix)
     }
+
+	/**
+	     * Copy an uploaded file to the temporary directory.
+	     *
+	     * @param uploadFileCommand
+	     * @param prefix for the uploaded file name
+	     * @return
+	     */
+	String writeFile(MultipartFile file, String prefix = '') {
+		String extension = FileSystemUtil.getFileExtension(file.getOriginalFilename())
+		OutputStream os
+		String temporaryFileName
+
+		try {
+			(temporaryFileName, os) = createTemporaryFile(prefix, extension)
+			os << file.inputStream
+			os.close()
+		} catch (Exception e) {
+			log.error(e.getMessage())
+			deleteTemporaryFile(temporaryFileName)
+			throw new InvalidParamException(e.getMessage())
+		}
+
+		return temporaryFileName
+	}
 
 	/**
 	 * Return the allowed extensions for ETL Uploads.
