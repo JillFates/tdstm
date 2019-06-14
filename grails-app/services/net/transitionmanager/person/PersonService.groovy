@@ -193,7 +193,6 @@ class PersonService implements ServiceMethods {
 		}
 
 		query +=  ' OR (pr.partyIdTo.firstName = :firstName AND pr.partyIdTo.middleName is null AND pr.partyIdTo.lastName is null))'
-
 		log.debug 'findByCompanyAndName() Query = {}', query
 
 		return PartyRelationship.executeQuery(query, queryParams)
