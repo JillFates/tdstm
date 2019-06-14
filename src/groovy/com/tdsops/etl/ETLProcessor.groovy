@@ -8,6 +8,7 @@ import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -39,7 +40,6 @@ import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
-
 /**
  * Class that receives all the ETL initial commands.
  * <pre>
@@ -227,6 +227,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *  https://en.wikipedia.org/wiki/Control_character
 	 */
 	static ControlCharactersRegex = /\\0|\\a\\0\\b\\t\\n\\v\\f\\r/
+
+	static final List<String> ProhibitedStringMethods = ['execute', 'asType', 'toURI', 'toURL']
+	static final List<String> AllowedObjectMethods    = ['clone', 'equals', 'toString', 'any', 'asBoolean', 'collect', 'contains',
+														 'count', 'each', 'eachWithIndex', 'equals', 'every', 'find', 'findIndexOf',
+														 'findIndexValues', 'findLastIndexOf', 'findResult', 'flatten', 'getAt', 'grep',
+														 'groupBy', 'inject', 'is', 'join', 'putAt', 'size', 'sum', 'with'
+	]
 
 	/**
 	 * Creates an instance of ETL processor with a source of data,
@@ -1651,6 +1658,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		}
 
 		ImportCustomizer customizer = new ImportCustomizer()
+
+		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
