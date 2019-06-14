@@ -578,8 +578,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				name: apiAction?.name,
 				remoteCredentialMethod :
 					(apiAction?.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
-				script: apiAction.script,
-				type: apiAction.actionType.name()
+				script: apiAction?.script,
+				type: apiAction?.actionType.name()
 			]
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
