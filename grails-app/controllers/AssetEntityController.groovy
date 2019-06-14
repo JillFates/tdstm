@@ -598,9 +598,10 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (assetComment?.taskBatch?.recipe) {
 				Recipe recipe = assetComment.taskBatch.recipe
 				recipeMap = [
-				    id: recipe.id,
+					id  : recipe.id,
 					name: recipe.name
 				]
+			}
 				commentList << [
 					action: assetComment.apiAction?.name,
 					actionInvocable: assetComment.isActionInvocableLocally(),
@@ -653,7 +654,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					taskSpecId: assetComment.taskSpec,
 					workflow:workflow
 				]
-			}
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "showComment: show comment view - $errorMsg"
