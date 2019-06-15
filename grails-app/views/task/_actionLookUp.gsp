@@ -36,6 +36,14 @@
                                 <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>${apiAction.description}</textarea>
                             </td>
                         </tr>
+						<tr class="prop">
+                            <td valign="top" class="script" >
+                                <label><b>Script:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <textarea cols="80" rows="6" name="actionScript" readonly>${apiAction.script}</textarea>
+                            </td>
+                        </tr>
                         <tr class="prop">
                             <td valign="top" colspan="2">
                                 <table id="updateCommentTableInnerTable">

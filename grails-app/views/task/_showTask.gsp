@@ -11,6 +11,7 @@
 	</div>
 	<div id="showCommentDialog" class="comment-dialog-content">
 		<div class="dialog" style="border: 1px solid #5F9FCF">
+			<g:hiddenField name="apiActionPercentDone" value="{{acData.apiActionPercentDone}}" />
 			<div>
 				<table id="showCommentTable" style="border: 0px;">
 					<tr class="prop">
@@ -38,9 +39,47 @@
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">
-              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
-            </td>
+              				<a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
+            			</td>
 					</tr>
+					<tr id="scriptType" class="prop">
+						<td valign="top" class="name"><label>Type:</label></td>
+						<td valign="top" class="value" colspan="3">{{acData.apiAction.type}}</td>
+					</tr>
+
+					<tr id="isRemote" class="prop">
+						<td valign="top" class="name"><label>Is Remote:</label></td>
+						<td valign="top" class="value" colspan="3">
+							<input class="checkbox" ng-checked="acData.apiAction.isRemote == true" id="checkIsRemote" type="checkbox" disabled>
+						</td>
+					</tr>
+
+					<tr class="prop">
+						<td valign="top" class="name"><label>Action Percent Done:</label></td>
+						<td class="dashboard_bar_base" colspan="2">
+							<div ng-if="acData.apiActionPercentDone == '0'" >
+								<div class="dashboard_bar_graph0">
+									<b>0 % Percent Done</b>
+								</div>
+							</div>
+
+							<div ng-if="acData.apiActionPercentDone == '100'">
+								<div class="task_completed"style="z-index: -1; height: 24px; width: 100%"></div>
+								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
+									<b>100% Percent Done</b>
+								</div>
+							</div>
+
+							<div ng-if="['0', '100'].indexOf(acData.apiActionPercentDone) === -1">
+								<div class="dashboard_bar_graph" id="analysisbar"style="width: 0%;"></div>
+								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
+									<b> {{acData.apiActionPercentDone}} %</b>
+								</div>
+							</div>
+						</td>
+						<td></td>
+					</tr>
+
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
 						<td valign="top" class="value" id="categoryTdId" style="width:15%">{{ac.category}}</td>
@@ -229,6 +268,11 @@
 		// defer setup tooltips until action-bar buttons is in place
 		setTimeout(function() {
 			$('[data-toggle="popover"]').popover();
+
+			%{--var percentagePlanReady = "${apiActionPercentDone}";--}%
+			// var percentagePlanReady = "{{acData.apiActionPercentDone}}";
+			var apiActionPercentDone = document.getElementById('apiActionPercentDone').value
+			$("#analysisbar").animate({width: apiActionPercentDone + "%"}, 1000);
 		},1500)
 	})
 </script>
