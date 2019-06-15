@@ -2,9 +2,8 @@ package net.transitionmanager.task.cpm
 
 class CriticalPathMethod {
 
-
 	/**
-	 * The WalkListAhead method receives the array that stores the activities
+	 * The {@code CriticalPathMethod#walkListAhead} method receives the array that stores the activities
 	 * and performs the forward walking inside the activity list calculating
 	 * for each activity its earliest start time and earliest end time.
 	 * @param list
@@ -28,7 +27,12 @@ class CriticalPathMethod {
 
 		return activities
 	}
-
+	/**
+	 * 	After the forward walking the {@code CriticalPathMethod#walkListAhead}
+	 * 	performs the backward walking calculating for each activity its latest start time and latest end time.
+	 * @param activities
+	 * @return
+	 */
 	private static List<Activity> walkListAback(List<Activity> activities) {
 
 		Activity sink = activities.last()

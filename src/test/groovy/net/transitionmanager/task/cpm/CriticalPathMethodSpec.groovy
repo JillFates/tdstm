@@ -1,34 +1,26 @@
 package net.transitionmanager.task.cpm
 
+import spock.lang.Shared
 import spock.lang.Specification
 
 class CriticalPathMethodSpec extends Specification {
 
+	@Shared
+	DirectedGraphTestHelper directedGraphTestHelper = new DirectedGraphTestHelper()
+	/*
+	+---+---+---+
+	| 0 | A | 3 |
+	+-----------+
+	| 0 | 3 | 3 |
+	+---+---+---+
+ 	*/
+
 	void 'test can calculate critical path method for a list of activities'() {
-		setup:
-			Activity A = new Activity(taskId: 'A', duration: 3)
-			Activity B = new Activity(taskId: 'B', duration: 4)
-			Activity C = new Activity(taskId: 'C', duration: 2)
-			Activity D = new Activity(taskId: 'D', duration: 5)
-			Activity E = new Activity(taskId: 'E', duration: 1)
-			Activity F = new Activity(taskId: 'F', duration: 2)
-			Activity G = new Activity(taskId: 'G', duration: 4)
-			Activity H = new Activity(taskId: 'H', duration: 3)
 
-			B.addPredecessor(A)
-			C.addPredecessor(A)
-			D.addPredecessor(B)
-			E.addPredecessor(C)
-			F.addPredecessor(C)
-			G.addPredecessor(D)
-			G.addPredecessor(E)
-			H.addPredecessor(F)
-			H.addPredecessor(G)
-
-			List<Activity> activities = [A, B, C, D, E, F, G, H]
-
+		given:
+			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraph()
 		when:
-			List<Activity> criticalPath = CriticalPathMethod.calculate(activities)
+			List<Activity> criticalPath = CriticalPathMethod.calculate(directedGraph)
 
 		then:
 			!criticalPath.isEmpty()
