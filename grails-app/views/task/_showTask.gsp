@@ -54,7 +54,7 @@
 						</td>
 					</tr>
 
-					<tr class="prop">
+					<tr class="prop" ng-if="acData.apiActionInvokedAt || acData.apiActionStarted">
 						<td valign="top" class="name"><label>Action Percent Done:</label></td>
 						<td class="dashboard_bar_base" colspan="1">
 							<div id="actionPercentDoneBar" 
