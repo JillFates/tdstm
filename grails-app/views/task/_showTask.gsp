@@ -37,22 +37,10 @@
 					</tr>
 					<tr id="actionShowId" class="api-action-section">
 						<td valign="top" class="name"  id="actionTdId"><label for="vmAction">Action:</label></td>
-						<td valign="top" class="value" id="vmAction" colspan="3">
+						<td valign="top" class="value" id="vmAction" colspan="2">
               				<a class="label-section" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" 
 							  ng-click="lookUpAction();">{{acData.apiAction.name}}
 							  </a>
-
-							<label class="label-section label-api-percent-done">Action Percent Done:</label>
-							<div class="dashboard_bar_base api-percent-done"  
-								ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
-								<div id="actionPercentDoneBar" 
-										class="dashboard_bar_graph task_completed" 
-										style="width: {{acData.apiActionPercentDone}}%;">
-								</div>
-								<div class="dashboard_bar_graph_value" >
-									<b>{{acData.apiActionPercentDone}} %</b>
-								</div>
-							</div>
             			</td>
 					</tr>
 
@@ -118,6 +106,18 @@
 						<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 						<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap">{{acData.dtResolved}}</td>
 					</tr >
+					<tr id="completitionPercent">
+						<td valign="top" class="name" ><label>Completition %:</label></td>
+						<td colspan="1">
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" 
+									style="width: {{acData.apiActionPercentDone}}%;" 
+									aria-valuenow="{{acData.apiActionPercentDone}}" 
+									aria-valuemin="0" 
+									aria-valuemax="100">{{acData.apiActionPercentDone}}%</div>
+							</div>	
+						</td>
+					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>

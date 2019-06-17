@@ -170,22 +170,8 @@ button.alert-close {
 	position: relative;
 }
 
-.comment-dialog-content .api-action-section .name {
-	vertical-align: middle;
-}
-
-.comment-dialog-content .api-action-section .label-section {
-	position:relative; 
-	top:-15px;
-}
-.comment-dialog-content .api-action-section .label-section.label-api-percent-done {
-	margin-left:40px;
-}
-
-.comment-dialog-content .api-action-section .api-percent-done {
-	display:inline-block;
-	width:150px;
-	text-align:center;
+.comment-dialog-content .progress {
+	margin-bottom: 5px
 }
 
 #actionLookupModal {
