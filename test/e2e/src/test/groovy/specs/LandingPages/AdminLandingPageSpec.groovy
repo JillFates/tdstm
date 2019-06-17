@@ -41,15 +41,14 @@ class AdminLandingPageSpec extends GebReportingSpec {
             adminModule.goToAdminMenu()
 
         then: 'The number of elements displayed matches'
-        //We set the number of elements as 25 because we need to take into account the divisions among items
+        //We set the number of elements as 21 because we need to take into account the divisions among items
         //We could also do the assertion comparing the length of the text
-        //adminModule.adminMenu.text().length() == 268
-            adminModule.adminMenu.children().size() == 25
+        //adminModule.adminMenu.text().length() == x
+            adminModule.adminMenu.children().size() == 21
             at MenuPage
     }
 
     def "2. Verify the Admin Portal Landing Page"() {
-        testKey = "TM-XXXX"
         given: 'The user is on the initial page'
             at MenuPage
         when: 'The User Clicks in the Admin>Admin Portal option'
@@ -141,7 +140,6 @@ class AdminLandingPageSpec extends GebReportingSpec {
     }
 
     def "13. Verify the List Manufacturers Landing Page"() {
-        testKey = "TM-XXXX"
         when: 'The User Clicks in the Admin>List Workflows option'
             adminModule.goToListManufacturers()
 

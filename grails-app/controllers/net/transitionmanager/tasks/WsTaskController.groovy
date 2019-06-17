@@ -1,5 +1,10 @@
 package net.transitionmanager.tasks
 
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.NumberUtil
+import net.transitionmanager.controller.PaginationMethods
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
@@ -20,6 +25,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 
 /**
@@ -29,13 +35,14 @@ import net.transitionmanager.task.TaskService
  */
 @Secured('isAuthenticated()')
 @Slf4j
-class WsTaskController implements ControllerMethods {
+class WsTaskController implements ControllerMethods, PaginationMethods {
 
 	CommentService commentService
 	QzSignService qzSignService
 	TaskService taskService
 	ApiActionService apiActionService
 	CredentialService credentialService
+    UserPreferenceService userPreferenceService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -268,5 +275,52 @@ class WsTaskController implements ControllerMethods {
 		if(AssetCommentStatus.list.contains(status)) {
 			taskService.setTaskStatus(comment,status)
 		}
+	}
+
+	/**
+	 * 	Returns a json with the rows that will be used to render the Task Manager contents.
+	 *
+	 *@return  The list of tasks as JSON
+	 */
+	@HasPermission(Permission.TaskManagerView)
+	def listTasks() {
+		Map params = request.JSON
+        println(params)
+        if (params.containsKey("justRemaining") && params.justRemaining in [0, 1]) {
+            userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
+        }
+        if (params.containsKey('viewUnpublished') && params.viewUnpublished in [0, 1]) {
+            userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
+        }
+        if (params.containsKey('moveEvent') && params.moveEvent > 0) {
+            userPreferenceService.setMoveEventId params.moveEvent
+        }
+
+		Map<String, String> definedSortableFields = [
+				'taskNumber': 'taskNumber',
+				'comment': 'comment',
+				'assetName': 'assetName',
+				'dueDate': 'dueDate',
+				'status': 'status',
+				'assignedTo': 'assignedTo',
+				'instructionsLink': 'instructionsLink',
+				'category': 'category',
+				'score': 'score'
+		].withDefault { key -> params.sidx }
+
+		String sortIndex =  definedSortableFields[params.sidx]
+		String sortOrder =  paginationSortOrder('sord')
+
+		Project project = getProjectForWs()
+		// Determine if only unpublished tasks need to be fetched.
+		params['viewUnpublished'] = securityService.viewUnpublished()
+
+		if(params['workflowTransition']){
+			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
+		}
+
+		// Fetch the tasks, the total count and the number of pages.
+		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
+		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)
 	}
 }

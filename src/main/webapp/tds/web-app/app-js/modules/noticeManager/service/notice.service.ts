@@ -1,11 +1,16 @@
 import {Injectable} from '@angular/core';
+import {Response, Headers, RequestOptions} from '@angular/http';
 import {HttpClient} from '@angular/common/http';
-import {NoticeModel} from '../model/notice.model';
-import {Observable} from 'rxjs';
+import {StringUtils} from '../../../shared/utils/string.utils';
+import {Observable} from 'rxjs/Observable';
+
+import {NoticeModel, PostNoticeResponse, NOTICE_TYPE_POST_LOGIN, NOTICE_TYPE_MANDATORY} from '../model/notice.model';
 
 import 'rxjs/add/operator/map';
+
 import 'rxjs/add/operator/catch';
 import {Flatten} from '../../../shared/model/data-list-grid.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 
 /**
  * @name NoticeService
@@ -26,82 +31,47 @@ export class NoticeService {
 	 */
 	getNoticesList(): Observable<NoticeModel[]> {
 		return this.http.get(this.noticeListUrl)
-			.map((response: any) => {
-				response.notices.forEach( (notice: any) => {
-					notice.typeId = notice.typeId.toString();
+			.map((result: any) => {
+				result.notices.forEach( (notice: any) => {
+					notice = this.cleanNotice(notice);
+					if (notice.typeId === NOTICE_TYPE_POST_LOGIN && notice.needAcknowledgement) {
+						notice.typeId = NOTICE_TYPE_MANDATORY;
+					}
 				});
-				return response && response.notices;
+				return result && result.notices;
 			})
 			.catch((error: any) => error);
 	}
 
-	createNotice(notice: NoticeModel): Observable<NoticeModel[]> {
-		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
-			.map((response: any) => response)
-			.catch((error: any) => Observable.throw(error || 'Server error'));
-	}
-
-	editNotice(notice: NoticeModel): Observable<NoticeModel[]> {
-		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
-			.map((response: any) => response)
-			.catch((error: any) => Observable.throw(error || 'Server error'));
-	}
-
-	deleteNotice(noticeId: string): Observable<NoticeModel[]> {
-		return this.http.delete(`${this.noticeListUrl}/${noticeId}`)
-			.map((response: any) => response)
-			.catch((error: any) => Observable.throw(error || 'Server error'));
-	}
-
 	/**
-	 * Based on provided column, update the structure which holds the current selected filters
-	 * @param {any} column: Column to filter
-	 * @param {any} state: Current filters state
-	 * @returns {any} Filter structure updated
+	 * Get a specific notice
+	 * @returns {Observable<R>}
+	 * @param {number} id: Notice id to fetch
 	 */
-	filterColumn(column: any, state: any): any {
-		let root = state.filter || { logic: 'and', filters: [] };
+	getNotice(id: number): Observable<NoticeModel> {
+		return this.http.get(`${this.noticeListUrl}/${id}`)
+			.map((res: any) => {
+				return this.cleanNotice(res);
+			})
+			.catch((error: any) => error);
+	}
 
-		let [filter] = Flatten(root).filter(item => item.field === column.property);
+	createNotice(notice: NoticeModel): Observable<any> {
+		return this.http.post(this.noticeListUrl, JSON.stringify(notice))
+			.map((res: any) => res)
+			.catch((error: any) => error);
+	}
 
-		if (column.type === 'text') {
-			if (!column.filter) {
-				column.filter = '';
-			}
+	editNotice(notice: NoticeModel): Observable<any> {
+		return this.http.put(`${this.noticeListUrl}/${notice.id}`, JSON.stringify(notice))
+			.map((res: any) => res)
+			.catch((error: any) => error);
+	}
 
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'contains',
-					value: column.filter,
-					ignoreCase: true
-				});
-			} else {
-				filter = root.filters.find((r) => {
-					return r['field'] === column.property;
-				});
-				filter.value = column.filter;
-			}
-		}
-
-		if (column.type === 'boolean') {
-			if (!filter) {
-				root.filters.push({
-					field: column.property,
-					operator: 'eq',
-					value: column.filter
-				});
-			} else {
-				if (column.filter !== null) {
-					filter = root.filters.find((r) => {
-						return r['field'] === column.property;
-					});
-					filter.value = column.filter
-				}
-			}
-		}
-
-		return root;
+	deleteNotice(id: string): Observable<any> {
+		return this.http.delete(`${this.noticeListUrl}/${id}`)
+			.map((res: any) => res)
+			.catch((error: any) => error);
 	}
 
 	/**
@@ -124,5 +94,22 @@ export class NoticeService {
 	getFiltersExcluding(excludeFilterName: string, state: any): any {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
+	}
+
+	/**
+	 * Set the default values for empty fields, and clean html coming with escape sequences
+	 * @param {NoticeModel} notice:  Notice received
+	 * @returns any : Notice with the default values and html content in place
+	 */
+	private cleanNotice(notice: NoticeModel): any {
+		notice.typeId = notice.typeId.toString();
+		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		notice.activationDate = notice.activationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		notice.expirationDate = notice.expirationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		return notice;
 	}
 }

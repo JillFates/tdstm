@@ -51,9 +51,12 @@
         </div>
         <div class="box-body">
             <asset-explorer-view-grid
+                    #assetExplorerViewGrid
+                    [hiddenFilters]="hiddenFilters"
                     [data]=data
                     (modelChange)="onQuery()"
                     (justPlanningChange)="onJustPlanningChange($event)"
+                    (hiddenFiltersChange)="onHiddenFiltersChange($event)"
                     [gridState]="gridState"
                     (gridStateChange)="onGridStateChange($event)"
                     [fields]="fields"

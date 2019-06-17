@@ -57,7 +57,7 @@ import {UserService} from './service/user.service';
 		ModuleResolveService,
 		UserResolveService,
 		// Service
-		UserService
+		UserService,
 	],
 	exports: [
 		UserListComponent

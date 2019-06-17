@@ -83,15 +83,6 @@ trait AllAssetsFilterUnitTest {
 					"domain"  : "common",
 					"edit"    : false,
 					"filter"  : "",
-					"label"   : "Tags",
-					"locked"  : false,
-					"property": "tagAssets",
-					"width"   : 220
-				],
-				[
-					"domain"  : "common",
-					"edit"    : false,
-					"filter"  : "",
 					"label"   : "Validation",
 					"locked"  : false,
 					"property": "validation",

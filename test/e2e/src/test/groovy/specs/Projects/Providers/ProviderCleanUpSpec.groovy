@@ -11,7 +11,7 @@ import pages.Login.MenuPage
 
 /**
  * This Spec cleans up the providers list.
- * If there are more than 3 providers (all we really need) then it will delete 8 of them (if possible).
+ * If there are more than 11 providers (all we really need) then it will delete 8 of them (if possible).
  * @author Alvaro Navarro
  */
 

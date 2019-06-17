@@ -65,7 +65,7 @@ class UserDetailsPage extends Page {
     }
 
     def verifyNotLockedOut(){
-        lockedOutUntil.text().contains("Not Locked Out")
+        waitFor(30){lockedOutUntil.text().contains("Not Locked Out")}
     }
 
 }

@@ -22,7 +22,7 @@ class TagsListSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        projectsModule.goToTagsPage()
+        waitFor(30){projectsModule.goToTagsPage()}
     }
 
     def setup() {

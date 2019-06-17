@@ -1,3 +1,4 @@
+import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -242,22 +243,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 
 	}
 
-	// Need to decide if there is any information to deal with de-dupping and error if not
-	@Ignore
-    void 'Test fetchEntityByFieldMetaData for no find.query specified'() {
-        setup:
-			String property = 'asset'
-			JSONObject fieldsInfo = initFieldsInfoForDependencyAsJSONObject()
-
-        when: 'called with no id and an empty query section'
-			def entity = SearchQueryHelper.findEntityByMetaData(property, fieldsInfo, context)
-        then: 'no entity should be returned'
-			! entity
-		and: 'a particular error message should be recorded in the fieldsInfo'
-			String errMsg = fieldsInfo[property].errors[0]
-			SearchQueryHelper.NO_FIND_QUERY_SPECIFIED_MSG == errMsg
-	}
-
     void 'Test fetchEntityByFieldMetaData for find by field.value set to asset ID number'() {
         setup:
 			String property = 'asset'
@@ -345,10 +330,11 @@ class DataImportServiceIntegrationSpec extends Specification {
 			device.id == result.id
 	}
 
-	// Need to implement
-	@Ignore
-    void 'Test fetchEntityByFieldMetaData for #6 - AssetDependency'() {
-	}
+//	 Need to implement
+//	 SL - 06/03 - This test can be still be ignored since service has not yet implemented
+//	 expected test scenario
+//    void 'Test fetchEntityByFieldMetaData for #6 - AssetDependency'() {
+//	}
 
     void 'Test fetchEntityByFieldMetaData for caching'() {
         setup:
@@ -506,28 +492,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 		// 	SearchQueryHelper.NOT_FOUND_BY_ID == entity
 	}
 
-	// This method was removed - check to see if there is an alternative that we are going to use
-	@Ignore
-	void '5. test findDomainByAlternateProperty method'() {
-		// findDomainByAlternateProperty(String propertyName, JSONObject fieldsInfo, Map context)
-		setup:
-			JSONObject fieldsInfoJO = initFieldsInfoForDependencyAsJSONObject()
-			fieldsInfoJO.asset.value = device.assetName
-
-		when: 'calling findDomainByAlternateProperty() with name of valid device'
-			List entities = dataImportService.findDomainByAlternateProperty('asset', fieldsInfoJO, context)
-		then: 'the device should be found'
-			1 == entities.size()
-		and: 'the device should match the expected one'
-			device.assetName == entities[0].assetName
-
-	}
-
-	@Ignore
-	void 'test recordDomainConstraintErrorsToFieldsInfoOrRecord method'() {
-		// recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo)
-	}
-
 	void '8. test bindFieldsInfoValuesToEntity method'() {
 		setup:
 			AssetEntity asset = new AssetEntity()
@@ -617,8 +581,8 @@ class DataImportServiceIntegrationSpec extends Specification {
 		// TODO : JPM 4/2018 : add tests for setting each data type (Date, Integer, Long, Person, etc)
 	}
 
-	@Ignore
-	void 'test createReferenceDomain method'() {
+	// SL - 06/03 - See if there are options to implement this one
+//	void 'test createReferenceDomain method'() {
 		// createReferenceDomain(String propertyName, Map fieldsInfo, Map context)
 		// TODO : Augusto - work on killing this one
 
@@ -647,7 +611,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 				"os": "Red Hat Enterprise Linux 6 (64-bit)"
 			}
 		*/
-	}
+//	}
 
 	void '10. test addErrorToFieldsInfoOrRecord method'() {
 		// addErrorToFieldsInfoOrRecord(String propertyName, JSONObject fieldsInfo, ImportBatchRecord record, Map context, String errorMsg)
@@ -736,12 +700,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 			5 == dataImportService.tallyNumberOfErrors(record, fieldsInfo)
 	}
 
-	@Ignore
-		// generateMd5OfQuery
-	void 'test findAndUpdateOrCreateDependency method'() {
-		// generateMd5OfQuery
-	}
-
 	void '14. test transformData method'() {
 		setup: 'Create a DataScript, a Provider and other required data'
 			String etlSourceCode = """
@@ -801,24 +759,25 @@ class DataImportServiceIntegrationSpec extends Specification {
 	}
 
 	// This method was replaced with bind...?
-	@Ignore
 	void '15. hammer the setDomainPropertyWithValue method'() {
 		setup:
 			Application application = new Application()
 			// context = dataImportService.initContextForProcessBatch( ETLDomain.Dependency )
-			String parentProperty = 'asset'
+			// String parentProperty = 'asset'
 			Map fieldsInfo = initFieldsInfoForDependency()
+			initializeFieldElement('description', fieldsInfo, 'This is pretty cool')
+			initializeFieldElement('moveBundle', fieldsInfo, moveBundle)
 
 		when: 'calling setDomainPropertyWithValue to set the description'
 			String description = 'This is pretty cool'
-			String error = dataImportService.setDomainPropertyWithValue(application, 'description', description, parentProperty, fieldsInfo, context)
+			String error = dataImportService.setDomainPropertyWithValue(application, 'description', fieldsInfo, context)
 		then: 'there should be no error'
 			! error
 		and: 'the description property should be set'
 			description == application.description
 
 		when: 'calling setDomainPropertyWithValue trying to set the moveBundle reference property'
-			error = dataImportService.setDomainPropertyWithValue(application, 'moveBundle', moveBundle.name, parentProperty, fieldsInfo, context)
+			error = dataImportService.setDomainPropertyWithValue(application, 'moveBundle', fieldsInfo, context, 'name')
 		then: 'there should be no errors'
 			! error
 		and: 'the moveBundle should be set on the domain'
@@ -826,49 +785,9 @@ class DataImportServiceIntegrationSpec extends Specification {
 
 		when: 'calling setDomainPropertyWithValue trying to set a blocked property'
 			String propertyName = 'version'
-			error = dataImportService.setDomainPropertyWithValue(application, 'version', 123, parentProperty, fieldsInfo, context)
+			 error = dataImportService.setDomainPropertyWithValue(application, 'version', fieldsInfo, context)
 		then: 'an appropriate error message should be returned'
 			StringUtil.replacePlaceholders(dataImportService.PROPERTY_NAME_CANNOT_BE_SET_MSG, [propertyName:propertyName]) == error
-
-	}
-
-	@Ignore
-	// TODO : JPM 4/2018 : This is not working and the code was disabled because the toSet is fucking with the order of the original list
-	void '16. Test fixOrderInWhichToProcessFields method'() {
-		expect:
-			expectedList == dataImportService.fixOrderInWhichToProcessFields(set)
-		where:
-			set												| expectedList
-			['a','b','c'].toSet()							| ['a','b','c']
-			['a','manufacturer','b','model','c'].toSet()	| ['a','manufacturer','b','model','c']
-			['a','model','b','manufacturer','c'].toSet()	| ['a','manufacturer','b','model','c']
-			['model','b','manufacturer','c'].toSet()		| ['manufacturer','b','model','c']
-	}
-
-	// This method was replaced with something else
-	@Ignore
-	void '17. Test the findReferenceDomainByAlternateKey method'() {
-		// 	List findReferenceDomainByAlternateKey(Object entity, String refDomainPropName, String searchValue, String parentPropertyName, Map fieldsInfo, Map context)
-		setup:
-			AssetEntity domainObject = new AssetEntity()
-			List results
-			Map fieldsInfo = initFieldsInfoForDependency()
-
-		when: 'Calling for a known Manufacturer'
-			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'HP', 'asset', fieldsInfo, context)
-		then: 'one result should be returned'
-			1 == results.size()
-
-		when: 'Calling for a known alias of Manufacturer'
-			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'Hewlett Packard', 'asset', fieldsInfo, context)
-		then: 'one result should be returned'
-			1 == results.size()
-
-		when: 'Calling for a non-existent Manufacturer'
-			results = dataImportService.findReferenceDomainByAlternateKey(domainObject, 'manufacturer', 'WillNotFindThisMfg', 'asset', fieldsInfo, context)
-		then: 'one result should be returned'
-			0 == results.size()
-		// and: 'An error should be logged'
 	}
 
 	void '18 Test the _hasSingleFindResult method'() {
@@ -914,14 +833,12 @@ class DataImportServiceIntegrationSpec extends Specification {
 			SearchQueryHelper.hasFindQuery(fieldName, fieldsInfo)
 	}
 
-	@Ignore
 	void '20 Test the bindFieldsInfoValuesToEntity method for bugs'() {
 		given: 'a fieldsInfo for a device'
 			Map fieldsInfo = initFieldsInfoForDevice()
 			AssetType assetType = AssetType.VM
 			Integer priority = 6
 			Double price = 1.25
-			Date retire = new Date()
 			SizeScale scale = SizeScale.TB
 			Person clientStaff1 = personTestHelper.createPerson(whom, project.client, project)
 			Person clientStaff2 = personTestHelper.createPerson(whom, project.client, project)
@@ -938,7 +855,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 			initializeFieldElement('assetType', fieldsInfo, assetType)
 			initializeFieldElement('priority', fieldsInfo, priority)
 			initializeFieldElement('purchasePrice', fieldsInfo, price)
-			initializeFieldElement('retireDate', fieldsInfo, retire)
 			initializeFieldElement('scale', fieldsInfo, scale)
 			initializeFieldElement('modifiedBy', fieldsInfo, clientStaff1.toString())
 			/*
@@ -963,7 +879,6 @@ class DataImportServiceIntegrationSpec extends Specification {
 			server.assetType == assetType.toString()
 			server.priority == priority
 			server.purchasePrice == price
-			server.retireDate == retire
 			server.scale == scale
 			server.modifiedBy == clientStaff1
 		and: 'calling bindFieldsInfoValuesToEntity should not error'

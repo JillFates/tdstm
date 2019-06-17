@@ -3208,7 +3208,7 @@ class AssetEntityService implements ServiceMethods {
 			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
 				assetSummaryList << [
 					id: moveBundle.id,
-					name: moveBundle,
+					name: moveBundle.name,
 					applicationCount: applicationCount,
 					serverCount: serverCount,
 					physicalCount: physicalCount,

@@ -67,7 +67,8 @@ export const en_DICTIONARY: Object = {
 			'TASKS' : 'Tasks',
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
-		}
+		},
+		'TOTAL': 'Total'
 	},
 	'ASSETS': {
 		'APPLICATION': 'Application',
@@ -133,6 +134,10 @@ export const en_DICTIONARY: Object = {
 				'REMOVE': 'Remove these'
 			}
 		}
+	},
+	'ASSET_SUMMARY': {
+		'ASSET_SUMMARY': 'Asset Summary',
+		'SUMMARY': 'Summary'
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
@@ -222,7 +227,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
-		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
+		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
 		'PROJECT': 'Project',
 		'CREATE_CUSTOM': 'Add Custom Field',
@@ -289,11 +294,27 @@ export const en_DICTIONARY: Object = {
 	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
+		'SHOW_NOTICE': 'Notice Detail',
 		'CREATE_NOTICE': 'Create Notice',
-		'EDIT_NOTICE': 'Edit Notice',
+		'EDIT_NOTICE': 'Notice Edit',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
+		'NOTICES': 'Notices',
 		'VIEW_HTML': 'View HTML',
+		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
+		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
+		'POST_NOTICES': 'Post Notices',
+		'TOOLTIP_TITLE': 'Notice title',
+		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
+Post Login: Used for general notices after Login
+Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
+		'TOOLTIP_ACTIVE': 'Notice will only appear when Active as long as it is within the Activation/Expiration date range if set',
+		'TOOLTIP_ACTIVATION_DATE': 'When set the notice will not appear before the date set otherwise it will be shown',
+		'TOOLTIP_EXPIRATION_DATE': 'When set the notice will stop being shown after the date',
+		'TOOLTIP_LOCKED': 'Once a notice is locked the Message Text and Post Message Text fields will become permanently read-only and can not be unlocked',
+		'TOOLTIP_SEQUENCE': 'Used to control the order of notices when 2 or more are being displayed where the lowest numbered notice is listed first',
+		'TOOLTIP_MESSAGE': 'HTML text to display in main user dialog window',
+		'TOOLTIP_POSTMESSAGE': 'Appears above the Accept button for Mandatory Acknowledgements'
 	},
 	'PAGES': {
 		'ERROR_TITLE': 'Oops! Something went wrong.',

@@ -85,6 +85,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/summaryTable" {
+			controller = "wsAsset"
+			action = [
+			    GET: "getSummaryTable"
+			]
+		}
+
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
@@ -214,6 +221,11 @@ class UrlMappings {
 		"/ws/dashboard/bundleData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"bundleData"]
+		}
+
+		"/ws/dashboard/getPlanningStats" {
+			controller = "wsDashboard"
+			action = [GET:"getDataForPlanningDashboard"]
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -368,6 +380,11 @@ class UrlMappings {
 				GET: "listComments",
 			    POST: 'saveComment'
 			]
+		}
+
+		"/ws/task/listTasks" {
+			controller = "wsTask"
+			action = [POST:"listTasks"]
 		}
 
 		"/ws/task/generateTasks" {
@@ -619,6 +636,14 @@ class UrlMappings {
 		}
 
 		///// NOTICES API /////////
+
+		"/ws/notices/continue" {
+			controller = 'wsNotice'
+			action = [
+				GET: 'clearNoticesWhenNoMandatoryLeft'
+			]
+		}
+
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
@@ -636,14 +661,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/notices/$id/ack" {
+		"/ws/notices/$id/acknowledge" {
 			controller = "wsNotice"
 			action = [
 					POST: "acknowledge"
 			]
 		}
 
-		"/ws/notice/fetchPostNotices" {
+		"/ws/notices/fetchPostLoginNotices" {
 			controller = "wsNotice"
 			action = [
 					GET: "fetchPostLoginNotices"

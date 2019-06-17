@@ -59,7 +59,7 @@ export class FieldSettingsService {
 			payload[domainModel.domain.toUpperCase()] = domainModel;
 		});
 		return this.http.post(`${this.fieldSettingsUrl}/ASSETS`, JSON.stringify(payload))
-			.map((response: any) => response['_body'] ? response : { status: 'Ok' })
+			.map((response: any) => response['_body'] ? response : {status: 'Ok'})
 			.catch((error: any) => Observable.throw(error || 'Server error'));
 	}
 
@@ -67,11 +67,11 @@ export class FieldSettingsService {
 	 * NOTE This function is added here in the service as it needs to be shared with different components.
 	 *
 	 * Checks if the label parameter string matches other labels in the fields list.
-	 * 	  This comparison is case-insensitive and it doesn't take into account any trailing,
-	 * 	  leading or in-between spaces.
-	 * 	  e.g. 	label: "Last Modified or last modified or LastModified".
-	 * 	  		other label: "Last Modified".
-	 * 	  		This comparisons will error.
+	 *    This comparison is case-insensitive and it doesn't take into account any trailing,
+	 *    leading or in-between spaces.
+	 *    e.g.  label: "Last Modified or last modified or LastModified".
+	 *        other label: "Last Modified".
+	 *        This comparisons will error.
 	 *
 	 * @param The label string to be compared with the list of existing labels.
 	 * @param The list of fields.
@@ -81,7 +81,7 @@ export class FieldSettingsService {
 		// when the label compares to itself.
 		return fields.filter(
 			item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
-				&& item.label.trim() !== '').length > 1;
+			&& item.label.trim() !== '').length > 1;
 	}
 
 	/**
@@ -89,14 +89,14 @@ export class FieldSettingsService {
 	 *
 	 * Checks if the label String matches any field names in the list of fields.
 	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
-	 * 	  e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
+	 *    e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
 	 * @param  The label string to be compared with the list of existing field names.
 	 * @param The list of fields.
 	 */
 	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
 		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
 		return fields.filter(
-			item => item.field.toLowerCase().trim() === cleanLabel
+				item => item.field.toLowerCase().trim() === cleanLabel
 				&& item.label.trim() !== '').length > 0;
 	}
 

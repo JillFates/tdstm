@@ -156,9 +156,9 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Assets</li>
                             <li class="menu-child-item menu-parent-assets-summary-table">
-                                <g:link class="mmlink" controller="assetEntity" action="assetSummary">
+                                <a href="/tdstm/module/assetsummary/list">
                                     <asset:image src="icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
-                                </g:link>
+                                </a>
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
                                 <g:link class="mmlink" controller="module" action="asset" id="views">
@@ -354,7 +354,7 @@
                             </li>
                             <tds:hasPermission permission="${Permission.ReportViewPlanning}">
                                 <li class="menu-child-item menu-parent-dashboard-planning-dashboard">
-                                    <g:link controller="moveBundle" action="planningStats">Planning Dashboard</g:link>
+                                    <a href="/tdstm/module/planning/dashboard">Planning Dashboard</a>
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-dashboard-event-dashboard">

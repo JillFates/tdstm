@@ -26,7 +26,7 @@ class TagsDeletionSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        projectsModule.goToTagsPage()
+        waitFor(30){projectsModule.goToTagsPage()}
         at TagsPage
         clickOnCreateTagButton()
         fillInFields customTag

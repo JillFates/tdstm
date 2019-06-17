@@ -40,7 +40,7 @@ class PlanningMenuModule extends Module {
     }
 
     def goToPlanningMenu() {
-        planningItem.click()
+        waitFor(30) {planningItem.click()}
     }
 
     def goToListEvents() {
