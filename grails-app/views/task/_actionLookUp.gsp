@@ -46,7 +46,7 @@
                         </tr>
 						<tr class="prop">
                             <td valign="top" class="name" >
-                                <label><b>Is Remote:</b></label>
+                                <label><b>Executes from TM:</b></label>
                             </td>
                             <td valign="top" class="value">
                                <g:if test="${apiAction.isRemote == true}">

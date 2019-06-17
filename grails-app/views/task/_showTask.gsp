@@ -106,7 +106,7 @@
 						<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 						<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap">{{acData.dtResolved}}</td>
 					</tr >
-					<tr id="completitionPercent">
+					<tr id="completitionPercent" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
 						<td valign="top" class="name" ><label>Completition %:</label></td>
 						<td colspan="1">
 							<div class="progress">
