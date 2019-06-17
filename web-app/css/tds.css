@@ -389,6 +389,11 @@
 	height: 0px; 
 	margin-left: 5px;
 }
+
+.task-details .api-action-section {
+	vertical-align: middle;
+}
+
 .task_completed + .dashboard_bar_graph_value {
 	color: #fff;
 }
