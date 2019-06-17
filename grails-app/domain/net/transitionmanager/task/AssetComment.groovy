@@ -1,6 +1,6 @@
 package net.transitionmanager.task
 
-
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -312,6 +312,14 @@ class AssetComment {
 		return hasAction() && !apiActionInvokedAt && !apiAction.isRemote && status in [READY, STARTED]
 	}
 
+	/**
+	 * Returns true if method can be invoked on server (WebAPI) otherwise false
+	 * @return
+	 */
+	Boolean canInvokeOnServer() {
+		return hasAction() && ActionType.WEB_API.equals(apiAction.actionType)
+	}
+
 	/*
 	 * Used to determine if the task action can be invoked remotely
 	 *
@@ -324,6 +332,55 @@ class AssetComment {
 	 */
 	Boolean isActionInvocableRemotely() {
 		return hasAction() && !apiActionInvokedAt && apiAction.isRemote && status in [READY, STARTED]
+	}
+
+	/**
+	 * Returns true if method can be invoked remotely in TM Desktop (e.g. scripts) otherwise false
+	 * @return
+	 */
+	Boolean canInvokeRemotely() {
+		return hasAction() && !ActionType.WEB_API.equals(apiAction.actionType)
+	}
+
+	/**
+	 * Return a map with Api Action Invoke button details to correctly
+	 * show button in Task Manager
+	 * @return
+	 */
+	Map<String, ?> getInvokeActionButtonDetails() {
+		boolean canInvokeOnServer = canInvokeOnServer()
+		boolean canInvokeRemotely = canInvokeRemotely()
+		if (isAutomatic() || (!canInvokeOnServer && !canInvokeRemotely)) {
+			return null
+		}
+
+		Closure<Map<String, ?>> invokeButtonDetails = { boolean disabled, String alt ->
+			return [
+					label      : 'Invoke',
+					icon       : 'ui-icon-gear',
+					actionType : 'invokeAction',
+					newStatus  : STARTED,
+					redirect   : 'taskManager',
+					disabled   : disabled,
+					tooltipText: alt
+			]
+		}
+
+		if (canInvokeOnServer) {
+			if (!apiActionInvokedAt && status in [READY, STARTED]) {
+				return invokeButtonDetails(false, null)
+			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
+				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+			}
+		} else if (canInvokeRemotely) {
+			if (!apiActionInvokedAt && status in [READY, STARTED]) {
+				return invokeButtonDetails(true, 'Action must be invoked from TM Desktop')
+			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
+				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+			}
+		}
+
+		return null
 	}
 
 	/*
