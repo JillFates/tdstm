@@ -19,7 +19,7 @@ class DataviewUserFilterParamsCommand implements CommandObject {
 
 	static constraints = {
 		domains nullable: false
-		columns nullable: false
+		columns nullable: true
 		extra nullable: true, validator: { val, obj ->
 			if (val) {
 				return val.every { (it as DataviewExtraFilterParamsCommand).validate() }

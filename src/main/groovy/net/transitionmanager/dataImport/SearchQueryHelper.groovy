@@ -17,7 +17,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.asset.Room
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.person.PersonService
-import org.grails.web.json.JSONObject
+import net.transitionmanager.project.Project
 
 @Slf4j
 class SearchQueryHelper {
@@ -848,7 +848,7 @@ class SearchQueryHelper {
 						errorMsg = "Reference ${fieldName} of domain ${refDomainName} does not support alternate key lookups"
 						return [entities, errorMsg]
 					}
-					entities = GormUtil.findDomainByAlternateKey(refDomainClass, searchValue, context.project, extraCriteria)
+					entities = GormUtil.findDomainByAlternateKey(refDomainClass, (String)searchValue.value, (Project)context.project, extraCriteria)
 				}
 
 				// If not found and the domain has an alias (mfg/model) then try looking up that way
