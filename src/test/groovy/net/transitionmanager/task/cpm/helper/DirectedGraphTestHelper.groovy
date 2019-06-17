@@ -1,4 +1,7 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.cpm.helper
+
+import net.transitionmanager.task.cpm.Activity
+import net.transitionmanager.task.cpm.DirectedGraph
 
 class DirectedGraphTestHelper {
 
@@ -155,12 +158,6 @@ class DirectedGraphTestHelper {
 			.addEdge(Activity1, Activity2)
 			.addEdge(Activity2, Activity3)
 			.addEdge(Activity3, Activity3)// Cyclic edge
-
-		Activity0.addPredecessor(Activity1)
-		Activity0.addPredecessor(Activity2)
-		Activity1.addPredecessor(Activity2)
-		Activity2.addPredecessor(Activity3)
-		Activity3.addPredecessor(Activity3) // Cyclic by self-loop
 
 		return directedGraph
 	}

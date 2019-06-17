@@ -1,5 +1,6 @@
 package net.transitionmanager.task.cpm
 
+import net.transitionmanager.task.cpm.helper.DirectedGraphTestHelper
 import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification

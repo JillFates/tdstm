@@ -1,5 +1,6 @@
 package net.transitionmanager.task.cpm
 
+import net.transitionmanager.task.cpm.helper.DirectedGraphTestHelper
 import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
@@ -44,6 +45,7 @@ class DirectedGraphSpec extends Specification {
 		then: 'vertices can be calculated'
 			graph.isCyclic() == false
 	}
+
 
 	void 'test can detect cycles in a DirectedGraph'() {
 

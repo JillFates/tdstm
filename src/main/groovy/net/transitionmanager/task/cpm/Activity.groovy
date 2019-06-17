@@ -51,4 +51,12 @@ class Activity {
 		predecessor.successors.add(this)
 	}
 
+
+	@Override
+	String toString() {
+		return "Activity{" +
+			"taskId='" + taskId + '\'' +
+			", duration=" + duration +
+			'}';
+	}
 }

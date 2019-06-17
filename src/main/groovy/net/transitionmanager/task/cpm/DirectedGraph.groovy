@@ -73,12 +73,12 @@ class DirectedGraph {
 
 		while (!stack.isEmpty()) {
 			Activity activity = stack.pop()
-			for (Activity predecessor in activity.predecessors) {
-				if (visitedMap[predecessor.taskId]) {
+			for (Activity successor in activity.successors) {
+				if (visitedMap[successor.taskId]) {
 					return true
 				} else {
-					stack.push(predecessor)
-					visitedMap[predecessor.taskId] = true
+					stack.push(successor)
+					visitedMap[successor.taskId] = true
 				}
 			}
 		}
