@@ -181,8 +181,8 @@ class WsReportsController implements ControllerMethods {
         Map requestParams = request.JSON
         // SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
         // implement the way dates are sent to backend
-        requestParams.startTime = TimeUtil.parseDateTime(requestParams.startTime) ?: null
-        requestParams.completionTime = TimeUtil.parseDateTime(requestParams.completionTime)
+        requestParams.startTime = TimeUtil.parseISO8601DateTime(requestParams.startTime) ?: null
+        requestParams.completionTime = TimeUtil.parseISO8601DateTime(requestParams.completionTime)
 
         def projectManagerId = NumberUtil.toPositiveLong(requestParams.projectManager)
         def moveManagerId = NumberUtil.toPositiveLong(requestParams.moveManager)
@@ -211,7 +211,7 @@ class WsReportsController implements ControllerMethods {
                 }
 
                 flash.message = "MoveBundle $moveBundle created"
-                renderSuccessJson()
+                renderSuccessJson(id: moveBundle.id)
 
             } catch (ServiceException e) {
                 flash.message = e.message
@@ -229,8 +229,8 @@ class WsReportsController implements ControllerMethods {
         Map requestParams = request.JSON
         // SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
         // implement the way dates are sent to backend
-        requestParams.startTime = TimeUtil.parseDateTime(requestParams.startTime) ?: null
-        requestParams.completionTime = TimeUtil.parseDateTime(requestParams.completionTime)
+        requestParams.startTime = TimeUtil.parseISO8601DateTime(requestParams.startTime) ?: null
+        requestParams.completionTime = TimeUtil.parseISO8601DateTime(requestParams.completionTime)
 
         def projectManagerId = requestParams.projectManager
         def moveManagerId = requestParams.moveManager
@@ -253,7 +253,7 @@ class WsReportsController implements ControllerMethods {
                 boolean errorInSteps = false
                 stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
                     def checkbox = requestParams["checkbox_" + it.id]
-                    if (checkbox == 'on') {
+                    if (checkbox) {
                         MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, requestParams)
                         if (step.hasErrors()) {
                             errorInSteps = true
@@ -270,11 +270,10 @@ class WsReportsController implements ControllerMethods {
                 if (errorInSteps) {
                     flash.message = "Validation error while adding steps."
                     renderErrorJson(flash.message)
-                    return
                 }
 
-                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", Party.findById(moveBundle.id), "ROLE_MOVE_BUNDLE", projectManagerId, "ROLE_PROJ_MGR")
-                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", Party.findById(moveBundle.id), "ROLE_MOVE_BUNDLE", moveManagerId, "ROLE_MOVE_MGR")
+                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "ROLE_MOVE_BUNDLE", projectManagerId, "ROLE_PROJ_MGR")
+                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "ROLE_MOVE_BUNDLE", moveManagerId, "ROLE_MOVE_MGR")
 
                 flash.message = "MoveBundle $moveBundle updated"
                 renderSuccessJson()
@@ -285,9 +284,11 @@ class WsReportsController implements ControllerMethods {
                 renderErrorJson(flash.message)
             } catch (ValidationException e) {
                 flash.message = "Error updating MoveBundle with id $requestParams.id"
+                renderErrorJson(flash.message)
             }
         } else {
             flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.allErrorsString(command)
+            renderErrorJson(flash.message)
         }
 
         // in case of error updating move bundle
@@ -295,7 +296,7 @@ class WsReportsController implements ControllerMethods {
         def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundleService.findById(moveBundleId))
         def remainingSteps = allDashboardSteps.remainingSteps
 
-        renderSuccessJson()
+        renderErrorJson(flash.message)
     }
 
     @HasPermission(Permission.BundleDelete)
@@ -316,12 +317,14 @@ class WsReportsController implements ControllerMethods {
             }
             catch (e) {
                 message = "Unable to Delete MoveBundle and Assets: $e.message"
+                renderErrorJson(message)
             }
         }
         else {
             message = "MoveBundle not found with id $moveBundleId"
+            renderErrorJson(message)
         }
-        renderSuccessJson(message: message)
+        renderSuccessJson(message)
     }
 
     def smeList(String moveBundleId) {

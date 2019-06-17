@@ -3,7 +3,7 @@ import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
 	selector: `bundle-show`,
@@ -23,6 +23,7 @@ export class BundleShowComponent implements OnInit {
 		private bundleService: BundleService,
 		private permissionService: PermissionService,
 		private route: ActivatedRoute,
+		private router: Router,
 		private preferenceService: PreferenceService) {
 		this.canCreateBundle = this.permissionService.hasPermission('BundleCreate');
 		this.bundleId = this.route.params['_value']['id'];
@@ -36,14 +37,18 @@ export class BundleShowComponent implements OnInit {
 	public deleteBundle() {
 		this.bundleService.deleteBundle(this.bundleId)
 			.subscribe((result) => {
-				return result;
+				if (result.status === 'success') {
+					this.router.navigateByUrl('bundle/list')
+				}
 			});
 	}
 
 	public deleteBundleAndAssets() {
 		this.bundleService.deleteBundleAndAssets(this.bundleId)
 			.subscribe((result) => {
-				return result;
+				if (result.status === 'success') {
+					this.router.navigateByUrl('bundle/list')
+				}
 			});
 	}
 

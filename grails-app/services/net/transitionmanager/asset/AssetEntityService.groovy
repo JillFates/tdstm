@@ -958,6 +958,9 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the number of assets that were deleted
 	 */
 	int deleteAssets(List<Long> assetIds) {
+		if(assetIds.size() == 0) {
+			return 0
+		}
 		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
 
 		ProjectAssetMap.where { asset in assets }.deleteAll()

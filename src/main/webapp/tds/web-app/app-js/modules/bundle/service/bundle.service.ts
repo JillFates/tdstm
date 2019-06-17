@@ -49,8 +49,6 @@ export class BundleService {
 	getModelForBundleEdit(id) {
 		return this.http.get(`../ws/reports/editBundle/${id}`)
 			.map((response: any) => {
-				response.data.moveBundleInstance.completionTime = ((response.data.moveBundleInstance.completionTime) ? new Date(response.data.moveBundleInstance.completionTime) : '');
-				response.data.moveBundleInstance.startTime = ((response.data.moveBundleInstance.startTime) ? new Date(response.data.moveBundleInstance.startTime) : '');
 				return response;
 			})
 			.catch((error: any) => error);
@@ -108,9 +106,20 @@ export class BundleService {
 			moveManager: model.moveManagerId,
 			operationalOrder: model.operationalOrder,
 			workflowCode: model.workflowCode,
-			useForPlanning: model.useForPlanning,
-			dashboardSteps: model.dashboardSteps
+			useForPlanning: model.useForPlanning
 		};
+
+		model.dashboardSteps.forEach(function(step) {
+			postRequest['checkbox_' + step.step.id] = step.dashboard;
+			if (step.dashboard) {
+				postRequest['dashboardLabel_' + step.step.id] = step.step.label;
+				postRequest['startTime_' + step.step.id] = step.moveBundleStep.planStartTime;
+				postRequest['completionTime_' + step.step.id] = step.moveBundleStep.planCompletionTime;
+				postRequest['calcMethod_' + step.step.id] = step.moveBundleStep.calcMethod;
+				postRequest['beGreen_' + step.step.id] = step.moveBundleStep.showInGreen ? 'on' : 'off';
+			}
+		});
+
 		return this.http.post(`../ws/reports/updateBundle/${id}`, JSON.stringify(postRequest))
 			.map((response: any) => {
 				return response;

@@ -145,6 +145,13 @@ export const en_DICTIONARY: Object = {
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
 	},
+	'BUNDLE': {
+		'BUNDLE' : 'Bundle',
+		'LIST': 'List Bundles',
+		'EDIT': 'Edit Bundle',
+		'SHOW': 'Show Bundle',
+		'CREATE': 'Create Bundle'
+	},
 	'CREDENTIAL': {
 		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREDENTIAL': 'Credential',

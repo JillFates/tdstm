@@ -1,7 +1,10 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {BundleModel} from '../../model/bundle.model';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: `bundle-edit`,
@@ -11,15 +14,22 @@ export class BundleEditComponent implements OnInit {
 	public managers;
 	public workflowCodes;
 	public rooms;
+	protected userTimeZone: string;
 	private bundleId;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public typeOptions = [{value: 'L', text: 'Linear'}, {value: 'M', text: 'Manual'}];
 	public bundleModel = null;
+	public savedModel = null;
 	public dashboardSteps;
+	@ViewChild('startTimePicker') startTimePicker;
+	@ViewChild('completionTimePicker') completionTimePicker;
 
 	constructor(
 		private bundleService: BundleService,
-		private route: ActivatedRoute) {
+		private preferenceService: PreferenceService,
+		private promptService: UIPromptService,
+		private route: ActivatedRoute,
+		private router: Router) {
 		this.bundleId = this.route.params['_value']['id'];
 	}
 
@@ -39,6 +49,7 @@ export class BundleEditComponent implements OnInit {
 			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.bundleModel = Object.assign({}, defaultBundle, this.bundleModel);
 	}
 
@@ -54,8 +65,16 @@ export class BundleEditComponent implements OnInit {
 				}
 			});
 			this.bundleModel = bundleModel;
+			if (this.bundleModel.startTime) {
+				this.startTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.startTime);
+			}
+			if (this.bundleModel.completionTime) {
+				this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.bundleModel.completionTime);
+			}
 			this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
 			this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
+
+			this.savedModel = JSON.parse(JSON.stringify(this.bundleModel));
 			this.dashboardSteps = data.dashboardSteps;
 			for (let i = 0; i < this.dashboardSteps.length; i++) {
 				this.dashboardSteps[i].dashboard = this.dashboardSteps[i].moveBundleStep ? true : false;
@@ -67,11 +86,46 @@ export class BundleEditComponent implements OnInit {
 		});
 	}
 
+	public formatForDateTimePicker (time) {
+		let localDateFormatted = DateUtils.convertFromGMT(time, this.userTimeZone);
+		return time ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
+	}
+
 	public saveForm() {
-		console.log(this.bundleModel);
-		this.bundleModel.dashboardSteps = this.dashboardSteps;
-		this.bundleService.updateBundle(this.bundleId, this.bundleModel).subscribe((result: any) => {
-			console.log(result);
+		let model = this.bundleModel
+		model.dashboardSteps = this.dashboardSteps;
+		this.bundleService.updateBundle(this.bundleId, model).subscribe((result: any) => {
+			if (result.status === 'success') {
+				this.router.navigateByUrl('bundle/' + this.bundleId + '/show')
+			}
 		});
+	}
+
+	public cancelEdit() {
+			if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.router.navigateByUrl('bundle/' + this.bundleId + '/show')
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.router.navigateByUrl('bundle/' + this.bundleId + '/show')
+		}
+	}
+
+	public onChangeDashboardStep(step) {
+		if (!step.moveBundleStep) {
+			step.moveBundleStep = {
+				planStartTime: this.bundleModel.startTime,
+				planCompletionTime: this.bundleModel.completionTime,
+				calcMethod: 'L',
+				showInGreen: false
+			};
+		}
 	}
 }

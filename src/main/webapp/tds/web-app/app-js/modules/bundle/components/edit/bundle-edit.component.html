@@ -1,112 +1,116 @@
 <div class="bundle-edit-component">
-    <form action="save" method="post" name="bundleEditForm">
+    <div>
         <div class="nav" style="border: 1px solid #CCCCCC; height: 24px;">
             <span class="menuButton"><a href="bundle/list"><input type="submit" name="_action_List" value="Bundle List" class="list"></a></span>
         </div>
         <br/>
-        <div class="dialog">
-            <table>
-                <tbody>
-                <tr>
-                    <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name"><b>Name:&nbsp;<span style="color: red">*</span></b></td>
-                    <td valign="top" class="value">
-                        <input type="text" [(ngModel)]="bundleModel.name" style="width:180px" id="name" name="name"/>
-                    </td>
-                </tr>
+        <form action="save" method="post" name="bundleEditForm">
+            <div class="dialog steps_table">
+                <span class="span"><b>Bundle Details</b></span>
+                <table style="border:0">
+                    <tbody>
+                    <tr>
+                        <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name"><b>Name:&nbsp;<span style="color: red">*</span></b></td>
+                        <td valign="top" class="value">
+                            <input type="text" [(ngModel)]="bundleModel.name" style="width:180px" id="name" name="name"/>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Description:</td>
-                    <td valign="top" class="value">
-                        <input type="text" [(ngModel)]="bundleModel.description"  style="width:98%" id="description" name="description"/>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name">From:</td>
-                    <td valign="top" class="value">
-                        <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.sourceRoom.id" >
-                            <option value="" selected="selected">Please Select</option>
-                            <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr class="prop">
-                    <td valign="top" class="name">To:</td>
-                    <td valign="top" class="value">
-                        <select id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.targetRoom.id" >
-                            <option value="" selected="selected">Please Select</option>
-                            <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                        </select>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Description:</td>
+                        <td valign="top" class="value">
+                            <input type="text" [(ngModel)]="bundleModel.description"  style="width:98%" id="description" name="description"/>
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">From:</td>
+                        <td valign="top" class="value">
+                            <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.sourceRoom.id" >
+                                <option value="" selected="selected">Please Select</option>
+                                <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">To:</td>
+                        <td valign="top" class="value">
+                            <select id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.targetRoom.id" >
+                                <option value="" selected="selected">Please Select</option>
+                                <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
+                            </select>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Start Time:</td>
-                    <td valign="top" class="value">
-                        <tds-datetime-control name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Start Time:</td>
+                        <td valign="top" class="value">
+                            <tds-datetime-control #startTimePicker name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Completion Time:</td>
-                    <td valign="top" class="value">
-                        <tds-datetime-control name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Completion Time:</td>
+                        <td valign="top" class="value">
+                            <tds-datetime-control #completionTimePicker name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Project Manager:</td>
-                    <td valign="top" class="value">
-                        <select id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId" >
-                            <option value="" selected="selected">Please Select</option>
-                            <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                        </select>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Manager:</td>
+                        <td valign="top" class="value">
+                            <select id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId" >
+                                <option value="" selected="selected">Please Select</option>
+                                <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
+                            </select>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Event Manager:</td>
-                    <td valign="top" class="value">
-                        <select id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId">
-                            <option value="" selected="selected">Please Select</option>
-                            <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                        </select>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Event Manager:</td>
+                        <td valign="top" class="value">
+                            <select id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId">
+                                <option value="" selected="selected">Please Select</option>
+                                <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
+                            </select>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Order:</td>
-                    <td valign="top" class="value">
-                        <select id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" >
-                            <option *ngFor="let order of orderNums" [value]="order">{{order}}</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                    <td valign="top" class="value">
-                        <select id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode">
-                            <option value="" selected="selected">Please Select</option>
-                            <option *ngFor="let code of workflowCodes" [value]="code">{{code}}</option>
-                        </select>
-                    </td>
-                </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Order:</td>
+                        <td valign="top" class="value">
+                            <select id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" >
+                                <option *ngFor="let order of orderNums" [value]="order">{{order}}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
+                        <td valign="top" class="value">
+                            <select id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode">
+                                <option value="" selected="selected">Please Select</option>
+                                <option *ngFor="let code of workflowCodes" [value]="code">{{code}}</option>
+                            </select>
+                        </td>
+                    </tr>
 
-                <tr class="prop">
-                    <td valign="top" class="name">Use for Planning:</td>
-                    <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" [(ngModel)]="bundleModel.useForPlanning"/></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="buttons">
-            <input type="hidden"  name="project.id"/>
-            <input type="hidden"  name="projectId"/>
-            <span class="button"><input class="save" type="submit" (click)="saveForm()" value="Save"/></span>
-        </div>
-    </form>
+                    <tr class="prop">
+                        <td valign="top" class="name">Use for Planning:</td>
+                        <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" [(ngModel)]="bundleModel.useForPlanning"/></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="buttons">
+                <input type="hidden"  name="project.id"/>
+                <input type="hidden"  name="projectId"/>
+                <span class="button"><input class="save" type="submit" (click)="saveForm()" value="Save"/></span>
+                <span class="button"><input class="delete" type="submit" (click)="cancelEdit()" value="Cancel"/></span>
+            </div>
+        </form>
+    </div>
     <div class="body" style="margin-left: 15px">
         <div class="steps_table" style="display:inline-block;">
             <span class="span"><b>Dashboard Steps</b></span>
@@ -127,7 +131,7 @@
                     <td>
                         {{step.step.label}}
                     </td>
-                    <td><input type="checkbox" [(ngModel)]="step.dashboard"/></td>
+                    <td><input type="checkbox" [(ngModel)]="step.dashboard" (change)="onChangeDashboardStep(step)"/></td>
                     <td style="display:grid">
                         <input *ngIf="step.dashboard" [ngModel]="step.moveBundleStep.planStartTime | tdsDateTime: userTimeZone" (ngModelChange)="console.log('hmm')"/>
                         <input *ngIf="step.dashboard" [ngModel]="step.moveBundleStep.planCompletionTime | tdsDateTime: userTimeZone" (ngModelChange)="console.log('hmm')"/>

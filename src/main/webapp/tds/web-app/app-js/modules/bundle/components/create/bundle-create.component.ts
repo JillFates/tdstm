@@ -1,6 +1,7 @@
 import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {BundleModel} from '../../model/bundle.model';
+import {Router} from '@angular/router';
 
 @Component({
 	selector: `bundle-create`,
@@ -13,7 +14,9 @@ export class BundleCreateComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel = null;
 
-	constructor(private bundleService: BundleService) {
+	constructor(
+		private bundleService: BundleService,
+		private router: Router) {
 	}
 
 	ngOnInit() {
@@ -23,8 +26,8 @@ export class BundleCreateComponent implements OnInit {
 
 	private getModel() {
 		this.bundleService.getModelForBundleCreate().subscribe((result: any) => {
-			console.log(result);
 			let data = result.data;
+			this.bundleModel.operationalOrder = 1;
 			this.managers = data.managers;
 			this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
 			this.workflowCodes = data.workflowCodes;
@@ -33,9 +36,10 @@ export class BundleCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		console.log(this.bundleModel);
 		this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
-			console.log(result);
+			if (result.status === 'success') {
+				this.router.navigateByUrl('bundle/' + result.data.id + '/show');
+			}
 		});
 	}
 }
