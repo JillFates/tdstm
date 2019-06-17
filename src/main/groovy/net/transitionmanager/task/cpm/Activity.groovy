@@ -5,6 +5,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Activity {
 
+	static final String HIDDEN_SOURCE_NODE = '_HIDDEN_SOURCE_NODE_'
+
 	String taskId;
 	String description;
 	/**
@@ -32,8 +34,8 @@ class Activity {
 	 */
 	Boolean isCriticalPath = false
 
-	Set<Activity> successors = new HashSet<>()
-	Set<Activity> predecessors = new HashSet<>()
+	List<Activity> successors = []
+	List<Activity> predecessors = []
 
 	/**
 	 *

@@ -6,12 +6,14 @@ class CriticalPathMethod {
 	 * The {@code CriticalPathMethod#walkListAhead} method receives the array that stores the activities
 	 * and performs the forward walking inside the activity list calculating
 	 * for each activity its earliest start time and earliest end time.
-	 * @param list
+	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAhead(List<Activity> activities) {
+	private static List<Activity> walkListAhead(DirectedGraph directedGraph) {
 
-		Activity sourceActivity = activities.first()
+		Activity sourceActivity = directedGraph.getSource()
+		List<Activity> activities = directedGraph.activities
+
 		sourceActivity.eet = sourceActivity.est + sourceActivity.duration
 
 		activities.subList(1, activities.size()).each { Activity activity ->
@@ -30,12 +32,13 @@ class CriticalPathMethod {
 	/**
 	 * 	After the forward walking the {@code CriticalPathMethod#walkListAhead}
 	 * 	performs the backward walking calculating for each activity its latest start time and latest end time.
-	 * @param activities
+	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAback(List<Activity> activities) {
+	private static List<Activity> walkListAback(DirectedGraph directedGraph) {
 
-		Activity sink = activities.last()
+		List<Activity> activities = directedGraph.activities
+		Activity sink = directedGraph.getSink()
 		sink.let = sink.eet
 		sink.lst = sink.let - sink.duration
 
@@ -60,10 +63,12 @@ class CriticalPathMethod {
 	static List<Activity> calculate(DirectedGraph directedGraph) {
 		List<Activity> criticalPath = []
 
-		directedGraph.activities = walkListAhead(directedGraph.activities)
-		directedGraph.activities = walkListAback(directedGraph.activities)
+		directedGraph.activities = walkListAhead(directedGraph)
+		directedGraph.activities = walkListAback(directedGraph)
 
-		return directedGraph.activities.findAll{ Activity activity ->
+		return directedGraph.activities.findAll { Activity activity ->
+			// TODO: dcorrea refactor this code
+			activity.taskId == Activity.HIDDEN_SOURCE_NODE ||
 			(activity.eet - activity.let == 0) && (activity.est - activity.lst == 0)
 		}
 	}

@@ -26,7 +26,7 @@ class DirectedGraphTestHelper {
 									 +-+
 	 */
 
-	DirectedGraph createAcyclicDirectedGraph() {
+	DirectedGraph createAcyclicDirectedGraphWithOneSourceAndOneSink() {
 		Activity A = new Activity(taskId: 'A', duration: 3)
 		Activity B = new Activity(taskId: 'B', duration: 4)
 		Activity C = new Activity(taskId: 'C', duration: 2)
@@ -36,17 +36,65 @@ class DirectedGraphTestHelper {
 		Activity G = new Activity(taskId: 'G', duration: 4)
 		Activity H = new Activity(taskId: 'H', duration: 3)
 
-		B.addPredecessor(A)
-		C.addPredecessor(A)
-		D.addPredecessor(B)
-		E.addPredecessor(C)
-		F.addPredecessor(C)
-		G.addPredecessor(D)
-		G.addPredecessor(E)
-		H.addPredecessor(F)
-		H.addPredecessor(G)
+		DirectedGraph directedGraph = new DirectedGraph([A, B, C, D, E, F, G, H])
+		directedGraph
+			.addEdge(A, B)
+			.addEdge(A, C)
+			.addEdge(B, D)
+			.addEdge(C, E)
+			.addEdge(C, F)
+			.addEdge(D, G)
+			.addEdge(E, G)
+			.addEdge(G, H)
+			.addEdge(F, H)
 
-		return new DirectedGraph([A, B, C, D, E, F, G, H])
+		return directedGraph
+	}
+
+	/*
+								 +-+
+								 |D|
+					  +--------+>+-+------------+
+					  |          |5|            v
+					 +++         +++           +-+
+					 |B|                       |G|
+		   			 +-+          +----------+>+-+
+		             |4|          |            |4|
+		             +-+         +++           +-+
+		                         |E|            +    +-+
+		              +--------+>+-+            +--->|H|
+		              |          |1|                 +-+
+		             +++         +-+            +--->|3|
+		             |C|                        |    +-+
+		      		 +-+                        |
+					 |2|                        |
+					 +++         +-+            |
+					  |          |F|            |
+					  +--------+>+-+------------+
+								 |2|
+								 +-+
+ 	*/
+
+	DirectedGraph createAcyclicDirectedGraphWithTwoSourcesAndOneSink() {
+		Activity B = new Activity(taskId: 'B', duration: 4)
+		Activity C = new Activity(taskId: 'C', duration: 2)
+		Activity D = new Activity(taskId: 'D', duration: 5)
+		Activity E = new Activity(taskId: 'E', duration: 1)
+		Activity F = new Activity(taskId: 'F', duration: 2)
+		Activity G = new Activity(taskId: 'G', duration: 4)
+		Activity H = new Activity(taskId: 'H', duration: 3)
+
+		DirectedGraph directedGraph = new DirectedGraph([B, C, D, E, F, G, H])
+		directedGraph
+			.addEdge(B, D)
+			.addEdge(C, E)
+			.addEdge(C, F)
+			.addEdge(D, G)
+			.addEdge(E, G)
+			.addEdge(G, H)
+			.addEdge(F, H)
+
+		return directedGraph
 	}
 
 	/*
@@ -67,13 +115,16 @@ class DirectedGraphTestHelper {
 		Activity Activity2 = new Activity(taskId: '2', duration: 2)
 		Activity Activity3 = new Activity(taskId: '3', duration: 5)
 
-		Activity0.addPredecessor(Activity1)
-		Activity0.addPredecessor(Activity2)
-		Activity2.addPredecessor(Activity0) // Cyclic edge
-		Activity1.addPredecessor(Activity2)
-		Activity2.addPredecessor(Activity3)
+		DirectedGraph directedGraph = new DirectedGraph([Activity0, Activity1, Activity2, Activity3])
 
-		return new DirectedGraph([Activity0, Activity1, Activity2, Activity3])
+		directedGraph
+			.addEdge(Activity0, Activity1)
+			.addEdge(Activity0, Activity2)
+			.addEdge(Activity1, Activity2)
+			.addEdge(Activity2, Activity1)// Cyclic edge
+			.addEdge(Activity2, Activity3)
+
+		return directedGraph
 	}
 
 	/*
@@ -89,11 +140,21 @@ class DirectedGraphTestHelper {
 						 |    |
 						 +----+
 	 */
+
 	DirectedGraph createCyclicDirectedGraphWithSelfLoop() {
 		Activity Activity0 = new Activity(taskId: '0', duration: 3)
 		Activity Activity1 = new Activity(taskId: '1', duration: 4)
 		Activity Activity2 = new Activity(taskId: '2', duration: 2)
 		Activity Activity3 = new Activity(taskId: '3', duration: 5)
+
+		DirectedGraph directedGraph = new DirectedGraph([Activity0, Activity1, Activity2, Activity3])
+
+		directedGraph
+			.addEdge(Activity0, Activity1)
+			.addEdge(Activity0, Activity2)
+			.addEdge(Activity1, Activity2)
+			.addEdge(Activity2, Activity3)
+			.addEdge(Activity3, Activity3)// Cyclic edge
 
 		Activity0.addPredecessor(Activity1)
 		Activity0.addPredecessor(Activity2)
@@ -101,6 +162,6 @@ class DirectedGraphTestHelper {
 		Activity2.addPredecessor(Activity3)
 		Activity3.addPredecessor(Activity3) // Cyclic by self-loop
 
-		return new DirectedGraph([Activity0, Activity1, Activity2, Activity3])
+		return directedGraph
 	}
 }

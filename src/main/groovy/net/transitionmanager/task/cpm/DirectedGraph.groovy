@@ -1,5 +1,7 @@
 package net.transitionmanager.task.cpm
 
+import groovy.transform.CompileStatic
+
 class DirectedGraph {
 
 	List<Activity> activities
@@ -13,9 +15,42 @@ class DirectedGraph {
 		this.vertices = this.activities.size()
 	}
 
+	Activity getSource() {
+		List<Activity> sources = activities.findAll { it.predecessors.isEmpty() }
+		if (sources.size() == 1) {
+			return sources.first()
+		} else {
+			// If there is more than one source
+			// We could add a new Activity
+			// pointing to these multiple sources
+			Activity source = new Activity(taskId: Activity.HIDDEN_SOURCE_NODE, duration: 0)
+			activities = [source] + activities
+			sources.each { addEdge(source, it) }
+			return source
+		}
+	}
+
+	Activity getSink() {
+		return activities.last()
+	}
+
 	int getVertices() {
 		return vertices
 	}
+
+	/**
+	 *
+	 * @param from
+	 * @param to
+	 * @return this instance of {@code DirectedGraph}
+	 */
+	DirectedGraph addEdge(Activity from, Activity to) {
+		// TODO: Could we add here validations
+		// Like self loops ?
+		from.addSuccessor(to)
+		return this
+	}
+
 	/**
 	 * Check whether the graph contains a cycle or not
 	 * using DFS solution
@@ -30,8 +65,9 @@ class DirectedGraph {
 		Map<String, Boolean> visitedMap = [:]
 
 		Stack<Activity> stack = new Stack<Activity>()
-		// TODO: Starts with the source of thd DirectedGraph
-		Activity source = activities.first()
+		// TODO: dcorrea: Starts with the source of thd DirectedGraph
+		// Refactor this
+		Activity source = getSource()
 		stack.push(source)
 		visitedMap[source.taskId] = true
 
@@ -48,15 +84,4 @@ class DirectedGraph {
 		}
 		return false
 	}
-}
-
-class ActivityWrapper {
-
-	final Activity activity
-	Boolean visited
-
-	ActivityWrapper(Activity activity) {
-		this.activity = activity
-	}
-
 }

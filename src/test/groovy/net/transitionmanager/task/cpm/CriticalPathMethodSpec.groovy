@@ -1,5 +1,6 @@
 package net.transitionmanager.task.cpm
 
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -15,10 +16,11 @@ class CriticalPathMethodSpec extends Specification {
 	+---+---+---+
  	*/
 
-	void 'test can calculate critical path method for a list of activities'() {
+	void 'test can calculate critical path method for an Acyclic Directed Graph with 1 source and 1 sink'() {
 
 		given:
-			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraph()
+			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+
 		when:
 			List<Activity> criticalPath = CriticalPathMethod.calculate(directedGraph)
 
@@ -26,6 +28,20 @@ class CriticalPathMethodSpec extends Specification {
 			!criticalPath.isEmpty()
 			criticalPath.size() == 5
 			criticalPath.collect { it.taskId } == ['A', 'B', 'D', 'G', 'H']
-
 	}
+
+	void 'test can calculate critical path method for an Acyclic Directed Graph with 2 sources and 1 sink'() {
+
+		given:
+			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraphWithTwoSourcesAndOneSink()
+
+		when:
+			List<Activity> criticalPath = CriticalPathMethod.calculate(directedGraph)
+
+		then:
+			!criticalPath.isEmpty()
+			criticalPath.size() == 5
+			criticalPath.collect { it.taskId } == [Activity.HIDDEN_SOURCE_NODE, 'B', 'D', 'G', 'H']
+	}
+
 }
