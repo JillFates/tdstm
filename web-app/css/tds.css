@@ -373,6 +373,7 @@
 	height: 0px;
 	margin-left: 5px;
 }
+
 .dashboard_bar_graph{
 	background-color:#BFF3A5; 
 	z-index:-1;
@@ -381,6 +382,22 @@
 	border-color: lightgray;
 	border-right-style: inset;
 }
+
+.dashboard_bar_graph_value {
+	position: relative; 
+	top: -18px; 
+	height: 0px; 
+	margin-left: 5px;
+}
+.task_completed + .dashboard_bar_graph_value {
+	color: #fff;
+}
+
+.dashboard_bar_graph.task_completed {
+	border-right-width: unset;
+	border-right-style: unset;
+}
+
 .dashboard_bar_graph_small{
 	background-color:#BFF3A5; 
 	z-index:-1;

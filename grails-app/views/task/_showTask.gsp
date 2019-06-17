@@ -56,28 +56,17 @@
 
 					<tr class="prop">
 						<td valign="top" class="name"><label>Action Percent Done:</label></td>
-						<td class="dashboard_bar_base" colspan="2">
-							<div ng-if="acData.apiActionPercentDone == '0'" >
-								<div class="dashboard_bar_graph0">
-									<b>0 % Percent Done</b>
-								</div>
+						<td class="dashboard_bar_base" colspan="1">
+							<div id="actionPercentDoneBar" 
+									class="dashboard_bar_graph" 
+									ng-class="{task_completed: acData.apiActionPercentDone == 100}"
+									style="width: 0%;">
 							</div>
-
-							<div ng-if="acData.apiActionPercentDone == '100'">
-								<div class="task_completed"style="z-index: -1; height: 24px; width: 100%"></div>
-								<div class="task_completed" style="position: relative; top: -20px; height: 0px; margin-left: 5px;">
-									<b>100% Percent Done</b>
-								</div>
-							</div>
-
-							<div ng-if="['0', '100'].indexOf(acData.apiActionPercentDone) === -1">
-								<div class="dashboard_bar_graph" id="analysisbar"style="width: 0%;"></div>
-								<div style="position: relative; top: -18px; height: 0px; margin-left: 5px;">
-									<b> {{acData.apiActionPercentDone}} %</b>
-								</div>
+							<div class="dashboard_bar_graph_value" >
+								<b>{{acData.apiActionPercentDone}} %</b>
 							</div>
 						</td>
-						<td></td>
+						<td colspan="2"></td>
 					</tr>
 
 					<tr id="categoryTrId">
@@ -269,10 +258,8 @@
 		setTimeout(function() {
 			$('[data-toggle="popover"]').popover();
 
-			%{--var percentagePlanReady = "${apiActionPercentDone}";--}%
-			// var percentagePlanReady = "{{acData.apiActionPercentDone}}";
 			var apiActionPercentDone = document.getElementById('apiActionPercentDone').value
-			$("#analysisbar").animate({width: apiActionPercentDone + "%"}, 1000);
-		},1500)
+			$("#actionPercentDoneBar").animate({width: apiActionPercentDone + "%"}, 1000);
+		},1000)
 	})
 </script>
