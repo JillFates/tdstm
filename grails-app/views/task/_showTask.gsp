@@ -39,22 +39,23 @@
 					<tr id="actionShowId">
 						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">
-              				<a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
+              				<a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" 
+							  ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
             			</td>
 					</tr>
-					<tr id="scriptType" class="prop">
+					<tr id="scriptType" class="prop" ng-if="acData.apiAction.id">
 						<td valign="top" class="name"><label>Type:</label></td>
 						<td valign="top" class="value" colspan="3">{{acData.apiAction.type}}</td>
 					</tr>
 
-					<tr id="isRemote" class="prop">
+					<tr id="isRemote" class="prop" ng-if="acData.apiAction.id">
 						<td valign="top" class="name"><label>Is Remote:</label></td>
 						<td valign="top" class="value" colspan="3">
 							<input class="checkbox" ng-checked="acData.apiAction.isRemote == true" id="checkIsRemote" type="checkbox" disabled>
 						</td>
 					</tr>
 
-					<tr class="prop" ng-if="acData.apiActionInvokedAt || acData.apiActionStarted">
+					<tr class="prop" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
 						<td valign="top" class="name"><label>Action Percent Done:</label></td>
 						<td class="dashboard_bar_base" colspan="1">
 							<div id="actionPercentDoneBar" 
