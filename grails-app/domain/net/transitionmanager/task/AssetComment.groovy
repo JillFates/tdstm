@@ -312,14 +312,6 @@ class AssetComment {
 		return hasAction() && !apiActionInvokedAt && !apiAction.isRemote && status in [READY, STARTED]
 	}
 
-	/**
-	 * Returns true if method can be invoked on server (WebAPI) otherwise false
-	 * @return
-	 */
-	Boolean canInvokeOnServer() {
-		return hasAction() && ActionType.WEB_API.equals(apiAction.actionType)
-	}
-
 	/*
 	 * Used to determine if the task action can be invoked remotely
 	 *
@@ -335,21 +327,13 @@ class AssetComment {
 	}
 
 	/**
-	 * Returns true if method can be invoked remotely in TM Desktop (e.g. scripts) otherwise false
-	 * @return
-	 */
-	Boolean canInvokeRemotely() {
-		return hasAction() && !ActionType.WEB_API.equals(apiAction.actionType)
-	}
-
-	/**
 	 * Return a map with Api Action Invoke button details to correctly
 	 * show button in Task Manager
 	 * @return
 	 */
 	Map<String, ?> getInvokeActionButtonDetails() {
-		boolean canInvokeOnServer = canInvokeOnServer()
-		boolean canInvokeRemotely = canInvokeRemotely()
+		boolean canInvokeOnServer = (hasAction() && ActionType.WEB_API == apiAction.actionType)
+		boolean canInvokeRemotely = (hasAction() && !ActionType.WEB_API == apiAction.actionType)
 		if (isAutomatic() || (!canInvokeOnServer && !canInvokeRemotely)) {
 			return null
 		}
