@@ -11,13 +11,13 @@ import net.transitionmanager.domain.DataScript
 import net.transitionmanager.domain.Model
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Rack
+import net.transitionmanager.security.ScriptExpressionChecker
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-import spock.lang.Ignore
 import spock.lang.See
 
 @TestFor(FileSystemService)
@@ -190,6 +190,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -235,6 +236,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -335,6 +337,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 			customizer.addStaticStars(Math.name)
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
