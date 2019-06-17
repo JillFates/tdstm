@@ -36,9 +36,9 @@ class PlanMethodExtraFilter extends SpecialExtraFilter {
 
 		String customField = project.planMethodology
 		if (!customField) {
-			throw new InvalidParamException('Invalid filter definition for '
+			throw new InvalidParamException('The Plan Methodology must be configured for project before using the '
 				+ ExtraFilterType.PLAN_METHOD.name
-				+ '. Project.planMethodology must be defined first.'
+				+ ' filter.'
 			)
 		}
 
