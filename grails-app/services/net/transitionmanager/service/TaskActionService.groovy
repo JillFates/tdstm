@@ -2,28 +2,29 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.RSACodec
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.RemoteCredentialMethod
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.domain.Person
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionThreadLocalVariable
+import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.springframework.dao.CannotAcquireLockException
 import org.springframework.web.multipart.MultipartFile
 
-import groovy.util.logging.Slf4j
-
-import org.springframework.dao.CannotAcquireLockException
-import net.transitionmanager.integration.ApiActionException
-
+import java.security.Key
 
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
@@ -109,7 +110,7 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
 	 */
-	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom) {
+	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom, String publicKey) {
 		AssetComment task = fetchTaskById(taskId, whom)
 
 		// task = taskService.recordRemoteActionStarted(task, whom)
@@ -136,10 +137,14 @@ class TaskActionService implements ServiceMethods {
 			credentials.password = credentialService.decryptPassword(task.apiAction.credential)
 			actionRequestMap.options.credentials = credentials
 
-			// TODO : JM 6/19 : Encrypt the credentials appropriately using the publicKey
-			// Encrypt the credentials appropriately
-			// if (actionRequest.options.credentails.type == x) {
-			// }
+			 //Encrypt the credentials appropriately
+			if (task.apiAction.remoteCredentialMethod == RemoteCredentialMethod.SUPPLIED) {
+				RSACodec rsaCodec = new RSACodec()
+				Key key = rsaCodec.getPublicKey(publicKey)
+
+				actionRequest.options.credentials.username = rsaCodec.encrypt(key, actionRequest.options.credentials.username)
+				actionRequest.options.credentials.password = rsaCodec.encrypt(key, actionRequest.options.credentials.password)
+			}
 		}
 
 		return actionRequestMap
