@@ -420,6 +420,11 @@ class ApiActionService implements ServiceMethods {
 		// Populate the apiAction with the properties from the command object
 		apiActionCommand.populateDomain(apiAction, false)
 
+		// If the Action has a catalog, but the command doesn't, clear the reference.
+		if (apiActionId && !apiAction.apiCatalog && apiAction.apiCatalog) {
+			apiAction.apiCatalog = null
+		}
+
 		apiAction.save(failOnError: true)
 
 		return apiAction
