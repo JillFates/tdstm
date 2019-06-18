@@ -25,9 +25,9 @@ import {DateValidationConstraints} from '../../../../shared/model/validation-con
 	template: `
 		<kendo-datepicker
 			[title]="title"
-			[value]="getDateValue()"
 			[min]="minimum"
 			[max]="maximum"
+			[value]="dateValue"
 			(blur)="onBlur()"
 			[format]="displayFormat"
 			[tabindex]="tabindex"
@@ -48,17 +48,25 @@ import {DateValidationConstraints} from '../../../../shared/model/validation-con
 		}
 	]
 })
-export class TDSDateControlComponent extends TDSCustomControl implements OnChanges  {
+export class TDSDateControlComponent extends TDSCustomControl implements OnChanges, OnInit  {
 	@Input('minimum') minimum;
 	@Input('maximum') maximum;
 	@Output() blur: EventEmitter<any> = new EventEmitter();
 	protected displayFormat: string;
+	public dateValue: Date;
 
 	constructor(
 		private userPreferenceService: PreferenceService,
 		protected validationRulesFactory: ValidationRulesFactoryService) {
 			super(validationRulesFactory);
 			this.displayFormat = userPreferenceService.getUserDateFormatForKendo();
+	}
+
+	/**
+	 * OnInit set a date value.
+	*/
+	ngOnInit(): void {
+		this.updateDateValue();
 	}
 
 	/**
@@ -90,6 +98,13 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 			minDate: this.minimum
 		};
 
+		// this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
+		if (inputs['_value']) {
+			if (!inputs['_value'].currentValue) {
+				this.updateDateValue();
+			}
+		}
+
 		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 	}
 
@@ -100,5 +115,16 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 
 		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
 		return  DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);
+	}
+
+	/**
+	 * Based on the current value set the corresponding formatted date value
+	 */
+	updateDateValue() {
+		if (this.value) {
+			let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+			this.dateValue = DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);
+		}
+		this.dateValue = this.value;
 	}
 }
