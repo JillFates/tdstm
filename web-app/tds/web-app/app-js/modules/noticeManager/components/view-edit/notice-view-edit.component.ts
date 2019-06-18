@@ -181,11 +181,14 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Determines if all the field forms comply with the validation rules
+	 * @param {any} form  - Main form holding all the field
 	*/
-	protected formValid(): boolean {
+	protected formValid(form: any): boolean {
 		const noticeType = this.noticeType && this.noticeType.typeId;
-		const isValid =  this.model && this.model.title &&
-				this.isValidHtmlText() && (noticeType || noticeType === 0);
+		const isValid = this.model && this.model.title &&
+						this.isValidHtmlText() &&
+						(noticeType || noticeType === 0) &&
+						form.valid;
 
 		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.acknowledgeLabel && this.model.acknowledgeLabel.trim() !== '')) : isValid;
 

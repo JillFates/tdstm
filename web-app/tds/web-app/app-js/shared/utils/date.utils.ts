@@ -354,7 +354,6 @@ export class DateUtils {
 	 * @returns {Date}
 	 */
 	public static stringDateToDate(date: any): any {
-		return (date && date.toDateString) ? date : new Date(DateUtils.getDateFromGMT(date));
-
+		return (date && date.toDateString) ? date : DateUtils.toDateUsingFormat(date, DateUtils.SERVER_FORMAT_DATE)
 	}
 }
