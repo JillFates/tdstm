@@ -36,6 +36,35 @@
                                 <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>${apiAction.description}</textarea>
                             </td>
                         </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Type:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <label>${apiAction.type}</label>
+                            </td>
+                        </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Executes from TM:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                               <g:if test="${apiAction.isRemote == true}">
+                                    <input class="checkbox" type="checkbox" checked disabled>
+                               </g:if>
+                               <g:else>
+                                    <input class="checkbox" type="checkbox" disabled>
+                               </g:else>
+                            </td>
+                        </tr>
+						<tr class="prop">
+                            <td valign="top" class="script" >
+                                <label><b>Script:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <textarea cols="80" rows="6" name="actionScript" readonly>${apiAction.script}</textarea>
+                            </td>
+                        </tr>
                         <tr class="prop">
                             <td valign="top" colspan="2">
                                 <table id="updateCommentTableInnerTable">

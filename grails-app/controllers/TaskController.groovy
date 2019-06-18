@@ -1091,6 +1091,9 @@ digraph runbook {
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
+				script: apiAction.script,
+				isRemote: apiAction.isRemote,
+				type: apiAction.actionType.type,
 				connector       : connector.name,
 				method      : methodInfo.name,
 				description : methodInfo.description,
