@@ -144,7 +144,7 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeLocalAction(Long id) {
-		AssetComment task = taskActionService.invokeLocalAction(id, currentPerson())
+		AssetComment task = taskService.invokeLocalAction(id, currentPerson())
 
 		Map results = [
 			assetComment: task,
@@ -164,7 +164,7 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
 	def recordRemoteActionStarted(Long id, String publicKey) {
-		Map actionRequest = taskActionService.recordRemoteActionStarted(id,  currentPerson(), publicKey)
+		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
@@ -176,7 +176,7 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
 		AssetComment task = fetchDomain(AssetComment, params)
-		String status = taskActionService.resetAction(id, currentPerson())
+		String status = taskService.resetAction(id, currentPerson())
 		renderAsJson([assetComment: task, status: status, statusCss: taskService.getCssClassForStatus(task.status)])
 	}
 
