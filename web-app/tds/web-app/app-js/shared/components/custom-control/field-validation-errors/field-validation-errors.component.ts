@@ -24,10 +24,10 @@ interface ErrorConstraints {
 			</div>
 			<div *ngIf="errors.notNegative">* Cannot be negative</div>
 			<div *ngIf="errors.maxDate">
-			 * Cannot be greather than: {{errors.maxDate.max | tdsDate:userDateFormat}}
+			 * Date cannot be greather than: {{errors.maxDate.max | tdsDate:userDateFormat}}
 			</div>
 			<div *ngIf="errors.minDate">
-			 * Cannot be lower than: {{errors.minDate.min | tdsDate:userDateFormat}}
+			 * Date cannot be lower than: {{errors.minDate.min | tdsDate:userDateFormat}}
 			</div>
 		</div>
 	`
