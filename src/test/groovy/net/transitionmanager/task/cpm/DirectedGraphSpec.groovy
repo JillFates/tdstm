@@ -37,31 +37,4 @@ class DirectedGraphSpec extends Specification {
 			graph.sink.taskId == 'H'
 	}
 
-	void 'test can check DirectedGraph without cycles'() {
-
-		when: 'a new instance of DirectedGraph is created'
-			DirectedGraph graph = directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
-
-		then: 'vertices can be calculated'
-			graph.isCyclic() == false
-	}
-
-
-	void 'test can detect cycles in a DirectedGraph'() {
-
-		when: 'a new instance of DirectedGraph is created with a cycle'
-			DirectedGraph graph = directedGraphTestHelper.createCyclicDirectedGraph()
-
-		then: 'vertices can be calculated'
-			graph.isCyclic() == true
-	}
-
-	void 'test can detect self loop cycle in a DirectedGraph'() {
-
-		when: 'a new instance of DirectedGraph is created with a self loop cycle'
-			DirectedGraph graph = directedGraphTestHelper.createCyclicDirectedGraphWithSelfLoop()
-
-		then: 'vertices can be calculated'
-			graph.isCyclic() == true
-	}
 }

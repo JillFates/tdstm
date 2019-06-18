@@ -7,28 +7,28 @@ class Activity {
 
 	static final String HIDDEN_SOURCE_NODE = '_HIDDEN_SOURCE_NODE_'
 
-	String taskId;
-	String description;
+	String taskId
+	String description
 	/**
 	 * Time to complete the activity
 	 */
-	int duration;
+	int duration
 	/**
 	 * Earliest start time
 	 */
-	int est;
+	int est
 	/**
 	 * Latest start time
 	 */
-	int lst;
+	int lst
 	/**
 	 * Earliest end time
 	 */
-	int eet;
+	int eet
 	/**
 	 * Latest end time
 	 */
-	int let;
+	int let
 	/**
 	 * Defines if this activity belongs to the Critical Path
 	 */
@@ -54,9 +54,10 @@ class Activity {
 
 	@Override
 	String toString() {
-		return "Activity{" +
+		return "Activity { " +
 			"taskId='" + taskId + '\'' +
+			", description='" + (description?:'') + '\'' +
 			", duration=" + duration +
-			'}';
+			' }';
 	}
 }

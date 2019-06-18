@@ -17,7 +17,7 @@ class CriticalPathMethodSpec extends Specification {
 	+---+---+---+
  	*/
 
-	void 'test can calculate critical path method for an Acyclic Directed Graph with 1 source and 1 sink'() {
+	void 'test can calculate critical path method for an Acyclic Directed Graph with one source and one sink'() {
 
 		given:
 			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
@@ -31,7 +31,8 @@ class CriticalPathMethodSpec extends Specification {
 			criticalPath.collect { it.taskId } == ['A', 'B', 'D', 'G', 'H']
 	}
 
-	void 'test can calculate critical path method for an Acyclic Directed Graph with 2 sources and 1 sink'() {
+
+	void 'test can calculate critical path method for an Acyclic Directed Graph with two sources and one sink'() {
 
 		given:
 			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraphWithTwoSourcesAndOneSink()
@@ -45,4 +46,38 @@ class CriticalPathMethodSpec extends Specification {
 			criticalPath.collect { it.taskId } == [Activity.HIDDEN_SOURCE_NODE, 'B', 'D', 'G', 'H']
 	}
 
+	void 'test can calculate critical path method for an Acyclic Directed Graph with one source and two sinks'() {
+
+		given:
+			DirectedGraph directedGraph = directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndTwoSinks()
+
+		when:
+			List<Activity> criticalPath = CriticalPathMethod.calculate(directedGraph)
+
+		then:
+			!criticalPath.isEmpty()
+			criticalPath.size() == 5
+			criticalPath.collect { it.taskId } == ['A', 'B', 'D', 'G', Activity.HIDDEN_SOURCE_NODE]
+	}
+
+	void 'test can calculate critical path method for group a task and dependencies'() {
+
+		given:
+			DirectedGraph directedGraph = directedGraphTestHelper.createTaskAndDependenciesExample()
+
+		when:
+			List<Activity> criticalPath = CriticalPathMethod.calculate(directedGraph)
+
+		then:
+			!criticalPath.isEmpty()
+			criticalPath.size() == 6
+			criticalPath.collect { it.taskId } == [
+				Activity.HIDDEN_SOURCE_NODE,
+				'3',
+				'11',
+				'13',
+				'16',
+				Activity.HIDDEN_SOURCE_NODE
+			]
+	}
 }

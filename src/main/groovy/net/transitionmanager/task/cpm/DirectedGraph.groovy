@@ -1,8 +1,8 @@
 package net.transitionmanager.task.cpm
 
-import groovy.transform.CompileStatic
-
 class DirectedGraph {
+
+	Map<String, Activity> activitiesMap
 
 	List<Activity> activities
 	/**
@@ -13,25 +13,49 @@ class DirectedGraph {
 	DirectedGraph(List<Activity> activities) {
 		this.activities = activities
 		this.vertices = this.activities.size()
+		//TODO: dcorrea create activitiesMap
+
 	}
 
 	Activity getSource() {
-		List<Activity> sources = activities.findAll { it.predecessors.isEmpty() }
+		// Avoid sources without sucessors too.
+		List<Activity> sources = activities.findAll { Activity act ->
+			act.predecessors.isEmpty() && !act.successors.isEmpty()
+		}
 		if (sources.size() == 1) {
 			return sources.first()
 		} else {
 			// If there is more than one source
 			// We could add a new Activity
 			// pointing to these multiple sources
-			Activity source = new Activity(taskId: Activity.HIDDEN_SOURCE_NODE, duration: 0)
-			activities = [source] + activities
-			sources.each { addEdge(source, it) }
-			return source
+			Activity hiddenSource = new Activity(taskId: Activity.HIDDEN_SOURCE_NODE, duration: 1)
+			activities = [hiddenSource] + activities
+			sources.each { addEdge(hiddenSource, it) }
+			return hiddenSource
 		}
 	}
 
+	/**
+	 *
+	 * @return
+	 */
 	Activity getSink() {
-		return activities.last()
+
+		List<Activity> sinks = activities.findAll { Activity act ->
+			act.successors.isEmpty() && !act.predecessors.isEmpty()
+		}
+
+		if (sinks.size() == 1) {
+			return sinks.first()
+		} else {
+			// If there is more than one sink
+			// We could add a new Activity
+			// pointing to these multiple sinks
+			Activity hiddenSink = new Activity(taskId: Activity.HIDDEN_SOURCE_NODE, duration: 1)
+			activities = activities + [hiddenSink]
+			sinks.each { addEdge(it, hiddenSink) }
+			return hiddenSink
+		}
 	}
 
 	int getVertices() {
@@ -49,39 +73,5 @@ class DirectedGraph {
 		// Like self loops ?
 		from.addSuccessor(to)
 		return this
-	}
-
-	/**
-	 * Check whether the graph contains a cycle or not
-	 * using DFS solution
-	 * Backedge: an edge that is from a node to itself (selfloop)
-	 * or one of its ancestors
-	 *
-	 * @return true if this {@code DirectedGraph} contains a cycle
-	 * 		and false in all the other cases.
-	 */
-	Boolean isCyclic() {
-
-		Map<String, Boolean> visitedMap = [:]
-
-		Stack<Activity> stack = new Stack<Activity>()
-		// TODO: dcorrea: Starts with the source of thd DirectedGraph
-		// Refactor this
-		Activity source = getSource()
-		stack.push(source)
-		visitedMap[source.taskId] = true
-
-		while (!stack.isEmpty()) {
-			Activity activity = stack.pop()
-			for (Activity successor in activity.successors) {
-				if (visitedMap[successor.taskId]) {
-					return true
-				} else {
-					stack.push(successor)
-					visitedMap[successor.taskId] = true
-				}
-			}
-		}
-		return false
 	}
 }

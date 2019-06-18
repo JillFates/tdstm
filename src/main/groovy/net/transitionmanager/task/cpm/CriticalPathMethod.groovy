@@ -9,14 +9,13 @@ class CriticalPathMethod {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAhead(DirectedGraph directedGraph) {
+	private static List<Activity> walkListAhead(Activity source, DirectedGraph directedGraph) {
 
 		Activity sourceActivity = directedGraph.getSource()
-		List<Activity> activities = directedGraph.activities
 
 		sourceActivity.eet = sourceActivity.est + sourceActivity.duration
 
-		activities.subList(1, activities.size()).each { Activity activity ->
+		(directedGraph.activities - source).each { Activity activity ->
 
 			activity.predecessors.each { Activity predecessor ->
 
@@ -27,7 +26,7 @@ class CriticalPathMethod {
 			activity.eet = activity.est + activity.duration
 		}
 
-		return activities
+		return directedGraph.activities
 	}
 	/**
 	 * 	After the forward walking the {@code CriticalPathMethod#walkListAhead}
@@ -35,14 +34,12 @@ class CriticalPathMethod {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAback(DirectedGraph directedGraph) {
+	private static List<Activity> walkListAback(Activity sink, DirectedGraph directedGraph) {
 
-		List<Activity> activities = directedGraph.activities
-		Activity sink = directedGraph.getSink()
 		sink.let = sink.eet
 		sink.lst = sink.let - sink.duration
 
-		activities.subList(0, activities.size() - 1).reverseEach { Activity activity ->
+		(directedGraph.activities - sink).reverseEach { Activity activity ->
 
 			activity.successors.each { Activity successor ->
 
@@ -56,15 +53,18 @@ class CriticalPathMethod {
 			}
 		}
 
-		return activities;
+		return directedGraph.activities
 	}
 
 
 	static List<Activity> calculate(DirectedGraph directedGraph) {
 		List<Activity> criticalPath = []
 
-		directedGraph.activities = walkListAhead(directedGraph)
-		directedGraph.activities = walkListAback(directedGraph)
+		Activity source = directedGraph.getSource()
+		Activity sink = directedGraph.getSink()
+
+		directedGraph.activities = walkListAhead(source, directedGraph)
+		directedGraph.activities = walkListAback(sink, directedGraph)
 
 		return directedGraph.activities.findAll { Activity activity ->
 			// TODO: dcorrea refactor this code
