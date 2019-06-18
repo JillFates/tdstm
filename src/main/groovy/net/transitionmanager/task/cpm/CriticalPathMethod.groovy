@@ -3,21 +3,21 @@ package net.transitionmanager.task.cpm
 class CriticalPathMethod {
 
 	/**
-	 * The {@code CriticalPathMethod#walkListAhead} method receives the array that stores the activities
+	 * The {@code CriticalPathMethod#walkListAhead} method receives the array that stores the vertices
 	 * and performs the forward walking inside the activity list calculating
 	 * for each activity its earliest start time and earliest end time.
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAhead(Activity source, DirectedGraph directedGraph) {
+	private static List<TaskTimeLineVertex> walkListAhead(TaskTimeLineVertex source, TaskTimeLineGraph directedGraph) {
 
-		Activity sourceActivity = directedGraph.getSource()
+		TaskTimeLineVertex sourceActivity = directedGraph.getSource()
 
 		sourceActivity.eet = sourceActivity.est + sourceActivity.duration
 
-		(directedGraph.activities - source).each { Activity activity ->
+		(directedGraph.vertices - source).each { TaskTimeLineVertex activity ->
 
-			activity.predecessors.each { Activity predecessor ->
+			activity.predecessors.each { TaskTimeLineVertex predecessor ->
 
 				if (activity.est < predecessor.eet) {
 					activity.est = predecessor.eet
@@ -26,7 +26,7 @@ class CriticalPathMethod {
 			activity.eet = activity.est + activity.duration
 		}
 
-		return directedGraph.activities
+		return directedGraph.vertices
 	}
 	/**
 	 * 	After the forward walking the {@code CriticalPathMethod#walkListAhead}
@@ -34,14 +34,14 @@ class CriticalPathMethod {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<Activity> walkListAback(Activity sink, DirectedGraph directedGraph) {
+	private static List<TaskTimeLineVertex> walkListAback(TaskTimeLineVertex sink, TaskTimeLineGraph directedGraph) {
 
 		sink.let = sink.eet
 		sink.lst = sink.let - sink.duration
 
-		(directedGraph.activities - sink).reverseEach { Activity activity ->
+		(directedGraph.vertices - sink).reverseEach { TaskTimeLineVertex activity ->
 
-			activity.successors.each { Activity successor ->
+			activity.successors.each { TaskTimeLineVertex successor ->
 
 				if (activity.let == 0) {
 					activity.let = successor.lst
@@ -53,22 +53,22 @@ class CriticalPathMethod {
 			}
 		}
 
-		return directedGraph.activities
+		return directedGraph.vertices
 	}
 
 
-	static List<Activity> calculate(DirectedGraph directedGraph) {
-		List<Activity> criticalPath = []
+	static List<TaskTimeLineVertex> calculate(TaskTimeLineGraph directedGraph) {
+		List<TaskTimeLineVertex> criticalPath = []
 
-		Activity source = directedGraph.getSource()
-		Activity sink = directedGraph.getSink()
+		TaskTimeLineVertex source = directedGraph.getSource()
+		TaskTimeLineVertex sink = directedGraph.getSink()
 
-		directedGraph.activities = walkListAhead(source, directedGraph)
-		directedGraph.activities = walkListAback(sink, directedGraph)
+		directedGraph.vertices = walkListAhead(source, directedGraph)
+		directedGraph.vertices = walkListAback(sink, directedGraph)
 
-		return directedGraph.activities.findAll { Activity activity ->
+		return directedGraph.vertices.findAll { TaskTimeLineVertex activity ->
 			// TODO: dcorrea refactor this code
-			activity.taskId == Activity.HIDDEN_SOURCE_NODE ||
+			activity.taskId == TaskTimeLineVertex.HIDDEN_SOURCE_NODE ||
 			(activity.eet - activity.let == 0) && (activity.est - activity.lst == 0)
 		}
 	}

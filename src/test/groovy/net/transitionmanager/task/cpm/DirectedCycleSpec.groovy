@@ -1,20 +1,19 @@
 package net.transitionmanager.task.cpm
 
-import net.transitionmanager.task.cpm.helper.DirectedGraphTestHelper
+import net.transitionmanager.task.cpm.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
 
 class DirectedCycleSpec extends Specification {
 
 	@Shared
-	DirectedGraphTestHelper directedGraphTestHelper = new DirectedGraphTestHelper()
-
+	TaskTimeLineGraphTestHelper taskTimeLineGraphTestHelper = new TaskTimeLineGraphTestHelper()
 
 	void 'test can check cycle in an acyclic directed graph with one source and one sink'() {
 
 		when:
 			DirectedCycle directedCycle = new DirectedCycle(
-				directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
 			)
 
 		then:
@@ -25,7 +24,7 @@ class DirectedCycleSpec extends Specification {
 
 		when:
 			DirectedCycle directedCycle = new DirectedCycle(
-				directedGraphTestHelper.createAcyclicDirectedGraphWithTwoSourcesAndOneSink()
+				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoSourcesAndOneSink()
 			)
 
 		then:
@@ -36,7 +35,7 @@ class DirectedCycleSpec extends Specification {
 
 		when:
 			DirectedCycle directedCycle = new DirectedCycle(
-				directedGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndTwoSinks()
+				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndTwoSinks()
 			)
 
 		then:
@@ -47,7 +46,7 @@ class DirectedCycleSpec extends Specification {
 
 		when:
 			DirectedCycle directedCycle = new DirectedCycle(
-				directedGraphTestHelper.createCyclicDirectedGraph()
+				taskTimeLineGraphTestHelper.createCyclicDirectedGraph()
 			)
 
 		then:
@@ -58,7 +57,7 @@ class DirectedCycleSpec extends Specification {
 
 		when:
 			DirectedCycle directedCycle = new DirectedCycle(
-				directedGraphTestHelper.createCyclicDirectedGraphWithSelfLoop()
+				taskTimeLineGraphTestHelper.createCyclicDirectedGraphWithSelfLoop()
 			)
 
 		then:
