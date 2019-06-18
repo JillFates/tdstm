@@ -64,7 +64,7 @@
                                 name="activationDate"
                                 #activationDate="ngModel"
                                 [maximum]="maxDate"
-                                (blur)="activationDate.valid && setMinDate($event)"
+                                (blur)="setMinDate($event)"
                                 [value]="model.activationDate"
                                 [(ngModel)]="model.activationDate">
                             </tds-date-control>
@@ -92,7 +92,7 @@
                                 name="expirationDate"
                                 #expirationDate="ngModel"
                                 [minimum]="minDate"
-                                (blur)="expirationDate.valid && setMaxDate($event)"
+                                (blur)="setMaxDate($event)"
                                 [value]="model.expirationDate"
                                 [(ngModel)]="model.expirationDate">
                             </tds-date-control>
