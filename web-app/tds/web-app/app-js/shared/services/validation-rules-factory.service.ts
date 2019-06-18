@@ -75,10 +75,12 @@ export class ValidationRulesFactoryService {
 			const params = <DateValidationConstraints>{...defaultConstraints, ...constraints};
 			const rules  = [...this.getCommonValidationRules(params)];
 
+			// add rule to validate maxDate
 			if (params.maxDate) {
 				rules.push(this.validationRulesDefinitions.maxDateValidationRule(params.maxDate))
 			}
 
+			// add rule to validate minDate
 			if (params.minDate) {
 				rules.push(this.validationRulesDefinitions.minDateValidationRule(params.minDate))
 			}

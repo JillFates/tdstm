@@ -75,7 +75,6 @@ export class ValidationRulesDefinitionsService {
 			return () => {
 				// if value comes as string cast it to date
 				const value = DateUtils.stringDateToDate(c.value);
-				// (c.value && c.value.toDateString) ? c.value : new Date(DateUtils.getDateFromGMT(c.value));
 
 				return !isNil(value) && (value > maxDate) ? err : null;
 			};

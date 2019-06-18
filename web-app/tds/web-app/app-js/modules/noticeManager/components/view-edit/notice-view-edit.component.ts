@@ -247,12 +247,6 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	setMaxDate(value: any) {
 		this.maxDate = value;
-		// console.log('Setting max date');
-		/*
-		if (this.model.activationDate && value <  this.convertToDate(this.model.activationDate)) {
-			this.model.expirationDate = '';
-		}
-		*/
 	}
 
 	/**
@@ -260,12 +254,6 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	*/
 	setMinDate(value: any) {
 		this.minDate = value;
-		// console.log('Setting min date');
-		/*
-		if (this.model.expirationDate && value >  this.convertToDate(this.model.expirationDate)) {
-			this.model.activationDate = '';
-		}
-		*/
 	}
 
 	/**

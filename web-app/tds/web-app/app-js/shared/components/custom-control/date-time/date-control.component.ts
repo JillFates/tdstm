@@ -87,7 +87,6 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 		} else {
 			this.value = null;
 		}
-		console.log('Value:', this.value);
 		this.onTouched();
 	}
 
@@ -98,7 +97,6 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 			minDate: this.minimum
 		};
 
-		// this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 		if (inputs['_value']) {
 			if (!inputs['_value'].currentValue) {
 				this.updateDateValue();
@@ -107,7 +105,9 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 
 		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 	}
-
+	/**
+	 * Format the date value to the fomarmat used by the date control
+	 */
 	getDateValue(): any {
 		if (!this.value) {
 			return null;
