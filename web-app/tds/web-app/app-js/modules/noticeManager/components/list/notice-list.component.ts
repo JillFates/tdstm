@@ -85,7 +85,6 @@ export class NoticeListComponent implements OnInit {
 					[{ dir: 'asc', field: 'name'}], // initial sort config.
 					{ mode: 'single', checkboxOnly: false}, // selectable config.
 					{ useColumn: 'id' } ); // checkbox config.
-				this.gridSettings.setNotifier(this.notifier);
 			},
 			(err) => console.log(err));
 	}

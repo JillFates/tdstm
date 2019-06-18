@@ -38,6 +38,9 @@ export class DataGridOperationsHelper {
 	private notifier: NotifierService;
 
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
+		// to notify grid height changes
+		this.notifier = new NotifierService();
+
 		this.state.sort = defaultSort;
 		if (pageSize) {
 			this.state.take = pageSize;
@@ -325,20 +328,10 @@ export class DataGridOperationsHelper {
 	 * Notify the event to update the grid height
 	 */
 	private notifyUpdateGridHeight(): void {
-		if (this.notifier) {
-			this.notifier.broadcast({
-				name: 'grid.header.position.change'
-			});
-			// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
-			jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
-		}
-	}
-
-	/**
-	 * Set the notifier used to comunicate grid layout changes
-	 * @param {NotifierService} notifier
-	 */
-	public setNotifier(notifier: NotifierService) {
-		this.notifier = notifier;
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
