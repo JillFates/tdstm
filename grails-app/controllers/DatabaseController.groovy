@@ -174,7 +174,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		queryParams.projectId = NumberUtil.toPositiveLong(project.id)
 
-		if (justPlanning) {
+		if (justPlanning == 'true') {
 			query.append(" AND mb.use_for_planning=true ")
 		}
 
