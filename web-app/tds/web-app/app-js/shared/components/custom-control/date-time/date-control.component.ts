@@ -70,26 +70,9 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 	}
 
 	/**
-	 * On blur emit the current value to the host component
+	 * On input properties change update accordly the validation rules
+	 * @param {SimpleChanges} inputs  Object containint input properties
 	*/
-	onBlur() {
-		this.onTouched();
-		this.blur.emit(this.getDateValue());
-	}
-
-	/**
-	 * On value Change on the component, emits the value to the listeners.
-	 * @param {value} Date
-	 */
-	onValueChange(value: Date): void {
-		if (value && value !== null) {
-			this.value = DateUtils.formatDate(value, DateUtils.SERVER_FORMAT_DATE)
-		} else {
-			this.value = null;
-		}
-		this.onTouched();
-	}
-
 	ngOnChanges(inputs: SimpleChanges) {
 		const dateConstraints: DateValidationConstraints = {
 			required: this.required,
@@ -105,10 +88,32 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 
 		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
 	}
+
+	/**
+	 * On blur emit the current value to the host component
+	*/
+	private onBlur(): void  {
+		this.onTouched();
+		this.blur.emit(this.getDateValue());
+	}
+
+	/**
+	 * On value Change on the component, emits the value to the listeners.
+	 * @param {value} Date
+	 */
+	private onValueChange(value: Date): void {
+		if (value && value !== null) {
+			this.value = DateUtils.formatDate(value, DateUtils.SERVER_FORMAT_DATE)
+		} else {
+			this.value = null;
+		}
+		this.onTouched();
+	}
+
 	/**
 	 * Format the date value to the fomarmat used by the date control
 	 */
-	getDateValue(): any {
+	private getDateValue(): any {
 		if (!this.value) {
 			return null;
 		}
@@ -120,7 +125,7 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 	/**
 	 * Based on the current value set the corresponding formatted date value
 	 */
-	updateDateValue() {
+	private updateDateValue() {
 		if (this.value) {
 			let localDateFormatted = DateUtils.getDateFromGMT(this.value);
 			this.dateValue = DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);

@@ -13,7 +13,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the angular form  function to validate a required field has a value
 	 * 	@return Curried function that determines if the rule is fulfilled
 	 */
-	requiredValidationRule(): Function {
+	public requiredValidationRule(): Function {
 		return (c: any) => {
 			const err = {
 				isRequired: {
@@ -29,7 +29,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to validate a range of numbers
 	 * 	@return Curried function that determines if the provided range meets the rule
 	 */
-	rangeValidationRule(maxValue: number, minValue: number): Function {
+	public rangeValidationRule(maxValue: number, minValue: number): Function {
 		return (c: any) => {
 			const err = {
 				range: {
@@ -47,7 +47,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to determine if a number is not negative
 	 * 	@return Curried function that determines if the provided value meets the rule
 	 */
-	notNegativeValidationRule(): Function {
+	public notNegativeValidationRule(): Function {
 		return (c: any) => {
 			const err = {
 				notNegative: {
@@ -63,7 +63,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to validate that a date cannot be greather than a max date
 	 * 	@return Curried function that determines if the provided range meets the rule
 	 */
-	maxDateValidationRule(maxDate: Date): Function {
+	public maxDateValidationRule(maxDate: Date): Function {
 		return (c: any) => {
 			const err = {
 				'maxDate': {
@@ -85,7 +85,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to validate that a date cannot be lower than a min date
 	 * 	@return Curried function that determines if the provided range meets the rule
 	 */
-	minDateValidationRule(minDate: Date): Function {
+	public minDateValidationRule(minDate: Date): Function {
 		return (c: any) => {
 			const err = {
 				'minDate': {
