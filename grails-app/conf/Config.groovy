@@ -420,6 +420,11 @@ grails {
 					validation {
 						enableAnonymousAccess = true
 					}
+					storage {
+						jwt {
+							expiration = 14400 // default expiration to 4 hours
+						}
+					}
 				}
 			}
 
