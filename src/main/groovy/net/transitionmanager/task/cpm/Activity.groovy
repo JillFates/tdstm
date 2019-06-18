@@ -2,6 +2,17 @@ package net.transitionmanager.task.cpm
 
 import groovy.transform.CompileStatic
 
+/*
+	Activity Structure definition
+	------------------------------
+
+										+-----+----------+-----+    	est: earliest start time
+taskId: task Identification				| est |  taskId  | eet |  		lst: latest start time
+										+----------------------+
+duration: time to complete a task		| lst | duration | let |		est: earliest start time
+										+-----+----------+-----+		est: earliest start time
+ */
+
 @CompileStatic
 class Activity {
 
@@ -56,7 +67,7 @@ class Activity {
 	String toString() {
 		return "Activity { " +
 			"taskId='" + taskId + '\'' +
-			", description='" + (description?:'') + '\'' +
+			", description='" + (description ?: '') + '\'' +
 			", duration=" + duration +
 			' }';
 	}

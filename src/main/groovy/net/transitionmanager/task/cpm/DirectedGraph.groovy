@@ -13,8 +13,9 @@ class DirectedGraph {
 	DirectedGraph(List<Activity> activities) {
 		this.activities = activities
 		this.vertices = this.activities.size()
-		//TODO: dcorrea create activitiesMap
-
+		activitiesMap = this.activities.collectEntries { Activity activity ->
+			[(activity.taskId): activity]
+		}
 	}
 
 	Activity getSource() {
