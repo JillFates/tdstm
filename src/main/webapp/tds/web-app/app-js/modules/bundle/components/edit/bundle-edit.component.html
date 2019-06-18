@@ -28,8 +28,8 @@
                     <tr class="prop">
                         <td valign="top" class="name">From:</td>
                         <td valign="top" class="value">
-                            <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.sourceRoom.id" >
-                                <option value="" selected="selected">Please Select</option>
+                            <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.fromId" >
+                                <option value="0" selected="selected">Please Select</option>
                                 <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
                             </select>
                         </td>
@@ -37,8 +37,8 @@
                     <tr class="prop">
                         <td valign="top" class="name">To:</td>
                         <td valign="top" class="value">
-                            <select id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.targetRoom.id" >
-                                <option value="" selected="selected">Please Select</option>
+                            <select id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.toId" >
+                                <option value="0" selected="selected">Please Select</option>
                                 <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
                             </select>
                         </td>
@@ -62,7 +62,7 @@
                         <td valign="top" class="name">Project Manager:</td>
                         <td valign="top" class="value">
                             <select id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId" >
-                                <option value="" selected="selected">Please Select</option>
+                                <option value="0" selected="selected">Please Select</option>
                                 <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
                             </select>
                         </td>
@@ -72,7 +72,7 @@
                         <td valign="top" class="name">Event Manager:</td>
                         <td valign="top" class="value">
                             <select id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId">
-                                <option value="" selected="selected">Please Select</option>
+                                <option value="0" selected="selected">Please Select</option>
                                 <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
                             </select>
                         </td>

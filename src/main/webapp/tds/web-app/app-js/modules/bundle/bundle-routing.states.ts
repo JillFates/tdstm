@@ -38,9 +38,9 @@ export const BundleRoute: Routes = [
 		path: BundleStates.BUNDLE_LIST.url,
 		data: {
 			page: {
-				title: 'BUNDLE.LIST',
+				title: 'PLANNING.BUNDLES.LIST',
 				instruction: '',
-				menu: ['BUNDLE.BUNDLE', 'BUNDLE.LIST'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.LIST'],
 			},
 			requiresAuth: true
 		},
@@ -55,9 +55,9 @@ export const BundleRoute: Routes = [
 		path: BundleStates.BUNDLE_SHOW.url,
 		data: {
 			page: {
-				title: 'BUNDLE.SHOW',
+				title: 'PLANNING.BUNDLES.DETAIL',
 				instruction: '',
-				menu: ['BUNDLE.BUNDLE', 'BUNDLE.SHOW'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.DETAIL'],
 			},
 			requiresAuth: true
 		},
@@ -72,9 +72,9 @@ export const BundleRoute: Routes = [
 		path: BundleStates.BUNDLE_EDIT.url,
 		data: {
 			page: {
-				title: 'BUNDLE.EDIT',
+				title: 'PLANNING.BUNDLES.EDIT',
 				instruction: '',
-				menu: ['BUNDLE.BUNDLE', 'BUNDLE.EDIT'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.EDIT'],
 			},
 			requiresAuth: true
 		},
@@ -89,9 +89,9 @@ export const BundleRoute: Routes = [
 		path: BundleStates.BUNDLE_CREATE.url,
 		data: {
 			page: {
-				title: 'BUNDLE.CREATE',
+				title: 'PLANNING.BUNDLES.CREATE',
 				instruction: '',
-				menu: ['BUNDLE.CREATE', 'BUNDLE.CREATE'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.CREATE'],
 			},
 			requiresAuth: true
 		},

@@ -92,14 +92,14 @@ export class BundleService {
 				.catch((error: any) => error);
 	}
 
-	updateBundle(id, model): Observable<any> {
+	updateBundle(id, model: BundleModel, dashboardSteps): Observable<any> {
 
 		let postRequest = {
 			id: id,
 			name: model.name,
 			description: model.description,
-			sourceRoom: model.sourceRoom.id,
-			targetRoom: model.targetRoom.id,
+			sourceRoom: model.fromId,
+			targetRoom: model.toId,
 			startTime: model.startTime,
 			completionTime: model.completionTime,
 			projectManager: model.projectManagerId,
@@ -109,7 +109,7 @@ export class BundleService {
 			useForPlanning: model.useForPlanning
 		};
 
-		model.dashboardSteps.forEach(function(step) {
+		dashboardSteps.forEach(function(step) {
 			postRequest['checkbox_' + step.step.id] = step.dashboard;
 			if (step.dashboard) {
 				postRequest['dashboardLabel_' + step.step.id] = step.step.label;

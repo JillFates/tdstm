@@ -1,7 +1,7 @@
 <div class="bundle-show-component">
     <div class="nav" style="border: 1px solid #CCCCCC; width: 300px; margin:9px 14px 0px">
         <span class="menuButton"><a href="bundle/list"><input type="submit" name="_action_List" value="Bundle List" class="list"></a></span>
-        <span *ngIf="canCreateBundle" class="menuButton"><a href="bundle/create"><input type="submit" name="_action_Create" value="Create Bundle" class="create"></a></span>
+        <span *ngIf="canEditBundle" class="menuButton"><a href="bundle/create"><input type="submit" name="_action_Create" value="Create Bundle" class="create"></a></span>
     </div>
 
     <div class="body" style="width: 330px; float: left">
@@ -107,12 +107,10 @@
             </table>
         </div>
 
-        <div class="buttons" style="float: left;">
-            <input type="hidden" name="id" value="id"/>
-            <input type="hidden" name="projectId" value="projectId"/>
+        <div *ngIf="canEditBundle" class="buttons" style="float: left;">
             <span class="button"><a href="bundle/{{bundleId}}/edit"><input type="submit" name="_action_Edit" value="Edit" class="edit"></a></span>
-            <span *ngIf="!isDefaultBundle" class="button"><input type="submit" (click)="deleteBundle()" name="_action_Delete" value="Delete" class="delete"></span>
-            <span class="button"><input type="submit" (click)="deleteBundleAndAssets()" name="_action_deleteBundleAndAssets" value="Delete Bundle & Assets" class="delete"></span>
+            <span *ngIf="!isDefaultBundle" class="button"><input type="submit" (click)="confirmDeleteBundle()" name="_action_Delete" value="Delete" class="delete"></span>
+            <span class="button"><input type="submit" (click)="confirmDeleteBundleAndAssets()" name="_action_deleteBundleAndAssets" value="Delete Bundle & Assets" class="delete"></span>
         </div>
     </div>
 

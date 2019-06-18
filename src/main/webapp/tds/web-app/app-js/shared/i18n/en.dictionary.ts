@@ -19,6 +19,7 @@ export const en_DICTIONARY: Object = {
 		'CLOSE': 'Close',
 		'CLONE': 'Clone',
 		'DELETE': 'Delete',
+		'DETAIL': 'Detail',
 		'EDIT': 'Edit',
 		'EXPORT': 'Export',
 		'FILTER': 'Filter',
@@ -150,13 +151,6 @@ export const en_DICTIONARY: Object = {
 			'MERGE_CONFIRMATION': 'Confirm merging of Tags. There is no undo for this action.'
 		}
 	},
-	'BUNDLE': {
-		'BUNDLE' : 'Bundle',
-		'LIST': 'List Bundles',
-		'EDIT': 'Edit Bundle',
-		'SHOW': 'Show Bundle',
-		'CREATE': 'Create Bundle'
-	},
 	'CREDENTIAL': {
 		'CREATE_CREDENTIAL': 'Create Credential',
 		'CREDENTIAL': 'Credential',
@@ -223,7 +217,14 @@ export const en_DICTIONARY: Object = {
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'BUNDLES': {
+			'BUNDLES': 'Bundles',
+			'DETAIL': 'Bundle Detail',
+			'LIST': 'Bundle List',
+			'CREATE': 'Create Bundle',
+			'EDIT': 'Bundle Edit'
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',

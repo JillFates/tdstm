@@ -2,8 +2,8 @@ import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {ActivatedRoute, Router} from '@angular/router';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: `bundle-show`,
@@ -16,7 +16,7 @@ export class BundleShowComponent implements OnInit {
 	public moveManager;
 	public projectId;
 	public projectManager;
-	public canCreateBundle;
+	public canEditBundle;
 	private bundleId;
 	protected userTimeZone: string;
 	constructor(
@@ -24,8 +24,9 @@ export class BundleShowComponent implements OnInit {
 		private permissionService: PermissionService,
 		private route: ActivatedRoute,
 		private router: Router,
-		private preferenceService: PreferenceService) {
-		this.canCreateBundle = this.permissionService.hasPermission('BundleCreate');
+		private preferenceService: PreferenceService,
+		private promptService: UIPromptService) {
+		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
 		this.bundleId = this.route.params['_value']['id'];
 	}
 
@@ -34,7 +35,33 @@ export class BundleShowComponent implements OnInit {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 	}
 
-	public deleteBundle() {
+	public confirmDeleteBundle() {
+		this.promptService.open(
+			'Confirmation Required',
+			'WARNING: Deleting this bundle will remove any teams and any related step data',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.deleteBundle();
+				}
+			})
+			.catch((error) => console.log(error));
+	}
+
+	public confirmDeleteBundleAndAssets() {
+		this.promptService.open(
+			'Confirmation Required',
+			'WARNING: Deleting this bundle will remove any teams, any related step data, AND ASSIGNED ASSETS (NO UNDO)',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.deleteBundleAndAssets();
+				}
+			})
+			.catch((error) => console.log(error));
+	}
+
+	private deleteBundle() {
 		this.bundleService.deleteBundle(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
@@ -43,7 +70,7 @@ export class BundleShowComponent implements OnInit {
 			});
 	}
 
-	public deleteBundleAndAssets() {
+	private deleteBundleAndAssets() {
 		this.bundleService.deleteBundleAndAssets(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {

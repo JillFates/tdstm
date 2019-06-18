@@ -8,14 +8,11 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetEntityPlanStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetDependencyBundle
@@ -24,18 +21,13 @@ import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import net.transitionmanager.asset.Room
 import net.transitionmanager.command.DependencyConsoleCommand
-import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.command.bundle.AssetsAssignmentCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.ServiceException
-import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
@@ -44,7 +36,6 @@ import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.StateEngineService
 import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
@@ -67,304 +58,10 @@ class MoveBundleController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ProgressService progressService
 	Scheduler quartzScheduler
-	StateEngineService stateEngineService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
     CustomDomainService customDomainService
 	MoveEventService moveEventService
-
-	@HasPermission(Permission.BundleView)
-	def list() {}
-
-	/**
-	 * Used to generate the List for Bundles using jqgrid.
-	 * @return : list of bundles as JSON
-	 */
-	@HasPermission(Permission.BundleView)
-	def listJson() {
-		String sortOrder  = params.sord ?: 'asc'
-		int maxRows = params.int('rows', 25)
-		int currentPage = params.int('page', 1)
-		int rowOffset = currentPage == 1 ? 0 : (currentPage - 1) * maxRows
-		Project project = securityService.userCurrentProject
-
-		def startDates = params.startTime ? MoveBundle.executeQuery('''
-			from MoveBundle where project =:project and cast(startTime as string) like :startTime
-			''', [project: project, startTime: '%' + params.startTime.trim() + '%'])?.startTime : []
-
-		def completionDates = !params.completionTime ? [] :
-				MoveBundle.executeQuery('''
-					select completionTime from MoveBundle
-					where project=:project
-					and str(completionTime) like :completionTime''',
-					[project: project, completionTime: '%' + params.completionTime + '%'])
-	}
-
-	/**
-	 * Generates the List for Bundles using Kendo Grid.
-	 * @return : list of bundles as JSON
-	 */
-	@HasPermission(Permission.BundleView)
-	def retrieveBundleList() {
-		List<MoveBundle> bundleList = MoveBundle.findAllByProject(securityService.loadUserCurrentProject())
-		renderAsJson bundleList.collect { MoveBundle entry -> [
-			bundleId: entry.id,
-			name: HtmlUtil.escape(entry.name),
-			description: entry.description,
-			planning: entry.useForPlanning,
-			assetqty: entry.assetQty,
-			startDate: entry.startTime,
-			completion: entry.completionTime
-		]}
-	}
-
-	@HasPermission(Permission.BundleView)
-	def show() {
-		Project project = controllerService.getProjectForPage(this)
-		if (!project) return
-
-		MoveBundle moveBundle = controllerService.getBundleForPage(this, project, params.id ?: userPreferenceService.moveBundleId)
-		if (!moveBundle) {
-			redirect(action: 'list')
-			return
-		}
-
-		userPreferenceService.setMoveBundleId(moveBundle.id)
-		def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "PROJ_MGR")
-		def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "MOVE_MGR")
-
-		// get the list of Manual Dashboard Steps that are associated to moveBundle.project
-		def moveBundleSteps = MoveBundleStep.executeQuery(
-				'FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',
-				[mb: moveBundle])
-		def dashboardSteps = []
-
-		moveBundleSteps.each {
-			def stepSnapshot = StepSnapshot.executeQuery(
-					'FROM StepSnapshot WHERE moveBundleStep=:msb ORDER BY dateCreated DESC',
-					[msb: it], [max: 1])[0]
-			dashboardSteps << [moveBundleStep : it, stepSnapshot: stepSnapshot]
-		}
-
-		[moveBundleInstance: moveBundle, projectId: project.id, projectManager: projectManager, moveManager: moveManager,
-		 dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id]
-	}
-
-	@HasPermission(Permission.BundleDelete)
-	def delete() {
-		String message = moveBundleService.deleteBundle(MoveBundle.get(params.id),
-			securityService.loadUserCurrentProject())
-		flash.message = message
-		redirect(action: 'list')
-	}
-
-	@HasPermission(Permission.BundleDelete)
-	def deleteBundleAndAssets() {
-		MoveBundle moveBundle = MoveBundle.get(params.id)
-		if (moveBundle) {
-			try{
-				moveBundleService.deleteBundleAndAssets(moveBundle)
-				flash.message = "MoveBundle $moveBundle deleted"
-			}
-			catch (e) {
-				flash.message = "Unable to Delete MoveBundle and Assets: $e.message"
-			}
-		}
-		else {
-			flash.message = "MoveBundle not found with id $params.id"
-		}
-		redirect(action: 'list')
-	}
-
-	@HasPermission(Permission.BundleEdit)
-	def edit() {
-		MoveBundle moveBundle = MoveBundle.get(params.id)
-		if (!moveBundle) {
-			flash.message = "MoveBundle not found with id $params.id"
-			redirect(action: 'list')
-			return
-		}
-
-		stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
-		Project project = securityService.userCurrentProject
-		def managers = partyRelationshipService.getProjectStaff(project.id)
-		def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "PROJ_MGR")
-		def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "MOVE_BUNDLE", "MOVE_MGR")
-
-		//get the all Dashboard Steps that are associated to moveBundle.project
-		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
-
-		[moveBundleInstance: moveBundle, projectId: project.id, managers: managers,
-		 projectManager: projectManager?.partyIdToId, moveManager: moveManager?.partyIdToId,
-		 dashboardSteps: allDashboardSteps.dashboardSteps?.sort{it["step"].id},
-		 remainingSteps: allDashboardSteps.remainingSteps, workflowCodes: stateEngineService.getWorkflowCode(),
-		 rooms: Room.findAllByProject(project)]
-	}
-
-	@HasPermission(Permission.BundleEdit)
-	def update(Long id) {
-		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
-		// implement the way dates are sent to backend
-		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
-		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
-
-		def projectManagerId = params.projectManager
-		def moveManagerId = params.moveManager
-
-		Project currentUserProject = controllerService.getProjectForPage(this)
-		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
-		command.useForPlanning = params.getBoolean('useForPlanning', false)
-		if (params?.moveEvent?.id) {
-			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
-		}
-		command.operationalOrder = params.getInt('operationalOrder', 1)
-		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
-		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
-
-		if (command.validate()) {
-			try {
-				MoveBundle moveBundle = moveBundleService.update(id, command)
-
-				stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
-				boolean errorInSteps = false
-				stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
-					def checkbox = params["checkbox_" + it.id]
-					if (checkbox == 'on') {
-						MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, params)
-						if (step.hasErrors()) {
-							errorInSteps = true
-							return
-						}
-					} else {
-						def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
-						if (moveBundleStep) {
-							moveBundleService.deleteMoveBundleStep(moveBundleStep)
-						}
-					}
-				}
-
-				if (errorInSteps) {
-					flash.message = "Validation error while adding steps."
-					redirect(action: "show", id: moveBundle.id)
-					return
-				}
-
-				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", projectManagerId, "PROJ_MGR")
-				partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "MOVE_BUNDLE", moveManagerId, "MOVE_MGR")
-
-				flash.message = "MoveBundle $moveBundle updated"
-				redirect(action: "show", id: moveBundle.id)
-				return
-
-			} catch (EmptyResultException e) {
-				flash.message = "MoveBundle not found with id $params.id"
-				redirect(action: 'edit', id: params.id)
-			} catch (ValidationException e) {
-				flash.message = "Error updating MoveBundle with id $params.id"
-			}
-		} else {
-			flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.allErrorsString(command)
-		}
-
-		// in case of error updating move bundle
-		//	get the all Dashboard Steps that are associated to moveBundle.project
-		def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundleService.findById(id))
-		def remainingSteps = allDashboardSteps.remainingSteps
-
-		render(view: 'edit',
-				model: [moveBundleInstance: command,
-						projectId: currentUserProject.id,
-						projectManager: projectManagerId,
-						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
-						moveManager: moveManagerId,
-						rooms: Room.findAllByProject(currentUserProject),
-						dashboardSteps: allDashboardSteps.dashboardSteps,
-						remainingSteps: remainingSteps,
-						workflowCodes: stateEngineService.getWorkflowCode()
-				])
-	}
-
-	@HasPermission(Permission.BundleCreate)
-	def create() {
-		Project project = securityService.userCurrentProject
-		[moveBundleInstance: new MoveBundle(params), managers: partyRelationshipService.getProjectStaff(project.id),
-		 projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)]
-	}
-
-	@HasPermission(Permission.BundleCreate)
-	def save() {
-		// SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
-		// implement the way dates are sent to backend
-		params.startTime = TimeUtil.parseDateTime(params.startTime) ?: null
-		params.completionTime = TimeUtil.parseDateTime(params.completionTime)
-
-		def projectManagerId = params.projectManager
-		def moveManagerId = params.moveManager
-
-		Project currentUserProject = controllerService.getProjectForPage(this)
-		MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
-		command.useForPlanning = params.getBoolean('useForPlanning', false)
-		if (params?.moveEvent?.id) {
-			command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, params.moveEvent.id as Long, false)
-		}
-		command.operationalOrder = params.getInt('operationalOrder', 1)
-		command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, params.sourceRoom, false)
-		command.targetRoom = GormUtil.findInProject(currentUserProject, Room, params.targetRoom, false)
-
-		if (command.validate()) {
-			try {
-				MoveBundle moveBundle = moveBundleService.save(command)
-
-				if (projectManagerId) {
-					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
-							Party.load(projectManager), "PROJ_MGR")
-				}
-				if (moveManagerId) {
-					partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
-							Party.load(moveManager), "ROLE_MOVE_MGR")
-				}
-
-				flash.message = "MoveBundle $moveBundle created"
-				redirect(action: "show", params: [id: moveBundle.id])
-				return
-
-			} catch (ServiceException e) {
-				flash.message = e.message
-			}
-		} else {
-			flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.allErrorsString(command)
-		}
-
-		// in case of error saving new move bundle
-		render(view: 'create',
-				model: [moveBundleInstance: command,
-						moveManager: moveManagerId,
-						projectManager: projectManagerId,
-						managers: partyRelationshipService.getProjectStaff(currentUserProject.id),
-						rooms: Room.findAllByProject(currentUserProject),
-						workflowCodes: stateEngineService.getWorkflowCode()
-				])
-	}
-
-	/**
-	 * If the checkbox is subsequently checked and the form submitted, a new MoveBundleStep shall be created for that transition.
-	 * @return  new moveBundleStep
-	 */
-	@HasPermission(Permission.BundleEdit)
-	MoveBundleStep createMoveBundleStep() {
-		def moveBundle = MoveBundle.get(params.moveBundleId)
-		int transitionId = params.int('transitionId')
-		MoveBundleStep moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, transitionId)
-		if (!moveBundleStep) {
-			moveBundleStep = new MoveBundleStep(moveBundle: moveBundle, transitionId: transitionId, calcMethod: 'L',
-			                                    label: stateEngineService.getDashboardLabel(moveBundle.workflowCode, transitionId))
-			if (!save(moveBundleStep)) {
-				response.sendError(500, "Validation Error")
-				return
-			}
-		}
-		render moveBundleStep
-	}
 
 	/*-----------------------------------------------------
 	 * remote function to verify stepSnapshot records for a list of steps.

@@ -12,7 +12,7 @@ export class BundleCreateComponent implements OnInit {
 	public workflowCodes;
 	public rooms;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
-	public bundleModel = null;
+	public bundleModel: BundleModel = null;
 
 	constructor(
 		private bundleService: BundleService,
@@ -22,6 +22,20 @@ export class BundleCreateComponent implements OnInit {
 	ngOnInit() {
 		this.getModel();
 		this.bundleModel = new BundleModel();
+		const defaultBundle = {
+			name: '',
+			description: '',
+			fromId: 0,
+			toId: 0,
+			startTime: '',
+			completionTime: '',
+			projectManagerId: 0,
+			moveManagerId: 0,
+			operationalOrder: 1,
+			workflowCode: 'STD_PROCESS',
+			useForPlanning: false,
+		};
+		this.bundleModel = Object.assign({}, defaultBundle, this.bundleModel);
 	}
 
 	private getModel() {

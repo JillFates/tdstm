@@ -37,6 +37,7 @@ export class BundleListComponent implements OnInit {
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: BundleModel[];
+	public canEditBundle;
 	public dateFormat = '';
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
@@ -62,6 +63,7 @@ export class BundleListComponent implements OnInit {
 				this.dateFormat = dateFormat;
 				this.bundleColumnModel = new BundleColumnModel(`{0:${dateFormat}}`);
 			});
+		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {

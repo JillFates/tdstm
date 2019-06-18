@@ -18,8 +18,8 @@ export class BundleEditComponent implements OnInit {
 	private bundleId;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public typeOptions = [{value: 'L', text: 'Linear'}, {value: 'M', text: 'Manual'}];
-	public bundleModel = null;
-	public savedModel = null;
+	public bundleModel: BundleModel = null;
+	public savedModel: BundleModel = null;
 	public dashboardSteps;
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
@@ -39,8 +39,8 @@ export class BundleEditComponent implements OnInit {
 		const defaultBundle = {
 			name: '',
 			description: '',
-			sourceRoom: {},
-			targetRoom: {},
+			fromId: 0,
+			toId: 0,
 			startTime: '',
 			completionTime: '',
 			projectManagerId: 0,
@@ -92,9 +92,7 @@ export class BundleEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		let model = this.bundleModel
-		model.dashboardSteps = this.dashboardSteps;
-		this.bundleService.updateBundle(this.bundleId, model).subscribe((result: any) => {
+		this.bundleService.updateBundle(this.bundleId, this.bundleModel, this.dashboardSteps).subscribe((result: any) => {
 			if (result.status === 'success') {
 				this.router.navigateByUrl('bundle/' + this.bundleId + '/show')
 			}
@@ -119,7 +117,7 @@ export class BundleEditComponent implements OnInit {
 	}
 
 	public onChangeDashboardStep(step) {
-		if (!step.moveBundleStep) {
+		if (step.dashboard) {
 			step.moveBundleStep = {
 				planStartTime: this.bundleModel.startTime,
 				planCompletionTime: this.bundleModel.completionTime,
