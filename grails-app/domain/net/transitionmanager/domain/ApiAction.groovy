@@ -3,19 +3,17 @@ package net.transitionmanager.domain
 import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdsops.tm.enums.domain.RemoteCredentialMethod
-import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.StringUtil
-import net.transitionmanager.connector.CallbackMode
+import groovy.transform.ToString
+import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ApiActionMethodParam
+import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.service.InvalidParamException
 import org.codehaus.groovy.grails.web.json.JSONObject
-import groovy.transform.ToString
-import groovy.util.logging.Slf4j
-
-import java.util.regex.Matcher
 
 /*
  * The ApiAction domain represents the individual mapped API methods that can be
@@ -125,6 +123,9 @@ class ApiAction {
 
 	// Flag that the action should be invoked remotely
 	Boolean isRemote = false
+
+	//A flag for remote tasks to know if they should record debug info.
+	Boolean debugEnabled = false
 
 	// How the authentication for remote scripts will be performed
 	RemoteCredentialMethod remoteCredentialMethod
