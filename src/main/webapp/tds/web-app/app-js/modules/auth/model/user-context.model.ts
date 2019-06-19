@@ -1,14 +1,17 @@
 export class UserContextModel {
-	bundle: any;
-	dateFormat: string;
-	event: any;
-	person: any;
-	project: any;
-	timezone: string;
-	user: any;
-	licenseInfo: any;
-	permissions: any[];
-	buildVersion: string;
+	bundle?: any;
+	dateFormat?: string;
+	event?: any;
+	person?: any;
+	project?: any;
+	timezone?: string;
+	user?: any;
+	licenseInfo?: any;
+	permissions?: any[];
+	buildVersion?: string;
+	notices?: {
+		redirectUrl?: string;
+	}
 }
 
 export enum USER_CONTEXT_REQUEST {

@@ -4,12 +4,10 @@
  */
 // Angular
 import {Injectable} from '@angular/core';
+// NGXS
+import {Store} from '@ngxs/store';
 // Model
-import {UserContextModel, USER_CONTEXT_REQUEST} from '../model/user-context.model';
-// Services
-import {UserService} from './user.service';
-import {PermissionService} from '../../../shared/services/permission.service';
-import {AuthService} from './auth.service';
+import {UserContextModel} from '../model/user-context.model';
 // Others
 import {BehaviorSubject, Observable} from 'rxjs';
 
@@ -20,9 +18,13 @@ export class UserContextService {
 	private userContext = this.userContextSubject.asObservable();
 
 	constructor(
-		private userService: UserService,
-		private permissionService: PermissionService,
-		private authService: AuthService) {
+		private store: Store) {
+		// Add the user context
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			if (userContext && userContext.user) {
+				this.userContextSubject.next(userContext);
+			}
+		});
 	}
 
 	/**
@@ -30,33 +32,5 @@ export class UserContextService {
 	 */
 	public getUserContext(): Observable<UserContextModel> {
 		return Observable.from(this.userContext);
-	}
-
-	/**
-	 * Being call in the Bootstrap of the Application
-	 */
-	public initializeUserContext() {
-		if (this.authService.isUserAuthenticated()) {
-			let contextPromises = [];
-			contextPromises.push(this.userService.getUserContext());
-			contextPromises.push(this.userService.getLicenseInfo());
-			contextPromises.push(this.permissionService.getPermissions());
-
-			return new Promise((resolve) => {
-				Observable.forkJoin(contextPromises)
-					.subscribe((contextResponse: any) => {
-						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
-						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
-						this.userContextSubject.next(userContext);
-						resolve(true);
-					});
-			});
-		} else {
-			// Both actions get resolved but one contains the entire Use Context
-			return new Promise((resolve) => {
-				resolve(true);
-			});
-		}
 	}
 }

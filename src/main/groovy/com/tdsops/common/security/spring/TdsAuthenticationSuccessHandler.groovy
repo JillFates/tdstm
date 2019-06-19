@@ -52,7 +52,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
-				redirectUri = '/auth/login'
+				redirectUri = '/module/auth/login'
 			} else {
 				userService.updateLastLogin(userLogin)
 				userService.resetFailedLoginAttempts(userLogin)

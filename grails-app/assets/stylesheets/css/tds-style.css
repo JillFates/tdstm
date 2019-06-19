@@ -2179,7 +2179,8 @@ div.content-wrapper div.execution-phase-wrapper {
     max-width: 285px; }
   .planning-dashboard .execution-phase {
     -ms-flex-preferred-size: 50%;
-    flex-basis: 50%; }
+    flex-basis: 50%;
+    padding-right: 0px; }
 
 @media (max-width: 1000px) {
   .planning-dashboard {
@@ -2209,8 +2210,8 @@ div.content-wrapper div.execution-phase-wrapper {
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
       max-width: 285px; }
     .planning-dashboard .execution-phase {
-      -ms-flex-preferred-size: 49%;
-      flex-basis: 49%; } }
+      -ms-flex-preferred-size: 70%;
+      flex-basis: 70%; } }
 
 /* Cookbook */
 .taskGeneration .container-fluid {

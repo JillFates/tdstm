@@ -51,13 +51,13 @@ class AuthController implements ControllerMethods {
 			redirectToPrefPage()
 		}
 		else {
-			redirect(action: 'login', params: params)
+			redirect(uri: '/tdstm/module/auth/login')
 		}
 	}
 
 	def login() {
 		// Adding the X-Login-URL header so that we can catch it in Ajax calls
-		response.setHeader('X-Login-URL', createLink(controller: 'auth', action: 'login', absolute: true).toString())
+		response.setHeader('X-Login-URL', '/tdstm/module/auth/login').toString()
 
 		def noticeList = noticeService.fetch();
 		def preLoginList = [];

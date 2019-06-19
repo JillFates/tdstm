@@ -18,7 +18,6 @@ import {ComponentCreatorService} from '../shared/services/component-creator.serv
 import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
 import {UILoaderService} from '../shared/services/ui-loader.service';
 import {PersonService} from './services/person.service';
-import {PermissionService} from './services/permission.service';
 import {WindowService} from './services/window.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
@@ -248,8 +247,6 @@ export class SharedModule {
 				// Preferences
 				PreferencesResolveService,
 				PreferenceService,
-				// Permissions
-				PermissionService,
 				// Dialogs
 				ComponentCreatorService,
 				UILoaderService,
