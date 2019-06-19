@@ -39,6 +39,8 @@ class EventDetailsPage extends Page {
         descriptionValue.text()==desc
     }
     def validateEventStartDate(dte){
+        println "Value from the row is: " + startDateValue.text()
+        println "Parameter is: " + dte
         startDateValue.text()==dte
     }
 

@@ -44,11 +44,16 @@ class ListEventsPage extends Page {
     }
 
     def validateDescription(desc){
-        rows[1].find("td")[2].text()==desc
+        waitFor{rows[1].find("td")[3].text()==desc}
     }
 
     def validateStartDate(dt){
-        rows[1].find("td")[1].text()==dt
+        rows[1].find("td", "aria-describedby":"moveEventListIdGrid_estStartTime").text()
+        def rowDateValue
+        rowDateValue = rows[1].find("td", "aria-describedby":"moveEventListIdGrid_estStartTime").text()
+        println "rodw date value is: " + rowDateValue
+        println "parameter dt is: " + dt
+        rowDateValue.equals(dt)
     }
 
     def validateEventNameAlongProjName(evtNm){

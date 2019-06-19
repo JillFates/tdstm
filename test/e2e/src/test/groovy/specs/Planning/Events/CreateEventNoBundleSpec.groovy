@@ -31,7 +31,7 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        planningModule.goToListEvents()
+        waitFor(30){planningModule.goToListEvents()}
         at ListEventsPage
 
     }
@@ -99,9 +99,9 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
         then: 'The event is retrieved'
             validateNameIsListed(bundleData[0])
         and: 'Description matches the one entered on creation'
-            validateDescription(bundleData[1])
+            waitFor(30){validateDescription(bundleData[1])}
         and: 'Start Date matches the one entered on creation'
-            validateStartDate(startDate)
+            waitFor(30){validateStartDate(startDate)}
         and: 'Event name is present on the top right along with project name'
             validateEventNameAlongProjName(bundleData[0])
     }
