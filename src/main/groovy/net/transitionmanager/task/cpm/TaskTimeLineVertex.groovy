@@ -49,9 +49,6 @@ class TaskTimeLineVertex {
 	List<TaskTimeLineVertex> successors = []
 	List<TaskTimeLineVertex> predecessors = []
 
-	// not accessible
-	private TaskTimeLineVertex() {}
-
 	/**
 	 *
 	 * @param successor
@@ -89,43 +86,46 @@ class TaskTimeLineVertex {
 			", duration=" + duration +
 			' }';
 	}
+
 	//// ------------------------------------------------////
 	//// ----------Factory Methods ----------------------////
 	//// ------------------------------------------------////
-	/**
-	 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
-	 * @param taskId
-	 * @param description
-	 * @param duration
-	 * @return
-	 */
-	static TaskTimeLineVertex newSimpleVertex(String taskId, String description, int duration) {
-		return new TaskTimeLineVertex(taskId: taskId, description: description, duration: duration)
-	}
+	static class Factory {
+		/**
+		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * @param taskId
+		 * @param description
+		 * @param duration
+		 * @return
+		 */
+		static TaskTimeLineVertex newSimpleVertex(String taskId, String description, int duration) {
+			return new TaskTimeLineVertex(taskId: taskId, description: description, duration: duration)
+		}
 
-	/**
-	 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
-	 * @param taskId
-	 * @param duration
-	 * @return
-	 */
-	static TaskTimeLineVertex newSimpleVertex(String taskId, int duration) {
-		return new TaskTimeLineVertex(taskId: taskId, duration: duration)
-	}
+		/**
+		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * @param taskId
+		 * @param duration
+		 * @return
+		 */
+		static TaskTimeLineVertex newSimpleVertex(String taskId, int duration) {
+			return new TaskTimeLineVertex(taskId: taskId, duration: duration)
+		}
 
-	/**
-	 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
-	 * @return
-	 */
-	static TaskTimeLineVertex newHiddenSource() {
-		return new TaskTimeLineVertex(taskId: HIDDEN_SOURCE_NODE, duration: 1)
-	}
+		/**
+		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * @return
+		 */
+		static TaskTimeLineVertex newHiddenSource() {
+			return new TaskTimeLineVertex(taskId: HIDDEN_SOURCE_NODE, duration: 1)
+		}
 
-	/**
-	 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
-	 * @return
-	 */
-	static TaskTimeLineVertex newHiddenSink() {
-		return new TaskTimeLineVertex(taskId: HIDDEN_SINK_NODE, duration: 1)
+		/**
+		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * @return
+		 */
+		static TaskTimeLineVertex newHiddenSink() {
+			return new TaskTimeLineVertex(taskId: HIDDEN_SINK_NODE, duration: 1)
+		}
 	}
 }

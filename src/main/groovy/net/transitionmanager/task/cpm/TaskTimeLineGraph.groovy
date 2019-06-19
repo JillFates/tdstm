@@ -1,5 +1,6 @@
 package net.transitionmanager.task.cpm
 
+
 class TaskTimeLineGraph {
 
 	Map<String, TaskTimeLineVertex> verticesMap
@@ -25,7 +26,7 @@ class TaskTimeLineGraph {
 			// If there is more than one source
 			// We could add a new TaskTimeLineVertex
 			// pointing to these multiple sources
-			TaskTimeLineVertex hiddenSource = TaskTimeLineVertex.newHiddenSource()
+			TaskTimeLineVertex hiddenSource = TaskTimeLineVertex.Factory.newHiddenSource()
 			vertices = [hiddenSource] + vertices
 			sources.each { addEdge(hiddenSource, it) }
 			return hiddenSource
@@ -48,7 +49,7 @@ class TaskTimeLineGraph {
 			// If there is more than one sink
 			// We could add a new TaskTimeLineVertex
 			// pointing to these multiple sinks
-			TaskTimeLineVertex hiddenSink = TaskTimeLineVertex.newHiddenSink()
+			TaskTimeLineVertex hiddenSink = TaskTimeLineVertex.Factory.newHiddenSink()
 			vertices = vertices + [hiddenSink]
 			sinks.each { addEdge(it, hiddenSink) }
 			return hiddenSink
