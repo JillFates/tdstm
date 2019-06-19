@@ -154,7 +154,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
-			apiActionInvokedAt: assetComment.apiActionInvokedAt,
+			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
+			apiActionPercentDone: detail.apiActionPercentDone,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
 			title: task.modal.title,
 			workflow: detail.workflow || '',
