@@ -31,10 +31,9 @@ export class RouterUtils {
 	 */
 	public static getAngularRoute(value: string): string[] {
 		let fullPath = [];
-		value.split('/').forEach((path) => {
-			if (path && path.length > 0 && path !== 'module') {
-				fullPath.push(path);
-			}
+		const angularPath = value.split('/module/')[1];
+		angularPath.split('/').forEach((path)  => {
+			fullPath.push(path);
 		});
 		return fullPath;
 	}
