@@ -1,50 +1,27 @@
 package net.transitionmanager.task.cpm
 
 import groovy.transform.CompileStatic
+import net.transitionmanager.task.CriticalPathNode
 
 /*
-	TaskTimeLineVertex Structure definition
-	------------------------------
+		TaskTimeLineVertex Structure definition, compound with CriticalPathNode
+		-----------------------------------------------------------------------
 
-										+-----+----------+-----+    	est: earliest start time
-taskId: task Identification				| est |  taskId  | eet |  		lst: latest start time
-										+----------------------+
-duration: time to complete a task		| lst | duration | let |		est: earliest start time
-										+-----+----------+-----+		est: earliest start time
+											+-----+----------+-----+    	est: earliest start time
+	taskId: task Identification				| est |  taskId  | eet |  		lst: latest start time
+											+----------------------+
+	duration: time to complete a task		| lst | duration | let |		est: earliest start time
+											+-----+----------+-----+		est: earliest start time
  */
 
 @CompileStatic
-class TaskTimeLineVertex {
+class TaskTimeLineVertex implements CriticalPathNode {
 
 	static final String HIDDEN_SOURCE_NODE = '_HIDDEN_SOURCE_NODE_'
 	static final String HIDDEN_SINK_NODE = '_HIDDEN_SINK_NODE_'
 
 	String taskId
 	String description
-	/**
-	 * Time to complete the activity
-	 */
-	int duration
-	/**
-	 * Earliest start time
-	 */
-	int est
-	/**
-	 * Latest start time
-	 */
-	int lst
-	/**
-	 * Earliest end time
-	 */
-	int eet
-	/**
-	 * Latest end time
-	 */
-	int let
-	/**
-	 * Defines if this activity belongs to the Critical Path
-	 */
-	Boolean isCriticalPath = false
 
 	List<TaskTimeLineVertex> successors = []
 	List<TaskTimeLineVertex> predecessors = []
