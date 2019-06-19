@@ -9,7 +9,7 @@ import {AuthService} from '../service/auth.service';
 import {tap} from 'rxjs/operators';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
-import {Observable} from 'rxjs';
+import {Observable, from} from 'rxjs';
 import {WindowService} from '../../../shared/services/window.service';
 
 @State<UserContextModel>({
@@ -32,20 +32,22 @@ export class UserContextState {
 
 	@Action(Login)
 	login(ctx: StateContext<UserContextModel>, {payload}: Login) {
-		let contextPromises = [];
-		contextPromises.push(this.authService.login({payload}));
-		contextPromises.push(this.userService.getLicenseInfo());
-		contextPromises.push(this.permissionService.getPermissions());
+		return this.authService.login({payload}).subscribe(userContext => {
+			let contextPromises = [];
+			contextPromises.push(from(new Promise(resolve => resolve(userContext))));
+			contextPromises.push(this.userService.getLicenseInfo());
+			contextPromises.push(this.permissionService.getPermissions());
 
-		return new Promise((resolve) => {
-			Observable.forkJoin(contextPromises)
-				.subscribe((contextResponse: any) => {
-					let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-					userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
-					userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
-					ctx.patchState(userContext);
-					resolve();
-				});
+			return new Promise((resolve) => {
+				Observable.forkJoin(contextPromises)
+					.subscribe((contextResponse: any) => {
+						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
+						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
+						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
+						ctx.patchState(userContext);
+						resolve();
+					});
+			});
 		});
 	}
 

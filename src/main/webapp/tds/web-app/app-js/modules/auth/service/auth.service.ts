@@ -42,7 +42,6 @@ export class AuthService {
 		);
 	}
 
-
 	/**
 	 * Verify if the user is already logged or not
 	 */
