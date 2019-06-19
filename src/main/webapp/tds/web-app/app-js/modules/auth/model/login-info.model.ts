@@ -15,7 +15,7 @@ export class LoginInfoModel {
 	}
 }
 
-export interface ILoginModel {
+export interface IFormLoginModel {
 	authority: string;
 	username: string;
 	password: string;

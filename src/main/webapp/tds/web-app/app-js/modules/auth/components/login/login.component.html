@@ -1,4 +1,4 @@
-<div class="login-component">
+<div class="login-component" *ngIf="!redirectUser">
     <div class="login-box" [ngClass]="{'login-notice': loginInfo && loginInfo.notices.length > 0 }">
         <div class="login-box-body">
             <div class="login-logo">
@@ -31,22 +31,40 @@
                 </div>
                 <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT">
                     {{'LOGIN.DOMAIN' | translate}}:
-                    <input type="text" class="form-control authority" [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}" name="authority" [(ngModel)]="loginModel.authority" placeholder="Enter {{loginInfo.config?.authorityLabel}}" title="Enter {{loginInfo.config?.authorityLabel}}" autocorrect="off" autocapitalize="off" required>
+                    <input type="text"
+                           class="form-control authority"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="authority"
+                           [(ngModel)]="loginModel.authority"
+                           placeholder="Enter {{loginInfo.config?.authorityLabel}}"
+                           title="Enter {{loginInfo.config?.authorityLabel}}"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           required>
                 </div>
                 <div class="form-group has-feedback">
-                    <input type="text" class="form-control username" [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}" name="username" [(ngModel)]="loginModel.username" placeholder="Enter your username" title="Enter your username" autocorrect="off" autocapitalize="off" required>
+                    <input type="text" class="form-control username"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="username"
+                           [(ngModel)]="loginModel.username"
+                           placeholder="Enter your username"
+                           title="Enter your username"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           required>
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
                     <input type="password" class="form-control" [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}" name="password" [(ngModel)]="loginModel.password" autocorrect="off" autocapitalize="off" placeholder="Enter your password" title="Enter your password" required/>
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
+                <div class="message">{{errMessage}}</div>
                 <div class="row">
                     <div class="col-xs-8">
                     </div>
                     <!-- /.col -->
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat submit-button" [disabled]="!loginForm.form.valid" (click)="onLogin()">Sign In</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
                     </div>
                     <!-- /.col -->
                 </div>
