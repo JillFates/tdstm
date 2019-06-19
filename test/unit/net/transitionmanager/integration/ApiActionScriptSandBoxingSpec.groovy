@@ -560,7 +560,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			request.config.getProperty('Exchange.CONTENT_TYPE') == 'application/json'
 	}
 
-	void 'test scripts with prohibted and non prohibted methods for strings and objects'() {
+	void 'test scripts with prohibited and non prohibited methods for strings and objects'() {
 
 			given:
 				ActionRequest request = new ActionRequest(['format': 'xml'])
