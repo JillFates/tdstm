@@ -1,16 +1,15 @@
 // Store
 import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
-import {USER_CONTEXT_REQUEST, UserContextModel} from '../model/user-context.model';
+import {UserContextModel} from '../model/user-context.model';
 // Actions
 import {LicenseInfo, Login, Logout, Permissions} from '../action/login.actions';
 // Services
 import {AuthService} from '../service/auth.service';
-import {tap} from 'rxjs/operators';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
-import {Observable, from} from 'rxjs';
-import {WindowService} from '../../../shared/services/window.service';
+// Others
+import {tap} from 'rxjs/operators';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -26,35 +25,22 @@ export class UserContextState {
 	constructor(
 		private authService: AuthService,
 		private permissionService: PermissionService,
-		private userService: UserService,
-		private windowService: WindowService) {
+		private userService: UserService) {
 	}
 
 	@Action(Login)
 	login(ctx: StateContext<UserContextModel>, {payload}: Login) {
-		return this.authService.login({payload}).subscribe(userContext => {
-			let contextPromises = [];
-			contextPromises.push(from(new Promise(resolve => resolve(userContext))));
-			contextPromises.push(this.userService.getLicenseInfo());
-			contextPromises.push(this.permissionService.getPermissions());
-
-			return new Promise((resolve) => {
-				Observable.forkJoin(contextPromises)
-					.subscribe((contextResponse: any) => {
-						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
-						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
-						ctx.patchState(userContext);
-						resolve();
-					});
-			});
-		});
+		return this.authService.getUserContext({payload}).pipe(
+			tap(result => {
+				ctx.patchState(result);
+			})
+		);
 	}
 
 	@Action(Logout)
 	logout(ctx: StateContext<UserContextModel>) {
 		ctx.setState({});
-		this.windowService.getWindow().location.href = '/tdstm/auth/signOut';
+		return this.authService.logout().subscribe();
 	}
 
 	@Action(Permissions)

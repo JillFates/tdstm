@@ -3,6 +3,7 @@
  * Do not add anything to this level, it works as the bootstrap entry point only
  */
 
+// Angular
 import {Component, OnInit} from '@angular/core';
 import {
 	ActivatedRoute,
@@ -11,6 +12,7 @@ import {
 	Router,
 	RoutesRecognized
 } from '@angular/router';
+// Services
 import {NotifierService} from '../shared/services/notifier.service';
 
 @Component({
@@ -27,7 +29,7 @@ import {NotifierService} from '../shared/services/notifier.service';
             </div>
             <!-- /.container -->
         </div>
-		<tds-footer></tds-footer>
+        <tds-footer></tds-footer>
 	`,
 })
 
