@@ -271,7 +271,7 @@
 
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop">
                                                     <td class="label N edge-cell" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>
@@ -296,6 +296,33 @@
                                                         <span class="read-only-dates">{{model.taskSpec}}</span>
                                                     </td>
                                                 </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
+                                                        <td class="label N edge-cell" nowrap="nowrap">
+                                                                <label><span>Completion %</span></label>
+                                                        </td>
+        
+                                                        <td class="valueNW completion">
+                                                            <input type="number" name="apiActionPercentDone" [(ngModel)]="model.apiActionPercentDone">
+                                                        </td>
+
+                                                        <td class="label N edge-cell" nowrap="nowrap">
+                                                            <label><span>Actual Start/Finish</span></label>
+                                                        </td>
+    
+                                                        <td class="valueNW">
+                                                            <span class="read-only-dates">{{model.actualStart}}-{{model.actualFinish}}</span>
+                                                        </td>
+    
+                                                        <td class="label N edge-cell" nowrap="nowrap">
+                                                            <label><span>TaskSpec ID</span></label>
+                                                        </td>
+    
+                                                        <td class="valueNW">
+                                                            <span class="read-only-dates">{{model.taskSpec}}</span>
+                                                        </td>
+                                                </tr>
+
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label N status-cell" nowrap="nowrap">
                                                         <label><span>Status</span></label>

@@ -276,7 +276,7 @@ export class TaskEditCreateModelHelper {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
 			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
-			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+			priority, assignedTeam, status, assignedTo, durationScale, apiActionInvokedAt, apiActionPercentDone} = this.model;
 
 		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
@@ -286,7 +286,7 @@ export class TaskEditCreateModelHelper {
 			.concat(this.model.deletedSuccessorList)
 			.join(',');
 
-		return  {
+		const payload =  {
 			assetClass: assetClass.id,
 			assetEntity: this.getEmptyStringIfNull(asset && asset.id).toString(),
 			assetType: assetClass.text,
@@ -335,6 +335,11 @@ export class TaskEditCreateModelHelper {
 			note: note,
 			id: id
 		};
+		if (apiActionInvokedAt) {
+			payload['apiActionPercentDone'] = apiActionPercentDone;
+		}
+
+		return payload;
 	}
 
 	/**
