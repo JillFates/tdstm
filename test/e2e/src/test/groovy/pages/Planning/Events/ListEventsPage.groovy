@@ -47,12 +47,30 @@ class ListEventsPage extends Page {
         waitFor{rows[1].find("td")[3].text()==desc}
     }
 
+    /*
+        The estimated start date works on a 12-hour format. This means that you can create an event with the following date:
+        11/11/2019 09:18 AM - Which is a problem because the Event List page displays times without the first 0, on the Event
+        List page that date would be displayed as  "11/11/2019 9:18 AM". This means that if we compare the date we used to create
+        it and the date that is displayed, the string is NOT the same.
+        For this reason we have to account for this and check the value displayed, the parameter that was sent and transform
+        it if necessary.
+        @author: Alvaro Navarro
+     */
     def validateStartDate(dt){
-        rows[1].find("td", "aria-describedby":"moveEventListIdGrid_estStartTime").text()
+
         def rowDateValue
         rowDateValue = rows[1].find("td", "aria-describedby":"moveEventListIdGrid_estStartTime").text()
-        println "rodw date value is: " + rowDateValue
-        println "parameter dt is: " + dt
+
+        def onlyDateValue
+        def onlyTimeValue
+        onlyDateValue = dt.substring(0, 11)
+        onlyTimeValue = dt.substring(dt.length()-8)
+
+        if(onlyTimeValue[0].equals("0"))
+        {
+            dt = onlyDateValue + onlyTimeValue.substring(1 , onlyTimeValue.length())
+        }
+
         rowDateValue.equals(dt)
     }
 
