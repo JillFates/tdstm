@@ -31,5 +31,5 @@ class AssetCommentStatus {
 	/**
 	 * The statuses of tasks that the resetting of actions are allowed
 	 */
-	static final List<String> AllowedStatusesToResetAction = [READY, STARTED, COMPLETED]
+	static final List<String> AllowedStatusesToResetAction = [READY, STARTED, HOLD, COMPLETED]
 }
