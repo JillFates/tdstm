@@ -12,69 +12,69 @@ class TaskTimeLineGraphSpec extends Specification {
 	void 'can calculate vertices for a TaskTimeLineGraph'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'vertices can be calculated'
 			graph.V() == 8
 	}
 
-	void 'can calculate source for a TaskTimeLineGraph with one source and one sink'() {
+	void 'can calculate source for a TaskTimeLineGraph with one start and one sink'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
-		then: 'source can be calculated'
-			graph.source.taskId == 'A'
+		then: 'start can be calculated'
+			graph.start.taskId == 'A'
 	}
 
-	void 'can calculate sink for a TaskTimeLineGraph with one source and one sink'() {
+	void 'can calculate sink for a TaskTimeLineGraph with one start and one sink'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'sink can be calculated'
 			graph.sink.taskId == 'H'
 	}
 
-	void 'can retrieve a for a TaskTimeLineGraph with one source and one sink by taskId'() {
+	void 'can retrieve a for a TaskTimeLineGraph with one start and one sink by taskId'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'a vertex can be retrieved'
 			graph.getVertex('B').taskId == 'B'
 	}
 
-	void 'can retrieve a for a TaskTimeLineGraph with one source and one sink by an instance of TaskTimeLineVertex'() {
+	void 'can retrieve a for a TaskTimeLineGraph with one start and one sink by an instance of TaskTimeLineVertex'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'a vertex can be retrieved'
 			graph.getVertex(graph.vertices.first()).taskId == 'A'
 	}
 
-	void 'can calculate source and sink for a TaskTimeLineGraph with two sources and one sink'() {
+	void 'can calculate start and sink for a TaskTimeLineGraph with two starts and one sink'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoSourcesAndOneSink()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndOneSink()
 
-		then: 'source can be calculated'
-			graph.source.taskId == TaskTimeLineVertex.HIDDEN_SOURCE_NODE
+		then: 'start can be calculated'
+			graph.start.taskId == TaskVertex.BINDER_START_NODE
 
 		then: 'sink can be calculated'
 			graph.sink.taskId == 'H'
 	}
 
-	void 'can calculate source and sink for a TaskTimeLineGraph with one source and two sinks'() {
+	void 'can calculate start and sink for a TaskTimeLineGraph with one start and two sinks'() {
 
 		when: 'a new instance of TaskTimeLineGraph is created'
-			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneSourceAndTwoSinks()
+			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndTwoSinks()
 
-		then: 'source can be calculated'
-			graph.source.taskId == 'A'
+		then: 'start can be calculated'
+			graph.start.taskId == 'A'
 
 		and: 'sink can be calculated'
-			graph.sink.taskId == TaskTimeLineVertex.HIDDEN_SINK_NODE
+			graph.sink.taskId == TaskVertex.BINDER_SINK_NODE
 	}
 }

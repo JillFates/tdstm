@@ -25,10 +25,10 @@ class DirectedCycle {
 
 	DirectedCycle(TaskTimeLineGraph directedGraph) {
 		// Initialize custom structure
-		directedGraph.vertices.each { TaskTimeLineVertex activity ->
+		directedGraph.vertices.each { TaskVertex activity ->
 			stateMap[activity.taskId] = NodeState.UNVISITED
 		}
-		directedGraph.vertices.each { TaskTimeLineVertex activity ->
+		directedGraph.vertices.each { TaskVertex activity ->
 			if (stateMap[activity.taskId] == NodeState.UNVISITED) {
 				dfsVisit(activity)
 			}
@@ -36,10 +36,10 @@ class DirectedCycle {
 	}
 
 	// check that algorithm computes either the topological order or finds a directed cycle
-	private void dfsVisit(TaskTimeLineVertex activity) {
+	private void dfsVisit(TaskVertex activity) {
 
 		stateMap[activity.taskId] = NodeState.OPEN
-		activity.successors.each { TaskTimeLineVertex successor ->
+		activity.successors.each { TaskVertex successor ->
 			if (stateMap[successor.taskId] == NodeState.UNVISITED) {
 				dfsVisit(successor)
 			} else if (stateMap[successor.taskId] == NodeState.OPEN) {

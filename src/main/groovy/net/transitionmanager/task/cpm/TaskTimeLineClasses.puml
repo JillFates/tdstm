@@ -1,0 +1,53 @@
+@startuml
+
+
+
+interface TaskNode {
+    duration: int
+    earliestStartTime: int
+    latestStartTime: int
+    earliestEndTime: int
+    latestEndTime: int
+}
+
+class TaskVertex implements TaskNode {
+    taskId: String
+    successors: List<TaskVertex>
+    predecessors: List<TaskVertex>
+}
+
+class TaskTimeLineGraph {
+	vertices: List<TaskVertex>
+	getStart(): TaskVertex
+	getSink(): TaskVertex
+}
+
+class  TaskTimeLineGraph.Builder {
+	vertices: List<TaskVertex>
+	Builder withVertex(String taskId, Integer duration)
+	Builder addEdgeTo(String taskId)
+	TaskTimeLineGraph build()
+}
+
+class TaskTimeLineCalculator {
+    {static} List<TaskVertex> calculate(TaskTimeLineGraph directedGraph)
+}
+
+note top of TaskTimeLineCalculator
+    It calculates critical path
+    using deep first search
+end note
+
+TaskTimeLineGraph *- TaskVertex : successors
+TaskTimeLineGraph *- TaskVertex : predecessors
+
+
+TaskTimeLineGraph.Builder -- TaskTimeLineGraph : builds an instance
+TaskTimeLineCalculator -- TaskTimeLineGraph : uses
+
+together {
+    interface TaskNode
+    class TaskVertex
+    class TaskTimeLineGraph
+}
+@enduml

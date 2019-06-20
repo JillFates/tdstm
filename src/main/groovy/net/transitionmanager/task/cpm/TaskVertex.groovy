@@ -1,10 +1,10 @@
 package net.transitionmanager.task.cpm
 
 import groovy.transform.CompileStatic
-import net.transitionmanager.task.CriticalPathNode
+import net.transitionmanager.task.TaskNode
 
 /*
-		TaskTimeLineVertex Structure definition, compound with CriticalPathNode
+		TaskVertex Structure definition, compound with TaskNode
 		-----------------------------------------------------------------------
 
 											+-----+----------+-----+    	est: earliest start time
@@ -15,27 +15,27 @@ import net.transitionmanager.task.CriticalPathNode
  */
 
 @CompileStatic
-class TaskTimeLineVertex implements CriticalPathNode {
+class TaskVertex implements TaskNode {
 
-	static final String HIDDEN_SOURCE_NODE = '_HIDDEN_SOURCE_NODE_'
-	static final String HIDDEN_SINK_NODE = '_HIDDEN_SINK_NODE_'
+	static final String BINDER_START_NODE = '_BINDER_START_NODE_'
+	static final String BINDER_SINK_NODE = '_BINDER_SINK_NODE_'
 
 	String taskId
 	String description
 
-	List<TaskTimeLineVertex> successors = []
-	List<TaskTimeLineVertex> predecessors = []
+	List<TaskVertex> successors = []
+	List<TaskVertex> predecessors = []
 
 	/**
 	 *
 	 * @param successor
 	 */
-	void addSuccessor(TaskTimeLineVertex successor) {
+	void addSuccessor(TaskVertex successor) {
 		this.successors.add(successor)
 		successor.predecessors.add(this)
 	}
 
-	void addPredecessor(TaskTimeLineVertex predecessor) {
+	void addPredecessor(TaskVertex predecessor) {
 		this.predecessors.add(predecessor)
 		predecessor.successors.add(this)
 	}
@@ -44,7 +44,7 @@ class TaskTimeLineVertex implements CriticalPathNode {
 		if (this.is(o)) return true
 		if (getClass() != o.class) return false
 
-		TaskTimeLineVertex that = (TaskTimeLineVertex) o
+		TaskVertex that = (TaskVertex) o
 
 		if (taskId != that.taskId) return false
 
@@ -57,7 +57,7 @@ class TaskTimeLineVertex implements CriticalPathNode {
 
 	@Override
 	String toString() {
-		return "TaskTimeLineVertex { " +
+		return "TaskVertex { " +
 			"taskId='" + taskId + '\'' +
 			", description='" + (description ?: '') + '\'' +
 			", duration=" + duration +
@@ -69,40 +69,40 @@ class TaskTimeLineVertex implements CriticalPathNode {
 	//// ------------------------------------------------////
 	static class Factory {
 		/**
-		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * Factory Method patter to create a new instance of {@code TaskVertex}
 		 * @param taskId
 		 * @param description
 		 * @param duration
 		 * @return
 		 */
-		static TaskTimeLineVertex newSimpleVertex(String taskId, String description, int duration) {
-			return new TaskTimeLineVertex(taskId: taskId, description: description, duration: duration)
+		static TaskVertex newSimpleVertex(String taskId, String description, int duration) {
+			return new TaskVertex(taskId: taskId, description: description, duration: duration)
 		}
 
 		/**
-		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * Factory Method patter to create a new instance of {@code TaskVertex}
 		 * @param taskId
 		 * @param duration
 		 * @return
 		 */
-		static TaskTimeLineVertex newSimpleVertex(String taskId, int duration) {
-			return new TaskTimeLineVertex(taskId: taskId, duration: duration)
+		static TaskVertex newSimpleVertex(String taskId, int duration) {
+			return new TaskVertex(taskId: taskId, duration: duration)
 		}
 
 		/**
-		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * Factory Method patter to create a new instance of {@code TaskVertex}
 		 * @return
 		 */
-		static TaskTimeLineVertex newHiddenSource() {
-			return new TaskTimeLineVertex(taskId: HIDDEN_SOURCE_NODE, duration: 1)
+		static TaskVertex newBinderStart() {
+			return new TaskVertex(taskId: BINDER_START_NODE, duration: 0)
 		}
 
 		/**
-		 * Factory Method patter to create a new instance of {@code TaskTimeLineVertex}
+		 * Factory Method patter to create a new instance of {@code TaskVertex}
 		 * @return
 		 */
-		static TaskTimeLineVertex newHiddenSink() {
-			return new TaskTimeLineVertex(taskId: HIDDEN_SINK_NODE, duration: 1)
+		static TaskVertex newBinderSink() {
+			return new TaskVertex(taskId: BINDER_SINK_NODE, duration: 0)
 		}
 	}
 }

@@ -1,6 +1,6 @@
 package net.transitionmanager.task
 
-trait CriticalPathNode {
+trait TaskNode {
 
 	/**
 	 * Time to complete the activity
@@ -9,19 +9,19 @@ trait CriticalPathNode {
 	/**
 	 * Earliest start time
 	 */
-	int est
+	int earliestStartTime
 	/**
 	 * Latest start time
 	 */
-	int lst
+	int latestStartTime
 	/**
 	 * Earliest end time
 	 */
-	int eet
+	int earliestEndTime
 	/**
 	 * Latest end time
 	 */
-	int let
+	int latestEndTime
 	/**
 	 * Defines if this activity belongs to the Critical Path
 	 */
