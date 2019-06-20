@@ -210,6 +210,7 @@ class PersonService implements ServiceMethods {
 			persons.addAll(PartyRelationship.executeQuery(query2.toString(), queryParams))
 		}
 		if (query3) {
+			queryParams.remove("middle")
 			queryParams.remove("last")
 			persons.addAll(PartyRelationship.executeQuery(query3.toString(), queryParams))
 		}
