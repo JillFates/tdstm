@@ -1138,7 +1138,7 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 			$scope.ac.id = $scope.ac.commentId;
 			$scope.ac.apiActionId = (($scope.acData.apiAction && $scope.acData.apiAction.id)? parseInt($scope.acData.apiAction.id): 0);
 			$scope.ac.assetEntity = $scope.commentInfo.currentAsset;
-			$scope.ac.apiActionPercentDone = $scope.acData.apiActionPercentDone;
+			$scope.ac.percentageComplete = $scope.acData.percentageComplete;
 
 			if (commentService.validDependencies($scope.dependencies)) {
 				if ($scope.isEdit) {

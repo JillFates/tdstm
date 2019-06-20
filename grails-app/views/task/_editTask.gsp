@@ -159,7 +159,7 @@
 					<tr class="prop" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
 						<td valign="top" class="name"><label for="status">Completion %:</label></td>
 						<td>
-							<input	type="number" min="0" max="100" name="percentageComplete" ng-model="acData.apiActionPercentDone">
+							<input	type="number" min="0" max="100" name="percentageComplete" ng-model="acData.percentageComplete">
 						</td>
 					</tr>
 					<tr class="prop">

@@ -115,10 +115,10 @@
 						<td colspan="1" class="progress-container">
 							<div class="progress">
 								<div class="progress-bar" role="progressbar" 
-									style="width: {{acData.apiActionPercentDone}}%;" 
-									aria-valuenow="{{acData.apiActionPercentDone}}" 
+									style="width: {{acData.percentageComplete}}%;" 
+									aria-valuenow="{{acData.percentageComplete}}" 
 									aria-valuemin="0" 
-									aria-valuemax="100">{{acData.apiActionPercentDone}}%</div>
+									aria-valuemax="100">{{acData.percentageComplete}}%</div>
 							</div>	
 						</td>
 					</tr>

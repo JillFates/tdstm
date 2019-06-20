@@ -155,7 +155,7 @@ export class TaskEditCreateModelHelper {
 
 		this.model = {
 			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
-			apiActionPercentDone: detail.apiActionPercentDone,
+			percentageComplete: detail.percentageComplete,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
 			title: task.modal.title,
 			workflow: detail.workflow || '',
@@ -276,7 +276,7 @@ export class TaskEditCreateModelHelper {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
 			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
-			priority, assignedTeam, status, assignedTo, durationScale, apiActionInvokedAt, apiActionPercentDone} = this.model;
+			priority, assignedTeam, status, assignedTo, durationScale, apiActionInvokedAt, percentageComplete} = this.model;
 
 		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
@@ -336,7 +336,7 @@ export class TaskEditCreateModelHelper {
 			id: id
 		};
 		if (apiActionInvokedAt) {
-			payload['apiActionPercentDone'] = apiActionPercentDone;
+			payload['percentageComplete'] = percentageComplete;
 		}
 
 		return payload;
