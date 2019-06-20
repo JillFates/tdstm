@@ -1,5 +1,6 @@
 package net.transitionmanager.common
 
+import com.tdsops.tm.enums.ControlType
 import grails.converters.JSON
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.FieldSpecsCacheService
@@ -219,7 +220,7 @@ class CustomDomainService implements ServiceMethods {
 
                 for (JSONObject field : customFieldSpec.fields) {
 
-                    if ( field.control == FieldSpec.CUSTOM_FIELD_TYPES.List.name() && ! field.constraints?.values ) {
+                    if ( field.control == ControlType.LIST.value() && ! field.constraints?.values ) {
                         List<String> values = distinctValues(project, assetClassType, [fieldSpec: field])
                         if (values) {
                             if (! field.constraints) {
