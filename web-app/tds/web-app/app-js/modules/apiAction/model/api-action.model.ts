@@ -147,6 +147,7 @@ export class APIActionModel {
 	isRemote?: boolean;
 	script?: any;
 	remoteInvocation?: boolean;
+	debugEnabled?: boolean;
 	description: string;
 	agentMethod?: AgentMethodModel;
 	httpMethod: string;
@@ -205,6 +206,7 @@ export class APIActionModel {
 		this.defaultDataScript = {id: null, name: ''};
 		this.isPolling = false;
 		this.producesData = false;
+		this.debugEnabled = false;
 		this.endpointUrl = '';
 		this.docUrl = '';
 		this.polling = {
