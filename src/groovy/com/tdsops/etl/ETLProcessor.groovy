@@ -1,6 +1,6 @@
 package com.tdsops.etl
 
-import com.tdssrc.grails.FilenameUtil
+
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -8,6 +8,7 @@ import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.domain.Project
+import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -25,8 +26,8 @@ import static org.codehaus.groovy.syntax.Types.DIVIDE
 import static org.codehaus.groovy.syntax.Types.EQUALS
 import static org.codehaus.groovy.syntax.Types.KEYWORD_IN
 import static org.codehaus.groovy.syntax.Types.KEYWORD_INSTANCEOF
-import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LEFT_SHIFT
+import static org.codehaus.groovy.syntax.Types.LEFT_SQUARE_BRACKET
 import static org.codehaus.groovy.syntax.Types.LOGICAL_AND
 import static org.codehaus.groovy.syntax.Types.LOGICAL_OR
 import static org.codehaus.groovy.syntax.Types.MINUS
@@ -1488,6 +1489,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator {
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
+		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
 		return  configuration
