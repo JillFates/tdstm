@@ -297,13 +297,17 @@
                                                     </td>
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
-                                                        <td class="label N edge-cell" nowrap="nowrap">
-                                                                <label><span>Completion %</span></label>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                        <td class="label N status-cell" nowrap="nowrap">
+                                                                <label><span>Status</span></label>
                                                         </td>
-        
-                                                        <td class="valueNW completion">
-                                                            <input type="number" name="apiActionPercentDone" [(ngModel)]="model.apiActionPercentDone">
+                                                        <td class="valueNW task-status vertical-note-status">
+                                                                <kendo-dropdownlist
+                                                                        name="statusList"
+                                                                        [class]="'form-control status task-' + model.status.toLowerCase()"
+                                                                        [data]="model.statusList"
+                                                                        [(ngModel)]="model.status">
+                                                                </kendo-dropdownlist>
                                                         </td>
 
                                                         <td class="label N edge-cell" nowrap="nowrap">
@@ -323,17 +327,20 @@
                                                         </td>
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N status-cell" nowrap="nowrap">
-                                                        <label><span>Status</span></label>
+                                                <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
+                                                    <td class="label N edge-cell" nowrap="nowrap">
+                                                            <label><span>Completion %</span></label>
                                                     </td>
-                                                    <td class="valueNW task-status vertical-note-status">
-                                                        <kendo-dropdownlist
-                                                                name="statusList"
-                                                                [class]="'form-control status task-' + model.status.toLowerCase()"
-                                                                [data]="model.statusList"
-                                                                [(ngModel)]="model.status">
-                                                        </kendo-dropdownlist>
+    
+                                                    <td class="valueNW completion">
+                                                        <tds-number-control
+                                                            name="apiActionPercentDone"
+                                                            [autoCorrect]="true"
+                                                            [(ngModel)]="model.apiActionPercentDone"
+                                                            [format]="'n'"
+                                                            [min]="0"
+                                                            [max]="100">
+                                                        </tds-number-control>
                                                     </td>
 
                                                     <td></td>

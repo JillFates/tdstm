@@ -150,16 +150,16 @@
 						   {{ (acData.atStart?acData.atStart:'') + ( (acData.dtResolved?(' - ' + acData.dtResolved):''))  }}
 						</td>
 					</tr >
-					<tr class="prop" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
-						<td valign="top" class="name"><label for="status">Completion %:</label></td>
-						<td>
-							<input	type="number" name="percentageComplete" ng-model="acData.apiActionPercentDone">
-						</td>
-					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td>
 							<status-select comment-id='ac.commentId' ng-model='ac.status'></status-select>
+						</td>
+					</tr>
+					<tr class="prop" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
+						<td valign="top" class="name"><label for="status">Completion %:</label></td>
+						<td>
+							<input	type="number" min="0" max="100" name="percentageComplete" ng-model="acData.apiActionPercentDone">
 						</td>
 					</tr>
 					<tr class="prop">

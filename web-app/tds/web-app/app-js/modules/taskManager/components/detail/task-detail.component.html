@@ -149,6 +149,25 @@
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                 </tr>
 
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                     <td class="label N" nowrap="nowrap">
+													  <label><span>Status</span></label>
+												    </td>
+												    <td class="valueNW task-{{model.status |  lowercase}}">
+													  <span>{{model.status}}</span>
+                                                    </td>
+
+                                                    <td class="label N" nowrap="nowrap">
+                                                        <label><span>Workflow</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{model.workflow || ''}}</span></td>
+
+                                                    <td class="label N" nowrap="nowrap">
+                                                        <label><span>Duration Delta</span></label>
+                                                    </td>
+                                                    <td class="valueNW"><span>{{model.durationDelta}}</span></td>
+                                                </tr>
+
                                                 <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
                                                     <td class="label N" nowrap="nowrap">
                                                          <label><span>Completion %:</span></label>
@@ -164,40 +183,8 @@
                                                                 </div>
                                                         </div>	
                                                     </td>
-   
-                                                    <td class="label N" nowrap="nowrap">
-                                                        <label><span>Workflow</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{model.workflow || ''}}</span></td>
-
-                                                    <td class="label N" nowrap="nowrap">
-                                                        <label><span>Duration Delta</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{model.durationDelta}}</span></td>
-
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                     <td class="label N" nowrap="nowrap">
-													  <label><span>Status</span></label>
-												  </td>
-												  <td class="valueNW task-{{model.status |  lowercase}}">
-													  <span>{{model.status}}</span>
-                                                  </td>
-
-                                                   <ng-template [ngIf]="!model.apiActionInvokedAt">
-                                                        <td class="label N" nowrap="nowrap">
-                                                            <label><span>Workflow</span></label>
-                                                        </td>
-                                                        <td class="valueNW"><span>{{model.workflow || ''}}</span></td>
-
-                                                        <td class="label N" nowrap="nowrap">
-                                                            <label><span>Duration Delta</span></label>
-                                                        </td>
-                                                        <td class="valueNW"><span>{{model.durationDelta}}</span></td>
-                                                   </ng-template>
-
-                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
