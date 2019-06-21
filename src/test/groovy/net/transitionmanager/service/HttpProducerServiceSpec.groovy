@@ -194,7 +194,6 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 	}
 
 	@See('TM-10046')
-	@Ignore
 	void 'Test http service execute call return DNS name not found'() {
 		when:
 			ActionRequest actionRequest = getActionRequest(action)
@@ -204,7 +203,6 @@ class HttpProducerServiceSpec extends Specification implements ServiceUnitTest<H
 	}
 
 	@See('TM-10046')
-	@Ignore
 	void 'Test http service execute call return failure to contact endpoint'() {
 		when:
 			action.endpointUrl = ersatz.httpUrl + '/test0'

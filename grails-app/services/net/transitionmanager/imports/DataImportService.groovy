@@ -1642,7 +1642,7 @@ class DataImportService implements ServiceMethods {
 
 				} else {
 					// Set the non-reference / Java types (e.g. Date, Integer, String, Boolean)
-					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName])
+					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName]?.value)
 				}
 			}
 			break

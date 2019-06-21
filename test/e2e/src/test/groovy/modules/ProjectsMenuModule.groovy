@@ -83,7 +83,9 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToETLScripts(){
+        waitFor (30) {projectsItem}
         selectMenu(projectsItem)
+        waitFor (30) {projectsETLScripts}
         selectItem(projectsETLScripts)
     }
 
@@ -93,7 +95,9 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToTagsPage(){
+        waitFor(30){projectsItem}
         selectMenu projectsItem
+        waitFor(30) {projectsTags}
         selectItem projectsTags
     }
 

@@ -1294,6 +1294,9 @@ class GormUtil{
 	 */
 	@Memoized
 	static boolean isReferenceProperty(Class domainClazz, String propertyName) {
+		if (!isDomainProperty(domainClazz, propertyName)){
+			return false
+		}
 		PersistentProperty grailsDomainClassProperty = getDomainProperty(domainClazz, propertyName)
 		return grailsDomainClassProperty instanceof Association
 	}

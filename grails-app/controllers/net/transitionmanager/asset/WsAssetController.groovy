@@ -5,9 +5,11 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import grails.gsp.PageRenderer
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
@@ -23,6 +25,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import org.apache.commons.lang3.BooleanUtils
 
 /**
  * Created by @oluna on 4/5/17.
@@ -78,6 +81,7 @@ class WsAssetController implements ControllerMethods {
 			AssetEntity assetEntity = AssetEntity.createCriteria().get {
 				and {
 					eq('assetName', command.name, [ignoreCase: true])
+					eq('project', getProjectForWs())
 					if(assetClassSample){
 						eq('assetClass', assetClassSample)
 					}
@@ -548,5 +552,17 @@ class WsAssetController implements ControllerMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 		List<AssetComment> assetComments = commentService.listAssetComments(project, viewUnpublished)
 		renderAsJson (assetComments*.toMap() )
+	}
+
+
+	/**
+	 * Return the content for the Asset Summary Table
+	 * @return the content for the asset table.
+	 */
+	def getSummaryTable() {
+		Project project = getProjectForWs()
+		String justPlanningPref = userPreferenceService.getPreference(null, UserPreferenceEnum.ASSET_JUST_PLANNING, "false")
+		Boolean justPlanning = StringUtil.toBoolean(justPlanningPref)
+		renderSuccessJson(assetEntityService.getAssetSummary(project, justPlanning))
 	}
 }

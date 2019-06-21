@@ -42,7 +42,8 @@ class FieldSearchData {
                     whereProperty: whereProperty,
 	                manyToManyQueries: manyToManyQueries,
                     fieldSpec: fieldSpec,
-                    domainAlias: domainAlias
+                    domainAlias: domainAlias,
+                    referenceProperty: referenceProperty
             ]
         }
 
@@ -121,6 +122,10 @@ class FieldSearchData {
 
     void setSqlSearchExpression(String searchExpression) {
         parsedInfo.searchExpression = searchExpression
+    }
+
+    String getReferenceProperty(){
+        return searchInfo.referenceProperty
     }
 
     String getSqlSearchExpression() {

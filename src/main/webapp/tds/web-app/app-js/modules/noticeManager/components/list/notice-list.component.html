@@ -14,7 +14,7 @@
                         [pageSize]="pageSize"
                         [resizable]="true"
                         (sortChange)="sortChange($event)"
-                        [pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
+                        [pageable]="{pageSizes: maxOptions, info: true}"
                         (pageChange)="pageChange($event)"
                         (cellClick)="cellClick($event)"
                         [selectable]="true">
@@ -33,12 +33,12 @@
                             <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
                                 <div *ngIf="column.type === 'date'">
 									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-									<span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+									<span *ngIf="column.filter" (click)="clearText(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
                                 <div *ngIf="(column.type === 'text' || column.type === 'number') && column.property !== 'typeId' && column.property !== 'active'">
                                     <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
                                 <div *ngIf="column.type === 'boolean'">

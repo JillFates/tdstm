@@ -85,6 +85,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/summaryTable" {
+			controller = "wsAsset"
+			action = [
+			    GET: "getSummaryTable"
+			]
+		}
+
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
@@ -214,6 +221,11 @@ class UrlMappings {
 		"/ws/dashboard/bundleData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"bundleData"]
+		}
+
+		"/ws/dashboard/getPlanningStats" {
+			controller = "wsDashboard"
+			action = [GET:"getDataForPlanningDashboard"]
 		}
 
 		"/ws/cookbook/recipe/list" {
