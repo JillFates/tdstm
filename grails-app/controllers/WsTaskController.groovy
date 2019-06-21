@@ -9,18 +9,14 @@ import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
-import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ApiActionService
 import net.transitionmanager.service.CommentService
 import net.transitionmanager.service.CoreService
 import net.transitionmanager.service.CredentialService
-import net.transitionmanager.service.InvalidRequestException
-import net.transitionmanager.service.LogicException
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.TaskActionService
 import net.transitionmanager.service.TaskService
-
 /**
  * Handles WS calls of the TaskService.
  *
@@ -148,7 +144,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeLocalAction(Long id) {
-		AssetComment task = taskActionService.invokeLocalAction(id, currentPerson())
+
+		AssetComment task = taskService.invokeLocalAction(getProjectForWs(), id, currentPerson())
 
 		Map results = [
 			assetComment: task,
@@ -167,8 +164,8 @@ class WsTaskController implements ControllerMethods {
 	 * @return JSON object containing an ActionRequest context object
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
-	def recordRemoteActionStarted(Long id) {
-		Map actionRequest = taskActionService.recordRemoteActionStarted(id,  currentPerson())
+	def recordRemoteActionStarted(Long id, String publicKey) {
+		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
@@ -180,7 +177,7 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
 		AssetComment task = fetchDomain(AssetComment, params)
-		String status = taskActionService.resetAction(id, currentPerson())
+		String status = taskService.resetAction(id, currentPerson())
 		renderAsJson([assetComment: task, status: status, statusCss: taskService.getCssClassForStatus(task.status)])
 	}
 
