@@ -144,8 +144,7 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeLocalAction(Long id) {
-
-		AssetComment task = taskService.invokeLocalAction(getProjectForWs(), id, currentPerson())
+		AssetComment task = taskService.invokeLocalAction(id, currentPerson())
 
 		Map results = [
 			assetComment: task,
@@ -176,9 +175,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
-		AssetComment task = fetchDomain(AssetComment, params)
-		String status = taskService.resetAction(id, currentPerson())
-		renderAsJson([assetComment: task, status: status, statusCss: taskService.getCssClassForStatus(task.status)])
+		AssetComment task = taskService.resetAction(id, currentPerson())
+		renderAsJson([assetComment: task, status: task.status, statusCss: taskService.getCssClassForStatus(task.status)])
 	}
 
 	/**

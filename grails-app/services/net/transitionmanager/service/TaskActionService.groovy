@@ -26,7 +26,6 @@ class TaskActionService implements ServiceMethods {
 
 	ApiActionService  apiActionService
 	AssetService      assetService
-	CoreService       coreService
 	CredentialService credentialService
 	FileSystemService fileSystemService
 	SecurityService   securityService
@@ -92,6 +91,21 @@ class TaskActionService implements ServiceMethods {
 		addMessageToTaskNotes(action.message, task, currentPerson)
 		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
+	}
+
+	/**
+	 * Logs stdOut and stdErr to task notes if the action has debug enabled
+	 *
+	 * @param task The task to log a note for, if its action has debugEnabled = true
+	 * @param currentPerson  The currently logged in person.
+	 * @param stdOut Standard output returned.
+	 * @param stdErr Standard error output returned.
+	 */
+	void logForDebug(AssetComment task, Person currentPerson, String stdOut, String stdErr) {
+		if (task.apiAction.debugEnabled) {
+			addMessageToTaskNotes(stdOut, task, currentPerson)
+			addMessageToTaskNotes(stdErr, task, currentPerson)
+		}
 	}
 
 	/**
@@ -181,24 +195,6 @@ class TaskActionService implements ServiceMethods {
 	private AssetComment fetchTaskForAction(ActionCommand action, Long taskId, Person currentPerson) {
 		securityService.hasAccessToProject(action.project)
 		return get(AssetComment, taskId, action.project)
-	}
-
-	/**
-	 * Used by these service methods to access the Task referenced by the task ID. If the
-	 * person does not have access to the project then an exception will be thrown
-	 *
-	 * @param taskId The task that the action command it tied to.
-	 * @param currentPerson The currently logged in person.
-	 */
-	private AssetComment fetchTaskById(Long taskId, Person currentPerson) {
-		AssetComment task = AssetComment.get(taskId)
-		if (! task) {
-			throw new EmptyResultException('Task was not found')
-		}
-		// Validate that the user has access to the project associated with the task
-		securityService.hasAccessToProject(task.project)
-
-		return task
 	}
 
 }
