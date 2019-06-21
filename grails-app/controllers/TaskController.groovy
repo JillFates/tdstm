@@ -1097,7 +1097,7 @@ digraph runbook {
 				type: apiAction.actionType.type,
 				connector : connector.name,
 				method      : methodInfo?.name,
-				description : methodInfo?.description,
+				description : apiAction?.description,
 				methodParams: methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
