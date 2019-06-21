@@ -406,27 +406,35 @@ class TaskService implements ServiceMethods {
 	 * Used by routes to update task status/state
 	 * @param whom - the Person that is performing the update (e.g. Automatic Task)
 	 * @param params - a map containing the values that come from the JSON
-	 * @return AssetComement	task that was updated by method
+	 * @return The updated task
 	 */
-	/*
-	void updateTaskState(Person whom, Map params) {
-		Map statusMap = ['running': ACS.STARTED, 'success': ACS.DONE, 'error': ACS.HOLD]
-		String status = statusMap[params.status]
-		if (!status) {
-			throw new InvalidRequestException("Invalid status ${params.status}, valid values are ${statusMap.keySet()}")
+	AssetComment updateTaskState(Person whom, Long taskId, String currentStatus, String status, String message='') {
+		AssetComment task = fetchTaskById(taskId, whom)
+
+		// Go through some of the validation
+		if (! currentStatus in ACS.AllowedStatusesForSetState) {
+			throw new InvalidParamException('Invalid currentStatus parameter value')
+		}
+		if (! status in ACS.AllowedStatusesForSetState) {
+			throw new InvalidParamException('Invalid status parameter value')
+		}
+		if (currentStatus == status) {
+			throw new InvalidParamException('status and currentStatus parameters must be different')
+		}
+		if (ACS.AllowedStatusesForSetState.indexOf(currentStatus) > ACS.AllowedStatusesForSetState.indexOf(status)) {
+			throw new InvalidParamException('Task status can not be reverted to a previous state')
+		}
+		if (task.status != currentStatus) {
+			throw new InvalidParamException('The task status was unexpectedly changed. Please refresh and try again.')
 		}
 
-		boolean isPM = false
-		AssetComment task = AssetComment.get(params.taskId)
-
-		if (!task) {
-			throw new InvalidRequestException("Task id ${params.taskId} not found")
+		setTaskStatus(task, status, whom, false)
+		if (status == ACS.HOLD && message) {
+			addNote(task, whom, message)
 		}
 
-		if (status == ACS.STARTED && task.)
-		return setTaskStatus(task, status, whom, isPM)
+		return task
 	}
-	*/
 
 	/**
 	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will

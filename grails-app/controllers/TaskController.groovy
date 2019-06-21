@@ -90,6 +90,22 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskView)
 	def index() { }
 
+
+	/**
+	 * Used to change the state of a task between Started, Done and Hold.
+	 * This will take the task ID and check to make sure that the user has access vs using the
+	 * User CurrentProject.
+	 * @param id - the ID of the task
+	 * @param currentStatus - the current status that we are expecting the task to be in
+	 * @param status - the status to set the task to
+	 * @param message - optional message when setting the task on HOLD
+	 * @return The task Map after it is updated
+	 */
+	def changeTaskState(Long id, String currentStatus, String status) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, currentStatus, status, params.message)
+		renderAsJson(task:task)
+	}
+
 	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
 	 */
