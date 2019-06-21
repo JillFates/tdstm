@@ -1,11 +1,15 @@
 package net.transitionmanager.service
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.Security
+
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.exceptions.ConfigurationException
 import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.RSACodec
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsUserDetails
@@ -23,8 +27,10 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.rest.token.AccessToken
 import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import java.security.PublicKey
 import net.transitionmanager.EmailDispatch
 import net.transitionmanager.PasswordHistory
 import net.transitionmanager.PasswordReset
@@ -82,8 +88,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	private long forgotMyPasswordResetTTL = 0
 	private long accountActivationTTL = 0
 
-
 	TokenGenerator tokenGenerator
+	private RSACodec rsaCodec = new RSACodec()
 
 	/**
 	 * Generates a Map that contains the JWT token for the current user.
@@ -91,6 +97,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 *
 	 * @return A Map that contains the JWT token, refresh token, username, roles, token type, and expiration in seconds.
 	 */
+	@NotTransactional()
 	Map generateJWT (){
 		UserDetails userDetails = springSecurityService.getPrincipal()
 		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
@@ -103,6 +110,26 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			"expires_in"   : token.expiration,
 			"refresh_token": token.refreshToken
 		]
+	}
+
+	/**
+	 * Used to encrypt a String using a public key
+	 * @param text - the text to be encrypted
+	 * @param publicKeyText - the public key to use for performing the encryption
+	 * @return the text encrypted
+	 */
+	@NotTransactional()
+	String encryptWithPublicKey(String text, String publicKeyText) {
+		if (! publicKeyText) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
+
+		try {
+			PublicKey publicKey = rsaCodec.getPublicKey(publicKeyText)
+			return rsaCodec.encrypt(publicKey, text)
+		} catch (java.security.spec.InvalidKeySpecException e) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
 	}
 
 	void afterPropertiesSet() {
@@ -120,6 +147,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		log.info 'Validating Security LDAP company/party setting'
 		validateLDAPCompanyProjectSettings(ldapConfigMap)
+
 	}
 
 	/**
