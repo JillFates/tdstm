@@ -467,7 +467,7 @@
 										<div class="form-group">
 											<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
 											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
 												       <!-- [checked]="isRemote()" -->
 												<input type="checkbox"
 												       id="simpleApiActionRemote"
@@ -487,13 +487,13 @@
 
 										<div class="form-group" *ngIf="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'">
 												<label for="simpleApiActionDebug" class="col-sm-3 control-label">Debug: </label>
-												<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+												<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
 													<input type="checkbox"
 														   id="debugEnabled"
 														   name="debugEnabled"
 														   tabindex="6"
 														   [(ngModel)]="apiActionModel.debugEnabled"
-														   class="form-check-input aligned-checkbox" />
+														   class="form-check-input aligned-checkbox debug" />
 												</div>
 												<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 													<label class="control-label label-detail">
