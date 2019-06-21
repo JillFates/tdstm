@@ -10,6 +10,11 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		"/task/$id" {
+			controller = "task"
+			action = [GET:"task"]
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */

@@ -90,6 +90,15 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskView)
 	def index() { }
 
+	/**
+	 * Used to get the task information by ID
+	 * @param id - the ID of the task to retrieve
+	 * @return JSON map of the Task object
+	 */
+	def task(Long id) {
+		AssetComment task = taskService.fetchTaskById(id, currentPerson())
+		renderAsJson(task:task.taskToMap())
+	}
 
 	/**
 	 * Used to change the state of a task between Started, Done and Hold.
