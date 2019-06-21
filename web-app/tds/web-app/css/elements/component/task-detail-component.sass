@@ -170,6 +170,8 @@
         kendo-datepicker.k-widget.k-datepicker,
         kendo-dateinput.k-widget.k-dateinput,
         .instructions-link  input,
+        .completion input,
+        .completion .k-numerictextbox,
         textarea
           width: 100%
         td.valueNW.estimated-finish
@@ -271,6 +273,8 @@
 // Kendo combo color rules has more specificity , in order to apply correct color status in those controls in this component
 // without using !important, we need to give more specificity to status rules
 .task-detail-component
+  .completion
+    margin: auto
   .task-status
     .task-hold
       @include task-hold
