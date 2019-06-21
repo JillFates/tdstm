@@ -81,6 +81,7 @@ class TaskActionService implements ServiceMethods {
 	void actionDone(ActionCommand action, Long taskId, Person currentPerson) {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
 		task.apiActionPercentDone = 100
@@ -98,7 +99,23 @@ class TaskActionService implements ServiceMethods {
 	void actionError(ActionCommand action, Long taskId, Person currentPerson) {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
+	}
+
+	/**
+	 * Logs stdOut and stdErr to task notes if the action has debug enabled
+	 *
+	 * @param task The task to log a note for, if its action has debugEnabled = true
+	 * @param currentPerson  The currently logged in person.
+	 * @param stdOut Standard output returned.
+	 * @param stdErr Standard error output returned.
+	 */
+	void logForDebug(AssetComment task, Person currentPerson, String stdOut, String stdErr) {
+		if (task.apiAction.debugEnabled) {
+			addMessageToTaskNotes(stdOut, task, currentPerson)
+			addMessageToTaskNotes(stdErr, task, currentPerson)
+		}
 	}
 
 	/**
