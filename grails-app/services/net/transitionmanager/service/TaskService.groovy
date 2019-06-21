@@ -498,6 +498,9 @@ class TaskService implements ServiceMethods {
 			actionRequestMap.options.credentials = credentials
 		}
 
+		// Add the Task object to the returned map
+		actionRequestMap.task = task.taskToMap()
+
 		return actionRequestMap
 	}
 
