@@ -9,6 +9,7 @@ export class UserContextModel {
 	licenseInfo?: any;
 	permissions?: any[];
 	buildVersion?: string;
+	postNoticesManager?: any;
 	notices?: {
 		redirectUrl?: string;
 	}

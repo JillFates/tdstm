@@ -5,9 +5,9 @@ import {Router} from '@angular/router';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
-import {NoticeModel, Notices, PostNoticeResponse } from '../../model/notice.model';
+import {NoticeModel, Notices} from '../../model/notice.model';
 // Components
 import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
 import {MandatoryNoticesComponent} from '../mandatory-notices/mandatory-notices.component';

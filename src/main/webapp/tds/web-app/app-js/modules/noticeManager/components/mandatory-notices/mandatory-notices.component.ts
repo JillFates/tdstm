@@ -3,9 +3,8 @@ import {Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 // Service
 import {NoticeService} from '../../service/notice.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'

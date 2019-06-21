@@ -14,7 +14,7 @@ import {
 } from '@angular/router';
 // Services
 import {NotifierService} from '../shared/services/notifier.service';
-import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
+import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
 
 declare var jQuery: any;
 
@@ -107,6 +107,6 @@ export class TDSAppComponent implements OnInit {
 				}
 			});
 
-		this.noticesValidatorService.setupValidation();
+		// this.noticesValidatorService.setupValidation();
 	}
 }

@@ -5,7 +5,7 @@ import {Observable} from 'rxjs';
 // Service
 import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
