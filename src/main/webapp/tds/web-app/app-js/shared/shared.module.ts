@@ -27,6 +27,9 @@ import {ValidationRulesDefinitionsService} from './services/validation-rules-def
 import {HttpRequestInterceptor, HTTPFactory} from './providers/http-request-interceptor.provider.';
 import {KendoFileUploadInterceptor, HTTPKendoFactory} from './providers/kendo-file-upload.interceptor';
 import {KendoFileHandlerService} from './services/kendo-file-handler.service';
+import {PostNoticesManagerService} from '../modules/security/services/post-notices-manager.service';
+import {PostNoticesService} from '../modules/security/services/post-notices.service';
+import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -285,7 +288,10 @@ export class SharedModule {
 					useValue: en_DICTIONARY
 				},
 				ValidationRulesFactoryService,
-				ValidationRulesDefinitionsService
+				ValidationRulesDefinitionsService,
+				PostNoticesManagerService,
+				PostNoticesService,
+				PostNoticesValidatorService,
 			]
 		};
 	}

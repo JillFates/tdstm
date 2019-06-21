@@ -3,7 +3,7 @@
 	<table cellpadding="0" cellspacing="0">
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" groupType="ac" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="assetClassesContainerId">
+				<span id="twistieSpanId" groupType="ac" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="assetClassesContainerId">
 					Asset Classes
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -11,7 +11,7 @@
 		</tr>
 	</table>
 	<!-- The list of asset classes with their icons -->
-	<div id="assetClassesContainerId" class="twistieControlledDiv" style="display: none;">
+	<div id="assetClassesContainerId" class="twistieControlledDiv">
 		<table cellpadding="0" cellspacing="0">
 			<g:each in="${assetTypes}" var="entry" status="i">
 				<g:set var="type" value="${entry.getKey()}" />
@@ -33,7 +33,7 @@
 		<tr><td colspan="3" class="noPadding"><br /></td></tr> <!-- Spacer -->
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" groupType="de" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyTypeContainerId">
+				<span id="twistieSpanId" groupType="de" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyTypeContainerId">
 					Dependencies
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -41,7 +41,7 @@
 		</tr>
 	</table>
 	<!-- The list of dependency line types with examples of each -->
-	<div id="dependencyTypeContainerId" class="twistieControlledDiv" style="display: none;">
+	<div id="dependencyTypeContainerId" class="twistieControlledDiv">
 		<table cellpadding="0" cellspacing="0">
 			<g:set var="arrowheadOffset" value="${params.arrowheadOffset ? 45 : 40}" />
 			<g:each in="${[['Standard','Valid Links'],['notApplicable','N/A'],['unresolved','Questioned'],['future','Future']]}" var="item" status="i">
@@ -67,7 +67,7 @@
 		<tr><td colspan="3" class="noPadding"><br /></td></tr> <!-- Spacer -->
 		<tr id="twistieRowId">
 			<td class="noPadding">
-				<span id="twistieSpanId" groupType="hb" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="colorGroupingContainerId">
+				<span id="twistieSpanId" groupType="hb" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="colorGroupingContainerId">
 					<p>Move Bundles</p>
 					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
@@ -75,7 +75,7 @@
 		</tr>
 	</table>
 	<!-- The list of groups and their colors -->
-	<div id="colorGroupingContainerId" class="twistieControlledDiv" style="display: none;">
+	<div id="colorGroupingContainerId" class="twistieControlledDiv">
 		<table id="colorGroupingTableId" cellpadding="0" cellspacing="0">
 			<tr id="colorKeyTemplateId" class="hidden">
 				<td class="bundleColorExample">

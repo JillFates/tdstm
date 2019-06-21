@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1fb8df41-4400-4908-bed4-58d1c69f9cb2",
+		"_postman_id": "3947438b-3737-4b87-8a9d-e87671a31820",
 		"name": "User Context",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -50,12 +50,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -105,10 +105,6 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/ws/user/context",
 					"host": [

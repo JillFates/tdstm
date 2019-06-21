@@ -2,13 +2,13 @@ import com.tdsops.tm.enums.domain.SecurityRole
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyGroupService
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.party.PartyGroupService
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import spock.lang.Shared
 import spock.lang.Specification
 

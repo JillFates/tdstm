@@ -18,6 +18,9 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Components
 import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';
+import {DatabaseConflictsComponent} from './components/database-conflicts/database-conflicts.component';
+import {DatabaseFiltersComponent} from './components/database-conflicts/components/database-filters.component';
+
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import { TagsResolveService } from '../assetManager/resolve/tags-resolve.service';
@@ -31,6 +34,7 @@ import {ServerConflictsReportComponent} from './components/server-conflicts/serv
 import {ApplicationEventResultsReportComponent} from './components/application-event-results/application-event-results-report.component';
 import {ReportToggleFiltersComponent} from './components/report-toggle-filters.component';
 import {ApplicationProfilesReportComponent} from './components/application-profiles/application-profiles-report.component';
+import {ActivityMetricsReportComponent} from './components/activity-metrics/activity-metrics-report.component';
 
 @NgModule({
 	imports: [
@@ -52,12 +56,15 @@ import {ApplicationProfilesReportComponent} from './components/application-profi
 	],
 	declarations: [
 		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
+		DatabaseFiltersComponent,
 		PreEventCheckListSelectorComponent,
 		TaskReportComponent,
 		ServerConflictsReportComponent,
 		ApplicationEventResultsReportComponent,
 		ApplicationProfilesReportComponent,
 		ReportToggleFiltersComponent,
+		ActivityMetricsReportComponent
 	],
 	providers: [
 		// Resolve
@@ -70,6 +77,7 @@ import {ApplicationProfilesReportComponent} from './components/application-profi
 	],
 	exports: [
 		ApplicationConflictsComponent,
+		DatabaseConflictsComponent,
 		PreEventCheckListSelectorComponent
 	],
 	entryComponents: []

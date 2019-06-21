@@ -40,6 +40,7 @@ export class UserDashboardComponent implements OnInit {
 	public activePersonList;
 	public activePersonColumnModel;
 	public eventList;
+	public showActiveEvents = true;
 	public eventColumnModel;
 	public eventNewsList;
 	public eventNewsColumnModel;
@@ -152,7 +153,8 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public fetchEventsForGrid(): void {
-		this.userService.getAssignedEvents()
+		let projectId = this.selectedProject ? this.selectedProject.id : 0;
+		this.userService.getAssignedEvents(projectId, this.showActiveEvents)
 			.subscribe((result) => {
 				this.eventList = result.events;
 			});
@@ -204,9 +206,13 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public handleApplicationClicked(event): void {
+		this.openAssetDialog(event.dataItem.appId, event.dataItem.assetClass);
+	}
+
+	public openAssetDialog(id, assetClass): void {
 		this.dialogService.open(AssetShowComponent, [
-			{provide: 'ID', useValue: event.dataItem.appId},
-			{provide: 'ASSET', useValue: event.dataItem.assetClass}
+			{provide: 'ID', useValue: id},
+			{provide: 'ASSET', useValue: assetClass}
 		], DIALOG_SIZE.LG);
 	}
 

@@ -45,10 +45,10 @@ class ViewPage extends Page{
         leftTableElements(required:false) {$("div" , class:"k-grid-content-locked element-height-100-per-i" , role:"presentation")}
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
-        firstElementAssetClass(required:false) {$('td#k-grid0-r2c3').find("span")}
-        nameFilter {$('td#k-grid0-r1c2').find("div").find("input", type:"text")}
+        firstElementAssetClass(required:false) {$("#k-grid5-r2c3").find("span")}
+        nameFilter {$('#k-grid5-r1c2').find("div").find("input", type:"text")}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
-        assetClassFilter {$('#k-grid0-r1c3 input.form-control')}
+        assetClassFilter {$('#k-grid5-r1c3').find("div").find("input", type:"text")}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
         descriptionFilter { $("#k-grid0-r1c4 input")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}

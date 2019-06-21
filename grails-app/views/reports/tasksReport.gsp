@@ -39,7 +39,7 @@
                     ${task.taskNumber}
                 </td>
                 <td>
-                    <div style="max-height: 100px; max-width: 150px; overflow: scroll;">
+                    <div style="max-height: 100px; max-width: 150px; overflow: auto;">
                         ${task.comment}
                     </div>
                 </td>

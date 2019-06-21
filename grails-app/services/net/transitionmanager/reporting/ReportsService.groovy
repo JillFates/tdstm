@@ -1,11 +1,14 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
@@ -15,6 +18,7 @@ import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -22,7 +26,10 @@ import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyRelationship
@@ -36,12 +43,14 @@ import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskService
@@ -50,6 +59,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -71,6 +81,9 @@ class ReportsService implements ServiceMethods {
     MoveEventService moveEventService
     CustomDomainService customDomainService
     AssetEntityService assetEntityService
+    ControllerService controllerService
+    ProjectService projectService
+    TagAssetService tagAssetService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -121,30 +134,66 @@ class ReportsService implements ServiceMethods {
 
         def taskAnalysisInfo = getTaskAnalysisInfo(moveEvent, eventErrorList, viewUnpublished)
 
-        [time                : eventsProjectInfo.time, moveEvent: moveEvent, userLoginError: eventsProjectInfo.userLoginError,
-         errorForEventTime   : eventsProjectInfo.errorForEventTime,
-         project             : project, clientAccess: eventsProjectInfo.clientAccess, list: eventsProjectInfo.list,
-         workFlowCodeSelected: eventBundleInfo.workFlowCodeSelected, steps: eventBundleInfo.steps,
-         moveBundleSize      : moveBundles.size(), moveBundles: moveBundles, summaryOk: assetsInfo.summaryOk,
-         duplicatesAssetNames: assetsInfo.duplicatesAssetNames, duplicates: assetsInfo.duplicates,
-         duplicatesTag       : assetsInfo.duplicatesTag, duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
-         missedRacks         : assetsInfo.missedRacks, missingRacks: assetsInfo.missingRacks,
-         dependenciesOk      : assetsInfo.dependenciesOk, issue: assetsInfo.issue, issueMap: assetsInfo.issues,
-         bundleMap           : moveBundleTeamInfo.bundleMap, notAssignedToTeam: moveBundleTeamInfo.notAssignedToTeam,
-         teamAssignment      : moveBundleTeamInfo.teamAssignment, inValidUsers: moveBundleTeamInfo.inValidUsers,
-         userLogin           : moveBundleTeamInfo.userLogin, truckError: transportInfo.truckError, truck: transportInfo.truck,
-         cartError           : transportInfo.cartError, cart: transportInfo.cart, shelf: transportInfo.shelf,
-         shelfError          : transportInfo.shelfError, nullAssetname: assetsInfo.nullAssetname, questioned: assetsInfo.questioned,
-         blankAssets         : assetsInfo.blankAssets, questionedDependency: assetsInfo.questionedDependency,
-         specialInstruction  : assetsInfo.specialInstruction, importantInstruction: assetsInfo.importantInstruction,
-         eventErrorString    : eventErrorString, dashBoardOk: eventBundleInfo.dashBoardOk, allErrors: allErrors,
-         nullAssetTag        : assetsInfo.nullAssetTag, blankAssetTag: assetsInfo.blankAssetTag, modelList: modelInfo.modelList,
-         modelError          : modelInfo.modelError, eventIssues: assetsInfo.eventIssues, nonAssetIssue: assetsInfo.nonAssetIssue,
-         dependenciesNotValid: assetsInfo.dependenciesNotValid, cyclicalsError: taskAnalysisInfo.cyclicalsError,
-         cyclicalsRef        : taskAnalysisInfo.cyclicalsRef, startsError: taskAnalysisInfo.startsError,
-         startsRef           : taskAnalysisInfo.startsRef, sinksError: taskAnalysisInfo.sinksError,
-         sinksRef            : taskAnalysisInfo.sinksRef, personAssignErr: taskAnalysisInfo.personAssignErr,
-         personTasks         : taskAnalysisInfo.personTasks, taskerrMsg: taskAnalysisInfo.exceptionString]
+        [
+            time                   : eventsProjectInfo.time,
+            moveEvent              : moveEvent,
+            userLoginError         : eventsProjectInfo.userLoginError,
+            errorForEventTime      : eventsProjectInfo.errorForEventTime,
+            project                : project,
+            clientAccess           : eventsProjectInfo.clientAccess,
+            projectStaffList       : eventsProjectInfo.projectStaffList,
+            list                   : eventsProjectInfo.list,
+            workFlowCodeSelected   : eventBundleInfo.workFlowCodeSelected,
+            steps                  : eventBundleInfo.steps,
+            moveBundleSize         : moveBundles.size(),
+            moveBundles            : moveBundles,
+            summaryOk              : assetsInfo.summaryOk,
+            duplicatesAssetNames   : assetsInfo.duplicatesAssetNames,
+            duplicates             : assetsInfo.duplicates,
+            duplicatesTag          : assetsInfo.duplicatesTag,
+            duplicatesAssetTagNames: assetsInfo.duplicatesAssetTagNames,
+            missedRacks            : assetsInfo.missedRacks,
+            missingRacks           : assetsInfo.missingRacks,
+            dependenciesOk         : assetsInfo.dependenciesOk,
+            issue                  : assetsInfo.issue,
+            issueMap               : assetsInfo.issues,
+            bundleMap              : moveBundleTeamInfo.bundleMap,
+            notAssignedToTeam      : moveBundleTeamInfo.notAssignedToTeam,
+            teamAssignment         : moveBundleTeamInfo.teamAssignment,
+            inValidUsers           : moveBundleTeamInfo.inValidUsers,
+            userLogin              : moveBundleTeamInfo.userLogin,
+            truckError             : transportInfo.truckError,
+            truck                  : transportInfo.truck,
+            cartError              : transportInfo.cartError,
+            cart                   : transportInfo.cart,
+            shelf                  : transportInfo.shelf,
+            shelfError             : transportInfo.shelfError,
+            nullAssetname          : assetsInfo.nullAssetname,
+            questioned             : assetsInfo.questioned,
+            blankAssets            : assetsInfo.blankAssets,
+            questionedDependency   : assetsInfo.questionedDependency,
+            specialInstruction     : assetsInfo.specialInstruction,
+            importantInstruction   : assetsInfo.importantInstruction,
+            eventErrorString       : eventErrorString,
+            dashBoardOk            : eventBundleInfo.dashBoardOk,
+            allErrors              : allErrors,
+            nullAssetTag           : assetsInfo.nullAssetTag,
+            blankAssetTag          : assetsInfo.blankAssetTag,
+            modelList              : modelInfo.modelList,
+            modelError             : modelInfo.modelError,
+            eventIssues            : assetsInfo.eventIssues,
+            nonAssetIssue          : assetsInfo.nonAssetIssue,
+            dependenciesNotValid   : assetsInfo.dependenciesNotValid,
+            cyclicalsError         : taskAnalysisInfo.cyclicalsError,
+            cyclicalsRef           : taskAnalysisInfo.cyclicalsRef,
+            startsError            : taskAnalysisInfo.startsError,
+            startsRef              : taskAnalysisInfo.startsRef,
+            sinksError             : taskAnalysisInfo.sinksError,
+            sinksRef               : taskAnalysisInfo.sinksRef,
+            personAssignErr        : taskAnalysisInfo.personAssignErr,
+            personTasks            : taskAnalysisInfo.personTasks,
+            taskerrMsg             : taskAnalysisInfo.exceptionString
+        ]
     }
 
     /**
@@ -284,8 +333,14 @@ class ReportsService implements ServiceMethods {
             userLogin = greenSpan('Team Details Check: OK')
         }
 
-        [bundleMap        : bundleMap, inValidUsers: inValidUsers, teamAssignment: teamAssignment,
-         notAssignedToTeam: notAssignedToTeam, userLogin: userLogin, eventErrorList: eventErrorList]
+        [
+            bundleMap        : bundleMap,
+            inValidUsers     : inValidUsers,
+            teamAssignment   : teamAssignment,
+            notAssignedToTeam: notAssignedToTeam,
+            userLogin        : userLogin,
+            eventErrorList   : eventErrorList
+        ]
     }
 
     /**
@@ -407,7 +462,7 @@ class ReportsService implements ServiceMethods {
         String dependenciesNotValid
         if (assetsWithOutDep) {
             dependenciesNotValid = redSpan('Assets without dependency: ' + assetsWithOutDep.size() + ' Assets:') +
-                    '<div style="margin-left:50px;"> ' + WebUtil.listAsMultiValueString(assetsWithOutDep.assetName) + '</div>'
+                    '<div style="margin-left:50px;"> ' + HtmlUtil.escape(WebUtil.listAsMultiValueString(assetsWithOutDep.assetName)) + '</div>'
         } else {
             dependenciesNotValid = redSpan('Assets without dependency: 0 Assets')
         }
@@ -489,13 +544,30 @@ class ReportsService implements ServiceMethods {
             eventIssues = greenSpan('Event Tasks: OK')
         }
 
-        [summaryOk              : summaryOk, issue: issue, issues: issues, dependenciesOk: dependenciesOk, dependencies: dependencies,
-         missingRacks           : missingRacks, missedRacks: missedRacks, duplicatesTag: duplicatesTag, duplicates: duplicates,
-         duplicatesAssetTagNames: duplicatesAssetTagNames, duplicatesAssetNames: duplicatesAssetNames,
-         nullAssetname          : nullAssetname, blankAssets: blankAssets, questioned: questioned, eventIssues: eventIssues,
-         questionedDependency   : questionedDependency, specialInstruction: specialInstruction, nullAssetTag: nullAssetTag,
-         importantInstruction   : importantInstruction, eventErrorList: eventErrorList, blankAssetTag: blankAssetTag,
-         nonAssetIssue          : nonAssetIssue, dependenciesNotValid: dependenciesNotValid]
+        [
+            summaryOk              : summaryOk,
+            issue                  : issue, issues: issues,
+            dependenciesOk         : dependenciesOk,
+            dependencies           : dependencies,
+            missingRacks           : missingRacks,
+            missedRacks            : missedRacks,
+            duplicatesTag          : duplicatesTag,
+            duplicates             : duplicates,
+            duplicatesAssetTagNames: duplicatesAssetTagNames,
+            duplicatesAssetNames   : duplicatesAssetNames,
+            nullAssetname          : nullAssetname,
+            blankAssets            : blankAssets,
+            questioned             : questioned,
+            eventIssues            : eventIssues,
+            questionedDependency   : questionedDependency,
+            specialInstruction     : specialInstruction,
+            nullAssetTag           : nullAssetTag,
+            importantInstruction   : importantInstruction,
+            eventErrorList         : eventErrorList,
+            blankAssetTag          : blankAssetTag,
+            nonAssetIssue          : nonAssetIssue,
+            dependenciesNotValid   : dependenciesNotValid
+        ]
     }
 
     def getEventsBundelsInfo(moveBundles, MoveEvent moveEvent, eventErrorList) {
@@ -558,7 +630,7 @@ class ReportsService implements ServiceMethods {
                     projectEndTime = TimeUtil.formatDateTime(it.completionTime, TimeUtil.FORMAT_DATE_TIME_8)
                 }
 
-                errorForEventTime += """<span style="color:green"><b>Event Time Period $it.name: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
+                errorForEventTime += """<span style="color:green"><b>Event Time Period ${HtmlUtil.escape(it.name)}: OK </b>$projectStartTime - $projectEndTime</span><br></br>"""
             }
         }
 
@@ -570,27 +642,35 @@ class ReportsService implements ServiceMethods {
             moveEventCompletiondate = lastMoveBundleDate[-1]
         }
 
-        List<Map> list = partyRelationshipService.getProjectStaff(currProj)
-        list.sort { a, b -> a.company?.toString() <=> b.company?.toString() ?: a.role?.toString() <=> b.role?.toString() }
+        // Get the list of staff assigned to the Event and sort it by company/role/name
+        List<Map> projectStaffList = partyRelationshipService.getProjectStaff(currProj)
+        projectStaffList.sort {
+            a, b ->
+                a.company?.toString() <=> b.company?.toString() ?:
+                    a.role?.toString() <=> b.role?.toString() ?:
+                        a.name?.toString() <=> b.name?.toString()
+        }
 
         def projectStaff = PartyRelationship.executeQuery('''
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id=?
 			  and roleTypeCodeFrom = 'ROLE_PROJECT'
+			  and roleTypeCodeTo = 'ROLE_STAFF'
 		''', [currProj.toLong()])
 
         String userLoginError = ''
+
         projectStaff.each { staff ->
             Person person = staff.partyIdTo
             UserLogin user = person.userLogin
 
             if (!user) {
                 eventErrorList << 'Project'
-                userLoginError += redSpan(person.toString() + ' login disabled', 'margin-left:50px;')
+                userLoginError += redSpan(HtmlUtil.escape(person.toString()) + ' no login', 'margin-left:50px;')
             } else if (user.active == 'N') {
                 eventErrorList << 'Project'
-                userLoginError += greenSpan(user.toString() + ' login inactive', 'margin-left:50px;')
+                userLoginError += greenSpan(HtmlUtil.escape(user.toString()) + ' login inactive', 'margin-left:50px;')
             }
         }
 
@@ -609,11 +689,20 @@ class ReportsService implements ServiceMethods {
             clientAccess = redSpan('No Client Access', '', false)
             eventErrorList << 'Project'
         } else {
-            clientAccess = greenSpan('Client Access:&nbsp;' + persons, '', false)
+            clientAccess = greenSpan(
+                'Client Access:&nbsp;' + persons.collect { HtmlUtil.escape(it.toString()) }.join(', ')
+                , '', false)
         }
 
-        [time          : time, moveEvent: moveEvent, errorForEventTime: errorForEventTime,
-         userLoginError: userLoginError, clientAccess: clientAccess, list: list, eventErrorList: eventErrorList]
+        [
+            time             : time,
+            moveEvent        : moveEvent,
+            errorForEventTime: errorForEventTime,
+            userLoginError   : userLoginError,
+            clientAccess     : clientAccess,
+            projectStaffList: projectStaffList,
+            eventErrorList   : eventErrorList
+        ]
     }
 
     def getTransportInfo(assetEntityList, List<String> eventErrorList) {
@@ -624,8 +713,15 @@ class ReportsService implements ServiceMethods {
         Set shelves = []
         String shelfError = transportError(assetEntityList, 'shelf', eventErrorList, 'Shelves', shelves)
 
-        [truckError: truckError, truck: trucks, cartError: cartError, cart: carts,
-         shelf     : shelves, shelfError: shelfError, eventErrorList: eventErrorList]
+        [
+            truckError    : truckError,
+            truck         : trucks,
+            cartError     : cartError,
+            cart          : carts,
+            shelf         : shelves,
+            shelfError    : shelfError,
+            eventErrorList: eventErrorList
+        ]
     }
 
     private String transportError(assetEntityList, String propertyName, List<String> eventErrorList, String type, Set instances) {
@@ -852,6 +948,136 @@ class ReportsService implements ServiceMethods {
          moveBundleId          : params.moveBundle, appCount: appCount]
     }
 
+    /**
+     * Create and return a map with the information that should populates the Database Conflict Report.
+     * @param project - a given project. If null, the user's current project will be used.
+     * @param command - a DatabaseConflictsCommand instance with the parameters selection.
+     * @return a map containing the corresponding database, the project, bundle and other data for the report.
+     */
+    Map generateDatabaseConflictsMap(Project project, DatabaseConflictsCommand command) {
+        if (!project) {
+            project = securityService.userCurrentProject
+        }
+
+        List<String> titleParts = []
+        if (command.bundleConflicts) {
+            titleParts.add('Bundle Conflicts')
+        }
+        if (command.unresolvedDependencies) {
+            titleParts.add('Unresolved Dependencies')
+        }
+        if (command.missingApplications) {
+            titleParts.add('No Applications')
+        }
+        if (command.unsupportedDependencies) {
+            titleParts.add('DB With NO support')
+        }
+
+        // No checkbox has been checked?
+        boolean noProblemsSelected = titleParts.size() == 0
+
+        if (noProblemsSelected) {
+            titleParts.add('All')
+        }
+
+        MoveBundle moveBundle
+        List<MoveBundle> bundles
+        if (command.moveBundle == 'useForPlanning') {
+            bundles = MoveBundle.findAllByProjectAndUseForPlanning(project, true)
+        } else {
+            Long moveBundleId = NumberUtil.toLong(command.moveBundle)
+            moveBundle = GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+            bundles = [moveBundle]
+        }
+
+        List<Database> databasesInBundles = []
+        if (bundles) {
+            databasesInBundles = Database.where {
+                moveBundle in (bundles)
+            }.order('assetName').max(command.maxAssets).list()
+        }
+
+
+        List<String> conflictingStatus = ['Validated', 'Questioned', 'Unknown']
+        List<String> unresolvedStatus = ['Questioned', 'Unknown']
+
+        List<Map> databaseList = []
+
+        databasesInBundles.each { Database database ->
+            List<AssetDependency> dependsOnList = AssetDependency.findAllByAsset(database)
+            List<AssetDependency> supportsList = AssetDependency.findAllByDependent(database)
+            boolean noAppSupport = !supportsList.asset.assetType.contains(AssetType.APPLICATION.toString())
+
+            // skip the asset if there is no deps and support
+            if (!dependsOnList && !supportsList) {
+                return
+            }
+
+            String header = ''
+
+            if (!supportsList) {
+                header += ' No DB support?'
+            }
+            if (noAppSupport) {
+                header += ' No applications?'
+            }
+
+            boolean showDb = noProblemsSelected
+
+            if (!showDb) {
+                // Check for vm No support if showDb is true
+                if (!supportsList && command.unsupportedDependencies) {
+                    showDb = true
+                }
+                // Check for bundleConflicts if showDb is false
+                if (!showDb && command.bundleConflicts) {
+                    AssetDependency conflictIssue = dependsOnList.find {
+                        (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && (it.status in conflictingStatus)
+                    }
+                    if (!conflictIssue) {
+                        conflictIssue = supportsList.find {
+                            (it.asset.moveBundle?.id != it.dependent.moveBundle?.id) && (it.status in conflictingStatus)
+                        }
+                    }
+                    if (conflictIssue) {
+                        showDb = true
+                    }
+                }
+                // Check for unResolved Dependencies if showDb is false
+                if (!showDb && command.unresolvedDependencies) {
+                    def statusIssue = dependsOnList.find { it.status in unresolvedStatus }
+                    if (!statusIssue) {
+                        statusIssue = supportsList.find { it.status in unresolvedStatus }
+                    }
+                    if (statusIssue) {
+                        showDb = true
+                    }
+                }
+
+                // Check for Run On if showDb is false
+                if (!showDb && command.missingApplications) {
+                    if (!supportsList.find { it.type == 'DB' }) {
+                        showDb = true
+                    }
+                }
+            }
+            if (showDb)
+                databaseList.add([db: database, dependsOnList: dependsOnList*.toMap(), supportsList: supportsList*.toMap(), header: header,
+                    dependsOnIssueCount: dependsOnList.size(), supportsIssueCount: supportsList.size()])
+        }
+
+        return [project: project,
+                dbList: databaseList,
+                title: titleParts.join(', '),
+                moveBundle: moveBundle ?: "Planning Bundles",
+                columns: 9] // Not sure what's the purpose of this.
+
+
+    }
+
+    /**
+     * @Deprecated on 4.7 (TM-13137)
+     */
     def genDatabaseConflicts(moveBundleId, bundleConflicts, unresolvedDep, noApps, dbSupport, planning, int assetCap) {
         Project project = securityService.userCurrentProject
         List assetList = []
@@ -1312,19 +1538,29 @@ class ReportsService implements ServiceMethods {
 			query.append(" AND mb.use_for_planning = true ")
 		}else{
 			query.append(" AND mb.move_bundle_id= :currentBundle ")
-			queryParams.currentBundle = MoveBundle.get(command.moveBundle).id
+            Long moveBundleId = NumberUtil.toPositiveLong(command.moveBundle)
+            MoveBundle moveBundle = GormUtil.findInProject(project, MoveBundle, moveBundleId, true)
+			queryParams.currentBundle = moveBundle.id
 		}
 
 		if(command.sme!='null'){
 			currentSme = Person.get(command.sme)
-			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id")
+            if (!currentSme) {
+                throw new InvalidParamException("Invalid SME1 given.")
+            }
+			query.append( "AND (p.person_id = :smeId OR p1.person_id = :sme2Id)")
 			queryParams.smeId = currentSme.id
 			queryParams.sme2Id = currentSme.id
 		}
 
 		if(command.appOwner!='null'){
 			query.append(" AND p2.person_id= :appOwner")
-			queryParams.appOwner = Person.get(command.appOwner).id
+            Long ownerId = NumberUtil.toPositiveLong(command.appOwner)
+            Person owner = Person.get(ownerId)
+            if (!owner) {
+                throw new InvalidParamException("Invalid owner id given.")
+            }
+			queryParams.appOwner = GormUtil.findInProject(project, Person, ownerId, true).id
 		}
 
 		int assetCap = 100 // default value
@@ -1378,6 +1614,9 @@ class ReportsService implements ServiceMethods {
 			def startupById = startupBy instanceof Person ? startupBy.id : -1
 			def testingById = testingBy instanceof Person ? testingBy.id : -1
 
+            // Load asset tags.
+            def tagAssetList = tagAssetService.list(project, app.id)*.toMap()
+
 			// TODO: we'd like to flush the session
 			// GormUtil.flushAndClearSession(idx)
 			appList.add([
@@ -1393,8 +1632,9 @@ class ReportsService implements ServiceMethods {
 				testingById: testingById,
 				shutdownBy: shutdownBy,
 				startupBy: startupBy,
-				testingBy: testingBy
-			])
+				testingBy: testingBy,
+                tagAssetList: tagAssetList ? tagAssetList : []
+            ])
 		}
 
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
@@ -1414,4 +1654,135 @@ class ReportsService implements ServiceMethods {
 			id: rs.getInt('id'),
 		]}
 	}
+
+    /**
+     * Used to generate project activity metrics excel file.
+     */
+    @HasPermission(Permission.ReportViewProjectDailyMetrics)
+    void generateProjectActivityMetrics(ActivityMetricsCommand command, HttpServletResponse response) {
+
+        Project project = controllerService.getProjectForPage(this)
+        if (!project) return
+
+        List projectIds = command.projectIds
+        Date startDate
+        Date endDate
+
+        boolean validDates = true
+        try {
+            startDate = TimeUtil.parseDate(command.startDate)
+            endDate = TimeUtil.parseDate(command.endDate)
+        } catch (e) {
+            validDates = false
+        }
+
+        if (projectIds && validDates) {
+            boolean allProjects = projectIds.find { it == 'all' }
+            boolean badProjectIds = false
+            List<Project> userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
+            Map<Long, Project> userProjectsMap = [:]
+            List<Long> invalidProjectIds = []
+            List<Long> allProjectIds = []
+
+            for (Project p in userProjects) {
+                userProjectsMap[p.id] = p
+                allProjectIds << p.id
+            }
+
+            if ( allProjects ) {
+                projectIds = allProjectIds
+            } else {
+                projectIds = projectIds.collect { NumberUtil.toLong(it) }
+                // Verify that the user can access the project.
+                projectIds.each { id ->
+                    if (!userProjectsMap[id]) {
+                        invalidProjectIds << id
+                        badProjectIds = true
+                    }
+                }
+            }
+
+            //if found any bad id returning to the user
+            if( badProjectIds ){
+                throw new InvalidParamException("Project ids $invalidProjectIds are not associated with current user.")
+            }
+
+            List<Map<String, Object>> activityMetrics = projectService.searchProjectActivityMetrics(projectIds, startDate, endDate)
+            exportProjectActivityMetricsExcel(activityMetrics, command.includeNonPlanning, response)
+
+        }
+    }
+
+    /**
+     * Export task report in XLS format
+     * @param activityMetrics: activity metrics
+     * @param includeNonPlanning: display or not non planning information
+     * @return : will generate a XLS file
+     */
+    private void exportProjectActivityMetricsExcel(List<Map<String, Object>> activityMetrics, boolean includeNonPlanning, HttpServletResponse response) {
+        File file = grailsApplication.parentContext.getResource( "/templates/ActivityMetrics.xls" ).getFile()
+        String fileDate = TimeUtil.formatDateTime(TimeUtil.nowGMT(), TimeUtil.FORMAT_DATE_ISO8601)
+        String filename = 'ActivityMetrics-' + fileDate + '-Report'
+
+        //set MIME TYPE as Excel
+        response.setContentType("application/vnd.ms-excel")
+        response.setHeader("Content-Disposition", 'attachment; filename="' + filename + '.xls"')
+
+        def book = new HSSFWorkbook(new FileInputStream( file ))
+        def metricsSheet = book.getSheet("metrics")
+
+        def projectNameFont = book.createFont()
+        projectNameFont.setFontHeightInPoints((short)12)
+        projectNameFont.setFontName("Arial")
+        projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+
+        def projectNameCellStyle
+        projectNameCellStyle = book.createCellStyle()
+        projectNameCellStyle.setFont(projectNameFont)
+
+        def rowNum = 5
+        def project_code
+
+        activityMetrics.each { Map<String, Object> am ->
+
+            if (project_code != am['project_code']) {
+                rowNum++
+                project_code = am['project_code']
+                WorkbookUtil.addCell(metricsSheet, 0, rowNum, am['project_code'])
+                WorkbookUtil.applyStyleToCell(metricsSheet, 0, rowNum, projectNameCellStyle)
+            }
+
+            WorkbookUtil.addCell(metricsSheet, 1, rowNum, TimeUtil.formatDateTime(am['metric_date'], TimeUtil.FORMAT_DATE_TIME_23))
+            WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Planning')
+            WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['planning_servers'])
+            WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['planning_applications'])
+            WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['planning_databases'])
+            WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['planning_network_devices'])
+            WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['planning_physical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['planning_logical_storages'])
+            WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['planning_other_devices'])
+            WorkbookUtil.addCell(metricsSheet, 10, rowNum, am['dependency_mappings'])
+            WorkbookUtil.addCell(metricsSheet, 11, rowNum, am['tasks_all'])
+            WorkbookUtil.addCell(metricsSheet, 12, rowNum, am['tasks_done'])
+            WorkbookUtil.addCell(metricsSheet, 13, rowNum, am['total_persons'])
+            WorkbookUtil.addCell(metricsSheet, 14, rowNum, am['total_user_logins'])
+            WorkbookUtil.addCell(metricsSheet, 15, rowNum, am['active_user_logins'])
+
+            rowNum++
+
+            if (includeNonPlanning) {
+                WorkbookUtil.addCell(metricsSheet, 2, rowNum, 'Non Planning')
+                WorkbookUtil.addCell(metricsSheet, 3, rowNum, am['non_planning_servers'])
+                WorkbookUtil.addCell(metricsSheet, 4, rowNum, am['non_planning_applications'])
+                WorkbookUtil.addCell(metricsSheet, 5, rowNum, am['non_planning_databases'])
+                WorkbookUtil.addCell(metricsSheet, 6, rowNum, am['non_planning_network_devices'])
+                WorkbookUtil.addCell(metricsSheet, 7, rowNum, am['non_planning_physical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 8, rowNum, am['non_planning_logical_storages'])
+                WorkbookUtil.addCell(metricsSheet, 9, rowNum, am['non_planning_other_devices'])
+                rowNum++
+            }
+        }
+
+        book.write(response.getOutputStream())
+    }
 }

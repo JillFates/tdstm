@@ -38,7 +38,7 @@ export class TagMergeDialogComponent {
 		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				let defaultEmptyItem = new TagModel();
-				defaultEmptyItem.name = 'Select...';
+				defaultEmptyItem.name = this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER');
 				this.mergeToTag = defaultEmptyItem;
 				this.tagList.push(defaultEmptyItem);
 				this.tagList.push(...result.data.filter( item => item.id !== this.tagModel.id ));

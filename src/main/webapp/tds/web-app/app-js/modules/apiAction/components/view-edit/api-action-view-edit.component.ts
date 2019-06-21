@@ -28,6 +28,7 @@ import * as R from 'ramda';
 import {forkJoin, Observable} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -76,7 +77,6 @@ export class APIActionViewEditComponent implements OnInit {
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
-	protected PLEASE_SELECT = 'Select...';
 
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
@@ -105,7 +105,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public commonFieldSpecs;
 	protected actionTypesList = [];
 	protected  remoteCredentials = [];
-	protected defaultItem = {id: '', value: 'Please Select'};
+	protected defaultItem = {id: '', value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -144,11 +144,11 @@ export class APIActionViewEditComponent implements OnInit {
 	public checkActionModel = CHECK_ACTION;
 	private lastSelectedDictionaryModel: DictionaryModel = {
 		id: 0,
-		name: this.PLEASE_SELECT
+		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	private lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: '0',
-		name: this.PLEASE_SELECT
+		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
@@ -169,7 +169,8 @@ export class APIActionViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
 		private apiActionService: APIActionService,
-		private customDomainService: CustomDomainService) {
+		private customDomainService: CustomDomainService,
+		private translatePipe: TranslatePipe) {
 		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.getModalTitle();
 	}
@@ -241,7 +242,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getProviders(result): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.providerList.push({ id: 0, name: this.PLEASE_SELECT });
+			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 			this.apiActionModel.provider = this.providerList[0];
 			this.modifySignatureByProperty('provider');
 		}
@@ -255,7 +256,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getAgents(result: any): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.dictionaryList.push({ id: 0, name: this.PLEASE_SELECT });
+			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 			this.apiActionModel.dictionary = this.dictionaryList[0];
 			this.modifySignatureByProperty('dictionary');
 		}
@@ -263,11 +264,11 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', name: this.PLEASE_SELECT });
+			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
-		this.httpMethodList.push(this.PLEASE_SELECT);
+		this.httpMethodList.push(this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER'));
 		this.httpMethodList.push(...result.data.httpMethod);
 		if (!this.apiActionModel.httpMethod) {
 			this.apiActionModel.httpMethod = this.httpMethodList[0];
@@ -300,7 +301,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.apiActionService.getCredentials().subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
-					this.agentCredentialList.push({ id: 0, name: this.PLEASE_SELECT });
+					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 					this.apiActionModel.credential = this.agentCredentialList[0];
 					this.modifySignatureByProperty('credential');
 				}
@@ -319,7 +320,7 @@ export class APIActionViewEditComponent implements OnInit {
 			(result: any) => {
 				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
 				if (this.modalType === ActionType.CREATE) {
-					this.datascriptList.push({ id: 0, name: this.PLEASE_SELECT });
+					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
@@ -510,7 +511,9 @@ export class APIActionViewEditComponent implements OnInit {
 			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 				comps.forEach((child) => {
 					this.codeMirrorComponent = child;
-					this.codeMirrorComponent.setDisabled(this.modalType === ActionType.VIEW);
+					setTimeout(() => {
+						child.setDisabled(this.modalType === ActionType.VIEW);
+					}, 100);
 				});
 			});
 		}
@@ -578,7 +581,7 @@ export class APIActionViewEditComponent implements OnInit {
 				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: this.PLEASE_SELECT});
+						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
@@ -594,7 +597,7 @@ export class APIActionViewEditComponent implements OnInit {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', name: this.PLEASE_SELECT});
+				this.agentMethodList.push({id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -739,12 +742,12 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Populate only the Credentials that are related to the provider
 		this.providerCredentialList = new Array<CredentialModel>();
-		this.providerCredentialList.push({id: 0, name: this.PLEASE_SELECT});
+		this.providerCredentialList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
 
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({id: 0, name: this.PLEASE_SELECT});
+		this.providerDatascriptList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
 
 		if (previousValue) {

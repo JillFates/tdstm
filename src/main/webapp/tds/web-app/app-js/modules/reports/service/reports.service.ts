@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import { ApplicationConflict } from '../model/application-conflicts.model';
 import {catchError, map} from 'rxjs/operators';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
@@ -25,6 +24,8 @@ export class ReportsService {
 	private readonly APP_EVENT_RESULTS_LISTS_URL = `${this.baseURL}/reports/generateApplicationMigration/{id}`;
 	private readonly APP_EVENT_RESULTS_REPORT_URL = `${this.APP_EVENT_RESULTS_LISTS_URL}`;
 	private readonly APPLICATION_PROFILES_REPORT_URL = `${this.baseURL}/reports/generateApplicationProfiles`;
+	private readonly PROJECT_METRICS_LISTS_URL = `${this.baseURL}/reports/projectMetricsLists`;
+	private readonly PROJECT_METRICS_REPORT_URL = `${this.baseURL}/reports/generateProjectMetrics`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private sanitizer: DomSanitizer) {
@@ -254,6 +255,17 @@ export class ReportsService {
 	}
 
 	/**
+	 * GET - Return the options lists of Project Metrics Report.
+	 */
+	getProjectMetricsLists(): Observable<any> {
+		return this.http.get(`${this.PROJECT_METRICS_LISTS_URL}`)
+			.map((response: any) => {
+				return response && response.status === 'success' && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
 	 * GET - Return the owners filtered by bundle
 	 * @param {string} moveBundleId Bundle id to filter
 	 */
@@ -280,52 +292,22 @@ export class ReportsService {
 		conflicts: boolean,
 		missing: boolean,
 		unresolved: boolean,
-		max: number
-		): Observable<Array<ApplicationConflict>> {
-			const url = `${this.baseURL}/reports/applicationConflicts?`;
-			const params = `moveBundle=${bundle}&appOwner=${owner}&bundleConflicts=${conflicts}` +
-			`&missingDependencies=${missing}&unresolvedDependencies=${unresolved}&maxAssets=${max}`;
+		max: number,
+		bundleList: any[]
+		): Observable<any> {
+			const url = `${this.baseURL}/reports/applicationConflicts`;
+			const params = new HttpParams()
+			.set('moveBundle', bundle)
+			.set('appOwner', owner)
+			.set('bundleConflicts', conflicts.toString())
+			.set('missingDependencies', missing.toString())
+			.set('unresolvedDependencies', unresolved.toString())
+			.set('maxAssets', max.toString())
 
-			return this.http.get(`${url}${params}`)
+			return this.http.get(`${url}`, {params})
 			.map((response: any) => {
 				const data =  (response && response.status === 'success' && response.data || null);
-
-				return data == null ? [] : data.appList
-					.map((appItem: any) => {
-						return {
-							'application': {
-								'id': appItem.app.id,
-								'name': appItem.app.assetName,
-								'assetClass': appItem.app.assetClass.name
-							},
-							'bundle': {
-								'id': data.moveBundle.id,
-								'name': data.moveBundle.name
-							},
-							supports: appItem.supportsList
-								.map((support: any) => {
-									return {
-										'type': support.type,
-										'class': support.asset.assetClass,
-										'name': support.asset.name,
-										'frequency': support.dataFlowFreq,
-										'bundle':  support.asset.moveBundle,
-										'status': support.status
-									};
-								}),
-							dependencies: appItem.dependsOnList
-							.map((dependency: any) => {
-								return {
-									'type': dependency.type,
-									'class': dependency.asset.assetClass,
-									'name': dependency.asset.name,
-									'frequency': dependency.dataFlowFreq,
-									'bundle': dependency.dependent.moveBundle,
-									'status': dependency.status
-								};
-							})
-						}
-					})
+				return this.mapConflictsResults(data, 'app', bundleList);
 			})
 			.catch((error: any) => error);
 	}
@@ -335,7 +317,7 @@ export class ReportsService {
 	 * @param moveBundleId
 	 */
 	generateApplicationProfilesReport(
-		moveBundle: number,
+		moveBundle: any,
 		sme: number,
 		appOwner: number,
 		reportMaxAssets: number): Observable<any> {
@@ -354,5 +336,126 @@ export class ReportsService {
 				return error;
 			})
 		)
+	}
+
+	/**
+	 * POST - Returns the excel spreadsheet file.
+	 * @param projectIds: Array<string>
+	 * @param startDate: Date
+	 * @param endDate: Date
+	 * @param includeNonPlanning: boolean
+	 */
+	generateActivityMetricsReport(projectIds: Array<string>, startDate: Date, endDate: Date, includeNonPlanning: boolean): Observable<any> {
+		if (projectIds.length === 1 && projectIds[0] === '-1') {
+			projectIds = ['all'];
+		}
+		const request = {
+			projectIds: projectIds,
+			startDate: `${startDate.getMonth() + 1}/${startDate.getDate()}/${startDate.getFullYear()}`,
+			endDate: `${endDate.getMonth() + 1}/${endDate.getDate()}/${endDate.getFullYear()}`,
+			includeNonPlanning: includeNonPlanning
+		};
+		return this.http.post(this.PROJECT_METRICS_REPORT_URL, request, {observe: 'response', responseType: 'blob'}).pipe(
+			map((result: any) => {
+				let filename: string = result.headers.get('content-disposition');
+				filename = filename.replace('attachment; filename=', '');
+				filename = filename.replace(new RegExp('"', 'g'), '');
+				return {
+					blob: new Blob([result.body], { type: result.body.type }),
+					filename: filename
+				}
+			}),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
+	}
+
+	/**
+	 * GET - Return the list of database conflicts
+	 * @param {string} bundle: Bundle ID related
+	 * @param {boolean} conflicts: Flag to get references to assets assigned to unrelated bundles
+	 * @param {boolean} missing: Flag to get missing applications
+	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questioned
+	 * @param {boolean} unsupported: Flag to get having no Requires dependency indication where database resides
+	 * @param {number} max: Max number of records to retrive
+	*/
+	getDatabaseConflicts(
+		bundle: string,
+		conflicts: boolean,
+		missing: boolean,
+		unresolved: boolean,
+		unsupported: boolean,
+		max: number,
+		bundleList: any[]
+		): Observable<any> {
+			const url = `${this.baseURL}/reports/databaseConflicts`;
+			const params = new HttpParams()
+				.set('moveBundle', bundle)
+				.set('bundleConflicts', conflicts.toString())
+				.set('missingApplications', missing.toString())
+				.set('unresolvedDependencies', unresolved.toString())
+				.set('unsupportedDependencies', unsupported.toString())
+				.set('maxAssets', max.toString());
+
+			return this.http.get(`${url}`, {params})
+				.map((response: any) => {
+					const data =  (response && response.status === 'success' && response.data || null);
+					return this.mapConflictsResults(data, 'db', bundleList);
+				})
+				.catch((error: any) => error);
+	}
+
+	/**
+	 * Map the resuls provided for the endpoint to get the conflicts, to the correspondint db or app reports
+	 * @param data Endpoint results
+	 * @param entity Name of the entity, it could be (app or db)
+	 * @param bundleList List of bundles related to the report
+	 */
+	private mapConflictsResults(data: any, entity: string,  bundleList: any[]): any {
+		return data == null ? [] : data[`${entity}List`]
+		.map((item: any) => {
+			let bundleName = data.moveBundle.name;
+			if (!bundleName) {
+				let currentBundle = bundleList.find((current) => current.id === item[entity].moveBundle.id.toString());
+				bundleName = (currentBundle) ? currentBundle.name : '';
+			}
+
+			return {
+				entity: {
+					id: item[entity].id,
+					name: item[entity].assetName,
+					assetClass: item[entity].assetClass.name
+				},
+				header: item.header ? ` - ${item.header}` : '',
+				bundle: {
+					id: data.moveBundle.id,
+					name: bundleName
+				},
+				supports: item.supportsList
+					.map((support: any) => {
+						return {
+							type: support.type,
+							class: support.asset.assetClass,
+							name: support.asset.name ,
+							frequency: support.dataFlowFreq,
+							bundle:  support.asset.moveBundle,
+							status: support.status
+						};
+					}),
+				dependencies: item.dependsOnList
+				.map((dependency: any) => {
+					return {
+						type: dependency.type,
+						class: dependency.dependent.assetClass,
+						name: dependency.dependent.name,
+						frequency: dependency.dataFlowFreq,
+						bundle: dependency.dependent.moveBundle,
+						status: dependency.status
+					};
+				})
+			}
+		});
 	}
 }

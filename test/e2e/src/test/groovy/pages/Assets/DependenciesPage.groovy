@@ -7,7 +7,7 @@ import modules.AssetsMenuModule
 class DependenciesPage extends Page {
 
     static at = {
-        dependenciesPageTitle.text().trim()  == "Dependencies List"
+        dependenciesPageTitle.text().trim()  == "Dependencies"
         dependenciesPageBreadcrumbs[0].text()   == "Assets"
         dependenciesPageBreadcrumbs[1].text()   == "Dependencies"
 

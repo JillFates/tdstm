@@ -717,10 +717,10 @@ function showManufacturer(id){
 		onComplete:function(e){
 			var data = eval('(' + e.responseText + ')')
 			var manufacturer = data.manufacturer
-			$("#showManuName").html( manufacturer.name )
-			$("#showManuAka").html( data.aliases )
-			$("#showManuDescription").html( manufacturer.description )
-			$("#show_manufacturerId").val( manufacturer.id )
+			$("#showManuName").html( _.escape(manufacturer.name) )
+			$("#showManuAka").html( _.escape(data.aliases) )
+			$("#showManuDescription").html( _.escape(manufacturer.description) )
+			$("#show_manufacturerId").val( _.escape(manufacturer.id) )
 			$("#manufacturerShowDialog").dialog("open")
 		}
 	})

@@ -417,9 +417,10 @@ grails {
 	}
 }
 
-if (System.getProperty("gconsole")) {
+if (System.getProperty("tdstm.gconsole")) {
 	grails {
 		plugin {
+			console.enabled = true
 			springsecurity {
 				staticSecurityRules << [pattern: '/health/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/info/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]

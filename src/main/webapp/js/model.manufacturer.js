@@ -183,7 +183,7 @@ var akaUtil = (function ($) {
 
 		var errorDiv = $('#' + errorId)
 		if (akaMessage) {
-			errorDiv.html(akaMessage)
+			errorDiv.html( _.escape(akaMessage))
 			errorDiv.css('display', 'block')
 			errorDiv.addClass('hasErrors')
 		} else {

@@ -551,11 +551,15 @@ class SqlUtil {
 		Object paramValue
 		boolean isNumber = false
 
-		if (isNumericField(fieldSearchData)) {
-			if (fieldSearchData.filter.isNumber()) {
-				paramValue = parseNumberParameter(fieldSearchData)
+		if (isNumericField(fieldSearchData) && fieldSearchData.filter.isNumber()) {
 				isNumber = true
-			}
+				/* TM-13420  If the filter is numeric and of the form "x." we should treat it as string, to preserve the dot
+				and end up with a paramValue of the form "x." and not just "x" (parseNumberParameter eliminates the dot) */
+				if (fieldSearchData.filter.contains('.')) {
+					paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
+				} else {
+					paramValue = parseNumberParameter(fieldSearchData)
+				}
 		} else { // we treat the field as a String
 			paramValue = parseStringParameter(fieldSearchData.filter, fieldSearchData.useWildcards)
 		}
@@ -774,12 +778,15 @@ class SqlUtil {
 			isNumeric = fieldSpec.isNumeric()
 		} else {
 
-			def properties = fsd.domain.metaClass.properties
-			// Look up the field type using the column.
-			Class fieldType = properties.find { it.name == fsd.column }?.type
-			// If it couldn't be found, try with the columnAlias
-			if (!fieldType) {
-				fieldType = properties.find { it.name == fsd.columnAlias }?.type
+  			Class fieldType
+
+			if (fsd.referenceProperty) {
+				Class domainClassOfProperty = GormUtil.getDomainClassOfProperty(fsd.domain, fsd.columnAlias)
+				fieldType = GormUtil.getDomainPropertyType(domainClassOfProperty, fsd.referenceProperty)
+			} else if (GormUtil.isDomainProperty(fsd.domain, fsd.column) ){
+				fieldType = GormUtil.getDomainPropertyType(fsd.domain, fsd.column)
+			} else if (GormUtil.isDomainProperty(fsd.domain, fsd.columnAlias) ){
+				fieldType = GormUtil.getDomainPropertyType(fsd.domain, fsd.columnAlias)
 			}
 
 			// If we could determine the class, check if it is a subclass of Number

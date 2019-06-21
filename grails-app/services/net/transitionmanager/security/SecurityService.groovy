@@ -1,8 +1,6 @@
 package net.transitionmanager.security
 
 import com.tdsops.common.builder.UserAuditBuilder
-import net.transitionmanager.exception.ConfigurationException
-import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
@@ -22,24 +20,26 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.web.servlet.mvc.GrailsParameterMap
+import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.security.PasswordHistory
-import net.transitionmanager.security.PasswordReset
-import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRole
-import net.transitionmanager.security.Permissions
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.PasswordHistory
+import net.transitionmanager.security.PasswordReset
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.Permissions
 import net.transitionmanager.security.RolePermissions
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
-import grails.web.servlet.mvc.GrailsParameterMap
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -53,7 +53,6 @@ import org.springframework.web.context.request.RequestContextHolder
 
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
-
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
@@ -448,13 +447,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	void cleanupPasswordReset(dataMap) {
 		log.info('Cleanup Password Reset: Started.')
 
-		def retainDays = userLocalConfig.forgotMyPasswordRetainHistoryDays
+		int retainDays = (int)userLocalConfig.forgotMyPasswordRetainHistoryDays
 		//println "retainDays: ${retainDays}"
 
-		jdbcTemplate.update("DELETE FROM password_reset WHERE created_date < (now() - INTERVAL $retainDays DAY)")
+		PasswordReset.where{createdDate < new Date() - retainDays}.deleteAll()
 
 		def now = TimeUtil.nowGMT()
-		jdbcTemplate.update("UPDATE password_reset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' and expires_after < ?", now)
+		PasswordReset.executeUpdate("UPDATE PasswordReset SET status = 'EXPIRED' WHERE status <> 'EXPIRED' AND expiresAfter < :date", [date:new Date()])
 
 		log.info('Cleanup Password Reset: Finished.')
 	}

@@ -61,7 +61,7 @@
 				<!-- Miscellaneous settings and controls -->
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="playPauseButtonId" type="button" value="Freeze Graph${legendTwistiePref}" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()" title="Pauses or Unpauses the physics of the force graph (can also be done with the [space] key)">
+						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()" title="Pauses or Unpauses the physics of the force graph (can also be done with the [space] key)">
 					</td>
 				</tr>
 				<tr>

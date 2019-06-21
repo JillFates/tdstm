@@ -161,7 +161,11 @@ var tdsCommon = {
 		var data = false;
 
 		if (response.status != 200) {
-			this.displayWsError(response, errorMsg, alerts);
+            if (response.errors) {
+                alert(response.errors);
+            } else {
+                this.displayWsError(response, errorMsg, alerts);
+            }
 		} else {
 			data = eval("(" + response.responseText + ")");
 			// See if we have a result that has 'status'
@@ -196,12 +200,16 @@ var tdsCommon = {
      * @param errorMsg
      * @param alerts
      */
-	isValidWsJQueryAjaxResponse: function (response, errorMsg, alerts) {
+    isValidWsJQueryAjaxResponse: function (response, errorMsg, alerts) {
         var isValid = false;
         var data = false;
 
         if (response.status != 200 && response.status !== 'success') {
-            this.displayWsError(response, errorMsg, alerts);
+            if (response.errors) {
+                alert(response.errors);
+            } else {
+                this.displayWsError(response, errorMsg, alerts);
+            }
         } else {
             isValid = (response.status == 'success');
             if (isValid) {
@@ -213,7 +221,19 @@ var tdsCommon = {
                 if (response.errors) {
                     alert(response.errors);
                 } else {
-                    alert("An error occurred while updating and/or updating information");
+                    if(response.responseText) {
+                        var responseJson = JSON.parse(response.responseText);
+                        if (responseJson.errors) {
+                            alert(responseJson.errors);
+                        } else {
+                            isValid = true;
+                            if(responseJson.data) {
+                                data = responseJson.data;
+                            }
+                        }
+                    } else {
+                        alert("An error occurred while updating and/or updating information");
+                    }
                 }
             }
         }

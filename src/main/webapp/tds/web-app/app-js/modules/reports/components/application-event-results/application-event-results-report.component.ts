@@ -8,7 +8,9 @@ import {ReportComponent} from '../report.component';
 	selector: 'tds-application-event-results-report',
 	template: `
 		<div class="content body">
-			<tds-report-toggle-filters [hideFilters]="hideFilters" (toggle)="toggleFilters($event)"></tds-report-toggle-filters>
+			<tds-report-toggle-filters [hideFilters]="hideFilters"
+																 (toggle)="toggleFilters($event)"
+																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
 					<form class="formly form-horizontal" role="form" novalidate>
@@ -106,9 +108,9 @@ import {ReportComponent} from '../report.component';
 											<tds-button-custom class="btn-primary"
 																				 [disabled]="loadingSmeList || loadingLists"
 																				 (click)="onGenerateReport()"
-																				 title="Generate Report"
-																				 tooltip="Generate Report"
-																				 icon="check-square">
+																				 title="Generate"
+																				 tooltip="Generate"
+																				 icon="table">
 											</tds-button-custom>
 										</div>
 									</div>
@@ -222,6 +224,7 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 						item.addEventListener('click', event => this.onAssetLinkClick(event));
 					})
 				}, 300);
+				this.generatedReport = true;
 		})
 	}
 

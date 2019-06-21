@@ -79,14 +79,17 @@ class License {
 	Map toJsonMap(GrailsApplication grailsApplication) {
 		PartyGroup client = getClient()
 		Map dProject = [
-		        id:"",
-				name:"all"
+				  id:"",
+				  name:"all",
+				  guid: "",
+				  // metricsGathering: false  // TODO: this is the client part of "Metrics Gathering" variable used by "tmci" to gather info is required in the CLIENT?
 		]
 
 		if(project != "all"){
 			Project prj = Project.get(project)
 			dProject.id = prj?.id
 			dProject.name = prj?.name
+			dProject.guid = prj?.guid
 		}
 
 		String toEmail = (grailsApplication.config.tdstm?.license?.request_email) ?: ''

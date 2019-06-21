@@ -85,6 +85,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/summaryTable" {
+			controller = "wsAsset"
+			action = [
+			    GET: "getSummaryTable"
+			]
+		}
+
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
@@ -214,6 +221,11 @@ class UrlMappings {
 		"/ws/dashboard/bundleData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"bundleData"]
+		}
+
+		"/ws/dashboard/getPlanningStats" {
+			controller = "wsDashboard"
+			action = [GET:"getDataForPlanningDashboard"]
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -370,6 +382,11 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/task/listTasks" {
+			controller = "wsTask"
+			action = [POST:"listTasks"]
+		}
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
@@ -495,7 +512,7 @@ class UrlMappings {
 			action = [ GET: "modelForUserDashboard" ]
 		}
 
-		"/ws/user/assignedEvents" {
+		"/ws/user/assignedEvents/$project" {
 			controller = "wsUser"
 			action = [ GET: "getAssignedEvents" ]
 		}
@@ -629,6 +646,14 @@ class UrlMappings {
 		}
 
 		///// NOTICES API /////////
+
+		"/ws/notices/continue" {
+			controller = 'wsNotice'
+			action = [
+				GET: 'clearNoticesWhenNoMandatoryLeft'
+			]
+		}
+
 		"/ws/notices/$id" {
 			controller = "wsNotice"
 			action = [
@@ -646,14 +671,14 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/notices/$id/ack" {
+		"/ws/notices/$id/acknowledge" {
 			controller = "wsNotice"
 			action = [
 					POST: "acknowledge"
 			]
 		}
 
-		"/ws/notice/fetchPostNotices" {
+		"/ws/notices/fetchPostLoginNotices" {
 			controller = "wsNotice"
 			action = [
 					GET: "fetchPostLoginNotices"
@@ -1041,7 +1066,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/dataingestion/provider/validateUnique/$name" {
+		"/ws/dataingestion/provider/validateUnique" {
 			controller = "wsProvider"
 			action = [
 					POST: "validateUniqueName"
@@ -1271,6 +1296,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/reports/databaseConflicts" {
+			controller = "wsReports"
+			action = [
+				GET: "getDatabaseConflicts"
+			]
+		}
+
 		"/ws/reports/tasksReport" {
 			controller = "wsReports"
 			action = [
@@ -1332,6 +1364,20 @@ class UrlMappings {
             controller = "wsReports"
             action = [
                     POST: "generateApplicationProfiles"
+            ]
+        }
+
+        "/ws/reports/projectMetricsLists" {
+            controller = "wsReports"
+            action = [
+                    GET: "projectMetricsLists"
+            ]
+        }
+
+        "/ws/reports/generateProjectMetrics" {
+            controller = "wsReports"
+            action = [
+                    POST: "generateProjectMetrics"
             ]
         }
 

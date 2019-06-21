@@ -25,6 +25,7 @@ import {NotFoundPageComponent} from './components/not-found-page/not-found-page.
 		UnauthorizedPageComponent,
 		NotFoundPageComponent
 	],
+	providers: [],
 	exports: [
 		ErrorPageComponent,
 		UnauthorizedPageComponent,

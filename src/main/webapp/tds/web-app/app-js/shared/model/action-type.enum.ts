@@ -6,5 +6,6 @@ export enum ActionType {
 	Create,
 	Edit,
 	Delete,
-	Update
+	Update,
+	View
 };

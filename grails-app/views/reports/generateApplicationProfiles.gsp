@@ -124,7 +124,8 @@ div.onepage {
 												  project:project, standardFieldSpecs: standardFieldSpecs,
 												  shutdownBy: application.shutdownBy, shutdownById: application.shutdownById,
 												  startupBy: application.startupBy, startupById: application.startupById,
-												  testingBy: application.testingBy, testingById: application.testingById]" >
+												  testingBy: application.testingBy, testingById: application.testingById,
+                                                  tagAssetList: application.tagAssetList, tagAssetsFromServer: true]" >
 								</g:render>
 							</td>
 						</tr>

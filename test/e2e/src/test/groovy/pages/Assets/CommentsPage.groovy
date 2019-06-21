@@ -7,7 +7,7 @@ import modules.AssetsMenuModule
 class CommentsPage extends Page {
 
     static at = {
-        commentsPageTitle.text().trim()  == "Asset Comment"
+        commentsPageTitle.text().trim()  == "Comments"
         commentsPageBreadcrumbs[0].text()   == "Assets"
         commentsPageBreadcrumbs[1].text()   == "Comments"
 
@@ -15,7 +15,7 @@ class CommentsPage extends Page {
 
     static content = {
         commentsPageTitle (wait:true) { $("section", 	class:"content-header").find("h1")}
-        commentsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        commentsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         assetsModule { module AssetsMenuModule}
         commonsModule { module CommonsModule }
     }

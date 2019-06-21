@@ -15,9 +15,11 @@ import net.transitionmanager.task.QzSignService
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.ExceptionLoggerFilter
 import org.apache.log4j.Logger
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
 
 import java.lang.management.ManagementFactory
+import java.security.Security
 
 class BootStrap {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
@@ -27,6 +29,9 @@ class BootStrap {
 	LicenseAdminService licenseAdminService
 
 	def init = { servletContext ->
+		//TM-15254 Needed for the RSA encryption.
+		Security.addProvider(new BouncyCastleProvider())
+
 		checkForBlacklistedVMParameters()
 
 		//Check required default Config Info

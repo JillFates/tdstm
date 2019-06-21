@@ -42,6 +42,7 @@ export class CodeMirrorComponent implements OnInit {
 	public setDisabled(disable: boolean): void {
 		if (this.instance && this.instance.options) {
 			this.instance.options.disableInput = disable;
+			this.instance.options.readOnly = disable;
 		}
 	}
 
@@ -50,9 +51,12 @@ export class CodeMirrorComponent implements OnInit {
 	 * @param {Array<number>} lineNumbers
 	 */
 	public addSyntaxErrors(lineNumbers: Array<number>) {
-		this.currentErrorLines = lineNumbers;
-		for (let line of this.currentErrorLines) {
-			this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
+		if (!this.currentErrorLines) {
+			this.currentErrorLines = [];
+		}
+		for (let line of lineNumbers) {
+			const lineHandle = this.instance.addLineClass(line, 'background', 'line-with-syntax-errors');
+			this.currentErrorLines.push(lineHandle);
 		}
 	}
 

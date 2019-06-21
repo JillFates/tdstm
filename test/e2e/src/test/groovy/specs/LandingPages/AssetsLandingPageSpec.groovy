@@ -76,7 +76,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Applications Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Application List")
+            verifyViewTitle("Applications")
     }
 
     def "5. Verify the Devices Landing Page"() {
@@ -85,7 +85,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Devices Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Device List")
+            verifyViewTitle("Devices")
     }
 
     def "6. Verify the Servers Landing Page"() {
@@ -94,7 +94,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Servers Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Server List")
+            verifyViewTitle("Servers")
     }
 
     def "7. Verify the Databases Landing Page"() {
@@ -103,25 +103,25 @@ class AssetsLandingPageSpec extends GebReportingSpec {
 
         then: 'The Databases Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Database List")
+            verifyViewTitle("Databases")
     }
 
-    def "8. Verify the Storage Devices Landing Page"() {
-        when: 'The user goes to the Databases page'
+    def "8. Verify the Physical Storage Landing Page"() {
+        when: 'The user goes to the Physical Storage page'
             assetsModule.goToStorageDevices()
 
-        then: 'The Storage Devices Page is loaded successfully'
+        then: 'The Physical Storage Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Storage Device List")
+            verifyViewTitle("Physical Storage")
     }
 
-    def "9. Verify the Storage Logical Landing Page"() {
+    def "9. Verify the Logical Storage Landing Page"() {
         when: 'The user goes to the Databases page'
             assetsModule.goToStorageLogical()
 
-        then: 'The Storage Logical Page is loaded successfully'
+        then: 'The Logical Storage Page is loaded successfully'
             at ViewPage
-            verifyViewTitle("Logical Storage List")
+            verifyViewTitle("Logical Storage")
     }
 
     def "10. Verify the Dependencies Landing Page"() {

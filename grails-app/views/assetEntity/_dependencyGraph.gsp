@@ -33,19 +33,19 @@ $(document).ready(function() {
 	$('.toolTipButton').popover()
 
 	// handle applying the legend twistie preferences
+	var graphPrefs = '${graphPrefs}'
 	var legendTwistiePref = '${legendTwistiePref}'
 	var twistieDivs = $('#legendDivId .twistieControlledDiv')
-	if(legendTwistiePref && legendTwistiePref.length > 0) {
+	var twistieSpans = $('#legendDivId #twistieSpanId')
+	if ((legendTwistiePref && legendTwistiePref.length > 0) && legendTwistiePref != 'no') {
 		legendTwistiePref = legendTwistiePref.split(',');
-		for (var i = 0; i < legendTwistiePref.length; ++i) {
-			//debugger;
-			var pref = legendTwistiePref[i];
-			var selectedTwisty = $("#legendDivId #twistieSpanId[groupType="+pref+"]");
-			if (selectedTwisty && selectedTwisty.length > 0) {
-				$(selectedTwisty).addClass('open').removeClass('closed');
-				$('#'+selectedTwisty.attr('for')).css('display','block');
-			}
-		}
+		twistieSpans.each(function (i, o) {
+			var groupType = $(o).attr('groupType')
+			if (legendTwistiePref.indexOf(groupType) == -1) {
+				$(o).addClass('closed').removeClass('open');
+				$('#'+$(o).attr('for')).css('display','none');
+			}	
+		})
 	}
 
 

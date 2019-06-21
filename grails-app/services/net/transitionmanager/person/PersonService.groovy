@@ -1,14 +1,5 @@
 package net.transitionmanager.person
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
@@ -18,23 +9,34 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.command.PersonCommand
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
+@Slf4j
 class PersonService implements ServiceMethods {
 
 	def auditService
@@ -161,61 +163,41 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException('User has no first name associated with account')
 		}
 
-		List persons = []
+		String query = '''
+			select 
+				pr.partyIdTo from PartyRelationship pr
+			where 
+				pr.partyIdFrom = :company
+				and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
+				and pr.roleTypeCodeTo = 'ROLE_STAFF'
+		'''
 		Map queryParams = [company: company]
-		def (first, middle, last) = [false, false, false]
 
-		StringBuilder select = new StringBuilder("select pr.partyIdTo from PartyRelationship pr")
-		select.append(" where pr.partyIdFrom = :company")
-		select.append(" and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'")
-		select.append(" and pr.roleTypeCodeTo = 'ROLE_STAFF'")
+		query += ' AND ((pr.partyIdTo.firstName = :firstName'
+		queryParams.firstName = nameMap.first
 
-		StringBuilder query1 = new StringBuilder(select)
-		if (nameMap.first) {
-			queryParams.first = nameMap.first
-			query1.append(" AND pr.partyIdTo.firstName=:first")
-			first = true
-		}
 		if (nameMap.middle) {
-			queryParams.middle = nameMap.middle
-			query1.append(" AND pr.partyIdTo.middleName=:middle")
-			middle = true
+			query += ' AND pr.partyIdTo.middleName = :middleName'
+			queryParams.middleName = nameMap.middle
 		}
+
 		if (nameMap.last) {
-			queryParams.last = nameMap.last
-			query1.append(" AND pr.partyIdTo.lastName=:last")
-			last = true
+			query += ' AND pr.partyIdTo.lastName = :lastName'
+			queryParams.lastName = nameMap.last
 		}
 
-		StringBuilder query2
-		if (first && middle && last) {
-			// Try and find individuals with just first and last, middle not set
-			query2 = new StringBuilder(select)
-			query2.append(" AND pr.partyIdTo.firstName=:first AND pr.partyIdTo.lastName=:last")
-			query2.append(" AND pr.partyIdTo.middleName is null")
-		}
-		StringBuilder query3
-		if (first) {
-			// Try and find individuals with just first, middle and last not set
-			query3 = new StringBuilder(select)
-			query3.append(" AND pr.partyIdTo.firstName=:first")
-			query3.append(" AND pr.partyIdTo.lastName is null")
-			query3.append(" AND pr.partyIdTo.middleName is null")
-		}
-		 log.debug "findByCompanyAndName() Query = ${query.toString()}"
-		persons = PartyRelationship.executeQuery(query1.toString(), queryParams)
+		query += ')'
 
-		if (query2) {
-			queryParams.remove("middle")
-			persons.addAll(PartyRelationship.executeQuery(query2.toString(), queryParams))
+		if (nameMap.last) {
+			query += ' OR (pr.partyIdTo.firstName = :firstName AND pr.partyIdTo.middleName is null AND pr.partyIdTo.lastName = :lastName)'
 		}
-		if (query3) {
-			queryParams.remove("last")
-			persons.addAll(PartyRelationship.executeQuery(query3.toString(), queryParams))
-		}
-		persons = persons.unique()
 
-		return persons
+		query +=  ' OR (pr.partyIdTo.firstName = :firstName AND pr.partyIdTo.middleName is null AND pr.partyIdTo.lastName is null))'
+
+		log.debug 'findByCompanyAndName() Query = {}', query
+
+		return PartyRelationship.executeQuery(query, queryParams)
+
 	}
 
 	/**
@@ -1635,7 +1617,7 @@ class PersonService implements ServiceMethods {
 
 		save person
 		if (person.hasErrors()) {
-			throw new DomainUpdateException('An error occurred while attempting to save person changes')
+			throw new InvalidParamException('An error occurred while attempting to save person changes')
 		}
 
 		UserLogin userLogin = securityService.getPersonUserLogin(person)
@@ -1752,7 +1734,7 @@ class PersonService implements ServiceMethods {
 			save person, true
 
 			if (person.hasErrors()) {
-				throw new DomainUpdateException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
+				throw new InvalidParamException("Unable to create person. $person${GormUtil.allErrorsString(person)}.")
 			}
 
 			auditService.logMessage("$byWhom created person $person as staff of $companyParty")

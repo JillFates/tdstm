@@ -158,45 +158,45 @@ class ApiActionService implements ServiceMethods {
 				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
 
 				// try to construct action request object and execute preScript if there is any
-					try {
-					actionRequest = createActionRequest(action)
-					} catch (ApiActionException preScriptException) {
-						addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
-						String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
-						String defaultScript = reactionScripts[ReactionScriptCode.DEFAULT.name()]
-						String finalizeScript = reactionScripts[ReactionScriptCode.FINAL.name()]
+				try {
+					actionRequest = createActionRequest(action, context)
+				} catch (ApiActionException preScriptException) {
+					addTaskScriptInvocationError(taskFacade, ReactionScriptCode.PRE, preScriptException)
+					String errorScript = reactionScripts[ReactionScriptCode.ERROR.name()]
+					String defaultScript = reactionScripts[ReactionScriptCode.DEFAULT.name()]
+					String finalizeScript = reactionScripts[ReactionScriptCode.FINAL.name()]
 
-						// execute ERROR or DEFAULT scripts if present
-						if (errorScript) {
-							assetFacade.setReadonly(false)
-							try {
-								invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-							} catch (ApiActionException errorScriptException) {
-								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
-							}
-							assetFacade.setReadonly(true)
-						} else if (defaultScript) {
-							assetFacade.setReadonly(false)
-							try {
-								invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-							} catch (ApiActionException defaultScriptException) {
-								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
-							}
-							assetFacade.setReadonly(true)
+					// execute ERROR or DEFAULT scripts if present
+					if (errorScript) {
+						assetFacade.setReadonly(false)
+						try {
+							invokeReactionScript(ReactionScriptCode.ERROR, errorScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
+						} catch (ApiActionException errorScriptException) {
+							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.ERROR, errorScriptException)
 						}
-
-						// finalize PRE branch when it failed
-						if (finalizeScript) {
-							try {
-								invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
-							} catch (ApiActionException finalizeScriptException) {
-								addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
-							}
+						assetFacade.setReadonly(true)
+					} else if (defaultScript) {
+						assetFacade.setReadonly(false)
+						try {
+							invokeReactionScript(ReactionScriptCode.DEFAULT, defaultScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
+						} catch (ApiActionException defaultScriptException) {
+							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.DEFAULT, defaultScriptException)
 						}
-
-						ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
-						return
+						assetFacade.setReadonly(true)
 					}
+
+					// finalize PRE branch when it failed
+					if (finalizeScript) {
+						try {
+							invokeReactionScript(ReactionScriptCode.FINAL, finalizeScript, actionRequest, new ApiActionResponse(), taskFacade, assetFacade, new ApiActionJob())
+						} catch (ApiActionException finalizeScriptException) {
+							addTaskScriptInvocationError(taskFacade, ReactionScriptCode.FINAL, finalizeScriptException)
+						}
+					}
+
+					ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
+					return
+				}
 
 				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
 				ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.TASK_FACADE, taskFacade)
@@ -239,17 +239,21 @@ class ApiActionService implements ServiceMethods {
 	/**
 	 * Create action request object containing all necessary data for the api connector to invoke an api action.
 	 * It executes the action pre-scripts if there is any.
-	 * @param action
+	 * @param action - an ApiAction that contains all parameters definitions
+	 * @param context - an AssetComment that can have an AssetEntity linked to it so
+	 * when building methods parameters from context the connection can have access to
+	 * AssetEntity fields that can be referenced by the ApiAction method params.
+	 *
 	 * @return
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	ActionRequest createActionRequest(ApiAction action) {
+	ActionRequest createActionRequest(ApiAction action, Object context) {
 		if (!action) {
 			throw new InvalidRequestException('No action was provided to the invoke command')
 		}
 
 		// methodParams will hold the parameters to pass to the remote method
-		Map remoteMethodParams = buildMethodParamsWithContext(action, null)
+		Map remoteMethodParams = buildMethodParamsWithContext(action, context)
 
 		ActionRequest actionRequest = new ActionRequest(remoteMethodParams)
 		Map optionalRequestParams = [

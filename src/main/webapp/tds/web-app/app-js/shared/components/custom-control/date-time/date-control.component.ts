@@ -2,6 +2,9 @@ import {
 	Component,
 	forwardRef,
 	OnInit,
+	Input,
+	Output,
+	EventEmitter,
 	OnChanges,
 	SimpleChanges
 } from '@angular/core';
@@ -20,6 +23,9 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 	selector: 'tds-date-control',
 	template: `
 		<kendo-datepicker
+			[title]="title"
+			[min]="minimum"
+			[max]="maximum"
 			[value]="dateValue"
 			(blur)="onTouched()"
 			[format]="displayFormat"
@@ -46,6 +52,9 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
  * output: yyyy-MM-dd (value string to be stored as final value)
  */
 export class TDSDateControlComponent extends TDSCustomControl implements OnInit, OnChanges  {
+	@Output() valueChange: EventEmitter<any> = new EventEmitter();
+	@Input('minimum') minimum;
+	@Input('maximum') maximum;
 	public displayFormat: string;
 	public dateValue: Date;
 
@@ -60,8 +69,7 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnInit,
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
-		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
-		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE) : null;
+		this.updateDateValue();
 	}
 
 	/**
@@ -75,12 +83,29 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnInit,
 			this.value = null;
 		}
 		this.onTouched();
+		this.valueChange.emit(value);
 	}
 
 	ngOnChanges(inputs: SimpleChanges) {
 		const dateConstraints = {
 			required: this.required
 		};
-		this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
+		if (inputs['_value']) {
+			if (!inputs['_value'].currentValue) {
+				this.updateDateValue();
+			}
+			this.setupValidatorFunction(CUSTOM_FIELD_TYPES.Date, dateConstraints);
+		}
+	}
+
+	/**
+	 * Based on the current value set the corresponding formatted date value
+	 */
+	updateDateValue() {
+		if (this.value) {
+			let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+			this.dateValue = DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);
+		}
+		this.dateValue = this.value;
 	}
 }

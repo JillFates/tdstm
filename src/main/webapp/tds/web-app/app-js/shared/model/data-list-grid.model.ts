@@ -1,4 +1,5 @@
 import { SortInfo } from '../utils/sort.utils';
+import { DateUtils } from '../utils/date.utils';
 
 export const COLUMN_MIN_WIDTH = 360;
 export const SELECT_ALL_COLUMN_WIDTH = 28;
@@ -39,4 +40,87 @@ export class GridColumnModel {
 		this.type = 'text';
 		this.width = COLUMN_MIN_WIDTH;
 	}
+
+	/**
+	 * Based on provided column, update the structure which holds the current selected filters
+	 * @param {any} column: Column to filter
+	 * @param {any} state: Current filters state
+	 * @returns {any} Filter structure updated
+	 */
+	static filterColumn(column: any, state: any): any  {
+		let root = state.filter || { logic: 'and', filters: [] };
+
+		let [filter] = Flatten(root).filter(item => item.field === column.property);
+
+		if (column.filter !== false && !column.filter) {
+			column.filter = '';
+		}
+
+		if (column.type === 'text') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'contains',
+					value: column.filter,
+					ignoreCase: true
+				});
+			} else {
+				filter = root.filters.find((r) => {
+					return r['field'] === column.property;
+				});
+				filter.value = column.filter;
+			}
+		}
+
+		if (column.type === 'date') {
+			const {init, end} = DateUtils.getInitEndFromDate(column.filter);
+
+			if (filter) {
+				const filters = (state.filter && state.filter.filters) || [];
+				state.filter.filters = filters.filter((r: any) => r['field'] !== column.property);
+			}
+			root.filters.push({ field: column.property, operator: 'gte', value: init, });
+			root.filters.push({ field: column.property, operator: 'lte', value: end });
+		}
+
+		if (column.type === 'boolean') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: (column.filter === 'True' || column.filter === true)
+				});
+			} else {
+				if (column.filter !== null && column.filter !== '') {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = (column.filter === 'True' || column.filter === true)
+				}
+			}
+		}
+
+		if (column.type === 'number') {
+			if (column.filter === '') {
+				const filters = (state.filter && state.filter.filters) || [];
+				state.filter.filters = filters.filter((r: any) => r['field'] !== column.property);
+			} else {
+				if (!filter) {
+					root.filters.push({
+						field: column.property,
+						operator: 'eq',
+						value: parseInt(column && column.filter || 0, 10)
+					});
+				} else {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = column.filter;
+				}
+			}
+		}
+
+		return root;
+	}
+
 }

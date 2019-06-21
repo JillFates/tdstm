@@ -15,6 +15,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 export function DeviceEditComponent(template, editModel, metadata: any) {
 
@@ -29,13 +30,14 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
 			userContextService: UserContextService,
+			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService) {
 
-			super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {

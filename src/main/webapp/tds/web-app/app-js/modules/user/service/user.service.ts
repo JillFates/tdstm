@@ -28,8 +28,8 @@ export class UserService {
 			.catch((error: any) => error);
 	}
 
-	getAssignedEvents() {
-		return this.http.get(`${this.userPreferenceUrl}/assignedEvents`)
+	getAssignedEvents(projId = '0', getActive = true) {
+		return this.http.get(`${this.userPreferenceUrl}/assignedEvents/${projId}?active=${getActive}`)
 			.map((response: any) => {
 				let data = response && response.status === 'success' && response.data;
 				return data;

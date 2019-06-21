@@ -19,6 +19,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.AssignToMeCommand
+import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
@@ -857,33 +858,28 @@ digraph runbook {
 	}
 
 	/**
-	 * Used in MyTask to set user preference for printername and quantity, we can get a key-vaulue or
+	 * Used in MyTask to set user preference for printername and quantity, we can get a key-value or
 	 * a json with a list of permissions to Change
 	 * @param preference - Key
 	 * @param value
 	 */
 	@HasPermission(Permission.TaskView)
 	def setLabelQuantityPref() {
-		Map preferencesMap
-		withFormat {
-			js {
-				preferencesMap = request.JSON
-
-			}
-			html {
-				preferencesMap = [:]
-				def key = params.preference
-				def value = params.value
-				if (value) {
-					preferencesMap[key] = value
-				}
-			}
+		Map preferencesMap = [:]
+		SetLabelQuantityPrefCommand commandObject = populateCommandObject(SetLabelQuantityPrefCommand)
+		if (commandObject.hasErrors()) {
+			sendInvalidInput( renderAsJson( GormUtil.validateErrorsI18n(commandObject) ) )
+			return
 		}
-
+	/*  If there are json properties present, set them in preferenceMap */
+		preferencesMap = commandObject.preferenceMap
+	/* If there are values sent in key-value format, set them in preferenceMap */
+		if(preferencesMap.value) {
+			preferencesMap[params.preference] = params.value
+		}
 		preferencesMap.each { key, value ->
 			userPreferenceService.setPreference(key, value)
 		}
-
 		render true
 	}
 

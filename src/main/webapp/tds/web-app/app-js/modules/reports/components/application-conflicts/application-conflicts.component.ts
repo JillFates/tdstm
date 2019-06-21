@@ -9,13 +9,9 @@ import {
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UserService} from '../../../auth/service/user.service';
-import { ApplicationConflict } from '../../model/application-conflicts.model';
+import { EntityConflict } from '../../model/conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {
-	DIALOG_SIZE,
-} from '../../../../shared/model/constants';
 
 @Component({
 	selector: 'tds-application-conflicts',
@@ -42,7 +38,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 		maxApplications: {value: 100},
 		maxApplicationsList: [{value: 100}, {value: 250}, {value: 500}]
 	};
-	applicationConflicts: Array<ApplicationConflict> = [];
+	applicationConflicts: Array<EntityConflict> = [];
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -110,9 +106,10 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				this.model.bundleConflict,
 				this.model.missingDependencies,
 				this.model.unresolvedDependencies,
-				this.model.maxApplications.value
+				this.model.maxApplications.value,
+				this.model.moveBundleList
 				)
-				.subscribe((results: Array<ApplicationConflict>) => {
+				.subscribe((results: any) => {
 					this.reportDate = new Date();
 					this.reportProject =  this.userContext.project.name;
 					this.reportBundle = this.getReportBundleName();
@@ -121,6 +118,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 					this.applicationConflicts = results;
 					this.isDisplayingReport = true;
 					this.hideFilters = true;
+					this.generatedReport = true;
 				});
 		}
 
@@ -142,21 +140,5 @@ export class ApplicationConflictsComponent extends ReportComponent {
 				}
 			});
 		}
-	}
-
-	/**
-	 * Open the asset show view of the current application selected
-	 * @param application: any
-	 */
-	onApplicationSelected(application: any): void {
-		this.dialogService.open(AssetShowComponent, [
-			{ provide: 'ID', useValue: application.id },
-			{ provide: 'ASSET', useValue: application.assetClass }],
-			DIALOG_SIZE.LG, false)
-			.then(asset => {
-				console.log('Done');
-			}).catch(error => {
-				console.log('Error:', error);
-			});
 	}
 }

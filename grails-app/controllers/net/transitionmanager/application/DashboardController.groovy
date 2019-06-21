@@ -2,20 +2,20 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectLogo
-import net.transitionmanager.security.Permission
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.common.ControllerService
-import net.transitionmanager.reporting.DashboardService
-import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.task.TaskService
+import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectLogo
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.reporting.DashboardService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.TaskService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class DashboardController implements ControllerMethods {
@@ -77,10 +77,18 @@ class DashboardController implements ControllerMethods {
 
 			boolean viewUnpublished = securityService.viewUnpublished()
 
-			def model = [project: project, projectLogo: projectLogo, moveEvent: moveEvent, moveEventsList: moveEventsList,
-			             moveBundleList: moveBundleList, timeToUpdate: timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never',
-			             EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),
-			             viewUnpublished: viewUnpublished ? '1' : '0']
+			def model = [
+				project                       : project,
+				projectLogo                   : projectLogo,
+				moveEvent                     : moveEvent,
+				moveEventsList                : moveEventsList,
+				moveBundleSteps               : moveEventService.getMoveBundleSteps(moveBundleList),
+				moveBundleList                : moveBundleList,
+				timeToUpdate                  : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never',
+				EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),
+				viewUnpublished               : viewUnpublished ? '1' : '0'
+			]
+
 			try {
 				def taskSummary = dashboardService.getTaskSummaryModel(moveEvent.id, 6, viewUnpublished)
 				if (taskSummary) {

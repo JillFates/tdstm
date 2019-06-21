@@ -9,13 +9,13 @@ class ActivityMetricsPage extends Page {
     static at = {
         activityMetricsPageTitle.text().trim()  == "Activity Metrics Report"
         activityMetricsPageBreadcrumbs[0].text()   == "Reports"
-        activityMetricsPageBreadcrumbs[1].text()   == "Activity"
+        activityMetricsPageBreadcrumbs[1].text()   == "Activity Metrics"
 
     }
 
     static content = {
         activityMetricsPageTitle (wait:true) { $("section", class:"content-header").find("h1")}
-        activityMetricsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        activityMetricsPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         reportsModule { module ReportsMenuModule}
         commonsModule { module CommonsModule }
     }

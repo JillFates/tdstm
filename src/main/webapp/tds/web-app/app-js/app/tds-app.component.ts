@@ -14,6 +14,9 @@ import {
 } from '@angular/router';
 // Services
 import {NotifierService} from '../shared/services/notifier.service';
+import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
+
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-app',
@@ -34,7 +37,7 @@ import {NotifierService} from '../shared/services/notifier.service';
 })
 
 export class TDSAppComponent implements OnInit {
-
+	private readonly DISABLE_HEADER_ON_NAVIGATION_START = ['/notice'];
 	/**
 	 * Inject the Router since it is the Route App
 	 * It keep listen and inform any subscribe code about changes made to the routing
@@ -45,7 +48,8 @@ export class TDSAppComponent implements OnInit {
 	constructor(
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private noticesValidatorService: PostNoticesValidatorService) {
 	}
 
 	ngOnInit(): void {
@@ -56,6 +60,17 @@ export class TDSAppComponent implements OnInit {
 	 * Listen to the Transitions
 	 */
 	private handleTransitions(): void {
+		// On Route Navigation Start
+		this.router.events
+		.filter(event => event instanceof NavigationStart)
+		.subscribe((event: NavigationStart) => {
+			// For some specific routes(cases) like notices we don't want the user to have
+			// any interaction with the topNav menu, so we must do the following.
+			if (this.DISABLE_HEADER_ON_NAVIGATION_START.includes(event.url)) {
+				jQuery('.main-header').css('pointer-events', 'none');
+			}
+		});
+
 		// Specific filter to get the information from the current Page of the latest request event
 		this.router.events
 			.filter((event) => event instanceof NavigationStart || event instanceof NavigationEnd || event instanceof RoutesRecognized)
@@ -91,5 +106,7 @@ export class TDSAppComponent implements OnInit {
 					});
 				}
 			});
+
+		this.noticesValidatorService.setupValidation();
 	}
 }

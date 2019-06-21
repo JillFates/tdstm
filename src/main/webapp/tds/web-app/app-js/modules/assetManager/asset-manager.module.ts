@@ -14,7 +14,7 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 // Assets Module
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
 // Route Module
-import {AssetManagerRouteModule} from './asset-manager-route';
+import {AssetManagerRouteModule} from './asset-manager.route';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
@@ -25,6 +25,7 @@ import {TagsResolveService} from './resolve/tags-resolve.service';
 import {AssetExplorerService} from './service/asset-explorer.service';
 import {TagService} from '../assetTags/service/tag.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
+import {AssetGlobalFiltersService} from './service/asset-global-filters.service';
 // Components
 import {AssetViewSelectorComponent} from './components/asset-view-selector/asset-view-selector.component';
 import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';
@@ -70,7 +71,8 @@ import {AssetViewManagerComponent} from './components/asset-view-manager/asset-v
 		// Services
 		CustomDomainService,
 		AssetExplorerService,
-		TagService
+		TagService,
+		AssetGlobalFiltersService
 	],
 	exports: [],
 	entryComponents: [

@@ -53,7 +53,8 @@ class AssetsMenuModule extends Module {
     }
 
     def goToAssetsMenu() {
-        assetsItem.click()
+        waitFor{assetsItem.displayed}
+        waitFor(30){assetsItem.click()}
     }
 
     def goToSummaryTable(){
@@ -142,7 +143,9 @@ class AssetsMenuModule extends Module {
     }
 
     def goToAllAssets(){
+        waitFor(5){assetsItem.displayed}
         selectMenu(assetsItem)
+        waitFor{assetsAllAssetsItem.displayed}
         selectItem(assetsAllAssetsItem)
     }
 

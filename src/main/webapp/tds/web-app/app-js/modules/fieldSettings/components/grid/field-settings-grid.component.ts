@@ -215,6 +215,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	protected onAddCustom(): void {
 		this.setIsDirty(true);
+		this.formHasError = true;
 
 		this.addEmitter.emit((custom) => {
 			this.state.sort = [
@@ -427,10 +428,6 @@ export class FieldSettingsGridComponent implements OnInit {
 					dataItem.errorMessage = message;
 				}
 			}
-		}
-
-		if (!dataItem.errorMessage && !dataItem.label.trim()) {
-			dataItem.errorMessage = 'Label is required';
 		}
 
 		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());

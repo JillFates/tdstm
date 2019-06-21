@@ -1,22 +1,23 @@
 {
 	"info": {
-		"_postman_id": "f628bf6f-e825-4ca4-8b5a-3ef1029baab8",
-		"name": "dependency analyzer graph Copy",
+		"_postman_id": "dcc07544-719e-444e-8d30-82221c1add2f",
+		"name": "Highliht by Tag",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Sign In",
+			"name": "Login - Highlight by Tag",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
+						"id": "2cd154d3-2684-4ea6-b676-ce908a2989f3",
 						"exec": [
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -37,12 +38,12 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "tdsadmin",
+							"value": "api_test_user",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "zelda123!",
+							"value": "api_password",
 							"type": "text"
 						}
 					]
@@ -89,10 +90,6 @@
 						"value": "application/json"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"provider\": {\"id\":1},\n  \"name\":\"My first Credential (updated)\",\n  \"environment\":\"Developement\",\n  \"status\":\"ACTIVE\",\n  \"authenticationMethod\":\"BASIC_AUTH\",\n  \"username\":\"boogyman\",\n  \"password\":\"boo!\",\n  \"httpMethod\":\"POST\",\n  \"authenticationUrl\":\"bullshit\",\n  \"renewTokenUrl\":\"\",\n  \"expirationDate\":\"2012-04-23T18:25:43.511Z\",\n  \"version\": 1\n}"
-				},
 				"url": {
 					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
 					"host": [
