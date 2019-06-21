@@ -1307,17 +1307,10 @@ class UrlMappings {
             ]
         }
 
-		"/ws/reports/showBundle/$moveBundleId" {
+		"/ws/reports/viewEditBundle/$moveBundleId" {
 			controller = "wsReports"
 			action = [
-					GET: "modelForBundleShow"
-			]
-		}
-
-		"/ws/reports/editBundle/$moveBundleId" {
-			controller = "wsReports"
-			action = [
-					GET: "modelForBundleEdit"
+					GET: "modelForBundleViewEdit"
 			]
 		}
 
@@ -1328,17 +1321,10 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/reports/saveBundle" {
+		"/ws/reports/saveBundle/$moveBundleId?" {
 			controller = "wsReports"
 			action = [
 					POST: "saveBundle"
-			]
-		}
-
-		"/ws/reports/updateBundle/$moveBundleId" {
-			controller = "wsReports"
-			action = [
-					POST: "updateBundle"
 			]
 		}
 

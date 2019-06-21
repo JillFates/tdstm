@@ -16,9 +16,8 @@ import {BundleListComponent} from './components/list/bundle-list.component';
 import {BundleService} from './service/bundle.service';
 import {BundleResolveService} from './resolve/bundle-resolve.service';
 import {BundleRouteModule} from './bundle-routing.states';
-import {BundleShowComponent} from './components/show/bundle-show.component';
 import {BundleCreateComponent} from './components/create/bundle-create.component';
-import {BundleEditComponent} from './components/edit/bundle-edit.component';
+import {BundleViewEditComponent} from './components/view-edit/bundle-view-edit.component';
 
 @NgModule({
 	imports: [
@@ -37,9 +36,8 @@ import {BundleEditComponent} from './components/edit/bundle-edit.component';
 	],
 	declarations: [
 		BundleListComponent,
-		BundleShowComponent,
-		BundleCreateComponent,
-		BundleEditComponent
+		BundleViewEditComponent,
+		BundleCreateComponent
 	],
 	providers: [
 		// Resolve
@@ -50,15 +48,13 @@ import {BundleEditComponent} from './components/edit/bundle-edit.component';
 	],
 	exports: [
 		BundleListComponent,
-		BundleShowComponent,
-		BundleCreateComponent,
-		BundleEditComponent
+		BundleViewEditComponent,
+		BundleCreateComponent
 	],
 	entryComponents: [
 		BundleListComponent,
-		BundleShowComponent,
-		BundleCreateComponent,
-		BundleEditComponent
+		BundleViewEditComponent,
+		BundleCreateComponent
 	]
 })
 

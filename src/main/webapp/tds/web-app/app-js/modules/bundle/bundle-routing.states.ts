@@ -8,9 +8,6 @@ import {AuthGuardService} from '../security/services/auth.guard.service';
 // Components
 import {BundleListComponent} from './components/list/bundle-list.component';
 import {BundleResolveService} from './resolve/bundle-resolve.service';
-import {BundleShowComponent} from './components/show/bundle-show.component';
-import {BundleCreateComponent} from './components/create/bundle-create.component';
-import {BundleEditComponent} from './components/edit/bundle-edit.component';
 
 /**
  * Asset Explorer Route States
@@ -20,15 +17,6 @@ import {BundleEditComponent} from './components/edit/bundle-edit.component';
 export class BundleStates {
 	public static readonly BUNDLE_LIST = {
 		url: 'list'
-	}
-	public static readonly BUNDLE_SHOW = {
-		url: ':id/show'
-	}
-	public static readonly BUNDLE_EDIT = {
-		url: ':id/edit'
-	}
-	public static readonly BUNDLE_CREATE = {
-		url: 'create'
 	}
 }
 
@@ -45,57 +33,6 @@ export const BundleRoute: Routes = [
 			requiresAuth: true
 		},
 		component: BundleListComponent,
-		resolve: {
-			bundles: BundleResolveService
-		},
-		canActivate: [AuthGuardService, ModuleResolveService],
-		runGuardsAndResolvers: 'always'
-	},
-	{
-		path: BundleStates.BUNDLE_SHOW.url,
-		data: {
-			page: {
-				title: 'PLANNING.BUNDLES.DETAIL',
-				instruction: '',
-				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.DETAIL'],
-			},
-			requiresAuth: true
-		},
-		component: BundleShowComponent,
-		resolve: {
-			bundles: BundleResolveService
-		},
-		canActivate: [AuthGuardService, ModuleResolveService],
-		runGuardsAndResolvers: 'always'
-	},
-	{
-		path: BundleStates.BUNDLE_EDIT.url,
-		data: {
-			page: {
-				title: 'PLANNING.BUNDLES.EDIT',
-				instruction: '',
-				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.EDIT'],
-			},
-			requiresAuth: true
-		},
-		component: BundleEditComponent,
-		resolve: {
-			bundles: BundleResolveService
-		},
-		canActivate: [AuthGuardService, ModuleResolveService],
-		runGuardsAndResolvers: 'always'
-	},
-	{
-		path: BundleStates.BUNDLE_CREATE.url,
-		data: {
-			page: {
-				title: 'PLANNING.BUNDLES.CREATE',
-				instruction: '',
-				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.CREATE'],
-			},
-			requiresAuth: true
-		},
-		component: BundleCreateComponent,
 		resolve: {
 			bundles: BundleResolveService
 		},

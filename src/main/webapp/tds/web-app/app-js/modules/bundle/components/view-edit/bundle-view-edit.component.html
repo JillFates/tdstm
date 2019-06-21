@@ -1,17 +1,126 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="bundle-create-component modal fade in" id="bundle-create-component" data-backdrop="static" tabindex="-1" role="dialog">
+<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="bundle-view-edit-component modal fade in" id="bundle-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content resizable">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Title</h4>
+                <h4 class="modal-title">Bundle {{editing ? "Edit" : "Detail"}}</h4>
             </div>
             <div class="modal-body">
                 <div class="modal-body-container">
-                    <form action="save" method="post" name="bundleCreateForm">
-                        <div class="dialog">
+                    <div *ngIf="!editing" class="body" style="width: 95%">
+                        <div class="steps_table">
                             <table>
+                                <tbody>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Name:</td>
+
+                                    <td valign="top" class="value">
+                                        {{savedModel?.name}}
+                                        <span *ngIf="isDefaultBundle">(Default)</span>
+                                    </td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Description:</td>
+
+                                    <td valign="top" class="value">{{savedModel?.description}}</td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">From:</td>
+
+                                    <td valign="top" class="value"><span *ngIf="sourceRoom != 'null'">{{sourceRoom}}</span></td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">To:</td>
+
+                                    <td valign="top" class="value"><span *ngIf="targetRoom != 'null'">{{targetRoom}}</span></td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Start Time:</td>
+
+                                    <td valign="top" class="value">{{savedModel?.startTime | tdsDateTime: userTimeZone}}</td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Completion Time:</td>
+
+                                    <td valign="top" class="value">{{savedModel?.completionTime | tdsDateTime: userTimeZone}}</td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Project Manager:</td>
+
+                                    <td valign="top" class="value">
+                                        <span *ngIf="projectManager">{{projectManager}}</span>
+                                    </td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Event Manager:</td>
+
+                                    <td valign="top" class="value">
+                                        <span *ngIf="moveManager">{{moveManager}}</span>
+                                    </td>
+
+                                </tr>
+                                <tr class="prop">
+                                    <td valign="top" class="name">Event:</td>
+
+                                    <td valign="top" class="value">
+                                        <a href="/tdstm/moveEvent/show/{{savedModel?.moveEventid}}">{{savedModel?.moveEventId}}</a>
+                                    </td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Order:</td>
+
+                                    <td valign="top" class="value">{{savedModel?.operationalOrder}}</td>
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">WorkFlow Code</td>
+
+                                    <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
+
+                                </tr>
+
+                                <tr class="prop">
+                                    <td valign="top" class="name">Use For Planning:</td>
+
+                                    <td valign="top" class="value">
+                                            <input *ngIf="savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"
+                                                   disabled="disabled"/>
+                                            <input *ngIf="!savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled"/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div *ngIf="canEditBundle">
+                            <button class="btn btn-primary" (click)="switchToEdit()">Edit</button>
+                            <button class="btn btn-danger" (click)="confirmDeleteBundle()">Delete</button>
+                            <button class="btn btn-danger" (click)="confirmDeleteBundleAndAssets()">Delete Bundle & Assets</button>
+                            <button class="btn btn-secondary"(click)="cancelCloseDialog()" style="float:right">Close</button>
+                        </div>
+                    </div>
+                    <form [hidden]="!editing" action="save" method="post" name="bundleEditForm">
+                        <div class="dialog steps_table">
+                            <table style="border:0">
                                 <tbody>
                                 <tr>
                                     <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
@@ -51,14 +160,14 @@
                                 <tr class="prop">
                                     <td valign="top" class="name">Start Time:</td>
                                     <td valign="top" class="value">
-                                        <tds-datetime-control name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
+                                        <tds-datetime-control #startTimePicker name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
                                     </td>
                                 </tr>
 
                                 <tr class="prop">
                                     <td valign="top" class="name">Completion Time:</td>
                                     <td valign="top" class="value">
-                                        <tds-datetime-control name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
+                                        <tds-datetime-control #completionTimePicker name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
                                     </td>
                                 </tr>
 
@@ -107,10 +216,9 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="buttons">
-                            <input type="hidden"  name="project.id"/>
-                            <input type="hidden"  name="projectId"/>
-                            <span class="button"><input class="save" type="submit" (click)="saveForm()" value="Save"/></span>
+                        <div>
+                            <button class="btn btn-primary" (click)="saveForm()">Save</button>
+                            <button class="btn btn-secondary" style="float:right" (click)="cancelEdit()">Cancel</button>
                         </div>
                     </form>
                 </div>

@@ -109,45 +109,15 @@ class WsReportsController implements ControllerMethods {
         renderSuccessJson(moveBundleService.moveBundlesByProject(project))
     }
 
-    def modelForBundleShow(String moveBundleId) {
-        Project project = controllerService.getProjectForPage(this)
-        if (!project) return
-
-        MoveBundle moveBundle = controllerService.getBundleForPage(this, project, moveBundleId ?: userPreferenceService.moveBundleId)
-        if (!moveBundle) {
-            redirect(action: 'list')
-            return
-        }
-
-        userPreferenceService.setMoveBundleId(moveBundle.id)
-        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_PROJ_MGR")
-        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_MOVE_MGR")
-
-        // get the list of Manual Dashboard Steps that are associated to moveBundle.project
-        def moveBundleSteps = MoveBundleStep.executeQuery(
-                'FROM MoveBundleStep mbs WHERE mbs.moveBundle = :mb ORDER BY mbs.transitionId',
-                [mb: moveBundle])
-        def dashboardSteps = []
-
-        moveBundleSteps.each {
-            def stepSnapshot = StepSnapshot.executeQuery(
-                    'FROM StepSnapshot WHERE moveBundleStep=:msb ORDER BY dateCreated DESC',
-                    [msb: it], [max: 1])[0]
-            dashboardSteps << [moveBundleStep : it, stepSnapshot: stepSnapshot, planDuration : it.getPlanDuration()]
-        }
-
-        renderSuccessJson([moveBundleInstance: moveBundle.toMap(), projectId: project.id, projectManager: projectManager?.partyIdTo?.lastNameFirstAndTitle, moveManager: moveManager?.partyIdTo?.lastNameFirstAndTitle,
-         dashboardSteps: dashboardSteps, isDefaultBundle: moveBundle.id == project.defaultBundle.id])
-    }
-
     @HasPermission(Permission.BundleCreate)
     def modelForBundleCreate() {
         Project project = securityService.userCurrentProject
         renderSuccessJson([managers: partyRelationshipService.getProjectStaff(project.id),
          projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)])
     }
+
     @HasPermission(Permission.BundleEdit)
-    def modelForBundleEdit(String moveBundleId) {
+    def modelForBundleViewEdit(String moveBundleId) {
         MoveBundle moveBundle = MoveBundle.get(NumberUtil.toPositiveLong(moveBundleId))
         if (!moveBundle) {
             flash.message = "MoveBundle not found with id $moveBundleId"
@@ -177,12 +147,15 @@ class WsReportsController implements ControllerMethods {
     }
 
     @HasPermission(Permission.BundleCreate)
-    def saveBundle() {
+    def saveBundle(Long moveBundleId) {
         Map requestParams = request.JSON
         // SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
         // implement the way dates are sent to backend
         requestParams.startTime = TimeUtil.parseISO8601DateTime(requestParams.startTime) ?: null
         requestParams.completionTime = TimeUtil.parseISO8601DateTime(requestParams.completionTime)
+
+        requestParams.sourceRoom = requestParams.sourceRoom != '0' && requestParams.sourceRoom != 0 ? requestParams.sourceRoom : null
+        requestParams.targetRoom = requestParams.targetRoom != '0' && requestParams.targetRoom != 0 ? requestParams.targetRoom : null
 
         def projectManagerId = NumberUtil.toPositiveLong(requestParams.projectManager)
         def moveManagerId = NumberUtil.toPositiveLong(requestParams.moveManager)
@@ -194,12 +167,18 @@ class WsReportsController implements ControllerMethods {
             command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, requestParams.moveEvent.id as Long, false)
         }
         command.operationalOrder = NumberUtil.toPositiveLong(requestParams.operationalOrder)
-        command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, requestParams.sourceRoom, false)
-        command.targetRoom = GormUtil.findInProject(currentUserProject, Room, requestParams.targetRoom, false)
+        command.sourceRoom = requestParams.sourceRoom ? GormUtil.findInProject(currentUserProject, Room, requestParams.sourceRoom, false) : null
+        command.targetRoom = requestParams.targetRoom ? GormUtil.findInProject(currentUserProject, Room, requestParams.targetRoom, false) : null
 
         if (command.validate()) {
             try {
-                MoveBundle moveBundle = moveBundleService.save(command)
+                MoveBundle moveBundle
+                if(moveBundleId) {
+                    moveBundle = moveBundleService.update(moveBundleId, command)
+                    stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
+                } else {
+                    moveBundle = moveBundleService.save(command)
+                }
 
                 if (projectManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
@@ -215,87 +194,16 @@ class WsReportsController implements ControllerMethods {
 
             } catch (ServiceException e) {
                 flash.message = e.message
+            } catch (EmptyResultException e) {
+                flash.message = "MoveBundle not found with id $requestParams.id"
+            } catch (ValidationException e) {
+                flash.message = "Error updating MoveBundle with id $requestParams.id"
             }
         } else {
             flash.message = 'Unable to save MoveBundle due to: ' + GormUtil.allErrorsString(command)
         }
 
         // in case of error saving new move bundle
-        renderErrorJson(flash.message)
-    }
-
-    @HasPermission(Permission.BundleEdit)
-    def updateBundle(Long moveBundleId) {
-        Map requestParams = request.JSON
-        // SL : 11-2018 : doing this here to avoid command validation errors, it will go away when front-end correctly
-        // implement the way dates are sent to backend
-        requestParams.startTime = TimeUtil.parseISO8601DateTime(requestParams.startTime) ?: null
-        requestParams.completionTime = TimeUtil.parseISO8601DateTime(requestParams.completionTime)
-
-        def projectManagerId = requestParams.projectManager
-        def moveManagerId = requestParams.moveManager
-
-        Project currentUserProject = controllerService.getProjectForPage(this)
-        MoveBundleCommand command = populateCommandObject(MoveBundleCommand)
-        command.useForPlanning = StringUtil.toBoolean(requestParams.useForPlanning)
-        if (requestParams?.moveEvent?.id) {
-            command.moveEvent = GormUtil.findInProject(currentUserProject, MoveEvent, requestParams.moveEvent.id as Long, false)
-        }
-        command.operationalOrder = NumberUtil.toPositiveLong(requestParams.operationalOrder)
-        command.sourceRoom = GormUtil.findInProject(currentUserProject, Room, requestParams.sourceRoom, false)
-        command.targetRoom = GormUtil.findInProject(currentUserProject, Room, requestParams.targetRoom, false)
-
-        if (command.validate()) {
-            try {
-                MoveBundle moveBundle = moveBundleService.update(moveBundleId, command)
-
-                stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
-                boolean errorInSteps = false
-                stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
-                    def checkbox = requestParams["checkbox_" + it.id]
-                    if (checkbox) {
-                        MoveBundleStep step = moveBundleService.createMoveBundleStep(moveBundle, it.id, requestParams)
-                        if (step.hasErrors()) {
-                            errorInSteps = true
-                            return
-                        }
-                    } else {
-                        def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, it.id)
-                        if (moveBundleStep) {
-                            moveBundleService.deleteMoveBundleStep(moveBundleStep)
-                        }
-                    }
-                }
-
-                if (errorInSteps) {
-                    flash.message = "Validation error while adding steps."
-                    renderErrorJson(flash.message)
-                }
-
-                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "ROLE_MOVE_BUNDLE", projectManagerId, "ROLE_PROJ_MGR")
-                partyRelationshipService.updatePartyRelationshipPartyIdTo("PROJ_BUNDLE_STAFF", moveBundle.id, "ROLE_MOVE_BUNDLE", moveManagerId, "ROLE_MOVE_MGR")
-
-                flash.message = "MoveBundle $moveBundle updated"
-                renderSuccessJson()
-                return
-
-            } catch (EmptyResultException e) {
-                flash.message = "MoveBundle not found with id $requestParams.id"
-                renderErrorJson(flash.message)
-            } catch (ValidationException e) {
-                flash.message = "Error updating MoveBundle with id $requestParams.id"
-                renderErrorJson(flash.message)
-            }
-        } else {
-            flash.message = 'Unable to update MoveBundle due to: ' + GormUtil.allErrorsString(command)
-            renderErrorJson(flash.message)
-        }
-
-        // in case of error updating move bundle
-        //	get the all Dashboard Steps that are associated to moveBundle.project
-        def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundleService.findById(moveBundleId))
-        def remainingSteps = allDashboardSteps.remainingSteps
-
         renderErrorJson(flash.message)
     }
 

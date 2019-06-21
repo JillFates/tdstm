@@ -30,24 +30,8 @@ export class BundleService {
 
 	}
 
-	getModelForBundleShow(id) {
-		return this.http.get(`../ws/reports/showBundle/${id}`)
-			.map((response: any) => {
-				response.data.moveBundleInstance.completionTime = ((response.data.moveBundleInstance.completionTime) ? new Date(response.data.moveBundleInstance.completionTime) : '');
-				response.data.moveBundleInstance.startTime = ((response.data.moveBundleInstance.startTime) ? new Date(response.data.moveBundleInstance.startTime) : '');
-				response.data.dashboardSteps.forEach((r) => {
-					r.moveBundleStep.planCompletionTime = ((r.moveBundleStep.planCompletionTime) ? new Date(r.moveBundleStep.planCompletionTime) : '');
-					r.moveBundleStep.planStartTime = ((r.moveBundleStep.planStartTime ) ? new Date(r.moveBundleStep.planStartTime ) : '');
-					r.planDuration = this.convertDurationToHHmm(Math.abs(r.planDuration));
-				});
-				return response;
-			})
-			.catch((error: any) => error);
-
-	}
-
-	getModelForBundleEdit(id) {
-		return this.http.get(`../ws/reports/editBundle/${id}`)
+	getModelForBundleViewEdit(id) {
+		return this.http.get(`../ws/reports/viewEditBundle/${id}`)
 			.map((response: any) => {
 				return response;
 			})
@@ -71,29 +55,7 @@ export class BundleService {
 			.catch((error: any) => error);
 	}
 
-	saveBundle(model: BundleModel): Observable<any> {
-		let postRequest = {
-			name: model.name,
-			description: model.description,
-			sourceRoom: model.fromId,
-			targetRoom: model.toId,
-			startTime: model.startTime,
-			completionTime: model.completionTime,
-			projectManager: model.projectManagerId,
-			moveManager: model.moveManagerId,
-			operationalOrder: model.operationalOrder,
-			workflowCode: model.workflowCode,
-			useForPlanning: model.useForPlanning
-		};
-		return this.http.post(`../ws/reports/saveBundle`, JSON.stringify(postRequest))
-				.map((response: any) => {
-					return response;
-				})
-				.catch((error: any) => error);
-	}
-
-	updateBundle(id, model: BundleModel, dashboardSteps): Observable<any> {
-
+	saveBundle(model: BundleModel, id = ''): Observable<any> {
 		let postRequest = {
 			id: id,
 			name: model.name,
@@ -108,23 +70,11 @@ export class BundleService {
 			workflowCode: model.workflowCode,
 			useForPlanning: model.useForPlanning
 		};
-
-		dashboardSteps.forEach(function(step) {
-			postRequest['checkbox_' + step.step.id] = step.dashboard;
-			if (step.dashboard) {
-				postRequest['dashboardLabel_' + step.step.id] = step.step.label;
-				postRequest['startTime_' + step.step.id] = step.moveBundleStep.planStartTime;
-				postRequest['completionTime_' + step.step.id] = step.moveBundleStep.planCompletionTime;
-				postRequest['calcMethod_' + step.step.id] = step.moveBundleStep.calcMethod;
-				postRequest['beGreen_' + step.step.id] = step.moveBundleStep.showInGreen ? 'on' : 'off';
-			}
-		});
-
-		return this.http.post(`../ws/reports/updateBundle/${id}`, JSON.stringify(postRequest))
-			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
+		return this.http.post(`../ws/reports/saveBundle/${id}`, JSON.stringify(postRequest))
+				.map((response: any) => {
+					return response;
+				})
+				.catch((error: any) => error);
 	}
 
 	deleteBundleAndAssets(id) {
@@ -133,12 +83,6 @@ export class BundleService {
 				return response;
 			})
 			.catch((error: any) => error);
-	}
-
-	convertDurationToHHmm(duration) {
-		let hours = (duration - (duration % 3600)) / 3600,
-			minutes = Math.floor ((duration - (hours * 3600)) / 60);
-		return hours + ':' + minutes;
 	}
 
 	/**

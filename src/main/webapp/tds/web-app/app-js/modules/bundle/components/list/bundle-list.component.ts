@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {GridDataResult} from '@progress/kendo-angular-grid';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -11,6 +11,8 @@ import {ActivatedRoute} from '@angular/router';
 import {BundleService} from '../../service/bundle.service';
 import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
+import {BundleCreateComponent} from '../create/bundle-create.component';
+import {BundleViewEditComponent} from '../view-edit/bundle-view-edit.component';
 
 declare var jQuery: any;
 
@@ -84,6 +86,24 @@ export class BundleListComponent implements OnInit {
 	protected clearValue(column: any): void {
 		this.bundleService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
+	}
+
+	protected showBundle(id): void {
+		this.dialogService.extra(BundleViewEditComponent,
+			[{provide: 'id', useValue: id}]).then(result => {
+			this.reloadData();
+		}).catch(result => {
+			this.reloadData();
+		});
+	}
+
+	protected openCreateBundle(): void {
+		this.dialogService.extra(BundleCreateComponent,
+			[]).then(result => {
+			this.reloadData();
+		}).catch(result => {
+			this.reloadData();
+		});
 	}
 
 	protected reloadData(): void {
