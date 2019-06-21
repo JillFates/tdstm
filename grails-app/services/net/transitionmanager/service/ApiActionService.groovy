@@ -366,16 +366,20 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the method name is invalid or the connector is not implemented
 	 */
 	DictionaryItem methodDefinition (ApiAction action) {
-		Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
-		Map<String, ?> method = dict[action?.connectorMethod]
+		DictionaryItem methodDef
+		if (action.apiCatalog) {
+			Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
+			Map<String, ?> method = dict[action?.connectorMethod]
 
-		if (!method) {
-			throw new InvalidRequestException(
+			if (!method) {
+				throw new InvalidRequestException(
 					"Action class ${action?.apiCatalog?.name} method ${action?.connectorMethod} not implemented")
+			}
+
+			methodDef = new DictionaryItem(method)
 		}
 
-		DictionaryItem methodDef = new DictionaryItem(method)
-		methodDef
+		return methodDef
 	}
 
 	/**
