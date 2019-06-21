@@ -3,7 +3,7 @@ package net.transitionmanager.task.cpm
 /**
  * http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/GraphAlgor/depthSearch.htm
  */
-class DirectedCycle {
+class DirectedCycleFinder {
 
 	enum NodeState {
 		/**
@@ -23,7 +23,7 @@ class DirectedCycle {
 	private Map<String, NodeState> stateMap = [:]
 	private Boolean cycle = false
 
-	DirectedCycle(TaskTimeLineGraph directedGraph) {
+	DirectedCycleFinder(TaskTimeLineGraph directedGraph) {
 		// Initialize custom structure
 		directedGraph.vertices.each { TaskVertex activity ->
 			stateMap[activity.taskId] = NodeState.UNVISITED

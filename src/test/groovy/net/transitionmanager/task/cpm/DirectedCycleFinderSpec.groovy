@@ -5,7 +5,7 @@ import net.transitionmanager.task.cpm.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
 
-class DirectedCycleSpec extends Specification {
+class DirectedCycleFinderSpec extends Specification {
 
 	@Shared
 	TaskTimeLineGraphTestHelper taskTimeLineGraphTestHelper = new TaskTimeLineGraphTestHelper()
@@ -14,56 +14,56 @@ class DirectedCycleSpec extends Specification {
 	void 'test can check cycle in an acyclic directed graph with one start and one sink'() {
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(
 				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 			)
 
 		then:
-			!directedCycle.hasCycle()
+			!directedCycleFinder.hasCycle()
 	}
 
 	void 'test can check cycle in an acyclic directed graph with two starts and one sink'() {
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(
 				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndOneSink()
 			)
 
 		then:
-			!directedCycle.hasCycle()
+			!directedCycleFinder.hasCycle()
 	}
 
 	void 'test can check cycle in an acyclic directed graph with one start and two sinks'() {
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(
 				taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndTwoSinks()
 			)
 
 		then:
-			!directedCycle.hasCycle()
+			!directedCycleFinder.hasCycle()
 	}
 
 	void 'test can check cycle in a cyclic directed graph'() {
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(
 				taskTimeLineGraphTestHelper.createCyclicDirectedGraph()
 			)
 
 		then:
-			directedCycle.hasCycle()
+			directedCycleFinder.hasCycle()
 	}
 
 	void 'test can check cycle in a cyclic directed graph with self loop'() {
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(
 				taskTimeLineGraphTestHelper.createCyclicDirectedGraphWithSelfLoop()
 			)
 
 		then:
-			directedCycle.hasCycle()
+			directedCycleFinder.hasCycle()
 	}
 
 	void 'test can check cycles in a complex graph'() {
@@ -77,10 +77,10 @@ class DirectedCycleSpec extends Specification {
 				.build()
 
 		when:
-			DirectedCycle directedCycle = new DirectedCycle(taskTimeLineGraph)
+			DirectedCycleFinder directedCycleFinder = new DirectedCycleFinder(taskTimeLineGraph)
 
 		then:
-			directedCycle.hasCycle() == true
+			directedCycleFinder.hasCycle() == true
 
 	}
 }
