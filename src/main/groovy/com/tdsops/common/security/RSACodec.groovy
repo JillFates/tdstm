@@ -22,11 +22,11 @@ class RSACodec {
 	private static final String cypherInstance = 'RSA/ECB/OAEPWithSHA1AndMGF1Padding'
 	private static final String RSAAlgorithm   = 'RSA'
 
-	private static final String privateKeyHeader = '-----BEGIN PRIVATE KEY-----\n'
-	private static final String privateKeyFooter = '-----END PRIVATE KEY-----'
+	static final String DefaultPrivateKeyHeader = '-----BEGIN PRIVATE KEY-----\n'
+	static final String DefaultPrivateKeyFooter = '-----END PRIVATE KEY-----'
 
-	private static final String publicKeyHeader = '-----BEGIN PUBLIC KEY-----\n'
-	private static final String publicKeyFooter = '-----END PUBLIC KEY-----'
+	static final String DefaultPublicKeyHeader = '-----BEGIN PUBLIC KEY-----\n'
+	static final String DefaultPublicKeyFooter = '-----END PUBLIC KEY-----'
 
 	/**
 	 * Default constructor, where the key size for the RSA algorithm is set to 1024
@@ -46,6 +46,10 @@ class RSACodec {
 	 * Generates a map with a public and a private key, for RSA encryption.
 	 *
 	 * @param size the size of the RSA key to use the default being 1024
+	 * @param publicKeyHeader the header for the public key defaulting to the DefaultPublicKeyHeader
+	 * @param publicKeyFooter the footer for the public key defaulting to the DefaultPublicKeyFooter
+	 * @param privateKeyHeader the header for the public key defaulting to the DefaultPrivateKeyHeader
+	 * @param privateKeyFooter the footer for the public key defaulting to the DefaultPrivateKeyFooter
 	 *
 	 * @return a map containing both the public and private keys(in pkcs8 format):
 	 * [
@@ -53,7 +57,12 @@ class RSACodec {
 	 *     private: '-----BEGIN PRIVATE KEY-----\nu489dfk5!...jfg83k=\n-----END PRIVATE KEY-----'
 	 * ]
 	 */
-	Map generateKeys(int size = keySize) {
+	Map generateKeys(
+		int size = keySize,
+		String publicKeyHeader = DefaultPublicKeyHeader,
+		String publicKeyFooter = DefaultPublicKeyFooter,
+		String privateKeyHeader = DefaultPrivateKeyHeader,
+		String privateKeyFooter = DefaultPrivateKeyFooter) {
 		KeyPairGenerator generator = KeyPairGenerator.getInstance(RSAAlgorithm)
 		generator.initialize(size)
 		KeyPair pair = generator.generateKeyPair()
@@ -81,10 +90,14 @@ class RSACodec {
 	 * Gets a public key instance from a string in pkcs8(X509EncodedKeySpec) format, striping out the header and footer.
 	 *
 	 * @param text The test of the public key.
+	 * @param publicKeyHeader the header for the public key defaulting to the DefaultPublicKeyHeader
+	 * @param publicKeyFooter the footer for the public key defaulting to the DefaultPublicKeyFooter
 	 *
 	 * @return the instance of the public key.
 	 */
-	PublicKey getPublicKey(String text) {
+	PublicKey getPublicKey(String text,
+			String publicKeyHeader = DefaultPublicKeyHeader,
+			String publicKeyFooter = DefaultPublicKeyFooter) {
 		text = text.replace(publicKeyHeader, '')
 		text = text.replace(publicKeyFooter, '')
 
@@ -98,10 +111,14 @@ class RSACodec {
 	 * Gets a private key instance from a string in pkcs8(PKCS8EncodedKeySpec) format, striping out the header and footer.
 	 *
 	 * @param text The test of the private key.
+	 * @param privateKeyHeader the header for the public key defaulting to the DefaultPrivateKeyHeader
+	 * @param privateKeyFooter the footer for the public key defaulting to the DefaultPrivateKeyFooter
 	 *
 	 * @return the instance of the private key.
 	 */
-	PrivateKey getPrivateKey(String text) {
+	PrivateKey getPrivateKey(String text,
+			String privateKeyHeader = DefaultPrivateKeyHeader,
+			String privateKeyFooter = DefaultPrivateKeyFooter) {
 		text = text.replace(privateKeyHeader, '')
 		text = text.replace(privateKeyFooter, '')
 
@@ -122,8 +139,8 @@ class RSACodec {
 	 * @return The encrypted text.
 	 */
 	String encrypt(Key key, String text, String instance = cypherInstance) {
-		if (text == null) {
-			throw new InvalidParamException('Null Strings can not be encrypted.')
+		if (!text) {
+			throw new InvalidParamException('Null/Blank Strings can not be encrypted.')
 		}
 
 		Cipher cipher = Cipher.getInstance(instance)
