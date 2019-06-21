@@ -51,6 +51,7 @@ import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
 import net.transitionmanager.integration.ApiActionException
+import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -421,15 +422,15 @@ class TaskService implements ServiceMethods {
 	}
 	*/
 
-
-/**
+	/**
 	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
 	 * plan to set the status to HOLD and add a note to the task.
 	 * @param task - the Task to invoke the method on
 	 * @return The status that the task should be set to
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	AssetComment invokeLocalAction(AssetComment task, Person whom) {
+	AssetComment invokeLocalAction(Project project, Long taskId, Person whom) {
+		AssetComment task = get(AssetComment, taskId, project)
 		log.debug "invokeLocalAction() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
 		markActionStarted(task.id, whom, true)
@@ -441,18 +442,47 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
-	 * plan to set the status to HOLD and add a note to the task.
-	 * @param task - the Task to invoke the method on
-	 * @return the updated task
+	 * Used to indicate that a task's remote action has been started. This will update the
+	 * action and task appropriately after which the Action Request object is constructed.
+	 *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
 	 */
-	@Transactional(noRollbackFor=[Throwable])
-	AssetComment recordRemoteActionStarted(AssetComment task, Person whom) {
-		log.debug "recordRemoteActionStarted() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom) {
+		AssetComment task = fetchTaskById(taskId, whom)
 
-		markActionStarted(task.id, whom, false)
+		// task = taskService.recordRemoteActionStarted(task, whom)
+		task = markActionStarted(task.id, whom, false)
 
-		return task
+		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
+
+		Map<String,?> actionRequestMap = actionRequest.toMap()
+
+		// Store Callback information into the options
+		String url = coreService.getApplicationUrl()
+		Map jwt = securityService.generateJWT()
+		actionRequestMap.options.callback = [
+			siteUrl: url,
+			token: jwt.access_token,
+			refreshToken: jwt.refresh_token
+		]
+
+		// check if api action has credentials so to include credentials password unencrypted
+		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
+		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
+			// Need to create new map because credentials map originally is immutable
+			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
+			credentials.password = credentialService.decryptPassword(task.apiAction.credential)
+			actionRequestMap.options.credentials = credentials
+
+			// TODO : JM 6/19 : Encrypt the credentials appropriately using the publicKey
+			// Encrypt the credentials appropriately
+			// if (actionRequest.options.credentails.type == x) {
+			// }
+		}
+
+		return actionRequestMap
 	}
 
 	/**

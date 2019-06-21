@@ -1085,7 +1085,6 @@ digraph runbook {
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
 			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
-			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
@@ -1094,9 +1093,7 @@ digraph runbook {
 				script: apiAction.script,
 				isRemote: apiAction.isRemote,
 				type: apiAction.actionType.type,
-				connector       : connector.name,
-				method      : methodInfo.name,
-				description : methodInfo.description,
+				connector : connector.name,
 				methodParams: methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]

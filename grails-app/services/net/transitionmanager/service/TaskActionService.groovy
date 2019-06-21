@@ -72,6 +72,7 @@ class TaskActionService implements ServiceMethods {
 	void actionDone(ActionCommand action, Long taskId, Person currentPerson) {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
 		task.apiActionPercentDone = 100
@@ -89,6 +90,7 @@ class TaskActionService implements ServiceMethods {
 	void actionError(ActionCommand action, Long taskId, Person currentPerson) {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
 	}
 

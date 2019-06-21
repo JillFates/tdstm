@@ -144,7 +144,8 @@ class WsTaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.ActionInvoke)
 	def invokeLocalAction(Long id) {
-		AssetComment task = taskService.invokeLocalAction(id, currentPerson())
+
+		AssetComment task = taskService.invokeLocalAction(getProjectForWs(), id, currentPerson())
 
 		Map results = [
 			assetComment: task,

@@ -147,15 +147,16 @@
                                                 </tr>
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-
                                                 </tr>
+
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                      <td class="label N" nowrap="nowrap">
 													  <label><span>Status</span></label>
-												  </td>
-												  <td class="valueNW task-{{model.status |  lowercase}}">
+												    </td>
+												    <td class="valueNW task-{{model.status |  lowercase}}">
 													  <span>{{model.status}}</span>
-												  </td>
+                                                    </td>
+
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Workflow</span></label>
                                                     </td>
@@ -166,6 +167,24 @@
                                                     </td>
                                                     <td class="valueNW"><span>{{model.durationDelta}}</span></td>
                                                 </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
+                                                    <td class="label N" nowrap="nowrap">
+                                                         <label><span>Completion %:</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <div class="progress completion">
+                                                                <div class="progress-bar" role="progressbar" 
+                                                                    [style.width.%]="model.percentageComplete" 
+                                                                    [attr.aria-valuenow]="model.percentageComplete" 
+                                                                    [attr.aria-valuemin]="0" 
+                                                                    [attr.aria-valuemax]="100">
+                                                                    {{model.percentageComplete}} %
+                                                                </div>
+                                                        </div>	
+                                                    </td>
+                                                </tr>
+
                                             </tbody>
                                         </table>
                                     </div>

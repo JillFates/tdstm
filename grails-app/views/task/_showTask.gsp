@@ -106,21 +106,21 @@
 						<td valign="top" class="name" nowrap="nowrap" width="10%"><label for="actFinishShowId">Actual Finish:</label></td>
 						<td valign="top" class="value" id="actFinishShowId" nowrap="nowrap">{{acData.dtResolved}}</td>
 					</tr >
-					<tr id="completitionPercent" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
-						<td valign="top" class="name" ><label>Completition %:</label></td>
-						<td colspan="1">
-							<div class="progress">
-								<div class="progress-bar" role="progressbar" 
-									style="width: {{acData.apiActionPercentDone}}%;" 
-									aria-valuenow="{{acData.apiActionPercentDone}}" 
-									aria-valuemin="0" 
-									aria-valuemax="100">{{acData.apiActionPercentDone}}%</div>
-							</div>	
-						</td>
-					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>
+					</tr>
+					<tr id="completitionPercent" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
+						<td valign="top" class="name" ><label>Completion %:</label></td>
+						<td colspan="1" class="progress-container">
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" 
+									style="width: {{acData.percentageComplete}}%;" 
+									aria-valuenow="{{acData.percentageComplete}}" 
+									aria-valuemin="0" 
+									aria-valuemax="100">{{acData.percentageComplete}}%</div>
+							</div>	
+						</td>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>
