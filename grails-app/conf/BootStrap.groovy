@@ -1,42 +1,20 @@
-import com.tds.asset.AssetComment
-import com.tds.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.security.AESCodec
 import com.tdsops.etl.ETLProcessorResult
-import com.tdsops.etl.marshall.AnnotationDrivenObjectMarshaller
 import com.tdsops.metaclass.CustomMethods
-import com.tdssrc.grails.GormUtil
-import grails.converters.JSON
 import grails.util.Environment
-import net.transitionmanager.domain.DataTransferSet
-import net.transitionmanager.domain.Manufacturer
-import net.transitionmanager.domain.Model
-import net.transitionmanager.domain.MoveBundle
-import net.transitionmanager.domain.MoveEvent
-import net.transitionmanager.domain.MoveEventNews
 import net.transitionmanager.domain.Notice
-import net.transitionmanager.domain.PartyGroup
-import net.transitionmanager.domain.PartyRelationship
-import net.transitionmanager.domain.PartyRelationshipType
-import net.transitionmanager.domain.PartyRole
-import net.transitionmanager.domain.PartyType
-import net.transitionmanager.domain.Person
-import net.transitionmanager.domain.Project
-import net.transitionmanager.domain.ProjectAssetMap
-import net.transitionmanager.domain.ProjectTeam
-import net.transitionmanager.domain.RoleType
-import net.transitionmanager.domain.UserLogin
-import net.transitionmanager.domain.UserPreference
 import net.transitionmanager.domain.Workflow
 import net.transitionmanager.service.AssetEntityAttributeLoaderService
+import net.transitionmanager.service.LicenseAdminService
 import net.transitionmanager.service.QzSignService
 import net.transitionmanager.service.StateEngineService
 import net.transitionmanager.service.TaskService
-import net.transitionmanager.service.LicenseAdminService
-import org.grails.refcode.RefCode
 import org.apache.log4j.Logger
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 
 import java.lang.management.ManagementFactory
+import java.security.Security
 
 class BootStrap {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
@@ -46,6 +24,9 @@ class BootStrap {
 	LicenseAdminService licenseAdminService
 
 	def init = { servletContext ->
+		//TM-15254 Needed for the RSA encryption.
+		Security.addProvider(new BouncyCastleProvider())
+
 		checkForBlacklistedVMParameters()
 
 		//Check required default Config Info
