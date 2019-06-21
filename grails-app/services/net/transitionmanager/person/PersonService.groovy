@@ -282,16 +282,18 @@ class PersonService implements ServiceMethods {
 			return results
 		}
 
-		List<Person> persons = findAllPersons(nameMap, project, staffList, clientStaffOnly, checkAmbiguity)
-		int s = persons?.size()
-		if (s > 1) {
-			results.isAmbiguous = true
-			results.partial = true
-		} else if (s == 1) {
-			String lastName = lastNameWithSuffix(nameMap)
-			results.person = persons[0]
-			results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
-			results.partial = true
+		Map<String, ?> findAllPersonsResult = findAllPersons(nameMap, project, staffList, clientStaffOnly, checkAmbiguity)
+		if (findAllPersonsResult) {
+			List<Person> persons = findAllPersonsResult.personsList
+			int s = persons?.size()
+			if (s > 1) {
+				results.isAmbiguous = true
+			} else if (s == 1) {
+				String lastName = lastNameWithSuffix(nameMap)
+				results.person = persons[0]
+				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
+			}
+			results.partial = findAllPersonsResult.partial
 		}
 
 		log.debug '{} results={}', mn, results
@@ -306,9 +308,11 @@ class PersonService implements ServiceMethods {
 	 * @param clientStaffOnly - a flag to indicate if the search should only look at staff of the client or all persons associated to the project
 	 * @param checkAmbiguity - a flag to indicate if the search should include lastName and middleName if present
 	 * in the nameMap as part of the where clause
-	 * @return A list of persons found by fullName passed as nameMap
+	 * @return A map with a clist of persons found by fullName passed as nameMap and a flag indicating if the
+	 * resulting list of persons found is a partial find or not
 	 */
-	List<Person> findAllPersons(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true, boolean checkAmbiguity = false) {
+	Map<String, ?> findAllPersons(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true, boolean checkAmbiguity = false) {
+		boolean partial = false
 		String mn = 'findAllPersons()'
 		log.debug '{} attempting to find nameMap={} in project {}', mn, nameMap, project
 
@@ -366,13 +370,14 @@ class PersonService implements ServiceMethods {
 			log.debug '{} partial search using {}', mn, queryParams
 			persons = Person.findAll(hql + where, queryParams)
 			if (persons) {
+				partial = true
 				persons = persons.collect({ it[1] })
 			}
 			log.debug '{} partial search found {}', mn, persons.size()
 		}
 
 		log.debug '{} results={}', mn, persons
-		return persons
+		return [partial: partial, personsList: persons]
 	}
 
 	/**

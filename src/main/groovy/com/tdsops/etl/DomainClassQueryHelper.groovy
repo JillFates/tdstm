@@ -432,9 +432,10 @@ class DomainClassQueryHelper {
 			if (clazz.isAssignableFrom(Person) && condition.propertyName == Person.FULLNAME_KEY) {
 				PersonService personService = ApplicationContextHolder.getService('personService')
 				Map personFullNameMap = personService.parseName(condition.value)
-				List<Person> personsList = personService.findAllPersons(personFullNameMap, project)
+				Map<String, ?> findAllPersonsResult = personService.findAllPersons(personFullNameMap, project)
 
-				if (personsList && personsList.size() > 0) {
+				if (findAllPersonsResult && findAllPersonsResult.personsList.size() > 0) {
+					List<Person> personsList = findAllPersonsResult.personsList
 					List<Long> personsIds = personsList.collect { it.id }
 					hqlParams['personsIdsHqlParam'] = personsIds
 					return  " ${DOMAIN_ALIAS}.id in ( :personsIdsHqlParam ) "
