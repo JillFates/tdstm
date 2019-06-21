@@ -87,6 +87,6 @@ export enum CUSTOM_FIELD_TYPES {
 }
 
 export const YesNoList = [
-	{value: false, name: 'No'},
+	{value: '', name: 'No'},
 	{value: true, name: 'Yes'}
 ];

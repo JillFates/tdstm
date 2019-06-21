@@ -4,20 +4,21 @@
         <div *ngIf="noticeColumnModel">
             <div class="box-body box-with-empty-header">
                 <kendo-grid
-                        [data]="gridData"
-                        [filter]="state.filter"
-                        [filterable]="true"
-                        (filterChange)="filterChange($event)"
-                        [sort]="state.sort"
-                        [skip]="skip"
-                        [sortable]="{mode:'single'}"
-                        [pageSize]="pageSize"
-                        [resizable]="true"
-                        (sortChange)="sortChange($event)"
-                        [pageable]="{pageSizes: maxOptions, info: true}"
-                        (pageChange)="pageChange($event)"
-                        (cellClick)="cellClick($event)"
-                        [selectable]="true">
+                    *ngIf="gridSettings"
+                    [data]="gridSettings.gridData"
+                    [filter]="gridSettings.state.filter"
+                    [filterable]="true"
+                    (filterChange)="gridSettings.filterChange($event)"
+                    [sort]="gridSettings.state.sort"
+                    [sortable]="{mode:'single'}"
+                    [pageSize]="gridSettings.state.take"
+                    [skip]="gridSettings.state.skip"
+                    [pageable]="{pageSizes: gridSettings.defaultPageOptions, info: true}"
+                    (pageChange)="gridSettings.pageChange($event)"
+                    [resizable]="true"
+                    (sortChange)="gridSettings.sortChange($event)"
+                    (cellClick)="cellClick($event)"
+                    [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                         <button [disabled]="!isCreateAvailable()" class="btn btn-default button-create-license" type="button" (click)="onCreateNotice()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ 'NOTICE.CREATE_NOTICE' | translate }}</button>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
@@ -32,13 +33,15 @@
                         <ng-template kendoGridFilterCellTemplate let-filter>
                             <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
                                 <div *ngIf="column.type === 'date'">
-									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-									<span *ngIf="column.filter" (click)="clearText(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <kendo-datepicker [format]="dateFormat" 
+                                        [(ngModel)]="column.filter" 
+                                        (valueChange)="gridSettings.onFilter(column)" [style.width.%]="100"></kendo-datepicker>
+									<span *ngIf="column.filter" (click)="gridSettings.clearFilter(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
                                 <div *ngIf="(column.type === 'text' || column.type === 'number') && column.property !== 'typeId' && column.property !== 'active'">
-                                    <input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-                                    <span *ngIf="column.filter" (click)="clearText(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <input type="text" (keyup)="gridSettings.onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
+                                    <span *ngIf="column.filter" (click)="gridSettings.clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
                                 <div *ngIf="column.type === 'boolean'">
@@ -49,11 +52,12 @@
                                             [valuePrimitive]="true"
                                             [(ngModel)]="column.filter"
                                             [defaultItem]="defaultYesNoList"
-                                            (valueChange)="onFilter(column)"
+                                            (valueChange)="gridSettings.onFilter(column)"
                                             class="form-control">
                                         </kendo-dropdownlist>
+
                                         <span *ngIf="column.filter == true || column.filter == false" 
-                                            (click)="resetTypeFilter(column)" 
+                                            (click)="resetBooleanFilter(column)" 
                                             style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" 
                                             class="fa fa-times form-control-feedback" 
                                             aria-hidden="true">
@@ -70,10 +74,10 @@
                                         [valuePrimitive]="true"
                                         [(ngModel)]="column.filter"
                                         [defaultItem]="defaultNoticeType"
-                                        (valueChange)="onFilter(column)"
+                                        (valueChange)="gridSettings.onFilter(column)"
                                         class="form-control">
                                     </kendo-dropdownlist>
-                                    <span *ngIf="column.filter" (click)="resetTypeFilter(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <span *ngIf="column.filter" (click)="resetBooleanFilter(column)" style="cursor:pointer;color:#656565;pointer-events:all;margin-right: 15px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
 
 
@@ -84,8 +88,8 @@
 
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
                             <div class="text-center">
-                                <button [disabled]="!isEditAvailable()" class="btn btn-default" (click)="openNotice(dataItem, actionType.Edit)"><span class="glyphicon glyphicon-pencil"></span></button>
-                                <button class="btn btn-default" (click)="onDelete(dataItem)"><span class="fa fa-fw fa-trash"></span></button>
+                                <button (click)="openNotice(dataItem, actionType.Edit)" [disabled]="!isEditAvailable()" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span></button>
+                                <button (click)="onDelete(dataItem)" class="btn btn-default"><span class="fa fa-fw fa-trash"></span></button>
                             </div>
                         </ng-template>
 

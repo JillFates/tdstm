@@ -9,6 +9,9 @@ import {
 } from '@progress/kendo-angular-grid';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../model/constants';
 import {DateUtils} from './date.utils';
+import { NotifierService } from '../services/notifier.service';
+
+declare var jQuery: any;
 
 export class DataGridOperationsHelper {
 
@@ -32,8 +35,12 @@ export class DataGridOperationsHelper {
 	private selectableSettings: SelectableSettings;
 	private checkboxSelectionConfig: any;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private notifier: NotifierService;
 
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
+		// to notify grid height changes
+		this.notifier = new NotifierService();
+
 		this.state.sort = defaultSort;
 		if (pageSize) {
 			this.state.take = pageSize;
@@ -74,13 +81,13 @@ export class DataGridOperationsHelper {
 				root.filters.push({
 					field: column.property,
 					operator: operator ? operator : 'eq',
-					value: column.filter
+					value: Number(column.filter)
 				});
 			} else {
 				filter = root.filters.find((r) => {
 					return r['field'] === column.property;
 				});
-				filter.value = column.filter;
+				filter.value = Number(column.filter);
 			}
 		}
 
@@ -115,7 +122,7 @@ export class DataGridOperationsHelper {
 				root.filters.push({
 					field: column.property,
 					operator: 'eq',
-					value: (column.filter === 'True')
+					value: (column.filter === 'True' || column.filter === true)
 				});
 			} else {
 				if (column.filter === DefaultBooleanFilterData) {
@@ -124,7 +131,7 @@ export class DataGridOperationsHelper {
 					filter = root.filters.find((r) => {
 						return r['field'] === column.property;
 					});
-					filter.value = (column.filter === 'True');
+					filter.value = (column.filter === 'True' || column.filter === true);
 				}
 			}
 		}
@@ -295,6 +302,7 @@ export class DataGridOperationsHelper {
 			this.state.skip = 0;
 			this.gridData = process(this.resultSet, this.state);
 		}
+		this.notifyUpdateGridHeight();
 	}
 
 	/**
@@ -315,5 +323,15 @@ export class DataGridOperationsHelper {
 			this.gridData.data.splice(index, 1);
 			this.reloadData(this.gridData.data);
 		}
+	}
+	/**
+	 * Notify the event to update the grid height
+	 */
+	private notifyUpdateGridHeight(): void {
+		this.notifier.broadcast({
+			name: 'grid.header.position.change'
+		});
+		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
+		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 }
