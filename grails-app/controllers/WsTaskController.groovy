@@ -148,6 +148,7 @@ class WsTaskController implements ControllerMethods {
 
 		Map results = [
 			assetComment: task,
+			task: task.taskToMap(),
 			status: task.status,
 			statusCss: taskService.getCssClassForStatus(task.status)
 		]
