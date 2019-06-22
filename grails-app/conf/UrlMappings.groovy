@@ -13,6 +13,9 @@ class UrlMappings {
 		"/task/$id" {
 			controller = "task"
 			action = [GET:"task"]
+			constraints {
+				id(matches: /[0-9]{1,}/)
+			}
 		}
 
 		/**
