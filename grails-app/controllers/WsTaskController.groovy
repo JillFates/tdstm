@@ -177,7 +177,12 @@ class WsTaskController implements ControllerMethods {
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
 		AssetComment task = taskService.resetAction(id, currentPerson())
-		renderAsJson([assetComment: task, status: task.status, statusCss: taskService.getCssClassForStatus(task.status)])
+		renderAsJson([
+			assetComment: task,
+			task: task.taskToMap(),
+			status: task.status,
+			statusCss: taskService.getCssClassForStatus(task.status)
+		])
 	}
 
 	/**
