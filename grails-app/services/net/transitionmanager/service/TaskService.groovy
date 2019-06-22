@@ -410,12 +410,11 @@ class TaskService implements ServiceMethods {
 	 */
 	AssetComment updateTaskState(Person whom, Long taskId, String currentStatus, String status, String message='') {
 		AssetComment task = fetchTaskById(taskId, whom)
-
 		// Go through some of the validation
-		if (! currentStatus in ACS.AllowedStatusesForSetState) {
+		if (!(currentStatus in ACS.AllowedStatusesForSetState)) {
 			throw new InvalidParamException('Invalid currentStatus parameter value')
 		}
-		if (! status in ACS.AllowedStatusesForSetState) {
+		if (!(status in ACS.AllowedStatusesForSetState)) {
 			throw new InvalidParamException('Invalid status parameter value')
 		}
 		if (currentStatus == status) {

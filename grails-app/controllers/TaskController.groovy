@@ -110,8 +110,8 @@ class TaskController implements ControllerMethods {
 	 * @param message - optional message when setting the task on HOLD
 	 * @return The task as an JSON object is updated
 	 */
-	def changeTaskState(Long id, String currentStatus, String status) {
-		AssetComment task = taskService.updateTaskState(currentPerson(), id, currentStatus, status, params.message)
+	def changeTaskState(Long id) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, request.JSON.currentStatus, request.JSON.status, request.JSON.message)
 		renderAsJson(task:task.taskToMap())
 	}
 
