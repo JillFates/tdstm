@@ -1,8 +1,6 @@
 package net.transitionmanager.integration
 
-
 import groovy.transform.TimedInterrupt
-import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -29,6 +27,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS
 import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
+
 /**
  * Evaluate and check API action scripts.
  *
@@ -79,25 +78,24 @@ class ApiActionScriptEvaluator {
 			starImportsWhitelist = []
 			// Language tokens allowed
 			tokensWhitelist = [
-				DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-				COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-				COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
+					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
+					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
+					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String,
-				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
+					Object, Integer, Float, Long, Double, BigDecimal, String,
+					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
-				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String
+					Object, // TODO: This is too much generic class.
+					Integer, Float, Double, Long, BigDecimal, String
 			].asImmutable()
 		}
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
-		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
 		return configuration
@@ -129,7 +127,7 @@ class ApiActionScriptEvaluator {
 	@TimedInterrupt(600l)
 	Object evaluate(String script, CompilerConfiguration configuration) {
 		return new GroovyShell(this.class.classLoader, this.binding, configuration)
-			.evaluate(script, ApiActionScriptEvaluator.class.name)
+				.evaluate(script, ApiActionScriptEvaluator.class.name)
 	}
 
 	/**
@@ -145,9 +143,9 @@ class ApiActionScriptEvaluator {
 
 		try{
 			new GroovyShell(
-				this.class.classLoader,
-				this.binding,
-				configuration
+					this.class.classLoader,
+					this.binding,
+					configuration
 			).parse(script?.trim(), ApiActionScriptEvaluator.class.name)
 
 		} catch(MultipleCompilationErrorsException cfe){
@@ -159,21 +157,21 @@ class ApiActionScriptEvaluator {
 
 			if(error instanceof SyntaxErrorMessage){
 				[
-					startLine: error.cause?.startLine,
-					endLine: error.cause?.endLine,
-					startColumn: error.cause?.startColumn,
-					endColumn: error.cause?.endColumn,
-					fatal: error.cause?.fatal,
-					message: error.cause?.message
+						startLine: error.cause?.startLine,
+						endLine: error.cause?.endLine,
+						startColumn: error.cause?.startColumn,
+						endColumn: error.cause?.endColumn,
+						fatal: error.cause?.fatal,
+						message: error.cause?.message
 				]
 			} else{
 				[
-					startLine: null,
-					endLine: null,
-					startColumn: null,
-					endColumn: null,
-					fatal: true,
-					message: error.cause?.message
+						startLine: null,
+						endLine: null,
+						startColumn: null,
+						endColumn: null,
+						fatal: true,
+						message: error.cause?.message
 				]
 
 			}
