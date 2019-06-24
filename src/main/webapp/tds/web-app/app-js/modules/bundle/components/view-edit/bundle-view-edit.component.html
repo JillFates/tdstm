@@ -111,10 +111,14 @@
 
                 <div class="modal-footer form-group-center">
                     <div *ngIf="canEditBundle">
-                        <button class="btn btn-primary pull-left" (click)="switchToEdit()">Edit</button>
-                        <button class="btn btn-danger pull-left" (click)="confirmDeleteBundle()">Delete</button>
-                        <button class="btn btn-danger pull-left" (click)="confirmDeleteBundleAndAssets()">Delete Bundle & Assets</button>
-                        <button class="btn btn-secondary pull-right"(click)="cancelCloseDialog()">Close</button>
+                        <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
+                        <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteBundle()"></tds-button-delete>
+                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger pull-left tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
+                            <div class="tds-action-button-container">
+                                <i class="fa fa-fw fa-trash"></i>Delete Bundle & Assets
+                            </div>
+                        </button>
+                        <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
                     </div>
                 </div>
             </div>
@@ -217,8 +221,8 @@
                     </table>
                 </div>
                 <div class="modal-footer form-group-center">
-                    <button class="btn btn-primary pull-left" (click)="saveForm()">Save</button>
-                    <button class="btn btn-secondary pull-right" (click)="cancelEdit()">Cancel</button>
+                    <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                    <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
                 </div>
             </form>
         </div>
