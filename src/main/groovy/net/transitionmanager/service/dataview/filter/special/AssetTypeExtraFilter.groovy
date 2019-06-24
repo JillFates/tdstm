@@ -47,7 +47,7 @@ class AssetTypeExtraFilter extends SpecialExtraFilter {
 				hqlParams = ['namedFilterNonOtherTypes': AssetType.nonOtherTypes]
 				break
 			default:
-				throw new InvalidParamException('Invalid filter definition:' + this.property)
+				throw new InvalidParamException('Invalid filter definition or it does not exist for: ' + this.property + '=' + this.filter)
 		}
 
 		return [
