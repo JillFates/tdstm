@@ -485,6 +485,7 @@ class AssetComment {
 			actFinish: actFinish,
 			team: role ?: '',
 			isPublished: isPublished,
+			percentageComplete: percentageComplete,
 			isActionInvocableLocally: isActionInvocableLocally(),
 			isActionInvocableRemotely: isActionInvocableRemotely(),
 			isAutomatic: isAutomatic(),
