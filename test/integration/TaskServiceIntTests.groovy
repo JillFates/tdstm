@@ -203,13 +203,13 @@ class TaskServiceIntTests extends IntegrationSpec {
             sessionFactory.getCurrentSession().flush()
 
         when: 'the action is invoked without proper permission'
-            task = taskService.invokeLocalAction(project, task.id, untrustedPerson)
+            task = taskService.invokeLocalAction(task.id, untrustedPerson)
         then: 'an exception should be thrown due to permissions'
             InvalidParamException ex = thrown()
             ex.message == 'You do not have permission to invoke the action'
 
         when: 'invoking the api action with an admin user'
-            task = taskService.invokeLocalAction(project, task.id, adminPerson)
+            task = taskService.invokeLocalAction(task.id, adminPerson)
         then: 'an exception should be thrown because the task status is not correct'
             ex = thrown()
             ex.message == 'The task must be in the Ready or Started state in order to invoke action'
@@ -217,7 +217,7 @@ class TaskServiceIntTests extends IntegrationSpec {
         when: 'the task status is READY'
             task.status = AssetCommentStatus.READY
         and: 'invoking the api action'
-            task = taskService.invokeLocalAction(project, task.id, adminPerson)
+            task = taskService.invokeLocalAction(task.id, adminPerson)
         then: 'then the task should returned'
             null != task
         and: 'the task status should be Started'

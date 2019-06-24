@@ -74,7 +74,7 @@ class WsAssetImportController implements ControllerMethods {
 		ApiAction action = fetchDomain(ApiAction, params)
 
 		// Invoke action and eval the result
-		ApiActionResponse actionInvocationResult = apiActionService.invoke(action)
+		ApiActionResponse actionInvocationResult = apiActionService.invoke(action, currentPerson())
 
 		if (actionInvocationResult.successful) {
 			renderSuccessJson( [ filename: actionInvocationResult.filename ] )

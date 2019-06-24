@@ -72,7 +72,7 @@ class TaskActionService implements ServiceMethods {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 		logForDebug(task, currentPerson,  action.stdout, action.stderr)
-		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
+		invokeReactionScript(currentPerson, ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
 		task.apiActionPercentDone = 100
 		task.save()
@@ -90,7 +90,7 @@ class TaskActionService implements ServiceMethods {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
 		logForDebug(task, currentPerson,  action.stdout, action.stderr)
-		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
+		invokeReactionScript(currentPerson, ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
 	}
 
 	/**
@@ -124,6 +124,7 @@ class TaskActionService implements ServiceMethods {
 	/**
 	 * Sets up and invokes the reaction script.
 	 *
+	 * @param whom - the individual that triggered the invocation of the action
 	 * @param code The ReactionScriptCode SUCCESS or ERROR
 	 * @param task The task that relates to the action, that was run.
 	 * @param stdout The standard output of the remote action that was run.
@@ -132,6 +133,7 @@ class TaskActionService implements ServiceMethods {
 	 * @param datafile A list of data files sent back as context of invoking the remote action
 	 */
 	private void invokeReactionScript(
+		Person whom,
 		ReactionScriptCode code,
 		AssetComment task,
 		String message,
@@ -142,7 +144,7 @@ class TaskActionService implements ServiceMethods {
 		List<MultipartFile> datafile = null) {
 
 		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
-		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task)
+		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
 		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, true)

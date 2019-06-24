@@ -79,7 +79,7 @@ class TaskActionServiceSpec extends Specification {
 						return true
 					}
 				] as TaskService
-		TaskFacade taskFacade2 = new TaskFacade()
+		TaskFacade taskFacade2 = new TaskFacade(new AssetComment(), new Person())
 		taskFacade2.taskService = service.taskService
 		Holders.grailsApplication.mainContext.beanFactory.registerSingleton("taskFacade", taskFacade2)
 		defineBeans {

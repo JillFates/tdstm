@@ -450,7 +450,7 @@ class TaskService implements ServiceMethods {
 		markActionStarted(task.id, whom, true)
 
 		// Try running the action
-		apiActionService.invoke(task.apiAction, task)
+		apiActionService.invoke(task.apiAction, task, whom)
 
 		return task
 	}
@@ -624,7 +624,7 @@ class TaskService implements ServiceMethods {
 			throw new EmptyResultException('Task was not found')
 		}
 		// Validate that the user has access to the project associated with the task
-		securityService.hasAccessToProject(task.project)
+		securityService.hasAccessToProject(task.project, currentPerson.userLogin)
 
 		return task
 	}

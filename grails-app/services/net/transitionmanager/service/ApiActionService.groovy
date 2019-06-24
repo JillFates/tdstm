@@ -22,6 +22,7 @@ import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
@@ -102,7 +103,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
-	void invoke(ApiAction action, Object context) {
+	void invoke(ApiAction action, AssetComment context, Person whom) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 
@@ -152,7 +153,7 @@ class ApiActionService implements ServiceMethods {
 				def connector = connectorInstanceForAction(action)
 
 				ActionRequest actionRequest
-				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
+				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
 
 				// try to construct action request object and execute preScript if there is any
 				try {
@@ -640,7 +641,8 @@ class ApiActionService implements ServiceMethods {
 						scriptBindingCommand.script,
 						new ActionRequest(),
 						new ApiActionResponse(),
-						new TaskFacade(),
+						// TODO : JPM 6/2019 : Perhaps we should be passing in the person?
+						new TaskFacade(new AssetComment(), new Person()),
 						new AssetFacade(new AssetEntity(), [:], true),
 						new ApiActionJob())
 		}
