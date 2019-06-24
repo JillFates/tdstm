@@ -19,7 +19,6 @@ export const en_DICTIONARY: Object = {
 		'CLOSE': 'Close',
 		'CLONE': 'Clone',
 		'DELETE': 'Delete',
-		'DETAIL': 'Detail',
 		'EDIT': 'Edit',
 		'EXPORT': 'Export',
 		'FILTER': 'Filter',
@@ -220,10 +219,7 @@ export const en_DICTIONARY: Object = {
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
-			'DETAIL': 'Bundle Detail',
 			'LIST': 'Bundle List',
-			'CREATE': 'Create Bundle',
-			'EDIT': 'Bundle Edit'
 		}
 	},
 	'FIELD_SETTINGS': {

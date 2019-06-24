@@ -289,11 +289,6 @@
                             <li class="menu-child-item menu-parent-planning-list-bundles">
                                 <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
-                            <g:if test="${currProject && moveBundle}">
-                                <li class="menu-child-item menu-parent-planning-selected-bundle">
-                                    <a href="../module/bundle/${moveBundle.id}/show">${moveBundle.name} Bundle Details</a>
-                                </li>
-                            </g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>

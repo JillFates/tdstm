@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { DomainModel } from '../model/domain.model';
 import {CUSTOM_FIELD_CONTROL_TYPE, FieldSettingsModel} from '../model/field-settings.model';
 import {HttpClient} from '@angular/common/http';
+import {equals} from 'ramda';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';

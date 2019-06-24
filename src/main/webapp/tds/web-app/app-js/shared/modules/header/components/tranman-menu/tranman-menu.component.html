@@ -238,9 +238,6 @@
                     <li class="menu-child-item menu-parent-planning-list-bundles">
                         <a href="/tdstm/module/bundle/list">List Bundles</a>
                     </li>
-                    <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
-                        <a href="/tdstm/module/bundle/{{userContext.bundle.id}}/show">{{userContext.bundle.name}} Bundle Details</a>
-                    </li>
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.TaskView)" class="dropdown menu-parent-tasks">
