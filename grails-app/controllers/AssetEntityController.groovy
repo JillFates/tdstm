@@ -612,7 +612,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					apiActionId: assetComment.apiAction?.id,
 					apiActionInvokedAt: assetComment.apiActionInvokedAt,
 					apiActionList:apiActionList,
-					apiActionPercentDone: assetComment.apiActionPercentDone,
 					assetClass: assetComment.assetEntity?.assetClass?.toString(),
 					assetClasses: assetEntityService.getAssetClasses(),
 					assetComment:assetComment,
@@ -650,7 +649,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					successorList: successorList,
 					successorsCount: successorsCount,
 					successorTable:successorTable ?: '',
-					taskPercentDone: assetComment.taskPercentDone,
+					percentageComplete: assetComment.percentageComplete,
 					taskSpecId: assetComment.taskSpec,
 					workflow:workflow
 				]
