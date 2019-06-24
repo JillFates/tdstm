@@ -18,5 +18,6 @@ export class UserContextModel {
 export enum USER_CONTEXT_REQUEST {
 	USER_INFO = 0,
 	LICENSE_INFO = 1,
-	PERMISSIONS = 2
+	PERMISSIONS = 2,
+	NOTICES = 3
 }

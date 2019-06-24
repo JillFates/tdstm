@@ -106,7 +106,7 @@ export class TDSAppComponent implements OnInit {
 					});
 				}
 			});
-
+		// on the load init of the router this change was fired, now it will be from the beginning...
 		// this.noticesValidatorService.setupValidation();
 	}
 }

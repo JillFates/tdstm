@@ -13,6 +13,7 @@ import {UserService} from './user.service';
 // Other
 import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {PostNoticesManagerService} from './post-notices-manager.service';
 
 export enum AUTH_API_URLS {
 	SIGN_IN = '/tdstm/auth/signIn',
@@ -26,6 +27,7 @@ export class AuthService {
 		private http: HttpClient,
 		private permissionService: PermissionService,
 		private userService: UserService,
+		private postNoticesManagerService: PostNoticesManagerService,
 		private store: Store) {
 	}
 
@@ -40,12 +42,14 @@ export class AuthService {
 				contextPromises.push(from(new Promise(resolve => resolve(userContext))));
 				contextPromises.push(this.userService.getLicenseInfo());
 				contextPromises.push(this.permissionService.getPermissions());
+				contextPromises.push(this.postNoticesManagerService.getNotices());
 
 				Observable.forkJoin(contextPromises)
 					.subscribe((contextResponse: any) => {
 						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
 						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
 						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
+						userContext.postNotices = contextResponse[USER_CONTEXT_REQUEST.NOTICES];
 						observer.next(userContext);
 						observer.complete();
 					});
