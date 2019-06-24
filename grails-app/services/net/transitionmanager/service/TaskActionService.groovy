@@ -56,7 +56,7 @@ class TaskActionService implements ServiceMethods {
 	void actionProgress(ActionCommand action, Long taskId, Person currentPerson) {
 		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
-		task.apiActionPercentDone = action.progress
+		task.percentageComplete = action.progress
 		task.save()
 	}
 
@@ -74,7 +74,7 @@ class TaskActionService implements ServiceMethods {
 		logForDebug(task, currentPerson,  action.stdout, action.stderr)
 		invokeReactionScript(currentPerson, ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
-		task.apiActionPercentDone = 100
+		task.percentageComplete = 100
 		task.save()
 	}
 

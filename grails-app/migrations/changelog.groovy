@@ -300,4 +300,5 @@ databaseChangeLog = {
 	include file: 'version/v4_6_2/20190530-add-guid-and-metrics_gathering-to-LicensedClient.groovy'
 
 	include file: 'version/v4_6_3/20190619-add-boolean-debug-flag-to-apiAction.groovy'
+	include file: 'version/v4_6_3/20190619-tmd-task-api-action-changes.groovy'
 }
