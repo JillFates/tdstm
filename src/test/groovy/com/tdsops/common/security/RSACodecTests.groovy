@@ -10,21 +10,13 @@ import java.security.PublicKey
 import java.security.Security
 
 class RSACodecTests extends Specification {
-	/**
-	 * An instance of the RSACodec, to use in testing RSA encryption.
-	 */
+	//An instance of the RSACodec, to use in testing RSA encryption.
 	@Shared
 	RSACodec instance
 
-	/**
-	 * A public key to test the RSACodec. Generated from node-rsa using:
-	 * var exportedPublic = key.exportKey('pkcs8-public');
-	 *
-	 * Changing the way the key is exported will change the algorithm and the header/footer tags,
-	 * and will not work with the defaults in the RSACodec
-	 */
+	//A public key to test the RSACodec. Generated from node-rsa.
 	@Shared
-	String privateKey = RSACodec.DefaultPrivateKeyHeader +
+	String privateKey = '-----BEGIN PRIVATE KEY-----\n' +
 						'MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIq/XbTimlLLnceg\n' +
 						'fVPveEECbmEp80BP4xhPr+yYuxOnSLkwCN7qMZEOgOEVfHMxE0d7FuWAtYmlkSef\n' +
 						'Yrn6FAtRc1FV1k0SF7rA3JwZD6xb0CCJZ/Ky0e0Z9wa/pTLP5Jntc6Y9HxKv52Do\n' +
@@ -39,25 +31,19 @@ class RSACodecTests extends Specification {
 						'96B4b3eRO1Vsd9RbVAGsm/X1bfUupDICVV95hzCaytf0/HLIGT09AkBSngn2zQ1H\n' +
 						'+l/Wnli7C2PpzBI5qruQX+4g4DY5qE82ObK5+XwQsJSKgVH8ApvLGsuMlmpULjFC\n' +
 						'xjGWs6IVVMvh\n' +
-						RSACodec.DefaultPrivateKeyFooter
+						'-----END PRIVATE KEY-----'
 
-	/**
-	 * A private key to test the RSACodec. Generated from node-rsa using:
-	 * var exportedPrivate = key.exportKey('pkcs8-private');
-	 *
-	 * Changing the way the key is exported will change the algorithm and the header/footer tags,
-	 * and will not work with the defaults in the RSACodec
-	 */
+	//A private key to test the RSACodec. Generated from node-rsa.
 	@Shared
-	String publicKey = RSACodec.DefaultPublicKeyHeader +
+	String publicKey = '-----BEGIN PUBLIC KEY-----\n' +
 					   'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCKv1204ppSy53HoH1T73hBAm5h\n' +
 					   'KfNAT+MYT6/smLsTp0i5MAje6jGRDoDhFXxzMRNHexblgLWJpZEnn2K5+hQLUXNR\n' +
 					   'VdZNEhe6wNycGQ+sW9AgiWfystHtGfcGv6Uyz+SZ7XOmPR8Sr+dg6P7mjtGP22A6\n' +
 					   'zGmSS9v/AGXmc8s0lwIDAQAB\n' +
-					   RSACodec.DefaultPublicKeyHeader
+					   '-----END PUBLIC KEY-----'
 
 	void setupSpec() {
-		Security.addProvider(new BouncyCastleProvider());
+		Security.addProvider(new BouncyCastleProvider())
 		instance = new RSACodec()
 	}
 
@@ -83,6 +69,22 @@ class RSACodecTests extends Specification {
 	void 'test encrypt private to public'() {
 		setup:'Given pre generated public/private keys and some original text'
 			String originalText = 'Some test text.'
+			PublicKey keyPub = instance.getPublicKey(publicKey)
+			PrivateKey keyPri = instance.getPrivateKey(privateKey)
+		when: 'test encrypting and decrypting text with a private/public key'
+			String encryptedText = instance.encrypt(keyPri, originalText)
+			String decryptedText = instance.decrypt(keyPub, encryptedText)
+		then: 'The original text is not the same as the encrypted text, and the decrypted text is the same as the original text.'
+			originalText != encryptedText
+			originalText == decryptedText
+	}
+
+	/*
+	 * Tests encryption works for blank text, by encrypting and decrypting, going from a private key to a public key.
+	 */
+	void 'test blank encrypt private to public'() {
+		setup:'Given pre generated public/private keys and some original text'
+			String originalText = ''
 			PublicKey keyPub = instance.getPublicKey(publicKey)
 			PrivateKey keyPri = instance.getPrivateKey(privateKey)
 		when: 'test encrypting and decrypting text with a private/public key'
@@ -133,5 +135,6 @@ class RSACodecTests extends Specification {
 			originalText != encryptedText
 			originalText == decryptedText
 	}
+
 
 }
