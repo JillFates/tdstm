@@ -33,7 +33,7 @@ class ETLScriptsPage extends Page {
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
-        firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
+        firstDSEditButton {$("tbody")[0].find("tr")[0].find("td").find("div", class:"tds-action-button-set").find("button", title:"Edit")}
         projectsModule { module ProjectsMenuModule}
         trashIconList {$(".fa.fa-fw.fa-trash")}
         confirmationModal {$("div.modal-dialog.modal-sm")}
@@ -59,7 +59,8 @@ class ETLScriptsPage extends Page {
     }
 
     def clickOnEditButtonForFirstDS(){
-        waitFor{firstDSEditButton.click()}
+        scrollLeft()
+        waitFor(30){firstDSEditButton.click()}
     }
 
     def clickOnFirstGridRow(){
