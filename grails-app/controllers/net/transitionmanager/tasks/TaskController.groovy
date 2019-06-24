@@ -27,6 +27,7 @@ import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
@@ -82,7 +83,6 @@ class TaskController implements ControllerMethods {
 	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
@@ -1118,9 +1118,12 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskView)
 	def list() {
-		// This will contain a reference to, either the user's project, or the project specified as
-		// a parameter (given that they have access to it)
-		Project project = getProjectForWs()
+		// The projectId parameter is mandatory. If not present (or invalid), an exception is thrown.
+		Long projectId = NumberUtil.toPositiveLong(params.projectId)
+		if (!projectId) {
+			throw new InvalidParamException('Missing project id parameter for retrieving tasks.')
+		}
+		Project project = getProjectForWs(projectId)
 
 		// If the params map has an event, validate that it exists and belongs to the project.
 		String eventIdParam = 'eventId'
