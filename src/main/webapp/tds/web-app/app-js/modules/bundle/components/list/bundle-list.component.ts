@@ -89,7 +89,7 @@ export class BundleListComponent implements OnInit {
 	}
 
 	protected showBundle(id): void {
-		this.dialogService.extra(BundleViewEditComponent,
+		this.dialogService.open(BundleViewEditComponent,
 			[{provide: 'id', useValue: id}]).then(result => {
 			this.reloadData();
 		}).catch(result => {
@@ -98,7 +98,7 @@ export class BundleListComponent implements OnInit {
 	}
 
 	protected openCreateBundle(): void {
-		this.dialogService.extra(BundleCreateComponent,
+		this.dialogService.open(BundleCreateComponent,
 			[]).then(result => {
 			this.reloadData();
 		}).catch(result => {

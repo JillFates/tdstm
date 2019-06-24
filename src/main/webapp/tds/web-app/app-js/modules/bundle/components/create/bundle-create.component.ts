@@ -2,14 +2,14 @@ import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {BundleModel} from '../../model/bundle.model';
 import {Router} from '@angular/router';
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: `bundle-create`,
 	templateUrl: 'bundle-create.component.html',
 })
-export class BundleCreateComponent extends UIExtraDialog implements OnInit {
+export class BundleCreateComponent implements OnInit {
 	public managers;
 	public workflowCodes;
 	public rooms;
@@ -19,8 +19,8 @@ export class BundleCreateComponent extends UIExtraDialog implements OnInit {
 
 	constructor(
 		private bundleService: BundleService,
-		private promptService: UIPromptService) {
-		super('#bundle-create-component');
+		private promptService: UIPromptService,
+		private activeDialog: UIActiveDialogService) {
 	}
 
 	ngOnInit() {
@@ -56,7 +56,7 @@ export class BundleCreateComponent extends UIExtraDialog implements OnInit {
 	public saveForm() {
 		this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
 			if (result.status === 'success') {
-				this.close();
+				this.activeDialog.close();
 			}
 		});
 	}
@@ -72,12 +72,12 @@ export class BundleCreateComponent extends UIExtraDialog implements OnInit {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.dismiss();
+						this.activeDialog.close();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.dismiss();
+			this.activeDialog.close();
 		}
 	}
 }

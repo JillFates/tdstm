@@ -3,7 +3,7 @@ import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
@@ -11,7 +11,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	selector: `bundle-view-edit-component`,
 	templateUrl: 'bundle-view-edit.component.html',
 })
-export class BundleViewEditComponent extends UIExtraDialog implements OnInit {
+export class BundleViewEditComponent implements OnInit {
 	public bundleModel: BundleModel = null;
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
@@ -35,8 +35,8 @@ export class BundleViewEditComponent extends UIExtraDialog implements OnInit {
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
+		private activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
-		super('#bundle-view-edit-component');
 		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
 		this.bundleId = this.id;
 	}
@@ -91,7 +91,7 @@ export class BundleViewEditComponent extends UIExtraDialog implements OnInit {
 		this.bundleService.deleteBundle(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.dismiss();
+					this.activeDialog.close(result);
 				}
 			});
 	}
@@ -100,7 +100,7 @@ export class BundleViewEditComponent extends UIExtraDialog implements OnInit {
 		this.bundleService.deleteBundleAndAssets(this.bundleId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.dismiss();
+					this.activeDialog.close(result);
 				}
 			});
 	}
@@ -190,12 +190,12 @@ export class BundleViewEditComponent extends UIExtraDialog implements OnInit {
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
-						this.dismiss();
+						this.activeDialog.close();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.dismiss();
+			this.activeDialog.close();
 		}
 	}
 
