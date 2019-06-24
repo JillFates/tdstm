@@ -21,7 +21,7 @@ import {CellClickEvent} from '@progress/kendo-angular-grid';
 
 @Component({
 	selector: 'tds-notice-list',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/list/notice-list.component.html'
+	templateUrl: 'notice-list.component.html'
 })
 
 export class NoticeListComponent implements OnInit {

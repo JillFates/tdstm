@@ -37,7 +37,6 @@ export class DataGridOperationsHelper {
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private notifier: NotifierService;
 
-
 	constructor(result: any, defaultSort?: Array<SortDescriptor>, selectableSettings?: SelectableSettings, checkboxSelectionConfig?: any, pageSize?: number) {
 		// to notify grid height changes
 		this.notifier = new NotifierService();

@@ -24,7 +24,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 import {ActionType} from '../../../../shared/model/action-type.enum';
 @Component({
 	selector: 'tds-notice-view-edit',
-	templateUrl: '../tds/web-app/app-js/modules/noticeManager/components/view-edit/notice-view-edit.component.html'
+	templateUrl: 'notice-view-edit.component.html'
 })
 export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
