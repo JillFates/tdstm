@@ -345,7 +345,7 @@ class AssetCommentQueryBuilder {
 				break
 
 			case "generalOverDue" :
-				whereClauses << "ac.dueDate IN < :filterToday"
+				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 				whereClauses << "ac.category in (:planningCategories)"
 				whereParams['planningCategories'] = AssetComment.planningCategories
