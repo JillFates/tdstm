@@ -9,6 +9,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
+import {PostNoticesManagerService} from '../../../auth/service/post-notices-manager.service';
 
 @Component({
 	selector: 'tds-standard-notices',
@@ -16,24 +17,19 @@ import {NoticeCommonComponent} from './../notice-common'
 })
 export class StandardNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
-	acceptAgreement: boolean;
-	private postNoticesManager: any;
 
 	constructor(
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
 		protected userContextService: UserContextService,
+		private postNoticesManager: PostNoticesManagerService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
 
 	ngOnInit() {
 		this.notices = this.model.notices;
-		this.userContextService.getUserContext()
-			.subscribe((context) => {
-				this.postNoticesManager = context.postNoticesManager;
-			})
 	}
 
 	/**
