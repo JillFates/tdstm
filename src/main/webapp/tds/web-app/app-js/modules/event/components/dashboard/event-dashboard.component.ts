@@ -85,7 +85,7 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
 						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
 						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
-						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunBook'], statusDetails);
+						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
 					});
 			}
 		});

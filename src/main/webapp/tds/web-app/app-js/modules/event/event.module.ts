@@ -22,6 +22,7 @@ import {EventDashboardComponent} from './components/dashboard/event-dashboard.co
 import {NewsComponent} from './components/news/news.component';
 import {NewsCreateEditComponent} from './components/news-create-edit/news-create-edit.component';
 import {PlanVersusStatusComponent} from './components/plan-versus-status/plan-versus-status.component';
+import {EventResumeComponent} from './components/event-resume/event-resume.component';
 
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
@@ -52,7 +53,8 @@ import {EventsService} from './service/events.service';
 		EventDashboardComponent,
 		NewsCreateEditComponent,
 		NewsComponent,
-		PlanVersusStatusComponent
+		PlanVersusStatusComponent,
+		EventResumeComponent
 	],
 	providers: [
 		// Resolve
@@ -64,7 +66,8 @@ import {EventsService} from './service/events.service';
 		EventDashboardComponent,
 		NewsCreateEditComponent,
 		NewsComponent,
-		PlanVersusStatusComponent
+		PlanVersusStatusComponent,
+		EventResumeComponent
 	],
 	entryComponents: [
 		NewsCreateEditComponent
