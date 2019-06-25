@@ -5,13 +5,15 @@
 import {Injectable} from '@angular/core'
 import {isNil, isEmpty} from 'ramda';
 
+import {DateUtils} from './../../shared/utils/date.utils';
+
 @Injectable()
 export class ValidationRulesDefinitionsService {
 	/**
 	 *	Defines the angular form  function to validate a required field has a value
 	 * 	@return Curried function that determines if the rule is fulfilled
 	 */
-	requiredValidationRule(): Function {
+	public requiredValidationRule(): Function {
 		return (c: any) => {
 			const err = {
 				isRequired: {
@@ -27,7 +29,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to validate a range of numbers
 	 * 	@return Curried function that determines if the provided range meets the rule
 	 */
-	rangeValidationRule(maxValue: number, minValue: number): Function {
+	public rangeValidationRule(maxValue: number, minValue: number): Function {
 		return (c: any) => {
 			const err = {
 				range: {
@@ -45,7 +47,7 @@ export class ValidationRulesDefinitionsService {
 	 *	Defines the rule function to determine if a number is not negative
 	 * 	@return Curried function that determines if the provided value meets the rule
 	 */
-	notNegativeValidationRule(): Function {
+	public notNegativeValidationRule(): Function {
 		return (c: any) => {
 			const err = {
 				notNegative: {
@@ -54,6 +56,50 @@ export class ValidationRulesDefinitionsService {
 			};
 
 			return () => (!isNil(c.value) && c.value < 0) ? err : null;
+		}
+	}
+
+	/**
+	 *	Defines the rule function to validate that a date cannot be greather than a max date
+	 * 	@return Curried function that determines if the provided range meets the rule
+	 */
+	public maxDateValidationRule(maxDate: Date): Function {
+		return (c: any) => {
+			const err = {
+				'maxDate': {
+					given: c.value,
+					max: maxDate
+				}
+			};
+
+			return () => {
+				// if value comes as string cast it to date
+				const value = DateUtils.stringDateToDate(c.value);
+
+				return !isNil(value) && (value > maxDate) ? err : null;
+			};
+		}
+	}
+
+	/**
+	 *	Defines the rule function to validate that a date cannot be lower than a min date
+	 * 	@return Curried function that determines if the provided range meets the rule
+	 */
+	public minDateValidationRule(minDate: Date): Function {
+		return (c: any) => {
+			const err = {
+				'minDate': {
+					given: c.value,
+					min: minDate
+				}
+			};
+
+			return () => {
+				// if value comes as string cast it to date
+				const value = DateUtils.stringDateToDate(c.value);
+
+				return !isNil(value) && (value < minDate) ? err : null;
+			};
 		}
 	}
 
