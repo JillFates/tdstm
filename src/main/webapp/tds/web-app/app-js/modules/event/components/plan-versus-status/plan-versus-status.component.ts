@@ -9,6 +9,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	@Input() currentProgress = 0;
 	@Output() changeProgress: EventEmitter<number> = new EventEmitter<number>();
 	public progress = 0;
+	public showEditControl = false;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes && changes.currentProgress) {
@@ -23,4 +24,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 		this.changeProgress.emit(this.progress);
 	}
 
+	public onClickChart() {
+		this.showEditControl = !this.showEditControl;
+	}
 }
