@@ -6,6 +6,8 @@ trait TaskNode {
 	 * Time to complete the activity
 	 */
 	int duration
+	// the cost of the task along the critical path
+	int criticalCost;
 	/**
 	 * Earliest start time
 	 */
@@ -25,6 +27,8 @@ trait TaskNode {
 	/**
 	 * Defines if this activity belongs to the Critical Path
 	 */
-	Boolean isCriticalPath = false
+	Boolean isCriticalPath() {
+		return (earliestEndTime - latestEndTime == 0) && (earliestStartTime - latestStartTime == 0)
+	}
 
 }

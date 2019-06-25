@@ -7,9 +7,9 @@ class TaskTimeLineGraph {
 
 	Map<String, TaskVertex> verticesMap
 
-	List<TaskVertex> vertices
+	Set<TaskVertex> vertices
 
-	TaskTimeLineGraph(List<TaskVertex> vertices) {
+	TaskTimeLineGraph(Set<TaskVertex> vertices) {
 		this.vertices = vertices
 		verticesMap = this.vertices.collectEntries { TaskVertex taskVertex ->
 			[(taskVertex.taskId): taskVertex]
@@ -19,7 +19,7 @@ class TaskTimeLineGraph {
 	TaskVertex getStart() {
 		// Avoid sources without successors too.
 		List<TaskVertex> starters = vertices.findAll { TaskVertex taskVertex ->
-			taskVertex.predecessors.isEmpty() && !taskVertex.successors.isEmpty()
+			taskVertex.predecessors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_SINK_NODE
 		}
 
 		if (starters.size() == 1) {
@@ -41,8 +41,8 @@ class TaskTimeLineGraph {
 	 */
 	TaskVertex getSink() {
 
-		List<TaskVertex> sinks = vertices.findAll { TaskVertex act ->
-			act.successors.isEmpty() && !act.predecessors.isEmpty()
+		List<TaskVertex> sinks = vertices.findAll { TaskVertex taskVertex ->
+			taskVertex.successors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_START_NODE
 		}
 
 		if (sinks.size() == 1) {
@@ -139,7 +139,7 @@ class TaskTimeLineGraph {
 			return this
 		}
 
-		Builder addEdgesTo(List<String> taskIds) {
+		Builder addEdgesTo(String... taskIds) {
 			if (!currentVertex) {
 				throw new InvalidParamException('Cannot add an edge without a previous vertex')
 			}
@@ -169,10 +169,13 @@ class TaskTimeLineGraph {
 			vertices.each { Map<String, ?> vertexMap ->
 				vertexMap.successors.each { String successorId ->
 					TaskVertex successor = taskVertices[successorId]
+					if (!successor) {
+						throw new InvalidParamException("TaskVertex: ${successorId} was not found")
+					}
 					taskVertices[vertexMap.taskId].addSuccessor(successor)
 				}
 			}
-			return new TaskTimeLineGraph(taskVertices.values().toList())
+			return new TaskTimeLineGraph(taskVertices.values().toSet())
 		}
 	}
 }

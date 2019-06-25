@@ -8,10 +8,10 @@ import net.transitionmanager.task.TaskNode
 		-----------------------------------------------------------------------
 
 											+-----+----------+-----+    	est: earliest start time
-	taskId: task Identification				| est |  taskId  | eet |  		lst: latest start time
+	taskId: task Identification				| est |  taskId  | eet |  		eet: earliest end time
 											+----------------------+
-	duration: time to complete a task		| lst | duration | let |		est: earliest start time
-											+-----+----------+-----+		est: earliest start time
+	duration: time to complete a task		| lst | duration | let |		lst: latest start time
+											+-----+----------+-----+		let: latest end time
  */
 
 @CompileStatic
@@ -40,6 +40,29 @@ class TaskVertex implements TaskNode {
 		predecessor.successors.add(this)
 	}
 
+	void setLatest(int maxCost) {
+		latestStartTime = maxCost - criticalCost
+		latestEndTime = latestStartTime + duration
+	}
+
+	boolean isSuccessor(TaskVertex taskVertex) {
+		return successors.contains(taskVertex)
+	}
+
+	boolean isDependent(TaskVertex taskVertex) {
+		//is t a direct dependency?
+		if (successors.contains(taskVertex)) {
+			return true;
+		}
+		//is t an indirect dependency
+		for (TaskVertex successor : successors) {
+			if (successor.isDependent(taskVertex)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	boolean equals(o) {
 		if (this.is(o)) return true
 		if (getClass() != o.class) return false
@@ -55,6 +78,13 @@ class TaskVertex implements TaskNode {
 		return taskId.hashCode()
 	}
 
+	String[] toStringArray() {
+		String criticalCond = earliestStartTime == latestStartTime ? "Yes" : "No";
+		String[] toString = [taskId, earliestStartTime + "", earliestEndTime + "", latestStartTime + "", latestEndTime + "",
+							 latestStartTime - earliestStartTime + "", criticalCond];
+		return toString;
+	}
+
 	@Override
 	String toString() {
 		return "TaskVertex { " +
@@ -64,7 +94,10 @@ class TaskVertex implements TaskNode {
 			' }';
 	}
 
-	//// ------------------------------------------------////
+	Boolean hasPredecessor(TaskVertex taskVertex) {
+		return predecessors.contains(taskVertex)
+	}
+//// ------------------------------------------------////
 	//// ----------Factory Methods ----------------------////
 	//// ------------------------------------------------////
 	static class Factory {

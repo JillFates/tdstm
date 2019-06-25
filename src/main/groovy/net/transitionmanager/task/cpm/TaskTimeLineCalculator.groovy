@@ -2,6 +2,7 @@ package net.transitionmanager.task.cpm
 
 class TaskTimeLineCalculator {
 
+
 	/**
 	 * The {@code TaskTimeLineCalculator#walkListForward} method receives the array that stores the vertices
 	 * and performs the forward walking inside the activity list calculating
@@ -9,23 +10,28 @@ class TaskTimeLineCalculator {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<TaskVertex> walkListForward(TaskVertex source, TaskTimeLineGraph directedGraph) {
+	private static List<TaskVertex> walkListForward(TaskVertex start, TaskTimeLineGraph directedGraph) {
 
-		TaskVertex sourceActivity = directedGraph.getStart()
+		Queue<TaskVertex> queue = [] as Queue<TaskVertex>
+		queue.add(start)
 
-		sourceActivity.earliestEndTime = sourceActivity.earliestStartTime + sourceActivity.duration
+		while (!queue.isEmpty()) {
+			TaskVertex currentVertex = queue.poll()
 
-		(directedGraph.vertices - source).each { TaskVertex activity ->
+			for (TaskVertex predecessor : currentVertex.predecessors) {
 
-			activity.predecessors.each { TaskVertex predecessor ->
-
-				if (activity.earliestStartTime < predecessor.earliestEndTime) {
-					activity.earliestStartTime = predecessor.earliestEndTime
+				if (currentVertex.earliestStartTime < predecessor.earliestEndTime) {
+					currentVertex.earliestStartTime = predecessor.earliestEndTime
 				}
 			}
-			activity.earliestEndTime = activity.earliestStartTime + activity.duration
-		}
+			currentVertex.earliestEndTime = currentVertex.earliestStartTime + currentVertex.duration
 
+			for (TaskVertex successor : currentVertex.successors) {
+				if (!queue.contains(successor)) {
+					queue.add(successor)
+				}
+			}
+		}
 		return directedGraph.vertices
 	}
 	/**
@@ -34,44 +40,203 @@ class TaskTimeLineCalculator {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<TaskVertex> walkListBackwards(TaskVertex sink, TaskTimeLineGraph directedGraph) {
+	private static List<TaskVertex> walkListBackward(TaskVertex sink, TaskTimeLineGraph directedGraph) {
 
 		sink.latestEndTime = sink.earliestEndTime
-		sink.latestStartTime = sink.latestEndTime - sink.duration
+		//sink.latestStartTime = sink.latestEndTime - sink.duration
 
-		(directedGraph.vertices - sink).reverseEach { TaskVertex activity ->
+		Queue<TaskVertex> queue = [] as Queue<TaskVertex>
+		queue.add(sink)
 
-			activity.successors.each { TaskVertex successor ->
+		while (!queue.isEmpty()) {
+			TaskVertex currentVertex = queue.poll()
 
-				if (activity.latestEndTime == 0) {
-					activity.latestEndTime = successor.latestStartTime
-				} else if (activity.latestEndTime > successor.latestStartTime) {
-					activity.latestEndTime = successor.latestStartTime
+			for (TaskVertex successor : currentVertex.successors) {
+				if (currentVertex.latestEndTime == 0) {
+					currentVertex.latestEndTime = successor.latestStartTime
+				} else if (currentVertex.latestEndTime > successor.latestStartTime) {
+					currentVertex.latestEndTime = successor.latestStartTime
 				}
+			}
+			currentVertex.latestStartTime = currentVertex.latestEndTime - currentVertex.duration
 
-				activity.latestStartTime = activity.latestEndTime - activity.duration
+			for (TaskVertex predecessor : currentVertex.predecessors) {
+				if (!queue.contains(predecessor)) {
+					queue.add(predecessor)
+				}
 			}
 		}
+
+//		(directedGraph.vertices - sink).reverseEach { TaskVertex activity ->
+//			activity.successors.each { TaskVertex successor ->
+//
+//				if (activity.latestEndTime == 0) {
+//					activity.latestEndTime = successor.latestStartTime
+//				} else if (activity.latestEndTime > successor.latestStartTime) {
+//					activity.latestEndTime = successor.latestStartTime
+//				}
+//				activity.latestStartTime = activity.latestEndTime - activity.duration
+//			}
+//		}
 
 		return directedGraph.vertices
 	}
 
-
+	/**
+	 *
+	 * @param directedGraph
+	 * @return
+	 */
 	static List<TaskVertex> calculate(TaskTimeLineGraph directedGraph) {
+
 		List<TaskVertex> criticalPath = []
 
 		TaskVertex source = directedGraph.getStart()
 		TaskVertex sink = directedGraph.getSink()
 
+		//directedGraph.vertices = sortVertexList(source, directedGraph)
 		directedGraph.vertices = walkListForward(source, directedGraph)
-		directedGraph.vertices = walkListBackwards(sink, directedGraph)
+		directedGraph.vertices = walkListBackward(sink, directedGraph)
 
+		// TODO: dcorrea refactor this code to return Critical Path
+		// in order starting by Starter Vertex
 		return directedGraph.vertices.findAll { TaskVertex activity ->
-			// TODO: dcorrea refactor this code
-			activity.taskId == TaskVertex.BINDER_START_NODE ||
-			(activity.earliestEndTime - activity.latestEndTime == 0) && (activity.earliestStartTime - activity.latestStartTime == 0)
+			activity.taskId == TaskVertex.BINDER_START_NODE || activity.taskId == TaskVertex.BINDER_SINK_NODE ||
+				(activity.earliestEndTime - activity.latestEndTime == 0) && (activity.earliestStartTime - activity.latestStartTime == 0)
 		}
 	}
 
+
+	static List<TaskVertex> sortVertexList(TaskVertex start, TaskTimeLineGraph taskTimeLineGraph) {
+
+		HashSet<TaskVertex> stack = new HashSet<TaskVertex>();
+		stack.add(start)
+
+
+		return taskTimeLineGraph.vertices.sort { TaskVertex a, TaskVertex b ->
+			if (a.isSuccessor(b)) {
+				return -1
+			} else if (b.isSuccessor(a)) {
+				return 1
+			} else {
+				return 0
+			}
+		}
+	}
+
+	static List<TaskVertex> apply(TaskTimeLineGraph directedGraph) {
+
+		//tasks whose critical cost has been calculated
+		HashSet<TaskVertex> completed = new HashSet<TaskVertex>()
+		//tasks whose ciritcal cost needs to be calculated
+		HashSet<TaskVertex> remaining = directedGraph.vertices.toSet()
+
+		//Backflow algorithm
+		//while there are tasks whose critical cost isn't calculated.
+		while (!remaining.isEmpty()) {
+			boolean progress = false
+
+			for (Iterator<TaskVertex> it = remaining.iterator(); it.hasNext();) {
+				TaskVertex task = it.next()
+
+				if (completed.containsAll(task.successors)) {
+					//all dependencies calculated, critical cost is max dependency
+					//critical cost, plus our cost
+					int critical = 0
+					for (TaskVertex successor : task.successors) {
+
+						if (successor.criticalCost > critical) {
+							critical = task.criticalCost
+						}
+					}
+
+					task.criticalCost = critical + task.duration
+					//set task as calculated an remove
+					completed.add(task)
+					it.remove()
+					//note we are making progress
+					progress = true
+				}
+			}
+
+			//If we haven't made any progress then a cycle must exist in
+			//the graph and we wont be able to calculate the critical path
+			if (!progress) throw new RuntimeException("Cyclic dependency, algorithm stopped!")
+		}
+
+
+		// get the cost
+		int maxCost = maxCost(directedGraph.vertices.toSet());
+		HashSet<TaskVertex> initialNodes = initials(directedGraph.vertices.toSet());
+		calculateEarly(initialNodes);
+
+
+		// get the tasks
+		TaskVertex[] ret = completed.toArray(new TaskVertex[0]);
+		// create a priority list
+		Arrays.sort(ret, new Comparator<TaskVertex>() {
+
+			@Override
+			int compare(TaskVertex o1, TaskVertex o2) {
+				return o1.taskId.compareTo(o2.taskId);
+			}
+		});
+
+
+		String format = '%1$-10s %2$-5s %3$-5s %4$-5s %5$-5s %6$-5s %7$-10s\n'
+		System.out.format(format, "Task", "ES", "EF", "LS", "LF", "Slack", "Critical?")
+		for (TaskVertex t : ret)
+			System.out.format(format, (Object[]) t.toStringArray());
+
+		return ret;
+	}
+
+	static void setEarly(TaskVertex initial) {
+		int completionTime = initial.earliestStartTime
+		for (TaskVertex t : initial.successors) {
+			if (completionTime >= t.earliestStartTime) {
+				t.earliestStartTime = completionTime
+				t.earliestEndTime = completionTime + t.duration
+			}
+			setEarly(t)
+		}
+	}
+
+	static void calculateEarly(HashSet<TaskVertex> initials) {
+		for (TaskVertex initial : initials) {
+			initial.earliestStartTime = 0
+			initial.earliestEndTime = initial.duration
+			setEarly(initial)
+		}
+	}
+
+	static HashSet<TaskVertex> initials(Set<TaskVertex> tasks) {
+		HashSet<TaskVertex> remaining = new HashSet<TaskVertex>(tasks);
+		for (TaskVertex t : tasks) {
+			for (TaskVertex td : t.successors) {
+				remaining.remove(td)
+			}
+		}
+
+		print("Initial nodes: ")
+		for (TaskVertex t : remaining)
+			System.out.print(t.taskId + " ")
+		System.out.print("\n\n")
+		return remaining
+	}
+
+	static int maxCost(Set<TaskVertex> tasks) {
+		int max = -1
+		for (TaskVertex t : tasks) {
+			if (t.criticalCost > max)
+				max = t.criticalCost
+		}
+		println("Critical path length (cost): " + max);
+		for (TaskVertex t : tasks) {
+			t.setLatest(max)
+		}
+
+		return max
+	}
 
 }
