@@ -496,6 +496,9 @@ class TaskService implements ServiceMethods {
 		// Add the Task object to the returned map
 		actionRequestMap.task = task.taskToMap()
 
+		// Add the Asset Entity to the returned map if task has one, otherwise GormUtil returns null
+		actionRequestMap.asset = GormUtil.domainObjectToMap(task.assetEntity)
+
 		return actionRequestMap
 	}
 
