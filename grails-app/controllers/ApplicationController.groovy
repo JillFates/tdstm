@@ -152,7 +152,7 @@ class ApplicationController implements ControllerMethods, PaginationMethods {
 				query.append(" AND ")
 
 				// Unescaping the paramater since it can include HTML encoded characters (like \' == &#39; )
-				String planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
+				String planMethodology = StringEscapeUtils.unescapeHtml4(params.planMethodology)
 
 				if (planMethodology == Application.UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
