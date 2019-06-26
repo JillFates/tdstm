@@ -162,7 +162,7 @@
 
 			<!-- Default Generic Filter Template -->
 			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
-				<div class=" has-feedback asset-grid-margin">
+				<div class="has-feedback asset-grid-margin">
 					<input type="text" class="form-control" name="{{column.domain}}.{{column.property}}" 
 							placeholder="{{'GLOBAL.FILTER' | translate}}" value=""
 					       [(ngModel)]="column.filter" (keyup)="onFilterKeyUp($event, column)" (keydown)="onFilterKeyDown($event)" input-paste (onPaste)="onPaste(column)">
