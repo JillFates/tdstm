@@ -4,6 +4,8 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
@@ -17,11 +19,11 @@ import net.transitionmanager.service.UserService
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
 import org.springframework.util.Assert
+
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpSession
-
 
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
@@ -89,10 +91,26 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
 			}
 
-			if (hasUnacknowledgedNotices) {
-				redirectStrategy.sendRedirect request, response, unacknowledgedNoticesUri
+			if(WebUtil.isAjax(request)){
+				// This map will contain all the user-related data that needs to be sent in the response's payload.
+				Map signInInfoMap = [
+					userContext: userService.getUserContext().toMap(),
+					notices    : [
+						noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
+						redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
+					]
+				]
+				response.setHeader('content-type', 'application/json')
+				PrintWriter responseWriter = response.getWriter()
+				responseWriter.print(JsonUtil.toJson(signInInfoMap))
+				responseWriter.flush()
 			} else {
-				redirectStrategy.sendRedirect request, response, redirectUri
+
+				if (hasUnacknowledgedNotices) {
+					redirectStrategy.sendRedirect request, response, unacknowledgedNoticesUri
+				} else {
+					redirectStrategy.sendRedirect request, response, redirectUri
+				}
 			}
 		} finally {
 			// always remove the saved request

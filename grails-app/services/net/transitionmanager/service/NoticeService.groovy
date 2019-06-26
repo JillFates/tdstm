@@ -14,7 +14,6 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 
 import javax.servlet.http.HttpSession
-
 /**
  * @author octavio
  */
@@ -228,5 +227,38 @@ class NoticeService implements ServiceMethods {
 			session.removeAttribute(SecurityUtil.REDIRECT_URI)
 		}
 		return hasMandatoryUnacknowledgedNotices
+	}
+
+	/**
+	 * Return a list of person post login notices that has not been acknowledged
+	 * @param person - person requesting list notices
+	 * @return
+	 */
+	List<Notice> fetchPersonPostLoginNotices(Person person) {
+		Date now = TimeUtil.nowGMT()
+		log.info('List person: [{}] post login notices.', person.id)
+
+		def result = Notice.withCriteria {
+			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
+			eq('active', true)
+			eq('typeId', NoticeType.POST_LOGIN)
+			eq('project', securityService.userCurrentProject)
+			and {
+				or {
+					isNull('activationDate')
+					lt('activationDate', now)
+				}
+				or {
+					isNull('expirationDate')
+					gt('expirationDate', now)
+				}
+			}
+			isNull('ack.person')
+
+			order('needAcknowledgement', 'desc')
+			order('sequence', 'desc')
+		}
+
+		return result
 	}
 }

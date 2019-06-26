@@ -2,7 +2,9 @@ package com.tdsops.common.security.spring
 
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.HtmlUtil
+import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
+import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
 import grails.transaction.Transactional
 import groovy.transform.CompileStatic
@@ -30,7 +32,6 @@ import javax.servlet.http.HttpServletResponse
 
 import static org.quartz.DateBuilder.IntervalUnit.MINUTE
 import static org.quartz.DateBuilder.futureDate
-
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
@@ -73,19 +74,30 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 			logger.error "Unexpected Authentication Exception for user $username'\n${ExceptionUtil.stackTraceToString(e)}"
 		}
 
-		FlashScope flash = ((GrailsWebRequest) RequestContextHolder.currentRequestAttributes()).flashScope
-		flash.message = userMsg ?: messageSource.getMessage('login.failed', null, LocaleContextHolder.locale)
+
 
 		auditService.logMessage(username + ' login attempt failed - ' + e.message)
 		auditService.logMessage(username + ' (' + HtmlUtil.getRemoteIp(request) + ') login attempt failed')
 
 		checkFailsCount(username)
 
-		Map<String, String> params = [username: username, targetUri: authentication?.targetUri,
-		                              authority: authentication?.authority, rememberMe: authentication?.rememberMe ? authentication?.rememberMe as String : null]
-		params.keySet().retainAll { params[it] }
-		redirectStrategy.sendRedirect(request, response,
-				grailsLinkGenerator.link(controller: 'auth', action: 'login', params: params, base: ' ').substring(1))
+		if (WebUtil.isAjax(request)) {
+			Map signInErrorMap = [error: userMsg ?: messageSource.getMessage('login.failed', null, LocaleContextHolder.locale)]
+			response.setHeader('content-type', 'application/json')
+			PrintWriter responseWriter = response.getWriter()
+			responseWriter.print(JsonUtil.toJson(signInErrorMap))
+			responseWriter.flush()
+		} else {
+			FlashScope flash = ((GrailsWebRequest) RequestContextHolder.currentRequestAttributes()).flashScope
+			flash.message = userMsg ?: messageSource.getMessage('login.failed', null, LocaleContextHolder.locale)
+
+			Map<String, String> params = [username : username, targetUri: authentication?.targetUri,
+										  authority: authentication?.authority, rememberMe: authentication?.rememberMe ? authentication?.rememberMe as String : null]
+			params.keySet().retainAll { params[it] }
+			redirectStrategy.sendRedirect(request, response, grailsLinkGenerator.link(
+				controller: 'auth', action: 'login', params: params, base: ' '
+			).substring(1))
+		}
 	}
 
 	/**
