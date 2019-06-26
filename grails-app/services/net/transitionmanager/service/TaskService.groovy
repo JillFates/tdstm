@@ -1,7 +1,5 @@
 package net.transitionmanager.service
 
-import com.tdsops.common.security.RSACodec
-
 import com.tds.asset.Application
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetDependency
@@ -52,8 +50,8 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
-import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.integration.ActionRequest
+import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -64,8 +62,6 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.TransactionStatus
-import org.springframework.dao.CannotAcquireLockException
 
 import java.text.DateFormat
 
@@ -646,6 +642,7 @@ class TaskService implements ServiceMethods {
 				task.apiActionCompletedAt = null
 				task.actStart = null
 				task.dateResolved = null
+				task.percentageComplete = 0
 
 				// Log a note that the API Action was reset
 				addNote(task, whom, "Reset action ${task.apiAction.name}")
