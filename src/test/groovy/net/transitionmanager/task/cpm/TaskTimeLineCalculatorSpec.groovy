@@ -215,7 +215,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.build()
 
 		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			List<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 4
@@ -260,7 +260,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.build()
 
 		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			List<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 5
@@ -311,7 +311,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.build()
 
 		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			List<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 5
@@ -361,7 +361,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.build()
 
 		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			List<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 4
@@ -400,7 +400,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		when:
-			List<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
@@ -452,7 +452,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndOneSink()
 
 		when:
-			List<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
@@ -500,7 +500,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndTwoSinks()
 
 		when:
-			List<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
@@ -548,7 +548,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndTwoSinks()
 
 		when:
-			List<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
@@ -596,7 +596,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createTaskAndDependenciesExample()
 
 		when:
-			List<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()

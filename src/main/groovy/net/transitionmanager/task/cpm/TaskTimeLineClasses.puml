@@ -33,6 +33,12 @@ class TaskTimeLineCalculator {
     {static} List<TaskVertex> calculate(TaskTimeLineGraph directedGraph)
 }
 
+class TaskTimeLineGraphCycleFinder {
+    TaskTimeLineGraphCycleFinder(TaskTimeLineGraph directedGraph)
+    boolean hasCycle()
+    List<List<TaskVertex>> getCycles()
+}
+
 note top of TaskTimeLineCalculator
     It calculates critical path
     using deep first search
@@ -44,6 +50,7 @@ TaskTimeLineGraph *- TaskVertex : predecessors
 
 TaskTimeLineGraph.Builder -- TaskTimeLineGraph : builds an instance
 TaskTimeLineCalculator -- TaskTimeLineGraph : uses
+TaskTimeLineGraphCycleFinder -- TaskTimeLineGraph : uses
 
 together {
     interface TaskNode

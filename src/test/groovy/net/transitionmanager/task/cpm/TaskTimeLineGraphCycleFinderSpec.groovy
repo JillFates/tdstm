@@ -149,4 +149,22 @@ class TaskTimeLineGraphCycleFinderSpec extends Specification {
 		then: 'it contains cycles'
 			!finder.hasCycle()
 	}
+
+	void 'test can find cycles in graph with four TaskVertex one with 3 predecessor'() {
+
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertex('A', 3).addEdgesTo('D', 'B', 'C')
+				.withVertex('B', 4).addEdgeTo('D')
+				.withVertex('C', 2).addEdgeTo('D')
+				.withVertex('D', 5)
+				.build()
+
+		when:
+			TaskTimeLineGraphCycleFinder finder = new TaskTimeLineGraphCycleFinder(taskTimeLineGraph)
+
+		then: 'it contains cycles'
+			!finder.hasCycle()
+	}
 }

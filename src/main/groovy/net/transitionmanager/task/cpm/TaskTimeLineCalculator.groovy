@@ -1,5 +1,8 @@
 package net.transitionmanager.task.cpm
 
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.task.TaskTimeLineGraphTopologicalSort
+
 class TaskTimeLineCalculator {
 
 
@@ -10,7 +13,7 @@ class TaskTimeLineCalculator {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<TaskVertex> walkListForward(TaskVertex start, TaskTimeLineGraph directedGraph) {
+	private static Set<TaskVertex> walkListForward(TaskVertex start, TaskTimeLineGraph directedGraph) {
 
 		Queue<TaskVertex> queue = [] as Queue<TaskVertex>
 		queue.add(start)
@@ -40,7 +43,7 @@ class TaskTimeLineCalculator {
 	 * @param directedGraph
 	 * @return
 	 */
-	private static List<TaskVertex> walkListBackward(TaskVertex sink, TaskTimeLineGraph directedGraph) {
+	private static Set<TaskVertex> walkListBackward(TaskVertex sink, TaskTimeLineGraph directedGraph) {
 
 		sink.latestEndTime = sink.earliestEndTime
 		//sink.latestStartTime = sink.latestEndTime - sink.duration
@@ -84,23 +87,32 @@ class TaskTimeLineCalculator {
 
 	/**
 	 *
-	 * @param directedGraph
+	 * @param timeLineGraph
 	 * @return
 	 */
-	static List<TaskVertex> calculate(TaskTimeLineGraph directedGraph) {
+	static Set<TaskVertex> calculate(TaskTimeLineGraph timeLineGraph) {
+
+		TaskTimeLineGraphCycleFinder cycleFinder = new TaskTimeLineGraphCycleFinder(timeLineGraph)
+		if (cycleFinder.hasCycle()) {
+			throw new InvalidParamException("TaskTimeLineGraph contains cycles: ${cycleFinder.cycles}")
+		}
+
+		TaskTimeLineGraphTopologicalSort sort = new TaskTimeLineGraphTopologicalSort(timeLineGraph)
+		if (!sort.hasOrder()){
+			throw new InvalidParamException("Cannot order TaskTimeLineGrap vertices")
+		}
 
 		List<TaskVertex> criticalPath = []
-
-		TaskVertex source = directedGraph.getStart()
-		TaskVertex sink = directedGraph.getSink()
+		TaskVertex source = timeLineGraph.getStart()
+		TaskVertex sink = timeLineGraph.getSink()
 
 		//directedGraph.vertices = sortVertexList(source, directedGraph)
-		directedGraph.vertices = walkListForward(source, directedGraph)
-		directedGraph.vertices = walkListBackward(sink, directedGraph)
+		timeLineGraph.vertices = walkListForward(source, timeLineGraph)
+		timeLineGraph.vertices = walkListBackward(sink, timeLineGraph)
 
 		// TODO: dcorrea refactor this code to return Critical Path
 		// in order starting by Starter Vertex
-		return directedGraph.vertices.findAll { TaskVertex activity ->
+		return timeLineGraph.vertices.findAll { TaskVertex activity ->
 			activity.taskId == TaskVertex.BINDER_START_NODE || activity.taskId == TaskVertex.BINDER_SINK_NODE ||
 				(activity.earliestEndTime - activity.latestEndTime == 0) && (activity.earliestStartTime - activity.latestStartTime == 0)
 		}
@@ -111,7 +123,6 @@ class TaskTimeLineCalculator {
 
 		HashSet<TaskVertex> stack = new HashSet<TaskVertex>();
 		stack.add(start)
-
 
 		return taskTimeLineGraph.vertices.sort { TaskVertex a, TaskVertex b ->
 			if (a.isSuccessor(b)) {

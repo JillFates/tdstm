@@ -18,7 +18,7 @@ class TaskTimeLineGraph {
 
 	TaskVertex getStart() {
 		// Avoid sources without successors too.
-		List<TaskVertex> starters = vertices.findAll { TaskVertex taskVertex ->
+		Set<TaskVertex> starters = vertices.findAll { TaskVertex taskVertex ->
 			taskVertex.predecessors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_SINK_NODE
 		}
 
@@ -41,7 +41,7 @@ class TaskTimeLineGraph {
 	 */
 	TaskVertex getSink() {
 
-		List<TaskVertex> sinks = vertices.findAll { TaskVertex taskVertex ->
+		Set<TaskVertex> sinks = vertices.findAll { TaskVertex taskVertex ->
 			taskVertex.successors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_START_NODE
 		}
 

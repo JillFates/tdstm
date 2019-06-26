@@ -34,7 +34,7 @@ trait TaskTimeLineDataTest {
 		]
 	}
 
-	void withCriticalPath(List<TaskVertex> target, List<String> criticalPath) {
+	void withCriticalPath(Set<TaskVertex> target, Set<String> criticalPath) {
 		assert target.collect { it.taskId } == criticalPath
 	}
 
