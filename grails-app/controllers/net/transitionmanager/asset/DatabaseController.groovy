@@ -74,7 +74,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		userPreferenceService.setPreference(PREF.ASSET_LIST_SIZE, maxRows)
 
-		List moveBundleList
+		def moveBundleList
 		if (params.event?.isNumber()) {
 			MoveEvent moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
