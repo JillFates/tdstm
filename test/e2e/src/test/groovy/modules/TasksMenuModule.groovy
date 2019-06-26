@@ -78,7 +78,7 @@ class TasksMenuModule extends Module {
     }
 
     def goToTasksCookbook(){
-        selectMenu(tasksItem)
+        waitFor {selectMenu(tasksItem)}
         selectItem(tasksCookbookItem)
     }
 
