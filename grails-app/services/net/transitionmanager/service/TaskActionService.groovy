@@ -147,12 +147,11 @@ class TaskActionService implements ServiceMethods {
 		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
-		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, true)
+		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, false)
 
 		List<String> filenames = datafile.collect { MultipartFile file ->
 			fileSystemService.writeFile(file, fileSystemService.TMD_PREFIX)
 		}
-
 		ApiActionResponse apiActionResponse = new ApiActionResponse(
 			originalFilename: datafile ? datafile[0].originalFilename : null,
 			filename: filenames ? filenames[0] : null,
