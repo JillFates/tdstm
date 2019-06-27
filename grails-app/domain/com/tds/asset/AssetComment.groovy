@@ -432,7 +432,6 @@ class AssetComment {
 			    id: apiAction.id,
 				name: apiAction.name,
 				isRemote: apiAction.isRemote,
-				// TODO : JPM 6/2019 : action.type should be changed to object with id/name appropriately
 				actionType: [
 					id: apiAction.actionType.name(),
 					name: apiAction.actionType.toString()
@@ -486,6 +485,10 @@ class AssetComment {
 			team: role ?: '',
 			isPublished: isPublished,
 			percentageComplete: percentageComplete,
+			project: [
+				id: this.project.id,
+				name: this.project.toString()
+			],
 			isActionInvocableLocally: isActionInvocableLocally(),
 			isActionInvocableRemotely: isActionInvocableRemotely(),
 			isAutomatic: isAutomatic(),
