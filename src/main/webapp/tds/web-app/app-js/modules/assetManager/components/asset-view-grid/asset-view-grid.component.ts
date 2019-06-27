@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, DoCheck, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
@@ -59,7 +59,7 @@ declare var jQuery: any;
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: 'asset-view-grid.component.html'
 })
-export class AssetViewGridComponent implements OnInit, OnChanges, DoCheck {
+export class AssetViewGridComponent implements OnInit, OnChanges {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
@@ -127,10 +127,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, DoCheck {
 				this.userDateFormat = userContext.dateFormat;
 				this.userTimeZone = userContext.timezone;
 			});
-	}
-
-	ngDoCheck(): void {
-		console.log('Doing check...');
 	}
 
 	ngOnInit(): void {

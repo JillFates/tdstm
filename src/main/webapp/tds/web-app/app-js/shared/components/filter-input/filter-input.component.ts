@@ -30,6 +30,7 @@ import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
 				[name]="name"
 				[value]="value"
 				[placeholder]="placeholder"
+				input-paste (onPaste)="onPaste($event)"
 				class="form-control">
 
 			<span *ngIf="filterInput.value"
@@ -97,6 +98,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	*/
 	public onClearFilter() {
 		this.filterInput.nativeElement.value = '';
+		this.previousSearch = '';
 		this.onFilter('');
 	}
 
@@ -156,6 +158,8 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * @param {string} search - Current search value
 	*/
 	protected onPaste(search: string): void {
+		this.filterInput.nativeElement.value = search;
+
 		if ( this.preventFilterSearch(search)) {
 			return; // prevent search
 		}
