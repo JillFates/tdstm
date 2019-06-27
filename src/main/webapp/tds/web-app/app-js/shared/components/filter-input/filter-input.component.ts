@@ -69,7 +69,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Event handler to be attached to the listener input keypress event of the search input
-	 * @param {KeyboardEvent} keyEvent - Current search value
+	 * @param {KeyboardEvent} keyEvent - Key press event info
 	*/
 	private keyPressedListener(keyEvent: KeyboardEvent): void {
 		this.onFilterKeyUp(keyEvent, this.filterInput.nativeElement.value);
@@ -131,7 +131,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * Notify to the host component about a new search only if the guards
 	 * defined on preventFilterSearch and the bounce timeout are met
 	 * it ignores the input of special characters
-	 * @param {KeyboardEvent} keyEvent - Current search value
+	 * @param {KeyboardEvent} keyEvent - Key press event info
 	 * @param {string} search - Current search value
 	*/
 	private onFilterKeyUp(keyEvent: KeyboardEvent, search: string): void {
