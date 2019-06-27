@@ -167,7 +167,7 @@
 						name="{{column.domain}}.{{column.property}}"
 						[value]="column.filter"
 						placeholder="{{'GLOBAL.FILTER' | translate}}"
-						(filter)="setFilterAndReloadGrid($event, column)">
+						(filter)="setFilter($event, column)">
 					</tds-filter-input>
 				</div>
 			</ng-template>

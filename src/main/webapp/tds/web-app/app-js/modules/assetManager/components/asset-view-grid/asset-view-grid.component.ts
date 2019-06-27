@@ -245,7 +245,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	 * @param {string} search - Current search value
 	 * @param {ViewColumn} column - Column of the datagrid which threw the event
 	*/
-	setFilterAndReloadGrid(search: string, column: ViewColumn): void {
+	public setFilter(search: string, column: ViewColumn): void {
 		column.filter = search;
 		this.onFilter();
 	}
@@ -253,7 +253,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	/**
 	 * Notify to the bulkcheckbox service about a datagrid operation and execute the datagrid update
 	*/
-	onFilter(): void {
+	private onFilter(): void {
 		this.bulkCheckboxService.handleFiltering();
 		this.updateGridState({skip: 0});
 		this.onReload();

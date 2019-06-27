@@ -32,7 +32,6 @@ import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
 				[placeholder]="placeholder"
 				input-paste (onPaste)="onPaste($event)"
 				class="form-control">
-
 			<span *ngIf="filterInput.value"
 				(click)="onClearFilter()"
 				[title]="'GLOBAL.CLEAR_FILTER' | translate"
@@ -40,7 +39,6 @@ import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
 				aria-hidden="true">
 			</span>
 		</div>
-
 	`
 })
 export class TDSFilterInputComponent implements OnInit, OnDestroy {
@@ -96,7 +94,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	/**
 	 * Clear the entered search string and notify to the host component
 	*/
-	public onClearFilter() {
+	public onClearFilter(): void {
 		this.filterInput.nativeElement.value = '';
 		this.previousSearch = '';
 		this.onFilter('');
@@ -122,7 +120,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * @param {string} search - Current search value
 	*/
 	private onFilter(search: string): void {
-		/* Here the search is done so the notification to the host component is done
+		/* Here the search is done so the notification to the host component is made
 			within the angular zone in order to update the UI
 		*/
 		this.zone.run(() => this.filter.emit(search));
@@ -157,7 +155,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * from new one
 	 * @param {string} search - Current search value
 	*/
-	protected onPaste(search: string): void {
+	public onPaste(search: string): void {
 		this.filterInput.nativeElement.value = search;
 
 		if ( this.preventFilterSearch(search)) {
