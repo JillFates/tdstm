@@ -10,21 +10,21 @@ class RoleType {
 	public static final String SECURITY = 'ROLE_SECURITY'
 
 	/** Code that represent Person Team types */
-	public static final String TEAM = 'ROLE_TEAM'
+	public static final String TEAM = 'TEAM'
 
 	/** Code that represents Project type roles */
-	public static final String PROJECT = 'ROLE_PROJECT'
+	public static final String PROJECT = 'PROJECT'
 
 	/** Code that represents Party roles */
-	public static final String PARTY = 'ROLE_PARTY'
+	public static final String PARTY = 'PARTY'
 
 	/** Code that represents Application roles - do not think this is utilized */
-	public static final String APP = 'ROLE_APP'
+	public static final String APP = 'APP'
 
 
 	/* Role Type Codes | Each of this is a role in the system, and is grouped by one Role Type */
-	/** Code that represents STAFF in the system - Is grouped under ROLE_TEAM */
-	public static final String ROLE_STAFF = 'ROLE_STAFF'
+	/** Code that represents STAFF in the system - Is grouped under TEAM */
+	public static final String STAFF = 'STAFF'
 
 
 	String id

@@ -372,7 +372,7 @@ class GormUtilIntegrationSpec extends Specification {
 			Person adminPerson = personHelper.getAdminPerson()
 			Map results = [:]
 			Map personMap = [lastName:'Bullafarht']
-			String extraTeam = 'ROLE_DB_ADMIN'
+			String extraTeam = 'DB_ADMIN'
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'From'])
 

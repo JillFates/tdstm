@@ -161,8 +161,8 @@ class Person extends Party {
 		String query = """select pr.partyIdFrom from
 					PartyRelationship pr where
 					pr.partyRelationshipType.id = 'STAFF'
-					and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-					and pr.roleTypeCodeTo.id = 'ROLE_STAFF'
+					and pr.roleTypeCodeFrom.id = 'COMPANY'
+					and pr.roleTypeCodeTo.id = 'STAFF'
 					and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
 		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff: staffRef])
 
@@ -193,7 +193,7 @@ class Person extends Party {
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='ROLE_COMPANY'
+			  AND pr.roleTypeCodeFrom='COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
@@ -224,10 +224,10 @@ class Person extends Party {
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='ROLE_COMPANY'
+			  AND pr.roleTypeCodeFrom='COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
-			  AND pr.roleTypeCodeTo <> 'ROLE_STAFF'
+			  AND pr.roleTypeCodeTo <> 'STAFF'
 		''', [company: company, person: this])
 	}
 

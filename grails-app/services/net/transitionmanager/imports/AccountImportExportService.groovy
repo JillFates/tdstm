@@ -2085,7 +2085,7 @@ class AccountImportExportService implements ServiceMethods {
 		if (true || formOptions.flagToUpdatePerson) {
 			// Get all teams except AUTO and we need to stuff STAFF into it
 			allTeamCodes = partyRelationshipService.getTeamCodes()
-			allTeamCodes << 'ROLE_STAFF'
+			allTeamCodes << 'STAFF'
 			//log.debug "allTeamCodes = $allTeamCodes"
 		}
 

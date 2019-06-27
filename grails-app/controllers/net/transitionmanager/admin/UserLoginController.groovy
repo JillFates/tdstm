@@ -108,8 +108,8 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 			FROM person p
 			LEFT OUTER JOIN party_role pr on p.person_id=pr.party_id
 			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='ROLE_STAFF'
-				AND role_type_code_from_id='ROLE_COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='COMPANY' AND role_type_code_to_id='STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE u.active = :ulActive """)
 
