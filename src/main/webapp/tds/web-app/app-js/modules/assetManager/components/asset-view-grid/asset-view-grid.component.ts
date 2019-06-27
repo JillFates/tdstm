@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
+import {Component, EventEmitter, Input, DoCheck, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
 import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {State} from '@progress/kendo-data-query';
 import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
@@ -59,7 +59,7 @@ declare var jQuery: any;
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: 'asset-view-grid.component.html'
 })
-export class AssetViewGridComponent implements OnInit, OnChanges {
+export class AssetViewGridComponent implements OnInit, OnChanges, DoCheck {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
@@ -128,6 +128,10 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 				this.userDateFormat = userContext.dateFormat;
 				this.userTimeZone = userContext.timezone;
 			});
+	}
+
+	ngDoCheck(): void {
+		console.log('Doing check...');
 	}
 
 	ngOnInit(): void {
@@ -253,7 +257,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		this.modelChange.emit();
 	}
 
+	setFilterAndReloadGrid(filterValue: string, column: ViewColumn): void {
+		column.filter = filterValue;
+		this.onFilter();
+	}
+
 	onFilter(): void {
+		this.bulkCheckboxService.handleFiltering();
 		this.updateGridState({skip: 0});
 		this.onReload();
 	}
@@ -277,20 +287,22 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		}
 	}
 
-	protected onPaste(column?: any): void {
-		if ( this.preventFilterSearch(column)) {
-			return; // prevent search
-		}
-		clearTimeout(this.typingTimeout);
-		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
-	}
-
+	/*
 	protected onFilterKeyDown(e: KeyboardEvent): void {
 		this.bulkCheckboxService.handleFiltering();
 
 		if (!this.notAllowedCharRegex.test(e.code)) {
 			clearTimeout(this.typingTimeout);
 		}
+	}
+	*/
+
+	protected onPaste(column?: any): void {
+		if ( this.preventFilterSearch(column)) {
+			return; // prevent search
+		}
+		clearTimeout(this.typingTimeout);
+		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
 	}
 
 	private applyData(data: any): void {
