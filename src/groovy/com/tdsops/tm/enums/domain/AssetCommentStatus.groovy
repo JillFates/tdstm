@@ -36,6 +36,6 @@ class AssetCommentStatus {
 	/**
 	 * The statuses that are allowed to change states to
 	 */
-	static final List<String> AllowedStatusesForSetState = [STARTED, HOLD, COMPLETED]
+	static final List<String> AllowedStatusesForSetState = [READY, STARTED, HOLD, COMPLETED]
 
 }
