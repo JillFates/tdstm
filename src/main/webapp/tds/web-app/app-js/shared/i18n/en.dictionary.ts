@@ -40,6 +40,7 @@ export const en_DICTIONARY: Object = {
 		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
+		'CLEAR_FILTER': 'Clear filter',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
