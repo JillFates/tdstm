@@ -1,8 +1,6 @@
 package com.tdsops.common.security.spring
 
-import com.tdssrc.grails.WebUtil
 import grails.plugin.springsecurity.web.authentication.GrailsUsernamePasswordAuthenticationFilter
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import net.transitionmanager.service.SecurityService
 import org.springframework.security.authentication.AuthenticationServiceException
@@ -24,42 +22,6 @@ class TdsLocalAuthenticationFilter extends GrailsUsernamePasswordAuthenticationF
 	protected boolean postOnly
 
 	SecurityService securityService
-
-
-	/**
-	 * Refactor the method for returning the username provided to work based
-	 * on a standard JSON request body, if isAjax, and to get the username from the request parameter otherwise.
-	 *
-	 * In Grails 2 I can't seem to find a statically compilable way to get at the JSON, as it comes from a private inner class...
-	 * @param request The HttpServletRequest
-	 *
-	 * @return the username as a string
-	 */
-	@CompileDynamic
-	protected String obtainUsername(HttpServletRequest request) {
-		if(WebUtil.isAjax(request)) {
-			return request.JSON[usernameParameter]
-		}else{
-			return request.getParameter(this.usernameParameter)
-		}
-	}
-
-	/**
-	 * Refactor the method for returning the password provided to work based
-	 * on a standard JSON request body, if isAjax, and to get the password from the request parameter otherwise.
-	 * @param request The HttpServletRequest
-	 *
-	 * In Grails 2 I can't seem to find a statically compilable way to get at the JSON, as it comes from a private inner class...
-	 * @return the password as a string.
-	 */
-	@CompileDynamic
-	protected String obtainPassword(HttpServletRequest request) {
-		if(WebUtil.isAjax(request)) {
-			return request.JSON[passwordParameter]
-		}else{
-			return request.getParameter(this.passwordParameter)
-		}
-	}
 
 	Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
