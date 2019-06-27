@@ -69,7 +69,9 @@ class PlanningMenuModule extends Module {
     }
 
     def goToListBundles() {
+        waitFor(30){planningItem}
         selectMenu(planningItem)
+        waitFor(30){planningListBundles}
         selectItem(planningListBundles)
     }
 
