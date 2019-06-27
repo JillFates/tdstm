@@ -3,7 +3,7 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
 import {UserContextModel} from '../model/user-context.model';
 // Actions
-import {LicenseInfo, Login, Logout, Permissions} from '../action/login.actions';
+import {LicenseInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
@@ -40,7 +40,14 @@ export class UserContextState {
 	@Action(Logout)
 	logout(ctx: StateContext<UserContextModel>) {
 		ctx.setState({});
-		return this.authService.logout().subscribe();
+		return this.authService.logout().pipe(
+			tap()
+		);
+	}
+
+	@Action(SessionExpired)
+	sessionExpired(ctx: StateContext<UserContextModel>) {
+		ctx.setState({});
 	}
 
 	@Action(Permissions)

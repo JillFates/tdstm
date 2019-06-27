@@ -7,6 +7,10 @@ export class Logout {
 	static readonly type = '[Auth] Logout';
 }
 
+export class SessionExpired {
+	static readonly type = '[Auth] SessionExpired';
+}
+
 export class Permissions {
 	static readonly type = '[Auth] getPermissions';
 }

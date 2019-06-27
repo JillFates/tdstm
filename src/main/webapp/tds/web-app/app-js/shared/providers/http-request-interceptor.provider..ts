@@ -10,6 +10,9 @@ import {
 	HttpRequest,
 	HttpResponse
 } from '@angular/common/http';
+// NGXS
+import {Store} from '@ngxs/store';
+import {SessionExpired} from '../../modules/auth/action/login.actions';
 // Model
 import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../model/constants';
 import {AlertType} from '../model/alert.model';
@@ -26,7 +29,9 @@ export const APPLICATION_JSON = 'application/json';
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
 
-	constructor(private notifierService: NotifierService) {
+	constructor(
+		private notifierService: NotifierService,
+		private store: Store) {
 	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -71,7 +76,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 				if (event instanceof HttpResponse) {
 					// Detects if the user has been rejected do time Session expiration
 					if (event.headers.get('x-login-url')) {
-						window.location.href = event.headers.get('x-login-url');
+						this.store.dispatch(new SessionExpired()).subscribe( () => {
+							window.location.href = event.headers.get('x-login-url');
+						});
 					}
 					// Handle Errors
 					this.intercept200Errors(event);
@@ -86,7 +93,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 				} else if (error.headers && error.headers.get('x-login-url')) {
 					if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0) {
 						errorMessage = 'Your Session expired';
-						window.location.href = error.headers.get('x-login-url');
+						this.store.dispatch(new SessionExpired()).subscribe( () => {
+							window.location.href = error.headers.get('x-login-url');
+						});
 					}
 				} else {
 					errorMessage = 'Bad Request';
@@ -133,6 +142,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	}
 }
 
-export function HTTPFactory(notifierService: NotifierService) {
-	return new HttpRequestInterceptor(notifierService);
+export function HTTPFactory(notifierService: NotifierService, store: Store) {
+	return new HttpRequestInterceptor(notifierService, store);
 }

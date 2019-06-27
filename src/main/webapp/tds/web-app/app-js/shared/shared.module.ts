@@ -10,6 +10,8 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
+// NGXS
+import {Store} from '@ngxs/store';
 // Shared Services
 import {HeaderService} from './modules/header/services/header.service';
 import {PreferenceService} from '../shared/services/preference.service';
@@ -264,7 +266,7 @@ export class SharedModule {
 					provide: HTTP_INTERCEPTORS,
 					useClass: HttpRequestInterceptor,
 					useFactory: HTTPFactory,
-					deps: [NotifierService],
+					deps: [NotifierService, Store],
 					multi: true
 				},
 				{
