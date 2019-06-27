@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.timeline
 
 /**
  * http://www.personal.kent.edu/~rmuhamma/Algorithms/MyAlgorithms/GraphAlgor/depthSearch.htm

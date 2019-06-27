@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.timeline
 
 import spock.lang.Specification
 

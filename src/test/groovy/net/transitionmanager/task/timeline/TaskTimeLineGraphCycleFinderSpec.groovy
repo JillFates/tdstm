@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.timeline
 
 
 import net.transitionmanager.task.cpm.helper.TaskTimeLineGraphTestHelper

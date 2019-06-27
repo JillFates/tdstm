@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.timeline
 
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.task.TaskTimeLineGraphTopologicalSort

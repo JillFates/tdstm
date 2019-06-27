@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm.helper
+package net.transitionmanager.task.timeline.helper
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.task.cpm.TaskTimeLineGraph

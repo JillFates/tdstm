@@ -1,4 +1,4 @@
-package net.transitionmanager.task.cpm
+package net.transitionmanager.task.timeline
 
 import groovy.transform.CompileStatic
 import net.transitionmanager.task.TaskNode
