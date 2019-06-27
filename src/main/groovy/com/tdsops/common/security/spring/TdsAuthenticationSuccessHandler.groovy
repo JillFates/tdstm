@@ -72,10 +72,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?:
-							authentication.targetUri ?:
-									requestCache.getRequest(request, response)?.redirectUrl ?:
-											redirectToPrefPage()
+					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage()
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
