@@ -49,6 +49,8 @@ export class FooterComponent implements AfterViewInit {
 		this.appSettingsService.getUserContext().subscribe((userContext: UserContextModel) => {
 			if (!userContext.user) {
 				this.pageMetaData.hideTopNav = true;
+			} else {
+				this.pageMetaData.hideTopNav = false;
 			}
 			this.userContext = userContext;
 		});

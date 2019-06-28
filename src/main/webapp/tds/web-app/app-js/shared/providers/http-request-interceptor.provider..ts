@@ -19,9 +19,12 @@ import {AlertType} from '../model/alert.model';
 // Service
 import {NotifierService} from '../services/notifier.service';
 import {FILE_SYSTEM_URL, ETL_SCRIPT_UPLOAD_URL, ASSET_IMPORT_UPLOAD_URL} from '../services/kendo-file-handler.service';
+import {Router} from '@angular/router';
+import {WindowService} from '../services/window.service';
 // Other
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
+import {RouterUtils} from '../utils/router.utils';
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
 export const APPLICATION_JSON = 'application/json';
@@ -31,7 +34,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
 	constructor(
 		private notifierService: NotifierService,
-		private store: Store) {
+		private router: Router,
+		private store: Store,
+		private windowService: WindowService) {
 	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -77,7 +82,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					// Detects if the user has been rejected do time Session expiration
 					if (event.headers.get('x-login-url')) {
 						this.store.dispatch(new SessionExpired()).subscribe( () => {
-							window.location.href = event.headers.get('x-login-url');
+							this.redirectUser(event.headers.get('x-login-url'));
 						});
 					}
 					// Handle Errors
@@ -92,16 +97,16 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 					errorMessage = 'The requested resource was not found';
 				} else if (error.headers && error.headers.get('x-login-url')) {
 					if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0) {
-						errorMessage = 'Your Session expired';
+						errorMessage = '';
 						this.store.dispatch(new SessionExpired()).subscribe( () => {
-							window.location.href = error.headers.get('x-login-url');
+							this.redirectUser(error.headers.get('x-login-url'));
 						});
 					}
 				} else {
 					errorMessage = 'Bad Request';
 				}
 
-				if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0) {
+				if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0 && errorMessage !== '') {
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: errorMessage
@@ -140,8 +145,20 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 			}
 		}
 	}
+
+	/**
+	 * Redirect the user to the Configured Login Path
+	 * @param fullPath
+	 */
+	private redirectUser(fullPath: string): void {
+		if (RouterUtils.isAngularRoute(fullPath)) {
+			this.router.navigate(RouterUtils.getAngularRoute(fullPath));
+		} else {
+			this.windowService.getWindow().location.href = fullPath;
+		}
+	}
 }
 
-export function HTTPFactory(notifierService: NotifierService, store: Store) {
-	return new HttpRequestInterceptor(notifierService, store);
+export function HTTPFactory(notifierService: NotifierService, store: Store, router: Router, windowService: WindowService) {
+	return new HttpRequestInterceptor(notifierService, router, store, windowService);
 }

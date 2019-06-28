@@ -1,6 +1,6 @@
 import {NgModule, ModuleWithProviders} from '@angular/core';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {RouterModule} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {PopupModule} from '@progress/kendo-angular-popup';
@@ -266,7 +266,7 @@ export class SharedModule {
 					provide: HTTP_INTERCEPTORS,
 					useClass: HttpRequestInterceptor,
 					useFactory: HTTPFactory,
-					deps: [NotifierService, Store],
+					deps: [NotifierService, Router, Store, WindowService],
 					multi: true
 				},
 				{
