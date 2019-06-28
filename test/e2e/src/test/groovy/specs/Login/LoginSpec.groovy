@@ -101,6 +101,7 @@ class LoginSpec extends GebReportingSpec {
         then: "The Not Locked Out legend is displayed on the User Details page"
             at UserDetailsPage
             driver.navigate().refresh()
+            driver.navigate().refresh() //Done twice because sometimes 1 time doesn't load the updated info fast enough
             waitFor(30){verifyNotLockedOut()}
     }
 
