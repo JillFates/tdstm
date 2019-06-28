@@ -3,11 +3,12 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
 import {UserContextModel} from '../model/user-context.model';
 // Actions
-import {LicenseInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
+import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
+import {LoginService} from '../service/login.service';
 // Others
 import {tap} from 'rxjs/operators';
 
@@ -25,7 +26,17 @@ export class UserContextState {
 	constructor(
 		private authService: AuthService,
 		private permissionService: PermissionService,
+		private loginService: LoginService,
 		private userService: UserService) {
+	}
+
+	@Action(LoginInfo)
+	loginInfo(ctx: StateContext<UserContextModel>, {payload}: LoginInfo) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			buildVersion: payload.buildVersion
+		});
 	}
 
 	@Action(Login)

@@ -6,7 +6,7 @@ import {Select, Store} from '@ngxs/store';
 import {LoginService} from '../../service/login.service';
 // Models
 import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
-import {Login} from '../../action/login.actions';
+import {Login, LoginInfo} from '../../action/login.actions';
 import {UserContextModel} from '../../model/user-context.model';
 import {Router} from '@angular/router';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
 	 */
 	public errMessage = '';
 	/**
-	 * Retrieve the Information of the login and noticies, including errors
+	 * Retrieve the Information of the login and notices, including errors
 	 */
 	public loginInfo: LoginInfoModel = new LoginInfoModel();
 	/**
@@ -58,9 +58,11 @@ export class LoginComponent implements OnInit {
 	 * Get the Login Information and prepare the store subscriber to redirect the user on a Success Login
 	 */
 	ngOnInit(): void {
+
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
+			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
 			this.setFocus();
 		});
 

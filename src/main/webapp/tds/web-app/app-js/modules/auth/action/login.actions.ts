@@ -3,6 +3,11 @@ export class Login {
 	constructor(public payload: { username: string, password: string }) {}
 }
 
+export class LoginInfo {
+	static readonly type = '[Auth] LoginInfo';
+	constructor(public payload: { buildVersion: string}) {}
+}
+
 export class Logout {
 	static readonly type = '[Auth] Logout';
 }

@@ -39,6 +39,8 @@ export class FooterComponent implements AfterViewInit {
 		this.notifierService.on('notificationRouteChange', event => {
 			if (event.event.url.indexOf('/auth/') >= 0) {
 				this.pageMetaData.hideTopNav = true;
+			} else {
+				this.pageMetaData.hideTopNav = false;
 			}
 		});
 	}
