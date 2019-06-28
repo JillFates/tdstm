@@ -65,7 +65,7 @@
                         <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
                         <div class="percentage-bar-text">
                             <b> {{planningDashboardModel.analysis.assignedAppPerc}}% </b>
-                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Assigned*'}">Applications Assigned</a>
+                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'=Assigned'}">Applications Assigned</a>
                         </div>
 
                     </td>
