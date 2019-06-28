@@ -26,7 +26,7 @@
                   <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
                   <td>
                     <g:select id="type" name="type"
-                              from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.security.RoleType.class).type.inList}" value="${roleTypeInstance.type}"
+                              from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(RoleType.class).type.inList}" value="${roleTypeInstance.type}"
                               noSelection="${['':'Please select']}" onchange="typeChanged()">
                     </g:select>
                   </td>
