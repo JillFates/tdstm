@@ -79,8 +79,11 @@ class UserDetailsPage extends Page {
         if((lockedOutUntil.text().contains("Not Locked Out")))
             true
         else
+        {
+            driver.navigate().refresh() //Done twice because sometimes 1 time doesn't load the updated info fast enough
             driver.navigate().refresh()
             waitFor(30){lockedOutUntil.text().contains("Not Locked Out")}
+        }
     }
 
 }
