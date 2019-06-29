@@ -97,28 +97,34 @@ class WsCookbookController implements ControllerMethods {
 		Recipe recipe = result.recipe
 		RecipeVersion rv = result.recipeVersion
 
+		Map sourceCodeAsMap
+		String sourceCode = rv.sourceCode
+		if (! sourceCode) {
+			sourceCode = "groups: [\n" +
+				"],\n"+
+				"tasks: [\n" +
+				"]"
+		}
 		boolean asJson = (params.format == 'json')
 
 		if (asJson) {
 			// Returns just the recipe syntax itself as a JSON object
-			Map recipeMap = cookbookService.parseRecipeSyntax(rv.sourceCode)
-			renderAsJson(recipe:recipeMap)
-		} else {
-			// Returns all details about the recipe including the syntax
-			renderSuccessJson(recipeId: recipe.id,
-				name: recipe.name,
-				description: recipe.description,
-				context: result.context,
-				createdBy: result.person.firstName + ' ' + result.person.lastName,
-				lastUpdated: rv.lastUpdated,
-				versionNumber: rv.versionNumber,
-				releasedVersionNumber: recipe.releasedVersion?.versionNumber ?: -1,
-				recipeVersionId: rv.id,
-				hasWIP: result.wip != null,
-				sourceCode: rv.sourceCode,
-				changelog: rv.changelog,
-				clonedFrom: (rv.clonedFrom ?: '').toString())
+			sourceCodeAsMap = cookbookService.parseRecipeSyntax(sourceCode)
 		}
+		// Returns all details about the recipe including the syntax
+		renderSuccessJson(recipeId: recipe.id,
+			name: recipe.name,
+			description: recipe.description,
+			context: result.context,
+			createdBy: result.person.firstName + ' ' + result.person.lastName,
+			lastUpdated: rv.lastUpdated,
+			versionNumber: rv.versionNumber,
+			releasedVersionNumber: recipe.releasedVersion?.versionNumber ?: -1,
+			recipeVersionId: rv.id,
+			hasWIP: result.wip != null,
+			sourceCode: asJson ? sourceCodeAsMap : sourceCode,
+			changelog: rv.changelog,
+			clonedFrom: (rv.clonedFrom ?: '').toString())
 	}
 
 	@HasPermission(Permission.RecipeView)
