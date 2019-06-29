@@ -74,7 +74,15 @@ export class EventsService {
 				const model = pathOr(null, ['data', 'model'], response);
 				if (model) {
 					return {
-						remainTaskCount: pathOr(null, ['remainTaskCount'], model)
+						remainTaskCount: model.remainTaskCount || 0,
+						percTaskDone: model.percTaskDone  || 0,
+						percTaskReady: model.percTaskReady  || 0,
+						percTaskStarted: model.percTaskStarted || 0,
+						countDone: model.countDone || 0,
+						countStarted: model.countStarted || 0,
+						countReady: model.countReady || 0,
+						countHold: model.countHold || 0,
+						countPending: model.countPending || 0
 					}
 				}
 

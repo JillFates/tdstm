@@ -57,10 +57,17 @@
                         <div>Tasks Remaining</div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    Graphs
+                <div class="col-md-5">
+                    <div style="display: flex;">
+                        <div># or Tasks</div>
+                        <div style="display: flex; border: 1px solid black;width: 100%;">
+                            <div class="task-done" style="overflow: hidden" [style.width.%]="eventDetails.percTaskDone">Done</div>
+                            <div class="task-ready" style="overflow: hidden" [style.width.%]="eventDetails.percTaskReady">Ready</div>
+                            <div class="task-started" style="overflow: hidden" [style.width.%]="eventDetails.percTaskStarted">Started</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-7">
                     Another
                 </div>
             </div>
