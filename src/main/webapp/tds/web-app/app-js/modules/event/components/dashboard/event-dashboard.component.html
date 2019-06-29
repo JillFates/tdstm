@@ -47,4 +47,24 @@
             </div>
         </div>
     </div>
+
+    <div class="panel" *ngIf="eventDetails">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div>
+                        <div>{{eventDetails.remainTaskCount}}</div>
+                        <div>Tasks Remaining</div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    Graphs
+                </div>
+                <div class="col-md-4">
+                    Another
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

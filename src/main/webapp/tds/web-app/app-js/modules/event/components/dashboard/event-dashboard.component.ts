@@ -37,6 +37,7 @@ export class EventDashboardComponent implements OnInit {
 	public includeUnpublished = true;
 	public userTimeZone: string;
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
+	public eventDetails = null;
 
 	constructor(
 		private eventsService: EventsService,
@@ -47,10 +48,10 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.populateDate();
+		this.populateData();
 	}
 
-	private populateDate(): void {
+	private populateData(): void {
 		const services = [
 			this.eventsService.getEvents(),
 			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
@@ -71,6 +72,13 @@ export class EventDashboardComponent implements OnInit {
 	onSelectedEvent(id: number): void {
 		this.eventsService.getNewsFromEvent(id)
 			.subscribe((news: NewsModel[]) => this.newsList = news);
+
+		this.eventsService.getEventDetails(id, true)
+			.subscribe((eventDetails: any) => {
+				console.log('The details are');
+				console.log(eventDetails);
+				this.eventDetails  = eventDetails;
+			});
 
 		this.eventsService.getListBundles(id)
 		.subscribe((results: any[]) => {

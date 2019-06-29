@@ -26,6 +26,7 @@ export class EventsService {
 	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/newsEditor/retrieveCommetOrNewsData`;
 	private readonly APP_EVENT_LIST_BUNDLES = `${this.baseURL}/ws/event/listBundles`;
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
+	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/moveEvent/updateEventSumamry`;
 
 	// Resolve HTTP using the constructor
@@ -62,6 +63,22 @@ export class EventsService {
 		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=N`)
 			.map((response: any) => {
 				return response && response.shift() || null;
+			})
+			.catch((error: any) => error);
+	}
+
+	getEventDetails(event: number, viewUnpublished: boolean): Observable<any> {
+		const url = `${this.APP_EVENT_DETAILS}/?moveEvent=${event}&viewUnpublished=${viewUnpublished ? 1 : 0}`;
+		return this.http.get(url)
+			.map((response: any) => {
+				const model = pathOr(null, ['data', 'model'], response);
+				if (model) {
+					return {
+						remainTaskCount: pathOr(null, ['remainTaskCount'], model)
+					}
+				}
+
+				return null;
 			})
 			.catch((error: any) => error);
 	}
