@@ -133,6 +133,7 @@ export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'applic
 
 // Setting content type Accepted, default 'application/json'
 // request.config.setProperty('Accept', 'application/xml;q=0.9')`;
+export const EVENT_DEFAULT_ERROR = '// Put the task on hold and add a comment with the cause of the error\n task.error( response.error )';
 export enum APIActionType {
 	HTTP_API = 1,
 	SCRIPT
@@ -231,7 +232,7 @@ export class APIActionModel {
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, EVENT_STATUS_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, EVENT_SUCCESS_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, EVENT_DEFAULT_TEXT));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, ''));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, EVENT_DEFAULT_ERROR));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
