@@ -63,10 +63,14 @@ export class AuthService {
 	 * @param password: string
 	 */
 	public login({payload}: Login): Observable<UserContextModel> {
-		const params = {
+		let params: any = {
 			username: payload.username,
 			password: payload.password
 		};
+
+		if (payload.authorityPrompt) {
+			params.authorityPrompt = payload.authorityPrompt;
+		}
 		return this.http.post(AUTH_API_URLS.SIGN_IN, JSON.stringify(params)).pipe(
 			map((result: any) => {
 				if (result.userContext && result.userContext.user) {

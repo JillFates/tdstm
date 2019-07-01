@@ -111,7 +111,13 @@ export class LoginComponent implements OnInit {
 		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
 		} else {
-			this.store.dispatch(new Login({username: this.loginModel.username, password: this.loginModel.password}));
+			this.store.dispatch(
+				new Login({
+					username: this.loginModel.username,
+					password: this.loginModel.password,
+					authorityPrompt: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
+				})
+			);
 		}
 	}
 }
