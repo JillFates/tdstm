@@ -410,26 +410,11 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * On blur input field controls, it applies the validation rules to the label and name of the field control
-	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
-	 * @param {any} event Context event from the input that launched the change
+	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
+	 * @param {any} event - Context event from the input that launched the change
 	 */
 	protected onLabelBlur(dataItem: FieldSettingsModel, event: any) {
-		dataItem.errorMessage = '';
-		const fields = this.getFieldsExcludingDeleted();
-		const message = 'The label must be different from all other field names and labels';
-
-		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
-			dataItem.errorMessage = message;
-		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
-				dataItem.errorMessage = message;
-			} else {
-				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
-					dataItem.errorMessage = message;
-				}
-			}
-		}
-
+		// if the data item has an error, mark the whole form as having an error
 		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 
 		if (dataItem.errorMessage)  {
@@ -530,13 +515,35 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * On esc key pressed open confirmation dialog
+	 * This code runs each time a key is pressed.
+	 * 
+	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
+	 * @param {KeyboardEvent} event - Context event from the input that launched the change
 	 */
-	protected onKeyPressed(event: KeyboardEvent): void {
+	protected onKeyPressed(dataItem: FieldSettingsModel, event: KeyboardEvent): void {
+		// Mark form as dirty
 		this.setIsDirty(true);
+		// On esc key pressed, open confirmation dialog
 		if (event.code === 'Escape') {
 			this.onCancel(event);
 		}
+		// Validate conflicts between label names and field names
+		dataItem.errorMessage = '';
+		const fields = this.getFieldsExcludingDeleted();
+		const message = 'The label must be different from all other field names and labels';
+
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
+			dataItem.errorMessage = message;
+		} else {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
+				dataItem.errorMessage = message;
+			} else {
+				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
+					dataItem.errorMessage = message;
+				}
+			}
+		}
+		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 	}
 
 	/**

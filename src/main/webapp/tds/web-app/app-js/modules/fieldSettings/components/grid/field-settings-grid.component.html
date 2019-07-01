@@ -158,7 +158,7 @@
 		             let-dataItem>
 			<!--'has-error': hasError(dataItem),-->
 			<input (blur)="onLabelBlur(dataItem, $event)"
-			       (keyup)="onKeyPressed($event)"
+			       (keyup)="onKeyPressed(dataItem, $event)"
 			       type="text"
 			       [ngClass]="{
 			        'has-error': dataItem.errorMessage,
