@@ -53,7 +53,7 @@ class RecipeHistorySpec extends GebReportingSpec {
                     '    description: \'Startup ALL applications\',',
                     '    title: \'Startup app ${it.assetName}\',',
                     '    workflow: \'AppStartup\',',
-                    '    team: \'APP_COORD\',',
+                    '    team: \'ROLE_APP_COORD\',',
                     '    category: \'startup\',',
                     '    duration: 10,',
                     '    filter : [',
@@ -93,14 +93,14 @@ class RecipeHistorySpec extends GebReportingSpec {
         waitFor {edTabSaveWipBtn.click()}
         at CookbookPage
         waitFor {taskGenerationTab.click()}
-        at TabTaskGenPage
+        at TabTaskGenPage/*
         def buildOutOp = tskGTabEventSelector.find("option").find{it.text() == "M1-Physical"}
         waitFor { buildOutOp.click()}
         waitFor { tskGTabGenUsingWipCBox.click()}
         waitFor { tskGTabGenerateTasksBtn.click()}
         waitForProgressBar()
         at TabTaskGenTabSummaryPage
-        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
+        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}*/
     }
 
     def setup() {
@@ -114,6 +114,13 @@ class RecipeHistorySpec extends GebReportingSpec {
 
     def "1. Selecting the Empty Recipe to verify its History"() {
         given: 'The User is in the Cookbook Section'
+        def buildOutOp = tskGTabEventSelector.find("option").find{it.text() == "M1-Physical"}
+        waitFor { buildOutOp.click()}
+        waitFor { tskGTabGenUsingWipCBox.click()}
+        waitFor { tskGTabGenerateTasksBtn.click()}
+        waitForProgressBar()
+        at TabTaskGenTabSummaryPage
+        waitFor { tskGTabSummaryList.find("li", 0).text().contains("Status: Complete")}
             at CookbookPage
         when: 'The User clicks in the Recipe'
             waitFor { getRecipeByName(recipeDataMap.name).click()}
