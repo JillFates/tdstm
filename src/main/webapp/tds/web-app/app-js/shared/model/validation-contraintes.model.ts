@@ -11,6 +11,8 @@ export interface NumberValidationConstraints extends ValidationConstraints{
 
 // constraints for custom date control
 export interface DateValidationConstraints extends ValidationConstraints{
+	maxDate: Date;
+	minDate: Date;
 }
 
 

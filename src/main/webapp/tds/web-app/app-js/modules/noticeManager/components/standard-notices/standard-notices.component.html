@@ -10,8 +10,7 @@
               class="form-horizontal"
 			  #form='ngForm'>
 			<div class="notices-container">
-				<div *ngFor="let notice of notices">
-
+				<div *ngFor="let notice of notices; let idx = index;">
 					<div class="standard-notice-card">	
 							<div class="form-group">
 								<div class="col-sm-12">
@@ -21,10 +20,10 @@
 					</div>
 					<div class="form-group container-dontshow-again">
 							<div class="col-sm-12">
-								<label for="agreement" class="pull-left aligned-label dontshow-again"> 
+								<label for="agreement-{{idx}}" class="pull-left aligned-label dontshow-again"> 
 									<input type="checkbox"  class="aligned-checkbox"
-										name="agreement" 
-										id="agreement" 
+										name="agreement-{{idx}}" 
+										id="agreement-{{idx}}" 
 										[(ngModel)]="notice.notShowAgain"> {{ 'NOTICE.DO_NOT_SHOW_AGAIN' | translate }}
 								</label>
 							</div>
