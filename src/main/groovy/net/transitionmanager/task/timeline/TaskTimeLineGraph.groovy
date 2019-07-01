@@ -1,61 +1,37 @@
 package net.transitionmanager.task.timeline
 
+import groovy.transform.CompileStatic
 import net.transitionmanager.exception.InvalidParamException
 
-
+@CompileStatic
 class TaskTimeLineGraph {
 
 	Map<String, TaskVertex> verticesMap
 
 	Set<TaskVertex> vertices
+	List<TaskVertex> starts = []
+	List<TaskVertex> sinks = []
 
 	TaskTimeLineGraph(Set<TaskVertex> vertices) {
 		this.vertices = vertices
 		verticesMap = this.vertices.collectEntries { TaskVertex taskVertex ->
-			[(taskVertex.taskId): taskVertex]
+			if (taskVertex.isStart()) {
+				starts.add(taskVertex)
+			}
+			if (taskVertex.isSink()) {
+				sinks.add(taskVertex)
+			}
+
+			[(taskVertex.taskNumber): taskVertex]
 		}
 	}
 
-	TaskVertex getStart() {
-		// Avoid sources without successors too.
-		Set<TaskVertex> starters = vertices.findAll { TaskVertex taskVertex ->
-			taskVertex.predecessors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_SINK_NODE
-		}
-
-		if (starters.size() == 1) {
-			return starters.first()
-		} else {
-			// If there is more than one source
-			// We could add a new TaskVertex
-			// pointing to these multiple sources
-			TaskVertex binderStart = TaskVertex.Factory.newBinderStart()
-			vertices = [binderStart] + vertices
-			starters.each { addEdge(binderStart, it) }
-			return binderStart
-		}
+	List<TaskVertex> getStarts() {
+		return starts
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	TaskVertex getSink() {
-
-		Set<TaskVertex> sinks = vertices.findAll { TaskVertex taskVertex ->
-			taskVertex.successors.isEmpty() && taskVertex.taskId != TaskVertex.BINDER_START_NODE
-		}
-
-		if (sinks.size() == 1) {
-			return sinks.first()
-		} else {
-			// If there is more than one sink
-			// We could add a new TaskVertex
-			// pointing to these multiple sinks
-			TaskVertex hiddenSink = TaskVertex.Factory.newBinderSink()
-			vertices = vertices + [hiddenSink]
-			sinks.each { addEdge(it, hiddenSink) }
-			return hiddenSink
-		}
+	List<TaskVertex> getSinks() {
+		return sinks
 	}
 
 	/**
@@ -81,7 +57,7 @@ class TaskTimeLineGraph {
 	 * @return
 	 */
 	TaskVertex getVertex(TaskVertex taskVertex) {
-		return this.getVertex(taskVertex.taskId)
+		return this.getVertex(taskVertex.taskNumber)
 	}
 	/**
 	 * Adds a new edge with successor and predecessor
@@ -108,11 +84,12 @@ class TaskTimeLineGraph {
 		 * @param duration
 		 * @return
 		 */
-		Builder withVertex(String taskId, String description, Integer duration) {
+		Builder withVertex(Long id, String taskId, String description, Integer duration) {
 			if (currentVertex) {
 				vertices.add(currentVertex)
 			}
 			currentVertex = [
+				id         : id,
 				taskId     : taskId,
 				duration   : duration,
 				description: description,
@@ -127,15 +104,15 @@ class TaskTimeLineGraph {
 		 * @param duration
 		 * @return same instance of {@code TaskTimeLineGraph.Builder}
 		 */
-		Builder withVertex(String taskId, Integer duration) {
-			withVertex(taskId, '', duration)
+		Builder withVertex(Long id, String taskId, Integer duration) {
+			withVertex(id, taskId, '', duration)
 		}
 
 		Builder addEdgeTo(String taskId) {
 			if (!currentVertex) {
 				throw new InvalidParamException('Cannot add an edge without a previous vertex')
 			}
-			currentVertex.successors.add(taskId)
+			(currentVertex.successors as List).add(taskId)
 			return this
 		}
 
@@ -143,7 +120,7 @@ class TaskTimeLineGraph {
 			if (!currentVertex) {
 				throw new InvalidParamException('Cannot add an edge without a previous vertex')
 			}
-			taskIds.each { currentVertex.successors.add(it) }
+			taskIds.each { (currentVertex.successors as List).add(it) }
 			return this
 		}
 
@@ -159,11 +136,13 @@ class TaskTimeLineGraph {
 			}
 			Map<String, TaskVertex> taskVertices =
 				vertices.collectEntries { Map<String, ?> vertexMap ->
-					[
-						(vertexMap.taskId): TaskVertex.Factory.newSimpleVertex(
-							vertexMap.taskId, vertexMap.description, vertexMap.duration
-						)
-					]
+
+					TaskVertex taskVertex = new TaskVertex(vertexMap.id as Long, vertexMap.taskId.toString(), vertexMap.duration as Integer)
+					if (vertexMap.description) {
+						taskVertex.comment = vertexMap.description
+					}
+
+					[(vertexMap.taskId): taskVertex]
 				}
 
 			vertices.each { Map<String, ?> vertexMap ->
@@ -172,7 +151,7 @@ class TaskTimeLineGraph {
 					if (!successor) {
 						throw new InvalidParamException("TaskVertex: ${successorId} was not found")
 					}
-					taskVertices[vertexMap.taskId].addSuccessor(successor)
+					taskVertices[vertexMap.taskId.toString()].addSuccessor(successor)
 				}
 			}
 			return new TaskTimeLineGraph(taskVertices.values().toSet())

@@ -24,7 +24,7 @@ trait TaskTimeLineDataTest {
 
 		assert firstRow == [
 			target.earliestStartTime,
-			target.taskId,
+			target.taskNumber,
 			target.earliestEndTime
 		]
 		assert secondRow == [
@@ -35,7 +35,7 @@ trait TaskTimeLineDataTest {
 	}
 
 	void withCriticalPath(Set<TaskVertex> target, Set<String> criticalPath) {
-		assert target.collect { it.taskId } == criticalPath
+		assert target.collect { it.taskNumber } == criticalPath
 	}
 
 	/**
@@ -57,7 +57,7 @@ trait TaskTimeLineDataTest {
 
 		resultList.takeRight(resultList.size() - 1).eachWithIndex { String row, int index ->
 			List<String> rowValues = row.trim().split('\t\t').toList()
-			assert rowValues[0] == target.vertices[index].taskId
+			assert rowValues[0] == target.vertices[index].taskNumber
 			assert rowValues[1].toInteger() == target.vertices[index].duration
 			assert rowValues[2].toInteger() == target.vertices[index].earliestStartTime
 			assert rowValues[3].toInteger() == target.vertices[index].earliestEndTime

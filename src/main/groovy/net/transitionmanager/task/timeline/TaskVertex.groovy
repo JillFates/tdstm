@@ -1,5 +1,6 @@
 package net.transitionmanager.task.timeline
 
+import com.tdsops.tm.enums.domain.TimeScale
 import groovy.transform.CompileStatic
 import net.transitionmanager.task.TaskNode
 
@@ -17,14 +18,31 @@ import net.transitionmanager.task.TaskNode
 @CompileStatic
 class TaskVertex implements TaskNode {
 
-	static final String BINDER_START_NODE = '_BINDER_START_NODE_'
-	static final String BINDER_SINK_NODE = '_BINDER_SINK_NODE_'
+	Long id
+	String taskNumber
+	/**
+	 * Time to complete a Task {@code AssetComment}
+	 */
+	int duration
+	TimeScale durationScale
 
-	String taskId
+	String comment
 	String description
+
+	Date estimatedStart
+	Date estimatedFinish
+	Date actualStart
+	String status
 
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
+
+	TaskVertex(Long id, String taskNumber, int duration = 0, TimeScale durationScale = TimeScale.M) {
+		this.id = id
+		this.taskNumber = taskNumber
+		this.duration = duration
+		this.durationScale = durationScale
+	}
 
 	/**
 	 *
@@ -40,27 +58,28 @@ class TaskVertex implements TaskNode {
 		predecessor.successors.add(this)
 	}
 
-	void setLatest(int maxCost) {
-		latestStartTime = maxCost - criticalCost
-		latestEndTime = latestStartTime + duration
-	}
-
 	boolean isSuccessor(TaskVertex taskVertex) {
 		return successors.contains(taskVertex)
 	}
 
-	boolean isDependent(TaskVertex taskVertex) {
-		//is t a direct dependency?
-		if (successors.contains(taskVertex)) {
-			return true;
-		}
-		//is t an indirect dependency
-		for (TaskVertex successor : successors) {
-			if (successor.isDependent(taskVertex)) {
-				return true;
-			}
-		}
-		return false;
+	Boolean isPredecessor(TaskVertex taskVertex) {
+		return predecessors.contains(taskVertex)
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	Boolean isStart() {
+		return predecessors.isEmpty()
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	Boolean isSink() {
+		return successors.isEmpty()
 	}
 
 	boolean equals(o) {
@@ -69,73 +88,22 @@ class TaskVertex implements TaskNode {
 
 		TaskVertex that = (TaskVertex) o
 
-		if (taskId != that.taskId) return false
+		if (id != that.id) return false
 
 		return true
 	}
 
 	int hashCode() {
-		return taskId.hashCode()
-	}
-
-	String[] toStringArray() {
-		String criticalCond = earliestStartTime == latestStartTime ? "Yes" : "No";
-		String[] toString = [taskId, earliestStartTime + "", earliestEndTime + "", latestStartTime + "", latestEndTime + "",
-							 latestStartTime - earliestStartTime + "", criticalCond];
-		return toString;
+		return id.hashCode()
 	}
 
 	@Override
 	String toString() {
 		return "TaskVertex { " +
-			"taskId='" + taskId + '\'' +
+			"id='" + id + '\'' +
+			"taskNumber='" + taskNumber + '\'' +
 			", description='" + (description ?: '') + '\'' +
 			", duration=" + duration +
 			' }';
-	}
-
-	Boolean hasPredecessor(TaskVertex taskVertex) {
-		return predecessors.contains(taskVertex)
-	}
-//// ------------------------------------------------////
-	//// ----------Factory Methods ----------------------////
-	//// ------------------------------------------------////
-	static class Factory {
-		/**
-		 * Factory Method patter to create a new instance of {@code TaskVertex}
-		 * @param taskId
-		 * @param description
-		 * @param duration
-		 * @return
-		 */
-		static TaskVertex newSimpleVertex(String taskId, String description, int duration) {
-			return new TaskVertex(taskId: taskId, description: description, duration: duration)
-		}
-
-		/**
-		 * Factory Method patter to create a new instance of {@code TaskVertex}
-		 * @param taskId
-		 * @param duration
-		 * @return
-		 */
-		static TaskVertex newSimpleVertex(String taskId, int duration) {
-			return new TaskVertex(taskId: taskId, duration: duration)
-		}
-
-		/**
-		 * Factory Method patter to create a new instance of {@code TaskVertex}
-		 * @return
-		 */
-		static TaskVertex newBinderStart() {
-			return new TaskVertex(taskId: BINDER_START_NODE, duration: 0)
-		}
-
-		/**
-		 * Factory Method patter to create a new instance of {@code TaskVertex}
-		 * @return
-		 */
-		static TaskVertex newBinderSink() {
-			return new TaskVertex(taskId: BINDER_SINK_NODE, duration: 0)
-		}
 	}
 }

@@ -1,6 +1,6 @@
 package net.transitionmanager.task.timeline
 
-import net.transitionmanager.task.cpm.helper.TaskTimeLineGraphTestHelper
+import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -19,45 +19,27 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		given: 'a TaskTimeLineGraph with an empty list of TaskVertex'
 			TaskTimeLineGraph emptyGraph = new TaskTimeLineGraph([] as Set)
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			TaskTimeLineCalculator.calculate(emptyGraph) // It creates START and SINK BINDING NODES
+		when: 'TimeLine tries to calculate its critical path'
+			TimeLine.calculate(emptyGraph) // It creates START and SINK BINDING NODES
 
 		then:
-			emptyGraph.V() == 2
-			with(emptyGraph.vertices.first(), TaskVertex) {
-				taskId == TaskVertex.BINDER_START_NODE
-				duration == 0
-				earliestStartTime == 0
-				earliestEndTime == 0
-				latestStartTime == 0
-				latestEndTime == 0
-				isCriticalPath()
-			}
-			with(emptyGraph.vertices.last(), TaskVertex) {
-				taskId == TaskVertex.BINDER_SINK_NODE
-				duration == 0
-				earliestStartTime == 0
-				earliestEndTime == 0
-				latestStartTime == 0
-				latestEndTime == 0
-				isCriticalPath()
-			}
+			emptyGraph.V() == 0
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex('A', 3)
+				.withVertex(1, 'A', 3)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(new Date())
 
 		then:
 			taskTimeLineGraph.V() == 1
 			with(taskTimeLineGraph.vertices.first(), TaskVertex) {
-				taskId == 'A'
+				taskNumber == 'A'
 				duration == 3
 				earliestStartTime == 0
 				earliestEndTime == 3
@@ -71,17 +53,17 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex('A', 3).addEdgeTo('B')
-				.withVertex('B', 4)
+				.withVertex(1, 'A', 3).addEdgeTo('B')
+				.withVertex(1, 'B', 4)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(new Date())
 
 		then:
 			taskTimeLineGraph.V() == 2
 			with(taskTimeLineGraph.vertices.first(), TaskVertex) {
-				taskId == 'A'
+				taskNumber == 'A'
 				duration == 3
 				earliestStartTime == 0
 				latestStartTime == 0
@@ -90,7 +72,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices.last(), TaskVertex) {
-				taskId == 'B'
+				taskNumber == 'B'
 				duration == 4
 				earliestStartTime == 3
 				latestStartTime == 3
@@ -109,13 +91,13 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex('C', 2)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			taskTimeLineGraph.V() == 4
 			with(taskTimeLineGraph.vertices[0], TaskVertex) {
-				taskId == 'A'
+				taskNumber == 'A'
 				duration == 3
 				earliestStartTime == 0
 				latestStartTime == 0
@@ -124,7 +106,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices[1], TaskVertex) {
-				taskId == 'B'
+				taskNumber == 'B'
 				duration == 4
 				earliestStartTime == 3
 				latestStartTime == 3
@@ -133,7 +115,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices[2], TaskVertex) {
-				taskId == 'C'
+				taskNumber == 'C'
 				duration == 2
 				earliestStartTime == 3
 				latestStartTime == 5
@@ -142,7 +124,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				!isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices[3], TaskVertex) {
-				taskId == TaskVertex.BINDER_SINK_NODE
+				taskNumber == TaskVertex.BINDER_SINK_NODE
 				duration == 0
 				earliestStartTime == 7
 				latestStartTime == 7
@@ -161,22 +143,13 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex('D', 5)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			taskTimeLineGraph.V() == 4
-			with(taskTimeLineGraph.vertices[0], TaskVertex) {
-				taskId == TaskVertex.BINDER_START_NODE
-				duration == 0
-				earliestStartTime == 0
-				latestStartTime == 2
-				earliestEndTime == 0
-				latestEndTime == 2
-				!isCriticalPath()
-			}
 			with(taskTimeLineGraph.vertices[1], TaskVertex) {
-				taskId == 'B'
+				taskNumber == 'B'
 				duration == 4
 				earliestStartTime == 0
 				latestStartTime == 0
@@ -185,7 +158,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices[2], TaskVertex) {
-				taskId == 'C'
+				taskNumber == 'C'
 				duration == 2
 				earliestStartTime == 0
 				latestStartTime == 2
@@ -194,7 +167,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				!isCriticalPath()
 			}
 			with(taskTimeLineGraph.vertices[3], TaskVertex) {
-				taskId == 'D'
+				taskNumber == 'D'
 				duration == 5
 				earliestStartTime == 4
 				latestStartTime == 4
@@ -214,8 +187,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex(D, 5)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			Set<TaskVertex> results = TimeLine.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 4
@@ -259,8 +232,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex(D, 5)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			Set<TaskVertex> results = TimeLine.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 5
@@ -310,8 +283,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex(D, 5)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			Set<TaskVertex> results = TimeLine.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 5
@@ -360,8 +333,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				.withVertex(A, 3).addEdgesTo(B, C)
 				.build()
 
-		when: 'TaskTimeLineCalculator tries to calculate its critical path'
-			Set<TaskVertex> results = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+		when: 'TimeLine tries to calculate its critical path'
+			Set<TaskVertex> results = TimeLine.calculate(taskTimeLineGraph)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 4
@@ -400,12 +373,12 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		when:
-			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
 			criticalPath.size() == 5
-			with(criticalPath.find { it.taskId == 'A' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'A' }, TaskVertex) {
 				duration == 3
 				earliestStartTime == 0
 				latestStartTime == 0
@@ -413,7 +386,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				latestEndTime == 3
 				isCriticalPath() == true
 			}
-			with(criticalPath.find { it.taskId == 'B' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'B' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 3
 				latestStartTime == 3
@@ -421,7 +394,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				latestEndTime == 7
 				isCriticalPath() == true
 			}
-			with(criticalPath.find { it.taskId == 'D' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'D' }, TaskVertex) {
 				duration == 5
 				earliestStartTime == 7
 				latestStartTime == 7
@@ -429,7 +402,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				latestEndTime == 12
 				isCriticalPath() == true
 			}
-			with(criticalPath.find { it.taskId == 'G' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'G' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 12
 				latestStartTime == 12
@@ -437,7 +410,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				latestEndTime == 16
 				isCriticalPath() == true
 			}
-			with(criticalPath.find { it.taskId == 'H' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'H' }, TaskVertex) {
 				duration == 3
 				earliestStartTime == 16
 				latestStartTime == 16
@@ -452,40 +425,33 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndOneSink()
 
 		when:
-			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
 			criticalPath.size() == 5
-			with(criticalPath.find { it.taskId == TaskVertex.BINDER_START_NODE }, TaskVertex) {
-				duration == 1
-				earliestStartTime == 0
-				latestStartTime == 0
-				earliestEndTime == 1
-				latestEndTime == 1
-			}
-			with(criticalPath.find { it.taskId == 'B' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'B' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 1
 				latestStartTime == 1
 				earliestEndTime == 5
 				latestEndTime == 5
 			}
-			with(criticalPath.find { it.taskId == 'D' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'D' }, TaskVertex) {
 				duration == 5
 				earliestStartTime == 5
 				latestStartTime == 5
 				earliestEndTime == 10
 				latestEndTime == 10
 			}
-			with(criticalPath.find { it.taskId == 'G' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'G' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 10
 				latestStartTime == 10
 				earliestEndTime == 14
 				latestEndTime == 14
 			}
-			with(criticalPath.find { it.taskId == 'H' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'H' }, TaskVertex) {
 				duration == 3
 				earliestStartTime == 14
 				latestStartTime == 14
@@ -500,40 +466,40 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndTwoSinks()
 
 		when:
-			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
 			criticalPath.size() == 5
-			with(criticalPath.find { it.taskId == 'A' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'A' }, TaskVertex) {
 				duration == 3
 				earliestStartTime == 0
 				latestStartTime == 0
 				earliestEndTime == 3
 				latestEndTime == 3
 			}
-			with(criticalPath.find { it.taskId == 'B' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'B' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 3
 				latestStartTime == 3
 				earliestEndTime == 7
 				latestEndTime == 7
 			}
-			with(criticalPath.find { it.taskId == 'D' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'D' }, TaskVertex) {
 				duration == 5
 				earliestStartTime == 7
 				latestStartTime == 7
 				earliestEndTime == 12
 				latestEndTime == 12
 			}
-			with(criticalPath.find { it.taskId == 'G' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'G' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 12
 				latestStartTime == 12
 				earliestEndTime == 16
 				latestEndTime == 16
 			}
-			with(criticalPath.find { it.taskId == TaskVertex.BINDER_SINK_NODE }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == TaskVertex.BINDER_SINK_NODE }, TaskVertex) {
 				duration == 1
 				earliestStartTime == 16
 				latestStartTime == 16
@@ -548,40 +514,33 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndTwoSinks()
 
 		when:
-			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
 			criticalPath.size() == 5
-			with(criticalPath.find { it.taskId == TaskVertex.BINDER_START_NODE }, TaskVertex) {
-				duration == 1
-				earliestStartTime == 0
-				latestStartTime == 0
-				earliestEndTime == 1
-				latestEndTime == 1
-			}
-			with(criticalPath.find { it.taskId == 'B' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'B' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 1
 				latestStartTime == 1
 				earliestEndTime == 5
 				latestEndTime == 5
 			}
-			with(criticalPath.find { it.taskId == 'D' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'D' }, TaskVertex) {
 				duration == 5
 				earliestStartTime == 5
 				latestStartTime == 5
 				earliestEndTime == 10
 				latestEndTime == 10
 			}
-			with(criticalPath.find { it.taskId == 'G' }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == 'G' }, TaskVertex) {
 				duration == 4
 				earliestStartTime == 10
 				latestStartTime == 10
 				earliestEndTime == 14
 				latestEndTime == 14
 			}
-			with(criticalPath.find { it.taskId == TaskVertex.BINDER_SINK_NODE }, TaskVertex) {
+			with(criticalPath.find { it.taskNumber == TaskVertex.BINDER_SINK_NODE }, TaskVertex) {
 				duration == 1
 				earliestStartTime == 14
 				latestStartTime == 14
@@ -596,18 +555,16 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createTaskAndDependenciesExample()
 
 		when:
-			Set<TaskVertex> criticalPath = TaskTimeLineCalculator.calculate(taskTimeLineGraph)
+			Set<TaskVertex> criticalPath = TimeLine.calculate(taskTimeLineGraph)
 
 		then:
 			!criticalPath.isEmpty()
 			criticalPath.size() == 6
-			criticalPath.collect { it.taskId } == [
-				TaskVertex.BINDER_START_NODE,
+			criticalPath.collect { it.taskNumber } == [
 				'3',
 				'11',
 				'13',
 				'16',
-				TaskVertex.BINDER_SINK_NODE
 			]
 	}
 }

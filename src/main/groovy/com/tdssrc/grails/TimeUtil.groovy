@@ -1103,4 +1103,13 @@ class TimeUtil {
 	static boolean canParseDateTime(String dateString) {
 		parseISO8601DateTime(dateString)
 	}
+
+	/**
+	 * Convert a given Time Duration into minutes.
+	 * @param timeDuration
+	 * @return
+	 */
+	static Integer toMinutes(TimeDuration timeDuration) {
+		return timeDuration.toMilliseconds() / 60000
+	}
 }

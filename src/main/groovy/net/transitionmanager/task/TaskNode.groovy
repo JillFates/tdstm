@@ -2,10 +2,7 @@ package net.transitionmanager.task
 
 trait TaskNode {
 
-	/**
-	 * Time to complete the activity
-	 */
-	int duration
+
 	// the cost of the task along the critical path
 	int criticalCost;
 	/**
