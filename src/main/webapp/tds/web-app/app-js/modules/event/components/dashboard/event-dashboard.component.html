@@ -57,9 +57,9 @@
                         <div>Tasks Remaining</div>
                     </div>
                 </div>
-                <div class="col-md-4" style="border:1px solid blue;">
+                <div class="col-md-4">
                     <div style="display: flex;width:100%;">
-                        <div style="width:20%;display:flex;justify-content: center;align-items: center;"># or Tasks</div>
+                        <div style="width:20%;display:flex;justify-content: center;align-items: center;"># or<br/> Tasks</div>
                         <div style="width:80%">
                             <div style="display: flex; border: 1px solid black;width: 100%;">
                                 <div class="task-done" style="overflow: hidden;height:34px;" [style.width.%]="eventDetails.percTaskDone">
@@ -89,6 +89,42 @@
                                 <div class="task-pending" style="width:20%;text-align: center">
                                     <div>Pending</div>
                                     <div>{{eventDetails.countPending}}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 10px"></div>
+                    <div style="display: flex;width:100%;">
+                        <div style="width:20%;display:flex;justify-content: center;align-items: center;">Level <br/>of Effort</div>
+                        <div style="width:80%">
+                            <div style="display: flex; border: 1px solid black;width: 100%;">
+                                <div class="task-done" style="overflow: hidden;height:34px;" [style.width.%]="eventDetails.percDurationDone">
+                                    {{eventDetails.percDurationDone < 5 ? '' : eventDetails.percDurationDone + '%'}}
+                                </div>
+                                <div class="task-started" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percDurationStarted"></div>
+                                <div class="task-ready" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percDurationReady"></div>
+                            </div>
+                            <div style="height: 5px;"></div>
+                            <div style="width: 100%;display:flex;">
+                                <div class="task-done" style="width:20%;text-align: center">
+                                    <div>Done</div>
+                                    <div>{{eventDetails.effortRemainDone}}</div>
+                                </div>
+                                <div class="task-started" style="width:20%;text-align: center">
+                                    <div>Started</div>
+                                    <div>{{eventDetails.effortRemainStarted}}</div>
+                                </div>
+                                <div class="task-ready" style="width:20%;text-align: center">
+                                    <div>Ready</div>
+                                    <div>{{eventDetails.effortRemainReady}}</div>
+                                </div>
+                                <div class="task-hold" style="width:20%;text-align: center">
+                                    <div>Hold</div>
+                                    <div>{{eventDetails.effortRemainHold}}</div>
+                                </div>
+                                <div class="task-pending" style="width:20%;text-align: center">
+                                    <div>Pending</div>
+                                    <div>{{eventDetails.effortRemainPending}}</div>
                                 </div>
                             </div>
                         </div>
