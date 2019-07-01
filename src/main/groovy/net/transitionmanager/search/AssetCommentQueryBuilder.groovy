@@ -328,7 +328,7 @@ class AssetCommentQueryBuilder {
 		Date today = new Date().clearTime()
 		switch (requestParams[field]) {
 			case "dueOpenIssue":
-				whereClauses << "ac.dueDate IN < :filterToday"
+				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 		// 'break' intentionally omitted.
 
@@ -345,7 +345,7 @@ class AssetCommentQueryBuilder {
 				break
 
 			case "generalOverDue" :
-				whereClauses << "ac.dueDate IN < :filterToday"
+				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 				whereClauses << "ac.category in (:planningCategories)"
 				whereParams['planningCategories'] = AssetComment.planningCategories

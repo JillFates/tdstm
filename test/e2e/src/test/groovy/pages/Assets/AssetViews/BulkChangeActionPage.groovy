@@ -20,8 +20,8 @@ class BulkChangeActionPage extends Page{
     static content = {
         bulkChangeActionModal { $("#bulk-change-action-component")}
         modalTitle { bulkChangeActionModal.find(".modal-title")}
-        nextButton { bulkChangeActionModal.find("button span.glyphicon-step-forward")}
-        cancelButton { bulkChangeActionModal.find("button span.glyphicon-ban-circle")}
+        nextButton { bulkChangeActionModal.find("tds-button-custom.btn-primary.pull-left")}
+        cancelButton { bulkChangeActionModal.find("button.tds-button-cancel")}
         closeButton { bulkChangeActionModal.find("button.close")}
         editCheckbox { bulkChangeActionModal.find("input", name: "operation")[0]}
         editCheckboxLabel { editCheckbox.parent()}

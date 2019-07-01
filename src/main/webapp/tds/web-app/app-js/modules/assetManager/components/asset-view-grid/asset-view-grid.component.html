@@ -162,7 +162,7 @@
 
 			<!-- Default Generic Filter Template -->
 			<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
-				<div class=" has-feedback">
+				<div class="has-feedback  asset-grid-margin">
 					<tds-filter-input
 						name="{{column.domain}}.{{column.property}}"
 						[value]="column.filter"
