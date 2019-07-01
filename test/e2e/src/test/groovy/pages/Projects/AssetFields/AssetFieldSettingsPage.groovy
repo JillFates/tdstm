@@ -32,7 +32,6 @@ class AssetFieldSettingsPage extends Page {
         kendoGridContainer { activeTabPane.find("kendo-grid.field-settings-grid")}
         headers { kendoGridContainer.find(".k-grid-header th")}
         gridRows { kendoGridContainer.find(".k-grid-container tbody[kendogridtablebody]").find("tr")}
-        firstRow { gridRows.first()}
         minSringControlLenght { $(".modal label[for=minSize]").next().find(".k-numeric-wrap input")}
         maxSringControlLenght { $(".modal label[for=maxSize]").next().find(".k-numeric-wrap input")}
         firstDeleteButton { gridRows[0].find("td")[0].find("div", class:"tds-action-button-set").find("tds-button-delete")}
@@ -91,7 +90,7 @@ class AssetFieldSettingsPage extends Page {
      * @author Sebastian Bigatton
      */
     def verifyCustomRowStatus(){
-        waitFor{firstRow.find("button span.fa-trash").displayed} // verify remove button displayed
+        waitFor{firstDeleteButton.displayed} // verify remove button displayed
 
         def labelInput = getLabelInput()
         labelInput.singleElement() == js."document.activeElement" // verify label has the focus
