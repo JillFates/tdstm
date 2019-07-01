@@ -82,7 +82,14 @@ export class EventsService {
 						countStarted: model.countStarted || 0,
 						countReady: model.countReady || 0,
 						countHold: model.countHold || 0,
-						countPending: model.countPending || 0
+						countPending: model.countPending || 0,
+						effortRemainDone: model.effortRemainDone || '',
+						effortRemainPending: model.effortRemainPending || '',
+						effortRemainReady: model.effortRemainReady || '',
+						effortRemainStarted: model.effortRemainStarted || '',
+						percDurationDone: model.percDurationDone || '',
+						percDurationReady: model.percDurationReady || '',
+						percDurationStarted: model.percDurationStarted || ''
 					}
 				}
 
