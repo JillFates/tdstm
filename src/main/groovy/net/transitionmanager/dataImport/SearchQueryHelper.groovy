@@ -1,5 +1,7 @@
 package net.transitionmanager.dataImport
 
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.etl.DomainClassQueryHelper
 import com.tdsops.etl.ETLDomain
@@ -9,13 +11,11 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import groovy.util.logging.Slf4j
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Room
-import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
+import net.transitionmanager.asset.Room
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
 
@@ -151,13 +151,7 @@ class SearchQueryHelper {
 
 		switch (domainClass) {
 			case AssetDependency:
-				// Like asset fields, first check fetch entity by id.
-				// It enables to looks up AssetDependency by ids.
-				entity = fetchEntityById(domainClass, fieldName, fieldsInfo, context)
-				if (!entity) {
-					entity = fetchAssetDependencyByAssets(fieldsInfo, context)
-				}
-
+				entity = fetchAssetDependencyByAssets(fieldsInfo, context)
 				break
 
 			case Person:
