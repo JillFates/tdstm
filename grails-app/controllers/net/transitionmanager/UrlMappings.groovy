@@ -213,6 +213,16 @@ class UrlMappings {
 			action = [GET: "listEvents"]
 		}
 
+		"/ws/moveEvent/createModel" {
+			controller = "wsEvent"
+			action = [GET:"getModelForCreate"]
+		}
+
+		"ws/moveEvent/saveEvent" {
+			controller = "wsEvent"
+			action = [POST:"saveEvent"]
+		}
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
@@ -302,7 +312,6 @@ class UrlMappings {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
 		}
-
 
 		/***************************/
 
