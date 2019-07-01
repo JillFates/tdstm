@@ -151,11 +151,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	 * @param fullPath
 	 */
 	private redirectUser(fullPath: string): void {
-		if (RouterUtils.isAngularRoute(fullPath)) {
-			this.router.navigate(RouterUtils.getAngularRoute(fullPath));
-		} else {
+		// if (RouterUtils.isAngularRoute(fullPath)) {
+		// 	this.router.navigate(RouterUtils.getAngularRoute(fullPath));
+		// } else {
 			this.windowService.getWindow().location.href = fullPath;
-		}
+		// }
 	}
 }
 

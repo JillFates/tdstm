@@ -32,10 +32,18 @@ export class RouterUtils {
 	public static getAngularRoute(value: string): string[] {
 		let fullPath = [];
 		const angularPath = value.split('/module/')[1];
-		angularPath.split('/').forEach((path)  => {
+		angularPath.split('/').forEach((path) => {
 			fullPath.push(path);
 		});
 		return fullPath;
+	}
+
+	public static getLegacyRoute(value: string): string {
+		const legacyBase = 'tdstm';
+		if (value.indexOf(legacyBase) <= 0) {
+			value = '/' + legacyBase + value;
+		}
+		return value;
 	}
 
 }

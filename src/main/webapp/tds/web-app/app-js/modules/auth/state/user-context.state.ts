@@ -10,7 +10,7 @@ import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
 import {LoginService} from '../service/login.service';
 // Others
-import {tap} from 'rxjs/operators';
+import {tap, map} from 'rxjs/operators';
 
 @State<UserContextModel>({
 	name: 'userContext',

@@ -73,7 +73,7 @@ export class LoginComponent implements OnInit {
 				if (RouterUtils.isAngularRoute(userContext.notices.redirectUrl)) {
 					this.router.navigate(RouterUtils.getAngularRoute(userContext.notices.redirectUrl));
 				} else {
-					this.windowService.getWindow().location.href = userContext.notices.redirectUrl;
+					this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
 				}
 			}
 		});
