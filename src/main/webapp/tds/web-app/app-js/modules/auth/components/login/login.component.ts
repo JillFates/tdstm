@@ -115,7 +115,7 @@ export class LoginComponent implements OnInit {
 				new Login({
 					username: this.loginModel.username,
 					password: this.loginModel.password,
-					authorityPrompt: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
+					authority: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
 				})
 			);
 		}

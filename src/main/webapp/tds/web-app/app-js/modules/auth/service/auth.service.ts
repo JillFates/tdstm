@@ -68,8 +68,8 @@ export class AuthService {
 			password: payload.password
 		};
 
-		if (payload.authorityPrompt) {
-			params.authorityPrompt = payload.authorityPrompt;
+		if (payload.authority) {
+			params.authority = payload.authority;
 		}
 		return this.http.post(AUTH_API_URLS.SIGN_IN, JSON.stringify(params)).pipe(
 			map((result: any) => {
