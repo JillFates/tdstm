@@ -516,7 +516,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * This code runs each time a key is pressed.
-	 * 
+	 *
 	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
 	 * @param {KeyboardEvent} event - Context event from the input that launched the change
 	 */

@@ -87,11 +87,11 @@ export class FieldSettingsService {
 
 	/**
 	 * Checks if `label` matches any field names inside `fields`.
-	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing, 
+	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing,
 	 * leading or in-between spaces.
-	 *    e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". 
+	 *    e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName".
 	 * 	  THE ABOVE COMPARISON WILL ERROR.
-	 * 
+	 *
 	 * @param {string} label - The label string to be compared with the list of field names in `fields`.
 	 * @param {any} fields - The list of fields.
 	 * @returns {boolean} - `true` if there are conflicts, `false` otherwise.
