@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {APIActionService} from '../../service/api-action.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
@@ -23,7 +23,7 @@ import {
 	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {APIActionType} from '../../model/api-action.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';

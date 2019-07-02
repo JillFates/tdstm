@@ -1,17 +1,22 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+// NGXS
+import {Store} from '@ngxs/store';
 // Component
 import {UserPreferencesComponent} from '../preferences/user-preferences.component';
 import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
 import {UserDateTimezoneComponent} from '../date-timezone/user-date-timezone.component';
 // Service
-import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 import {UIDialogService} from '../../../../services/ui-dialog.service';
+import {NotifierService} from '../../../../services/notifier.service';
 // Model
-import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {PersonModel} from '../../../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {DIALOG_SIZE} from '../../../../model/constants';
+import {PageMetadataModel} from '../../model/page-metadata.model';
+import {Logout} from '../../../../../modules/auth/action/login.actions';
 
 declare var jQuery: any;
 
@@ -20,28 +25,41 @@ declare var jQuery: any;
 	templateUrl: 'header.component.html',
 })
 
-export class HeaderComponent implements OnInit {
+export class HeaderComponent {
 
 	public userContext: UserContextModel;
+	public pageMetaData: PageMetadataModel = new PageMetadataModel();
 
 	constructor(
 		private userContextService: UserContextService,
-		private dialogService: UIDialogService) {
+		private dialogService: UIDialogService,
+		private notifierService: NotifierService,
+		private store: Store) {
 		this.getUserContext();
+		this.headerListeners();
 	}
 
-	ngOnInit(): void {
-		/**
-		 * AdminLTE is main js that handles the layout, this could me removed later when implementing the footer
-		 */
-		if (jQuery.AdminLTE) {
-			jQuery.AdminLTE.layout.fix();
-		}
-		jQuery('.main-footer').show();
+	/**
+	 * Create the Lister for any changes made to the Routing that affects the Header Component
+	 * Includes breadcrumbs, tiles, and other menu changes
+	 */
+	private headerListeners(): void {
+		this.notifierService.on('notificationRouteChange', event => {
+			if (event.event.url.indexOf('/auth/') >= 0) {
+				this.pageMetaData.hideTopNav = true;
+				jQuery('div.content-wrapper').addClass('content-login-wrapper');
+			} else {
+				this.pageMetaData.hideTopNav = false;
+				jQuery('div.content-wrapper').removeClass('content-login-wrapper');
+			}
+		});
 	}
 
 	protected getUserContext(): void {
 		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
+			if (!userContext.user) {
+				this.pageMetaData.hideTopNav = true;
+			}
 			this.userContext = userContext;
 		});
 	}
@@ -65,5 +83,12 @@ export class HeaderComponent implements OnInit {
 		this.dialogService.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG).catch(result => {
 			//
 		});
+	}
+
+	/**
+	 * Destroy the Storage and redirect the user
+	 */
+	public logOut(): void {
+		this.store.dispatch(new Logout());
 	}
 }

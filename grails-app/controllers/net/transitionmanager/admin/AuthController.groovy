@@ -1,6 +1,8 @@
 package net.transitionmanager.admin
 
 import com.tdsops.common.builder.UserAuditBuilder
+import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.StartPageEnum
@@ -49,23 +51,19 @@ class AuthController implements ControllerMethods {
 			redirectToPrefPage()
 		}
 		else {
-			redirect(action: 'login', params: params)
+			redirect(uri: '/tdstm/module/auth/login')
 		}
 	}
 
 	def login() {
 		// Adding the X-Login-URL header so that we can catch it in Ajax calls
-		response.setHeader('X-Login-URL', createLink(controller: 'auth', action: 'login', absolute: true).toString())
+		response.setHeader('X-Login-URL', '/tdstm/module/auth/login')
 
 		return [username: params.username, authority: params.authority, rememberMe: params.rememberMe != null,
 		 loginConfig: securityService.getLoginConfig(), buildInfo: environmentService.getVersionText(),
 		 preLoginList: noticeService.fetchPreLoginNotices()]
 	}
 
-	private signIn() {
-		// Now redirect back to the login page.
-		redirect(action: 'login')
-	}
 
 	private void redirectToPrefPage() {
 
@@ -184,6 +182,7 @@ class AuthController implements ControllerMethods {
 	 * This will send the email notice to the user and then redirect them to the login form with a flash message
 	 * explaining the next step.
 	 */
+	@Deprecated
 	def sendResetPassword() {
 		def email = params.email
 		def success = true
@@ -196,6 +195,21 @@ class AuthController implements ControllerMethods {
 		}
 
 		render( view:'_forgotMyPassword', model: [email: params.email, success: success] )
+	}
+
+	/**
+	 * Send the reset password email notification for the given email address.
+	 * @return whether or not the process was successful.
+	 */
+	def sendResetPasswordEMail() {
+		String email = params.email
+		boolean success = true
+		try {
+			securityService.sendResetPasswordEmail(email, request.getRemoteAddr(), PasswordResetType.FORGOT_MY_PASSWORD)
+		} catch (ServiceException e) {
+			success = false
+		}
+		renderSuccessJson([success: success])
 	}
 
 	/**
@@ -255,5 +269,19 @@ class AuthController implements ControllerMethods {
 			log.info("Error applying new password: ${exceptionMessage}")
 			resetPassword()
 		}
+	}
+
+	/**
+	 * Fetch the info necessary for the login page
+	 * @return build version, pre login notices and session expired and account locked out flags.
+	 */
+	def getLoginInfo() {
+		renderSuccessJson([
+			buildVersion: environmentService.getVersionText(),
+			config: securityService.getConfigForLogin(),
+			notices: noticeService.getPreLoginNotices(),
+			sessionExpired: session.getAttribute(TdsHttpSessionRequestCache.SESSION_EXPIRED),
+			accountLockedOut: session.getAttribute(SecurityUtil.ACCOUNT_LOCKED_OUT)
+		])
 	}
 }

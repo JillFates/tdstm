@@ -1,6 +1,6 @@
 import {NgModule, ModuleWithProviders} from '@angular/core';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import {RouterModule} from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {PopupModule} from '@progress/kendo-angular-popup';
@@ -10,6 +10,8 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
+// NGXS
+import {Store} from '@ngxs/store';
 // Shared Services
 import {HeaderService} from './modules/header/services/header.service';
 import {PreferenceService} from '../shared/services/preference.service';
@@ -18,7 +20,6 @@ import {ComponentCreatorService} from '../shared/services/component-creator.serv
 import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
 import {UILoaderService} from '../shared/services/ui-loader.service';
 import {PersonService} from './services/person.service';
-import {PermissionService} from './services/permission.service';
 import {WindowService} from './services/window.service';
 import {BulkChangeService} from './services/bulk-change.service';
 import {BulkCheckboxService} from './services/bulk-checkbox.service';
@@ -28,9 +29,9 @@ import {ValidationRulesDefinitionsService} from './services/validation-rules-def
 import {HttpRequestInterceptor, HTTPFactory} from './providers/http-request-interceptor.provider.';
 import {KendoFileUploadInterceptor, HTTPKendoFactory} from './providers/kendo-file-upload.interceptor';
 import {KendoFileHandlerService} from './services/kendo-file-handler.service';
-import {PostNoticesManagerService} from '../modules/security/services/post-notices-manager.service';
-import {PostNoticesService} from '../modules/security/services/post-notices.service';
-import {PostNoticesValidatorService} from '../modules/security/services/post-notices-validator.service';
+import {PostNoticesManagerService} from '../modules/auth/service/post-notices-manager.service';
+import {PostNoticesService} from '../modules/auth/service/post-notices.service';
+import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -59,6 +60,7 @@ import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
 import {PopupLegendsComponent} from './modules/popup/legends/popup-legends.component';
 import {BreadcrumbNavigationComponent} from './modules/header/components/breadcrumb-navigation/breadcrumb-navigation.component';
 import {HeaderComponent} from './modules/header/components/header/header.component';
+import {FooterComponent} from './modules/footer/components/footer.component';
 import {TranmanMenuComponent} from './modules/header/components/tranman-menu/tranman-menu.component';
 import {LicenseWarningComponent} from './modules/header/components/license-warning/license-warning.component';
 import {UserManageStaffComponent} from './modules/header/components/manage-staff/user-manage-staff.component';
@@ -125,6 +127,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UIDialogDirective,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		FooterComponent,
 		UserPreferencesComponent,
 		UserEditPersonComponent,
 		UserDateTimezoneComponent,
@@ -188,6 +191,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		EscapeUrlEncodingPipe,
 		BreadcrumbNavigationComponent,
 		HeaderComponent,
+		FooterComponent,
 		UserPreferencesComponent,
 		UserEditPersonComponent,
 		UserDateTimezoneComponent,
@@ -251,8 +255,6 @@ export class SharedModule {
 				// Preferences
 				PreferencesResolveService,
 				PreferenceService,
-				// Permissions
-				PermissionService,
 				// Dialogs
 				ComponentCreatorService,
 				UILoaderService,
@@ -267,7 +269,7 @@ export class SharedModule {
 					provide: HTTP_INTERCEPTORS,
 					useClass: HttpRequestInterceptor,
 					useFactory: HTTPFactory,
-					deps: [NotifierService],
+					deps: [NotifierService, Router, Store, WindowService],
 					multi: true
 				},
 				{

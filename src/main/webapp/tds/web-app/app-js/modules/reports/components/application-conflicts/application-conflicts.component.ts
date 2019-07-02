@@ -8,7 +8,7 @@ import {
 
 import {ReportsService} from '../../service/reports.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {UserService} from '../../../security/services/user.service';
+import {UserService} from '../../../auth/service/user.service';
 import { EntityConflict } from '../../model/conflicts.model';
 import {ReportComponent} from '../report.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -27,7 +27,7 @@ export class ApplicationConflictsComponent extends ReportComponent {
 	reportBundle = '';
 	reportOwner = '';
 	planningBundles: any;
-	model = {
+	public model = {
 		moveBundleList: [],
 		appOwnerList: [],
 		appOwner: null,

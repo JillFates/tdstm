@@ -9,11 +9,12 @@ import net.transitionmanager.common.EnvironmentService
  * @author Jorge Morayta
  */
 
-@Secured('isAuthenticated()')
+@Secured('permitAll')
 class SingleAppController {
     EnvironmentService environmentService
 
     def index() {
+        response.setHeader('X-Login-URL', '/tdstm/module/auth/login')
         [buildHash: environmentService.buildHash]
     }
 }

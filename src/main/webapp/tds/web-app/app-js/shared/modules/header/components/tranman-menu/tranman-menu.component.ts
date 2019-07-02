@@ -1,10 +1,10 @@
 // Angular
 import {Component} from '@angular/core';
 // Model
-import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {Permission} from '../../../../model/permission.model';
 // Service
-import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 import {PermissionService} from '../../../../services/permission.service';
 
 @Component({
