@@ -484,11 +484,8 @@ class TaskService implements ServiceMethods {
 			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
 
 			// Encrypt the username and password with the Public Key that the client sent to the server
-			credentials.username = task.apiAction.credential.username
-			credentials.password = credentialService.decryptPassword(task.apiAction.credential)
-			// credentials.username = securityService.encryptWithPublicKey(task.apiAction.credential.username, publicKey)
-			// credentials.password = securityService.encryptWithPublicKey(
-			// 	credentialService.decryptPassword(task.apiAction.credential), publicKey)
+			 credentials.username = securityService.encryptWithPublicKey(task.apiAction.credential.username, publicKey)
+			 credentials.password = securityService.encryptWithPublicKey(credentialService.decryptPassword(task.apiAction.credential), publicKey)
 
 			actionRequestMap.options.credentials = credentials
 		}
