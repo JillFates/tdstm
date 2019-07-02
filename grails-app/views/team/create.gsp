@@ -6,7 +6,7 @@
     <title>Create RoleType</title>
   </head>
   <body>
-    <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Role Type','Create']"/><br />
+    <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Team','Create']"/><br />
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
             	<span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>
@@ -75,19 +75,5 @@
         </div>
         <div class="buttons"><span class="button"><input class="save" type="submit" value="Save" /></span></div>
     </g:form></div>
-    <script>
-
-
-    function typeChanged(){
-      var type = $("#type").val()
-      if(type == "SECURITY"){
-        $("#levelRow").css("display", "")
-        $("#level").val("")
-      }else{
-        $("#level").val("0")
-        $("#levelRow").css("display", "none")
-      }
-    }
-    </script>
   </body>
 </html>

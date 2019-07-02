@@ -5,7 +5,7 @@
     <title>Show Team</title>
   </head>
   <body>
-    <tds:subHeader title="Show Team" crumbs="['Admin','Portal','Role Type','Show']"/><br/>
+    <tds:subHeader title="Show Team" crumbs="['Admin','Portal','Team','Show']"/><br/>
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
 	            <span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>

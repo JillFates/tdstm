@@ -7,7 +7,7 @@
         <title>Team List</title>
     </head>
     <body>
-        <tds:subHeader title="Teams" crumbs="['Admin','Portal','Role Type','List']"/><br/>
+        <tds:subHeader title="Teams" crumbs="['Admin','Portal','Team','List']"/><br/>
         <div class="body">
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
