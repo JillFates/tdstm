@@ -48,7 +48,7 @@ class ApplicationFieldCleanUpSpec extends GebReportingSpec{
             bulkDelete minNumberOfFieldsPresent
     }
 
-    def "2. The user verifies no more than 2 QAE2E fields are dispayed"() {
+    def "2. The user verifies no more than 2 QAE2E fields are displayed"() {
         when: 'The user filters by label'
             filterByName baseName
         then: 'No more than min QAE2E fields are displayed'

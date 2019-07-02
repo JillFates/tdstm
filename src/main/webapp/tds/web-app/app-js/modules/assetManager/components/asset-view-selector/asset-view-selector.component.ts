@@ -31,8 +31,7 @@ import {Router} from '@angular/router';
                             [valueField]="'name'"
                             (click)="onToggle()"
                             [textField]="'name'"
-                            class="asset-explorer-view-selector-component"
-                            style="width: 266px;">
+                            class="asset-explorer-view-selector-component">
             <ng-template kendoDropDownListValueTemplate let-dataItem>
 		<span style="cursor:pointer;width:100%;">
 			<div *ngIf="selectedItem !== ''; else noneSelectedItem">

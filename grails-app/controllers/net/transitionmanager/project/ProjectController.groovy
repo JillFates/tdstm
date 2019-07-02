@@ -123,7 +123,7 @@ class ProjectController implements ControllerMethods {
 
 		[
 			projectInstance      : project,
-			timezone             : project.timezone.label ?: '',
+			timezone             : project.timezone?.label ?: '',
 			client               : project.client,
 			defaultBundle        : project.defaultBundle,
 			projectPartners      : partyRelationshipService.getProjectPartners(project),
