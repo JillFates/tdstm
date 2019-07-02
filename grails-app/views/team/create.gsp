@@ -9,7 +9,7 @@
     <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Role Type','Create']"/><br />
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
-            	<span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
+            	<span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>
 	  </div>
 	  <br/>
       <g:if test="${flash.message}">
@@ -21,16 +21,6 @@
 				<tr>
 					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
-
-              <tr class="prop">
-                  <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
-                  <td>
-                    <g:select id="type" name="type"
-                              from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(RoleType.class).type.inList}" value="${roleTypeInstance.type}"
-                              noSelection="${['':'Please select']}" onchange="typeChanged()">
-                    </g:select>
-                  </td>
-              </tr>
 
               <tr class="prop" id="levelRow">
                 <td valign="top" class="name"><label for="id"><b>Level:</b></label></td>

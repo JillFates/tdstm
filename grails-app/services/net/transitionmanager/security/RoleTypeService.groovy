@@ -2,13 +2,17 @@ package net.transitionmanager.security
 
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.command.RoleTypeCommand
+import net.transitionmanager.command.TeamCommand
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
 import org.grails.datastore.mapping.query.api.Criteria
 
+/**
+ * A service for creating, updating, listing and deleting RoleTypes
+ *
+ * This is currently only used for Teams, but the service is agnostic, so it could be used in the future for other RoleTypes.
+ */
 class RoleTypeService implements ServiceMethods {
 
 	/**
@@ -16,9 +20,9 @@ class RoleTypeService implements ServiceMethods {
 	 *
 	 * @return a list of RoleType
 	 */
-	List<RoleType> list() {
+	List<RoleType> list(String roleType) {
 		Criteria query = RoleType.where {
-			type == RoleType.TEAM
+			type == roleType
 		}
 
 		query.order('type', 'asc')
@@ -73,7 +77,7 @@ class RoleTypeService implements ServiceMethods {
 	 * @return and updated instance of RoleType
 	 */
 	@Transactional
-	RoleType update(RoleTypeCommand roleTypeCommand) {
+	RoleType update(TeamCommand roleTypeCommand) {
 		RoleType roleTypeInstance = getById(roleTypeCommand.id, true)
 		roleTypeCommand.populateDomain(roleTypeInstance, false, ['type', 'code'])
 
@@ -90,7 +94,7 @@ class RoleTypeService implements ServiceMethods {
 	 * @return
 	 */
 	@Transactional
-	RoleType save(RoleTypeCommand roleTypeCommand) {
+	RoleType save(TeamCommand roleTypeCommand) {
 		RoleType roleTypeInstance = new RoleType()
 		roleTypeCommand.populateDomain(roleTypeInstance)
 

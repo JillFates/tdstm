@@ -158,7 +158,7 @@ a:hover {
 						</tr>
 						<tr class="odd">
 							<td>
-								<g:link controller="roleType" style="color:black">Teams</g:link>
+								<g:link controller="team" style="color:black">Teams</g:link>
 							</td>
 							<td>Used to add/modify the Team labels for all projects on instance</td>
 						</tr>
