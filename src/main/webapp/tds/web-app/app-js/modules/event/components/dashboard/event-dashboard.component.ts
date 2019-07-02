@@ -4,6 +4,8 @@ import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { pathOr } from 'ramda';
 
+import * as R from  'ramda';
+
 // Services
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UserContextService } from '../../../security/services/user-context.service';
@@ -22,7 +24,7 @@ import { DIALOG_SIZE } from '../../../../shared/model/constants';
 import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../security/model/user-context.model';
 import { ContextMenuComponent } from '@progress/kendo-angular-menu';
-import any from 'ramda/es/any';
+// import any from 'ramda/es/any';
 
 @Component({
 	selector: 'event-dashboard',
@@ -38,83 +40,83 @@ export class EventDashboardComponent implements OnInit {
 	public userTimeZone: string;
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
-	public teamTaskMatrix: [
+	public teamTaskMatrix = R.flatten([
 		[
 			{
-				'teamTaskCount': 1,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_ACCT_MGR',
-					'description': 'Account Manager'
+				teamTaskCount: 1,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_ACCT_MGR',
+					description: 'Account Manager'
 				},
-				'percDone': 0
+				percDone: 0
 			},
 			{
-				'teamTaskCount': 50,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_SYS_ADMIN',
-					'description': 'System Admin'
+				teamTaskCount: 50,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_SYS_ADMIN',
+					description: 'System Admin'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		],
 		[
 			{
-				'teamTaskCount': 210,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_APP_COORD',
-					'description': 'App Coordinator'
+				teamTaskCount: 210,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_APP_COORD',
+					description: 'App Coordinator'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		],
 		[
 			{
-				'teamTaskCount': 14,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_CLEANER',
-					'description': 'Logistics Technician'
+				teamTaskCount: 14,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_CLEANER',
+					description: 'Logistics Technician'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		],
 		[
 			{
-				'teamTaskCount': 1,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_MOVE_MGR',
-					'description': 'Move Manager'
+				teamTaskCount: 1,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_MOVE_MGR',
+					description: 'Move Manager'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		],
 		[
 			{
-				'teamTaskCount': 29,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_MOVE_TECH',
-					'description': 'Move Technician'
+				teamTaskCount: 29,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_MOVE_TECH',
+					description: 'Move Technician'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		],
 		[
 			{
-				'teamTaskCount': 2,
-				'teamDoneCount': 0,
-				'role': {
-					'id': 'ROLE_PROJ_MGR',
-					'description': 'Project Manager'
+				teamTaskCount: 2,
+				teamDoneCount: 0,
+				role: {
+					id: 'ROLE_PROJ_MGR',
+					description: 'Project Manager'
 				},
-				'percDone': 0
+				percDone: 0
 			}
 		]
-	];
+	]);
 
 	constructor(
 		private eventsService: EventsService,

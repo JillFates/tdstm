@@ -54,14 +54,16 @@
     }
 </style>
 
-<div style="display: flex; flex-direction: row;">
-    <div id="teamTableContent" class="teamBreakdown toprightcontent smallTable">
+
+<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+    <div *ngFor="let team of teamTaskMatrix" class="teamBreakdown toprightcontent smallTable">
         <table style="border:none;">
             <tbody>
                 <tr>
                     <td class="teamcol" nowrap="">
-                        <a href="/tdstm/assetEntity/listTasks?role=ROLE_APP_COORD" style="display:block">App
-                            Coordinator</a>
+                        <a href="/tdstm/assetEntity/listTasks?role=ROLE_APP_COORD" style="display:block">
+                            {{team.role.description}}
+                        </a>
                     </td>
                     <td class="teamcountcolumn">
                         <a href="/tdstm/assetEntity/listTasks?role=ROLE_APP_COORD" style="display:block">1</a>
