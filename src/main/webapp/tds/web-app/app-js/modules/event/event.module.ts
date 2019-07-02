@@ -23,6 +23,7 @@ import {NewsComponent} from './components/news/news.component';
 import {NewsCreateEditComponent} from './components/news-create-edit/news-create-edit.component';
 import {PlanVersusStatusComponent} from './components/plan-versus-status/plan-versus-status.component';
 import {EventResumeComponent} from './components/event-resume/event-resume.component';
+import {TeamTaskPercentsComponent} from './components/team-task-percents/team-task-percents.component';
 
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
@@ -54,7 +55,8 @@ import {EventsService} from './service/events.service';
 		NewsCreateEditComponent,
 		NewsComponent,
 		PlanVersusStatusComponent,
-		EventResumeComponent
+		EventResumeComponent,
+		TeamTaskPercentsComponent
 	],
 	providers: [
 		// Resolve
@@ -67,7 +69,8 @@ import {EventsService} from './service/events.service';
 		NewsCreateEditComponent,
 		NewsComponent,
 		PlanVersusStatusComponent,
-		EventResumeComponent
+		EventResumeComponent,
+		TeamTaskPercentsComponent
 	],
 	entryComponents: [
 		NewsCreateEditComponent

@@ -1,27 +1,27 @@
 // Angular
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Observable, forkJoin} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {pathOr} from 'ramda';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { pathOr } from 'ramda';
 
 // Services
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
-import {ActionType} from '../../../../shared/model/action-type.enum';
-import {EventsService} from './../../service/events.service';
-import {NewsModel, NewsDetailModel} from './../../model/news.model';
-import {EventModel, EventPlanStatus} from './../../model/event.model';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { UserContextService } from '../../../security/services/user-context.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
+import { ActionType } from '../../../../shared/model/action-type.enum';
+import { EventsService } from './../../service/events.service';
+import { NewsModel, NewsDetailModel } from './../../model/news.model';
+import { EventModel, EventPlanStatus } from './../../model/event.model';
 // Components
-import {NewsCreateEditComponent} from '../news-create-edit/news-create-edit.component';
+import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
 // Model
 
-import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {DIALOG_SIZE} from '../../../../shared/model/constants';
-import {GridComponent} from '@progress/kendo-angular-grid';
-import {UserContextModel} from '../../../security/model/user-context.model';
-import {ContextMenuComponent} from '@progress/kendo-angular-menu';
+import { COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
+import { DIALOG_SIZE } from '../../../../shared/model/constants';
+import { GridComponent } from '@progress/kendo-angular-grid';
+import { UserContextModel } from '../../../security/model/user-context.model';
+import { ContextMenuComponent } from '@progress/kendo-angular-menu';
 import any from 'ramda/es/any';
 
 @Component({
@@ -38,6 +38,83 @@ export class EventDashboardComponent implements OnInit {
 	public userTimeZone: string;
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
+	public teamTaskMatrix: [
+		[
+			{
+				'teamTaskCount': 1,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_ACCT_MGR',
+					'description': 'Account Manager'
+				},
+				'percDone': 0
+			},
+			{
+				'teamTaskCount': 50,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_SYS_ADMIN',
+					'description': 'System Admin'
+				},
+				'percDone': 0
+			}
+		],
+		[
+			{
+				'teamTaskCount': 210,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_APP_COORD',
+					'description': 'App Coordinator'
+				},
+				'percDone': 0
+			}
+		],
+		[
+			{
+				'teamTaskCount': 14,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_CLEANER',
+					'description': 'Logistics Technician'
+				},
+				'percDone': 0
+			}
+		],
+		[
+			{
+				'teamTaskCount': 1,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_MOVE_MGR',
+					'description': 'Move Manager'
+				},
+				'percDone': 0
+			}
+		],
+		[
+			{
+				'teamTaskCount': 29,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_MOVE_TECH',
+					'description': 'Move Technician'
+				},
+				'percDone': 0
+			}
+		],
+		[
+			{
+				'teamTaskCount': 2,
+				'teamDoneCount': 0,
+				'role': {
+					'id': 'ROLE_PROJ_MGR',
+					'description': 'Project Manager'
+				},
+				'percDone': 0
+			}
+		]
+	];
 
 	constructor(
 		private eventsService: EventsService,
@@ -77,26 +154,26 @@ export class EventDashboardComponent implements OnInit {
 			.subscribe((eventDetails: any) => {
 				console.log('The details are');
 				console.log(eventDetails);
-				this.eventDetails  = eventDetails;
+				this.eventDetails = eventDetails;
 			});
 
 		this.eventsService.getListBundles(id)
-		.subscribe((results: any[]) => {
-			this.selectedEventBundle = results.length > 0 ? results.shift() : null;
-			this.eventPlanStatus = new EventPlanStatus();
-			if (this.selectedEventBundle) {
-				this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
-					.subscribe((statusDetails: any) => {
-						console.log('The event status details are');
-						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
-						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
-						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
-						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
-						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
-						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
-					});
-			}
-		});
+			.subscribe((results: any[]) => {
+				this.selectedEventBundle = results.length > 0 ? results.shift() : null;
+				this.eventPlanStatus = new EventPlanStatus();
+				if (this.selectedEventBundle) {
+					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
+						.subscribe((statusDetails: any) => {
+							console.log('The event status details are');
+							this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
+							this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
+							this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
+							this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
+							this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
+							this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
+						});
+				}
+			});
 
 	}
 
@@ -120,7 +197,7 @@ export class EventDashboardComponent implements OnInit {
 
 	openCreateEdiceNews(model: NewsDetailModel) {
 		this.dialogService.open(NewsCreateEditComponent, [
-			{provide: NewsDetailModel, useValue: model},
+			{ provide: NewsDetailModel, useValue: model },
 		]).then(result => {
 			console.log('reloading data');
 		}, error => {
@@ -133,7 +210,7 @@ export class EventDashboardComponent implements OnInit {
 			type: 'N',
 			text: '',
 			state: 'L'
-		} ;
+		};
 	}
 
 	onCreate(): void {
@@ -149,12 +226,12 @@ export class EventDashboardComponent implements OnInit {
 			value: value,
 			checkbox: true
 		})
-		.subscribe((result) => {
-			console.log('The resulting of update is:');
-			console.log(result);
-		}, error => {
-			console.log('here error is');
-			console.log(error);
-		});
+			.subscribe((result) => {
+				console.log('The resulting of update is:');
+				console.log(result);
+			}, error => {
+				console.log('here error is');
+				console.log(error);
+			});
 	}
 }
