@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "dcc07544-719e-444e-8d30-82221c1add2f",
+		"_postman_id": "f6fc1969-4db2-418e-bc87-eb554da09102",
 		"name": "Highliht by Tag",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -13,8 +13,15 @@
 					"script": {
 						"id": "2cd154d3-2684-4ea6-b676-ce908a2989f3",
 						"exec": [
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -26,7 +33,9 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					},
 					{
 						"key": "Accept",
@@ -34,19 +43,8 @@
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "api_test_user",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "api_password",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
