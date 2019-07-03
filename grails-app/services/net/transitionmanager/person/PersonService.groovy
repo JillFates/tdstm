@@ -460,7 +460,7 @@ class PersonService implements ServiceMethods {
 		name = StringUtils.strip(name)
 		Map<String, String> map = [first: '', last: '', middle: '', suffix: '']
 		boolean firstLast = true
-		String[] split
+		List<String> split
 
 		if (!name) {
 			return null
@@ -541,7 +541,7 @@ class PersonService implements ServiceMethods {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			String last = split[0].split("\\s+").collect { it.trim() }
+			List<String> last = split[0].split("\\s+").collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -551,7 +551,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			String first = split[1].split("\\s+").collect { it.trim() }
+			List<String> first = split[1].split("\\s+").collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {
