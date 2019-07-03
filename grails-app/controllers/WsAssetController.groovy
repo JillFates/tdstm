@@ -82,6 +82,7 @@ class WsAssetController implements ControllerMethods {
 			AssetEntity assetEntity = AssetEntity.createCriteria().get {
 				and {
 					eq('assetName', command.name, [ignoreCase: true])
+					eq('project', getProjectForWs())
 					if(assetClassSample){
 						eq('assetClass', assetClassSample)
 					}

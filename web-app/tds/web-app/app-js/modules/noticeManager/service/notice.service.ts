@@ -82,10 +82,12 @@ export class NoticeService {
 	 * @param {any} state: Current filters state
 	 * @returns void
 	 */
+	/*
 	clearFilter(column: any, state: any): void {
 		column.filter = '';
 		state.filter.filters = this.getFiltersExcluding(column.property, state);
 	}
+	*/
 
 	/**
 	 * Get the filters state structure excluding the column filter name provided
@@ -93,28 +95,10 @@ export class NoticeService {
 	 * @param {any} state: Current filters state
 	 * @returns void
 	 */
+	/*
 	getFiltersExcluding(excludeFilterName: string, state: any): any {
 		const filters = (state.filter && state.filter.filters) || [];
 		return  filters.filter((r) => r['field'] !== excludeFilterName);
-	}
-
-	/**
-	 * Get the post Notices to process
-	 * @returns any
-	 */
-	/*
-	getPostNotices(): Observable<PostNoticeResponse> {
-		return this.http.get(`${this.singleNoticeUrl}/fetchPostLoginNotices`)
-			.map((res: Response) => {
-				let result = res.json();
-				let notices = result.data && result.data.notices || [];
-				notices.forEach( (notice: any) => {
-					notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
-				});
-
-				return result && result.data || [];
-			})
-			.catch((error: any) => error.json());
 	}
 	*/
 

@@ -77,7 +77,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 		Project project = securityService.userCurrentProject
 		session.DB = [:]
 
-		List moveBundleList
+		def moveBundleList
 		if (params.event?.isNumber()) {
 			MoveEvent moveEvent = MoveEvent.read(params.event)
 			moveBundleList = moveEvent?.moveBundles?.findAll { it.useForPlanning }
@@ -179,7 +179,7 @@ class DatabaseController implements ControllerMethods, PaginationMethods {
 
 		queryParams.projectId = NumberUtil.toPositiveLong(project.id)
 
-		if (justPlanning) {
+		if (justPlanning == 'true') {
 			query.append(" AND mb.use_for_planning=true ")
 		}
 

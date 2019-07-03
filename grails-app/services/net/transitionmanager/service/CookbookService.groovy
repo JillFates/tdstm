@@ -673,7 +673,7 @@ class CookbookService implements ServiceMethods {
 	 */
 	Map parseRecipeSyntax(String  sourceCode) {
 		if (!sourceCode) {
-//			throw new InvalidSyntaxException('Recipe contains no source code')
+			//	throw new InvalidSyntaxException('Recipe contains no source code')
 			throw new RuntimeException('Recipe contains no source code')
 		}
 

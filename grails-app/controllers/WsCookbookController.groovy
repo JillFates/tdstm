@@ -97,6 +97,21 @@ class WsCookbookController implements ControllerMethods {
 		Recipe recipe = result.recipe
 		RecipeVersion rv = result.recipeVersion
 
+		Map sourceCodeAsMap
+		String sourceCode = rv.sourceCode
+		if (! sourceCode) {
+			sourceCode = "groups: [\n" +
+				"],\n"+
+				"tasks: [\n" +
+				"]"
+		}
+		boolean asJson = (params.format == 'json')
+
+		if (asJson) {
+			// Returns just the recipe syntax itself as a JSON object
+			sourceCodeAsMap = cookbookService.parseRecipeSyntax(sourceCode)
+		}
+		// Returns all details about the recipe including the syntax
 		renderSuccessJson(recipeId: recipe.id,
 			name: recipe.name,
 			description: recipe.description,
@@ -107,7 +122,7 @@ class WsCookbookController implements ControllerMethods {
 			releasedVersionNumber: recipe.releasedVersion?.versionNumber ?: -1,
 			recipeVersionId: rv.id,
 			hasWIP: result.wip != null,
-			sourceCode: rv.sourceCode,
+			sourceCode: asJson ? sourceCodeAsMap : sourceCode,
 			changelog: rv.changelog,
 			clonedFrom: (rv.clonedFrom ?: '').toString())
 	}
