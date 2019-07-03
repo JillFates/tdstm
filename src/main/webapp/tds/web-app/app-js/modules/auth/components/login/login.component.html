@@ -46,6 +46,7 @@
                     <input type="text" class="form-control username"
                            [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
                            name="username"
+                           id="usernameid"
                            [(ngModel)]="loginModel.username"
                            placeholder="Enter your username"
                            title="Enter your username"
@@ -55,7 +56,16 @@
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
-                    <input type="password" class="form-control" [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}" name="password" [(ngModel)]="loginModel.password" autocorrect="off" autocapitalize="off" placeholder="Enter your password" title="Enter your password" required/>
+                    <input type="password" class="form-control"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="password"
+                           id="password"
+                           [(ngModel)]="loginModel.password"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           placeholder="Enter your password"
+                           title="Enter your password"
+                           required/>
                     <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
                 <div class="message">{{errMessage}}</div>
@@ -64,7 +74,7 @@
                     </div>
                     <!-- /.col -->
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
+                        <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
                     </div>
                     <!-- /.col -->
                 </div>

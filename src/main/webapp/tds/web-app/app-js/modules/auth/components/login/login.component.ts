@@ -75,6 +75,8 @@ export class LoginComponent implements OnInit {
 				} else {
 					this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
 				}
+			} else if (userContext.error) {
+				this.errMessage = userContext.error;
 			}
 		});
 	}

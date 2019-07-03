@@ -39,6 +39,11 @@ export class AuthService {
 		return new Observable(observer => {
 			this.login({payload}).subscribe(userContext => {
 				let contextPromises = [];
+				// Something goes wrong from the first login
+				if (userContext['error']) {
+					observer.error(userContext['error']);
+					return observer.complete();
+				}
 				contextPromises.push(from(new Promise(resolve => resolve(userContext))));
 				contextPromises.push(this.userService.getLicenseInfo());
 				contextPromises.push(this.permissionService.getPermissions());
@@ -75,6 +80,9 @@ export class AuthService {
 			map((result: any) => {
 				if (result.userContext && result.userContext.user) {
 					return {...result.userContext, notices: result.notices};
+				}
+				if (result.error) {
+					return result;
 				}
 				return {};
 			})
