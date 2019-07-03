@@ -16,6 +16,10 @@ class AppVersionController implements ControllerMethods{
     EnvironmentService environmentService
 
 
+    /**
+     * Retrieve and return the build version.
+     * @return
+     */
     def index() {
         renderSuccessJson([version: environmentService.getVersionText()])
     }
