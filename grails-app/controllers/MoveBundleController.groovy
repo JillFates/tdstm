@@ -729,8 +729,8 @@ class MoveBundleController implements ControllerMethods {
 
 		def today = new Date()
 		def todayClearedTime = today.clearTime()
-		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
-		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
+		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status not in (:status) and a.commentType =:type AND a.isPublished = true"
+		def issueArgs = [project:project, status: [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED], type:AssetCommentType.TASK.toString()]
 
 		def openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
 		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate:todayClearedTime]).size()
