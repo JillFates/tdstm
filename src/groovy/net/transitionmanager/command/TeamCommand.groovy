@@ -4,15 +4,15 @@ import grails.validation.Validateable
 import net.transitionmanager.domain.RoleType
 
 @Validateable
-class RoleTypeCommand implements CommandObject {
+class TeamCommand implements CommandObject {
 
 	String id
 	String description
 	String help
-	String type
+	String type = RoleType.TEAM
 	Integer level
 
 	static constraints = {
-		type inList: [RoleType.SECURITY, RoleType.TEAM, RoleType.PROJECT, RoleType.PARTY, RoleType.APP]
+		type inList: [RoleType.TEAM]
 	}
 }
