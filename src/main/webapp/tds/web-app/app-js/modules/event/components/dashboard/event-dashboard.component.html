@@ -131,7 +131,9 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <tds-team-task-percents [teamTaskMatrix]="teamTaskMatrix"></tds-team-task-percents>
+                    <tds-team-task-percents *ngIf="eventDetails" 
+                        [teamTaskMatrix]="teamTaskMatrix">
+                    </tds-team-task-percents>
                 </div>
             </div>
         </div>

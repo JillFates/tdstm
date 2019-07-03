@@ -40,83 +40,7 @@ export class EventDashboardComponent implements OnInit {
 	public userTimeZone: string;
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
-	public teamTaskMatrix = R.flatten([
-		[
-			{
-				teamTaskCount: 1,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_ACCT_MGR',
-					description: 'Account Manager'
-				},
-				percDone: 0
-			},
-			{
-				teamTaskCount: 50,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_SYS_ADMIN',
-					description: 'System Admin'
-				},
-				percDone: 0
-			}
-		],
-		[
-			{
-				teamTaskCount: 210,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_APP_COORD',
-					description: 'App Coordinator'
-				},
-				percDone: 0
-			}
-		],
-		[
-			{
-				teamTaskCount: 14,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_CLEANER',
-					description: 'Logistics Technician'
-				},
-				percDone: 0
-			}
-		],
-		[
-			{
-				teamTaskCount: 1,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_MOVE_MGR',
-					description: 'Move Manager'
-				},
-				percDone: 0
-			}
-		],
-		[
-			{
-				teamTaskCount: 29,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_MOVE_TECH',
-					description: 'Move Technician'
-				},
-				percDone: 0
-			}
-		],
-		[
-			{
-				teamTaskCount: 2,
-				teamDoneCount: 0,
-				role: {
-					id: 'ROLE_PROJ_MGR',
-					description: 'Project Manager'
-				},
-				percDone: 0
-			}
-		]
-	]);
+	public teamTaskMatrix = [];
 
 	constructor(
 		private eventsService: EventsService,
@@ -157,6 +81,7 @@ export class EventDashboardComponent implements OnInit {
 				console.log('The details are');
 				console.log(eventDetails);
 				this.eventDetails = eventDetails;
+				this.teamTaskMatrix = R.flatten(eventDetails.teamTaskMatrix || []);
 			});
 
 		this.eventsService.getListBundles(id)

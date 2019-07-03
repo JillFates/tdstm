@@ -89,7 +89,8 @@ export class EventsService {
 						effortRemainStarted: model.effortRemainStarted || '',
 						percDurationDone: model.percDurationDone || '',
 						percDurationReady: model.percDurationReady || '',
-						percDurationStarted: model.percDurationStarted || ''
+						percDurationStarted: model.percDurationStarted || '',
+						teamTaskMatrix: model.teamTaskMatrix || []
 					}
 				}
 

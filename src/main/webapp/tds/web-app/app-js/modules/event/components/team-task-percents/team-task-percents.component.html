@@ -1,6 +1,6 @@
 <style>
     .teamBreakdown.toprightcontent.smallTable {
-        width: 300px;
+        width: 250px;
         overflow-y: hidden;
     }
     .teamBreakdown.toprightcontent {
@@ -24,14 +24,21 @@
         width: 110px;
         padding: 2px;
     }
+    .teamcol a,
+    .teamcountcolumn a {
+        color: #000;
+        font-weight: bold;
+    }
+
     .teamcountcolumn {
         width: 30px;
-        text-align: right;
+        /* text-align: right; */
     }
     .teambarcolumn {
         width: 70px;
         text-align: center;
     }
+
     .team_bar_base_small {
         padding: 0px;
         padding-right: 5px;
@@ -41,6 +48,7 @@
         box-shadow: 0px 0px 0px;
         border: 1px solid #24488A;
     }
+
     .team_bar_graph_small {
         background-color: #24488A;
         z-index: -1;
@@ -49,6 +57,7 @@
         border-color: lightgray;
         border-right-style: inset;
     }
+
     .small_text {
         font: 10px helvetica, arial, sans-serif;
     }
@@ -56,23 +65,31 @@
 
 
 <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
-    <div *ngFor="let team of teamTaskMatrix" class="teamBreakdown toprightcontent smallTable">
+    <div *ngFor="let team of teamTaskMatrix" 
+        class="teamBreakdown toprightcontent smallTable">
         <table style="border:none;">
             <tbody>
                 <tr>
                     <td class="teamcol" nowrap="">
-                        <a href="/tdstm/assetEntity/listTasks?role=ROLE_APP_COORD" style="display:block">
+                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
+                            style="display:block">
                             {{team.role.description}}
                         </a>
                     </td>
                     <td class="teamcountcolumn">
-                        <a href="/tdstm/assetEntity/listTasks?role=ROLE_APP_COORD" style="display:block">1</a>
+                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
+                            style="display:block">
+                           {{team.teamTaskCount}} 
+                        </a>
                     </td>
                     <td class="teambarcolumn" nowrap="">
                         <div class="team_bar_base_small">
-                            <div class="team_bar_graph_small" id="team_ROLE_APP_COORD" style="width: 0%;"></div>
+                            <div class="team_bar_graph_small" 
+                                id="team_{{team.role.id}}" 
+                                [style.width.%]="team.percDone">
+                            </div>
                         </div>
-                        <span class="small_text"><b>1 to go</b></span>
+                        <span class="small_text"><b>{{team.teamTaskCount}} to go</b></span>
                     </td>
                 </tr>
             </tbody>
