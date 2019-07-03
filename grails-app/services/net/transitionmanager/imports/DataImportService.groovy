@@ -1235,7 +1235,7 @@ class DataImportService implements ServiceMethods {
 		try {
 			switch (fieldClassType) {
 				case String:
-					_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+					_recordChangeOnField(domain, fieldName, valueToSet as String, isInitValue, fieldsInfo)
 					break
 
 				case Integer:

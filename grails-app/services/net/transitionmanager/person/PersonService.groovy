@@ -456,11 +456,11 @@ class PersonService implements ServiceMethods {
 	 * @param String The full name of the person
 	 * @return Map - the map of the parsed name that includes first, last, middle, suffix or null if it couldn't be parsed for some odd reason
 	 */
-	Map parseName(String name) {
+	Map<String, String> parseName(String name) {
 		name = StringUtils.strip(name)
-		Map map = [first: '', last: '', middle: '', suffix: '']
-		def firstLast = true
-		def split
+		Map<String, String> map = [first: '', last: '', middle: '', suffix: '']
+		boolean firstLast = true
+		String[] split
 
 		if (!name) {
 			return null
@@ -470,11 +470,11 @@ class PersonService implements ServiceMethods {
 		if (name.contains(',')) {
 			split = name.split(',').collect { it.trim() }
 			//println "a) split ($split) isa ${split.getClass()}"
-			def size = split.size()
+			int size = split.size()
 
 			if (size == 2) {
 				// Check to see if it is a Suffix vs last, first
-				def s = split[1]
+				String s = split[1]
 				if (SUFFIXES.contains(s.toLowerCase())) {
 					// We got first last, suffix
 					map.suffix = s
@@ -498,7 +498,7 @@ class PersonService implements ServiceMethods {
 			//println "0) split ($split) isa ${split.getClass()}"
 		}
 
-		def size = split.size()
+		int size = split.size()
 
 		if (firstLast) {
 
@@ -522,7 +522,7 @@ class PersonService implements ServiceMethods {
 			// Check to see if we have a middle name or a compound name
 			if (size >= 2) {
 				//println "4) split ($split) isa ${split.getClass()}"
-				def last = split.pop()
+				String last = split.pop()
 				if (COMPOUND_NAMES.contains(split[-1].toLowerCase())) {
 					last = split.pop() + ' ' + last
 				}
@@ -541,7 +541,7 @@ class PersonService implements ServiceMethods {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			def last = split[0].split("\\s+").collect { it.trim() }
+			String last = split[0].split("\\s+").collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -551,7 +551,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			def first = split[1].split("\\s+").collect { it.trim() }
+			String first = split[1].split("\\s+").collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {
