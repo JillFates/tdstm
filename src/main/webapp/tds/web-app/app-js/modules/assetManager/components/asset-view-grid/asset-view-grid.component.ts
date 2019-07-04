@@ -38,14 +38,14 @@ import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asse
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
-import {UserService} from '../../../security/services/user.service';
+import {UserService} from '../../../auth/service/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,

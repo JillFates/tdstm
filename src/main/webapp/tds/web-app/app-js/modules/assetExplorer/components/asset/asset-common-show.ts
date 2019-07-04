@@ -10,8 +10,8 @@ import {AssetShowComponent} from './asset-show.component';
 import {AssetDependencyComponent} from '../asset-dependency/asset-dependency.component';
 import {AssetCommonHelper} from './asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 declare var jQuery: any;
 

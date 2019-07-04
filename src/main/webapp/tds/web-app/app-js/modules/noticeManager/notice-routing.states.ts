@@ -5,7 +5,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {NoticeResolveService} from './resolve/notice-resolve.service';
 // Services
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {PreferencesResolveService} from '../../shared/resolves/preferences-resolve.service';
 // Components
 import {NoticeListComponent} from './components/list/notice-list.component';
@@ -54,7 +54,6 @@ export const NoticeManagerRoute: Routes = [
 		resolve: {},
 		canActivate: [AuthGuardService, ModuleResolveService, PreferencesResolveService]
 	}
-
 ];
 
 @NgModule({

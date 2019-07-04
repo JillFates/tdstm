@@ -172,6 +172,15 @@ class SearchQueryHelper {
 						// addErrorToFieldsInfoOrRecord(fieldName, fieldsInfo, context, errorMsg)
 						recordError(context, errorMsg)
 					}
+				} else {
+					// if there is no init or entity value, let's try to find by single find result from fieldsInfo
+					if ( hasSingleFindResult(fieldName, fieldsInfo) ) {
+						entity = fetchEntityByFindResults(fieldName, fieldsInfo, context)
+						if (entity) {
+							log.debug 'fetchEntityByFindResults() - entity found: {}', entity
+							break
+						}
+					}
 				}
 				break
 

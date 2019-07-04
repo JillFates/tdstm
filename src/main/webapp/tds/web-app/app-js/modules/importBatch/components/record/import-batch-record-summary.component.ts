@@ -2,8 +2,8 @@ import {Component, Input} from '@angular/core';
 import {ImportBatchModel} from '../../model/import-batch.model';
 import {ImportBatchRecordModel} from '../../model/import-batch-record.model';
 import {PreferenceService, PREFERENCES_LIST, IMPORT_BATCH_PREFERENCES} from '../../../../shared/services/preference.service';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: 'import-batch-record-summary',

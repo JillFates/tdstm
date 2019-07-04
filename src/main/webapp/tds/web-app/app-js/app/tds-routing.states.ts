@@ -7,7 +7,7 @@ export const Paths = {
 };
 
 export const TDSAppRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: 'security'},
+	{path: '', pathMatch: 'full', redirectTo: 'auth'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
 	{path: 'assetcomment', loadChildren: '../modules/assetComment/asset-comment.module#AssetCommentModule'},

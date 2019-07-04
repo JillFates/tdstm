@@ -7,7 +7,7 @@ import pages.Admin.User.*
 import pages.Login.MenuPage
 
 class LoginPage extends Page {
-    static url = "/tdstm/auth/login"
+    static url = "/tdstm/module/auth/login"
 
     static at = {
         title == "Login"

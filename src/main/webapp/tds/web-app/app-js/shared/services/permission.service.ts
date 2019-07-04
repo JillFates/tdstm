@@ -6,10 +6,14 @@
 
 // Angular
 import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+// NGXS
+import {Select, Store} from '@ngxs/store';
+// Models
+import {UserContextModel} from '../../modules/auth/model/user-context.model';
 // Other
 import {Observable} from 'rxjs';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {HttpClient} from '@angular/common/http';
 
 @Injectable()
 export class PermissionService {
@@ -21,7 +25,15 @@ export class PermissionService {
 	/**
 	 * @param http
 	 */
-	constructor(private http: HttpClient) {
+	constructor(
+		private http: HttpClient,
+		private store: Store) {
+		// Add the user permissions
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			if (userContext && userContext.user && userContext.permissions) {
+				this.permissionsList.next(userContext.permissions);
+			}
+		});
 	}
 
 	/**
