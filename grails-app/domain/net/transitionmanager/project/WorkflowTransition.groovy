@@ -48,7 +48,7 @@ class WorkflowTransition {
 
 	def beforeInsert = {
 		if (!role) {
-			role = RoleType.load('PROJ_MGR')
+			role = RoleType.load(RoleType.CODE_PROJ_MGR)
 		}
 	}
 

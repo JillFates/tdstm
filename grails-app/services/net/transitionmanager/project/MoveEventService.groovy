@@ -460,12 +460,12 @@ class MoveEventService implements ServiceMethods {
 
 			// Update the project staff
 			// TODO : JPM 11/2015 : Project staff should get list from ProjectService instead of querying PartyRelationship
-			def projectStaff = PartyRelationship.executeQuery('''
+			def projectStaff = PartyRelationship.executeQuery("""
 					from PartyRelationship
 					where partyRelationshipType='PROJ_STAFF'
 					  and partyIdFrom=:project
-					  and roleTypeCodeFrom='PROJECT'
-			''', [project: currentProject])
+					  and roleTypeCodeFrom='$RoleType.CODE_PROJECT'
+			""".toString(), [project: currentProject])
 
 			for (int r = 8; r <= projectStaff.size() + 7; r++) {
 				WorkbookUtil.addCell(personelSheet, 1, r, projectStaff[r - 8].partyIdTo?.toString())

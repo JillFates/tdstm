@@ -117,8 +117,8 @@ class PersonService implements ServiceMethods {
 		StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		query.append(' WHERE pr.party_id_from_id=:company')
-		query.append(' AND pr.role_type_code_from_id="COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="STAFF"')
+		query.append(" AND pr.role_type_code_from_id='$RoleType.CODE_COMPANY'")
+		query.append(" AND pr.role_type_code_to_id='$RoleType.CODE_STAFF'")
 		// query.append(' ')
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
@@ -163,14 +163,14 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException('User has no first name associated with account')
 		}
 
-		String query = '''
+		String query = """
 			select 
 				pr.partyIdTo from PartyRelationship pr
 			where 
 				pr.partyIdFrom = :company
-				and pr.roleTypeCodeFrom.id = 'COMPANY'
-				and pr.roleTypeCodeTo = 'STAFF'
-		'''
+				and pr.roleTypeCodeFrom.id = '$RoleType.CODE_COMPANY'
+				and pr.roleTypeCodeTo = '$RoleType.CODE_STAFF'
+		"""
 		Map queryParams = [company: company]
 
 		query += ' AND ((pr.partyIdTo.firstName = :firstName'
@@ -212,8 +212,8 @@ class PersonService implements ServiceMethods {
 			Map args = [company: company, email: email]
 			persons = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr " +
 					"where pr.partyIdFrom = :company " +
-					"and pr.roleTypeCodeFrom.id = 'COMPANY' " +
-					"and pr.roleTypeCodeTo = 'STAFF' " +
+					"and pr.roleTypeCodeFrom.id = '$RoleType.CODE_COMPANY' " +
+					"and pr.roleTypeCodeTo = '$RoleType.CODE_STAFF' " +
 					"and pr.partyIdTo.email = :email", args)
 		}
 		return persons
@@ -1018,7 +1018,7 @@ class PersonService implements ServiceMethods {
 		addToTeam(person, teamCode)
 
 		if (!isAssignedToProjectTeam(project, person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PROJECT, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project '$project.name' on team $teamCode")
 			}
 			else {
@@ -1037,7 +1037,7 @@ class PersonService implements ServiceMethods {
 	 */
 	void addToTeam(Person person, String teamCode) {
 		if (!isAssignedToTeam(person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "COMPANY", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, RoleType.CODE_COMPANY, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to team $teamCode")
 			}
 			else {
@@ -1079,7 +1079,7 @@ class PersonService implements ServiceMethods {
 	private void addToProjectSecured(Project project, Person person) {
 		// Add to the project if not assigned already
 		if (!isAssignedToProject(project, person)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "PROJECT", person, 'STAFF')) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PROJECT, person, RoleType.CODE_STAFF)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
 			} else {
 				throw new DomainUpdateException("An error occurred while attempting to assign the person to the project")
@@ -1343,7 +1343,7 @@ class PersonService implements ServiceMethods {
 	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
 	PartyRelationship getProjectReference(Project project, Person person) {
-		return getProjectTeamReference(project, person, 'STAFF')
+		return getProjectTeamReference(project, person, RoleType.CODE_STAFF)
 	}
 
 	/**
@@ -1360,7 +1360,7 @@ class PersonService implements ServiceMethods {
 		def teamRef = PartyRelationship.createCriteria().get {
 			and {
 				eq('partyRelationshipType.id', 'PROJ_STAFF')
-				eq('roleTypeCodeFrom.id', 'PROJECT')
+				eq('roleTypeCodeFrom.id', RoleType.CODE_PROJECT)
 				eq("roleTypeCodeTo${teamCode instanceof RoleType ? '' : '.id'}", teamCode)
 				eq('partyIdFrom', project)
 				eq('partyIdTo', person)
@@ -1420,7 +1420,7 @@ class PersonService implements ServiceMethods {
 		PartyRelationship.createCriteria().list {
 			eq('partyRelationshipType', PartyRelationshipType.load('PROJ_STAFF'))
 			and {
-				eq('roleTypeCodeFrom', RoleType.load('PROJECT'))
+				eq('roleTypeCodeFrom', RoleType.load(RoleType.CODE_PROJECT))
 				eq('partyIdTo', person)
 				if (project) {
 					eq('partyIdFrom', project)

@@ -253,8 +253,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			// Find the projects that the user has been assigned to
 			projectIds = PartyRelationship.where {
 				partyRelationshipType.id == 'PROJ_STAFF'
-				roleTypeCodeFrom.id == 'PROJECT'
-				roleTypeCodeTo.id == 'STAFF'
+				roleTypeCodeFrom.id == RoleType.CODE_PROJECT
+				roleTypeCodeTo.id == RoleType.CODE_STAFF
 				partyIdTo.id == person.id
 				if (projectId) {
 					partyIdFrom.id == projectId

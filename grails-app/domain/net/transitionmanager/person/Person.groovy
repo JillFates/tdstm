@@ -30,6 +30,8 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.CommentNote
 import net.transitionmanager.task.RecipeVersion
 
+import javax.management.relation.Role
+
 class Person extends Party {
 
 	// Data of Special Person Required by the System
@@ -161,8 +163,8 @@ class Person extends Party {
 		String query = """select pr.partyIdFrom from
 					PartyRelationship pr where
 					pr.partyRelationshipType.id = 'STAFF'
-					and pr.roleTypeCodeFrom.id = 'COMPANY'
-					and pr.roleTypeCodeTo.id = 'STAFF'
+					and pr.roleTypeCodeFrom.id = '$RoleType.CODE_COMPANY'
+					and pr.roleTypeCodeTo.id = '$RoleType.CODE_STAFF'
 					and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
 		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff: staffRef])
 
@@ -173,14 +175,14 @@ class Person extends Party {
 	 * The projects that the person is assigned to.
 	 */
 	List<Project> getAssignedProjects() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.partyIdFrom
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
 			  AND pr.partyIdTo=?
-			  AND pr.roleTypeCodeFrom='PROJECT'
-			  AND pr.roleTypeCodeTo='STAFF'
-		''', [this])
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PROJECT'
+			  AND pr.roleTypeCodeTo='$RoleType.CODE_STAFF'
+		""".toString(), [this])
 	}
 
 	/**
@@ -189,15 +191,15 @@ class Person extends Party {
 	 * @return a list of the RoleType records that represent the teams that a person belongs to a project
 	 */
 	List<RoleType> getTeamsCanParticipateIn() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		''', [company: company, person: this, team: RoleType.TEAM])
+		""".toString(), [company: company, person: this, team: RoleType.TEAM])
 	}
 
 	/**
@@ -205,30 +207,30 @@ class Person extends Party {
 	 * @param project - the project to search for teams
 	 */
 	List<RoleType> getTeamsAssignedTo(Project project) {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
-			  AND pr.roleTypeCodeFrom='PROJECT'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PROJECT'
 			  AND pr.partyIdFrom=:project
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		''', [project: project, person: this, team: RoleType.TEAM])
+		""".toString(), [project: project, person: this, team: RoleType.TEAM])
 	}
 
 	/**
 	 * The teams that a person has been indicated as being suitable to participate with.
 	 */
 	List<RoleType> getSuitableTeams() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
-			  AND pr.roleTypeCodeTo <> 'STAFF'
-		''', [company: company, person: this])
+			  AND pr.roleTypeCodeTo <> '$RoleType.CODE_STAFF'
+		""".toString(), [company: company, person: this])
 	}
 
 	boolean isEnabled() {
