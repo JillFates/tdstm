@@ -10,7 +10,8 @@ import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
 import {LoginService} from '../service/login.service';
 // Others
-import {tap, map} from 'rxjs/operators';
+import {tap, catchError} from 'rxjs/operators';
+import {of} from 'rxjs';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -41,11 +42,20 @@ export class UserContextState {
 
 	@Action(Login)
 	login(ctx: StateContext<UserContextModel>, {payload}: Login) {
-		return this.authService.getUserContext({payload}).pipe(
-			tap(result => {
-				ctx.patchState(result);
-			})
-		);
+		const state = ctx.getState();
+		return this.authService.getUserContext({payload})
+			.pipe(
+				tap(result => {
+					ctx.patchState(result);
+				}),
+				catchError(err => {
+					ctx.setState({
+						...state,
+						error: err
+					});
+					return of(err);
+				})
+			);
 	}
 
 	@Action(Logout)

@@ -12,7 +12,8 @@ export class UserContextModel {
 	postNotices?: any;
 	notices?: {
 		redirectUrl?: string;
-	}
+	};
+	error?: string;
 }
 
 export enum USER_CONTEXT_REQUEST {
