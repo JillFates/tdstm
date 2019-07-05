@@ -19,5 +19,17 @@ export class EventPlanStatus {
 		this.eventTitle = '';
 		this.status = '';
 	}
+}
 
+export class TaskSummaryStep {
+	columnNumber: number;
+	status: {
+		value: string;
+		classes: string;
+	};
+	tasks: string;
+	plannedStart: string;
+	plannedCompletion: string;
+	actualStart: string;
+	actualCompletion: string;
 }

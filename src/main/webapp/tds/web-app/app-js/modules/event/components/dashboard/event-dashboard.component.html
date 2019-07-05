@@ -6,22 +6,16 @@
                     <span>{{'EVENT.EVENT' | translate}}:</span>
                 </div>
                 <div class="col-md-2">
-                    <kendo-dropdownlist 
-                        [data]="eventList" 
-                        [(ngModel)]="selectedEvent" 
-                        (ngModelChange)="onSelectedEvent($event.id)" 
-                        textField="name" 
-                        valueField="id">
-                    </kendo-dropdownlist>   
+                    <kendo-dropdownlist [data]="eventList" [(ngModel)]="selectedEvent"
+                        (ngModelChange)="onSelectedEvent($event.id)" textField="name" valueField="id">
+                    </kendo-dropdownlist>
                 </div>
                 <div class="col-md-3 pull-left">
-                    <label for="agreement" class="pull-left aligned-label dontshow-again"> 
-                            <input type="checkbox"  class="aligned-checkbox"
-                                name="agreement" 
-                                id="agreement" 
-                                [(ngModel)]="includeUnpublished"> {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
-                    </label>                
-                </div>                
+                    <label for="agreement" class="pull-left aligned-label dontshow-again">
+                        <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
+                            [(ngModel)]="includeUnpublished"> {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                    </label>
+                </div>
                 <div class="col-md-3 pull-right">
                     <tds-pie-countdown></tds-pie-countdown>
                 </div>
@@ -30,8 +24,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-3">
-                    <tds-plan-versus-status 
-                        (changeProgress)="onChangeStatus($event)"
+                    <tds-plan-versus-status (changeProgress)="onChangeStatus($event)"
                         [currentProgress]="eventPlanStatus.dialIndicator">
                     </tds-plan-versus-status>
                 </div>
@@ -39,10 +32,7 @@
                     <tds-event-resume [event]="eventPlanStatus"></tds-event-resume>
                 </div>
                 <div class="col-md-6">
-                    <tds-news 
-                        [news]="newsList" 
-                        (create)="onCreate()"
-                        (selected)="onSelectedNews($event)"></tds-news>
+                    <tds-news [news]="newsList" (create)="onCreate()" (selected)="onSelectedNews($event)"></tds-news>
                 </div>
             </div>
         </div>
@@ -59,14 +49,18 @@
                 </div>
                 <div class="col-md-4">
                     <div style="display: flex;width:100%;">
-                        <div style="width:20%;display:flex;justify-content: center;align-items: center;"># or<br/> Tasks</div>
+                        <div style="width:20%;display:flex;justify-content: center;align-items: center;"># or<br />
+                            Tasks</div>
                         <div style="width:80%">
                             <div style="display: flex; border: 1px solid black;width: 100%;">
-                                <div class="task-done" style="overflow: hidden;height:34px;" [style.width.%]="eventDetails.percTaskDone">
+                                <div class="task-done" style="overflow: hidden;height:34px;"
+                                    [style.width.%]="eventDetails.percTaskDone">
                                     {{eventDetails.percTaskDone < 5 ? '' : eventDetails.percTaskDone + '%'}}
                                 </div>
-                                <div class="task-ready" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percTaskReady"></div>
-                                <div class="task-started" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percTaskStarted"></div>
+                                <div class="task-ready" style="overflow: hidden;height: 34px;"
+                                    [style.width.%]="eventDetails.percTaskReady"></div>
+                                <div class="task-started" style="overflow: hidden;height: 34px;"
+                                    [style.width.%]="eventDetails.percTaskStarted"></div>
                             </div>
                             <div style="height: 5px;"></div>
                             <div style="width: 100%;display:flex;">
@@ -95,14 +89,18 @@
                     </div>
                     <div style="height: 10px"></div>
                     <div style="display: flex;width:100%;">
-                        <div style="width:20%;display:flex;justify-content: center;align-items: center;">Level <br/>of Effort</div>
+                        <div style="width:20%;display:flex;justify-content: center;align-items: center;">Level <br />of
+                            Effort</div>
                         <div style="width:80%">
                             <div style="display: flex; border: 1px solid black;width: 100%;">
-                                <div class="task-done" style="overflow: hidden;height:34px;" [style.width.%]="eventDetails.percDurationDone">
+                                <div class="task-done" style="overflow: hidden;height:34px;"
+                                    [style.width.%]="eventDetails.percDurationDone">
                                     {{eventDetails.percDurationDone < 5 ? '' : eventDetails.percDurationDone + '%'}}
                                 </div>
-                                <div class="task-started" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percDurationStarted"></div>
-                                <div class="task-ready" style="overflow: hidden;height: 34px;" [style.width.%]="eventDetails.percDurationReady"></div>
+                                <div class="task-started" style="overflow: hidden;height: 34px;"
+                                    [style.width.%]="eventDetails.percDurationStarted"></div>
+                                <div class="task-ready" style="overflow: hidden;height: 34px;"
+                                    [style.width.%]="eventDetails.percDurationReady"></div>
                             </div>
                             <div style="height: 5px;"></div>
                             <div style="width: 100%;display:flex;">
@@ -131,12 +129,13 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <tds-team-task-percents *ngIf="eventDetails" 
-                        [teamTaskMatrix]="teamTaskMatrix">
+                    <tds-team-task-percents *ngIf="eventDetails" [teamTaskMatrix]="teamTaskMatrix">
                     </tds-team-task-percents>
                 </div>
             </div>
+            <div class="row">
+                <tds-bundle-steps></tds-bundle-steps>
+            </div>
         </div>
     </div>
-
 </div>

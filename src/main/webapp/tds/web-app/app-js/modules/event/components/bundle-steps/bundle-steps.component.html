@@ -1,0 +1,23 @@
+<style>
+</style>
+
+<div class="container">
+    <div class="row" *ngFor="let row of steps; let rowIndex = index;">
+        <div class="col-md-2">{{categories[rowIndex]}}</div>
+        <div *ngFor="let column of row.slice(showFrom, showTo + 1); let colIndex = index" class="col-md-{{colSize}}">
+                <img *ngIf="rowIndex == 0 && colIndex === showFrom" src="/tdstm/assets/images/left_arrow.png" 
+                    alt="back" 
+                    border="0" 
+                    width="16" 
+                    height="23" 
+                    class="disabled"> 
+                {{column.text}} 
+                <img  *ngIf="rowIndex == 0 && colIndex === showTo " src="/tdstm/assets/images/right_arrow.png" 
+                    alt="back" 
+                    border="0" 
+                    width="16" 
+                    height="23"
+                    class="disabled">
+        </div>
+    </div>
+</div>
