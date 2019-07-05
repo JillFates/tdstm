@@ -718,7 +718,7 @@ class TaskService implements ServiceMethods {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
-				task = invokeLocalAction(task, whom)
+				task = invokeLocalAction(task.id, whom)
 				status = task.status
 			}
 		}
