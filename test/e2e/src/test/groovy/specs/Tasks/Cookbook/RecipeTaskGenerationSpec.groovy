@@ -44,7 +44,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    description: \'Startup ALL applications\',',
             '    title: \'Startup app ${it.assetName}\',',
             '    workflow: \'AppStartup\',',
-            '    team: \'ROLE_APP_COORD\',',
+            '    team: \'APP_COORD\',',
             '    category: \'startup\',',
             '    duration: 10,',
             '    filter : [',

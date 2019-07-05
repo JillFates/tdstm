@@ -6,7 +6,7 @@ import modules.CommonsModule
 class SummaryTablePage extends Page {
 
     static at = {
-        modaltitle.text().contains("Asset Summary")
+        modaltitle.text().contains("Asset Summary Table")
     }
 
     static content = {

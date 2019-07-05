@@ -73,4 +73,21 @@ class MoveBundle extends Party {
 	boolean belongsToClient(client) {
 		project.clientId == client?.id
 	}
+
+	Map toMap() {
+		[
+		    name: name,
+			description: description,
+			startTime: startTime,
+			completionTime: completionTime,
+			operationalOrder: operationalOrder,
+			moveEvent: [id: moveEvent?.id, name: moveEvent?.name],
+			workflowCode: workflowCode,
+			useForPlanning: useForPlanning,
+			sourceRoom: sourceRoom.toString(),
+			targetRoom: targetRoom.toString(),
+			tasksCreated: tasksCreated,
+			assets: assets
+		]
+	}
 }

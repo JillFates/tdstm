@@ -216,7 +216,11 @@ export const en_DICTIONARY: Object = {
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'BUNDLES': {
+			'BUNDLES': 'Bundles',
+			'LIST': 'Bundle List',
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',

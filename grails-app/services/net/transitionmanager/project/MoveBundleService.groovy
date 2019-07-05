@@ -123,8 +123,8 @@ class MoveBundleService implements ServiceMethods {
 			moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
 		}
 		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = TimeUtil.parseDateTime((String) params['startTime_' + transitionId])
-		moveBundleStep.planCompletionTime = TimeUtil.parseDateTime((String) params['completionTime_' + transitionId])
+		moveBundleStep.planStartTime = TimeUtil.parseISO8601DateTime((String) params['startTime_' + transitionId])
+		moveBundleStep.planCompletionTime = TimeUtil.parseISO8601DateTime((String) params['completionTime_' + transitionId])
 
 		//show the step progress in green when user select the beGreen option
 		moveBundleStep.showInGreen = beGreen == 'on' ? 1 : 0
@@ -955,6 +955,10 @@ class MoveBundleService implements ServiceMethods {
                 id: entry.id,
                 name: entry.name,
                 description: entry.description,
+				planning: entry.useForPlanning,
+				assetqty: entry.assetQty,
+				startDate: entry.startTime,
+				completion: entry.completionTime
         ]}
     }
 }
