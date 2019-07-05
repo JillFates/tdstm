@@ -91,6 +91,31 @@ class TaskController implements ControllerMethods {
 	def index() { }
 
 	/**
+	 * Used to get the task information by ID
+	 * @param id - the ID of the task to retrieve
+	 * @return JSON map of the Task object
+	 */
+	def task(Long id) {
+		AssetComment task = taskService.fetchTaskById(id, currentPerson())
+		renderAsJson(task:task.taskToMap())
+	}
+
+	/**
+	 * Used to change the state of a task between Started, Done and Hold.
+	 * This will take the task ID and check to make sure that the user has access vs using the
+	 * User CurrentProject.
+	 * @param id - the ID of the task
+	 * @param currentStatus - the current status that we are expecting the task to be in
+	 * @param status - the status to set the task to
+	 * @param message - optional message when setting the task on HOLD
+	 * @return The task as an JSON object is updated
+	 */
+	def changeTaskState(Long id) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, request.JSON.currentStatus, request.JSON.status, request.JSON.message)
+		renderAsJson(task:task.taskToMap())
+	}
+
+	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
 	 */
 	@HasPermission(Permission.TaskEdit)
@@ -1084,16 +1109,20 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
-			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
-				connector       : connector.name,
-				method      : methodInfo.name,
-				description : methodInfo.description,
+				name: apiAction.name,
+				script: apiAction.script,
+				isRemote: apiAction.isRemote,
+				type: apiAction.actionType.type,
+				connector : connector.name,
+				method      : methodInfo?.name,
+				description : apiAction?.description,
 				methodParams: methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]

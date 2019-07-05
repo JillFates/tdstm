@@ -106,6 +106,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected actionTypesList = [];
 	protected  remoteCredentials = [];
 	protected defaultItem = {id: '', value: 'Please Select'};
+	public SUPPLIED_CREDENTIAL = 'SUPPLIED';
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -185,6 +186,7 @@ export class APIActionViewEditComponent implements OnInit {
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
+		this.apiActionModel.isRemote = this.isRemote();
 
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
@@ -1033,11 +1035,44 @@ export class APIActionViewEditComponent implements OnInit {
 		if (language) {
 			this.codeMirror.mode = language
 		}
+		this.apiActionModel.isRemote = this.isRemote();
+
+		// on create api action, set the default value for is remote action
+		if (this.modalType === ActionType.CREATE && this.apiActionModel.isRemote) {
+			this.setSelectEventReaction('SUCCESS', true);
+			this.setSelectEventReaction('ERROR', true);
+		}
 	}
 
 	getClonedCodeMirrorSettings(properties: any): any {
 		const cloned =  Object.assign({}, this.codeMirror, properties);
 
 		return cloned;
+	}
+
+	/**
+	 * Based on the action type determines if the invocation is remote
+	*/
+	isRemote(): boolean {
+		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== 'WEB_API');
+	}
+
+	/**
+	 * Determine if the current credential type selected is Supplied by Transition Manager
+	*/
+	isSuppliedCredential(): boolean {
+		const id = R.pathOr('', ['remoteCredentialMethod', 'id'], this.apiActionModel);
+
+		return id === this.SUPPLIED_CREDENTIAL;
+	}
+
+	/**
+	 * Get a specific event reaction searching by type and set its selected property
+	*/
+	setSelectEventReaction(type: string, selected: boolean): void {
+		const evenReaction = this.apiActionModel.eventReactions.find((item: EventReaction) => item.type === type);
+		if (evenReaction) {
+			evenReaction.selected = selected;
+		}
 	}
 }

@@ -5,6 +5,7 @@ import grails.validation.ValidationException
 import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
@@ -45,6 +46,7 @@ class ApiActionServiceIntegrationTests extends IntegrationSpec {
 	private AssetComment task
 	private AssetEntity asset
 	private Project project
+	private Person whom
 	ProjectTestHelper projectHelper = new ProjectTestHelper()
 
 	private static final String paramsJson = """
@@ -99,6 +101,7 @@ class ApiActionServiceIntegrationTests extends IntegrationSpec {
 			project: project
 		)
 
+		whom = new Person()
 		task = new AssetComment(
 			comment:'Test the crap out of this feature',
 			commentType: AssetCommentType.TASK,
@@ -190,7 +193,7 @@ class ApiActionServiceIntegrationTests extends IntegrationSpec {
 			awsConnector.awsService = awsService
 
 		when: 'calling the invoke method on the service'
-			apiActionService.invoke(action, task)
+			apiActionService.invoke(action, task, whom)
 		then: 'the awsService.sendSnsNotification should be called with proper params'
 			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
 	}
@@ -248,9 +251,6 @@ class ApiActionServiceIntegrationTests extends IntegrationSpec {
 			apiActionService.delete(apiAction2.id, null)
 		then: "An EmptyResultException is thrown"
 			thrown EmptyResultException
-
-
-
 	}
 
 	def "8. Test validateApiActionName with different values"() {

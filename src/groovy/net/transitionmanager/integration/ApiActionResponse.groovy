@@ -18,7 +18,7 @@ class ApiActionResponse {
 	/**
 	 * A place to store standard ou,t so that reaction scripts can access them.
 	 */
-	String stdout //
+	String stdout
 
 	/**
 	 * A place to store standard error, so that reaction scripts can access them.

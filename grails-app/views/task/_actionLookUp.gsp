@@ -1,6 +1,6 @@
 <div id="actionLookupModal" draggable class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable" tabindex="-1" data-keyboard="false">
 	<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
-		<span id="ui-id-5" class="ui-dialog-title">Action Summary</span>
+		<span id="ui-id-5" class="ui-dialog-title">Action Summary - ${apiAction.name}</span>
 		<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close" ng-click="close()">
 		<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>
 		<span class="ui-button-text">close</span>
@@ -12,22 +12,16 @@
             <div class="dialog" style="border: 1px solid #5F9FCF">
                 <div>
                     <table id="updateCommentTable" class="inner">
-                        <tr class="prop">
-                            <td valign="top" class="name">
-                                <label><b>Dictionary:</b></label>
-                            </td>
-                            <td valign="top" class="value">
-                                <label>${apiAction.agent}</label>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">
-                                <label><b>Method:</b></label>
-                            </td>
-                            <td valign="top" class="value">
-                                <label>${apiAction.method}</label>
-                            </td>
-                        </tr>
+						<g:if test="${apiAction.type == 'WebAPI'}">
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label><b>Method:</b></label>
+								</td>
+								<td valign="top" class="value">
+									<label>${apiAction.method}</label>
+								</td>
+							</tr>
+						</g:if>
                         <tr class="prop">
                             <td valign="top" class="name" >
                                 <label><b>Description:</b></label>
@@ -36,6 +30,38 @@
                                 <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>${apiAction.description}</textarea>
                             </td>
                         </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Type:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <label>${apiAction.type}</label>
+                            </td>
+                        </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Is Remote:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                               <g:if test="${apiAction.isRemote == true}">
+                                    <input class="checkbox" type="checkbox" checked disabled>
+                               </g:if>
+                               <g:else>
+                                    <input class="checkbox" type="checkbox" disabled>
+                               </g:else>
+                            </td>
+                        </tr>
+                        <g:if test="${apiAction.type != 'WebAPI'}">
+							<tr class="prop">
+								<td valign="top" class="script" >
+									<label><b>Script:</b></label>
+								</td>
+								<td valign="top" class="value">
+									<textarea cols="80" rows="6" name="actionScript" readonly>${apiAction.script}</textarea>
+								</td>
+							</tr>
+						</g:if>
+
                         <tr class="prop">
                             <td valign="top" colspan="2">
                                 <table id="updateCommentTableInnerTable">

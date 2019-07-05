@@ -43,4 +43,5 @@ class ApiActionCommand implements CommandObject {
     String script
     String commandLine
     RemoteCredentialMethod remoteCredentialMethod
+    Boolean debugEnabled = false
 }

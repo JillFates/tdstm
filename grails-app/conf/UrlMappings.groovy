@@ -10,6 +10,14 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		"/task/$id" {
+			controller = "task"
+			action = [GET:"task"]
+			constraints {
+				id(matches: /[0-9]{1,}/)
+			}
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -427,6 +435,11 @@ class UrlMappings {
 		"/ws/task/$id/addNote" {
 			controller = "wsTask"
 			action = [POST:"addNote"]
+		}
+
+		"/ws/task/$id/changeTaskState" {
+			controller = "Task"
+			action = [POST:"changeTaskState"]
 		}
 
 		"/ws/progress/$id" {
@@ -1253,10 +1266,6 @@ class UrlMappings {
 		"401" ( controller: 'errorHandler', action: 'unauthorized' )
 		"403" ( controller: 'errorHandler', action: 'forbidden' )
 		"404" ( controller: 'errorHandler', action: 'notFound' )
-		// These were commented out as part of TM-8782 - the exceptions in ControllerMethods should catch these now
-		// "500" ( controller: 'errorHandler', action: 'notFound', exception: NotFoundException)
-		// "500" ( controller: 'errorHandler', action: 'forbidden', exception: AccessDeniedException)
-		// "500" ( controller: 'errorHandler', action: 'licensing', exception: InvalidLicenseException)
 		"500" ( controller: 'errorHandler', action: 'error' )
 
 	}

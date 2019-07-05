@@ -50,6 +50,7 @@ import net.transitionmanager.domain.RecipeVersion
 import net.transitionmanager.domain.Tag
 import net.transitionmanager.domain.TaskBatch
 import net.transitionmanager.domain.WorkflowTransition
+import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ApiActionException
 import net.transitionmanager.security.Permission
 import org.apache.commons.lang3.StringUtils
@@ -61,7 +62,6 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -83,6 +83,8 @@ class TaskService implements ServiceMethods {
 	ApiActionService apiActionService
 	ControllerService controllerService
 	CookbookService cookbookService
+	CredentialService credentialService
+	CoreService coreService
 	JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	def partyRelationshipService
@@ -400,59 +402,98 @@ class TaskService implements ServiceMethods {
 	 * Used by routes to update task status/state
 	 * @param whom - the Person that is performing the update (e.g. Automatic Task)
 	 * @param params - a map containing the values that come from the JSON
-	 * @return AssetComement	task that was updated by method
+	 * @return The updated task
 	 */
-	/*
-	void updateTaskState(Person whom, Map params) {
-		Map statusMap = ['running': ACS.STARTED, 'success': ACS.DONE, 'error': ACS.HOLD]
-		String status = statusMap[params.status]
-		if (!status) {
-			throw new InvalidRequestException("Invalid status ${params.status}, valid values are ${statusMap.keySet()}")
+	AssetComment updateTaskState(Person whom, Long taskId, String currentStatus, String status, String message='') {
+		AssetComment task = fetchTaskById(taskId, whom)
+		// Go through some of the validation
+		if (!(currentStatus in ACS.AllowedStatusesForSetState)) {
+			throw new InvalidParamException('Invalid currentStatus parameter value')
+		}
+		if (!(status in ACS.AllowedStatusesForSetState)) {
+			throw new InvalidParamException('Invalid status parameter value')
+		}
+		if (currentStatus == status) {
+			throw new InvalidParamException('status and currentStatus parameters must be different')
+		}
+		if (ACS.AllowedStatusesForSetState.indexOf(currentStatus) > ACS.AllowedStatusesForSetState.indexOf(status)) {
+			throw new InvalidParamException('Task status can not be reverted to a previous state')
+		}
+		if (task.status != currentStatus) {
+			throw new InvalidParamException('The task status was unexpectedly changed. Please refresh and try again.')
 		}
 
-		boolean isPM = false
-		AssetComment task = AssetComment.get(params.taskId)
-
-		if (!task) {
-			throw new InvalidRequestException("Task id ${params.taskId} not found")
+		setTaskStatus(task, status, whom, false)
+		if (status == ACS.HOLD && message) {
+			addNote(task, whom, message)
 		}
 
-		if (status == ACS.STARTED && task.)
-		return setTaskStatus(task, status, whom, isPM)
+		return task
 	}
-	*/
 
 	/**
 	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
 	 * plan to set the status to HOLD and add a note to the task.
-	 * @param task - the Task to invoke the method on
+	 * @param taskId - the Task ID to invoke the method on
+	 * @param whom - the person who is invoking the action
 	 * @return The status that the task should be set to
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	AssetComment invokeLocalAction(AssetComment task, Person whom) {
+	AssetComment invokeLocalAction(Long taskId, Person whom) {
+		AssetComment task = fetchTaskById(taskId, whom)
 		log.debug "invokeLocalAction() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
 
 		markActionStarted(task.id, whom, true)
 
 		// Try running the action
-		apiActionService.invoke(task.apiAction, task)
+		apiActionService.invoke(task.apiAction, task, whom)
 
 		return task
 	}
 
 	/**
-	 * Used to invoke an action on the task which will attempt to do so. If the function fails then it will
-	 * plan to set the status to HOLD and add a note to the task.
-	 * @param task - the Task to invoke the method on
-	 * @return the updated task
+	 * Used to indicate that a task's remote action has been started. This will update the
+	 * action and task appropriately after which the Action Request object is constructed.
+	 *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
 	 */
-	@Transactional(noRollbackFor=[Throwable])
-	AssetComment recordRemoteActionStarted(AssetComment task, Person whom) {
-		log.debug "recordRemoteActionStarted() Attempting to invoke action ${task.apiAction.name} for task.id=${task.id}"
+	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom, String publicKey) {
+		AssetComment task = fetchTaskById(taskId, whom)
 
-		markActionStarted(task.id, whom, false)
+		task = markActionStarted(task.id, whom, false)
 
-		return task
+		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
+
+		Map<String,?> actionRequestMap = actionRequest.toMap()
+
+		// Store Callback information into the options
+		String url = coreService.getApplicationUrl()
+		Map jwt = securityService.generateJWT()
+		actionRequestMap.options.callback = [
+			siteUrl: url,
+			token: jwt.access_token,
+			refreshToken: jwt.refresh_token
+		]
+
+		// check if api action has credentials so to include credentials password unencrypted
+		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
+		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
+			// Need to create new map because credentials map originally is immutable
+			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
+
+			// Encrypt the username and password with the Public Key that the client sent to the server
+			 credentials.username = securityService.encryptWithPublicKey(task.apiAction.credential.username, publicKey)
+			 credentials.password = securityService.encryptWithPublicKey(credentialService.decryptPassword(task.apiAction.credential), publicKey)
+
+			actionRequestMap.options.credentials = credentials
+		}
+
+		// Add the Task object to the returned map
+		actionRequestMap.task = task.taskToMap()
+
+		return actionRequestMap
 	}
 
 	/**
@@ -464,7 +505,7 @@ class TaskService implements ServiceMethods {
 	 * @param invokingLocally - Flag to indicate if the intent is to invoke the action local (true) or remotely (false)
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	private void markActionStarted(Long taskId, Person whom, Boolean invokingLocally) {
+	private AssetComment markActionStarted(Long taskId, Person whom, Boolean invokingLocally) {
 		log.debug "markActionStarted() Attempting to mark action as started for task.id={}", taskId
 		String errMsg
 		AssetComment taskWithLock
@@ -477,7 +518,7 @@ class TaskService implements ServiceMethods {
 				throw new EmptyResultException('Task was not found')
 			}
 
-			if (! ACTIONABLE_STATUSES.contains(taskWithLock.status)) {
+			if (! AssetCommentStatus.ActionableStatusCodes.contains(taskWithLock.status)) {
 				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
 			}
 
@@ -559,17 +600,38 @@ class TaskService implements ServiceMethods {
 			// TODO : JPM 6/2019 : We should have a general TM exception that we know the message can displayed to the user
 			throw new InvalidParamException(errMsg)
 		}
+
+		return taskWithLock
+	}
+
+	/**
+	 * Used by these service methods to access the Task referenced by the task ID. If the
+	 * person does not have access to the project then an exception will be thrown
+	 *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 */
+	private AssetComment fetchTaskById(Long taskId, Person currentPerson) {
+		AssetComment task = AssetComment.get(taskId)
+		if (! task) {
+			throw new EmptyResultException('Task was not found')
+		}
+		// Validate that the user has access to the project associated with the task
+		securityService.hasAccessToProject(task.project, currentPerson.userLogin)
+
+		return task
 	}
 
 	/**
 	 * Reset an action so it can be invoked again
-	 * @param task
+	 * @param taskId - the ID of the task
 	 * @param whom
 	 * @return
 	 */
-	String resetAction(AssetComment task, Person whom) {
-		String status = task.status
-		if (task.hasAction() && !task.isAutomatic() && status == AssetCommentStatus.HOLD) {
+	AssetComment resetAction(Long taskId, Person whom) {
+		AssetComment task = fetchTaskById(taskId, whom)
+
+		if (task.hasAction() && !task.isAutomatic() && task.status in AssetCommentStatus.AllowedStatusesToResetAction) {
 			String errMsg
 			try {
 				// Update the task so it can be invoked again
@@ -577,13 +639,13 @@ class TaskService implements ServiceMethods {
 				task.apiActionCompletedAt = null
 				task.actStart = null
 				task.dateResolved = null
+				task.percentageComplete = 0
 
 				// Log a note that the API Action was reset
 				addNote(task, whom, "Reset action ${task.apiAction.name}")
 
 				// Make sure that the status is READY instead
-				status = AssetCommentStatus.READY
-				task.status = status
+				task.status = AssetCommentStatus.READY
 
 			} catch (InvalidRequestException e) {
 				errMsg = e.getMessage()
@@ -597,11 +659,12 @@ class TaskService implements ServiceMethods {
 			if (errMsg) {
 				log.info "resetAction() error $errMsg"
 				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
-				status = ACS.HOLD
-				task.status = status
+				task.status = AssetCommentStatus.HOLD
 			}
+		} else {
+			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
 		}
-		return status
+		return task
 	}
 
 	/**
@@ -651,7 +714,7 @@ class TaskService implements ServiceMethods {
 
 		// Trigger the action if it is automatic and the action is local
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally()) {
-			if (ACTIONABLE_STATUSES.contains(status) ) {
+			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
@@ -792,6 +855,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
@@ -801,6 +865,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForRackStatus(String status) {
 		ACS.list.contains(status) ? 'rack_task_' + status.toLowerCase() : 'task_na'
 	}

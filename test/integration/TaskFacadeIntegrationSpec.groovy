@@ -1,6 +1,7 @@
 import com.tds.asset.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.domain.MoveEvent
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.task.TaskFacade
@@ -15,6 +16,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	@Shared
 	def grailsApplication
+	private PersonTestHelper personHelper = new PersonTestHelper()
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 	AssetCommentTestHelper assetCommentTestHelper = new AssetCommentTestHelper()
@@ -22,9 +24,11 @@ class TaskFacadeIntegrationSpec extends Specification {
 	Project project
 	MoveEvent moveEvent
 	AssetComment assetComment
+	Person whom
 
 	void setup() {
 		project = projectTestHelper.createProject(null)
+		whom = personHelper.createStaff(project.owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
 		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
 	}
@@ -145,7 +149,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 	 * @return
 	 */
 	private TaskFacade getTaskFacadeBean() {
-		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment)
+		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment, whom)
 	}
 
 	/**

@@ -571,7 +571,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
 
 			ApiAction apiAction = assetComment.apiAction
-			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+
+			Map apiActionMap = [
+				id: apiAction?.id,
+				isRemote: apiAction?.isRemote,
+				name: apiAction?.name,
+				remoteCredentialMethod :
+					(apiAction?.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
+				script: apiAction?.script,
+				type: apiAction?.actionType?.type
+			]
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
@@ -589,60 +598,61 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (assetComment?.taskBatch?.recipe) {
 				Recipe recipe = assetComment.taskBatch.recipe
 				recipeMap = [
-				    id: recipe.id,
+					id  : recipe.id,
 					name: recipe.name
 				]
 			}
-			commentList << [
-					assetComment:assetComment,
+				commentList << [
+					action: assetComment.apiAction?.name,
+					actionInvocable: assetComment.isActionInvocableLocally(),
+					actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
+					actionMode: actionMode,
+					actualDuration: TimeUtil.formatDuration(actualDuration),
+					apiAction:apiActionMap,
+					apiActionId: assetComment.apiAction?.id,
+					apiActionInvokedAt: assetComment.apiActionInvokedAt,
 					apiActionList:apiActionList,
-					priorityList: assetEntityService.getAssetPriorityOptions(),
-					durationScale:assetComment.durationScale.value(),
-					durationLocked: assetComment.durationLocked,
-					personCreateObj:personCreateObj,
-					personResolvedObj:personResolvedObj,
+					assetClass: assetComment.assetEntity?.assetClass?.toString(),
+					assetClasses: assetEntityService.getAssetClasses(),
+					assetComment:assetComment,
+					assetId: assetComment.assetEntity?.id ?: "",
+					assetName:assetComment.assetEntity?.assetName ?: "",
+					assetType: assetComment.assetEntity?.assetType,
+					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
+					atStart:atStart,
+					canEdit: canEdit,
+					categories: AssetCommentCategory.list,
+					cssForCommentStatus: cssForCommentStatus,
 					dtCreated:dtCreated ?: "",
 					dtResolved:dtResolved ?: "",
-					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
-					assetName:assetComment.assetEntity?.assetName ?: "",
-					eventName:assetComment.moveEvent?.name ?: "",
 					dueDate:dueDate,
-					etStart:etStart,
+					durationDelta: TimeUtil.formatDuration(durationDelta),
+					durationLocked: assetComment.durationLocked,
+					durationScale:assetComment.durationScale.value(),
 					etFinish:etFinish,
-					atStart:atStart,
+					etStart:etStart,
+					eventList: eventList,
+					eventName:assetComment.moveEvent?.name ?: "",
+					instructionsLinkLabel: instructionsLinkLabel ?: "",
+					instructionsLinkURL: instructionsLinkURL ?: "",
+					lastUpdated: lastUpdated,
 					notes:notes,
-					workflow:workflow,
-					roles:roles?:'Unassigned',
+					personCreateObj:personCreateObj,
+					personResolvedObj:personResolvedObj,
+					predecessorList: predecessorList,
+					predecessorsCount: predecessorsCount,
 					predecessorTable:predecessorTable ?: '',
-					successorTable:successorTable ?: '',
-					cssForCommentStatus: cssForCommentStatus,
+					priorityList: assetEntityService.getAssetPriorityOptions(),
+					recipe: recipeMap,
+					roles:roles?:'Unassigned',
 					statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
+					successorList: successorList,
 					successorsCount: successorsCount,
-				predecessorsCount: predecessorsCount,
-				taskSpecId: assetComment.taskSpec,
-				assetId: assetComment.assetEntity?.id ?: "",
-				assetType: assetComment.assetEntity?.assetType,
-				assetClass: assetComment.assetEntity?.assetClass?.toString(),
-				predecessorList: predecessorList,
-				successorList: successorList,
-				instructionsLinkURL: instructionsLinkURL ?: "",
-				instructionsLinkLabel: instructionsLinkLabel ?: "",
-				canEdit: canEdit,
-				apiAction:apiActionMap,
-				actionMode: actionMode,
-				actionInvocable: assetComment.isActionInvocableLocally(),
-				actionMode: actionMode,
-				lastUpdated: lastUpdated,
-				apiActionId: assetComment.apiAction?.id,
-				action: assetComment.apiAction?.name,
-				recipe: recipeMap,
-				actualDuration: TimeUtil.formatDuration(actualDuration),
-				durationDelta: TimeUtil.formatDuration(durationDelta),
-				eventList: eventList,
-				categories: AssetCommentCategory.list,
-				assetClasses: assetEntityService.getAssetClasses()
-					//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
-			]
+					successorTable:successorTable ?: '',
+					percentageComplete: assetComment.percentageComplete,
+					taskSpecId: assetComment.taskSpec,
+					workflow:workflow
+				]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "showComment: show comment view - $errorMsg"
@@ -1368,20 +1378,38 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	/**
 	 * Get assetColumn value based on field name. .
 	 */
-	private taskManagerValues(value, task) {
+	private taskManagerValues(String fieldName, AssetComment task) {
 		def result
-		switch (value) {
-			case 'assetName': result = task.assetEntity?.assetName; break
-			case 'assetType': result = task.assetEntity?.assetType; break
-			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
-			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
-			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
+		switch (fieldName) {
+			case 'apiAction':
+				result = task.apiAction?.toString()
+				break
+			case 'assetName':
+				result = task.assetEntity?.assetName
+				break
+			case 'assetType':
+				result = task.assetEntity?.assetType
+				break
+			case 'assignedTo':
+				result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: '')
+				break
+			case 'resolvedBy':
+				result = task.resolvedBy?.toString() ?: ''
+				break
+			case 'createdBy':
+				result = task.createdBy?.toString() ?: ''
+				break
 			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
-				result = TimeUtil.formatDateTime(task[value])
-			break
-			case "event": result = task.moveEvent?.name; break
-			case "bundle": result = task.assetEntity?.moveBundle?.name; break
-			default: result = task[value]
+				result = TimeUtil.formatDateTime(task[fieldName])
+				break
+			case "event":
+				result = task.moveEvent?.name
+				break
+			case "bundle":
+				result = task.assetEntity?.moveBundle?.name
+				break
+			default:
+				result = task[fieldName]
 		}
 		return result
 	}

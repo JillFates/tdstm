@@ -79,7 +79,7 @@ class TaskActionServiceSpec extends Specification {
 						return true
 					}
 				] as TaskService
-		TaskFacade taskFacade2 = new TaskFacade()
+		TaskFacade taskFacade2 = new TaskFacade(new AssetComment(), new Person())
 		taskFacade2.taskService = service.taskService
 		Holders.grailsApplication.mainContext.beanFactory.registerSingleton("taskFacade", taskFacade2)
 		defineBeans {
@@ -175,6 +175,11 @@ class TaskActionServiceSpec extends Specification {
 		service.assetService = [
 			getAssetFacade: {AssetEntity asset, boolean readonly-> null}
 		] as AssetService
+
+		service.securityService =[
+			hasAccessToProject: {Project project -> true}
+
+		] as SecurityService
 	}
 
 	void 'Test updateRemoteActionStatus started'() {
@@ -185,11 +190,12 @@ class TaskActionServiceSpec extends Specification {
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.actionStarted(action, assetComment.id, whom, project)
-		then: 'task notes are added and the apiActionPercentDone is updated'
+			service.actionStarted(action, assetComment.id, whom)
+		then: 'task notes are added and the percentageComplete is updated'
 			notes.size() ==2
 			notes.contains('some message')
 			notes[1].startsWith('testAction started at')
@@ -203,14 +209,15 @@ class TaskActionServiceSpec extends Specification {
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.actionProgress(action, assetComment.id, whom, project)
+			service.actionProgress(action, assetComment.id, whom)
 		then:
 			notes.size() == 1
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 5
+			assetComment.percentageComplete == 5
 	}
 
 	void 'Test updateRemoteActionStatus error'() {
@@ -221,10 +228,11 @@ class TaskActionServiceSpec extends Specification {
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.actionError(action, assetComment.id, whom, project)
+			service.actionError(action, assetComment.id, whom)
 		then: 'Task notes are added'
 			notes.size() == 2
 			notes.contains('some message')
@@ -239,14 +247,15 @@ class TaskActionServiceSpec extends Specification {
 				stdout: 'output message',
 				stderr: 'error message',
 				data: [someKey: 'some data'],
-				datafile: null
+				datafile: null,
+				project: project
 			)
 		when: 'updating the action status'
-			service.actionDone(action, assetComment.id, whom, project)
-		then: 'task node are added, and the apiActionPercentDone is set to 100'
+			service.actionDone(action, assetComment.id, whom)
+		then: 'task node are added, and the percentageComplete is set to 100'
 			notes.size() == 2
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 100
+			assetComment.percentageComplete == 100
 			notes[1] == 'Invoked Task with status: SUCCESS'
 	}
 
@@ -258,7 +267,8 @@ class TaskActionServiceSpec extends Specification {
 					stdout: 'output message',
 					stderr: 'error message',
 					data: [someKey: 'some data'],
-					datafile: null
+					datafile: null,
+					project: project
 				)
 
 				service.apiActionService = [
@@ -278,7 +288,7 @@ class TaskActionServiceSpec extends Specification {
 					}
 				] as ApiActionService
 			when: 'updating the action status'
-				service.actionError(action, assetComment.id, whom, project)
+				service.actionError(action, assetComment.id, whom)
 			then: 'Task notes are added'
 				notes.size() == 3
 				notes.contains('some message')
@@ -294,7 +304,8 @@ class TaskActionServiceSpec extends Specification {
 					stdout: 'output message',
 					stderr: 'error message',
 					data: [someKey: 'some data'],
-					datafile: null
+					datafile: null,
+					project: project
 				)
 
 				service.apiActionService = [
@@ -314,7 +325,7 @@ class TaskActionServiceSpec extends Specification {
 					}
 				] as ApiActionService
 			when: 'updating the action status'
-				service.actionDone(action, assetComment.id, whom, project)
+				service.actionDone(action, assetComment.id, whom)
 			then: 'Task notes are added'
 				notes.size() == 3
 				notes.contains('some message')
@@ -330,7 +341,8 @@ class TaskActionServiceSpec extends Specification {
 						stdout: 'output message',
 						stderr: 'error message',
 						data: [someKey: 'some data'],
-						datafile: null
+						datafile: null,
+						project: project
 					)
 
 					service.apiActionService = [
@@ -355,7 +367,7 @@ class TaskActionServiceSpec extends Specification {
 						 }
 					] as ApiActionService
 				when: 'updating the action status'
-					service.actionDone(action, assetComment.id, whom, project)
+					service.actionDone(action, assetComment.id, whom)
 				then: 'Task notes are added'
 					notes.size() == 2
 					notes.contains('some message')

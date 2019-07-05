@@ -2,7 +2,6 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetComment
 import com.tds.asset.AssetEntity
-import com.tdsops.common.exceptions.ServiceException
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ActionType
 import com.tdssrc.grails.ApiCatalogUtil
@@ -13,16 +12,17 @@ import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.AssetFacade
+import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.connector.GenericHttpConnector
-import net.transitionmanager.asset.AssetFacade
-import net.transitionmanager.command.ApiActionCommand
 import net.transitionmanager.domain.ApiAction
 import net.transitionmanager.domain.ApiCatalog
 import net.transitionmanager.domain.Credential
 import net.transitionmanager.domain.DataScript
+import net.transitionmanager.domain.Person
 import net.transitionmanager.domain.Project
 import net.transitionmanager.domain.Provider
 import net.transitionmanager.i18n.Message
@@ -103,7 +103,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
-	void invoke(ApiAction action, Object context) {
+	void invoke(ApiAction action, AssetComment context, Person whom) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 
@@ -153,7 +153,7 @@ class ApiActionService implements ServiceMethods {
 				def connector = connectorInstanceForAction(action)
 
 				ActionRequest actionRequest
-				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
+				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
 
 				// try to construct action request object and execute preScript if there is any
 				try {
@@ -367,16 +367,20 @@ class ApiActionService implements ServiceMethods {
 	 * @throws InvalidRequestException if the method name is invalid or the connector is not implemented
 	 */
 	DictionaryItem methodDefinition (ApiAction action) {
-		Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
-		Map<String, ?> method = dict[action?.connectorMethod]
+		DictionaryItem methodDef
+		if (action.apiCatalog) {
+			Map<String, ?> dict = ApiCatalogUtil.getCatalogMethods(action.apiCatalog.dictionaryTransformed)
+			Map<String, ?> method = dict[action?.connectorMethod]
 
-		if (!method) {
-			throw new InvalidRequestException(
+			if (!method) {
+				throw new InvalidRequestException(
 					"Action class ${action?.apiCatalog?.name} method ${action?.connectorMethod} not implemented")
+			}
+
+			methodDef = new DictionaryItem(method)
 		}
 
-		DictionaryItem methodDef = new DictionaryItem(method)
-		methodDef
+		return methodDef
 	}
 
 	/**
@@ -419,6 +423,11 @@ class ApiActionService implements ServiceMethods {
 
 		// Populate the apiAction with the properties from the command object
 		apiActionCommand.populateDomain(apiAction, false)
+
+		// If the Action has a catalog, but the command doesn't, clear the reference.
+		if (apiActionId && !apiAction.apiCatalog && apiAction.apiCatalog) {
+			apiAction.apiCatalog = null
+		}
 
 		apiAction.save(failOnError: true)
 
@@ -632,7 +641,8 @@ class ApiActionService implements ServiceMethods {
 						scriptBindingCommand.script,
 						new ActionRequest(),
 						new ApiActionResponse(),
-						new TaskFacade(),
+						// TODO : JPM 6/2019 : Perhaps we should be passing in the person?
+						new TaskFacade(new AssetComment(), new Person()),
 						new AssetFacade(new AssetEntity(), [:], true),
 						new ApiActionJob())
 		}
@@ -668,7 +678,7 @@ class ApiActionService implements ServiceMethods {
 			if (ActionType.WEB_API == apiAction.actionType) {
 				properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
 			} else {
-				properties << ['commandLine', 'script', 'remoteCredentialMethod']
+				properties << ['commandLine', 'script', 'remoteCredentialMethod', 'debugEnabled']
 			}
 		}
 
