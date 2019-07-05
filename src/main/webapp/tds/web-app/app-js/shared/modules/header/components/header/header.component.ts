@@ -89,6 +89,7 @@ export class HeaderComponent {
 	 * Destroy the Storage and redirect the user
 	 */
 	public logOut(): void {
+		localStorage.removeItem('@@STATE');
 		this.store.dispatch(new Logout());
 	}
 }
