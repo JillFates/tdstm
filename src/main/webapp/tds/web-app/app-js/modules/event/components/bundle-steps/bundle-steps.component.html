@@ -1,23 +1,39 @@
 <style>
+    .bundle-steps-component {
+    }
+
+    .bundle-steps-component img {
+       position: absolute;
+       border: 0px; 
+       width: 16px;
+       height: 23px;
+       cursor: pointer;
+    }
+
+    .bundle-steps-component img.back {
+        left: -10px;
+    }
+
+    .bundle-steps-component img.next {
+        margin-left: 7px;
+    }
+
 </style>
 
-<div class="container">
+<div class="container bundle-steps-component" >
     <div class="row" *ngFor="let row of steps; let rowIndex = index;">
         <div class="col-md-2">{{categories[rowIndex]}}</div>
-        <div *ngFor="let column of row.slice(showFrom, showTo + 1); let colIndex = index" class="col-md-{{colSize}}">
-                <img *ngIf="rowIndex == 0 && colIndex === showFrom" src="/tdstm/assets/images/left_arrow.png" 
+        <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
+                class="col-md-{{colSize}}">
+                <img *ngIf="rowIndex == 0 && first" src="/tdstm/assets/images/left_arrow.png" 
                     alt="back" 
-                    border="0" 
-                    width="16" 
-                    height="23" 
-                    class="disabled"> 
+                    (click)="onBack()"
+                    class="disabled back"> 
                 {{column.text}} 
-                <img  *ngIf="rowIndex == 0 && colIndex === showTo " src="/tdstm/assets/images/right_arrow.png" 
+                <img  *ngIf="rowIndex == 0 && last " src="/tdstm/assets/images/right_arrow.png" 
                     alt="back" 
-                    border="0" 
-                    width="16" 
-                    height="23"
-                    class="disabled">
+                    (click)="onNext()"
+                    class="disabled next">
         </div>
     </div>
 </div>
