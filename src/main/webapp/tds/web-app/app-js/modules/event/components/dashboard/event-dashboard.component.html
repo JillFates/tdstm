@@ -134,7 +134,7 @@
                 </div>
             </div>
             <div class="row">
-                <tds-bundle-steps [bundleSteps]="bundleSteps"></tds-bundle-steps>
+                <tds-bundle-steps *ngIf="bundleSteps" [bundleSteps]="bundleSteps"></tds-bundle-steps>
             </div>
         </div>
     </div>

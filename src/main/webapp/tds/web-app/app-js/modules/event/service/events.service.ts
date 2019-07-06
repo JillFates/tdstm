@@ -91,7 +91,8 @@ export class EventsService {
 						percDurationReady: model.percDurationReady || '',
 						percDurationStarted: model.percDurationStarted || '',
 						teamTaskMatrix: model.teamTaskMatrix || [],
-						moveEvent: model.moveEvent
+						moveEvent: model.moveEvent,
+						moveBundleSteps: model.moveBundleSteps || []
 					}
 				}
 
@@ -148,7 +149,7 @@ export class EventsService {
 			});
 	}
 
-	getBundleSteps(): any {
+	getBundleSteps(snapshot: any, moveBundleSteps: []): any {
 		let headers = [];
 		let percents = [];
 		let categories = [];
@@ -167,6 +168,12 @@ export class EventsService {
 			'Actual Completion'
 		];
 
+		let headerRow = [];
+		moveBundleSteps.forEach((moveBundle: any) => {
+			headerRow.push({ id: moveBundle.id, text: moveBundle.label, classes: '' });
+		});
+
+		/*
 		let headerRow = [
 			{ text: 'Ready', classes: '' },
 			{ text: 'BackupDone', classes: '' },
@@ -180,6 +187,7 @@ export class EventsService {
 			{ text: 'Powered On', classes: '' },
 			{ text: 'App Startup', classes: '' }
 		];
+		*/
 
 		steps.push(headerRow);
 		steps.push([
@@ -269,7 +277,7 @@ export class EventsService {
 		return {
 			categories,
 			steps,
-			columnslength: headerRow.length
+			columnsLength: headerRow.length
 		};
 	}
 }

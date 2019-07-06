@@ -41,6 +41,7 @@ export class EventDashboardComponent implements OnInit {
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
 	public teamTaskMatrix = [];
+	public bundleSteps = null;
 
 	constructor(
 		private eventsService: EventsService,
@@ -82,11 +83,12 @@ export class EventDashboardComponent implements OnInit {
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
 				if (bundles.length) {
-					this.selectedEventBundle =  bundles[0];
+					this.selectedEventBundle =  {id: 3239}; // bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						console.log('The event status details are');
+						this.bundleSteps = this.eventsService.getBundleSteps(statusDetails, this.eventDetails.moveBundleSteps)
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
 						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
 						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);

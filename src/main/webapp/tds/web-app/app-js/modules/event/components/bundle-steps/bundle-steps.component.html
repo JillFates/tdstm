@@ -22,7 +22,7 @@
 
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
     <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
-        <div class="col-md-2">{{categories[rowIndex]}}</div>
+        <div class="col-md-2">{{bundleSteps.categories[rowIndex]}}</div>
         <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
                 class="col-md-{{colSize}}">
                 <img *ngIf="rowIndex == 0 && first" src="/tdstm/assets/images/left_arrow.png" 
