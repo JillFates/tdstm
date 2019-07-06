@@ -78,12 +78,27 @@ export class EventDashboardComponent implements OnInit {
 
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
-				console.log('The details are');
-				console.log(eventDetails);
 				this.eventDetails = eventDetails;
-				this.teamTaskMatrix = R.flatten(eventDetails.teamTaskMatrix || []);
+				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
+				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
+				if (bundles.length) {
+					this.selectedEventBundle =  bundles[0];
+					this.eventPlanStatus = new EventPlanStatus();
+					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
+					.subscribe((statusDetails: any) => {
+						console.log('The event status details are');
+						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
+						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
+						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
+						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
+						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
+						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
+					});
+				}
+
 			});
 
+		/*
 		this.eventsService.getListBundles(id)
 			.subscribe((results: any[]) => {
 				this.selectedEventBundle = results.length > 0 ? results.shift() : null;
@@ -101,7 +116,7 @@ export class EventDashboardComponent implements OnInit {
 						});
 				}
 			});
-
+			*/
 	}
 
 	onSelectedNews(id: number): void {
