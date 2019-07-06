@@ -1,16 +1,6 @@
 // Angular
 import {Component, Input} from '@angular/core';
 
-enum RowType {
-	Header,
-	Percents,
-	Tasks,
-	PlannedStart,
-	PlannedCompletion,
-	ActualStart,
-	ActualCompletion
-}
-
 @Component({
 	selector: 'tds-bundle-steps',
 	templateUrl: 'bundle-steps.component.html'

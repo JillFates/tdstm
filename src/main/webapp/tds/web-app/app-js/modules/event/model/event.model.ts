@@ -3,6 +3,16 @@ export class EventModel {
 	name: string;
 };
 
+export enum EventRowType {
+	Header,
+	Percents,
+	Tasks,
+	PlannedStart,
+	PlannedCompletion,
+	ActualStart,
+	ActualCompletion
+}
+
 export class EventPlanStatus {
 	dialIndicator: number;
 	cssClass: string;

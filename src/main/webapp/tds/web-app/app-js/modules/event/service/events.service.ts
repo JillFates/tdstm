@@ -7,8 +7,9 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {catchError, map} from 'rxjs/operators';
 
-import {EventModel} from '../model/event.model';
+import {EventModel, EventRowType} from '../model/event.model';
 import {NewsModel, NewsDetailModel} from '../model/news.model';
+import move from 'ramda/es/move';
 
 /**
  * @name EventsService
@@ -273,6 +274,29 @@ export class EventsService {
 			{ text: '', classes: '' },
 			{ text: '', classes: '' }
 		]);
+
+		snapshot.steps.forEach((step: any) => {
+			const bundle: any = moveBundleSteps
+				.find((currentBundle: any) => {
+					return currentBundle.moveBundle.id === parseInt(snapshot.moveBundleId, 10) && step.tid === currentBundle.transitionId;
+				});
+
+			if (bundle) {
+				console.log(bundle);
+			}
+			let colIndex = headerRow.findIndex((item: any) => item.id === bundle.id);
+			console.log(colIndex);
+			console.log('----------');
+
+			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
+			steps[EventRowType.Percents][colIndex].text = percent;
+			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
+
+			if (snapshot.runbookOn === 1) {
+				console.log('print');
+			}
+
+		});
 
 		return {
 			categories,
