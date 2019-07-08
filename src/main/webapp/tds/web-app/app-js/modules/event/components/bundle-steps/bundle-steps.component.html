@@ -1,5 +1,6 @@
 <style>
     .bundle-steps-component {
+        padding-right: 30px;
     }
 
     .bundle-steps-component img {
@@ -35,18 +36,58 @@
         border: 2px solid #595959;
     }
 
+    .bundle-steps-component .category-description {
+        background-position: right;
+        background-repeat: no-repeat;
+        font-weight: bold;
+        min-height: 31px;
+        padding-right: 30px;
+        text-align: right;
+    }
+
+    .bundle-steps-component .heading {
+        font-size: 16px;
+        font-weight: bold;
+        color: #63a242;
+    }
+
+    .bundle-steps-component .primary {
+        background-color: #D3D7DC;
+        border: 2px solid white;
+        color: #000000;
+        display: block;
+        font-size: 11px;
+        line-height: 24px;
+        margin-top: 1px;
+        text-align: center;
+        height: 32px;
+    }
+
+    .bundle-steps-component .secondary {
+        color: #000000;
+        background-color: #b5bdc6;
+        border: 2px solid white;
+        line-height: 28px;
+        margin-top: 1px;
+        display: block;
+        font-size: 11px;
+        text-align: center;
+        height: 32px;
+    }
+
 </style>
 
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
     <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
-        <div class="col-md-2">{{bundleSteps.categories[rowIndex]}}</div>
+        <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}} {{rowIndex}}</div>
         <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
-                class="col-md-{{colSize}}" [ngClass]="column.classes">
+                class="col-md-{{colSize}} {{column.classes}}" 
+                [ngClass]="{'heading': rowIndex === 0}">
                 <img *ngIf="rowIndex == 0 && first" src="/tdstm/assets/images/left_arrow.png" 
                     alt="back" 
                     (click)="onBack()"
                     class="disabled back"> 
-                {{column.text}} 
+                <span>{{column.text}}</span>
                 <img  *ngIf="rowIndex == 0 && last " src="/tdstm/assets/images/right_arrow.png" 
                     alt="back" 
                     (click)="onNext()"

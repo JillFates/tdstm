@@ -160,8 +160,8 @@ export class EventsService {
 		let steps = [];
 
 		categories = [
+			'Step',
 			'',
-			'Percents',
 			'Tasks',
 			'Planned Start',
 			'Planned Completion',
@@ -193,21 +193,7 @@ export class EventsService {
 		steps.push(headerRow);
 		steps.push([
 			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
-		]);
-
-		steps.push([
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
+			{ text: ' ', classes: '' },
 			{ text: '', classes: '' },
 			{ text: '', classes: '' },
 			{ text: '', classes: '' },
@@ -220,60 +206,76 @@ export class EventsService {
 		]);
 
 		steps.push([
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' }
 		]);
 
 		steps.push([
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' }
+		]);
+
+
+
+		steps.push([
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' },
+			{ text: '', classes: 'secondary' }
 		]);
 
 		steps.push([
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' }
 		]);
 
 		steps.push([
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
-		]);
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' },
+			{ text: '', classes: 'primary' }
+		])
 
 		snapshot.steps.forEach((step: any) => {
 			const bundle: any = moveBundleSteps
@@ -291,6 +293,10 @@ export class EventsService {
 			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
 			steps[EventRowType.Percents][colIndex].text = percent;
 			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
+			steps[EventRowType.PlannedStart][colIndex].text = step.planStart;
+			steps[EventRowType.PlannedCompletion][colIndex].text = step.planComp;
+			// set the task value
+			steps[EventRowType.Tasks][colIndex].text = `${step.tskComp} (of ${step.tskTot})`;
 
 			if (snapshot.runbookOn === 1) {
 				console.log('print');
