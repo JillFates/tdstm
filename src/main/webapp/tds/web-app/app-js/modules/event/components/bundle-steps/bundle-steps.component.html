@@ -96,8 +96,20 @@
 </style>
 
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
+    <div class="row">
+        <div class="col-md-2">Empty Space</div>
+        <div class="col-md-10">
+
+            <kendo-tabstrip>
+                <kendo-tabstrip-tab [title]="bundle.name" 
+                    *ngFor="let bundle of bundleSteps.moveBundleList">
+                </kendo-tabstrip-tab>
+
+            </kendo-tabstrip>
+        </div>
+    </div>
     <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
-        <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}} {{rowIndex}}</div>
+        <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}}</div>
         <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
                 class="col-md-{{colSize}} {{column.classes}}" 
                 [ngClass]="{'heading': rowIndex === 0}">

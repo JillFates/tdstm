@@ -96,7 +96,8 @@ export class EventDashboardComponent implements OnInit {
 						this.bundleSteps = this.eventsService.getBundleSteps(
 							statusDetails,
 							this.eventDetails.moveBundleSteps,
-							this.userTimeZone
+							this.userTimeZone,
+							this.eventDetails.moveBundleList
 						);
 
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);

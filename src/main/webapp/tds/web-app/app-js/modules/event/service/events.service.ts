@@ -94,7 +94,8 @@ export class EventsService {
 						percDurationStarted: model.percDurationStarted || '',
 						teamTaskMatrix: model.teamTaskMatrix || [],
 						moveEvent: model.moveEvent,
-						moveBundleSteps: model.moveBundleSteps || []
+						moveBundleSteps: model.moveBundleSteps || [],
+						moveBundleList: model.moveBundleList || []
 					}
 				}
 
@@ -151,7 +152,7 @@ export class EventsService {
 			});
 	}
 
-	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string): any {
+	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any): any {
 		let headers = [];
 		let percents = [];
 		let categories = [];
@@ -324,7 +325,8 @@ export class EventsService {
 		return {
 			categories,
 			steps,
-			columnsLength: headerRow.length
+			columnsLength: headerRow.length,
+			moveBundleList: moveBundleList
 		};
 	}
 }
