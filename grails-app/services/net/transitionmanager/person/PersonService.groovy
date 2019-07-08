@@ -322,7 +322,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-			"and PR.roleTypeCodeFrom.id='COMPANY' and PR.roleTypeCodeTo.id='STAFF' and PR.partyIdFrom IN (:companies)"
+			"and PR.roleTypeCodeFrom.id='$RoleType.CODE_COMPANY' and PR.roleTypeCodeTo.id='$RoleType.CODE_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 
