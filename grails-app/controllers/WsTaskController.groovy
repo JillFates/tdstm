@@ -5,6 +5,7 @@ import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.AssetCommentSaveUpdateCommand
+import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.domain.Person
@@ -164,8 +165,8 @@ class WsTaskController implements ControllerMethods {
 	 * @return JSON object containing an ActionRequest context object
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
-	def recordRemoteActionStarted(Long id, String publicKey) {
-		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), publicKey)
+	def recordRemoteActionStarted(Long id, RecordRemoteActionStartedCommand commandObject) {
+		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
