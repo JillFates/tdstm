@@ -1,0 +1,16 @@
+package net.transitionmanager.command.task
+
+import grails.validation.Validateable
+import net.transitionmanager.command.CommandObject
+
+/**
+ * A command for passing the public key, so that either a form post or a json post can be used.
+ */
+@Validateable
+class RecordRemoteActionStartedCommand implements CommandObject {
+
+	/**
+	 * The public that will be used for encrypting the credentials that will be passed down to TMD.
+	 */
+	String publicKey
+}
