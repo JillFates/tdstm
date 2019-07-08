@@ -56,6 +56,11 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	private populateData(): void {
+		this.userContextService.getUserContext()
+		.subscribe((userContext: UserContextModel) => {
+			this.userTimeZone = userContext.timezone;
+		})
+
 		const services = [
 			this.eventsService.getEvents(),
 			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
@@ -88,7 +93,12 @@ export class EventDashboardComponent implements OnInit {
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						console.log('The event status details are');
-						this.bundleSteps = this.eventsService.getBundleSteps(statusDetails, this.eventDetails.moveBundleSteps)
+						this.bundleSteps = this.eventsService.getBundleSteps(
+							statusDetails,
+							this.eventDetails.moveBundleSteps,
+							this.userTimeZone
+						);
+
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
 						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
 						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);

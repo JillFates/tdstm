@@ -87,7 +87,7 @@
                     alt="back" 
                     (click)="onBack()"
                     class="disabled back"> 
-                <span>{{column.text}}</span>
+                <span [innerHtml]="column.text"></span>
                 <img  *ngIf="rowIndex == 0 && last " src="/tdstm/assets/images/right_arrow.png" 
                     alt="back" 
                     (click)="onNext()"

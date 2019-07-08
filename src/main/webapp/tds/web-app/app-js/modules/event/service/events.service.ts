@@ -9,6 +9,7 @@ import {catchError, map} from 'rxjs/operators';
 
 import {EventModel, EventRowType} from '../model/event.model';
 import {NewsModel, NewsDetailModel} from '../model/news.model';
+import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
 
 /**
@@ -150,7 +151,7 @@ export class EventsService {
 			});
 	}
 
-	getBundleSteps(snapshot: any, moveBundleSteps: []): any {
+	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string): any {
 		let headers = [];
 		let percents = [];
 		let categories = [];
@@ -293,10 +294,26 @@ export class EventsService {
 			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
 			steps[EventRowType.Percents][colIndex].text = percent;
 			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
-			steps[EventRowType.PlannedStart][colIndex].text = step.planStart;
-			steps[EventRowType.PlannedCompletion][colIndex].text = step.planComp;
+			steps[EventRowType.PlannedStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planStart);
+			steps[EventRowType.PlannedCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planComp);
+			steps[EventRowType.ActualStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actStart);
+			steps[EventRowType.ActualCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actComp);
+
+			let remainingTasksNumber = 0
+			let totalTasksNumber = 0
+			if (!isNaN(step.tskComp / step.tskTot)) {
+				remainingTasksNumber = step.tskComp
+				totalTasksNumber = step.tskTot
+			}
+
+			let taskManagerUrl =  '/assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
+			let firstUrl = taskManagerUrl + '1&step=' + step.wfTranId
+			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
+			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl+ '\'>' + totalTasksNumber + '</a>)';
 			// set the task value
-			steps[EventRowType.Tasks][colIndex].text = `${step.tskComp} (of ${step.tskTot})`;
+			// steps[EventRowType.Tasks][colIndex].text = `${step.tskComp} (of ${step.tskTot})`;
+			steps[EventRowType.Tasks][colIndex].text = linksHtml;
+
 
 			if (snapshot.runbookOn === 1) {
 				console.log('print');

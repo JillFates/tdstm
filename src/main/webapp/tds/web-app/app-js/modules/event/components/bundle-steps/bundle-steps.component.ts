@@ -1,5 +1,6 @@
 // Angular
 import {Component, Input} from '@angular/core';
+import {EventRowType} from './../../model/event.model';
 
 @Component({
 	selector: 'tds-bundle-steps',
@@ -10,6 +11,7 @@ export class BundleStepsComponent {
 	public colSize = 2;
 	public showFrom = 0;
 	public elementsToShow = 5;
+	public RowType = EventRowType;
 
 	constructor() {
 		console.log('On constructor');
