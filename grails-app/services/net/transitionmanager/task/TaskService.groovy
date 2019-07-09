@@ -613,16 +613,16 @@ class TaskService implements ServiceMethods {
 		return task
 	}
 
-	/**
-	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
-	 * @param task
-	 * @param status
-	 * @return AssetComement	task that was updated by method
-	 */
-	AssetComment setTaskStatus(AssetComment task, String status, Person whom) {
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, whom.id, 'PROJ_MGR')
-		return setTaskStatus(task, status, whom, isPM)
-	}
+//	/**
+//	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
+//	 * @param task
+//	 * @param status
+//	 * @return AssetComement	task that was updated by method
+//	 */
+//	AssetComment setTaskStatus(AssetComment task, String status, Person whom) {
+//		boolean isPM = partyRelationshipService.staffHasFunction(task.project, whom.id, 'PROJ_MGR')
+//		return setTaskStatus(task, status, whom, isPM)
+//	}
 
 	/**
 	 * Set the status of the task, which will perform additional updated based on the state.
