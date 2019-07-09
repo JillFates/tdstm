@@ -45,7 +45,7 @@ class ApiActionScriptSpec extends Specification {
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(new ApiActionResponse().asImmutable())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(reactionScriptCode)
 
@@ -77,7 +77,7 @@ class ApiActionScriptSpec extends Specification {
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
 			applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -98,7 +98,7 @@ class ApiActionScriptSpec extends Specification {
 		when: 'Tries to create an instance of ApiActionScriptBinding for a ReactionScriptCode without the correct context objects'
 			applicationContext.getBean(ApiActionScriptBindingBuilder)
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -119,7 +119,7 @@ class ApiActionScriptSpec extends Specification {
 					.with(request)
 					.with(new ApiActionResponse())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -127,21 +127,21 @@ class ApiActionScriptSpec extends Specification {
 			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-				
+
 				// Set the socket and connect to 5 seconds
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				// Set up a proxy for the call
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
-				
+
 				// Set the charset for the exchange
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
-				
+
 				// Set the content-type to JSON
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
-				
+
 			""".stripIndent())
 
 		then: 'All the correct variables were bound'
@@ -169,7 +169,7 @@ class ApiActionScriptSpec extends Specification {
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -177,7 +177,7 @@ class ApiActionScriptSpec extends Specification {
 			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-				
+
 				if (response.status == SC.OK) {
 				   return SUCCESS
 				} else {
@@ -205,7 +205,7 @@ class ApiActionScriptSpec extends Specification {
 					.with(request)
 					.with(new ApiActionResponse().asImmutable())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 
@@ -213,7 +213,7 @@ class ApiActionScriptSpec extends Specification {
 			new ApiActionScriptEvaluator(scriptBinding).evaluate("""
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-				
+
 				if (response.status == SC.OK) {
 				   return SUCCESS
 				} else {
@@ -240,7 +240,7 @@ class ApiActionScriptSpec extends Specification {
 					.with(new ActionRequest(['property1': 'value1']))
 					.with(response.asImmutable())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.STATUS)
 

@@ -86,7 +86,9 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 						return true
 					}
 				] as TaskService
-
+		TaskFacade taskFacade2 = new TaskFacade(new AssetComment(), new Person())
+		taskFacade2.taskService = service.taskService
+		Holders.grailsApplication.mainContext.beanFactory.registerSingleton("taskFacade", taskFacade2)
 		defineBeans {
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
@@ -99,9 +101,15 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 
 			taskFacade(TaskFacade) { bean ->
 				bean.scope = 'prototype'
+
 				taskService = [
-					addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+					addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+						notes << note
 						return true
+					},
+					setTaskStatus: {AssetComment task, String status, Person whom, boolean isPM=false->
+						notes << "Placed task on HOLD, previous state was 'Ready'"
+						return null
 					}
 				] as TaskService
 			}
@@ -194,7 +202,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			)
 		when: 'updating the action status'
 			service.actionStarted(action, assetComment.id, whom)
-		then: 'task notes are added and the apiActionPercentDone is updated'
+		then: 'task notes are added and the percentageComplete is updated'
 			notes.size() ==2
 			notes.contains('some message')
 			notes[1].startsWith('testAction started at')
@@ -216,7 +224,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		then:
 			notes.size() == 1
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 5
+			assetComment.percentageComplete == 5
 	}
 
 	void 'Test updateRemoteActionStatus error'() {
@@ -251,10 +259,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			)
 		when: 'updating the action status'
 			service.actionDone(action, assetComment.id, whom)
-		then: 'task node are added, and the apiActionPercentDone is set to 100'
+		then: 'task node are added, and the percentageComplete is set to 100'
 			notes.size() == 2
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 100
+			assetComment.percentageComplete == 100
 			notes[1] == 'Invoked Task with status: SUCCESS'
 	}
 

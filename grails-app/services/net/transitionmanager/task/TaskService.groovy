@@ -570,13 +570,14 @@ class TaskService implements ServiceMethods {
 
 	/**
 	 * Reset an action so it can be invoked again
-	 * @param task
+	 * @param taskId - the ID of the task
 	 * @param whom
 	 * @return
 	 */
-	String resetAction(AssetComment task, Person whom) {
-		String status = task.status
-		if (task.hasAction() && !task.isAutomatic() && status == AssetCommentStatus.HOLD) {
+	AssetComment resetAction(Long taskId, Person whom) {
+		AssetComment task = fetchTaskById(taskId, whom)
+
+		if (task.hasAction() && !task.isAutomatic() && task.status in AssetCommentStatus.AllowedStatusesToResetAction) {
 			String errMsg
 			try {
 				// Update the task so it can be invoked again
@@ -584,13 +585,13 @@ class TaskService implements ServiceMethods {
 				task.apiActionCompletedAt = null
 				task.actStart = null
 				task.dateResolved = null
+				task.percentageComplete = 0
 
 				// Log a note that the API Action was reset
 				addNote(task, whom, "Reset action ${task.apiAction.name}")
 
 				// Make sure that the status is READY instead
-				status = AssetCommentStatus.READY
-				task.status = status
+				task.status = AssetCommentStatus.READY
 
 			} catch (InvalidRequestException e) {
 				errMsg = e.getMessage()
@@ -604,11 +605,23 @@ class TaskService implements ServiceMethods {
 			if (errMsg) {
 				log.info "resetAction() error $errMsg"
 				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
-				status = ACS.HOLD
-				task.status = status
+				task.status = AssetCommentStatus.HOLD
 			}
+		} else {
+			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
 		}
-		return status
+		return task
+	}
+
+	/**
+	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
+	 * @param task
+	 * @param status
+	 * @return AssetComement	task that was updated by method
+	 */
+	AssetComment setTaskStatus(AssetComment task, String status, Person whom) {
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, whom.id, 'PROJ_MGR')
+		return setTaskStatus(task, status, whom, isPM)
 	}
 
 	/**
@@ -645,12 +658,14 @@ class TaskService implements ServiceMethods {
 			whom = getAutomaticPerson()
 		}
 
-		if (task.isAutomatic() && status == ACS.READY) {
-			if (ACTIONABLE_STATUSES.contains(status) ) {
+		// Trigger the action if it is automatic and the action is local
+		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally()) {
+			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
-				status = invokeAction(task, whom)
+				task = invokeLocalAction(task, whom)
+				status = task.status
 			}
 		}
 
@@ -786,6 +801,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForStatus(status) {
 		ACS.list.contains(status) ? 'task_' + status.toLowerCase() : 'task_na'
 	}
@@ -795,6 +811,7 @@ class TaskService implements ServiceMethods {
 	 * @param status
 	 * @return String The appropriate CSS style or task_na if the status is invalid
 	 */
+	@NotTransactional()
 	String getCssClassForRackStatus(String status) {
 		ACS.list.contains(status) ? 'rack_task_' + status.toLowerCase() : 'task_na'
 	}
@@ -995,13 +1012,16 @@ class TaskService implements ServiceMethods {
 	 * @return 'true' is the note was added successfully, 'false' otherwise.
 	 */
 	Boolean addNote(AssetComment task, Person person, String note, int isAudit = 1) {
-		def taskNote = new CommentNote(createdBy: person, note: note, isAudit: isAudit, assetComment: task)
+		if (note == null) {
+			note = "addNote was called with null value"
+		}
+		CommentNote taskNote = new CommentNote(createdBy: person, note: note, isAudit: isAudit, assetComment: task)
 		taskNote.validate()
 		if (taskNote.hasErrors()) {
-			log.error "addNote: failed to save note : ${GormUtil.allErrorsString(taskNote)}"
+			log.error "addNote(): failed to save note : {}", GormUtil.allErrorsString(taskNote)
 			return false
 		}
-
+		log.debug "addNote() Note was created: {}", note
 		task.addToNotes(taskNote)
 		true
 	}

@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.task.AssetComment
@@ -49,14 +50,16 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
 			ApiActionResponse actionResponse = new ApiActionResponse()
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			TaskFacade task = new TaskFacade()
+			AssetComment realTask = new AssetComment()
+			Person whom = new Person()
+			TaskFacade task = new TaskFacade(realTask, whom)
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A PRE script is evaluated'
 			String script = """
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-						
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
 			""".stripIndent()
@@ -85,14 +88,16 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			ActionRequest actionRequest = new ActionRequest(['property1': 'value1', 'format': 'xml'])
 			ApiActionResponse actionResponse = new ApiActionResponse()
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			TaskFacade task = new TaskFacade()
+			AssetComment realTask = new AssetComment()
+			Person whom = new Person()
+			TaskFacade task = new TaskFacade(realTask, whom)
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A PRE script is evaluated'
 			String script = """
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-						
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
 			""".stripIndent()
@@ -123,7 +128,9 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			actionResponse.status = ReactionHttpStatus.OK
 
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			TaskFacade task = new TaskFacade()
+			AssetComment realTask = new AssetComment()
+			Person whom = new Person()
+			TaskFacade task = new TaskFacade(realTask, whom)
 			ApiActionJob job = new ApiActionJob()
 
 		when: 'A STATUS script is evaluated'
@@ -166,12 +173,12 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			def taskServiceMock = [
 				getAutomaticPerson: { -> new Person() },
 				setTaskStatus: { AssetComment task, String status, Person whom ->
-					assetComment.status = 'Completed'
+					assetComment.status = AssetCommentStatus.COMPLETED
 					assetComment
 				}
 			] as TaskService
 
-			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment, whom)
 			task.taskService = taskServiceMock
 
 
@@ -210,7 +217,9 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			TaskFacade task = new TaskFacade()
+			AssetComment realTask = new AssetComment()
+			Person whom = new Person()
+			TaskFacade task = new TaskFacade(realTask, whom)
 			ApiActionJob job = new ApiActionJob()
 
 
@@ -218,7 +227,7 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			String script = """
 				 if (response.status == SC.OK) {
 					return SUCCESS
-				 } 
+				 }
 			""".stripIndent()
 
 			service.invokeReactionScript(
@@ -251,7 +260,9 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			actionResponse.status = ReactionHttpStatus.NOT_FOUND
 
 			AssetFacade asset = new AssetFacade(null, [:], true)
-			TaskFacade task = new TaskFacade()
+			AssetComment realTask = new AssetComment()
+			Person whom = new Person()
+			TaskFacade task = new TaskFacade(realTask, whom)
 			ApiActionJob job = new ApiActionJob()
 
 
@@ -259,7 +270,7 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 			String script = """
 				 if (response.status == SC.OK) {
 					return SUCCESS
-				 } 
+				 }
 			""".stripIndent()
 
 			service.invokeReactionScript(

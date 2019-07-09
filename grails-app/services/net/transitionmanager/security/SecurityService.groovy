@@ -4,6 +4,7 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.RSACodec
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsUserDetails
@@ -19,6 +20,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.rest.token.AccessToken
@@ -58,6 +60,8 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
 
+import java.security.PublicKey
+
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
 /**
@@ -79,7 +83,6 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	SpringSecurityService    springSecurityService
 	UserPreferenceService    userPreferenceService
 	JdbcTemplate             jdbcTemplate
-	TokenGenerator           tokenGenerator
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -91,24 +94,48 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	private long forgotMyPasswordResetTTL = 0
 	private long accountActivationTTL = 0
 
+	TokenGenerator tokenGenerator
+	private RSACodec       rsaCodec = new RSACodec()
+
 	/**
 	 * Generates a Map that contains the JWT token for the current user.
 	 * This is comparable to logging in using the /api url, using spring security rest.
 	 *
 	 * @return A Map that contains the JWT token, refresh token, username, roles, token type, and expiration in seconds.
 	 */
-	Map generateJWT() {
+	@NotTransactional()
+	Map generateJWT (){
 		UserDetails userDetails = springSecurityService.getPrincipal()
 		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
 
 		return [
-			username       : userDetails.username,
-			roles          : userDetails.authorities*.toString(),
+			// username       : userDetails.username,
+			// roles          : userDetails.authorities*.toString(),
 			"token_type"   : "Bearer",
 			"access_token" : token.accessToken,
 			"expires_in"   : token.expiration,
 			"refresh_token": token.refreshToken
 		]
+	}
+
+	/**
+	 * Used to encrypt a String using a public key
+	 * @param text - the text to be encrypted
+	 * @param publicKeyText - the public key to use for performing the encryption
+	 * @return the text encrypted
+	 */
+	@NotTransactional()
+	String encryptWithPublicKey(String text, String publicKeyText) {
+		if (! publicKeyText) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
+
+		try {
+			PublicKey publicKey = rsaCodec.getPublicKey(publicKeyText)
+			return rsaCodec.encrypt(publicKey, text)
+		} catch (java.security.spec.InvalidKeySpecException e) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
 	}
 
 	void afterPropertiesSet() {

@@ -1,10 +1,11 @@
-import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.i18n.Message
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -19,16 +20,19 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	@Shared
 	def grailsApplication
+	private PersonTestHelper personHelper = new PersonTestHelper()
 	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
 	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
 	AssetCommentTestHelper assetCommentTestHelper = new AssetCommentTestHelper()
 
-	Project project
-	MoveEvent moveEvent
+	Project      project
+	MoveEvent    moveEvent
 	AssetComment assetComment
+	Person       whom
 
 	void setup() {
 		project = projectTestHelper.createProject(null)
+		whom = personHelper.createStaff(project.owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
 		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
 	}
@@ -149,7 +153,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 	 * @return
 	 */
 	private TaskFacade getTaskFacadeBean() {
-		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment)
+		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment, whom)
 	}
 
 	/**
