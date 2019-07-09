@@ -2,6 +2,7 @@ package pages.Admin.User
 
 import geb.Page
 import modules.AdminModule
+import modules.CommonsModule
 
 class UserDetailsPage extends Page {
 
@@ -31,6 +32,7 @@ class UserDetailsPage extends Page {
         unlockUserLoginUsername {$("#unlockUserDialog").find("ul").find("li")[0]}
         unlockUserLoginConfirmBtn {$(class:"ui-dialog-buttonset").find("button")[0]}
         unlockUserLoginCancelBtn {$(class:"ui-dialog-buttonset").find("button")[1]}
+        commonsModule { module CommonsModule }
     }
 
     def clickOnDeleteButtonAndConfirm(){
