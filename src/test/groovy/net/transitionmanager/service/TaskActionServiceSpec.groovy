@@ -7,6 +7,7 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
+import grails.util.Holders
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalog

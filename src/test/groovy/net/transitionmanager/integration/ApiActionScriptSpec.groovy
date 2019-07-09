@@ -282,7 +282,8 @@ class ApiActionScriptSpec extends Specification {
 				}
 			] as TaskService
 
-			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			Person whom = new Person()
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment, whom)
 			task.taskService = taskServiceMock
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
@@ -328,7 +329,8 @@ class ApiActionScriptSpec extends Specification {
 				}
 			] as TaskService
 
-			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment)
+			Person whom = new Person()
+			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment, whom)
 			task.taskService = taskServiceMock
 
 			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)

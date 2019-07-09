@@ -178,6 +178,7 @@ class ApiActionServiceSpec  extends Specification implements ServiceUnitTest<Api
 				}
 			] as TaskService
 
+			Person whom = new Person()
 			TaskFacade task = applicationContext.getBean(TaskFacade, assetComment, whom)
 			task.taskService = taskServiceMock
 
