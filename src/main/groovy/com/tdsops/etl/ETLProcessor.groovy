@@ -8,7 +8,6 @@ import getl.data.Field
 import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -40,6 +39,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
+
 /**
  * Class that receives all the ETL initial commands.
  * <pre>
@@ -1676,7 +1676,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
-		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
 		return configuration
