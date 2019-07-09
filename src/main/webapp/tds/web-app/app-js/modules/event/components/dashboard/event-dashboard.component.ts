@@ -88,7 +88,7 @@ export class EventDashboardComponent implements OnInit {
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
 				if (bundles.length) {
-					this.selectedEventBundle =  {id: 3239}; // bundles[0];
+					this.selectedEventBundle = bundles[0]; //  {id: 3239}; // bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
@@ -97,7 +97,8 @@ export class EventDashboardComponent implements OnInit {
 							statusDetails,
 							this.eventDetails.moveBundleSteps,
 							this.userTimeZone,
-							this.eventDetails.moveBundleList
+							this.eventDetails.moveBundleList,
+							this.selectedEventBundle && this.selectedEventBundle.id
 						);
 
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
@@ -108,28 +109,7 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
 					});
 				}
-
 			});
-
-		/*
-		this.eventsService.getListBundles(id)
-			.subscribe((results: any[]) => {
-				this.selectedEventBundle = results.length > 0 ? results.shift() : null;
-				this.eventPlanStatus = new EventPlanStatus();
-				if (this.selectedEventBundle) {
-					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
-						.subscribe((statusDetails: any) => {
-							console.log('The event status details are');
-							this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
-							this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
-							this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
-							this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
-							this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
-							this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
-						});
-				}
-			});
-			*/
 	}
 
 	onSelectedNews(id: number): void {
@@ -188,5 +168,18 @@ export class EventDashboardComponent implements OnInit {
 				console.log('here error is');
 				console.log(error);
 			});
+	}
+
+	onChangeStepsTab(selectedBundleId: number) {
+		this.eventsService.getEventStatusDetails(selectedBundleId, this.selectedEvent.id)
+		.subscribe((statusDetails: any) => {
+			this.bundleSteps = this.eventsService.getBundleSteps(
+				statusDetails,
+				this.eventDetails.moveBundleSteps,
+				this.userTimeZone,
+				this.eventDetails.moveBundleList,
+				selectedBundleId
+			);
+		});
 	}
 }

@@ -116,6 +116,29 @@
         cursor: none;
     }
 
+    .bundle-steps-component .right-arrow {
+        position: absolute;
+        margin-left: 25px;
+        margin-top: 5px;
+    }
+
+    .bundle-steps-component .tab-item { 
+        color: red;
+        text-decoration: none; 
+    }
+
+    .bundle-steps-component .k-tabstrip-items {
+        background: red !important;
+    }
+
+    .bundle-steps-component .k-item {
+        background: green !important;
+    }
+
+    .k-tabstrip-items .k-link {
+        color: red !important;
+
+    }
 </style>
 
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
@@ -123,8 +146,11 @@
         <div class="col-md-2">Empty Space</div>
         <div class="col-md-10">
 
-            <kendo-tabstrip>
-                <kendo-tabstrip-tab [title]="bundle.name" 
+            <kendo-tabstrip (tabSelect)="onChangeTab($event)">
+                <kendo-tabstrip-tab 
+                    [title]="bundle.name" 
+                    class="tab-item"
+                    [selected]="bundle.id === bundleSteps.selectedBundleId"
                     *ngFor="let bundle of bundleSteps.moveBundleList">
                 </kendo-tabstrip-tab>
 
@@ -141,25 +167,12 @@
                       [ngClass]="{'disabled': showFrom === 0}"
                       (click)="onBack()">
                 </span>
-                <!--
-                <img *ngIf="rowIndex == 0 && first" src="/tdstm/assets/images/left_arrow.png" 
-                    alt="back" 
-                    (click)="onBack()"
-                    class="disabled back"> 
-                -->        
                 <span [innerHtml]="column.text"></span>
                 <span *ngIf="rowIndex == 0 && last" 
                       class="glyphicon glyphicon-chevron-right right-arrow" 
                       [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  bundleSteps.columnsLength}"
                       (click)="onNext()">
                 </span>
-                <!--
-                <img  *ngIf="rowIndex == 0 && last " src="/tdstm/assets/images/right_arrow.png" 
-                    alt="back" 
-                    (click)="onNext()"
-                    class="disabled next">
-                -->
-                    
         </div>
     </div>
 </div>

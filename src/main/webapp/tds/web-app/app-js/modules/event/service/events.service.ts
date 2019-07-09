@@ -152,7 +152,7 @@ export class EventsService {
 			});
 	}
 
-	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any): any {
+	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
 		let headers = [];
 		let percents = [];
 		let categories = [];
@@ -235,8 +235,6 @@ export class EventsService {
 			{ text: '', classes: 'secondary' }
 		]);
 
-
-
 		steps.push([
 			{ text: '', classes: 'secondary' },
 			{ text: '', classes: 'secondary' },
@@ -310,11 +308,10 @@ export class EventsService {
 			let taskManagerUrl =  '/assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
 			let firstUrl = taskManagerUrl + '1&step=' + step.wfTranId
 			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
-			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl+ '\'>' + totalTasksNumber + '</a>)';
+			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
 			// set the task value
 			// steps[EventRowType.Tasks][colIndex].text = `${step.tskComp} (of ${step.tskTot})`;
 			steps[EventRowType.Tasks][colIndex].text = linksHtml;
-
 
 			if (snapshot.runbookOn === 1) {
 				console.log('print');
@@ -326,7 +323,8 @@ export class EventsService {
 			categories,
 			steps,
 			columnsLength: headerRow.length,
-			moveBundleList: moveBundleList
+			moveBundleList: moveBundleList,
+			selectedBundleId: selectedBundleId
 		};
 	}
 }
