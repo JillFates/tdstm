@@ -169,7 +169,7 @@ class MoveEventService implements ServiceMethods {
 		assert moveEvent
 		assert person
 
-		if (teamRoleType.type != RoleType.TEAM) {
+		if (teamRoleType.type != RoleType.TYPE_TEAM) {
 			throw new InvalidParamException('Invalid team code $teamRoleType.id was specified')
 		}
 
@@ -215,7 +215,7 @@ class MoveEventService implements ServiceMethods {
 	 */
 	@Transactional(readOnly = true)
 	RoleType teamRoleType(String teamCode) {
-		RoleType.findByIdAndType(teamCode, RoleType.TEAM)
+		RoleType.findByIdAndType(teamCode, RoleType.TYPE_TEAM)
 	}
 
 	/**
@@ -230,7 +230,7 @@ class MoveEventService implements ServiceMethods {
 		assert person
 		boolean status = false
 
-		if (teamRoleType.type != RoleType.TEAM) {
+		if (teamRoleType.type != RoleType.TYPE_TEAM) {
 			throw new InvalidParamException("Invalid team code '$teamRoleType.id' was specified")
 		}
 
@@ -464,7 +464,7 @@ class MoveEventService implements ServiceMethods {
 					from PartyRelationship
 					where partyRelationshipType='PROJ_STAFF'
 					  and partyIdFrom=:project
-					  and roleTypeCodeFrom='$RoleType.CODE_PROJECT'
+					  and roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			""".toString(), [project: currentProject])
 
 			for (int r = 8; r <= projectStaff.size() + 7; r++) {

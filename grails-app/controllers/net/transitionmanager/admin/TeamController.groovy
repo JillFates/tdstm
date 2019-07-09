@@ -26,7 +26,7 @@ class TeamController implements ControllerMethods {
 	 */
     @HasPermission(Permission.RoleTypeView)
     def list() {
-        [roleTypeInstanceList: roleTypeService.list(RoleType.TEAM)]
+        [roleTypeInstanceList: roleTypeService.list(RoleType.TYPE_TEAM)]
     }
 
 	/**

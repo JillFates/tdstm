@@ -73,7 +73,7 @@ class PersonServiceIntegrationTests extends Specification {
 			adminPerson = personHelper.createStaff(projectService.getOwner(project))
 			assert adminPerson
 
-			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_PROJ_MGR])
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 			adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			// adminUser = UserLogin.findByUsername('tdsadmin')
@@ -314,30 +314,30 @@ class PersonServiceIntegrationTests extends Specification {
 				[lastName:'Buster', firstName:'Brock'],
 				['SYS_ADMIN', 'DB_ADMIN'], ['ROLE_editor'])
 
-			personService.addToTeam(person, RoleType.CODE_SYS_ADMIN)
-			personService.addToTeam(person, RoleType.CODE_DB_ADMIN)
+			personService.addToTeam(person, RoleType.CODE_TEAM_SYS_ADMIN)
+			personService.addToTeam(person, RoleType.CODE_TEAM_DB_ADMIN)
 			List teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 2
-			teams.contains(RoleType.CODE_SYS_ADMIN)
-			teams.contains(RoleType.CODE_DB_ADMIN)
-			teams[0] == RoleType.CODE_DB_ADMIN   // Should be sorted alphabetical
+			teams.contains(RoleType.CODE_TEAM_SYS_ADMIN)
+			teams.contains(RoleType.CODE_TEAM_DB_ADMIN)
+			teams[0] == RoleType.CODE_TEAM_DB_ADMIN   // Should be sorted alphabetical
 			// Check individually
-			personService.isAssignedToTeam(person, RoleType.CODE_SYS_ADMIN)
-			personService.isAssignedToTeam(person, RoleType.CODE_DB_ADMIN)
-			!personService.isAssignedToTeam(person, RoleType.CODE_PROJ_MGR)
+			personService.isAssignedToTeam(person, RoleType.CODE_TEAM_SYS_ADMIN)
+			personService.isAssignedToTeam(person, RoleType.CODE_TEAM_DB_ADMIN)
+			!personService.isAssignedToTeam(person, RoleType.CODE_TEAM_PROJ_MGR)
 
 		// Add a new team to the person's repertoire
 		when:
 			Map results = [:]
-			personService.addToProjectTeam(project.id.toString(), person.id.toString(), RoleType.CODE_PROJ_MGR, results)
+			personService.addToProjectTeam(project.id.toString(), person.id.toString(), RoleType.CODE_TEAM_PROJ_MGR, results)
 			teams = personService.getPersonTeamCodes(person)
 		then:
 			teams.size() == 3
-			teams.contains(RoleType.CODE_PROJ_MGR)
-			personService.isAssignedToTeam(person, RoleType.CODE_PROJ_MGR)
-			personService.isAssignedToProjectTeam(project, person, RoleType.CODE_PROJ_MGR)
-			!personService.isAssignedToProjectTeam(project, person, RoleType.CODE_SYS_ADMIN)
+			teams.contains(RoleType.CODE_TEAM_PROJ_MGR)
+			personService.isAssignedToTeam(person, RoleType.CODE_TEAM_PROJ_MGR)
+			personService.isAssignedToProjectTeam(project, person, RoleType.CODE_TEAM_PROJ_MGR)
+			!personService.isAssignedToProjectTeam(project, person, RoleType.CODE_TEAM_SYS_ADMIN)
 	}
 
 	def '08. Test assigning a person to a move event team directly by an admin user'() {
@@ -362,15 +362,15 @@ class PersonServiceIntegrationTests extends Specification {
 			String meId = moveEvent.id.toString()
 			String personId = person.id.toString()
 		then: 'no error message should be returned'
-			personService.assignToProjectEvent(personId, meId, RoleType.CODE_SYS_ADMIN, '1') == ''
+			personService.assignToProjectEvent(personId, meId, RoleType.CODE_TEAM_SYS_ADMIN, '1') == ''
 		and: 'the person should be assigned to the project'
-			personService.isAssignedToProjectTeam(project, person, RoleType.CODE_SYS_ADMIN)
+			personService.isAssignedToProjectTeam(project, person, RoleType.CODE_TEAM_SYS_ADMIN)
 		and: 'the person should be assigned to the event'
-			personService.isAssignedToEventTeam(moveEvent, person, RoleType.CODE_SYS_ADMIN)
+			personService.isAssignedToEventTeam(moveEvent, person, RoleType.CODE_TEAM_SYS_ADMIN)
 		and: 'the person DB_ADMIN role was not assigned to the project'
-			! personService.isAssignedToProjectTeam(project, person, RoleType.CODE_DB_ADMIN)
+			! personService.isAssignedToProjectTeam(project, person, RoleType.CODE_TEAM_DB_ADMIN)
 		and: 'the person DB_ADMIN role was not assigned to the event'
-			! personService.isAssignedToEventTeam(moveEvent, person, RoleType.CODE_DB_ADMIN)
+			! personService.isAssignedToEventTeam(moveEvent, person, RoleType.CODE_TEAM_DB_ADMIN)
 	}
 
 	/*
@@ -512,7 +512,7 @@ class PersonServiceIntegrationTests extends Specification {
 		// Note that there maybe some overlap of this test and GormUtilIntegrationSpec.mergeDomainReferences
 		when: 'Setup the initial data for the test cases'
 			Map results = [:]
-			String extraTeam = RoleType.CODE_DB_ADMIN
+			String extraTeam = RoleType.CODE_TEAM_DB_ADMIN
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap)
 			personService.addToProjectTeam(project.id.toString(), fromPerson.id.toString(), extraTeam, results)

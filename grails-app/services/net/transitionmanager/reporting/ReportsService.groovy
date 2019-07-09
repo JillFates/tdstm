@@ -655,8 +655,8 @@ class ReportsService implements ServiceMethods {
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id=?
-			  and roleTypeCodeFrom = '$RoleType.CODE_PROJECT'
-			  and roleTypeCodeTo = '$RoleType.CODE_STAFF'
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+			  and roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
 		""".toString(), [currProj.toLong()])
 
         String userLoginError = ''
@@ -679,8 +679,8 @@ class ReportsService implements ServiceMethods {
 			id in (select p.partyIdTo from PartyRelationship p
 			       where p.partyRelationshipType='STAFF'
 			         and p.partyIdFrom.id=:clientId
-			         and p.roleTypeCodeFrom= '$RoleType.CODE_COMPANY'
-			         and p.roleTypeCodeTo='$RoleType.CODE_STAFF')
+			         and p.roleTypeCodeFrom= '$RoleType.CODE_PARTY_COMPANY'
+			         and p.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF')
 			order by lastName
 		""".toString(), [clientId: project.clientId])
 

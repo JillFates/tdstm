@@ -55,7 +55,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			assert adminPerson
 
 			// Assign the admin to the project
-			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_PROJ_MGR])
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 			adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			assert adminUser

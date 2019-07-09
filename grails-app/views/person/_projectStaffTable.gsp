@@ -41,7 +41,7 @@
 					</td>
 				</g:if>
 				<g:else>
-					<g:if test="${projectStaff.role != RoleType.CODE_STAFF}">
+					<g:if test="${projectStaff.role != RoleType.CODE_PARTY_STAFF}">
 
 						<td id="projectColumnId"
 							onClick="clkCB(event, $(this),${projectStaff.personId},${project.id}, null, '${projectStaff.role}', 'addRemoveProjectTeam');"
@@ -65,7 +65,7 @@
 					</g:else>
 				</g:else>
 				<g:each in="${moveEventList}" var="moveEvent">
-					<g:if test="${projectStaff.role != RoleType.CODE_STAFF}">
+					<g:if test="${projectStaff.role != RoleType.CODE_PARTY_STAFF}">
 						<g:if test="${projectStaff.unavailableDates.tokenize(',').contains(moveEvent.startDate)}">
 							<td id="${moveEvent.id}" class="unavailibleStaff" nowrap="nowrap" title="Not available on ${moveEvent.startTime}">
 								<input type="checkbox" disabled />

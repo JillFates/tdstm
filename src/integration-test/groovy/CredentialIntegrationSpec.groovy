@@ -52,7 +52,7 @@ class CredentialIntegrationSpec extends Specification {
 		setup:
 			Project project = projectHelper.createProjectWithDefaultBundle()
 			Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
-			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_PROJ_MGR])
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 			UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			securityService.assumeUserIdentity(adminUser.username, false)

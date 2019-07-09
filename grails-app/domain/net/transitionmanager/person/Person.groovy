@@ -30,8 +30,6 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.CommentNote
 import net.transitionmanager.task.RecipeVersion
 
-import javax.management.relation.Role
-
 class Person extends Party {
 
 	// Data of Special Person Required by the System
@@ -166,8 +164,8 @@ class Person extends Party {
 		String query = """select pr.partyIdFrom from
 					PartyRelationship pr where
 					pr.partyRelationshipType.id = 'STAFF'
-					and pr.roleTypeCodeFrom.id = '$RoleType.CODE_COMPANY'
-					and pr.roleTypeCodeTo.id = '$RoleType.CODE_STAFF'
+					and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY'
+					and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 					and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
 		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff: staffRef])
 
@@ -183,8 +181,8 @@ class Person extends Party {
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
 			  AND pr.partyIdTo=?
-			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PROJECT'
-			  AND pr.roleTypeCodeTo='$RoleType.CODE_STAFF'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
+			  AND pr.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF'
 		""".toString(), [this])
 	}
 
@@ -198,11 +196,11 @@ class Person extends Party {
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='$RoleType.CODE_COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		""".toString(), [company: company, person: this, team: RoleType.TEAM])
+		""".toString(), [company: company, person: this, team: RoleType.TYPE_TEAM])
 	}
 
 	/**
@@ -214,11 +212,11 @@ class Person extends Party {
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
-			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PROJECT'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			  AND pr.partyIdFrom=:project
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		""".toString(), [project: project, person: this, team: RoleType.TEAM])
+		""".toString(), [project: project, person: this, team: RoleType.TYPE_TEAM])
 	}
 
 	/**
@@ -229,10 +227,10 @@ class Person extends Party {
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='$RoleType.CODE_COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
-			  AND pr.roleTypeCodeTo <> '$RoleType.CODE_STAFF'
+			  AND pr.roleTypeCodeTo <> '$RoleType.CODE_PARTY_STAFF'
 		""".toString(), [company: company, person: this])
 	}
 

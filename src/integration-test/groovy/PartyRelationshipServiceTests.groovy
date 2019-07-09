@@ -71,7 +71,7 @@ class PartyRelationshipServiceTests extends Specification {
 		then:
 			teams != null
 			teams?.size() > 1
-			teams.find { it.id == RoleType.CODE_SYS_ADMIN}
+			teams.find { it.id == RoleType.CODE_TEAM_SYS_ADMIN}
 			!teams.find { it.id == 'BOGUS_TEAM_CODE_THAT_WOULD_NOT_EXIST' }
 	}
 
@@ -81,11 +81,11 @@ class PartyRelationshipServiceTests extends Specification {
 		then:
 			teams != null
 			teams?.size() > 1
-			teams.contains(RoleType.CODE_SYS_ADMIN)
+			teams.contains(RoleType.CODE_TEAM_SYS_ADMIN)
 			!teams.contains('BOGUS_TEAM_CODE_THAT_WOULD_NOT_EXIST')
 
 		then: 'the AUTO team should not appear by default'
-			!teams.contains(RoleType.CODE_AUTO)
+			!teams.contains(RoleType.CODE_TEAM_AUTO)
 
 		when:
 			teams = partyRelationshipService.getTeamCodes(true)
@@ -94,7 +94,7 @@ class PartyRelationshipServiceTests extends Specification {
 			teams?.size() > 1
 
 		then: 'the AUTO team should now appear'
-			teams.contains(RoleType.CODE_AUTO)
+			teams.contains(RoleType.CODE_TEAM_AUTO)
 	}
 
 	void "Test the getStaffingRoles method"() {
@@ -103,17 +103,17 @@ class PartyRelationshipServiceTests extends Specification {
 		then:
 			roles != null
 			roles?.size() > 1
-			roles.find { it.id == RoleType.CODE_SYS_ADMIN }
+			roles.find { it.id == RoleType.CODE_TEAM_SYS_ADMIN }
 			!roles.find { it.id == 'BOGUS_TEAM_CODE_THAT_WOULD_NOT_EXIST' }
 
 		then: 'the AUTO team should appear by default'
-			roles.find { it.id == RoleType.CODE_AUTO }
+			roles.find { it.id == RoleType.CODE_TEAM_AUTO }
 
 		when:
 			roles = partyRelationshipService.getStaffingRoles(false)
 		then: 'the AUTO team should appear by default so this is a test to see if it does not when passed false'
 			roles.size > 1
-			!roles.find { it.id == RoleType.CODE_AUTO }
+			!roles.find { it.id == RoleType.CODE_TEAM_AUTO }
 
 		then: 'test that the list is sorted by the description'
 			for (int i = 0; i < roles.size() - 1; i++) {
@@ -124,43 +124,43 @@ class PartyRelationshipServiceTests extends Specification {
 	void "Test team assignment to company staff"() {
 		// Try assigning the person to two different teams
 		when:
-			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_PROJ_MGR, RoleType.CODE_SYS_ADMIN])
+			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_TEAM_PROJ_MGR, RoleType.CODE_TEAM_SYS_ADMIN])
 			List teamAssignments = partyRelationshipService.getCompanyStaffFunctions(project.client.id, person.id)
 		then:
 			teamAssignments != null
 			teamAssignments.size() == 2
-			teamAssignments.find { it.id == RoleType.CODE_PROJ_MGR }
-			teamAssignments.find { it.id == RoleType.CODE_SYS_ADMIN }
+			teamAssignments.find { it.id == RoleType.CODE_TEAM_PROJ_MGR }
+			teamAssignments.find { it.id == RoleType.CODE_TEAM_SYS_ADMIN }
 
 		// Assign the person to a different team and make sure that it removed them from the other teams
 		when:
-			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_CLEANER])
+			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_TEAM_CLEANER])
 			teamAssignments = partyRelationshipService.getCompanyStaffFunctions(project.client.id, person.id)
 		then:
 			teamAssignments != null
 			teamAssignments.size() == 1
-			teamAssignments.find { it.id == RoleType.CODE_CLEANER }
+			teamAssignments.find { it.id == RoleType.CODE_TEAM_CLEANER }
 	}
 
 	void "Test Move Event Team Assignments"() {
 		// Assign a person to a move event for the PROJ_MGR team
 		when:
 			// Make sure that the person has these teams
-			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_PROJ_MGR, RoleType.CODE_SYS_ADMIN])
+			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_TEAM_PROJ_MGR, RoleType.CODE_TEAM_SYS_ADMIN])
 			// And then assign the person with the PROJ_MGR team to the event
-			personService.addToEvent(project.id, moveEvent.id, person.id, RoleType.CODE_PROJ_MGR)
+			personService.addToEvent(project.id, moveEvent.id, person.id, RoleType.CODE_TEAM_PROJ_MGR)
 			List moveEventAssignments = MoveEventStaff.findAllByPersonAndMoveEvent(person, moveEvent)
 		then:
 			moveEventAssignments != null
 			moveEventAssignments.size() > 0
-			moveEventAssignments.find { it.role.id == RoleType.CODE_PROJ_MGR }
+			moveEventAssignments.find { it.role.id == RoleType.CODE_TEAM_PROJ_MGR }
 
 		// Remove the PROJ_MGR team assignment from the person should also delete the moveEvent assignment
 		when:
-			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_SYS_ADMIN])
+			partyRelationshipService.updateAssignedTeams(person, [RoleType.CODE_TEAM_SYS_ADMIN])
 			moveEventAssignments = MoveEventStaff.findAllByPersonAndMoveEvent(person, moveEvent)
 		then:
-			! moveEventAssignments?.find { it.role.id == RoleType.CODE_PROJ_MGR }
+			! moveEventAssignments?.find { it.role.id == RoleType.CODE_TEAM_PROJ_MGR }
 	}
 
 	void "Test getCompanyOfStaff"() {

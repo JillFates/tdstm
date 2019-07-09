@@ -9,75 +9,34 @@ class RoleType {
 	/* Code that represent User Security Group types */
 	public static final String TYPE_SECURITY = 'SECURITY'
 	/* Code that represent Person Team types */
-	public static final String TEAM = 'TEAM'
+	public static final String TYPE_TEAM     = 'TEAM'
 	/* Code that represents Project type roles */
-	public static final String PROJECT = 'PROJECT'
+	public static final String TYPE_PROJECT  = 'PROJECT'
 	/* Code that represents Party roles */
-	public static final String PARTY = 'PARTY'
+	public static final String TYPE_PARTY    = 'PARTY'
 	/* Code that represents Application roles - do not think this is utilized */
-	public static final String APP = 'APP'
-
-
-	/* Role Type Codes for Role Type ROLE_SECURITY */
-	public static final String CODE_ROLE_ADMIN = 'ROLE_ADMIN'
-	public static final String CODE_ROLE_CLIENT_ADMIN = 'ROLE_CLIENT_ADMIN'
-	public static final String CODE_ROLE_CLIENT_MGR = 'ROLE_CLIENT_MGR'
-	public static final String CODE_ROLE_EDITOR = 'ROLE_EDITOR'
-	public static final String CODE_ROLE_SUPERVISOR = 'ROLE_SUPERVISOR'
-	public static final String CODE_ROLE_USER = 'ROLE_USER'
+	public static final String TYPE_APP      = 'APP'
 
 	/* Role Type Codes for Role Type TEAM */
-	public static final String ODE_ACCT_MGR = 'ACCT_MGR'
-	public static final String CODE_APP_COORD = 'APP_COORD'
-	public static final String CODE_AUTO = 'AUTO'
-	public static final String CODE_BACKUP_ADMIN = 'BACKUP_ADMIN'
-	public static final String CODE_CLEANER = 'CLEANER'
-	public static final String CODE_DBA_DB2 = 'DBA_DB2'
-	public static final String CODE_DB_ADMIN = 'DB_ADMIN'
-	public static final String CODE_DB_ADMIN_MS = 'DB_ADMIN_MS'
-	public static final String CODE_DB_ADMIN_ORA = 'DB_ADMIN_ORA'
-	public static final String CODE_MIG_ANALYST = 'MIG_ANALYST'
-	public static final String CODE_MIG_LEAD = 'MIG_LEAD'
-	public static final String CODE_MOVE_MGR = 'MOVE_MGR'
-	public static final String CODE_MOVE_TECH = 'MOVE_TECH'
-	public static final String CODE_MOVE_TECH_SR = 'MOVE_TECH_SR'
-	public static final String CODE_NETWORK_ADMIN = 'NETWORK_ADMIN'
-	public static final String CODE_PROJ_ADMIN = 'PROJ_ADMIN'
-	public static final String CODE_PROJ_MGR = 'PROJ_MGR'
-	public static final String CODE_STOR_ADMIN = 'STOR_ADMIN'
-	public static final String CODE_SYS_ADMIN = 'SYS_ADMIN'
-	public static final String CODE_SYS_ADMIN_AIX = 'SYS_ADMIN_AIX'
-	public static final String CODE_SYS_ADMIN_LNX = 'SYS_ADMIN_LNX'
-	public static final String CODE_SYS_ADMIN_UNIX = 'SYS_ADMIN_UNIX'
-	public static final String CODE_SYS_ADMIN_WIN = 'SYS_ADMIN_WIN'
-	public static final String CODE_TECH = 'TECH'
-	public static final String CODE_VM_ADMIN = 'VM_ADMIN'
-	public static final String CODE_VM_ADMIN_AWS = 'VM_ADMIN_AWS'
-	public static final String CODE_VM_ADMIN_EC2 = 'VM_ADMIN_EC2'
-	public static final String CODE_VM_ADMIN_HYPERV = 'VM_ADMIN_HYPERV'
-	public static final String CODE_VM_ADMIN_UCS = 'VM_ADMIN_UCS'
-	public static final String CODE_VM_ADMIN_VMWARE = 'VM_ADMIN_VMWARE'
-	public static final String CODE_VM_ADMIN_XEN = 'VM_ADMIN_XEN'
-
-	/* Role Type Codes for Role Type APP */
-	public static final String CODE_APP_1ST_CONTACT = 'APP_1ST_CONTACT'
-	public static final String CODE_APP_2ND_CONTACT = 'APP_2ND_CONTACT'
-	public static final String CODE_APP_OWNER = 'APP_OWNER'
-	public static final String CODE_APP_SME = 'APP_SME'
+	public static final String CODE_TEAM_AUTO      = 'AUTO'
+	public static final String CODE_TEAM_CLEANER   = 'CLEANER'
+	public static final String CODE_TEAM_DB_ADMIN  = 'DB_ADMIN'
+	public static final String CODE_TEAM_MOVE_MGR  = 'MOVE_MGR'
+	public static final String CODE_TEAM_MOVE_TECH = 'MOVE_TECH'
+	public static final String CODE_TEAM_PROJ_MGR  = 'PROJ_MGR'
+	public static final String CODE_TEAM_SYS_ADMIN = 'SYS_ADMIN'
 
 	/* Role Type Codes for Role Type PROJECT */
-	public static final String CODE_MOVE_BUNDLE = 'MOVE_BUNDLE'
+	public static final String CODE_PROJECT_MOVE_BUNDLE = 'MOVE_BUNDLE'
 
 	/* Role Type Codes for Role Type Party */
-	public static final String CODE_APP_ROLE = 'APP_ROLE'
-	public static final String CODE_CLIENT = 'CLIENT'
-	public static final String CODE_COMPANY = 'COMPANY'
-	public static final String CODE_PARTNER = 'PARTNER'
-	public static final String CODE_PROJECT = 'PROJECT'
-	public static final String CODE_STAFF = 'STAFF'
-	public static final String CODE_TEAM = 'TEAM'
-	public static final String CODE_TEAM_MEMBER = 'TEAM_MEMBER'
-	public static final String CODE_VENDOR = 'VENDOR'
+	public static final String CODE_PARTY_CLIENT  = 'CLIENT'
+	public static final String CODE_PARTY_COMPANY = 'COMPANY'
+	public static final String CODE_PARTY_PARTNER = 'PARTNER'
+	public static final String CODE_PARTY_PROJECT = 'PROJECT'
+	public static final String CODE_PARTY_STAFF   = 'STAFF'
+	public static final String CODE_PARTY_TEAM    = 'TEAM'
+	public static final String CODE_TEAM_MEMBER   = 'TEAM_MEMBER'
 
 	String id
 	String description
@@ -91,7 +50,7 @@ class RoleType {
 		id blank: false, size: 1..32
 		description nullable: true
 		help nullable: true
-		type nullable: false, inList: [SECURITY, TEAM, PROJECT, PARTY, APP]
+		type nullable: false, inList: [TYPE_SECURITY, TYPE_TEAM, TYPE_PROJECT, TYPE_PARTY, TYPE_APP]
 		level range: 0..100
 	}
 
@@ -112,7 +71,7 @@ class RoleType {
 	 * Determine if the current RoleType is a Team Role
 	 */
 	boolean isTeamRole() {
-		type == TEAM
+		type == TYPE_TEAM
 	}
 
 	String toString() {

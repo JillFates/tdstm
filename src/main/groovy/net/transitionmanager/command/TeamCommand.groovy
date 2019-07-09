@@ -11,10 +11,10 @@ class TeamCommand implements CommandObject {
 	String id
 	String description
 	String help
-	String type = RoleType.TEAM
+	String type = RoleType.TYPE_TEAM
 	Integer level
 
 	static constraints = {
-		type inList: [RoleType.TEAM]
+		type inList: [RoleType.TYPE_TEAM]
 	}
 }

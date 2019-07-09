@@ -22,7 +22,6 @@ import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.party.PartyRole
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
@@ -130,7 +129,7 @@ class PersonController implements ControllerMethods, PaginationMethods {
 					IFNULL(p.model_score, 0) AS modelScore
 				FROM person p
 				LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
-					AND role_type_code_from_id='$RoleType.CODE_COMPANY' AND role_type_code_to_id='$RoleType.CODE_STAFF' AND party_id_to_id=p.person_id
+					AND role_type_code_from_id='$RoleType.CODE_PARTY_COMPANY' AND role_type_code_to_id='$RoleType.CODE_PARTY_STAFF' AND party_id_to_id=p.person_id
 				LEFT OUTER JOIN party pa on p.person_id=pa.party_id
 				LEFT OUTER JOIN user_login u on p.person_id=u.person_id
 				LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
@@ -323,14 +322,14 @@ class PersonController implements ControllerMethods, PaginationMethods {
 			Project project = securityService.userCurrentProject
 			def personParty = Person.get(personId)
 			if (NumberUtil.toInteger(request.JSON.val) == 1) {
-				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PROJECT, personParty, roleType)
+				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, personParty, roleType)
 				def moveEvents = MoveEvent.findAllByProject(project)
 				MoveEventStaff.executeUpdate(
 						"delete from MoveEventStaff where moveEvent in (:moveEvents) and person = :person and role = :role",
 						[moveEvents:moveEvents, person:personParty,role:RoleType.load(roleType)])
 			} else if (personService.hasAccessToProject(personParty, project) ||
 				        (!(partyRelationshipService.isTdsEmployee(personId) && !securityService.hasPermission(Permission.PersonEditTDS)))) {
-				partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PROJECT, personParty, roleType)
+				partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, personParty, roleType)
 			}else{
 				message = "This person doesn't have access to the selected project"
 			}
@@ -643,10 +642,10 @@ class PersonController implements ControllerMethods, PaginationMethods {
 						LEFT OUTER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
 							AND pr2.role_type_code_to_id = pr.role_type_code_to_id
 							AND pr2.party_id_from_id IN ($projects)
-							AND pr2.role_type_code_from_id = '$RoleType.CODE_PROJECT'
+							AND pr2.role_type_code_from_id = '$RoleType.CODE_PARTY_PROJECT'
 						LEFT OUTER JOIN move_event_staff mes ON mes.person_id = p.person_id
 							AND mes.role_id = pr.role_type_code_to_id
-					WHERE pr.role_type_code_from_id in ('$RoleType.CODE_COMPANY')
+					WHERE pr.role_type_code_from_id in ('$RoleType.CODE_PARTY_COMPANY')
 						AND pr.party_relationship_type_id in ('STAFF')
 						AND pr.party_id_from_id IN ($companies)
 						AND p.active = 'Y'

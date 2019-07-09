@@ -45,7 +45,7 @@ class ProjectTeamController implements ControllerMethods {
 			delete from PartyRelationship
 			where partyRelationshipType.id = 'PROJ_TEAM'
 			  and partyIdFrom = : projectTeam
-			  and roleTypeCodeFrom.id = '$RoleType.CODE_TEAM'
+			  and roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_TEAM'
 		""", args)
 
 		projectTeam.delete()
@@ -83,7 +83,7 @@ class ProjectTeamController implements ControllerMethods {
 				delete from PartyRelationship
 				where partyRelationshipType.id = 'PROJ_TEAM'
 				  and partyIdFrom.id = : projectTeamId
-				  and roleTypeCodeFrom.id = '$RoleType.CODE_TEAM'
+				  and roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_TEAM'
 			""", [projectTeamId: projectTeam.id])
 
 			partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
