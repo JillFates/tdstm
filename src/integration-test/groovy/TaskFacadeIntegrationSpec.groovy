@@ -2,9 +2,11 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.MessageSource
@@ -32,7 +34,9 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	void setup() {
 		project = projectTestHelper.createProject(null)
-		whom = personHelper.createStaff(project.owner)
+		ProjectService projectService = new ProjectService()
+		PartyGroup owner = projectService.getOwner(project)
+		whom = personHelper.createStaff(owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
 		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
 	}

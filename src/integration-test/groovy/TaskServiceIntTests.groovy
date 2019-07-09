@@ -1,3 +1,4 @@
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -11,6 +12,7 @@ import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.action.Provider
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.person.Person
@@ -29,7 +31,7 @@ import test.helper.ApiCatalogTestHelper
 @Integration
 @Rollback
 class TaskServiceIntTests extends Specification{
-
+    CustomDomainService customDomainService
     TaskService taskService
     SecurityService securityService
 
