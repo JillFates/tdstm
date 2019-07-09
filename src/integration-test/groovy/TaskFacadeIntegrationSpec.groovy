@@ -22,23 +22,45 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	@Shared
 	def grailsApplication
-	private PersonTestHelper personHelper = new PersonTestHelper()
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
-	AssetCommentTestHelper assetCommentTestHelper = new AssetCommentTestHelper()
 
+	@Shared
+	private PersonTestHelper personHelper
+
+	@Shared
+	ProjectTestHelper projectTestHelper
+
+	@Shared
+	MoveEventTestHelper moveEventTestHelper
+
+	@Shared
+	AssetCommentTestHelper assetCommentTestHelper
+
+	@Shared
 	Project      project
+
+	@Shared
 	MoveEvent    moveEvent
+
+	@Shared
 	AssetComment assetComment
+
+	@Shared
 	Person       whom
 
+
 	void setup() {
+		personHelper = new PersonTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		moveEventTestHelper = new MoveEventTestHelper()
+		assetCommentTestHelper = new AssetCommentTestHelper()
+
 		project = projectTestHelper.createProject(null)
 		ProjectService projectService = new ProjectService()
 		PartyGroup owner = projectService.getOwner(project)
 		whom = personHelper.createStaff(owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
 		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
+
 	}
 
 	void 'test different bean ids when getting prototype TaskFacade bean from SpringContext'() {
