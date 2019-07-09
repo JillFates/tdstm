@@ -3,6 +3,10 @@
         padding-right: 30px;
     }
 
+    .bundle-steps-component .k-tabstrip {
+        margin-bottom: 10px;
+    }
+
     .bundle-steps-component img {
        position: absolute;
        border: 0px; 
@@ -10,15 +14,22 @@
        height: 23px;
        cursor: pointer;
     }
+    
+    .bundle-steps-component img.next.disabled,
+    .bundle-steps-component img.back.disabled {
+        cursor: none;
+    }
 
     .bundle-steps-component img.back {
         position: absolute;
         left: -20px;
+        cursor: pointer;
     }
 
     .bundle-steps-component img.next {
         position: absolute;
         right: 0;
+        cursor: pointer;
     }
 
     .bundle-steps-component .step_statusbar_good {
@@ -93,6 +104,18 @@
         height: 32px;
     }
 
+    .bundle-steps-component .left-arrow,
+    .bundle-steps-component .right-arrow {
+        color: #000;
+        cursor: pointer;
+    }
+
+    .bundle-steps-component .left-arrow.disabled,
+    .bundle-steps-component .right-arrow.disabled {
+        color: lightgrey;
+        cursor: none;
+    }
+
 </style>
 
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
@@ -113,15 +136,30 @@
         <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
                 class="col-md-{{colSize}} {{column.classes}}" 
                 [ngClass]="{'heading': rowIndex === 0}">
+                <span *ngIf="rowIndex == 0 && first" 
+                      class="glyphicon glyphicon-chevron-left left-arrow" 
+                      [ngClass]="{'disabled': showFrom === 0}"
+                      (click)="onBack()">
+                </span>
+                <!--
                 <img *ngIf="rowIndex == 0 && first" src="/tdstm/assets/images/left_arrow.png" 
                     alt="back" 
                     (click)="onBack()"
                     class="disabled back"> 
+                -->        
                 <span [innerHtml]="column.text"></span>
+                <span *ngIf="rowIndex == 0 && last" 
+                      class="glyphicon glyphicon-chevron-right right-arrow" 
+                      [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  bundleSteps.columnsLength}"
+                      (click)="onNext()">
+                </span>
+                <!--
                 <img  *ngIf="rowIndex == 0 && last " src="/tdstm/assets/images/right_arrow.png" 
                     alt="back" 
                     (click)="onNext()"
                     class="disabled next">
+                -->
+                    
         </div>
     </div>
 </div>
