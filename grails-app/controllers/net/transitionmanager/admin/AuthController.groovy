@@ -201,7 +201,7 @@ class AuthController implements ControllerMethods {
 	 * Send the reset password email notification for the given email address.
 	 * @return whether or not the process was successful.
 	 */
-	def sendResetPasswordEMail() {
+	def sendResetPasswordEmail() {
 		String email = params.email
 		boolean success = true
 		try {
