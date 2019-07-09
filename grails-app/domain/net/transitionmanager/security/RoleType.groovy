@@ -79,7 +79,7 @@ class RoleType {
 	}
 
 	def beforeValidate() {
-		if (level == null && type != 'SECURITY') {
+		if (level == null && type != TYPE_SECURITY) {
 			level = 0
 		}
 	}
