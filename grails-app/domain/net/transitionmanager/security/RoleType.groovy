@@ -7,7 +7,7 @@ class RoleType {
 
 	/* Role Types | Each of this works as a category that groups one or more Role Type Codes */
 	/* Code that represent User Security Group types */
-	public static final String SECURITY = 'ROLE_SECURITY'
+	public static final String TYPE_SECURITY = 'SECURITY'
 	/* Code that represent Person Team types */
 	public static final String TEAM = 'TEAM'
 	/* Code that represents Project type roles */
@@ -105,7 +105,7 @@ class RoleType {
 	 * Determine if the given type is a security role type
 	 */
 	boolean isSecurityRole() {
-		type == SECURITY
+		type == TYPE_SECURITY
 	}
 
 	/**
@@ -120,7 +120,7 @@ class RoleType {
 	}
 
 	def beforeValidate() {
-		if (level == null && type != 'ROLE_SECURITY') {
+		if (level == null && type != 'SECURITY') {
 			level = 0
 		}
 	}

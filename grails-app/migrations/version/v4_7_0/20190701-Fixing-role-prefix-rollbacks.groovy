@@ -28,6 +28,12 @@ databaseChangeLog = {
 		comment('Rolling back add ROLE_ prefix')
 		sql('UPDATE move_event_staff SET role_id = SUBSTRING(role_id, 6) WHERE  role_id like "ROLE_%" ;')
 	}
+
+
+	changeSet(author: "tpelletier", id: "20190627 TM-13321-8") {
+		comment('Rolling back role prefix ROLE_.')
+		sql('''UPDATE role_type  SET type = SUBSTRING(type,6) WHERE type = 'ROLE_SECURITY';''')
+	}
 }
 
 
