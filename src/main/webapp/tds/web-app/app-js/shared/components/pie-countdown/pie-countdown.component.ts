@@ -8,6 +8,9 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
+				<span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="onReload()"></span>
+
+				<!--
 				<tds-button-custom
 					icon="refresh"
 					title="Refresh"
@@ -15,6 +18,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 					class="component-action-reload pull-righ"
 					(click)="onReload()">
 				</tds-button-custom>
+				-->
 
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"

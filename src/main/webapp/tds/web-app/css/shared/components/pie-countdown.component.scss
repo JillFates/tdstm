@@ -11,6 +11,16 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+    align-items: center;
+  }
+
+  .pie-countdown .refresh {
+    color: #3c8dbc;
+    cursor: pointer;
+  }
+
+  .pie-countdown-container .k-dropdown {
+    width: 75px;
   }
 
       .pie-countdown-timer {
