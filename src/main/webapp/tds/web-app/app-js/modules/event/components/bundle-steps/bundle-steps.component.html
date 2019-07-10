@@ -1,8 +1,8 @@
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
     <div class="row">
         <div class="col-md-2">Empty Space</div>
-        <div class="col-md-10">
-
+        <div class="col-md-1 column-navigation"></div>
+        <div class="col-md-8">
             <kendo-tabstrip (tabSelect)="onChangeTab($event)">
                 <kendo-tabstrip-tab 
                     [title]="bundle.name" 
@@ -13,23 +13,28 @@
 
             </kendo-tabstrip>
         </div>
+        <div class="col-md-1 column-navigation"></div>
     </div>
     <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
         <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}}</div>
-        <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
-                class="col-md-{{colSize}} {{column.classes}}" 
-                [ngClass]="{'heading': rowIndex === 0}">
-                <span *ngIf="rowIndex == 0 && first" 
+        <div class="col-md-1 column-navigation">
+                <span *ngIf="rowIndex == 0" 
                       class="glyphicon glyphicon-chevron-left left-arrow" 
                       [ngClass]="{'disabled': showFrom === 0}"
                       (click)="onBack()">
                 </span>
+        </div>
+        <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
+                class="col-md-{{colSize}} {{column.classes}}" 
+                [ngClass]="{'heading': rowIndex === 0}">
                 <span [innerHtml]="column.text"></span>
-                <span *ngIf="rowIndex == 0 && last" 
+        </div>
+        <div class="col-md-1 column-navigation">
+                <span *ngIf="rowIndex == 0" 
                       class="glyphicon glyphicon-chevron-right right-arrow" 
                       [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  bundleSteps.columnsLength}"
                       (click)="onNext()">
-                </span>
+                </span>            
         </div>
     </div>
 </div>
