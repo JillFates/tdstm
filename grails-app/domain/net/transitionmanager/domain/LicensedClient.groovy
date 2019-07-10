@@ -40,7 +40,7 @@ class LicensedClient {
 	String  websitename
 	String  hash
 	String  bannerMessage
-	int     gracePeriodDays = 5
+	int     gracePeriodDays = 14
 
 	/** Date when the change was performed */
 	Date dateCreated
