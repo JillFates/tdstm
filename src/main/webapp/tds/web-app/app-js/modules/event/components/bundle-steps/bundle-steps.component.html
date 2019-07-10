@@ -1,6 +1,6 @@
 <div class="container bundle-steps-component" *ngIf="bundleSteps">
     <div class="row">
-        <div class="col-md-2">Empty Space</div>
+        <div class="col-md-2"></div>
         <div class="col-md-1 column-navigation"></div>
         <div class="col-md-8">
             <kendo-tabstrip (tabSelect)="onChangeTab($event)">
@@ -10,7 +10,6 @@
                     [selected]="bundle.id === bundleSteps.selectedBundleId"
                     *ngFor="let bundle of bundleSteps.moveBundleList">
                 </kendo-tabstrip-tab>
-
             </kendo-tabstrip>
         </div>
         <div class="col-md-1 column-navigation"></div>
@@ -24,7 +23,7 @@
                       (click)="onBack()">
                 </span>
         </div>
-        <div *ngFor="let column of getColumns(row); let first = first; let last = last;" 
+        <div *ngFor="let column of getColumns(row);" 
                 class="col-md-{{colSize}} {{column.classes}}" 
                 [ngClass]="{'heading': rowIndex === 0}">
                 <span [innerHtml]="column.text"></span>

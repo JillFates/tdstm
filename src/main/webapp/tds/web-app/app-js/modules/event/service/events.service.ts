@@ -176,35 +176,19 @@ export class EventsService {
 			headerRow.push({ id: moveBundle.id, text: moveBundle.label, classes: '' });
 		});
 
-		/*
-		let headerRow = [
-			{ text: 'Ready', classes: '' },
-			{ text: 'BackupDone', classes: '' },
-			{ text: 'Release', classes: '' },
-			{ text: 'Staged', classes: '' },
-			{ text: 'Powered On', classes: '' },
-			{ text: 'Completed', classes: '' },
-			{ text: 'Powered Down', classes: '' },
-			{ text: 'Unracking', classes: '' },
-			{ text: 'Reracking', classes: '' },
-			{ text: 'Powered On', classes: '' },
-			{ text: 'App Startup', classes: '' }
-		];
-		*/
-
 		steps.push(headerRow);
 		steps.push([
-			{ text: '', classes: '' },
-			{ text: ' ', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' },
-			{ text: '', classes: '' }
+			{ text: '', classes: 'empty-column' },
+			{ text: ' ', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' },
+			{ text: '', classes: 'empty-column' }
 		]);
 
 		steps.push([

@@ -29,7 +29,7 @@ export class BundleStepsComponent {
 	setInitialConfiguration(): void {
 		this.colSize = 1;
 		this.showFrom = 0;
-		this.elementsToShow = 8;
+		this.elementsToShow = 9;
 	}
 
 	onNext(): void {
