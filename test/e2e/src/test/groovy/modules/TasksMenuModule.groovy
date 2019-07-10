@@ -63,7 +63,9 @@ class TasksMenuModule extends Module {
     }
 
     def goToTasksManager(){
+        waitFor(30){tasksItem}
         selectMenu(tasksItem)
+        waitFor(30){tasksManagerItem}
         selectItem(tasksManagerItem)
     }
 

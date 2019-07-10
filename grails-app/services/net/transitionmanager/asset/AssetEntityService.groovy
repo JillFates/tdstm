@@ -958,6 +958,9 @@ class AssetEntityService implements ServiceMethods {
 	 * @return the number of assets that were deleted
 	 */
 	int deleteAssets(List<Long> assetIds) {
+		if(assetIds.size() == 0) {
+			return 0
+		}
 		List<AssetEntity> assets = AssetEntity.where { id in assetIds}.list()
 
 		ProjectAssetMap.where { asset in assets }.deleteAll()
@@ -3205,7 +3208,7 @@ class AssetEntityService implements ServiceMethods {
 			if (!justPlanning || serverCount || applicationCount || physicalCount || databaseCount || filesCount) {
 				assetSummaryList << [
 					id: moveBundle.id,
-					name: moveBundle,
+					name: moveBundle.name,
 					applicationCount: applicationCount,
 					serverCount: serverCount,
 					physicalCount: physicalCount,

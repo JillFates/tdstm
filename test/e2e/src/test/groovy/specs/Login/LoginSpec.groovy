@@ -84,24 +84,24 @@ class LoginSpec extends GebReportingSpec {
         given: "The User is on the User Details Page of the locked user"
             at UserDetailsPage
         when: "We click the Unlock icon"
-            unlockButtonID.click()
+            waitFor(30){unlockButtonID.click()}
         then: "The modal has the username info"
             verifyUsernameLocked("login_e2e_test_user@tdsi.com")
         and: "We click the Cancel button"
-            unlockUserLoginCancelBtn.click()
+            waitFor(30){unlockUserLoginCancelBtn.click()}
     }
 
     def "7. Unlock the login_e2e_test_user@tdsi.com user"(){
         given: "The User is on the User Details Page of the locked user"
             at UserDetailsPage
         and: "We click the Unlock icon"
-            unlockButtonID.click()
+            waitFor(30){unlockButtonID.click()}
         when: "The confirm button is clicked"
-            unlockUserLoginConfirmBtn.click()
+            waitFor(30){unlockUserLoginConfirmBtn.click()}
         then: "The Not Locked Out legend is displayed on the User Details page"
             at UserDetailsPage
             driver.navigate().refresh()
-            verifyNotLockedOut()
+            waitFor(30){verifyNotLockedOut()}
     }
 
     def "8. Verify the previously-locked-user now can login again"(){

@@ -64,17 +64,17 @@ class PersonService implements ServiceMethods {
 
 	// A list of the Domain class properties that perform cross references to prevent deletions
 	private static final Map<String, Map<String, Boolean>> PERSON_DELETE_EXCEPTIONS_MAP = [
-		application: [sme_id: true, sme2_id: true],
-		asset_entity: [app_owner_id: true]
+			application: [sme_id: true, sme2_id: true],
+			asset_entity: [app_owner_id: true]
 	]
 
 	// The Person properties that are updated by the Person Merge functionality
 	private static final List<String> MERGE_PERSON_DOMAIN_PROPERTIES = [
-		'firstName', 'middleName', 'lastName', 'nickName', 'title', 'email',
-		'department', 'location', 'stateProv', 'country',
-		'workPhone', 'mobilePhone',
-		'personImageURL',
-		'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
+			'firstName', 'middleName', 'lastName', 'nickName', 'title', 'email',
+			'department', 'location', 'stateProv', 'country',
+			'workPhone', 'mobilePhone',
+			'personImageURL',
+			'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
 	]
 
 	/* ***************************
@@ -202,7 +202,7 @@ class PersonService implements ServiceMethods {
 			query3.append(" AND pr.partyIdTo.lastName is null")
 			query3.append(" AND pr.partyIdTo.middleName is null")
 		}
-		 log.debug "findByCompanyAndName() Query = ${query.toString()}"
+		log.debug "findByCompanyAndName() Query = ${query.toString()}"
 		persons = PartyRelationship.executeQuery(query1.toString(), queryParams)
 
 		if (query2) {
@@ -302,7 +302,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-			  "and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
+				"and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 
@@ -1736,10 +1736,10 @@ class PersonService implements ServiceMethods {
 			person = personList.find {
 				// Find person using case-insensitive search
 				StringUtils.equalsIgnoreCase(it.firstName, personCommand.firstName) &&
-					((StringUtils.isEmpty(personCommand.lastName) && StringUtils.isEmpty(it.lastName)) ||
-					  StringUtils.equalsIgnoreCase(it.lastName, personCommand.lastName)) &&
-					((StringUtils.isEmpty(personCommand.middleName) && StringUtils.isEmpty(it.middleName)) ||
-					  StringUtils.equalsIgnoreCase(it.middleName, personCommand.middleName))
+						((StringUtils.isEmpty(personCommand.lastName) && StringUtils.isEmpty(it.lastName)) ||
+								StringUtils.equalsIgnoreCase(it.lastName, personCommand.lastName)) &&
+						((StringUtils.isEmpty(personCommand.middleName) && StringUtils.isEmpty(it.middleName)) ||
+								StringUtils.equalsIgnoreCase(it.middleName, personCommand.middleName))
 			}
 
 			if (person != null) {
@@ -1819,6 +1819,6 @@ class PersonService implements ServiceMethods {
 	 */
 	Person findByUsername(String username) {
 		Person.executeQuery('select u.person from UserLogin u where u.username=:username',
-			[username: username])[0]
+				[username: username])[0]
 	}
 }

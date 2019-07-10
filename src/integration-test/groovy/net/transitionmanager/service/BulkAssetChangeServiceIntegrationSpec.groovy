@@ -19,9 +19,9 @@ import net.transitionmanager.bulk.change.BulkChangeReference
 import net.transitionmanager.bulk.change.BulkChangeString
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.bulk.change.BulkChangeYesNo
-import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.command.bulk.BulkChangeCommand
 import net.transitionmanager.command.bulk.EditCommand
+import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.Setting
@@ -31,7 +31,6 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.dataview.AllAssetsFilterUnitTest
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.tag.TagAssetService
@@ -45,7 +44,7 @@ import test.helper.PersonTestHelper
 
 @Integration
 @Rollback
-class BulkAssetChangeServiceIntegrationSpec extends  Specification implements AllAssetsFilterUnitTest {
+class BulkAssetChangeServiceIntegrationSpec extends Specification {
 	@Autowired
 	BulkAssetChangeService bulkAssetChangeService
 
@@ -188,7 +187,7 @@ class BulkAssetChangeServiceIntegrationSpec extends  Specification implements Al
 
 			now = TimeUtil.nowGMT().clearTime()
 
-			dataviewUserParamsCommand = new DataviewUserParamsCommand(allAssetsDataviewMap)
+			dataviewUserParamsCommand = new DataviewUserParamsCommand([filters: [ domains: [] ], sortDomain: 'device', sortProperty: 'id'])
 			bulkChangeCommand = new BulkChangeCommand(
 				userParams: dataviewUserParamsCommand,
 				dataViewId: 1,

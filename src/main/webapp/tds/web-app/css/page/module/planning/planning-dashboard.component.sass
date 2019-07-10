@@ -1,0 +1,108 @@
+.planning-dashboard-component
+  font-family: helvetica, arial, sans-serif
+  line-height: 12px
+  a
+    color: black
+    font-weight: bold
+  a :hover
+    text-decoration: underline
+    color: black
+  .percentage-bars
+    border: 1px solid #63a242
+    margin-bottom: 10px
+    border-spacing: 0px
+  .percentage-bar-text
+    position: relative
+    top: -18px
+    height: 0px
+    margin-left: 5px
+  table
+    width: 100%
+    .dashboard-stat-icon-td
+      width: 14px
+      padding-left: 2px
+      padding-right: 2px
+      background-color: transparent
+    .dashboard-stat-desc-td
+      width: 90px
+      padding-right: 2px
+    .dashboard-stat-td-l
+      width: 20px
+      text-align: left
+    .dashboard-stat-graph-td
+      padding-left: 2px
+      padding-right: 2px
+    td
+      padding: 4px 5px
+    .dashboard-bar-base-small
+      padding: 0px
+      padding-right: 5px
+      width: 85%
+      height: 5px
+      background-color: lightyellow
+      box-shadow: 0px 0px 0px
+      border: 1px solid #63a242
+    .dashboard-bar-graph-small
+      background-color: #BFF3A5
+      z-index: -1
+      height: 5px
+      border-right-width: 3px
+      border-color: lightgray
+      border-right-style: inset
+  h4
+    font-weight: 700
+  .phase-wrapper
+    min-height: 200px
+    display: flex
+    margin-left: 20px
+    .dashboard-head
+      color: green
+      font-size: 18px
+      font-weight: bold
+      line-height: 31px
+      margin-bottom: -15px
+      white-space: nowrap
+    .dashboard-div
+      margin-top: 10px
+      margin-left: 5px
+      background-image: url('../../../images/news_bg.jpg')
+      background-size: contain
+      padding: 15px
+    .discovery-phase
+      width: 285px
+    .analysis-phase
+      width: 285px
+    .execution-phase
+      padding-right: 9px
+      width: 61%
+      .row-fluid
+        width: 100%
+        .execution-table
+          overflow-y: hidden
+  .dashboard-bar-base
+    padding: 0px
+    height: 24px
+    background-color: lightyellow
+    box-shadow: 2px 3px 3px lightgrey inset
+    .dashboard-bar-graph
+      background-color: #BFF3A5
+      z-index: -1
+      height: 24px
+      border-right-width: 3px
+      border-color: lightgray
+      border-right-style: inset
+  .dashboard-stat-exec-tdmc
+    width: 48px
+    font-size: 10px
+    text-align: right
+  .container-fluid
+    padding-left: 0px
+  .asset-name-column
+    vertical-align: middle
+  .execution-data-column
+    text-align: right
+  .dashboard-right-table
+    width: auto
+  @media (min-width: 1201px)
+    .execution-phase
+      flex-basis: 67%

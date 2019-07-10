@@ -66,16 +66,29 @@
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section">
-				<div>
+				<div *ngIf="hiddenFilters; then hiddenFiltersButton else clearFilters"></div>
+				<ng-template #clearFilters>
 					<tds-button-custom
 							class="component-action-clear-filters"
-					        id="btnClean"
-					        icon="times"
-					        title="Clear filters"
-					        [disabled]="!hasFilterApplied()"
-					        (click)="onClearFilters()">
+							id="btnClean"
+							icon="times"
+							title="Clear filters"
+							[disabled]="!hasFilterApplied()"
+							(click)="onClearFilters()">
 					</tds-button-custom>
-				</div>
+				</ng-template>
+				<ng-template #hiddenFiltersButton>
+					<tds-button-custom
+							class="component-action-clear-filters"
+							id="btnCleanHiddenFilters"
+							icon="eye-close"
+							title="Clear filters"
+							tooltip="Clear filters and Hidden Fields"
+							iconPrefixVendor="glyphicon glyphicon-"
+							[disabled]="!hasFilterApplied()"
+							(click)="onClearHiddenFilters()">
+					</tds-button-custom>
+				</ng-template>
 				<tds-button-custom
 				            icon="refresh"
 				            title="Refresh"

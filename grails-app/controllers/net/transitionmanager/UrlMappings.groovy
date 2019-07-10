@@ -85,6 +85,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/summaryTable" {
+			controller = "wsAsset"
+			action = [
+			    GET: "getSummaryTable"
+			]
+		}
+
 		"/ws/apiAction" {
 			controller = "wsApiAction"
 			action = [
@@ -214,6 +221,11 @@ class UrlMappings {
 		"/ws/dashboard/bundleData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"bundleData"]
+		}
+
+		"/ws/dashboard/getPlanningStats" {
+			controller = "wsDashboard"
+			action = [GET:"getDataForPlanningDashboard"]
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -1303,6 +1315,41 @@ class UrlMappings {
             ]
         }
 
+		"/ws/reports/viewEditBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleViewEdit"
+			]
+		}
+
+		"/ws/reports/createBundleModel" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleCreate"
+			]
+		}
+
+		"/ws/reports/saveBundle/$moveBundleId?" {
+			controller = "wsReports"
+			action = [
+					POST: "saveBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundleAndAssets/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundleAndAssets"
+			]
+		}
+
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"
 			action = [
@@ -1391,7 +1438,11 @@ class UrlMappings {
 
 		"/api/${controller}"(version: "1.0", namespace: "v1", method: "GET")
 		"/api/${controller}/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
-		"/api/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
+
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "GET")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "POST")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "PUT")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "DELETE")
 
 		"/api/${controller}/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
 		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")

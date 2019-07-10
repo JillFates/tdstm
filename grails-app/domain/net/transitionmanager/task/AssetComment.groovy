@@ -1,6 +1,6 @@
 package net.transitionmanager.task
 
-
+import com.tdsops.tm.enums.domain.ActionType
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -324,6 +324,53 @@ class AssetComment {
 	 */
 	Boolean isActionInvocableRemotely() {
 		return hasAction() && !apiActionInvokedAt && apiAction.isRemote && status in [READY, STARTED]
+	}
+
+	/**
+	 * Get invoke api action buttom details (enabled, disabled, alt text, etc)
+	 * @param disabled - whether button should be disabled or not
+	 * @param alt - alt message to show if apply
+	 * @return
+	 */
+	Map<String, ?> getInvokeButtonDetails(boolean disabled, String alt) {
+		return [
+				label      : 'Invoke',
+				icon       : 'ui-icon-gear',
+				actionType : 'invokeAction',
+				newStatus  : STARTED,
+				redirect   : 'taskManager',
+				disabled   : disabled,
+				tooltipText: alt
+		]
+	}
+
+	/**
+	 * Return a map with Api Action Invoke button details to correctly
+	 * show button in Task Manager
+	 * @return
+	 */
+	Map<String, ?> getInvokeActionButtonDetails() {
+		boolean canInvokeOnServer = (hasAction() && ActionType.WEB_API == apiAction.actionType)
+		boolean canInvokeRemotely = (hasAction() && !ActionType.WEB_API == apiAction.actionType)
+		if (isAutomatic() || (!canInvokeOnServer && !canInvokeRemotely)) {
+			return null
+		}
+
+		if (canInvokeOnServer) {
+			if (!apiActionInvokedAt && status in [READY, STARTED]) {
+				return getInvokeButtonDetails(false, null)
+			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
+				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+			}
+		} else if (canInvokeRemotely) {
+			if (!apiActionInvokedAt && status in [READY, STARTED]) {
+				return getInvokeButtonDetails(true, 'Action must be invoked from TM Desktop')
+			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
+				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+			}
+		}
+
+		return null
 	}
 
 	/*
