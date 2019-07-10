@@ -48,18 +48,18 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div style="display: flex;width:100%;">
-                        <div style="width:20%;display:flex;justify-content: center;align-items: center;"># or<br />
+                    <div class="task-effort-container">
+                        <div class="task-title"># of<br />
                             Tasks</div>
-                        <div style="width:80%">
-                            <div style="display: flex; border: 1px solid black;width: 100%;">
-                                <div class="task-done" style="overflow: hidden;height:34px;"
+                        <div class="task-graph-section">
+                            <div class="task-graph-container">
+                                <div class="task-done task-item" 
                                     [style.width.%]="eventDetails.percTaskDone">
                                     {{eventDetails.percTaskDone < 5 ? '' : eventDetails.percTaskDone + '%'}}
                                 </div>
-                                <div class="task-ready" style="overflow: hidden;height: 34px;"
+                                <div class="task-ready task-item" 
                                     [style.width.%]="eventDetails.percTaskReady"></div>
-                                <div class="task-started" style="overflow: hidden;height: 34px;"
+                                <div class="task-started task-item" 
                                     [style.width.%]="eventDetails.percTaskStarted"></div>
                             </div>
                             <div style="height: 5px;"></div>
@@ -88,18 +88,18 @@
                         </div>
                     </div>
                     <div style="height: 10px"></div>
-                    <div style="display: flex;width:100%;">
-                        <div style="width:20%;display:flex;justify-content: center;align-items: center;">Level <br />of
+                    <div class="task-effort-container">
+                        <div class="task-title">Level <br />of
                             Effort</div>
-                        <div style="width:80%">
-                            <div style="display: flex; border: 1px solid black;width: 100%;">
-                                <div class="task-done" style="overflow: hidden;height:34px;"
+                        <div class="task-graph-section">
+                            <div class="task-graph-container">
+                                <div class="task-done task-item"
                                     [style.width.%]="eventDetails.percDurationDone">
                                     {{eventDetails.percDurationDone < 5 ? '' : eventDetails.percDurationDone + '%'}}
                                 </div>
-                                <div class="task-started" style="overflow: hidden;height: 34px;"
+                                <div class="task-started task-item" 
                                     [style.width.%]="eventDetails.percDurationStarted"></div>
-                                <div class="task-ready" style="overflow: hidden;height: 34px;"
+                                <div class="task-ready task-item" 
                                     [style.width.%]="eventDetails.percDurationReady"></div>
                             </div>
                             <div style="height: 5px;"></div>
@@ -133,7 +133,7 @@
                     </tds-team-task-percents>
                 </div>
             </div>
-            <div class="row">
+            <div class="row bundle-steps-container">
                 <tds-bundle-steps 
                     *ngIf="bundleSteps" 
                     (changeTab)="onChangeStepsTab($event)"
