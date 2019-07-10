@@ -1311,6 +1311,41 @@ class UrlMappings {
             ]
         }
 
+		"/ws/reports/viewEditBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleViewEdit"
+			]
+		}
+
+		"/ws/reports/createBundleModel" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleCreate"
+			]
+		}
+
+		"/ws/reports/saveBundle/$moveBundleId?" {
+			controller = "wsReports"
+			action = [
+					POST: "saveBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundleAndAssets/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundleAndAssets"
+			]
+		}
+
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"
 			action = [

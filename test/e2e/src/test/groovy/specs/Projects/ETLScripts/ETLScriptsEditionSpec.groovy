@@ -116,7 +116,7 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         given: 'The User is on the ETLScripts Page'
             at ETLScriptsPage
         when: 'the user clicks on edit button'
-            waitFor(30){clickOnEditButtonForFirstDS()}
+            clickOnEditButtonForFirstDS()
         then: 'ETLScripts details modal is displayed'
             at EditETLScriptsPage
     }

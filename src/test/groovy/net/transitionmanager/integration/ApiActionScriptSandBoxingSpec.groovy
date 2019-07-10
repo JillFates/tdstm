@@ -1,6 +1,5 @@
 package net.transitionmanager.integration
 
-
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
@@ -146,8 +145,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			}
 
 			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -416,7 +413,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
