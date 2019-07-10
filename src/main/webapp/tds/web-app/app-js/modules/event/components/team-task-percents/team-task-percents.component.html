@@ -1,73 +1,7 @@
-<style>
-    .teamBreakdown.toprightcontent.smallTable {
-        width: 250px;
-        overflow-y: hidden;
-    }
-    .teamBreakdown.toprightcontent {
-        width: 630px;
-        overflow-y: hidden;
-    }
-    .teamBreakdown {
-        margin-top: 5px;
-        margin-left: 50px;
-        overflow: auto;
-    }
-    .toprightcontent {
-        float: left;
-        text-align: center;
-        width: 180px;
-        margin-top: 25px;
-        font-size: 13px;
-        line-height: 21px;
-    }
-    .teamcol {
-        width: 110px;
-        padding: 2px;
-    }
-    .teamcol a,
-    .teamcountcolumn a {
-        color: #000;
-        font-weight: bold;
-    }
-
-    .teamcountcolumn {
-        width: 30px;
-        /* text-align: right; */
-    }
-    .teambarcolumn {
-        width: 70px;
-        text-align: center;
-    }
-
-    .team_bar_base_small {
-        padding: 0px;
-        padding-right: 5px;
-        width: 85%;
-        height: 5px;
-        background-color: lightyellow;
-        box-shadow: 0px 0px 0px;
-        border: 1px solid #24488A;
-    }
-
-    .team_bar_graph_small {
-        background-color: #24488A;
-        z-index: -1;
-        height: 5px;
-        border-right-width: 3px;
-        border-color: lightgray;
-        border-right-style: inset;
-    }
-
-    .small_text {
-        font: 10px helvetica, arial, sans-serif;
-    }
-</style>
-
-
-<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+<div class="team-task-percents">
     <div *ngFor="let team of teamTaskMatrix" 
         class="teamBreakdown toprightcontent smallTable">
-        <table style="border:none;">
+        <table>
             <tbody>
                 <tr>
                     <td class="teamcol" nowrap="">
