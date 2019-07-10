@@ -59,4 +59,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_0/20190516-asset-entity-table-rename-column-hinfo-to-os.groovy'
 	include file: 'version/v4_6_2/20190530-add-guid-and-metrics_gathering-to-LicensedClient.groovy'
 	include file: 'version/v4_7_0/20190628-set-max-asset-pagination-pref-value-to-100.groovy'
+	include file: 'version/v4_7_0/20190701-Fixing-role-prefix-rollbacks.groovy'
 }

@@ -3,16 +3,18 @@ package net.transitionmanager.command
 
 import net.transitionmanager.security.RoleType
 
-
-class RoleTypeCommand implements CommandObject {
+/**
+ * A Command object for holding params for Team CRUD.
+ */
+class TeamCommand implements CommandObject {
 
 	String id
 	String description
 	String help
-	String type
+	String type = RoleType.TYPE_TEAM
 	Integer level
 
 	static constraints = {
-		type inList: [RoleType.SECURITY, RoleType.TEAM, RoleType.PROJECT, RoleType.PARTY, RoleType.APP]
+		type inList: [RoleType.TYPE_TEAM]
 	}
 }

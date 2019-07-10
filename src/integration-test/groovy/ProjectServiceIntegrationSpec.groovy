@@ -15,6 +15,7 @@ import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import org.springframework.transaction.annotation.Transactional
@@ -47,7 +48,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 		assert adminPerson
 
 		// Assign the admin to the project
-		projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
+		projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 		adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 		assert adminUser
@@ -68,18 +69,18 @@ class ProjectServiceIntegrationSpec extends Specification {
 			1 == staff?.size()
 
 		when: 'getting a subset of staff for SYS_ADMIN'
-			staff = projectService.getStaff(project, 'ROLE_SYS_ADMIN')
+			staff = projectService.getStaff(project, RoleType.CODE_TEAM_SYS_ADMIN)
 		then: 'then the list should be empty'
 			!staff
 
 		when: 'adding the SYS_ADMIN team to the person and the getting the list'
-			projectService.addTeamMember(project, adminPerson, ['ROLE_SYS_ADMIN'])
-			staff = projectService.getStaff(project, 'ROLE_SYS_ADMIN')
-		then: 'the list it should be have the staff member'
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_SYS_ADMIN])
+			staff = projectService.getStaff(project,RoleType.CODE_TEAM_SYS_ADMIN)
+		 then: 'the list it should be have the staff member'
 			1 == staff?.size()
 
 		when: 'getting a subset of staff for PROJ_MGR'
-			staff = projectService.getStaff(project, 'ROLE_PROJ_MGR')
+			staff = projectService.getStaff(project, RoleType.CODE_TEAM_PROJ_MGR)
 		then: 'there should be one staff member'
 			1 == staff?.size()
 	}
@@ -311,7 +312,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 	void '12. Testing the getUserProjects for users without the permission for accessing the default project'() {
         when: 'creating a new person'
 			Person userPerson = personHelper.createStaff(projectService.getOwner(project))
-			projectService.addTeamMember(project, userPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, userPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
 		then: 'a person should have been created'
@@ -331,7 +332,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 	void '13. Test deleting a project will delete Dataviews belonging to the project'() {
 		setup: 'Given a project is created'
 			Person userPerson = personHelper.createStaff(projectService.getOwner(project))
-			projectService.addTeamMember(project, userPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, userPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 			UserLogin userLogin = personHelper.createUserLoginWithRoles(userPerson, ["${SecurityRole.ROLE_USER}"])
 			securityService.assumeUserIdentity(userLogin.username, false)
 		and: 'Dataview is created for the project'
@@ -378,7 +379,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			PartyGroup partner = projectHelper.createPartner(projectService.getOwner(project), project)
 		and: 'partner staff is added to the project'
 			def partnerPerson = personHelper.createStaff(partner)
-			projectService.addTeamMember(project, partnerPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, partnerPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 			List assocStaff = projectService.getAssociatedStaffIds(project)
 		then: 'the list of associated staff should have increased by one'
 			2 == assocStaff.size()
@@ -393,7 +394,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			3 == projectService.getAssociatedStaffIds(project).size()
 
 		when: 'a client staff is assigned to the project'
-			projectService.addTeamMember(project, clientPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, clientPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 		then: 'the list of associated staff should remain the same size'
 			3 == projectService.getAssociatedStaffIds(project).size()
 
@@ -403,7 +404,7 @@ class ProjectServiceIntegrationSpec extends Specification {
 			3 == projectService.getAssociatedStaffIds(project).size()
 
 		when: 'a owner staff is assigned to the project'
-			projectService.addTeamMember(project, ownerPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, ownerPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 		then: 'the list of associated staff should have increased by one'
 			4 == projectService.getAssociatedStaffIds(project).size()
 	}

@@ -164,8 +164,8 @@ class Person extends Party {
 		String query = """select pr.partyIdFrom from
 					PartyRelationship pr where
 					pr.partyRelationshipType.id = 'STAFF'
-					and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-					and pr.roleTypeCodeTo.id = 'ROLE_STAFF'
+					and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY'
+					and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 					and pr.partyIdTo${(byId ? '.id' : '')} = :staff"""
 		List<PartyGroup> company = PartyRelationship.executeQuery(query, [staff: staffRef])
 
@@ -176,14 +176,14 @@ class Person extends Party {
 	 * The projects that the person is assigned to.
 	 */
 	List<Project> getAssignedProjects() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.partyIdFrom
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
 			  AND pr.partyIdTo=?
-			  AND pr.roleTypeCodeFrom='PROJECT'
-			  AND pr.roleTypeCodeTo='STAFF'
-		''', [this])
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
+			  AND pr.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF'
+		""".toString(), [this])
 	}
 
 	/**
@@ -192,15 +192,15 @@ class Person extends Party {
 	 * @return a list of the RoleType records that represent the teams that a person belongs to a project
 	 */
 	List<RoleType> getTeamsCanParticipateIn() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='ROLE_COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		''', [company: company, person: this, team: RoleType.TEAM])
+		""".toString(), [company: company, person: this, team: RoleType.TYPE_TEAM])
 	}
 
 	/**
@@ -208,30 +208,30 @@ class Person extends Party {
 	 * @param project - the project to search for teams
 	 */
 	List<RoleType> getTeamsAssignedTo(Project project) {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
-			  AND pr.roleTypeCodeFrom='PROJECT'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			  AND pr.partyIdFrom=:project
 			  AND pr.partyIdTo=:person
 			  AND pr.roleTypeCodeTo.type=:team
-		''', [project: project, person: this, team: RoleType.TEAM])
+		""".toString(), [project: project, person: this, team: RoleType.TYPE_TEAM])
 	}
 
 	/**
 	 * The teams that a person has been indicated as being suitable to participate with.
 	 */
 	List<RoleType> getSuitableTeams() {
-		executeQuery('''
+		executeQuery("""
 			SELECT pr.roleTypeCodeTo
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='STAFF'
-			  AND pr.roleTypeCodeFrom='ROLE_COMPANY'
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_COMPANY'
 			  AND pr.partyIdFrom=:company
 			  AND pr.partyIdTo=:person
-			  AND pr.roleTypeCodeTo <> 'ROLE_STAFF'
-		''', [company: company, person: this])
+			  AND pr.roleTypeCodeTo <> '$RoleType.CODE_PARTY_STAFF'
+		""".toString(), [company: company, person: this])
 	}
 
 	boolean isEnabled() {
