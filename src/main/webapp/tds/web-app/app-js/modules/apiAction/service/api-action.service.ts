@@ -79,6 +79,9 @@ export class APIActionService {
 	}
 
 	private transformApiActionModel(model: any): void {
+		if (model.actionType && model.actionType.id !== 'WEB_API') {
+			model.debugEnabled = model.debugEnabled || false;
+		}
 		model.dictionary = model.apiCatalog;
 		model.agentMethod = {id: model.connectorMethod};
 		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
@@ -231,6 +234,8 @@ export class APIActionService {
 			pollingInterval: DateUtils.convertInterval(model.polling.frequency, INTERVAL.SECONDS),
 			pollingLapsedAfter: DateUtils.convertInterval(model.polling.lapsedAfter, INTERVAL.SECONDS),
 			pollingStalledAfter: DateUtils.convertInterval(model.polling.stalledAfter, INTERVAL.SECONDS),
+			isRemote: model.isRemote,
+			debugEnabled: model.debugEnabled || false
 		};
 
 		const actionType = (model.actionType && model.actionType.id) || '';
