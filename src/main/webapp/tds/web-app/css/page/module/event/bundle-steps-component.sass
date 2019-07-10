@@ -2,20 +2,20 @@
 	padding-right: 30px 
 	.k-tabstrip 
 		margin-bottom: 10px 
-	img 
-		position: absolute 
-		border: 0px 
-		width: 16px 
-		height: 23px 
-		cursor: pointer 
-		&.back 
-			position: absolute 
-			left: -20px 
-			cursor: pointer 
-		&.next 
-			position: absolute 
-			right: 0 
-			cursor: pointer 
+	// img 
+	// 	position: absolute 
+	// 	border: 0px 
+	// 	width: 16px 
+	// 	height: 23px 
+	// 	cursor: pointer 
+	// 	&.back 
+	// 		position: absolute 
+	// 		left: -20px 
+	// 		cursor: pointer 
+	// 	&.next 
+	// 		position: absolute 
+	// 		right: 0 
+	// 		cursor: pointer 
 	.step_statusbar_good 
 		font-size: 14px 
 		font-weight: bold 
@@ -80,24 +80,33 @@
 		position: absolute 
 		margin-left: 25px 
 		margin-top: 5px 
-	.tab-item 
-		color: red 
-		text-decoration: none 
-	.k-tabstrip-items 
-		background: red !important 
-	.k-item 
-		background: green !important 
+
+	// .tab-item 
+		// color: red 
+		// text-decoration: none 
+
+	// .k-tabstrip-items 
+		// background: red !important 
+
+	// .k-item 
+		// background: green !important 
 
 	.left-arrow,
-		.bundle-steps-component .right-arrow 
+	.right-arrow 
 		color: #000 
 		cursor: pointer 
 
 	.left-arrow.disabled,
-		.bundle-steps-component .right-arrow.disabled 
+	.right-arrow.disabled 
 		color: lightgrey 
 		cursor: none 
 
 	.k-tabstrip-items 
 		.k-link 
-			color: red !important 
+			color: #000 
+			cursor: pointer
+			max-width: 123px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display: block;
