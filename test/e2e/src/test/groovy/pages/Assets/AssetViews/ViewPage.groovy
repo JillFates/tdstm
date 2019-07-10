@@ -50,9 +50,9 @@ class ViewPage extends Page{
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
         assetClassFilter {$('#k-grid5-r1c3').find("div").find("input", type:"text")}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
-        descriptionFilter { $("#k-grid0-r1c4 input")}
+        descriptionFilter { $('#k-grid5-r1c4').find("div").find("input", type:"text")}
         descriptionFilterXicon { descriptionFilter.next("span.component-action-clear-filter")}
-        environmentFilter { $("#k-grid0-r1c5 input")}
+        environmentFilter { $('#k-grid5-r1c5').find("div").find("input", type:"text")}
         environmentFilterXicon { environmentFilter.next("span.component-action-clear-filter")}
         allFilterXIcons { $('td[kendogridfiltercell] span.component-action-clear-filter')}
         nameColumn(required:false) { gridHeader.find("div.sortable-column", text: contains("Name")).parent("a.k-link")}

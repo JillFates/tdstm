@@ -21,8 +21,8 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {EnumModel} from '../../../../shared/model/enum.model';
 import {ImportBatchDetailDialogComponent} from '../detail/import-batch-detail-dialog.component';
 import {ActivatedRoute} from '@angular/router';
-import {UserContextModel} from '../../../security/model/user-context.model';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 @Component({
 	selector: 'import-batch-list',

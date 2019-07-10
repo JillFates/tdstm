@@ -169,6 +169,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	}
 
 	/**
+	 * Create and return a map with the login config for the login page.
+	 * @return
+	 */
+	Map getConfigForLogin() {
+		return SecurityConfigParser.parseLoginSettings(grailsApplication.config, true)
+	}
+
+	/**
 	 * Returns the configuration map for the LDAP setting derived from the tdstm-config.groovy settings
 	 * @return a map of all of the settings for the login
 	 *    String authorityPrompt - select:show select, prompt: prompt for autority, na: do nothing for authority
