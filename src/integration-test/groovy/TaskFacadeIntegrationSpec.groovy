@@ -96,6 +96,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	void 'test task done using TaskFacade should complete the task and update status'() {
 		setup: 'giving a task facade with an asset comment'
+			assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
 			TaskFacade taskFacade = getTaskFacadeBean()
 		expect:
 			!taskFacade.isDone()
