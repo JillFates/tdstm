@@ -40,11 +40,14 @@
 
     <div class="panel" *ngIf="eventDetails">
         <div class="panel-body">
-            <div class="row">
+            <div class="box-header">
+                <h3 class="box-title">Task Summary</h3>
+            </div>
+            <div class="row task-section">
                 <div class="col-md-2">
-                    <div>
-                        <div>{{eventDetails.remainTaskCount}}</div>
-                        <div>Tasks Remaining</div>
+                    <div class="task-count-container">
+                        <span class="task-count">{{eventDetails.remainTaskCount | number}}</span>
+                        <h5>Tasks Remaining</h5>
                     </div>
                 </div>
                 <div class="col-md-4">
