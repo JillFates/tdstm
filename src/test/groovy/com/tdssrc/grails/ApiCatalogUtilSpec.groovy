@@ -155,10 +155,10 @@ class ApiCatalogUtilSpec extends Specification {
 				apiMethod == 'callEndpoint'
 				script.size() == 4
 				with(script) {
-					SUCCESS == "// Success script for 204 status code - nocontent\n          task.hold( 'Moving the task to hold since no content was received' )"
-					FAILED == "// a script that isn't in the dictionary.script declaration\n                    // Failed -logic to perform when API call receives 400 or 500 series HTTP error code.\n                     task.error( response.error )"
-					STATUS == "// Check the HTTP response code for a 200 OK\n          if (response.status == SC.OK) { \n            return SUCCESS \n        } else { \n            return ERROR \n        }"
-					ERROR == "// Put the task on hold and add a comment with the cause of the error\n          task.error( response.error )"
+					SUCCESS.replaceAll("\\s","") == "// Success script for 204 status code - nocontent\n          task.hold( 'Moving the task to hold since no content was received' )".replaceAll("\\s","")
+					FAILED.replaceAll("\\s","") == "// a script that isn't in the dictionary.script declaration\n                    // Failed -logic to perform when API call receives 400 or 500 series HTTP error code.\n                     task.error( response.error )".replaceAll("\\s","")
+					STATUS.replaceAll("\\s","") == "// Check the HTTP response code for a 200 OK\n          if (response.status == SC.OK) { \n            return SUCCESS \n        } else { \n            return ERROR \n        }".replaceAll("\\s","")
+					ERROR.replaceAll("\\s","") == "// Put the task on hold and add a comment with the cause of the error\n          task.error( response.error )".replaceAll("\\s","")
 				}
 			}
 

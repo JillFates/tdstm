@@ -139,7 +139,7 @@ class ApiCatalogTestHelper {
         "description": "Call endpoint",
         "endpointUrl": "https://{HOSTNAME}.about.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
-        "method": "fetchAssetList",
+        "method": "invokeHttpRequest",
         "httpMethod": "GET",
         "producesData": 1,
         "params": [

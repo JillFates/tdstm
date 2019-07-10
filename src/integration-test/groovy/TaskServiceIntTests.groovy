@@ -1,6 +1,7 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -14,12 +15,14 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
@@ -44,6 +47,11 @@ class TaskServiceIntTests extends Specification{
 
     SessionFactory    sessionFactory
     GrailsApplication grailsApplication
+
+    private Person    adminPerson
+    private Person    untrustedPerson
+    private UserLogin adminUser
+    private UserLogin untrustedUser
 
     /* Test SetUp */
     void setup() {
@@ -116,6 +124,19 @@ class TaskServiceIntTests extends Specification{
         AssetEntity.list()
     }
 
+    /**
+     * Used to create the persons and users needed for some of the tests
+     */
+    private void createPersonAndUsers() {
+        Project project = projectTestHelper.createProject()
+		adminPerson = personTestHelper.createStaff(project)
+		untrustedPerson =personTestHelper.createStaff(project)
+
+        adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+        untrustedUser = personTestHelper.createUserLoginWithRoles(untrustedPerson, ["${SecurityRole.ROLE_USER}"])
+    }
+
+
     void 'test can find tasks by AssetEntity instance'() {
         setup:
             Project project = projectTestHelper.getProject()
@@ -150,32 +171,54 @@ class TaskServiceIntTests extends Specification{
     }
 
     void 'invocation of an api action show return status as started'() {
-        setup: 'giving an api action'
+        setup: 'giving a local api action'
             Person whom = taskService.getAutomaticPerson()
             Project project = projectTestHelper.getProject()
+            createPersonAndUsers()
             Provider provider = providerTestHelper.createProvider(project)
             ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
 
-            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
-            methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
-            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
-
+            ApiAction apiAction = new ApiAction(
+                project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
+                description: RandomStringUtils.randomAlphanumeric(10),
+                apiCatalog: apiCatalog,
+                connectorMethod: 'callEndpoint',
+                methodParams: '[]',
+                reactionScripts: '{"SUCCESS": "task.done()","STATUS": "if (response.status == SC.OK) {  return SUCCESS } else { return ERROR }","ERROR": "task.error( response.error )"}',
+                reactionScriptsValid: 1,
+                callbackMode: null,
+                endpointUrl: 'http://www.yahoo.com', endpointPath: '/', isRemote:false)
+            .save(failOnError: true)
+        and: 'a test setup to automatically execute'
             AssetComment task = new AssetComment(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
                     commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
-                    status: 'Ready'
-            ).save()
+                    status: AssetCommentStatus.READY
+            ).save(failOnError: true)
             sessionFactory.getCurrentSession().flush()
 
-        when: 'invoking the api action'
-            def status = taskService.invokeLocalAction(task.id, whom)
+        when: 'the action is invoked without proper permission'
+            task = taskService.invokeLocalAction(task.id, untrustedPerson)
+        then: 'an exception should be thrown due to permissions'
+            InvalidParamException ex = thrown()
+            ex.message == 'You do not have permission to invoke the action'
 
-        then: 'status should show task as started'
-            null != status
-            'Started'
+        when: 'invoking the api action with an admin user'
+            task = taskService.invokeLocalAction(task.id, adminPerson)
+        then: 'an exception should be thrown because the task status is not correct'
+            ex = thrown()
+            ex.message == 'The task must be in the Ready or Started state in order to invoke action'
+
+        when: 'the task status is READY'
+            task.status = AssetCommentStatus.READY
+        and: 'invoking the api action'
+            task = taskService.invokeLocalAction(task.id, adminPerson)
+        then: 'then the task should returned'
+            null != task
+        and: 'the task status should be Started'
+            AssetCommentStatus.COMPLETED == task.status
     }
 
 //    void 'simultaneous invocations of an api action should throw error'() {

@@ -106,7 +106,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
-	void invoke(ApiAction action, Object context) {
+	void invoke(ApiAction action, AssetComment context, Person whom) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 
@@ -156,7 +156,7 @@ class ApiActionService implements ServiceMethods {
 				def connector = connectorInstanceForAction(action)
 
 				ActionRequest actionRequest
-				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
+				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
 
 				// try to construct action request object and execute preScript if there is any
 				try {

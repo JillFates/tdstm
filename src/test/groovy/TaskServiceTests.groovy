@@ -63,7 +63,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				status: 'Planned'
 			).save(flush: true)
 
-			task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
+			task = service.setTaskStatus(task, AssetCommentStatus.STARTED, whom, true)
 
 		then:
 			task.actStart != null
@@ -74,7 +74,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 
 		when:
 			// Test bumping status to COMPLETED after STARTED
-			service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
+			service.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom, true)
 
 		then:
 			task.actStart != null

@@ -1,31 +1,28 @@
 package net.transitionmanager.tasks
 
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.task.TaskGenerationCommand
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.security.Permission
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.asset.CommentService
+import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
+import net.transitionmanager.command.task.TaskGenerationCommand
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
-import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
-import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 
 /**
@@ -174,8 +171,8 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return JSON object containing an ActionRequest context object
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
-	def recordRemoteActionStarted(Long id, String publicKey) {
-		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), publicKey)
+	def recordRemoteActionStarted(Long id, RecordRemoteActionStartedCommand commandObject) {
+		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
