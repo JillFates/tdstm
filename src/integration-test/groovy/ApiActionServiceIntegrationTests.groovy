@@ -295,8 +295,6 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiActionService.validateApiActionName(project1, apiAction1.name, apiAction1.id)
 		and: "True when changing the name for an existing Action with a valid input (an update operation)"
 			apiActionService.validateApiActionName(project1, apiAction2.name, apiAction1.id)
-		and: "False when no project is given."
-			!apiActionService.validateApiActionName(null, apiAction1.name)
 		and: "False when no name is given."
 			!apiActionService.validateApiActionName(project1, null)
 

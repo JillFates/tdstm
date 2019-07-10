@@ -171,7 +171,7 @@ class TaskServiceIntTests extends Specification{
             sessionFactory.getCurrentSession().flush()
 
         when: 'invoking the api action'
-            def status = taskService.invokeAction(task, whom)
+            def status = taskService.invokeLocalAction(task.id, whom)
 
         then: 'status should show task as started'
             null != status
