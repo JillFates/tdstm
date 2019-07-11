@@ -145,6 +145,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			}
 
 			ImportCustomizer customizer = new ImportCustomizer()
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -413,6 +414,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
+			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
