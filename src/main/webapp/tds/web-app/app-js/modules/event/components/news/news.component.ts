@@ -11,15 +11,15 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div class="col-sm-5 date">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
 						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 				<kendo-tabstrip-tab [title]="'Archive'">
 				<ng-template kendoTabContent>
-					<div *ngFor="let item of archivedNews" class="row">
-						<div class="col-sm-5 date">{{item.created | tdsDateTime: userTimeZone}}</div>
+					<div *ngFor="let item of archivedNews" class="row event-news">
+						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
 						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
 					</div>
 				</ng-template>

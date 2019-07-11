@@ -78,9 +78,13 @@ export class EventDashboardComponent implements OnInit {
 			});
 	}
 
-	onSelectedEvent(id: number): void {
+	getNewsFromEvent(id: number): void {
 		this.eventsService.getNewsFromEvent(id)
 			.subscribe((news: NewsModel[]) => this.newsList = news);
+	}
+
+	onSelectedEvent(id: number): void {
+		this.getNewsFromEvent(id);
 
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
@@ -118,7 +122,10 @@ export class EventDashboardComponent implements OnInit {
 
 		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
-				news.commentObject.moveEvent.id = this.selectedEvent.id;
+				console.log(news);
+				if (news.commentObject) {
+					news.commentObject.moveEvent.id = this.selectedEvent.id;
+				}
 				this.openCreateEdiceNews(news)
 			})
 		console.log(id);
@@ -135,7 +142,7 @@ export class EventDashboardComponent implements OnInit {
 		this.dialogService.open(NewsCreateEditComponent, [
 			{ provide: NewsDetailModel, useValue: model },
 		]).then(result => {
-			console.log('reloading data');
+			this.getNewsFromEvent(this.selectedEvent.id);
 		}, error => {
 			console.log(error);
 		});
