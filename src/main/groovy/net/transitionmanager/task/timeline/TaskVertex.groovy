@@ -2,7 +2,6 @@ package net.transitionmanager.task.timeline
 
 import com.tdsops.tm.enums.domain.TimeScale
 import groovy.transform.CompileStatic
-import net.transitionmanager.task.TaskNode
 
 /*
 		TaskVertex Structure definition, compound with TaskNode
@@ -16,7 +15,7 @@ import net.transitionmanager.task.TaskNode
  */
 
 @CompileStatic
-class TaskVertex implements TaskNode {
+class TaskVertex {
 
 	Long id
 	String taskNumber
@@ -67,7 +66,8 @@ class TaskVertex implements TaskNode {
 	}
 
 	/**
-	 *
+	 * A <b>source</b> or <b>start</b> is a vertex with not predecessors
+	 * or incoming edges
 	 * @return
 	 */
 	Boolean isStart() {
@@ -75,7 +75,8 @@ class TaskVertex implements TaskNode {
 	}
 
 	/**
-	 *
+	 * A <b>sink</b> is a vertex without successors
+	 * or outgoing edges
 	 * @return
 	 */
 	Boolean isSink() {

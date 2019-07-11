@@ -42,7 +42,7 @@ trait TaskTimeLineDataTest {
 	 * Asserts several values from a {@code TaskTimeLineGraph#vertices}
 	 * from a custom table in a GString defined like te following example:
 	 * <pre>
-	 * 	Task	dur.	est.	eed.	lst.	led.	CriticalPath?
+	 * 	Task	dur.	es.		ef.		ls.		lf.		CriticalPath?
 	 * 	A		3		0		3		0		3		true
 	 * 	B		4		3		3		7		7		true
 	 * 	C		2		3		5		5		7		false
@@ -51,20 +51,24 @@ trait TaskTimeLineDataTest {
 	 * @param target
 	 * @param tableResults
 	 */
-	void withTaskTimeLineGraph(TaskTimeLineGraph target, String tableResults) {
+	Boolean withTimeLineTable(TimelineTable target, String tableResults) {
 		List<String> resultList = tableResults.trim().stripIndent().split('\n')
-		assert target.V() == resultList.size() - 1
+		assert target.nodesMap.size() == resultList.size() - 1
 
 		resultList.takeRight(resultList.size() - 1).eachWithIndex { String row, int index ->
 			List<String> rowValues = row.trim().split('\t\t').toList()
-			assert rowValues[0] == target.vertices[index].taskNumber
-			assert rowValues[1].toInteger() == target.vertices[index].duration
-			assert rowValues[2].toInteger() == target.vertices[index].earliestStartTime
-			assert rowValues[3].toInteger() == target.vertices[index].earliestEndTime
-			assert rowValues[4].toInteger() == target.vertices[index].latestStartTime
-			assert rowValues[5].toInteger() == target.vertices[index].latestEndTime
-			assert new Boolean(rowValues[6]) == target.vertices[index].isCriticalPath()
+			Map.Entry<TaskVertex, TimelineNode> entry = target.nodesMap.find { it.key.taskNumber == rowValues[0] }
+			TaskVertex vertex = entry.key
+			TimelineNode timelineNode = entry.value
+
+			assert timelineNode
+			assert rowValues[1].toInteger() == vertex.duration, "Incorrect duration for row number $index"
+			assert rowValues[2].toInteger() == timelineNode.earliestStart, "Incorrect earliestStart for row number $index"
+			assert rowValues[3].toInteger() == timelineNode.earliestFinish, "Incorrect earliestFinish for row number $index"
+			assert rowValues[4].toInteger() == timelineNode.latestStart, "Incorrect latestStart for row number $index"
+			assert rowValues[5].toInteger() == timelineNode.latestFinish, "Incorrect latestFinish for row number $index"
 		}
+		return true
 	}
 
 }
