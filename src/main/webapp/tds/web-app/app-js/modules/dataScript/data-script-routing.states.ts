@@ -6,7 +6,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 import {DataScriptResolveService} from './resolve/data-script-resolve.service';
 // Services
 import {DataScriptService} from './service/data-script.service';
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {DataScriptListComponent} from './components/list/data-script-list.component';
 

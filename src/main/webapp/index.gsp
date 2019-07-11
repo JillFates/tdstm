@@ -19,6 +19,6 @@ each to execute its default action:</p>
 	</g:each>
 </ul>
 </div> -->
-<% response.sendRedirect("auth/login"); %>
+<% response.sendRedirect("module/auth/login"); %>
 </body>
 </html>

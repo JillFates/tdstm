@@ -61,8 +61,6 @@ class AssetsBulkEditSpec extends GebReportingSpec {
             at BulkChangeActionPage
         and: 'Edit radio button is selected'
             getEditRadioButtonStatus() == true
-        and: 'Bulk change action message is correct'
-            verifyActionMessageText "This action will effect ${assetNames.size()} Asset(s)"
     }
 
     def "2. Certify assets still selected after cancel process"(){
@@ -97,7 +95,7 @@ class AssetsBulkEditSpec extends GebReportingSpec {
         and: 'The User clicks on Next button'
             clickOnNextButton()
         then: 'Delete confirmation modal message is correct'
-            commonsModule.verifyConfirmationPrompDialogMessage "You are about to update ${assetNames.size()} Asset(s)"
+            commonsModule.verifyConfirmationPrompDialogMessage "You are about to update ${assetNames.size()} Assets"
     }
 
     def "5. Certify bulk change edit asset process is complete"() {

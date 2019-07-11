@@ -11,7 +11,7 @@ import {AssetCloneComponent} from '../asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 
 export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({

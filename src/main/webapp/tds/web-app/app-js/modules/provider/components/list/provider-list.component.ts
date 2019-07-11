@@ -5,7 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {ProviderService} from '../../service/provider.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 // Components
 import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
@@ -15,7 +15,7 @@ import {ProviderAssociatedComponent} from '../provider-associated/provider-assoc
 import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
 import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
 // Kendo
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';

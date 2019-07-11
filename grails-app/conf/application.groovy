@@ -383,7 +383,7 @@ grails {
 				postOnly = true
 			}
 			auth {
-				loginFormUrl = '/auth/login'
+				loginFormUrl = '/module/auth/login'
 				useForward = false
 				ajaxLoginFormUrl = loginFormUrl // Overrides default redirect Login URL for AJAX requests.
 			}
@@ -391,7 +391,7 @@ grails {
 				hideUserNotFoundExceptions = false
 			}
 
-			failureHandler.defaultFailureUrl = '/auth/login'
+			failureHandler.defaultFailureUrl = '/module/auth/login'
 
 			// See https://grails-plugins.github.io/grails-spring-security-core/v2/guide/requestMappings.html for details
 			// Note that when the two property values are reversed that Forbidden is thrown for unknown controllers while

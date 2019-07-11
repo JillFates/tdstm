@@ -3,12 +3,12 @@ import {Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 // Service
 import {NoticeService} from '../../service/notice.service';
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
 import {NoticeModel, Notices} from '../../model/notice.model';
 import {NoticeCommonComponent} from './../notice-common'
+import {PostNoticesManagerService} from '../../../auth/service/post-notices-manager.service';
 
 @Component({
 	selector: 'tds-mandatory-notices',
@@ -17,13 +17,13 @@ import {NoticeCommonComponent} from './../notice-common'
 export class MandatoryNoticesComponent extends NoticeCommonComponent implements OnInit {
 	private notices: NoticeModel[];
 	private currentNoticeIndex: number;
-	private postNoticesManager;
 
 	constructor(
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
 		protected noticeService: NoticeService,
 		protected userContextService: UserContextService,
+		private postNoticesManager: PostNoticesManagerService,
 		protected sanitizer: DomSanitizer) {
 			super(sanitizer);
 	}
@@ -31,7 +31,6 @@ export class MandatoryNoticesComponent extends NoticeCommonComponent implements 
 	ngOnInit() {
 		this.userContextService.getUserContext()
 		.subscribe((context) => {
-			this.postNoticesManager = context.postNoticesManager;
 			this.notices = this.model.notices.filter((notice) => notice.needAcknowledgement);
 			this.currentNoticeIndex = 0;
 		});
