@@ -52,11 +52,13 @@ class ApiActionService implements ServiceMethods {
 			ActionThreadLocalVariable.ASSET_FACADE,
 			ActionThreadLocalVariable.REACTION_SCRIPTS
 	]
-						CredentialService     credentialService
-						DataScriptService     dataScriptService
-						CustomDomainService   customDomainService
-						ProviderService       providerService
-						ApiCatalogService     apiCatalogService
+
+	CredentialService   credentialService
+	DataScriptService   dataScriptService
+	CustomDomainService customDomainService
+	ProviderService     providerService
+	ApiCatalogService   apiCatalogService
+	TaskActionService   taskActionService
 
 	/**
 	 * Find an ApiAction by id

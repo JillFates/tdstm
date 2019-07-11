@@ -57,6 +57,7 @@ import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.WorkflowTransition
+import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
@@ -103,6 +104,8 @@ class TaskService implements ServiceMethods {
 	CommentService             commentService
 	AssetEntityService         assetEntityService
 	LinkGenerator              grailsLinkGenerator
+	CoreService                coreService
+	CredentialService          credentialService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
