@@ -36,7 +36,6 @@ import java.sql.Timestamp
  */
 @CompileStatic
 class FieldSpec {
-
 	public static final CAST_BIG_DECIMAL_FUNCTION = 'cast_big_decimal'
 	public static final CAST_LONG_FUNCTION = 'cast_long'
 	public static final CAST_DATE_TIME_FUNCTION = 'cast_date_time'

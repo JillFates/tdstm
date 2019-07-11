@@ -12,7 +12,6 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
-import net.transitionmanager.security.RoleType
 
 @Stepwise
 class RecipeTaskGenerationSpec extends GebReportingSpec {
@@ -45,7 +44,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
             '    description: \'Startup ALL applications\',',
             '    title: \'Startup app ${it.assetName}\',',
             '    workflow: \'AppStartup\',',
-            "    team: '$RoleType.CODE_APP_COORD',",
+            '    team: \'APP_COORD\',',
             '    category: \'startup\',',
             '    duration: 10,',
             '    filter : [',
