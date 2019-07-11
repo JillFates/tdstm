@@ -358,7 +358,7 @@
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                                <g:link controller="dashboard">Event Dashboard</g:link>
+                                <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
                             </li>
                             <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">
