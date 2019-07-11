@@ -20,6 +20,7 @@ import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.RoleType
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint
@@ -372,7 +373,7 @@ class GormUtilIntegrationSpec extends Specification {
 			Person adminPerson = personHelper.getAdminPerson()
 			Map results = [:]
 			Map personMap = [lastName:'Bullafarht']
-			String extraTeam = 'ROLE_DB_ADMIN'
+			String extraTeam = RoleType.CODE_TEAM_DB_ADMIN
 
 			Person fromPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'From'])
 

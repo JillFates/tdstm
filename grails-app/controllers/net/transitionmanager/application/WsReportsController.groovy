@@ -36,6 +36,7 @@ import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.command.reports.ApplicationConflictsCommand
 
@@ -181,12 +182,12 @@ class WsReportsController implements ControllerMethods {
                 }
 
                 if (projectManagerId) {
-                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
+                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
                             Party.findById(projectManagerId), "ROLE_PROJ_MGR")
                 }
                 if (moveManagerId) {
-                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE",
-                            Party.findById(moveManagerId), "ROLE_MOVE_MGR")
+                    partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
+                            Party.findById(moveManagerId), RoleType.CODE_TEAM_MOVE_MGR)
                 }
 
                 flash.message = "MoveBundle $moveBundle created"

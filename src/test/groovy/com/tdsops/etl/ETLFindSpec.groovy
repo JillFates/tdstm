@@ -4075,4 +4075,52 @@ class ETLFindSpec extends ETLBaseSpec {
 			"extract 1 init undefinedVar"                                 || ETLProcessorException | 'No such property: undefinedVar at line 6'
 			"extract 1 initialize undefinedVar"                           || ETLProcessorException | 'No such property: undefinedVar at line 6'
 	}
+
+	@See('TM-15257')
+	@ConfineMetaClassChanges([AssetEntity])
+	void 'test can enable console and log FINDINGS variable'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description
+				xraysrv01,100,XRay SRV
+			""".stripIndent())
+
+		and:
+			mockDomain(AssetEntity)
+			AssetEntity.metaClass.static.executeQuery = { String query, Map namedParams, Map metaParams ->
+				[12345l]
+			}
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName' set nameVar
+				   find Device by 'Name' eq nameVar into 'id'
+				   console on
+				   log FINDINGS
+				   console off
+				}
+				""".stripIndent())
+
+
+		then: 'A console content could be recovered after processing an ETL Script'
+			etlProcessor.debugConsole.buffer.toString().contains('statement=[assetName eq xraysrv01],')
+			etlProcessor.debugConsole.buffer.toString().contains('results=[objects:[12345], matchOn:0]')
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
 }

@@ -108,4 +108,13 @@ class FindingsFacade {
 		return findElement.hasResults() &&
 					findElement.results.every{ it in clazz}
 	}
+
+
+	@Override
+	String toString() {
+		return """FINDINGS {
+			statement=${findElement?.currentFind?.statement?.conditions},
+			results=${findElement?.results}
+		}"""
+	}
 }

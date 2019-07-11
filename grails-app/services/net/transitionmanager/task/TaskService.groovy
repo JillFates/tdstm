@@ -58,6 +58,7 @@ import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
@@ -450,7 +451,7 @@ class TaskService implements ServiceMethods {
 	 */
 	AssetComment setTaskStatus(AssetComment task, String status) {
 		def currentPerson = securityService.getUserLoginPerson()
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, 'ROLE_PROJ_MGR')
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, currentPerson.id, RoleType.CODE_TEAM_PROJ_MGR)
 		return setTaskStatus(task, status, currentPerson, isPM)
 	}
 
@@ -699,7 +700,7 @@ class TaskService implements ServiceMethods {
 	 * TODO tpelletier 2019-07-09 17:36:48 come back to this to fix the role prefix, when the role prefix rollback is merged.
 	 */
 	AssetComment setTaskStatus(AssetComment task, String status, Person whom) {
-		boolean isPM = partyRelationshipService.staffHasFunction(task.project, whom.id, 'ROLE_PROJ_MGR')
+		boolean isPM = partyRelationshipService.staffHasFunction(task.project, whom.id, 'PROJ_MGR')
 		return setTaskStatus(task, status, whom, isPM)
 	}
 
@@ -858,7 +859,7 @@ class TaskService implements ServiceMethods {
 		} else {
 			if (whom == null) {
 				whom = securityService.userLoginPerson
-				isPM = securityService.hasRole("ROLE_PROJ_MGR")
+				isPM = securityService.hasRole(RoleType.CODE_TEAM_PROJ_MGR)
 			}
 			long startTime = System.currentTimeMillis() + (2000L)
 			Trigger trigger = new SimpleTriggerImpl('tm-updateTaskSuccessors-' + taskId + System.currentTimeMillis(), null, new Date(startTime))

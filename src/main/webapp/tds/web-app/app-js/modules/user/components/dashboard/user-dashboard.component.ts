@@ -176,7 +176,7 @@ export class UserDashboardComponent implements OnInit {
 		this.userService.getAssignedTasks()
 			.subscribe((result) => {
 				this.taskList = result.tasks;
-				this.summaryDetail = result.summaryDetail
+				this.summaryDetail = result.summaryDetail === 'No active tasks were found.' ? '' : result.summaryDetail;
 				for (let i = 0; i < this.taskList.length; i++) {
 					this.taskList[i].parsedInstructions = this.getMarkupUrlData(this.taskList[i].instructionsLink);
 				}

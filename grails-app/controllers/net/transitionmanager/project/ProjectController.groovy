@@ -28,6 +28,7 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.security.RoleType
 import org.apache.commons.lang.StringEscapeUtils
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -413,7 +414,7 @@ class ProjectController implements ControllerMethods {
 			// Deal with the Project Manager if one is supplied
 			Long projectManagerId = NumberUtil.toPositiveLong(params.projectManagerId, -1)
 			if (projectManagerId > 0) {
-				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), "ROLE_PROJ_MGR")
+				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), RoleType.CODE_TEAM_PROJ_MGR)
 			}
 
 			// Deal with the adding the project logo if one was supplied
@@ -492,11 +493,11 @@ class ProjectController implements ControllerMethods {
 		}
 
 		// Use the passed role or default all staff
-		String staffRole = request.JSON.role ?: 'ROLE_STAFF'
+		String staffRole = request.JSON.role ?: RoleType.CODE_PARTY_STAFF
 		List<Map> staffList = []
 		String staffQuery = "FROM PartyRelationship p \
 			WHERE p.partyRelationshipType = 'STAFF' AND p.partyIdFrom = :company \
-			AND p.roleTypeCodeFrom.id = 'ROLE_COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
+			AND p.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY' AND p.roleTypeCodeTo.id = :staffRole"
 
 		// Closure to do query and load the staff into the staffList variable for the given company
 		def getCompanyStaffClosure = { def company ->

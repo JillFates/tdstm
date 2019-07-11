@@ -6,6 +6,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.security.Permission
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.security.RoleType
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class ProjectTeamController implements ControllerMethods {
@@ -40,12 +41,12 @@ class ProjectTeamController implements ControllerMethods {
 
 		Map args = [projectTeam: projectTeam]
 
-		PartyRelationship.executeUpdate('''\
+		PartyRelationship.executeUpdate("""
 			delete from PartyRelationship
 			where partyRelationshipType.id = 'PROJ_TEAM'
 			  and partyIdFrom = : projectTeam
-			  and roleTypeCodeFrom.id = 'ROLE_TEAM'
-		''', args)
+			  and roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_TEAM'
+		""", args)
 
 		projectTeam.delete()
 
@@ -78,12 +79,12 @@ class ProjectTeamController implements ControllerMethods {
 		projectTeam.properties = params
 		if (!projectTeam.hasErrors() && projectTeam.save(flush: true)) {
 
-			PartyRelationship.executeUpdate('''\
+			PartyRelationship.executeUpdate("""
 				delete from PartyRelationship
 				where partyRelationshipType.id = 'PROJ_TEAM'
 				  and partyIdFrom.id = : projectTeamId
-				  and roleTypeCodeFrom.id = 'ROLE_TEAM'
-			''', [projectTeamId: projectTeam.id])
+				  and roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_TEAM'
+			""", [projectTeamId: projectTeam.id])
 
 			partyRelationshipService.createBundleTeamMembers(projectTeam, teamMemberIds)
 			flash.message = "ProjectTeam $projectTeam updated"

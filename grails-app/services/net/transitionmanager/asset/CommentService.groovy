@@ -2,6 +2,7 @@ package net.transitionmanager.asset
 
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.common.SequenceService
 import net.transitionmanager.service.ServiceMethods
@@ -176,7 +177,7 @@ class CommentService implements ServiceMethods {
 								break
 							case AssetCommentStatus.STARTED:
 								// Check to see if this is an project admin because they can update a task for users
-								def isPM = partyRelationshipService.staffHasFunction(project, currentPerson.id, 'ROLE_PROJ_MGR')
+								def isPM = partyRelationshipService.staffHasFunction(project, currentPerson.id, RoleType.CODE_TEAM_PROJ_MGR)
 
 								log.debug "Task Already STARTED - isPM? $isPM, whoDidIt=$whoDidIt, person=$currentUsername"
 								// We'll allow the same user to click Start and Done
