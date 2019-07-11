@@ -1,20 +1,21 @@
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.task.CommentNote
-import net.transitionmanager.task.TaskDependency
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
-import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.common.SequenceService
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.RoleType
 import net.transitionmanager.project.Workflow
 import net.transitionmanager.project.WorkflowTransition
-import net.transitionmanager.common.SequenceService
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import org.joda.time.DateTime
 import org.quartz.Scheduler
@@ -25,6 +26,10 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 
 	void setupSpec(){
 		mockDomains AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, Person, WorkflowTransition, Project, Workflow
+	}
+
+	void setup(){
+		service.partyRelationshipService = [staffHasFunction:{Project project, staffId, functionCodes-> false}] as PartyRelationshipService
 	}
 
 	void testCompareStatus() {
