@@ -6,25 +6,27 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 @Component({
 	selector: 'tds-news',
 	template: `
-		<kendo-tabstrip>
-			<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
-			<ng-template kendoTabContent>
-				<div *ngFor="let item of eventNews" class="row">
-					<div class="col-sm-3">{{item.created | tdsDateTime: userTimeZone}}</div>
-					<div class="col-sm-9" (click)="onSelectedNews(item.id)">{{item.text}}</div>
-				</div>
-			</ng-template>
-			</kendo-tabstrip-tab>
-			<kendo-tabstrip-tab [title]="'Archive'">
-			<ng-template kendoTabContent>
-				<div *ngFor="let item of archivedNews" class="row">
-					<div class="col-sm-3">{{item.created | tdsDateTime: userTimeZone}}</div>
-					<div class="col-sm-9" (click)="onSelectedNews(item.id)">{{item.text}}</div>
-				</div>
-			</ng-template>
-			</kendo-tabstrip-tab>
-		</kendo-tabstrip>
-		<tds-button-create (click)="onCreate()"></tds-button-create>
+		<div class="event-news-component">
+			<kendo-tabstrip>
+				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
+				<ng-template kendoTabContent>
+					<div *ngFor="let item of eventNews" class="row event-news">
+						<div class="col-sm-5 date">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+					</div>
+				</ng-template>
+				</kendo-tabstrip-tab>
+				<kendo-tabstrip-tab [title]="'Archive'">
+				<ng-template kendoTabContent>
+					<div *ngFor="let item of archivedNews" class="row">
+						<div class="col-sm-5 date">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+					</div>
+				</ng-template>
+				</kendo-tabstrip-tab>
+			</kendo-tabstrip>
+			<tds-button-create (click)="onCreate()" class="btn-primary" title="Add News"></tds-button-create>
+		</div>
 	`,
 	styles: [`
 		kendo-tabstrip p {
