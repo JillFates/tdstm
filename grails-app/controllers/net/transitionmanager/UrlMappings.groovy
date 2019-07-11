@@ -218,9 +218,19 @@ class UrlMappings {
 			action = [GET:"getModelForCreate"]
 		}
 
-		"ws/moveEvent/saveEvent" {
+		"/ws/moveEvent/viewEditModel/$id" {
+			controller = "wsEvent"
+			action = [GET:"getModelForViewEdit"]
+		}
+
+		"/ws/moveEvent/saveEvent/$id?" {
 			controller = "wsEvent"
 			action = [POST:"saveEvent"]
+		}
+
+		"/ws/moveEvent/deleteEvent/$id" {
+			controller = "wsEvent"
+			action = [DELETE:"deleteEvent"]
 		}
 
 		"/ws/moveEventNews/$id?" {

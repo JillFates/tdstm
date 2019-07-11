@@ -35,6 +35,10 @@
                             </div>
                         </ng-template>
 
+                        <ng-template kendoGridCellTemplate *ngIf="column.property=='name'" let-dataItem>
+                            <a (click)="showEvent(dataItem.id)">{{dataItem[column.property]}}</a>
+                        </ng-template>
+
                         <ng-template kendoGridFilterCellTemplate let-filter>
                             <div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
                                 <div *ngIf="column.type === 'date'">

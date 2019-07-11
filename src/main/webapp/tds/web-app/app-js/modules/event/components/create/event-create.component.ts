@@ -27,12 +27,12 @@ export class EventCreateComponent implements OnInit {
 		this.defaultModel = {
 			name: '',
 			description: '',
-			tags: [],
-			bundles: [],
+			tagIds: [],
+			moveBundle: [],
 			runbookStatus: '',
 			runbookBridge1: '',
 			runbookBridge2: '',
-			videoLink: '',
+			videolink: '',
 			estStartTime: '',
 			estCompletionTime: '',
 			apiActionBypass: false
@@ -49,7 +49,7 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public onAssetTagChange(event) {
-		this.eventModel.tags = event.tags;
+		this.eventModel.tagIds = event.tags;
 	}
 
 	public saveForm() {

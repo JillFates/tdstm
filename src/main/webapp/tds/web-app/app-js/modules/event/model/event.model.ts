@@ -43,12 +43,12 @@ export class EventColumnModel {
 export class EventModel {
 	name: string;
 	description?: string;
-	tags?: number[];
-	bundles?: number[];
+	tagIds?: number[];
+	moveBundle?: number[];
 	runbookStatus?: string;
 	runbookBridge1?: string;
 	runbookBridge2?: string;
-	videoLink?: string;
+	videolink?: string;
 	estStartTime?: Date;
 	estCompletionTime?: Date;
 	apiActionBypass: boolean;

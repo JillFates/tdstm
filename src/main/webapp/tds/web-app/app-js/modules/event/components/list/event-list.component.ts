@@ -17,6 +17,7 @@ import {EventColumnModel, EventModel} from '../../model/event.model';
 import {EventService} from '../../service/event.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {EventCreateComponent} from '../create/event-create.component';
+import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
 
 declare var jQuery: any;
 
@@ -132,21 +133,6 @@ export class EventListComponent implements OnInit {
 		});
 	}
 
-	/**
-	 * Open The Dialog to Create, View or Edit the Event
-	 */
-	/*private openEventDialogViewEdit(eventModel: EventModel, actionType: number): void {
-		this.dialogService.open(EventViewEditComponent, [
-			{ provide: ProviderModel, useValue: eventModel },
-			{ provide: Number, useValue: actionType}
-		]).then(result => {
-			// update the list to reflect changes, it keeps the filter
-			this.reloadData();
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
-	}*/
-
 	private selectRow(dataItemId: number): void {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
@@ -160,6 +146,15 @@ export class EventListComponent implements OnInit {
 		if (event.target && event.target.parentNode) {
 			event.target.parentNode.click();
 		}
+	}
+
+	protected showEvent(id): void {
+		this.dialogService.open(EventViewEditComponent,
+			[{provide: 'id', useValue: id}]).then(result => {
+			this.reloadData();
+		}).catch(result => {
+			this.reloadData();
+		});
 	}
 
 	/**

@@ -44,7 +44,7 @@
                             <label for="moveBundle">Bundle:</label>
                         </td>
                         <td class="value">
-                            <kendo-multiselect id="moveBundle" [data]="bundles" [(ngModel)]="eventModel.bundles" textField="name" [valueField]="id"></kendo-multiselect>
+                            <kendo-multiselect id="moveBundle" [data]="bundles" [(ngModel)]="eventModel.moveBundle" textField="name" valueField="id"></kendo-multiselect>
                         </td>
                     </tr>
                     <tr class="prop">
@@ -79,7 +79,7 @@
                             <label for="description">Video Link:</label>
                         </td>
                         <td class="value">
-                            <input type="text" id="videolink" [(ngModel)]="eventModel.videoLink"/>
+                            <input type="text" id="videolink" [(ngModel)]="eventModel.videolink"/>
                         </td>
                     </tr>
                     <tr class="prop">

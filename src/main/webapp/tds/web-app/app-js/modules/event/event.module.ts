@@ -13,6 +13,7 @@ import {EventService} from './service/event.service';
 import {EventRouteModule} from './event-routing.states';
 import {EventsResolveService} from './resolve/events-resolve.service';
 import {EventCreateComponent} from './components/create/event-create.component';
+import {EventViewEditComponent} from './components/view-edit/event-view-edit.component';
 
 @NgModule({
 	imports: [
@@ -31,7 +32,8 @@ import {EventCreateComponent} from './components/create/event-create.component';
 	],
 	declarations: [
 		EventListComponent,
-		EventCreateComponent
+		EventCreateComponent,
+		EventViewEditComponent
 	],
 	providers: [
 		// Resolve
@@ -42,10 +44,12 @@ import {EventCreateComponent} from './components/create/event-create.component';
 	],
 	exports: [
 		EventListComponent,
-		EventCreateComponent
+		EventCreateComponent,
+		EventViewEditComponent
 	],
 	entryComponents: [
-		EventCreateComponent
+		EventCreateComponent,
+		EventViewEditComponent
 	]
 })
 

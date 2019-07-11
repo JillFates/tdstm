@@ -1,0 +1,179 @@
+import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {EventService} from '../../service/event.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {PreferenceService} from '../../../../shared/services/preference.service';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {EventModel} from '../../model/event.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+
+@Component({
+	selector: `event-view-edit-component`,
+	templateUrl: 'event-view-edit.component.html',
+})
+export class EventViewEditComponent implements OnInit {
+	public eventModel: EventModel = null;
+	public savedModel: EventModel = null;
+	public availableBundles: any[] = [];
+	public runbookStatuses: string[] = [];
+	public availableTags: any[] = [];
+	public canEditEvent;
+	public eventId;
+	public editing = false;
+	protected userTimeZone: string;
+	@ViewChild('startTimePicker') startTimePicker;
+	@ViewChild('completionTimePicker') completionTimePicker;
+	constructor(
+		private eventService: EventService,
+		private permissionService: PermissionService,
+		private preferenceService: PreferenceService,
+		private promptService: UIPromptService,
+		private activeDialog: UIActiveDialogService,
+		@Inject('id') private id) {
+		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
+		this.eventId = this.id;
+	}
+
+	ngOnInit() {
+		this.eventModel = new EventModel();
+		const defaultEvent = {
+			name: '',
+			description: '',
+			tagIds: [],
+			bundles: [],
+			runbookStatus: '',
+			runbookBridge1: '',
+			runbookBridge2: '',
+			videoLink: '',
+			estStartTime: '',
+			estCompletionTime: '',
+			apiActionBypass: false
+		};
+		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.eventModel = Object.assign({}, defaultEvent, this.eventModel);
+		this.getModel(this.eventId);
+	}
+
+	public confirmDeleteEvent() {
+		this.promptService.open(
+			'Confirmation Required',
+			'WARNING: Are you sure you want to delete this event?',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.deleteEvent();
+				}
+			})
+			.catch((error) => console.log(error));
+	}
+
+	private deleteEvent() {
+		this.eventService.deleteEvent(this.eventId)
+			.subscribe((result) => {
+				if (result.status === 'success') {
+					this.activeDialog.close(result);
+				}
+			});
+	}
+
+	public switchToEdit() {
+		this.editing = true;
+		if (this.eventModel.estStartTime) {
+			this.startTimePicker.dateValue = this.formatForDateTimePicker(this.eventModel.estStartTime);
+		}
+		if (this.eventModel.estCompletionTime) {
+			this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.eventModel.estCompletionTime);
+		}
+	}
+
+	private getModel(id) {
+		this.eventService.getModelForEventViewEdit(id)
+			.subscribe((result) => {
+				let data = result;
+				let eventModel = this.eventModel;
+				// Fill the model based on the current person.
+				Object.keys(data.moveEventInstance).forEach((key) => {
+					if (key in eventModel && data.moveEventInstance[key]) {
+						eventModel[key] = data.moveEventInstance[key];
+					}
+				});
+				this.eventModel = eventModel;
+				this.availableBundles = data.availableBundles;
+				this.availableTags = data.tags;
+				this.runbookStatuses = data.runbookStatuses;
+				if(data.selectedTags) {
+					data.selectedTags.forEach((item) => {
+						this.availableTags.forEach((availableTag) => {
+							if (item.id === availableTag.id) {
+								this.eventModel.tagIds.push(availableTag);
+							}
+						});
+					});
+				}
+				this.eventModel.moveBundle = data.selectedBundles;
+
+				this.updateSavedFields();
+			});
+
+	}
+
+	private updateSavedFields() {
+		this.savedModel = JSON.parse(JSON.stringify(this.eventModel));
+	}
+
+
+	public saveForm() {
+		this.eventService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
+			if (result.status === 'success') {
+				this.updateSavedFields();
+				this.editing = false;
+			}
+		});
+	}
+
+	/**
+	 *  Put date in format to be accepted in a dateTimePicker
+	 */
+	public formatForDateTimePicker (time) {
+		let localDateFormatted = DateUtils.convertFromGMT(time, this.userTimeZone);
+		return time ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
+	}
+
+	/**
+	 * Close the Dialog but first it verify is not Dirty
+	 */
+	public cancelCloseDialog(): void {
+		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.activeDialog.close();
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.activeDialog.close();
+		}
+	}
+
+	public cancelEdit(): void {
+		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
+			this.promptService.open(
+				'Confirmation Required',
+				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Confirm', 'Cancel')
+				.then(confirm => {
+					if (confirm) {
+						this.editing = false;
+						this.eventModel = JSON.parse(JSON.stringify(this.savedModel));
+					}
+				})
+				.catch((error) => console.log(error));
+		} else {
+			this.editing = false;
+		}
+	}
+}

@@ -38,10 +38,36 @@ export class EventService {
 			.catch((error: any) => error);
 	}
 
-	saveEvent(eventModel: EventModel): Observable<any> {
-		return this.http.post(`../ws/moveEvent/saveEvent`, JSON.stringify(eventModel))
+	getModelForEventViewEdit(id): Observable<any> {
+		return this.http.get(`../ws/moveEvent/viewEditModel/${id}`)
+			.map((response: any) => {
+				let eventModels = response && response.status === 'success' && response.data;
+				return eventModels;
+			})
+			.catch((error: any) => error);
+	}
+
+	saveEvent(eventModel: EventModel, id = null): Observable<any> {
+		let postObject = JSON.parse(JSON.stringify(eventModel));
+		let i = 0;
+		for (i = 0; i < postObject.moveBundle.length; i++) {
+			postObject.moveBundle[i] = postObject.moveBundle[i].id;
+		}
+		for (i = 0; i < postObject.tagIds.length; i++) {
+			postObject.tagIds[i] = postObject.tagIds[i].id;
+		}
+		return this.http.post(`../ws/moveEvent/saveEvent/${id}`, JSON.stringify(postObject))
 			.map((response: any) => {
 				return response;
+			})
+			.catch((error: any) => error);
+	}
+
+	deleteEvent(id): Observable<any> {
+		return this.http.delete(`../ws/moveEvent/deleteEvent/${id}`)
+			.map((response: any) => {
+				let eventModels = response && response.status === 'success' && response.data;
+				return eventModels;
 			})
 			.catch((error: any) => error);
 	}
