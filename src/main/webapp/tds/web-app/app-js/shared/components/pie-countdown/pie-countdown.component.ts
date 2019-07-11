@@ -8,7 +8,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="onReload()"></span>
+				<span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="notifyTimeout()"></span>
 
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
@@ -70,12 +70,14 @@ export class PieCountdownComponent implements OnInit {
 	];
 
 	onSelectedTimerOption(timerOption: any): void {
-		this.selectedTimerOption = {seconds : 0, description: ''};
-		setTimeout(() => {
-			this.selectedTimerOption = timerOption;
-			this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
-		}, 0);
-
+		this.preferenceService.setPreference(PREFERENCES_LIST.EVENTDB_REFRESH, timerOption.seconds)
+			.subscribe(() => {
+				this.selectedTimerOption = {seconds : 0, description: ''};
+				setTimeout(() => {
+					this.selectedTimerOption = timerOption;
+					this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
+				}, 0)
+			});
 	}
 
 	getTimerClass(): string {
