@@ -19,6 +19,7 @@ export class EventPlanStatus {
 	dayTime: string;
 	description: string;
 	eventTitle: string;
+	startDate: string;
 	status: string;
 
 	constructor() {
