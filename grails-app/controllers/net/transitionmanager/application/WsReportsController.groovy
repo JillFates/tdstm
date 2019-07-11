@@ -48,7 +48,7 @@ class WsReportsController implements ControllerMethods {
         }
         userPreferenceService.setMoveEventId(moveEventId)
         MoveEvent moveEvent = MoveEvent.findByIdAndProject(moveEventId, project )
-        render (view: "/reports/generateCheckList", model: reportsService.generatePreMoveCheckList(project.id, moveEvent))
+        render (view: "/reports/generateCheckList", model: reportsService.generatePreMoveCheckList(project.id, moveEvent, request.JSON.viewUnpublished))
     }
 
     /**
