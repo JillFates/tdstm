@@ -1,9 +1,7 @@
 // Angular
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { pathOr } from 'ramda';
-
 import * as R from  'ramda';
 
 // Services
@@ -11,20 +9,14 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UserContextService } from '../../../security/services/user-context.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { ActionType } from '../../../../shared/model/action-type.enum';
 import { EventsService } from './../../service/events.service';
 import { NewsModel, NewsDetailModel } from './../../model/news.model';
 import { EventModel, EventPlanStatus } from './../../model/event.model';
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
-// Model
 
-import { COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
-import { GridComponent } from '@progress/kendo-angular-grid';
+// Model
 import { UserContextModel } from '../../../security/model/user-context.model';
-import { ContextMenuComponent } from '@progress/kendo-angular-menu';
-// import any from 'ramda/es/any';
 
 @Component({
 	selector: 'event-dashboard',
@@ -84,7 +76,7 @@ export class EventDashboardComponent implements OnInit {
 	 * Get the news corresponding to the event provided as argument
  	 * @param {number} id  Event id
 	*/
-	getNewsFromEvent(id: number): void {
+	private getNewsFromEvent(id: number): void {
 		this.eventsService.getNewsFromEvent(id)
 			.subscribe((news: NewsModel[]) => this.newsList = news);
 	}
@@ -93,7 +85,7 @@ export class EventDashboardComponent implements OnInit {
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
 	*/
-	onSelectedEvent(id: number): void {
+	public onSelectedEvent(id: number): void {
 		this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 		this.getNewsFromEvent(id);
 
@@ -131,14 +123,14 @@ export class EventDashboardComponent implements OnInit {
 	 * On click over a news title get the news details and with that show the create/edit news views
  	 * @param {number} id  News id
 	*/
-	onSelectedNews(id: number): void {
+	public onSelectedNews(id: number): void {
 		const getNewsDetail = id ? this.eventsService.getNewsDetail(id) : Observable.of(new NewsDetailModel());
 		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
 				if (news.commentObject) {
 					news.commentObject.moveEvent.id = this.selectedEvent.id;
 				}
-				this.openCreateEdiceNews(news)
+				this.openCreateEditNews(news)
 			})
 	}
 
@@ -147,7 +139,7 @@ export class EventDashboardComponent implements OnInit {
  	 * @param {number} id  Event id
 	 * @returns {any} Event found otherwhise null
 	*/
-	getDefaultEvent(id: string): any {
+	private getDefaultEvent(id: string): any {
 		if (id) {
 			return this.eventList.find((event) => event.id.toString() === id) || null;
 		}
@@ -158,7 +150,7 @@ export class EventDashboardComponent implements OnInit {
 	 * Open the view to create/edit news
   	 * @param {NewsDetailModel} model  News info
 	*/
-	openCreateEdiceNews(model: NewsDetailModel): void  {
+	private openCreateEditNews(model: NewsDetailModel): void  {
 		this.dialogService.open(NewsCreateEditComponent, [
 			{ provide: NewsDetailModel, useValue: model },
 		]).then(result => {
@@ -171,18 +163,18 @@ export class EventDashboardComponent implements OnInit {
 	/**
 	 * Create an empty news model and call the component to show the edit/create news view
 	*/
-	onCreateNews(): void {
+	public onCreateNews(): void {
 		const model = new NewsDetailModel();
 
 		model.commentObject.moveEvent.id = this.selectedEvent.id;
-		this.openCreateEdiceNews(model);
+		this.openCreateEditNews(model);
 	}
 
 	/**
 	 * Call the endpoint to update the status value
   	 * @param {number} value Status value
 	*/
-	onChangeStatus(value: number): void {
+	public onChangeStatus(value: number): void {
 		this.eventsService.updateStatusDetails({
 			moveEventId: this.selectedEvent.id,
 			value: value,
@@ -199,7 +191,7 @@ export class EventDashboardComponent implements OnInit {
 	 * On changing the bundle steps tab, call the endpoint to refresh the status details
   	 * @param {number} selectedBundleId Current step bundle tab selected
 	*/
-	onChangeStepsTab(selectedBundleId: number): void {
+	public onChangeStepsTab(selectedBundleId: number): void {
 		this.eventsService.getEventStatusDetails(selectedBundleId, this.selectedEvent.id)
 		.subscribe((statusDetails: any) => {
 			this.bundleSteps = this.eventsService.getBundleSteps(
@@ -215,7 +207,7 @@ export class EventDashboardComponent implements OnInit {
 	/**
 	 * On countdown timer timeout, call the on selected method to refresh the report
 	*/
-	onTimeout(): void {
+	public onTimeout(): void {
 		this.onSelectedEvent(this.selectedEvent.id);
 	}
 }

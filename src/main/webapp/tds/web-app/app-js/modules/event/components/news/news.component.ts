@@ -25,15 +25,9 @@ import { UserContextModel } from 'web-app/app-js/modules/security/model/user-con
 				</ng-template>
 				</kendo-tabstrip-tab>
 			</kendo-tabstrip>
-			<tds-button-create (click)="onCreate()" class="btn-primary" title="Add News"></tds-button-create>
+			<tds-button-create (click)="onCreateNews()" class="btn-primary" title="Add News"></tds-button-create>
 		</div>
-	`,
-	styles: [`
-		kendo-tabstrip p {
-			margin: 0;
-			padding: 8px;
-		}
-	`]
+	`
 })
 export class NewsComponent implements OnChanges {
 	@Input() news: Array<NewsModel> = [];
@@ -50,6 +44,11 @@ export class NewsComponent implements OnChanges {
 			})
 	}
 
+	/**
+	 * On changing input properties divide all the notices
+	 * into two groups (event news and archived news)
+ 	 * @param {SimpleChanges} changes  host input properties
+	*/
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes && changes.news && changes.news.currentValue) {
 			this.eventNews = changes.news.currentValue.filter((item: NewsModel) => item.state === 'L');
@@ -57,11 +56,21 @@ export class NewsComponent implements OnChanges {
 		}
 	}
 
-	onSelectedNews(id: number): void {
+	/**
+	 * Selecting a news throw the event to notify to the host component
+	 * to open the news details
+ 	 * @param {number} id  News id
+	*/
+	public onSelectedNews(id: number): void {
 		this.selected.emit(id);
 	}
 
-	onCreate(): void {
+	/**
+	 * Clicking on Create New button throw the event to notify to the host component
+	 * to open the create news view
+ 	 * @param {number} id  News id
+	*/
+	public onCreateNews(): void {
 		this.create.emit();
 	}
 }
