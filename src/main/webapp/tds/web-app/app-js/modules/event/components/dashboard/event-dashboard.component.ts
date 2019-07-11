@@ -84,6 +84,7 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	onSelectedEvent(id: number): void {
+		this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 		this.getNewsFromEvent(id);
 
 		this.eventsService.getEventDetails(id, true)

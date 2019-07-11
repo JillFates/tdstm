@@ -45,7 +45,6 @@ export class PieCountdownComponent implements OnInit {
 					seconds: parseInt(preferences[PREFERENCES_LIST.EVENTDB_REFRESH] || '0', 10),
 					description: ''
 				};
-				// this.interval =  setInterval(() => this.notifyTimeout(), this.selectedTimerOption.seconds * 1000);
 				this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
 			});
 	}
@@ -53,7 +52,6 @@ export class PieCountdownComponent implements OnInit {
 	private setCurrentInterval(milliseconds: number): void {
 		if (this.interval) {
 			clearInterval(this.interval);
-			this.interval = null;
 		}
 		if (milliseconds) {
 			this.interval =  setInterval(() => this.notifyTimeout(), milliseconds);
@@ -88,6 +86,7 @@ export class PieCountdownComponent implements OnInit {
 
 	notifyTimeout(): void {
 		console.log('----Time out----');
+		console.log(this.interval);
 		this.timeout.emit();
 	}
 }

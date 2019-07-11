@@ -17,7 +17,6 @@ import move from 'ramda/es/move';
  */
 @Injectable()
 export class EventsService {
-
 	// private instance variable to hold base url
 	private readonly baseURL = '/tdstm';
 	private readonly APP_EVENT_LISTS_URL = `${this.baseURL}/ws/moveEvent/list`;
@@ -30,6 +29,15 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/moveEvent/updateEventSumamry`;
+	private readonly categories = [
+		'Step',
+		'',
+		'Tasks',
+		'Planned Start',
+		'Planned Completion',
+		'Actual Start',
+		'Actual Completion'
+	];
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -163,21 +171,10 @@ export class EventsService {
 	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
 		let headers = [];
 		let percents = [];
-		let categories = [];
 		let colSize = 2;
 		let showFrom = 0;
 		let elementsToShow = 5;
 		let steps = [];
-
-		categories = [
-			'Step',
-			'',
-			'Tasks',
-			'Planned Start',
-			'Planned Completion',
-			'Actual Start',
-			'Actual Completion'
-		];
 
 		let headerRow = [];
 		moveBundleSteps.forEach((moveBundle: any) => {
@@ -220,7 +217,7 @@ export class EventsService {
 				totalTasksNumber = step.tskTot
 			}
 
-			let taskManagerUrl =  '/assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
+			let taskManagerUrl =  './../assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
 			let firstUrl = taskManagerUrl + '1&step=' + step.wfTranId
 			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
 			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
@@ -234,11 +231,21 @@ export class EventsService {
 		});
 
 		return {
-			categories,
+			categories: this.categories,
 			steps,
 			columnsLength: headerRow.length,
 			moveBundleList: moveBundleList,
 			selectedBundleId: selectedBundleId
 		};
+	}
+
+	getEmptyBundleSteps(): any {
+		return {
+			categories: this.categories,
+			columnsLength: 0,
+			moveBundleList: [],
+			selectedBundleId: null,
+			steps: []
+		}
 	}
 }
