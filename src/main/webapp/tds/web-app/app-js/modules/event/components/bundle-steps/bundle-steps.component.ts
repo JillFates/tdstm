@@ -16,29 +16,43 @@ export class BundleStepsComponent {
 	public RowType = EventRowType;
 
 	constructor() {
-		console.log('On constructor');
 		this.setInitialConfiguration();
 	}
 
-	onBack(): void {
+	/**
+	 * If showFrom start indicator is valid decrease its value
+	*/
+	public onBack(): void {
 		if (this.showFrom > 0) {
 			this.showFrom -= 1;
 		}
 	}
 
-	setInitialConfiguration(): void {
+	/**
+	 * Set the initial configuration to determine how many elements to show
+	*/
+	private setInitialConfiguration(): void {
 		this.colSize = 1;
 		this.showFrom = 0;
 		this.elementsToShow = 9;
 	}
 
-	onNext(): void {
+	/**
+	 * Increase the showFrom indicator one value just if doing this doesn't cause an index overflow
+	*/
+	public onNext(): void {
 		if (this.bundleSteps &&  (this.showFrom + this.elementsToShow + 1) <= this.bundleSteps.columnsLength)  {
 			this.showFrom += 1;
 		}
 	}
 
-	getColumns(row: any): any {
+	/**
+	 * Based on showFrom index indicator and elements to show
+	 * extract from the array the items to be displayed
+ 	 * @param {any} row  Row containing all the available columns
+	 * @returns {Array<any>} Array containing the columns covered by the interval defined
+	*/
+	public getColumns(row: any): any {
 		if (!this.bundleSteps) {
 			return [];
 		}
@@ -46,7 +60,12 @@ export class BundleStepsComponent {
 		return row.slice(this.showFrom, this.showFrom + this.elementsToShow);
 	}
 
-	onChangeTab(selecteEvent: any): void {
+	/**
+	 * Reset the initial configuration and notify to the host component
+	 * about a change tabe event
+ 	 * @param {any} selectedEvent Change event info
+	*/
+	public onChangeTab(selecteEvent: any): void {
 		this.setInitialConfiguration();
 		this.changeTab.emit(this.bundleSteps.moveBundleList[selecteEvent.index].id);
 	}

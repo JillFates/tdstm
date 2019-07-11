@@ -55,6 +55,9 @@ export class EventDashboardComponent implements OnInit {
 		this.populateData();
 	}
 
+	/**
+	 * Call the endpoints required to populate the initial data
+	*/
 	private populateData(): void {
 		this.userContextService.getUserContext()
 		.subscribe((userContext: UserContextModel) => {
@@ -73,16 +76,23 @@ export class EventDashboardComponent implements OnInit {
 				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
 				if (this.selectedEvent) {
 					this.onSelectedEvent(this.selectedEvent.id);
-
 				}
 			});
 	}
 
+	/**
+	 * Get the news corresponding to the event provided as argument
+ 	 * @param {number} id  Event id
+	*/
 	getNewsFromEvent(id: number): void {
 		this.eventsService.getNewsFromEvent(id)
 			.subscribe((news: NewsModel[]) => this.newsList = news);
 	}
 
+	/**
+	 * Whenever an event is selected call the endpoint to get the details to refresh the report
+ 	 * @param {number} id  Event id
+	*/
 	onSelectedEvent(id: number): void {
 		this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 		this.getNewsFromEvent(id);
@@ -93,11 +103,10 @@ export class EventDashboardComponent implements OnInit {
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
 				if (bundles.length) {
-					this.selectedEventBundle = bundles[0]; //  {id: 3239}; // bundles[0];
+					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
-						console.log('The event status details are');
 						this.bundleSteps = this.eventsService.getBundleSteps(
 							statusDetails,
 							this.eventDetails.moveBundleSteps,
@@ -118,28 +127,38 @@ export class EventDashboardComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * On click over a news title get the news details and with that show the create/edit news views
+ 	 * @param {number} id  News id
+	*/
 	onSelectedNews(id: number): void {
 		const getNewsDetail = id ? this.eventsService.getNewsDetail(id) : Observable.of(new NewsDetailModel());
-
 		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
-				console.log(news);
 				if (news.commentObject) {
 					news.commentObject.moveEvent.id = this.selectedEvent.id;
 				}
 				this.openCreateEdiceNews(news)
 			})
-		console.log(id);
 	}
 
-	getDefaultEvent(defaultEventId: string): any {
-		if (defaultEventId) {
-			return this.eventList.find((event) => event.id.toString() === defaultEventId) || null;
+	/**
+	 * Passing and event id search for it in the event list
+ 	 * @param {number} id  Event id
+	 * @returns {any} Event found otherwhise null
+	*/
+	getDefaultEvent(id: string): any {
+		if (id) {
+			return this.eventList.find((event) => event.id.toString() === id) || null;
 		}
 		return null;
 	}
 
-	openCreateEdiceNews(model: NewsDetailModel) {
+	/**
+	 * Open the view to create/edit news
+  	 * @param {NewsDetailModel} model  News info
+	*/
+	openCreateEdiceNews(model: NewsDetailModel): void  {
 		this.dialogService.open(NewsCreateEditComponent, [
 			{ provide: NewsDetailModel, useValue: model },
 		]).then(result => {
@@ -149,37 +168,38 @@ export class EventDashboardComponent implements OnInit {
 		});
 	}
 
-	getEmptyNews(): NewsModel {
-		return {
-			type: 'N',
-			text: '',
-			state: 'L'
-		};
-	}
-
-	onCreate(): void {
+	/**
+	 * Create an empty news model and call the component to show the edit/create news view
+	*/
+	onCreateNews(): void {
 		const model = new NewsDetailModel();
 
 		model.commentObject.moveEvent.id = this.selectedEvent.id;
 		this.openCreateEdiceNews(model);
 	}
 
-	onChangeStatus(value: number) {
+	/**
+	 * Call the endpoint to update the status value
+  	 * @param {number} value Status value
+	*/
+	onChangeStatus(value: number): void {
 		this.eventsService.updateStatusDetails({
 			moveEventId: this.selectedEvent.id,
 			value: value,
 			checkbox: true
 		})
 			.subscribe((result) => {
-				console.log('The resulting of update is:');
 				console.log(result);
 			}, error => {
-				console.log('here error is');
 				console.log(error);
 			});
 	}
 
-	onChangeStepsTab(selectedBundleId: number) {
+	/**
+	 * On changing the bundle steps tab, call the endpoint to refresh the status details
+  	 * @param {number} selectedBundleId Current step bundle tab selected
+	*/
+	onChangeStepsTab(selectedBundleId: number): void {
 		this.eventsService.getEventStatusDetails(selectedBundleId, this.selectedEvent.id)
 		.subscribe((statusDetails: any) => {
 			this.bundleSteps = this.eventsService.getBundleSteps(
@@ -192,9 +212,10 @@ export class EventDashboardComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * On countdown timer timeout, call the on selected method to refresh the report
+	*/
 	onTimeout(): void {
-		console.log('on time out on event dashboard');
-		console.log('----------------');
 		this.onSelectedEvent(this.selectedEvent.id);
 	}
 }

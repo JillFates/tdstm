@@ -33,7 +33,7 @@
                     <tds-event-resume [event]="eventPlanStatus"></tds-event-resume>
                 </div>
                 <div class="col-md-4">
-                    <tds-news [news]="newsList" (create)="onCreate()" (selected)="onSelectedNews($event)"></tds-news>
+                    <tds-news [news]="newsList" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
                 </div>
                 <div class="col-md-2"></div>
             </div>
@@ -67,7 +67,6 @@
                                 <div class="task-started task-item" 
                                     [style.width.%]="eventDetails.percTaskStarted"></div>
                             </div>
-                            <div style="height: 5px;"></div>
                             <div class="fixed-tasks">
                                 <div class="task-done fixed-status">
                                     <div>Done</div>
@@ -92,7 +91,6 @@
                             </div>
                         </div>
                     </div>
-                    <div style="height: 10px"></div>
                     <div class="task-effort-container">
                         <div class="task-title">Level <br />of
                             Effort</div>
@@ -107,7 +105,6 @@
                                 <div class="task-ready task-item" 
                                     [style.width.%]="eventDetails.percDurationReady"></div>
                             </div>
-                            <div style="height: 5px;"></div>
                             <div class="fixed-tasks">
                                 <div class="task-done fixed-status">
                                     <div>Done</div>
