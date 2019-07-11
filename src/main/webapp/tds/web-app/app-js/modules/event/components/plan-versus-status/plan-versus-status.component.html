@@ -2,8 +2,9 @@
     <img src="/tdstm/assets/i/dials/dial-{{currentProgress || 0}}.png" 
         (click)="onClickChart()">
     <div class="title">Event Status vs. Plan</div>
-    <div *ngIf="showEditControl">
-        <input type="number" [(ngModel)]="progress" #progressInput>
-        <tds-button-save (click)="onSave(progressInput.value)"></tds-button-save>
+
+    <div *ngIf="showEditControl" class="update-controls">
+            <input type="number" [(ngModel)]="progress" #progressInput>
+            <tds-button-save (click)="onSave(progressInput.value)" class="btn-primary"></tds-button-save>
     </div>
 </div>

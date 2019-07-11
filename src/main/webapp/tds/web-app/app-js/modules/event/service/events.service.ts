@@ -152,6 +152,14 @@ export class EventsService {
 			});
 	}
 
+	private getInitialValues(lenght: number, classes: string): any {
+		const items = [];
+		for (let i = 0; i < lenght; i++) {
+			items.push({text: '', classes})
+		}
+		return items;
+	}
+
 	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
 		let headers = [];
 		let percents = [];
@@ -177,89 +185,12 @@ export class EventsService {
 		});
 
 		steps.push(headerRow);
-		steps.push([
-			{ text: '', classes: 'empty-column' },
-			{ text: ' ', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' },
-			{ text: '', classes: 'empty-column' }
-		]);
-
-		steps.push([
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' }
-		]);
-
-		steps.push([
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' }
-		]);
-
-		steps.push([
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' },
-			{ text: '', classes: 'secondary' }
-		]);
-
-		steps.push([
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' }
-		]);
-
-		steps.push([
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' },
-			{ text: '', classes: 'primary' }
-		])
+		steps.push(this.getInitialValues(headerRow.length, 'empty-column'));
+		steps.push(this.getInitialValues(headerRow.length, 'primary'));
+		steps.push(this.getInitialValues(headerRow.length, 'secondary'));
+		steps.push(this.getInitialValues(headerRow.length, 'secondary'));
+		steps.push(this.getInitialValues(headerRow.length, 'primary'));
+		steps.push(this.getInitialValues(headerRow.length, 'primary'));
 
 		snapshot.steps.forEach((step: any) => {
 			const bundle: any = moveBundleSteps
@@ -294,7 +225,6 @@ export class EventsService {
 			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
 			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
 			// set the task value
-			// steps[EventRowType.Tasks][colIndex].text = `${step.tskComp} (of ${step.tskTot})`;
 			steps[EventRowType.Tasks][colIndex].text = linksHtml;
 
 			if (snapshot.runbookOn === 1) {
