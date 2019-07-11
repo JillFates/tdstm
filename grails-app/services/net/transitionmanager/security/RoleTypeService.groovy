@@ -42,7 +42,7 @@ class RoleTypeService implements ServiceMethods {
 	RoleType getById(String roleTypeId, boolean throwException = false) {
 		RoleType roleType = RoleType.where { id == roleTypeId }.get()
 		if (!roleType && throwException) {
-			throw new EmptyResultException("Role type not found with id: ${roleTypeId}.")
+			throw new EmptyResultException("Not found with id: ${roleTypeId}.")
 		}
 
 		return roleType
@@ -82,7 +82,7 @@ class RoleTypeService implements ServiceMethods {
 		roleTypeCommand.populateDomain(roleTypeInstance, false, ['type', 'code'])
 
 		if (!roleTypeInstance.save(failOnError: false)) {
-			throw new DomainUpdateException('Unable to update role type ' + GormUtil.allErrorsString(roleTypeInstance))
+			throw new DomainUpdateException("Unable to update $roleTypeInstance.type ${GormUtil.allErrorsString(roleTypeInstance)}")
 		}
 		return roleTypeInstance
 	}
@@ -99,7 +99,7 @@ class RoleTypeService implements ServiceMethods {
 		roleTypeCommand.populateDomain(roleTypeInstance)
 
 		if (!roleTypeInstance.save(failOnError: false)) {
-			throw new DomainUpdateException('Unable to update role type ' + GormUtil.allErrorsString(roleTypeInstance))
+			throw new DomainUpdateException("Unable to update $roleTypeInstance.type ${GormUtil.allErrorsString(roleTypeInstance)}")
 		}
 		return roleTypeInstance
 	}

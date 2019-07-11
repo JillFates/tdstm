@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="layout" content="topNav" />
-<title>Edit RoleType</title>
+<title>Edit Team</title>
 </head>
 <body>
 	<tds:subHeader title="Edit Team" crumbs="['Admin','Portal','Team','Edit']"/> <br/>
@@ -23,7 +23,14 @@
 	<table>
 		<tbody>
 
-			<g:if test="${roleTypeInstance.type == 'SECURITY'}">
+			<tr class="prop">
+				<td valign="top" class="name"><label for="id">Type:</label></td>
+				<td valign="top"
+					class="value">${roleTypeInstance?.type}</td>
+			</tr>
+
+
+			<g:if test="${roleTypeInstance?.type == 'SECURITY'}">
 
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Level:</label></td>

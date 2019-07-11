@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="topNav" />
-    <title>Create RoleType</title>
+    <title>Create Team</title>
   </head>
   <body>
     <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Team','Create']"/><br />
