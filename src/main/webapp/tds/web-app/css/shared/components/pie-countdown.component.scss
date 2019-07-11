@@ -27,9 +27,9 @@
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        background: yellowgreen;
-        background-image: linear-gradient(to right, transparent 50%, #655 0);
-        color: #655;
+        background: #eee;
+        background-image: linear-gradient(to right, transparent 50%, #3c8dbc 0);
+        color: #eee;
       }
       
       .pie-countdown-timer::before {
@@ -48,7 +48,7 @@
       }
       
       @keyframes bg {
-        50% { background: #655; }
+        50% { background: #3c8dbc; }
       }
       
       .timer-30-seconds::before {
