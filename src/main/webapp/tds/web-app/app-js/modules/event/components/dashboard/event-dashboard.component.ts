@@ -190,4 +190,10 @@ export class EventDashboardComponent implements OnInit {
 			);
 		});
 	}
+
+	onTimeout(): void {
+		console.log('on time out on event dashboard');
+		console.log('----------------');
+		this.onSelectedEvent(this.selectedEvent.id);
+	}
 }
