@@ -301,4 +301,6 @@ databaseChangeLog = {
 
 	include file: 'version/v4_6_3/20190619-add-boolean-debug-flag-to-apiAction.groovy'
 	include file: 'version/v4_6_3/20190619-tmd-task-api-action-changes.groovy'
+	include file: 'version/v4_6_3/20190628-set-max-asset-pagination-pref-value-to-100.groovy'
+
 }
