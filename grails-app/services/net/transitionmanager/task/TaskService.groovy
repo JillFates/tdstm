@@ -40,6 +40,7 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.exception.EmptyResultException
