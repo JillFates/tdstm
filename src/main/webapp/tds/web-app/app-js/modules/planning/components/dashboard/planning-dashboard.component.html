@@ -205,7 +205,7 @@
                                 <td class="asset-name-column">
                                     <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_ufp: 'true'}">Applications</a>
                                 </td>
-                                <td class="execution-data-column"><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Unassigned'}">{{planningDashboardModel.execution.unassignedAppCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
+                                <td class="execution-data-column"><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Unassigned', _ufp: 'true'}">{{planningDashboardModel.execution.unassignedAppCount}} ({{planningDashboardModel.execution.unassignedAppPerc}}%)</a></td>
                                 <td *ngFor="let app of planningDashboardModel.execution.appList" class="execution-data-column">
                                     <span *ngIf="app.count==0" class='colorGrey'>0</span>
                                     <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_event: app.moveEvent, _ufp: 'true'}" *ngIf="app.count!=0">
