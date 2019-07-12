@@ -1,6 +1,7 @@
 package net.transitionmanager.notice
 
 import com.tdsops.common.security.SecurityUtil
+import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.NoticeCommand
 import net.transitionmanager.exception.EmptyResultException
@@ -145,7 +146,7 @@ class NoticeService implements ServiceMethods {
 			activationDate == null || activationDate < now
 			expirationDate == null || expirationDate > now
 
-		}.order('sequence').list()
+		}.order('sequence').order('dateCreated').list()
 	}
 
 	/**
@@ -168,7 +169,7 @@ class NoticeService implements ServiceMethods {
 			unacknowledgedNoticesCriteriaClosure(person, project, new Date())
 
 			order('needAcknowledgement', 'desc')
-			order('sequence', 'desc')
+			order('sequence', 'asc')
 			order('dateCreated', 'asc')
 		}
 
@@ -224,5 +225,51 @@ class NoticeService implements ServiceMethods {
 			session.removeAttribute(SecurityUtil.REDIRECT_URI)
 		}
 		return hasMandatoryUnacknowledgedNotices
+	}
+
+    /**
+     * Create and return a list of the Notices that should be displayed
+     * in the Login form.
+     * @return a list of active notices for the login page.
+     */
+    List<Notice> getPreLoginNotices() {
+	    Date now = TimeUtil.nowGMT()
+        return Notice.where {
+            typeId == NoticeType.PRE_LOGIN && active
+	        (activationDate == null || activationDate < now) && (expirationDate == null || expirationDate > now)
+        }.list()
+    }
+
+	/**
+	 * Return a list of person post login notices that has not been acknowledged
+	 * @param person - person requesting list notices
+	 * @return
+	 */
+	List<Notice> fetchPersonPostLoginNotices(Person person) {
+		Date now = TimeUtil.nowGMT()
+		log.info('List person: [{}] post login notices.', person.id)
+
+		def result = Notice.withCriteria {
+			createAlias('noticeAcknowledgements', 'ack', JoinType.LEFT_OUTER_JOIN, Restrictions.eq('ack.person', person))
+			eq('active', true)
+			eq('typeId', NoticeType.POST_LOGIN)
+			eq('project', securityService.userCurrentProject)
+			and {
+				or {
+					isNull('activationDate')
+					lt('activationDate', now)
+				}
+				or {
+					isNull('expirationDate')
+					gt('expirationDate', now)
+				}
+			}
+			isNull('ack.person')
+
+			order('needAcknowledgement', 'desc')
+			order('sequence', 'desc')
+		}
+
+		return result
 	}
 }

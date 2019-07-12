@@ -814,6 +814,9 @@ class DataImportService implements ServiceMethods {
 			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
 
+				// flag to determine if entity is new, this is used below
+				boolean isNewEntity = entity.id == null
+
 				// Now add/update the remaining properties on the domain entity appropriately
 				Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
 				Boolean abandonEntity = true
@@ -854,6 +857,12 @@ class DataImportService implements ServiceMethods {
 							// Note that I was running to some strange issues of casting that prevented from doing this originally
 							// record.status = ImportBatchRecordStatusEnum.COMPLETED
 							record.status = ImportBatchStatusEnum.COMPLETED
+
+							// if entity is Person then associate it to company and project
+							if (isNewEntity && Person.isAssignableFrom(entity.class)) {
+								associatePersonToCompanyAndProject(context.project, entity)
+							}
+
 						} else {
 							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
 							record.addError(GormUtil.allErrorsString(entity))
@@ -1186,9 +1195,9 @@ class DataImportService implements ServiceMethods {
 						if (hasWhenFoundUpdate(fieldName, fieldsInfo)) {
 							// Process the 'whenFound update' logic if it was specified on the reference
 							Map fieldsValueMap = fieldsInfo[fieldName][WHEN_FOUND_UPDATE_PROPERTY]
-							errMsg = updateReferenceEntityFromWhenFound(fieldName, fieldsValueMap, context)
-							if (errMsg) {
-								recordErrorHelper(fieldName, errMsg)
+							List<String> errMsgList = updateReferenceEntityFromWhenFound(valueToSet, fieldsValueMap, context)
+							if (errMsgList && errMsgList.size() > 0) {
+								recordErrorHelper(fieldName, errMsgList.join(','))
 							}
 						}
 				}
@@ -1226,7 +1235,7 @@ class DataImportService implements ServiceMethods {
 		try {
 			switch (fieldClassType) {
 				case String:
-					_recordChangeOnField(domain, fieldName, valueToSet, isInitValue, fieldsInfo)
+					_recordChangeOnField(domain, fieldName, valueToSet as String, isInitValue, fieldsInfo)
 					break
 
 				case Integer:
@@ -1517,6 +1526,14 @@ class DataImportService implements ServiceMethods {
 
 					// Create the domain and set any of the require properties that are required
 					entity = createEntity(domainClassToCreate, fieldsValueMap, context)
+					boolean isPerson = Person.isAssignableFrom(entity.class)
+                  
+					// Check if isPerson and fieldsValueMap contains 'fullName' which means that user is looking for a person by fullName
+					// so we need to replace that with the correct parsing of full name into [firstName, lastName and middleName]
+					if (isPerson && fieldsValueMap.containsKey(Person.FULLNAME_KEY)) {
+						replaceFullnameEntryByPersonFullnameMap(fieldsValueMap)
+					}
+
 					fieldsValueMap.each { fieldName, value ->
 						errMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context, referenceFieldName)
 						if (errMsg) {
@@ -1526,7 +1543,11 @@ class DataImportService implements ServiceMethods {
 
 					// Attempt to save this sucker
 					if (errorMsgs.size() == 0) {
-						if (! entity.save(flush:true, failOnError:false)) {
+						if (entity.save(flush:true, failOnError:false)) {
+							if (isPerson) {
+								associatePersonToCompanyAndProject(context.project, entity)
+							}
+						} else {
 							errorMsgs << GormUtil.allErrorsString(entity)
 						}
 					}
@@ -1567,9 +1588,15 @@ class DataImportService implements ServiceMethods {
 		log.debug 'updateReferenceEntityFromWhenFound() UPDATING reference entity {} {} with {}',
 			entity.getClass().getName(), entity, fieldsValueMap
 
+		// check if isPerson and fieldsValueMap contains 'fullName' which means that user is lookign for a person by fullName
+		// so we need to replace that with the correct parsing of full name into [firstName, lastName, middlename]
+		if (Person.isAssignableFrom(entity.class) && fieldsValueMap.containsKey(Person.FULLNAME_KEY)) {
+			replaceFullnameEntryByPersonFullnameMap(fieldsValueMap)
+		}
+
 		// Get the list of all the fields to be set from the create section of the fieldsInfo of the referenceField
 		fieldsValueMap.each { fieldName, value ->
-			failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap,  context)
+			String failureMsg = setDomainPropertyWithValue(entity, fieldName, fieldsValueMap, context)
 			if (failureMsg) {
 				errMsgs << failureMsg
 			}
@@ -1642,7 +1669,7 @@ class DataImportService implements ServiceMethods {
 
 				} else {
 					// Set the non-reference / Java types (e.g. Date, Integer, String, Boolean)
-					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName])
+					errorMsg = setNonReferenceField(entity, fieldName, fieldsValueMap[fieldName]?.value)
 				}
 			}
 			break
@@ -1780,6 +1807,34 @@ class DataImportService implements ServiceMethods {
 
 		// return progress key
 		return ['progressKey': key]
+	}
+
+	/**
+	 * Load the fieldsValueMap appropriate with the returned name map (e.g. fieldsValueMap.put('firstName', nameMap.first) )
+	 * @param fieldsValueMap - map contanining person fullName key
+	 */
+	private void replaceFullnameEntryByPersonFullnameMap(Map fieldsValueMap) {
+		Map nameMap = personService.parseName(fieldsValueMap.get(Person.FULLNAME_KEY))
+		fieldsValueMap.remove(Person.FULLNAME_KEY)
+		if (nameMap) {
+			fieldsValueMap.put('firstName', nameMap.first)
+			fieldsValueMap.put('lastName', nameMap.last)
+			fieldsValueMap.put('middleName', nameMap.middle)
+		}
+	}
+
+	/**
+	 * Person object is created presently via the ETL process there is no consideration
+	 * for the company that they are associated to or the project.
+	 * This method does that association.
+	 *
+	 * @param project - current user project
+	 * @param person - new person being created
+	 */
+	private void associatePersonToCompanyAndProject(Project project, Person person) {
+		partyRelationshipService.addCompanyStaff(project.client, person)
+		personService.addToProjectSecured(project, person)
+
 	}
 }
 

@@ -46,7 +46,8 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToProjectsMenu() {
-        projectsItem.click()
+        waitFor{projectsItem.click()}
+        waitFor(30){projectsItem.click()}
     }
 
     def goToProjectsActive(){
@@ -65,12 +66,16 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToAssetFieldSettings(){
+        waitFor(30){projectsItem}
         selectMenu(projectsItem)
+        waitFor(30){projectsFieldsSetItem}
         selectItem(projectsFieldsSetItem)
     }
 
     def goToProviders(){
+        waitFor (30) {projectsItem}
         selectMenu(projectsItem)
+        waitFor (30) {projectsProviders}
         selectItem(projectsProviders)
     }
 
@@ -90,7 +95,9 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToTagsPage(){
+        waitFor(30){projectsItem}
         selectMenu projectsItem
+        waitFor(30) {projectsTags}
         selectItem projectsTags
     }
 

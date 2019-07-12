@@ -1,6 +1,8 @@
 // Angular
 import {Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import {FormControl} from '@angular/forms';
+import {pathOr} from 'ramda';
+
 // Component
 import {RichTextEditorComponent} from '../../../../shared/modules/rich-text-editor/rich-text-editor.component';
 import {ViewHtmlComponent} from '../view-html/view-html.component';
@@ -13,7 +15,6 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-
 // Kendo
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
@@ -61,7 +62,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		this.noticeIsLocked = this.model.locked;
 		this.model.active = StringUtils.stringToBoolean(this.model.active);
 		const currentType = this.typeDataSource
-		.find((typeData) => typeData.typeId === this.model.typeId);
+						.find((typeData) => typeData.typeId === this.model.typeId);
 		if (currentType) {
 			this.typeName = currentType.name;
 		}
@@ -69,6 +70,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		if (this.model.needAcknowledgement) {
 			this.model.typeId = NOTICE_TYPE_MANDATORY;
 		}
+
 		this.noticeType = {typeId: this.model && this.model.typeId || null};
 
 		if (this.model.expirationDate) {
@@ -78,6 +80,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		if (this.model.activationDate) {
 			this.setMinDate(this.model.activationDate);
 		}
+
 		this.userDateFormat = this.preferenceService.getUserDateFormatForMomentJS();
 
 		this.dataSignature = JSON.stringify(this.model);
@@ -138,8 +141,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		// use zero for empty sequences
 		payload.sequence = payload.sequence === null || typeof payload.sequence === 'undefined' ? 0 : payload.sequence;
 		// don't send '' for empty dates, instead use null
-		payload.activationDate = !payload.activationDate  ? null : this.convertToDate(payload.activationDate);
-		payload.expirationDate = !payload.expirationDate  ? null : this.convertToDate(payload.expirationDate);
+		payload.activationDate = payload.activationDate === '' ? null : payload.activationDate;
+		payload.expirationDate = payload.expirationDate === '' ? null : payload.expirationDate;
 
 		return payload;
 	}
@@ -178,11 +181,14 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 	/**
 	 * Determines if all the field forms comply with the validation rules
+	 * @param {any} form  - Main form holding all the field
 	*/
-	protected formValid(): boolean {
+	protected formValid(form: any): boolean {
 		const noticeType = this.noticeType && this.noticeType.typeId;
-		const isValid =  this.model && this.model.title &&
-				this.isValidHtmlText() && (noticeType || noticeType === 0);
+		const isValid = this.model && this.model.title &&
+						this.isValidHtmlText() &&
+						(noticeType || noticeType === 0) &&
+						form.valid;
 
 		const returnValue =  (noticeType === this.MANDATORY) ? (isValid && (this.model.acknowledgeLabel && this.model.acknowledgeLabel.trim() !== '')) : isValid;
 
@@ -216,6 +222,13 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	}
 
 	/**
+	 * Change to edit mode
+	 */
+	protected editNotice(): void {
+		this.action = ActionType.Edit;
+	}
+
+	/**
 	 * Grab the current html value emitted by rich text editor
 	 */
 	onValueChange(value: string) {
@@ -234,9 +247,6 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	 */
 	setMaxDate(value: any) {
 		this.maxDate = value;
-		if (this.model.activationDate && value <  this.convertToDate(this.model.activationDate)) {
-			this.model.expirationDate = '';
-		}
 	}
 
 	/**
@@ -244,30 +254,24 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	*/
 	setMinDate(value: any) {
 		this.minDate = value;
-		if (this.model.expirationDate && value >  this.convertToDate(this.model.expirationDate)) {
-			this.model.activationDate = '';
-		}
 	}
 
 	/**
-	 * Could receive a string or date, based in the type make sure returns a date  object
-	 * @param {any} value:  String or Date to cast
-	 * @returns {date}
+	 * Get a field from the form by control name
+	 * @param {any} form  - Main form holding all the field
+	 * @param {string} controlName - Name of th field to get
+	 * @returns {any} - Returns the field or null if not found
 	 */
-	private convertToDate(value: any): any {
-		return (value && value.toDateString) ?
-			value :
-			DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(value), DateUtils.SERVER_FORMAT_DATE);
-			// new Date(DateUtils.getDateFromGMT(value));
-	}
+	public getFormField(form: any, controlName: string): any {
+		const field = pathOr(null, ['controls', controlName], form);
 
-	/**
-	 * Change to edit mode
-	 */
-	protected editNotice(): void {
-		this.action = ActionType.Edit;
+		return  field === null ? null : {
+			valid: field.valid,
+			touched: field.touched,
+			dirty: field.dirty,
+			errors: field.errors || {}
+		};
 	}
-
 	/**
 	 * Based on modalType action returns the corresponding title
 	 * @param {ActionType} modalType

@@ -120,7 +120,7 @@ class ApplicationCloneSameNameSpec extends GebReportingSpec {
         given: 'The User is in the Application Details modal'
             at AssetDetailsPage
         and: 'The user closes details modal'
-            clickOnCloseButton()
+            waitFor(30){clickOnCloseButton()}
         and: 'The User is in the Application List Page'
             at ViewPage
         when: 'The user filters by app name'

@@ -5,8 +5,8 @@ import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 

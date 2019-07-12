@@ -1,7 +1,7 @@
 import {Component, OnChanges, Input, Output, EventEmitter, SimpleChanges} from '@angular/core';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {NewsModel} from './../../model/news.model';
-import { UserContextModel } from 'web-app/app-js/modules/security/model/user-context.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: 'tds-news',

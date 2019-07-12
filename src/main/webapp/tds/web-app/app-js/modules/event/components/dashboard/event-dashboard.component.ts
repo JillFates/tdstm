@@ -6,7 +6,7 @@ import * as R from  'ramda';
 
 // Services
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UserContextService } from '../../../security/services/user-context.service';
+import { UserContextService } from '../../../auth/service/user-context.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
 import { EventsService } from './../../service/events.service';
@@ -16,7 +16,7 @@ import { EventModel, EventPlanStatus } from './../../model/event.model';
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
 
 // Model
-import { UserContextModel } from '../../../security/model/user-context.model';
+import { UserContextModel } from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: 'event-dashboard',

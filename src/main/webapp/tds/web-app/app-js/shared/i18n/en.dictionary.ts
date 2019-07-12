@@ -40,6 +40,7 @@ export const en_DICTIONARY: Object = {
 		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
+		'CLEAR_FILTER': 'Clear filter',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
@@ -67,7 +68,8 @@ export const en_DICTIONARY: Object = {
 			'TASKS' : 'Tasks',
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
-		}
+		},
+		'TOTAL': 'Total'
 	},
 	'ASSETS': {
 		'APPLICATION': 'Application',
@@ -133,6 +135,10 @@ export const en_DICTIONARY: Object = {
 				'REMOVE': 'Remove these'
 			}
 		}
+	},
+	'ASSET_SUMMARY': {
+		'ASSET_SUMMARY': 'Asset Summary',
+		'SUMMARY': 'Summary'
 	},
 	'ASSET_TAGS': {
 		'TAG': 'Tag',
@@ -211,11 +217,15 @@ export const en_DICTIONARY: Object = {
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'BUNDLES': {
+			'BUNDLES': 'Bundles',
+			'LIST': 'Bundle List',
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
-		'FIELD_NOT_LONGER_EXIST_ON_DOMAIN': 'Field not longer exist on domain',
+		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
 		'PROJECT': 'Project',
 		'CREATE_CUSTOM': 'Add Custom Field',
@@ -290,6 +300,22 @@ export const en_DICTIONARY: Object = {
 		'EDIT_NEWS': 'News Edit',
 		'CREATE_NEWS': 'News Create'
 	},
+	'LOGIN': {
+		'BACK_TO_LOGIN': 'Back to Login',
+		'CHECK_YOUR_EMAIL': 'Check Your Email',
+		'DOMAIN': 'Domain',
+		'FORGOT_PASSWORD': 'Forgot Password',
+		'LOGIN': 'Login',
+		'PLEASE_SELECT': 'Please select',
+		'SEND': 'Send',
+		'START_YOUR_SESSION': 'Sign in to start your session',
+		'SESSION_EXPIRED': 'Your session has expired. Please log in.',
+		'PASSWORD_ASSISTANT': 'Password Assistant',
+		'THANKS_FOR_REQUEST': 'Thank you for requesting a password reset. If your account is currently active,\n' +
+			'\t\t\tyou will receive an email with a reset link. If you do not receive this email,\n' +
+			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
+		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
+	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',
@@ -310,7 +336,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'TOOLTIP_ACTIVATION_DATE': 'When set the notice will not appear before the date set otherwise it will be shown',
 		'TOOLTIP_EXPIRATION_DATE': 'When set the notice will stop being shown after the date',
 		'TOOLTIP_LOCKED': 'Once a notice is locked the Message Text and Post Message Text fields will become permanently read-only and can not be unlocked',
-		'TOOLTIP_SEQUENCE': 'Used to control the order of notices when 2 or more a being displayed with lowest numbers first',
+		'TOOLTIP_SEQUENCE': 'Used to control the order of notices when 2 or more are being displayed where the lowest numbered notice is listed first',
 		'TOOLTIP_MESSAGE': 'HTML text to display in main user dialog window',
 		'TOOLTIP_POSTMESSAGE': 'Appears above the Accept button for Mandatory Acknowledgements'
 	},

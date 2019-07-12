@@ -8,6 +8,8 @@ import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.Dataview
+import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
+import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import org.grails.web.json.JSONObject
 
 /**
@@ -65,17 +67,31 @@ class DataviewSpec {
 	private Map<String, String> order
 	private Boolean justPlanning
 	/*
-		Extra Filters are used by All Assets for custom filtering from Planing dashboard
+		Extra Filters are used by All Assets for custom filtering on Planing dashboard
+		"extra": [ {
+        	"property": "_event",
+        	"filter": "323",
+      	},
+      	{
+        	"property": "_assetType",
+        	"filter": "physicalServer",
+      	}]
+	 */
+	List<SpecialExtraFilter> specialExtraFilters = []
+	/*
+		Extra Filters are used by All Assets for custom filtering on Planing dashboard
 		"extra": [ {
         	"property": "assetName",
         	"filter": "FOO",
       	},
       	{
-        	"property": "_filter",
+        	"property": "common_moveBundle.id",
         	"filter": "physicalServer",
       	}]
 	 */
-	private List<ExtraFilter> extraFilters
+	List<FieldNameExtraFilter> fieldNameExtraFilters  = []
+
+
 	/**
 	 * Character separator used for named filters
 	 */
@@ -170,12 +186,12 @@ class DataviewSpec {
 			column.fieldSpec = lookupFieldSpec(fieldSpecProject, column.domain, column.property)
 		}
 
-		//5) Add extra filter from UI params in command Object
-		extraFilters = command.filters.extra.collect { extraFilter ->
-			ExtraFilter.builder()
+		//5) Add extra filter from UI params in command Object.
+		command.filters.extra.each { extraFilter ->
+			new ExtraFilterBuilder()
 				.withProperty(extraFilter.property)
 				.withFilter(extraFilter.filter)
-				.build(spec.domains, fieldSpecProject)
+				.build(this, fieldSpecProject)
 		}
 	}
 
@@ -296,15 +312,5 @@ class DataviewSpec {
 	 */
 	Boolean getJustPlanning() {
 		justPlanning
-	}
-
-	/**
-	 * Used to determine if there is extra filters for a DataviewSpec request
-	 *
-	 * @return null if the variable wasn't set or a List value if DataviewSpec is prepared for filtering using extra filters
-	 * @See DataviewSpec#extraFilters
-	 */
-	List<ExtraFilter> getExtraFilters() {
-		return extraFilters
 	}
 }

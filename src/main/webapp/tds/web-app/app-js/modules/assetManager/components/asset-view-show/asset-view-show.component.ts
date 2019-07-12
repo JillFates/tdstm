@@ -1,26 +1,32 @@
-import {Component, Inject, ViewChild, OnInit, OnDestroy} from '@angular/core';
+// Angular
+import {Component, ViewChild, OnInit, OnDestroy} from '@angular/core';
 import {ActivatedRoute, Router, NavigationEnd} from '@angular/router';
-import { Observable } from 'rxjs';
-import {State} from '@progress/kendo-data-query';
-
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
+// Model
 import {ViewGroupModel, ViewModel} from '../../../assetExplorer/model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { Permission } from '../../../../shared/model/permission.model';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
-import { GRID_DEFAULT_PAGE_SIZE } from '../../../../shared/model/constants';
-import { AssetViewSelectorComponent } from '../asset-view-selector/asset-view-selector.component';
-import { AssetViewSaveComponent } from '../../../assetManager/components/asset-view-save/asset-view-save.component';
-import { AssetViewExportComponent } from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import { AssetQueryParams } from '../../../assetExplorer/model/asset-query-params';
-import { DomainModel } from '../../../fieldSettings/model/domain.model';
-import { AssetExportModel } from '../../../assetExplorer/model/asset-export-model';
-import {TagModel} from '../../../assetTags/model/tag.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {AlertType} from '../../../../shared/model/alert.model';
+import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
+import {DomainModel} from '../../../fieldSettings/model/domain.model';
+import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
+// Service
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {AssetGlobalFiltersService} from '../../service/asset-global-filters.service';
+// Component
+import {AssetViewSelectorComponent} from '../asset-view-selector/asset-view-selector.component';
+import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
+import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+// Other
+import {State} from '@progress/kendo-data-query';
+import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
+import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 
 declare var jQuery: any;
+
 @Component({
 	selector: 'tds-asset-view-show',
 	templateUrl: 'asset-view-show.component.html'
@@ -36,6 +42,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private lastSnapshot;
 	protected navigationSubscription;
 	protected justPlanning: boolean;
+	protected globalQueryParams = {};
 	public data: any;
 	public gridState: State = {
 		skip: 0,
@@ -44,8 +51,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	};
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
+	// When the URL contains extra parameters we can determinate the form contains hidden filters
+	public hiddenFilters = false;
 
 	@ViewChild('select') select: AssetViewSelectorComponent;
+	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
 
 	constructor(
 		private route: ActivatedRoute,
@@ -54,7 +64,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private notifier: NotifierService,
-		protected translateService: TranslatePipe) {
+		protected translateService: TranslatePipe,
+		private assetGlobalFiltersService: AssetGlobalFiltersService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -64,6 +75,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
+
+		// Get all Query Params
+		this.route.queryParams.subscribe(map => map);
+		this.globalQueryParams = this.route.snapshot.queryParams;
+		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
+
 		this.reloadStrategy();
 		this.initialiseComponent();
 	}
@@ -89,7 +106,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			}
 			// If it is a NavigationEnd event re-initalise the component
 			if (event instanceof NavigationEnd) {
-				console.log(event);
 				if (this.currentId && this.currentId !== this.lastSnapshot.params.id) {
 					this.metadata.tagList = this.lastSnapshot.data['tagList'];
 					this.fields = this.lastSnapshot.data['fields'];
@@ -133,9 +149,20 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: this.model.schema.columns
 			}
 		};
+
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
+
+			let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
+			if (justPlanning !== null) {
+				this.assetExplorerViewGrid.justPlanning = justPlanning;
+			}
+		}
+
 		if (this.justPlanning) {
 			params['justPlanning'] = true;
 		}
+
 		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
 			this.data = result;
 			jQuery('[data-toggle="popover"]').popover();
@@ -319,7 +346,14 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 -
+	 * After every time the hidden filter changes, propagate the value
+	 * @param hiddenFilters
+	 */
+	public onHiddenFiltersChange(hiddenFilters: boolean): void {
+		this.hiddenFilters = hiddenFilters;
+	}
+
+	/**
 	 * Whenever the grid state change, grab the new value
 	 * @param state New state
 	 */

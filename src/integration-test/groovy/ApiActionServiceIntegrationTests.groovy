@@ -20,7 +20,6 @@ import net.transitionmanager.security.SecurityService
 import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Title
@@ -157,25 +156,25 @@ class ApiActionServiceIntegrationTests extends Specification{
 			thrown MissingPropertyException
 	}
 
-	@Ignore
-	// TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
-	def '2. Tests for the connectorInstanceForAction method'() {
-		setup: 'requires an Object to hold the Connector instance so that'
-			Object aws
-
-		when: 'calling the method to get an implemented Connector'
-			aws = apiActionService.connectorInstanceForAction(action)
-		then: 'the requested Connector class instance should be returned'
-			(aws instanceof AwsConnector)
-		and: 'the AwsService was propery injected into the instance'
-			aws.awsService != null
-
-		when: 'the method is called requesting an unimplemented Connector'
-			// action.connectorClass = ConnectorClass.RACIME
-			clazz = apiActionService.connectorInstanceForAction(action)
-		then: 'an exception should be thrown'
-			thrown InvalidRequestException
-	}
+//	@Ignore
+//	 TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
+//	def '2. Tests for the connectorInstanceForAction method'() {
+//		setup: 'requires an Object to hold the Connector instance so that'
+//			Object aws
+//
+//		when: 'calling the method to get an implemented Connector'
+//			aws = apiActionService.connectorInstanceForAction(action)
+//		then: 'the requested Connector class instance should be returned'
+//			(aws instanceof AwsConnector)
+//		and: 'the AwsService was propery injected into the instance'
+//			aws.awsService != null
+//
+//		when: 'the method is called requesting an unimplemented Connector'
+//			// action.connectorClass = ConnectorClass.RACIME
+//			clazz = apiActionService.connectorInstanceForAction(action)
+//		then: 'an exception should be thrown'
+//			thrown InvalidRequestException
+//	}
 
 	def '3. Tests for methodDefinition'() {
 		setup:
@@ -210,19 +209,19 @@ class ApiActionServiceIntegrationTests extends Specification{
 			asset.assetName == methodParamsMap.serverRefId
 	}
 
-	@Ignore
-	// TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
-	def '5. Test the invoke method'() {
-		setup: 'will inject a mock awsService into the AwsConnector class to stub out calls to AWS so that'
-			AwsService awsService = Mock()
-			AwsConnector awsConnector = AwsConnector.instance
-			awsConnector.awsService = awsService
-
-		when: 'calling the invoke method on the service'
-			apiActionService.invoke(action, task)
-		then: 'the awsService.sendSnsNotification should be called with proper params'
-			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
-	}
+//	@Ignore
+//	 TODO : SL 6/2018 : Test being ignored until AWS Connector will be reestablished
+//	def '5. Test the invoke method'() {
+//		setup: 'will inject a mock awsService into the AwsConnector class to stub out calls to AWS so that'
+//			AwsService awsService = Mock()
+//			AwsConnector awsConnector = AwsConnector.instance
+//			awsConnector.awsService = awsService
+//
+//		when: 'calling the invoke method on the service'
+//			apiActionService.invoke(action, task)
+//		then: 'the awsService.sendSnsNotification should be called with proper params'
+//			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
+//	}
 
 	def "6. tests deleting an ApiAction and other related methods"() {
 		setup: "Create an API Action"

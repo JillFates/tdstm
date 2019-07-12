@@ -67,6 +67,26 @@ class TdsLocalAuthenticationFilter extends GrailsUsernamePasswordAuthenticationF
 		}
 	}
 
+	/**
+	 * Refactor the method for returning the username provided to work based
+	 * on a standard JSON request body.
+	 * @param request
+	 * @return
+	 */
+	protected String obtainUsername(HttpServletRequest request) {
+		return request.JSON[usernameParameter]
+	}
+
+	/**
+	 * Refactor the method for returning the password provided to work based
+	 * on a standard JSON request body.
+	 * @param request
+	 * @return
+	 */
+	protected String obtainPassword(HttpServletRequest request) {
+		return request.JSON[passwordParameter]
+	}
+
 	protected void initFilterBean() {
 		Assert.notNull securityService, 'securityService is required'
 	}

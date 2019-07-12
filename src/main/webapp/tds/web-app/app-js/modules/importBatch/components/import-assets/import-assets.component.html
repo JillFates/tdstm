@@ -61,7 +61,7 @@
                                         (upload)="onUploadFile($event)"
                                         (remove)="onRemoveFile($event)"
                                         (success)="completeEventHandler($event)">
-                                    <kendo-upload-messages select="Please Select.."></kendo-upload-messages>
+                                    <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
                                 </kendo-upload><!---->
                             </div>
                             <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"

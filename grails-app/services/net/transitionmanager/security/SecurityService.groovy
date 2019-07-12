@@ -20,9 +20,13 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.rest.token.AccessToken
+import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
 import grails.web.servlet.mvc.GrailsParameterMap
 import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -30,8 +34,11 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyRole
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.PasswordHistory
 import net.transitionmanager.security.PasswordReset
@@ -65,13 +72,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = ROLE_USER.name()
 
-	def auditService
-	def emailDispatchService
-	def partyRelationshipService
-	def personService
-	def springSecurityService
-	def userPreferenceService
-	JdbcTemplate jdbcTemplate
+	AuditService             auditService
+	EmailDispatchService     emailDispatchService
+	PartyRelationshipService partyRelationshipService
+	PersonService            personService
+	SpringSecurityService    springSecurityService
+	UserPreferenceService    userPreferenceService
+	JdbcTemplate             jdbcTemplate
+	TokenGenerator           tokenGenerator
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -82,6 +90,26 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	private long forgotMyPasswordResetTTL = 0
 	private long accountActivationTTL = 0
+
+	/**
+	 * Generates a Map that contains the JWT token for the current user.
+	 * This is comparable to logging in using the /api url, using spring security rest.
+	 *
+	 * @return A Map that contains the JWT token, refresh token, username, roles, token type, and expiration in seconds.
+	 */
+	Map generateJWT() {
+		UserDetails userDetails = springSecurityService.getPrincipal()
+		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
+
+		return [
+			username       : userDetails.username,
+			roles          : userDetails.authorities*.toString(),
+			"token_type"   : "Bearer",
+			"access_token" : token.accessToken,
+			"expires_in"   : token.expiration,
+			"refresh_token": token.refreshToken
+		]
+	}
 
 	void afterPropertiesSet() {
 
@@ -138,6 +166,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	Map getLoginConfig() {
 		loginConfigMap
+	}
+
+	/**
+	 * Create and return a map with the login config for the login page.
+	 * @return
+	 */
+	Map getConfigForLogin() {
+		return SecurityConfigParser.parseLoginSettings(grailsApplication.config, true)
 	}
 
 	/**

@@ -46,6 +46,11 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
+
+			function clearStorage() {
+				localStorage.removeItem('@@STATE');
+			}
+
 		</script>
 	</head>
 <%
@@ -405,7 +410,7 @@ int minPasswordLength = tds.minPasswordLength()
 						<ul>
 							<li><g:link class="home mmlink" controller="modules" action="user" link="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">User Dashboard</g:link></li>
 							<tds:hasPermission permission="${Permission.ReportViewPlanning}">
-							<li><g:link class="home mmlink" controller="moveBundle" action="planningStats" onclick="hideMegaMenu('dashboardMegaMenu')">Planning Dashboard</g:link></li>
+							<li><a href="/tdstm/module/planning/dashboard">Planning Dashboard</a></li>
 							</tds:hasPermission>
 							<li><g:link class="home mmlink" controller="dashboard" onclick="hideMegaMenu('dashboardMegaMenu')">Event Dashboard</g:link></li>
 							<%-- Removed until this report will be implemented using tasks
@@ -482,7 +487,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</td>
 			<td style="vertical-align:top">
 				<ul>
-					<li><g:link class="mmlink" controller="auth" action="signOut">Sign out</g:link></li>
+					<li><g:link class="mmlink" controller="auth" action="signOut" onclick="clearStorage()">Sign out</g:link></li>
 				</ul>
 			</td>
 			</tr></table>

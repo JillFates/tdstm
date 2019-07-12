@@ -270,10 +270,10 @@ class PartyRelationshipService implements ServiceMethods {
 				from PartyRelationship
 				where partyRelationshipType = :relationshipType
 				  and partyIdFrom.id = :partyIdFromId
-				  and partyIdTo.id = :partyIdTo
+				  and partyIdTo.id = :partyIdToId
 				  and roleTypeCodeFrom = :roleTypeIdFrom
 				  and roleTypeCodeTo = :roleTypeIdTo
-			''', [relationshipType: relationshipType, roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo,
+			''', [relationshipType: PartyRelationshipType.load(relationshipType), roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo),
 			      partyIdFromId: NumberUtil.toLong(partyIdFrom), partyIdToId: NumberUtil.toLong(partyIdTo)], [max: 1])[0]
 
 			// condition to check whether relationship has changed or not
@@ -284,8 +284,8 @@ class PartyRelationshipService implements ServiceMethods {
 					  and partyIdFrom.id = :partyIdFromId
 					  and roleTypeCodeFrom = :roleTypeIdFrom
 					  and roleTypeCodeTo = :roleTypeIdTo
-				''', [relationshipType: relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom),
-				      roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo], [max: 1])[0]
+				''', [relationshipType: PartyRelationshipType.load(relationshipType), partyIdFromId: NumberUtil.toLong(partyIdFrom),
+				      roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo)], [max: 1])[0]
 
 				if (otherRelationship) {
 					otherRelationship.delete(flush:true)
@@ -293,9 +293,9 @@ class PartyRelationshipService implements ServiceMethods {
 
 				new PartyRelationship(
 						partyRelationshipType: PartyRelationshipType.load(relationshipType),
-						partyIdFrom: Party.load(NumberUtil.toLong(partyIdFrom)),
+						partyIdFrom: Party.load(partyIdFrom),
 						roleTypeCodeFrom: RoleType.load(roleTypeIdFrom),
-						partyIdTo: Party.load(NumberUtil.toLong(partyIdTo)),
+						partyIdTo: Party.load(partyIdTo),
 						roleTypeCodeTo: RoleType.load(roleTypeIdTo),
 						statusCode: 'ENABLED').save()
 			}

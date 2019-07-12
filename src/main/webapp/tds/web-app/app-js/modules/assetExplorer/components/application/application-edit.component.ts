@@ -16,7 +16,8 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -41,13 +42,14 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
 			userContextService: UserContextService,
+			permissionService: PermissionService,
 			assetExplorerService: AssetExplorerService,
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
 			promptService: UIPromptService
 			) {
-				super(model, activeDialog, userContextService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
 		}
 
 		ngOnInit() {
@@ -159,10 +161,12 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 					this.persons[fieldName] = { personId: this.model.asset[fieldName].id};
 				});
 		}
-		getPersonList(personList: any[]): any[] {
+		getPersonList(personList: any[]) {
 			if (!this.personList) {
 				this.personList = personList;
-				this.personList.unshift(this.addPersonItem)
+				if (this.permissionService.hasPermission('PersonCreate')) {
+					this.personList.unshift(this.addPersonItem)
+				}
 			}
 			return this.personList;
 		}

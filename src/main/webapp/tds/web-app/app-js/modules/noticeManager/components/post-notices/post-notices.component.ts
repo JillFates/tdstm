@@ -5,24 +5,24 @@ import {Router} from '@angular/router';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NoticeService} from '../../service/notice.service';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
-import {NoticeModel, Notices, PostNoticeResponse } from '../../model/notice.model';
+import {NoticeModel, Notices} from '../../model/notice.model';
 // Components
 import {StandardNoticesComponent} from '../standard-notices/standard-notices.component';
 import {MandatoryNoticesComponent} from '../mandatory-notices/mandatory-notices.component';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {PostNoticesManagerService} from '../../../auth/service/post-notices-manager.service';
 
 @Component({
 	selector: 'tds-notice-post-notices',
 	template: '<div></div>'
 })
 export class PostNoticesComponent implements OnInit {
-	private postNoticesManager: any;
 	private postNotices: NoticeModel[] = [];
 	private redirectUri: string;
-	private baseUri = '/tdstm'
-	private signOutUri = `${this.baseUri}/auth/signOut`
+	private baseUri = '/tdstm';
+	private signOutUri = `${this.baseUri}/auth/signOut`;
 
 	/**
 	 * @constructor
@@ -33,6 +33,7 @@ export class PostNoticesComponent implements OnInit {
 		private noticeService: NoticeService,
 		private windowService: WindowService,
 		protected userContextService: UserContextService,
+		private postNoticesManager: PostNoticesManagerService,
 		private router: Router) {
 	}
 
@@ -41,21 +42,17 @@ export class PostNoticesComponent implements OnInit {
 	*/
 	ngOnInit() {
 		this.userContextService.getUserContext()
-		.subscribe((context) => {
-			this.postNoticesManager = context.postNoticesManager;
-			this.postNoticesManager.getNotices()
-				.subscribe((response) => {
-					const redirect = (response && response.redirectUri) || '';
-					this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
+		.subscribe((context: UserContextModel) => {
+			const redirect = (context.postNotices && context.postNotices.redirectUri) || '';
+			this.redirectUri = redirect.startsWith('/') ? `${this.baseUri}${redirect}` : `${redirect}`;
 
-					if (this.redirectUri) {
-						this.postNotices = response.notices.map((notice: NoticeModel) => {
-							notice.sequence = notice.sequence || 0;
-							return notice;
-						});
-						this.showNotices();
-					}
-				})
+			if (this.redirectUri) {
+				this.postNotices = context.postNotices.notices.map((notice: NoticeModel) => {
+					notice.sequence = notice.sequence || 0;
+					return notice;
+				});
+				this.showNotices();
+			}
 		});
 	}
 
@@ -98,9 +95,7 @@ export class PostNoticesComponent implements OnInit {
 			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};
-			})
-			.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
-
+			});
 	}
 
 	/**
