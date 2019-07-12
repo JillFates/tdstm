@@ -1,27 +1,21 @@
 // Angular
-import {Component, ViewChild, OnInit, Output, EventEmitter} from '@angular/core';
-import {FormControl} from '@angular/forms';
-// Component
+import {Component} from '@angular/core';
+
 // Service
-import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {StringUtils} from '../../../../shared/utils/string.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {EventsService} from '../../service/events.service';
 
-// Kendo
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 // Model
 import {NewsDetailModel} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
+
 @Component({
 	selector: 'tds-news-create-edit',
 	templateUrl: 'news-create-edit.component.html'
 })
-export class NewsCreateEditComponent implements OnInit {
+export class NewsCreateEditComponent {
 	constructor(
 		public model: NewsDetailModel,
 		public activeDialog: UIActiveDialogService,
@@ -30,10 +24,9 @@ export class NewsCreateEditComponent implements OnInit {
 		private eventsService: EventsService) {
 	}
 
-	ngOnInit() {
-		console.log('On init');
-	}
-
+	/**
+	 * On cancel edition show a prompt to the user, this action will loose the changes
+	*/
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
@@ -51,7 +44,11 @@ export class NewsCreateEditComponent implements OnInit {
 		}
 	}
 
-	protected onDelete(): void {
+	/**
+	 * On delete news shows the confirmation dialog
+	 * if the user decides continue call the endpoint to delete the record
+	*/
+	public onDelete(): void {
 		this.promptService.open('Confirmation Required', 'You are about to delete the selected item. Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
@@ -85,7 +82,7 @@ export class NewsCreateEditComponent implements OnInit {
 	/**
 	 * Save the changes to the news
 	 */
-	protected onSave(): void {
+	public onSave(): void {
 		const payload = this.getPayloadFromModel();
 
 		const updateMethod = payload.id ? this.eventsService.updateNews(payload) : this.eventsService.saveNews(payload);
@@ -101,15 +98,25 @@ export class NewsCreateEditComponent implements OnInit {
 	/**
 	 * Determines if all the field forms comply with the validation rules
 	*/
-	protected formValid(): boolean {
+	public formValid(): boolean {
 		return true;
 	}
 
-	protected isCreateEditAvailable(): boolean {
+	/**
+	 * Based on the permissions determine if the user
+	 * has create/edit permissions
+	 * @returns {boolean}
+	 */
+	public isCreateEditAvailable(): boolean {
 		return	this.permissionService.hasPermission(Permission.NewsEdit);
 	}
 
-	protected isDeleteAvailable(): boolean {
+	/**
+	 * Based on the permissions determine if the user
+	 * has delete permissions
+	 * @returns {boolean}
+	 */
+	public isDeleteAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NewsDelete);
 	}
 
@@ -117,11 +124,16 @@ export class NewsCreateEditComponent implements OnInit {
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
-	protected isDirty(): boolean {
+	public isDirty(): boolean {
 		return false;
 	}
 
-	isCreate(): boolean {
+	/**
+	 * Determine based on the id if the model is
+	 * intented to be used for a create operation
+	 * @returns {boolean}
+	 */
+	public isCreate(): boolean {
 		return !Boolean(this.model.commentObject.id);
 	}
 }

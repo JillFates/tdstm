@@ -69,6 +69,11 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Get the news details
+ 	 * @param {number} newsid News Id
+	 * @returns {Observable<NewsDetailModel>}
+	 */
 	getNewsDetail(newsId: number): Observable<NewsDetailModel> {
 		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=N`)
 			.map((response: any) => {
@@ -77,6 +82,12 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Get event details
+ 	 * @param {number} event Event id
+ 	 * @param {boolean} viewUnpublished Flag to filter unpublished events
+	 * @returns {Observable<any>} Event details
+	*/
 	getEventDetails(event: number, viewUnpublished: boolean): Observable<any> {
 		const url = `${this.APP_EVENT_DETAILS}/?moveEvent=${event}&viewUnpublished=${viewUnpublished ? 1 : 0}`;
 		return this.http.get(url)
@@ -112,6 +123,11 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Call the endpoint to update the news
+ 	 * @param {any} news News info
+	 * @returns {Observable<NewsDetailModel>} News details updated
+	*/
 	updateNews(news: any): Observable<NewsDetailModel> {
 		news.mode = 'ajax';
 		return this.http.post(`${this.APP_EVENT_UPDATE_NEWS}`, JSON.stringify(news))
@@ -121,6 +137,11 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Call the endpoint to create a news
+ 	 * @param {any} news News info
+	 * @returns {Observable<NewsDetailModel>} News details created
+	*/
 	saveNews(news: any): Observable<NewsDetailModel> {
 		news.mode = 'ajax';
 		return this.http.post(`${this.APP_EVENT_SAVE_NEWS}`, JSON.stringify(news))
@@ -130,6 +151,11 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Call the endpoint to delete a news
+ 	 * @param {any} news News info
+	 * @returns {Observable<NewsDetailModel>} Delete operation results
+	*/
 	deleteNews(news: any): Observable<NewsDetailModel> {
 		news.mode = 'ajax';
 		return this.http.get(`${this.APP_EVENT_DELETE_NEWS}/?id=${news.id}`)
@@ -139,28 +165,48 @@ export class EventsService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Get the bundles list corresponding to an specific event
+ 	 * @param {number} eventId Event id
+	 * @returns {Observable<any[]>} Event Bundle list
+	*/
 	getListBundles(eventId: number): Observable<any[]> {
 		return this.http.get(`${this.APP_EVENT_LIST_BUNDLES}/${eventId}`)
 			.map((response: any) => pathOr(null, ['data', 'list'], response))
 			.catch((error: any) => error);
 	}
 
-	getEventStatusDetails(bundleId: number, eventId: number) {
+	/**
+	 * Get the event status details for an specific bundle
+ 	 * @param {number} bundleId Bundle id
+	 * @returns {Observable<any>} Event status details
+	*/
+	getEventStatusDetails(bundleId: number, eventId: number): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
 			.map((response: any) => pathOr(null, ['snapshot'], response))
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Call the endpoint to update the status details
+ 	 * @param {any} payload Status details
+	 * @returns {Observable<any>}
+	*/
 	updateStatusDetails(payload: any): Observable<any> {
 		return this.http.post(`${this.APP_EVENT_STATUS_UPDATE}`, JSON.stringify(payload))
 			.catch((error: any) => {
-				console.log('The error is');
 				console.log(error);
 				return error
 			});
 	}
 
-	private getInitialValues(lenght: number, classes: string): any {
+	/**
+	 * Get the initial array of bundles
+ 	 * @param {number} lenght Bundle numbers
+ 	 * @param {string} classes Css classes to style the bundles
+	 * @returns {any[]} Array of empty bundles
+	*/
+	private getInitialBundleValues(lenght: number, classes: string): any[] {
 		const items = [];
 		for (let i = 0; i < lenght; i++) {
 			items.push({text: '', classes})
@@ -168,12 +214,16 @@ export class EventsService {
 		return items;
 	}
 
+	/**
+	 * Get the steps of every bundle
+ 	 * @param {any} snapshot
+ 	 * @param {any} moveBundleSteps
+ 	 * @param {string} userTimeZone
+ 	 * @param {any} moveBundleList
+ 	 * @param {number} selectedBundleId
+	 * @returns {any} Array of empty bundles
+	*/
 	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
-		let headers = [];
-		let percents = [];
-		let colSize = 2;
-		let showFrom = 0;
-		let elementsToShow = 5;
 		let steps = [];
 
 		let headerRow = [];
@@ -182,12 +232,12 @@ export class EventsService {
 		});
 
 		steps.push(headerRow);
-		steps.push(this.getInitialValues(headerRow.length, 'empty-column'));
-		steps.push(this.getInitialValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialValues(headerRow.length, 'primary'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'empty-column'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
+		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
 
 		snapshot.steps.forEach((step: any) => {
 			const bundle: any = moveBundleSteps
@@ -199,9 +249,6 @@ export class EventsService {
 				console.log(bundle);
 			}
 			let colIndex = headerRow.findIndex((item: any) => item.id === bundle.id);
-			console.log(colIndex);
-			console.log('----------');
-
 			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
 			steps[EventRowType.Percents][colIndex].text = percent;
 			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
@@ -223,11 +270,6 @@ export class EventsService {
 			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
 			// set the task value
 			steps[EventRowType.Tasks][colIndex].text = linksHtml;
-
-			if (snapshot.runbookOn === 1) {
-				console.log('print');
-			}
-
 		});
 
 		return {
@@ -239,6 +281,10 @@ export class EventsService {
 		};
 	}
 
+	/**
+	 * Get and empty bundle object
+	 * @returns {any}
+	*/
 	getEmptyBundleSteps(): any {
 		return {
 			categories: this.categories,

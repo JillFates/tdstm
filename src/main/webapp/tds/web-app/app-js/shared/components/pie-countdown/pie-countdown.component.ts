@@ -9,7 +9,6 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
 				<span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="notifyTimeout()"></span>
-
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
@@ -17,7 +16,6 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 					(valueChange)="onSelectedTimerOption($event)"
 					[textField]="'description'">
 				</kendo-dropdownlist>
-
 				<div class="pie-countdown-timer" [ngClass]="getTimerClass()"></div>
 			</div>
 		</div>
@@ -28,11 +26,16 @@ export class PieCountdownComponent implements OnInit {
 	@Input() refreshEverySeconds = 0;
 	public selectedTimerOption: CountDownItem = null;
 	private interval: any;
+	public timerOptions: Array<CountDownItem> = [
+		{seconds: 0, description: 'Manual'},
+		{seconds: 30, description: '30 Sec'},
+		{seconds: 60, description: '1 Min'},
+		{seconds: 120, description: '2 Min'},
+		{seconds: 300, description: '5 Min'},
+		{seconds: 600, description: '10 Min'}
+	];
 
-	constructor(
-		private preferenceService: PreferenceService,
-	) {
-		console.log('on constructor');
+	constructor(private preferenceService: PreferenceService) {
 	}
 
 	/**
@@ -49,6 +52,10 @@ export class PieCountdownComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Set the current interval function based on the current selected unit time
+ 	 * @param {number} milliseconds Milliseconds value
+	*/
 	private setCurrentInterval(milliseconds: number): void {
 		if (this.interval) {
 			clearInterval(this.interval);
@@ -58,15 +65,10 @@ export class PieCountdownComponent implements OnInit {
 		}
 	}
 
-	public timerOptions: Array<CountDownItem> = [
-		{seconds: 0, description: 'Manual'},
-		{seconds: 30, description: '30 Sec'},
-		{seconds: 60, description: '1 Min'},
-		{seconds: 120, description: '2 Min'},
-		{seconds: 300, description: '5 Min'},
-		{seconds: 600, description: '10 Min'}
-	];
-
+	/**
+	 * selecting a timer clear the previous interval and set the new one
+ 	 * @param {any} timerOption current timer option selected
+	*/
 	onSelectedTimerOption(timerOption: any): void {
 		this.preferenceService.setPreference(PREFERENCES_LIST.EVENTDB_REFRESH, timerOption.seconds)
 			.subscribe(() => {
@@ -78,15 +80,20 @@ export class PieCountdownComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Based on the current timer option selected, get the css corresponding class
+	 * @returns {string} Corresponding css class
+	*/
 	getTimerClass(): string {
 		const seconds = this.selectedTimerOption && this.selectedTimerOption.seconds || '';
 
 		return seconds ? `timer-${seconds}-seconds` : '';
 	}
 
+	/**
+	 * Notify to the host component about a countdown timeout event
+	*/
 	notifyTimeout(): void {
-		console.log('----Time out----');
-		console.log(this.interval);
 		this.timeout.emit();
 	}
 }
