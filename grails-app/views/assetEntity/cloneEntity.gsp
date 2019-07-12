@@ -120,11 +120,11 @@
      */
     function cloneAsset(action) {
         var newAssetName = $('#newAssetName').val();
-        var includeDependencies = ($('#includeDependencies').is(":checked")? '1' : '0');
+        var includeDependencies = $('#includeDependencies').is(":checked");
 
         var assetToClone = {
             assetId: ${asset.assetEntityInstance.id},
-            dependencies: includeDependencies,
+            cloneDependencies: includeDependencies,
             name: newAssetName
         };
         EntityCrud.cloneAsset(assetToClone, function(resp){
