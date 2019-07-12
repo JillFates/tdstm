@@ -50,10 +50,10 @@
             </table>
             <h4>Open Tasks</h4>
             <div>
-                <a href="/tdstm/assetEntity/listTasks?filter=openIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.activeTasks}} Active Tasks</a>
+                <a href="/tdstm/assetEntity/listTasks?filter=openIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.activeTasks}} Active {{planningDashboardModel.discovery.activeTasks > 1 ? 'Tasks' : 'Task'}}</a>
             </div>
-            <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0">
-                <a href="/tdstm/assetEntity/listTasks?filter=dueOpenIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.overdueTasks}} Overdue Tasks</a>
+            <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0" class="planning-dashboard-overdue-tasks">
+                <a href="/tdstm/assetEntity/listTasks?filter=dueOpenIssue&moveEvent=0&justRemaining=1"><span>{{planningDashboardModel.discovery.overdueTasks}}</span> Overdue Tasks</a>
             </div>
         </div>
         <div class="dashboard-div analysis-phase">
