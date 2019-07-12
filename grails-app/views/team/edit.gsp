@@ -6,12 +6,12 @@
 <title>Edit RoleType</title>
 </head>
 <body>
-	<tds:subHeader title="Edit RoleType" crumbs="['Admin','Portal','Role Type','Edit']"/> <br/>
+	<tds:subHeader title="Edit Team" crumbs="['Admin','Portal','Team','Edit']"/> <br/>
 <div class="body">
  <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
-	            <span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
+	            <span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>
 	             <tds:hasPermission permission="${Permission.RoleTypeCreate}">
-	            	<span class="menuButton"><g:link class="create" action="create">Create RoleType</g:link></span>
+	            	<span class="menuButton"><g:link class="create" action="create">Create Team</g:link></span>
 	            </tds:hasPermission>
         	</div>
         	<br/>
@@ -22,13 +22,6 @@
 	<div class="dialog">
 	<table>
 		<tbody>
-
-			<tr class="prop">
-				<td valign="top" class="name"><label for="id">Type:</label></td>
-				<td valign="top"
-					class="value">${fieldValue(bean:roleTypeInstance,field:'type')}</td>
-			</tr>
-
 
 			<g:if test="${roleTypeInstance.type == 'SECURITY'}">
 

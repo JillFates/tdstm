@@ -17,6 +17,7 @@ import net.transitionmanager.asset.Room
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import spock.lang.Issue
+import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
 
 /**
@@ -539,6 +540,84 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
+
+		cleanup:
+			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-15257')
+	void 'test can enable console and log LOOKUP variable'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(DependencyDataSetContent)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+						
+						read labels
+						domain Device
+						iterate {
+							extract 'server' load 'Name' set nameVar
+							extract 'model' load 'model'
+							extract 'dependsOn' set dependsOnVar
+
+							lookup 'assetName' with dependsOnVar
+							console on
+							log LOOKUP
+							console off
+						}
+						""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0]) {
+					domain == ETLDomain.Device.name()
+					fieldNames == ['assetName', 'model'] as Set
+					data.size() == 3
+					assertWith(data[0]) {
+						assertWith(fields.assetName) {
+							value == 'xray01'
+							originalValue == 'xray01'
+						}
+						assertWith(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+					}
+
+					assertWith(data[1]) {
+						assertWith(fields.assetName) {
+							value == 'deltasrv03'
+							originalValue == 'deltasrv03'
+						}
+						assertWith(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+					}
+
+					assertWith(data[2]) {
+						assertWith(fields.assetName) {
+							value == 'alpha'
+							originalValue == 'alpha'
+						}
+						assertWith(fields.model) {
+							value == 'VM'
+							originalValue == 'VM'
+						}
+					}
+				}
+			}
+			etlProcessor.debugConsole.content().count('found=false') == 2
+			etlProcessor.debugConsole.content().count('found=true') == 1
 
 		cleanup:
 			if(fileName) fileSystemService.deleteTemporaryFile(fileName)

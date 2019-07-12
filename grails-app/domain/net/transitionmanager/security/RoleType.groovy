@@ -6,26 +6,37 @@ class RoleType {
 
 
 	/* Role Types | Each of this works as a category that groups one or more Role Type Codes */
-	/** Code that represent User Security Group types */
-	public static final String SECURITY = 'ROLE_SECURITY'
+	/* Code that represent User Security Group types */
+	public static final String TYPE_SECURITY = 'SECURITY'
+	/* Code that represent Person Team types */
+	public static final String TYPE_TEAM     = 'TEAM'
+	/* Code that represents Project type roles */
+	public static final String TYPE_PROJECT  = 'PROJECT'
+	/* Code that represents Party roles */
+	public static final String TYPE_PARTY    = 'PARTY'
+	/* Code that represents Application roles - do not think this is utilized */
+	public static final String TYPE_APP      = 'APP'
 
-	/** Code that represent Person Team types */
-	public static final String TEAM = 'ROLE_TEAM'
+	/* Role Type Codes for Role Type TEAM */
+	public static final String CODE_TEAM_AUTO      = 'AUTO'
+	public static final String CODE_TEAM_CLEANER   = 'CLEANER'
+	public static final String CODE_TEAM_DB_ADMIN  = 'DB_ADMIN'
+	public static final String CODE_TEAM_MOVE_MGR  = 'MOVE_MGR'
+	public static final String CODE_TEAM_MOVE_TECH = 'MOVE_TECH'
+	public static final String CODE_TEAM_PROJ_MGR  = 'PROJ_MGR'
+	public static final String CODE_TEAM_SYS_ADMIN = 'SYS_ADMIN'
 
-	/** Code that represents Project type roles */
-	public static final String PROJECT = 'ROLE_PROJECT'
+	/* Role Type Codes for Role Type PROJECT */
+	public static final String CODE_PROJECT_MOVE_BUNDLE = 'MOVE_BUNDLE'
 
-	/** Code that represents Party roles */
-	public static final String PARTY = 'ROLE_PARTY'
-
-	/** Code that represents Application roles - do not think this is utilized */
-	public static final String APP = 'ROLE_APP'
-
-
-	/* Role Type Codes | Each of this is a role in the system, and is grouped by one Role Type */
-	/** Code that represents STAFF in the system - Is grouped under ROLE_TEAM */
-	public static final String ROLE_STAFF = 'ROLE_STAFF'
-
+	/* Role Type Codes for Role Type Party */
+	public static final String CODE_PARTY_CLIENT  = 'CLIENT'
+	public static final String CODE_PARTY_COMPANY = 'COMPANY'
+	public static final String CODE_PARTY_PARTNER = 'PARTNER'
+	public static final String CODE_PARTY_PROJECT = 'PROJECT'
+	public static final String CODE_PARTY_STAFF   = 'STAFF'
+	public static final String CODE_PARTY_TEAM    = 'TEAM'
+	public static final String CODE_TEAM_MEMBER   = 'TEAM_MEMBER'
 
 	String id
 	String description
@@ -39,7 +50,7 @@ class RoleType {
 		id blank: false, size: 1..32
 		description nullable: true
 		help nullable: true
-		type nullable: false, inList: [SECURITY, TEAM, PROJECT, PARTY, APP]
+		type nullable: false, inList: [TYPE_SECURITY, TYPE_TEAM, TYPE_PROJECT, TYPE_PARTY, TYPE_APP]
 		level range: 0..100
 	}
 
@@ -47,21 +58,20 @@ class RoleType {
 		version false
 		id column: 'role_type_code', generator: 'assigned'
 	}
-
 	static transients = ['securityRole']
 
 	/**
 	 * Determine if the given type is a security role type
 	 */
 	boolean isSecurityRole() {
-		type == SECURITY
+		type == TYPE_SECURITY
 	}
 
 	/**
 	 * Determine if the current RoleType is a Team Role
 	 */
 	boolean isTeamRole() {
-		type == TEAM
+		type == TYPE_TEAM
 	}
 
 	String toString() {
@@ -69,7 +79,7 @@ class RoleType {
 	}
 
 	def beforeValidate() {
-		if (level == null && type != 'ROLE_SECURITY') {
+		if (level == null && type != TYPE_SECURITY) {
 			level = 0
 		}
 	}

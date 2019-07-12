@@ -1711,7 +1711,7 @@ class AccountImportExportService implements ServiceMethods {
 	private void addTeamsToSpreadsheet(sheet) {
 		def tab = sheet.getSheet('Teams')
 		assert tab
-		List teams = RoleType.findAllByType(RoleType.TEAM, [order:'description'])
+		List teams = RoleType.findAllByType(RoleType.TYPE_TEAM, [order:'description'])
 		int row = 1
 		teams.each {t ->
 			WorkbookUtil.addCell(tab, 0, row, t.id)
@@ -2085,7 +2085,7 @@ class AccountImportExportService implements ServiceMethods {
 		if (true || formOptions.flagToUpdatePerson) {
 			// Get all teams except AUTO and we need to stuff STAFF into it
 			allTeamCodes = partyRelationshipService.getTeamCodes()
-			allTeamCodes << 'ROLE_STAFF'
+			allTeamCodes << RoleType.CODE_PARTY_STAFF
 			//log.debug "allTeamCodes = $allTeamCodes"
 		}
 

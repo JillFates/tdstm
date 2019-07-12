@@ -40,13 +40,6 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.PasswordHistory
-import net.transitionmanager.security.PasswordReset
-import net.transitionmanager.security.Permission
-import net.transitionmanager.security.Permissions
-import net.transitionmanager.security.RolePermissions
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -289,8 +282,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			// Find the projects that the user has been assigned to
 			projectIds = PartyRelationship.where {
 				partyRelationshipType.id == 'PROJ_STAFF'
-				roleTypeCodeFrom.id == 'ROLE_PROJECT'
-				roleTypeCodeTo.id == 'ROLE_STAFF'
+				roleTypeCodeFrom.id == RoleType.CODE_PARTY_PROJECT
+				roleTypeCodeTo.id == RoleType.CODE_PARTY_STAFF
 				partyIdTo.id == person.id
 				if (projectId) {
 					partyIdFrom.id == projectId
@@ -465,7 +458,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @return  the RoleTypes
 	 */
 	List<RoleType> getSecurityRoleTypes() {
-		return RoleType.findAllByType(RoleType.SECURITY, [sort: 'level', order: 'desc'])
+		return RoleType.findAllByType(RoleType.TYPE_SECURITY, [sort: 'level', order: 'desc'])
 	}
 
 	/**
@@ -1254,7 +1247,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		// Remove any Roles that are not in the above list
-		partyRelationshipService.updatePartyRoleByType(RoleType.SECURITY, person, assignedRoles)
+		partyRelationshipService.updatePartyRoleByType(RoleType.TYPE_SECURITY, person, assignedRoles)
 
 		if (setUserRoles(assignedRoles, person.id)) {
 			throw new DomainUpdateException('Unable to update user security roles')
@@ -1295,7 +1288,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	RoleType getSecurityRoleType(String roleCode) {
 		RoleType rt = RoleType.find('from RoleType rt where rt.id=:code and rt.type=:type',
-		                            [code: roleCode, type: RoleType.SECURITY])
+		                            [code: roleCode, type: RoleType.TYPE_SECURITY])
 		if (!rt) {
 			log.warn 'getSecurityRoleType() called with invalid code {}', roleCode
 		}
@@ -1493,9 +1486,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		return RoleType.findAllByTypeAndLevelLessThanEquals(
-				RoleType.SECURITY,
-				maxLevel,
-				[sort: 'level', order: 'desc']
+			RoleType.TYPE_SECURITY,
+			maxLevel,
+			[sort: 'level', order: 'desc']
 		)
 	}
 
@@ -1521,7 +1514,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		String query = """from RoleType r where r.type = :type and r.id in
 			(select pr.roleType.id from PartyRole pr where pr.party=:person group by pr.roleType.id)
 			order by r.level desc"""
-		RoleType.executeQuery(query, [person: person, type: RoleType.SECURITY])
+		RoleType.executeQuery(query, [person: person, type: RoleType.TYPE_SECURITY])
 	}
 
 	/**
@@ -1625,7 +1618,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	PartyRole assignRoleCode(Person person, String roleCode) {
 		RoleType rt = RoleType.get(roleCode)
-		if (!rt || rt.type != RoleType.SECURITY ) {
+		if (!rt || rt.type != RoleType.TYPE_SECURITY ) {
 			throw new InvalidParamException("Invalid role code $roleCode specified")
 		}
 
@@ -1835,7 +1828,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			                 group by roleType.id)
 			  and (type = ? OR type = ?)
 			order by description
-		''', [person, RoleType.TEAM, RoleType.SECURITY])
+		''', [person, RoleType.TYPE_TEAM, RoleType.TYPE_SECURITY])
 	}
 
 	@Transactional

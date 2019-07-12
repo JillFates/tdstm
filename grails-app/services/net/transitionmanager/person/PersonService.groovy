@@ -22,7 +22,6 @@ import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipType
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
@@ -117,8 +116,8 @@ class PersonService implements ServiceMethods {
 		StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		query.append(' WHERE pr.party_id_from_id=:company')
-		query.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="ROLE_STAFF"')
+		query.append(" AND pr.role_type_code_from_id='$RoleType.CODE_PARTY_COMPANY'")
+		query.append(" AND pr.role_type_code_to_id='$RoleType.CODE_PARTY_STAFF'")
 		// query.append(' ')
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
@@ -163,14 +162,14 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException('User has no first name associated with account')
 		}
 
-		String query = '''
+		String query = """
 			select 
 				pr.partyIdTo from PartyRelationship pr
 			where 
 				pr.partyIdFrom = :company
-				and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-				and pr.roleTypeCodeTo = 'ROLE_STAFF'
-		'''
+				and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY'
+				and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+		"""
 		Map queryParams = [company: company]
 
 		query += ' AND ((pr.partyIdTo.firstName = :firstName'
@@ -211,8 +210,8 @@ class PersonService implements ServiceMethods {
 			Map args = [company: company, email: email]
 			persons = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr " +
 					"where pr.partyIdFrom = :company " +
-					"and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY' " +
-					"and pr.roleTypeCodeTo = 'ROLE_STAFF' " +
+					"and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY' " +
+					"and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' " +
 					"and pr.partyIdTo.email = :email", args)
 		}
 		return persons
@@ -322,7 +321,7 @@ class PersonService implements ServiceMethods {
 		}
 
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-				"and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
+			"and PR.roleTypeCodeFrom.id='$RoleType.CODE_PARTY_COMPANY' and PR.roleTypeCodeTo.id='$RoleType.CODE_PARTY_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 
@@ -1038,7 +1037,7 @@ class PersonService implements ServiceMethods {
 		addToTeam(person, teamCode)
 
 		if (!isAssignedToProjectTeam(project, person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project '$project.name' on team $teamCode")
 			}
 			else {
@@ -1057,7 +1056,7 @@ class PersonService implements ServiceMethods {
 	 */
 	void addToTeam(Person person, String teamCode) {
 		if (!isAssignedToTeam(person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "ROLE_COMPANY", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, RoleType.CODE_PARTY_COMPANY, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to team $teamCode")
 			}
 			else {
@@ -1099,7 +1098,7 @@ class PersonService implements ServiceMethods {
 	private void addToProjectSecured(Project project, Person person) {
 		// Add to the project if not assigned already
 		if (!isAssignedToProject(project, person)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, 'ROLE_STAFF')) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, person, RoleType.CODE_PARTY_STAFF)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
 			} else {
 				throw new DomainUpdateException("An error occurred while attempting to assign the person to the project")
@@ -1212,7 +1211,7 @@ class PersonService implements ServiceMethods {
 		// Remove the Project Staff relationship for the project
 		List<RoleType> roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
 		for (RoleType role in roles) {
-			if (role.type == RoleType.TEAM) {
+			if (role.type == RoleType.TYPE_TEAM) {
 				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, role.type)
 				metrics.teamsUnassigned++
 			}
@@ -1363,7 +1362,7 @@ class PersonService implements ServiceMethods {
 	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
 	PartyRelationship getProjectReference(Project project, Person person) {
-		return getProjectTeamReference(project, person, 'ROLE_STAFF')
+		return getProjectTeamReference(project, person, RoleType.CODE_PARTY_STAFF)
 	}
 
 	/**
@@ -1380,7 +1379,7 @@ class PersonService implements ServiceMethods {
 		def teamRef = PartyRelationship.createCriteria().get {
 			and {
 				eq('partyRelationshipType.id', 'PROJ_STAFF')
-				eq('roleTypeCodeFrom.id', 'ROLE_PROJECT')
+				eq('roleTypeCodeFrom.id', RoleType.CODE_PARTY_PROJECT)
 				eq("roleTypeCodeTo${teamCode instanceof RoleType ? '' : '.id'}", teamCode)
 				eq('partyIdFrom', project)
 				eq('partyIdTo', person)
@@ -1438,9 +1437,9 @@ class PersonService implements ServiceMethods {
 		assert person != null
 
 		PartyRelationship.createCriteria().list {
-			eq('partyRelationshipType', PartyRelationshipType.load('ROLE_PROJ_STAFF'))
+			eq('partyRelationshipType', PartyRelationshipType.load('PROJ_STAFF'))
 			and {
-				eq('roleTypeCodeFrom', RoleType.load('ROLE_PROJECT'))
+				eq('roleTypeCodeFrom', RoleType.load(RoleType.CODE_PARTY_PROJECT))
 				eq('partyIdTo', person)
 				if (project) {
 					eq('partyIdFrom', project)

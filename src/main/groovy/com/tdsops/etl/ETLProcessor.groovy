@@ -1142,7 +1142,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor log(Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
-		debugConsole.append(level, ETLValueHelper.valueOf(message))
+		debugConsole.append(level, String.valueOf(message))
 		return this
 	}
 
