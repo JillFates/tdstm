@@ -235,7 +235,8 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH': 'Max Length',
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
-		}
+		},
+		'CLEAR_UNDERLAYING_DATA': 'Should underlying data be cleared for deleted custom field(s)?\n Yes to clear data and save changes or No to preserve data and save changes.'
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',

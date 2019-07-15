@@ -16,6 +16,7 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
 import {AlertType} from '../../../../shared/model/alert.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -87,6 +88,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
 		private dialogService: UIDialogService,
+		private translate: TranslatePipe,
 		private fieldSettingsService: FieldSettingsService) {
 	}
 
@@ -144,10 +146,28 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	protected onSaveAll(): void {
+		this.askForDeleteUnderlayingData()
+			.then((deleteUnderLaying: boolean) => this.notifySaveAll(deleteUnderLaying));
+	}
+
+	private askForDeleteUnderlayingData(): Promise<boolean> {
+		const askPromise =  this.prompt.open(
+			this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
+			this.translate.transform('GLOBAL.YES'),
+			this.translate.transform('GLOBAL.NO'),
+			true);
+
+		return this.fieldsToDelete.length ? askPromise : Promise.resolve(true);
+	}
+
+	private notifySaveAll(deleteUnderLaying: boolean): void {
+		console.log('Delete under:', deleteUnderLaying);
+		/*
 		this.saveEmitter.emit(() => {
 			this.reset();
 		});
-
+		*/
 	}
 
 	/**
