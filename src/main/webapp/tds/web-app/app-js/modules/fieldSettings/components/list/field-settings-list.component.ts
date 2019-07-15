@@ -135,6 +135,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 							if (res.status === 'error') {
 								return res;
 							} else {
+								// delete underlaying data
 								return savingInfo.deleteUnderLaying ?
 									this.fieldService.deleteCustomFields(this.fieldsToDelete) :
 									Observable.of(true);

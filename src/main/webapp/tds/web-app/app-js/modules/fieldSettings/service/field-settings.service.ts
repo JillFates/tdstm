@@ -67,7 +67,7 @@ export class FieldSettingsService {
 	/**
 	 * Delete the underlaying data for the custom fields selected
 	 * @param {string} payload - Contains the list of fields to be remove grouped by domain
-	 * @returns {any}  
+	 * @returns {any}
 	 */
 	deleteCustomFields(payload: any): Observable<any> {
 		return this.http.post(`${this.fieldSettingsUrl}/ASSETS/DELETE`, JSON.stringify(payload))
