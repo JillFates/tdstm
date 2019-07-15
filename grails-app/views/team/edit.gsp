@@ -26,11 +26,11 @@
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Type:</label></td>
 				<td valign="top"
-					class="value">${fieldValue(bean:roleTypeInstance,field:'type')}</td>
+					class="value">${roleTypeInstance?.type}</td>
 			</tr>
 
 
-			<g:if test="${roleTypeInstance.type == 'SECURITY'}">
+			<g:if test="${roleTypeInstance?.type == 'SECURITY'}">
 
 			<tr class="prop">
 				<td valign="top" class="name"><label for="id">Level:</label></td>
