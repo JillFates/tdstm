@@ -60,10 +60,6 @@ class AuthController implements ControllerMethods {
 		response.setHeader('X-Login-URL', '/tdstm/module/auth/login')
 
 		redirect(uri: '/tdstm/module/auth/login')
-
-//		return [username: params.username, authority: params.authority, rememberMe: params.rememberMe != null,
-//		 loginConfig: securityService.getLoginConfig(), buildInfo: environmentService.getVersionText(),
-//		 preLoginList: noticeService.fetchPreLoginNotices()]
 	}
 
 
