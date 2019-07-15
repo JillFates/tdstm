@@ -208,6 +208,11 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
+		"/ws/moveEvent/dashboardModel" {
+			controller = "wsEvent"
+			action = [GET: "getEventDashboardModel"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
