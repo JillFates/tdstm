@@ -679,26 +679,15 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-		Map requestParams = null
-		if (request.format == 'json') {
-			requestParams = request.JSON
-		} else {
-			params.taskDependency = params.list('taskDependency[]')
-			params.taskSuccessor = params.list('taskSuccessor[]')
-			requestParams = params
 
-		}
+		Map requestParams  = request.JSON
+
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, false, flash)
 		if (params.open == "view") {
 			if (map.error) {
 				flash.message = map.error
 			}
 			forward(action: "showComment", params: [id: params.id])
-		} else if (params.view == "myTask") {
-			if (map.error) {
-				flash.message = map.error
-			}
-			forward(action: 'listComment', params: [view: params.view, tab: params.tab])
 		} else if (params.open != "view") {
 			renderAsJson map
 		}
@@ -2015,7 +2004,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.WorkflowView)
 	def retrieveWorkflowTransition() {
 		Project project = securityService.userCurrentProject
-		def format = params.format
 		def assetCommentId = params.assetCommentId
 		AssetComment assetComment = AssetComment.read(assetCommentId)
 		AssetEntity assetEntity = AssetEntity.get(params.assetId)
@@ -2034,16 +2022,28 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			workFlowTransitions.removeAll(existingWorkflows)
 		}
 
-		if (format == 'json') {
-			renderSuccessJson(workFlowTransitions.collect { [ id:it.id, name: it.name] })
-		} else {
-			String result = ''
-			if (workFlowTransitions) {
-				result = HtmlUtil.generateSelect(selectId: 'workFlowId', selectName: 'workFlow', options: workFlowTransitions,
-					firstOption: [value: '', display: ''], optionKey: 'id', optionValue: 'name',
-					optionSelected: assetComment?.workflowTransitionId)
+		withFormat {
+			js {
+				renderSuccessJson(workFlowTransitions.collect { [id: it.id, name: it.name] })
 			}
-			render result
+
+			html {
+				String result = ''
+
+				if (workFlowTransitions) {
+					result = HtmlUtil.generateSelect(
+						selectId: 'workFlowId',
+						selectName: 'workFlow',
+						options: workFlowTransitions,
+						firstOption: [value: '', display: ''],
+						optionKey: 'id',
+						optionValue: 'name',
+						optionSelected: assetComment?.workflowTransitionId
+					)
+				}
+
+				render result
+			}
 		}
 	}
 
@@ -2123,7 +2123,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		//Changing code to populate all select options without checking security roles.
 		def mapKey = 'ALL'//securityService.hasRole([ADMIN.name(),SUPERVISOR.name(),CLIENT_ADMIN.name(),CLIENT_MGR.name()]) ? 'ALL' : 'LIMITED'
 		def optionForRole = statusOptionForRole.get(mapKey)
-		def format = params.format
 		def taskId = params.id
 		def status = taskId ? (AssetComment.read(taskId)?.status?: '*EMPTY*') : AssetCommentStatus.READY
 		def optionList = optionForRole.get(status)
@@ -2131,13 +2130,21 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def selectId = taskId ? "statusEditId" : "statusCreateId"
 		def optionSelected = taskId ? (status != '*EMPTY*' ? status : 'na'): AssetCommentStatus.READY
 
-		if (format == 'json') {
-			renderSuccessJson(optionList)
-		} else {
-			render HtmlUtil.generateSelect(selectId: selectId, selectName: 'statusEditId', options: optionList,
-				selectClass: "task_${optionSelected.toLowerCase()}", optionSelected: optionSelected,
-				javascript: "onChange='this.className=this.options[this.selectedIndex].className'",
-				firstOption: firstOption, optionClass: '')
+		withFormat {
+			js {
+				renderSuccessJson(optionList)
+			}
+
+			html {
+				render HtmlUtil.generateSelect(
+					selectId: selectId,
+					selectName: 'statusEditId',
+					options: optionList,
+					selectClass: "task_${optionSelected.toLowerCase()}", optionSelected: optionSelected,
+					javascript: "onChange='this.className=this.options[this.selectedIndex].className'",
+					firstOption: firstOption, optionClass: ''
+				)
+			}
 		}
 	}
 
@@ -2227,7 +2234,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def predecessorSelectHtml() {
 		Project project = securityService.userCurrentProject
 		def task
-		def format=params.format
 		def moveEventId=params.moveEvent
 
 		if (params.commentId) {
@@ -2239,19 +2245,29 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		def taskList = taskService.search(project, task, moveEventId)
 
-		if (format=='json') {
-			def list = []
-			list << [ id: '', desc: 'Please Select', category: '', taskNumber: '']
-			taskList.list.each {
-				def desc = it.comment?.length()>50 ? it.comment.substring(0,50): it.comment
-				list << [ id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+		withFormat {
+			js {
+				def list = []
+				list << [id: '', desc: 'Please Select', category: '', taskNumber: '']
+
+				taskList.list.each {
+					def desc = it.comment?.length() > 50 ? it.comment.substring(0, 50) : it.comment
+					list << [id: it.id, desc: desc, category: it.category, taskNumber: it.taskNumber]
+				}
+
+				renderSuccessJson(list)
 			}
-			renderSuccessJson(list)
-		} else {
-			// Build the SELECT HTML
-			render HtmlUtil.generateSelect(selectId: task ? 'taskDependencyEditId' : 'taskDependencyId',
-				selectName: params.forWhom, options: taskList.list, optionKey: 'id',
-				firstOption: [value:'', display:'Please Select'])
+
+			html {
+				// Build the SELECT HTML
+				render HtmlUtil.generateSelect(
+					selectId: task ? 'taskDependencyEditId' : 'taskDependencyId',
+					selectName: params.forWhom,
+					options: taskList.list,
+					optionKey: 'id',
+					firstOption: [value: '', display: 'Please Select']
+				)
+			}
 		}
 	}
 
