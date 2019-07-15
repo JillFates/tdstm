@@ -147,6 +147,20 @@ class TaskTimeLineGraphTestHelper {
 			.build()
 	}
 
+	TaskTimeLineGraph createCyclicDirectedGraphWithOneStartAndTwoSinks() {
+
+		return new TaskTimeLineGraph.Builder()
+			.withVertex(1, 'A', 3).addEdgesTo('B', 'C')
+			.withVertex(2, 'B', 4).addEdgeTo('D')
+			.withVertex(3, 'C', 2).addEdgesTo('E', 'F')
+			.withVertex(4, 'D', 5).addEdgesTo('G', 'B')
+			.withVertex(5, 'E', 1).addEdgeTo('G')
+			.withVertex(6, 'F', 2).addEdgeTo('H')
+			.withVertex(7, 'G', 4)
+			.withVertex(8, 'H', 3)
+			.build()
+	}
+
 	/*
 								 +-+
 								 |D|

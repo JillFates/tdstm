@@ -3,7 +3,20 @@ package net.transitionmanager.task.timeline
 
 import groovy.time.TimeCategory
 
+/*
+		TimelineNode Structure definition
+		-----------------------------------------------------------------------
+
+											+----+----------+----+    	es: earliest start
+	taskId: task Identification				| es |  taskId  | ls |  	ef: earliest finish
+											+--------------------+
+	duration: time to complete a task		| ls | duration | lf |		ls: latest start
+											+----+----------+----+		lf: latest finish
+ */
+
 class TimelineNode {
+
+	Integer duration
 
 	Integer earliestStart = 0
 	Integer earliestFinish = 0
@@ -27,14 +40,7 @@ class TimelineNode {
 		earliestStart = earliest
 		latestStart = latest
 
-//		this.duration = vertex.remainingDuration()
-//      if (status in [COMPLETED, TERMINATED]){
-//		return 0
-//	   } else if (vertex.startTime != null) {
-//			return this.duration = duration - ((NOW - actualStart)? :)
-//		} else {
-//			return this.duration
-//		}
+		this.duration = vertex.remainingDurationInMinutes()
 
 		if (vertex.isStart()) {
 			// TODO: dcorrea review this logic.

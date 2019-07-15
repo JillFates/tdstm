@@ -3,17 +3,6 @@ package net.transitionmanager.task.timeline
 import com.tdsops.tm.enums.domain.TimeScale
 import groovy.transform.CompileStatic
 
-/*
-		TaskVertex Structure definition, compound with TaskNode
-		-----------------------------------------------------------------------
-
-											+-----+----------+-----+    	est: earliest start time
-	taskId: task Identification				| est |  taskId  | eet |  		eet: earliest end time
-											+----------------------+
-	duration: time to complete a task		| lst | duration | let |		lst: latest start time
-											+-----+----------+-----+		let: latest end time
- */
-
 @CompileStatic
 class TaskVertex {
 
@@ -63,6 +52,18 @@ class TaskVertex {
 
 	Boolean isPredecessor(TaskVertex taskVertex) {
 		return predecessors.contains(taskVertex)
+	}
+
+	Integer remainingDurationInMinutes() {
+		//      if (status in [COMPLETED, TERMINATED]){
+//		return 0
+//	   } else if (vertex.startTime != null) {
+//			return this.duration = duration - ((NOW - actualStart)? :)
+//		} else {
+//			return this.duration
+//		}
+
+		return duration
 	}
 
 	/**

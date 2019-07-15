@@ -27,13 +27,8 @@ class TimelineTable {
 
 		if (successorNode.earliestStart == 0 || (currentNode.earliestFinish > successorNode.earliestStart)) {
 			successorNode.earliestStart = currentNode.earliestFinish
-			successorNode.earliestFinish = successorNode.earliestStart + successor.duration
+			successorNode.earliestFinish = successorNode.earliestStart + successorNode.duration
 			successorNode.earliestPredecessor = vertex
-
-			if (successor.isSink()) {
-				successorNode.latestFinish = successorNode.earliestFinish
-				successorNode.latestStart = successorNode.latestFinish - successor.duration
-			}
 
 			timesUpdated = true
 		}
@@ -49,7 +44,7 @@ class TimelineTable {
 
 		if (predecessorNode.latestFinish > currentNode.latestStart) {
 			predecessorNode.latestFinish = currentNode.latestStart
-			predecessorNode.latestStart = predecessorNode.latestFinish - predecessor.duration
+			predecessorNode.latestStart = predecessorNode.latestFinish - predecessorNode.duration
 			predecessorNode.latestPredecessor = predecessor
 			timesUpdated = true
 		}
@@ -102,5 +97,13 @@ class TimelineTable {
 			vertex = (TaskVertex) nodesMap[vertex][predecessorField]
 		}
 		return path.reverse()
+	}
+
+	void updateSinkLatestTimes(TaskVertex sink) {
+
+		TimelineNode sinkNode = nodesMap[sink]
+		sinkNode.latestFinish = sinkNode.earliestFinish
+		sinkNode.latestStart = sinkNode.latestFinish - sinkNode.duration
+
 	}
 }

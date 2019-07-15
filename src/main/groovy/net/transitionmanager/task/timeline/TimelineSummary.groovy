@@ -14,10 +14,7 @@ class TimelineSummary {
 	TimelineTable timelineTable
 
 	List<List<TaskVertex>> cycles = []
-	List<TaskVertex> criticalPath
-	List<List<TaskVertex>> earliestPaths
-	List<List<TaskVertex>> latestPaths
-
+	List<TaskVertex> criticalPath = []
 
 	TimelineSummary(Date startDate) {
 		this.startDate = startDate

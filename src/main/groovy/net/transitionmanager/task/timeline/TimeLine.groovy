@@ -43,6 +43,7 @@ class TimeLine {
 
 		for (TaskVertex sink : graph.getSinks()) {
 			GraphPath graphPath = new GraphPath()
+			timelineTable.updateSinkLatestTimes(sink)
 			doDijkstraForLatestTimes(sink, graphPath)
 		}
 
@@ -57,9 +58,8 @@ class TimeLine {
 	private void doDijkstraForLatestTimes(TaskVertex vertex, GraphPath graphPath) {
 		graphPath.push(vertex)
 		for (TaskVertex predecessor : vertex.predecessors) {
-			if (graphPath.visited(predecessor)) {
-				// timelineSummary.cycles.add(graphPath.getCyclePath(vertex))
-			} else if (timelineTable.checkAndUpdateLatestTimes(predecessor, vertex)) {
+			if (!graphPath.visited(predecessor)
+				&& timelineTable.checkAndUpdateLatestTimes(predecessor, vertex)) {
 				doDijkstraForLatestTimes(predecessor, graphPath)
 			}
 		}
