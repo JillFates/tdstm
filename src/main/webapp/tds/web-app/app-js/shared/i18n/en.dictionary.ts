@@ -204,6 +204,11 @@ export const en_DICTIONARY: Object = {
 		'PLURAL_NAME': 'Dependencies',
 		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
+	'EVENT': {
+		'EVENTS': 'Events',
+		'CREATE_EVENT': 'Create Event',
+		'LIST': 'Event List'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',

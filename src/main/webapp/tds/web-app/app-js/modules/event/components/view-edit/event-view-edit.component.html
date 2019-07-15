@@ -29,7 +29,7 @@
                         <tr class="prop">
                             <td valign="top" class="name">Tags:</td>
 
-                            <td valign="top" class="value"><span *ngFor="let tag of savedModel?.tagIds">{{tag.name}}</span></td>
+                            <td valign="top" class="value"><span *ngFor="let tag of savedModel?.tagIds" class="assetTag {{tag.css}}">{{tag.name}}</span></td>
                         </tr>
 
                         <tr class="prop">
@@ -95,7 +95,7 @@
                     </tr>
                     <tr class="prop">
                         <td class="name">
-                            <label for="name">Name: <span class="requiredProp">*</span> </label>
+                            <label for="name">Name: <span class="requiredProp" style="color:red">*</span> </label>
                         </td>
                         <td class="value">
                             <input type="text" id="name" [(ngModel)]="eventModel.name"/>
@@ -198,6 +198,7 @@
                 <div *ngIf="canEditEvent">
                     <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
                     <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteEvent()"></tds-button-delete>
+                    <button class="btn btn-primary pull-left" (click)="confirmMarkAssetsMoved()">Mark Assets Moved</button>
                     <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
                 </div>
             </div>

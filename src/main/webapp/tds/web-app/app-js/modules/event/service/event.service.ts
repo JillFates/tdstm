@@ -72,6 +72,15 @@ export class EventService {
 			.catch((error: any) => error);
 	}
 
+	markAssetsMoved(id): Observable<any> {
+		return this.http.put(`../ws/moveEvent/markAssetsMoved/${id}`,null)
+			.map((response: any) => {
+				let eventModels = response && response.status === 'success' && response.data;
+				return eventModels;
+			})
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * Based on provided column, update the structure which holds the current selected filters
 	 * @param {any} column: Column to filter

@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
+import net.transitionmanager.command.IdsCommand
 import net.transitionmanager.command.event.CreateEventCommand
 import net.transitionmanager.command.tag.ListCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -19,7 +20,9 @@ import net.transitionmanager.project.EventService
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.tag.TagEventService
 import net.transitionmanager.tag.TagService
+import org.springframework.jdbc.core.JdbcTemplate
 
 /**
  * Handles WS calls of the EventService.
@@ -30,10 +33,11 @@ import net.transitionmanager.tag.TagService
 class WsEventController implements ControllerMethods {
 
 	EventService eventService
-
+	JdbcTemplate jdbcTemplate
 	MoveEventService moveEventService
 	MoveBundleService moveBundleService
 	TagService tagService
+	TagEventService tagEventService
 	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.EventView)
@@ -143,7 +147,7 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def saveEvent(String id) {
-		if (id == null) {
+		if (id == null || id == 'null') {
 			CreateEventCommand event = populateCommandObject(CreateEventCommand)
 			Project currentProject = securityService.userCurrentProject
 
@@ -161,10 +165,26 @@ class WsEventController implements ControllerMethods {
 		else {
 			// populate create event command from request
 			CreateEventCommand command = populateCommandObject(CreateEventCommand)
+			Project project = getProjectForWs()
 
 			try {
 				MoveEvent moveEvent = moveEventService.update(id.toLong(), command)
 				moveBundleService.assignMoveEvent(moveEvent, command.moveBundle)
+
+                List tagEventsToDelete = moveEvent.tagEvents.findAll { !command.tagIds.contains( it.tagId ) } // Find all tag event ids to delete
+				List<Long> tagEventIdsToDelete = tagEventsToDelete.collect { it -> it.id }
+                moveEvent.tagEvents.removeAll(tagEventsToDelete)
+                // tagEventsToDelete.clear()
+				if (tagEventIdsToDelete.size() > 0) {
+					tagEventService.removeTags(project, tagEventIdsToDelete)
+				}
+
+				List tagEventTagIds = moveEvent.tagEvents.collect { it -> it.tagId} // Get all the tagIds of the tagEvents
+				List tagIdsToAdd = command.tagIds.findAll { !tagEventTagIds.contains( it )} // Find all tags to add
+
+				if (command.tagIds) {
+					tagEventService.applyTags(project, tagIdsToAdd, moveEvent.id)
+				}
 				flash.message = "MoveEvent '$moveEvent.name' updated"
 				renderSuccessJson()
 			} catch (EmptyResultException e) {
@@ -194,5 +214,37 @@ class WsEventController implements ControllerMethods {
 			flash.message = e
 		}
 		renderSuccessJson()
+	}
+
+	@HasPermission(Permission.AssetEdit)
+	def markEventAssetAsMoved(String id) {
+		def moveEvent = MoveEvent.get(id.toLong())
+		if (!moveEvent) {
+			log.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
+
+			renderErrorJson( 'An unexpected condition with the event occurred that is preventing an update.')
+			return
+		}
+
+		if (!securityService.isCurrentProjectId(moveEvent.project.id)) {
+			log.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
+			renderErrorJson('An unexpected condition with the event occurred that is preventing an update')
+			return
+		}
+
+		int assetAffected = 0
+
+		if (moveEvent.moveBundles) {
+			assetAffected = jdbcTemplate.update("update asset_entity  \
+			set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
+				rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
+				source_chassis_id = target_chassis_id, source_blade_position = target_blade_position, \
+				target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
+				target_chassis_id = null, target_blade_position = null\
+			where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
+				and plan_status != 'Moved' ")
+		}
+
+		renderSuccessJson(assetAffected)
 	}
 }

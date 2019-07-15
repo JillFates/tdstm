@@ -228,6 +228,11 @@ class UrlMappings {
 			action = [POST:"saveEvent"]
 		}
 
+		"/ws/moveEvent/markAssetsMoved/$id" {
+			controller = "wsEvent"
+			action = [PUT:"markEventAssetAsMoved"]
+		}
+
 		"/ws/moveEvent/deleteEvent/$id" {
 			controller = "wsEvent"
 			action = [DELETE:"deleteEvent"]

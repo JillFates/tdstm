@@ -121,12 +121,36 @@ export class EventViewEditComponent implements OnInit {
 		this.savedModel = JSON.parse(JSON.stringify(this.eventModel));
 	}
 
+	public onAssetTagChange(event) {
+		this.eventModel.tagIds = event.tags;
+	}
 
 	public saveForm() {
 		this.eventService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
 			if (result.status === 'success') {
 				this.updateSavedFields();
 				this.editing = false;
+			}
+		});
+	}
+
+	public confirmMarkAssetsMoved() {
+		this.promptService.open(
+			'Confirmation Required',
+			'Change asset locations to targets? (No undo, please backup prior)',
+			'Confirm', 'Cancel')
+			.then(confirm => {
+				if (confirm) {
+					this.markAssetsMoved();
+				}
+			})
+			.catch((error) => console.log(error));
+	}
+
+	public markAssetsMoved() {
+		this.eventService.markAssetsMoved(this.eventId).subscribe((result: any) => {
+			if (result.status === 'success') {
+				alert("wow you did it");
 			}
 		});
 	}
