@@ -12,7 +12,6 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
-import net.transitionmanager.security.RoleType
 
 @Stepwise
 class RecipeTaskGenerationSpec extends GebReportingSpec {
