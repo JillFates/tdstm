@@ -150,24 +150,34 @@ export class FieldSettingsGridComponent implements OnInit {
 			.then((deleteUnderLaying: boolean) => this.notifySaveAll(deleteUnderLaying));
 	}
 
+	/**
+	 * If there is records to be deleted, show the confirmation propmpt dialog asking
+	 * if those fields should be deleted in the back end as well
+	 */
 	private askForDeleteUnderlayingData(): Promise<boolean> {
-		const askPromise =  this.prompt.open(
-			this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-			this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
-			this.translate.transform('GLOBAL.YES'),
-			this.translate.transform('GLOBAL.NO'),
-			true);
+		if (this.fieldsToDelete.length) {
+			return this.prompt.open(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
+				this.translate.transform('GLOBAL.YES'),
+				this.translate.transform('GLOBAL.NO'),
+				true);
+		}
 
-		return this.fieldsToDelete.length ? askPromise : Promise.resolve(true);
+		return Promise.resolve(false);
 	}
 
+	/**
+	 * Notify to the host component about a save all action
+	 * Send the flag to inform about deleting the underlaying data
+	 * @param {boolean} deleteUnderLaying True to delete the underlaying data in the backend
+	 */
 	private notifySaveAll(deleteUnderLaying: boolean): void {
-		console.log('Delete under:', deleteUnderLaying);
-		/*
-		this.saveEmitter.emit(() => {
-			this.reset();
-		});
-		*/
+		const savingInfo = {
+			deleteUnderLaying,
+			callback: () => this.reset()
+		}
+		this.saveEmitter.emit(savingInfo);
 	}
 
 	/**
