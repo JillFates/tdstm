@@ -1,5 +1,5 @@
 // Angular
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -24,7 +24,7 @@ declare var jQuery: any;
 	selector: 'event-list',
 	templateUrl: 'event-list.component.html',
 })
-export class EventListComponent implements OnInit {
+export class EventListComponent implements OnInit, AfterContentInit {
 	protected gridColumns: any[];
 
 	private state: State = {
@@ -72,6 +72,9 @@ export class EventListComponent implements OnInit {
 				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
 			})
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
+	}
+
+	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
 			this.showEvent(this.route.snapshot.queryParams['show']);
 		}
