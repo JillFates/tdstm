@@ -1,6 +1,7 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.asset.AssetEntityService
@@ -361,4 +362,22 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
         def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
         renderAsJson(customColumns: existingColsMap, assetCommentFields: assetCommentFields)
     }
+
+	/**
+	 * Retrieve the information required by the front-end for rendering the Action Bar for a given Task.
+	 * @param taskId - the id of the task.
+	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
+	 *  successors and predecessors.
+	 */
+	@HasPermission(Permission.TaskManagerView)
+	def getInfoForActionBar(Long taskId) {
+		Project project = getProjectForWs()
+		AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
+		renderAsJson(
+			apiActionId: task.apiAction?.id,
+			assignedTo: task.assignedTo?.id,
+			predecessorsCount: task.taskDependencies.size(),
+			successorsCount: TaskDependency.countByPredecessor(task)
+		)
+	}
 }
