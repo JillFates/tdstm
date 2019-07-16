@@ -266,6 +266,11 @@
                             <li class="menu-child-item menu-parent-planning-event-list">
                                 <g:link controller="module" action="event" id="list">List Events</g:link>
                             </li>
+                            <g:if test="${currProject && moveEvent}">
+                                <li class="menu-child-item menu-parent-planning-event-detail-list">
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">${moveEvent.name} Event Details</a>
+                                </li>
+                            </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">
                                 <li class="menu-child-item menu-parent-planning-event-news">
                                     <g:link controller="newsEditor">List Event News</g:link>

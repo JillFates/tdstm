@@ -178,7 +178,7 @@ class WsEventController implements ControllerMethods {
                 List tagEventsToDelete = moveEvent.tagEvents.findAll { !command.tagIds.contains( it.tagId ) } // Find all tag event ids to delete
 				List<Long> tagEventIdsToDelete = tagEventsToDelete.collect { it -> it.id }
                 moveEvent.tagEvents.removeAll(tagEventsToDelete)
-                // tagEventsToDelete.clear()
+				
 				if (tagEventIdsToDelete.size() > 0) {
 					tagEventService.removeTags(project, tagEventIdsToDelete)
 				}

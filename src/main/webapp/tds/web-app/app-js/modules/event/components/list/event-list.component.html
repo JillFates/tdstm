@@ -1,5 +1,5 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid api-action-list-component">
+<div class="content body tds-kendo-grid event-list-component">
     <section>
         <div *ngIf="eventColumnModel">
             <div class="box-body box-with-empty-header">
@@ -19,7 +19,7 @@
                         (cellClick)="cellClick($event)"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <tds-button-create (click)="openEventDialogCreate()" [title]="'EVENT.CREATE_EVENT' | translate">
+                        <tds-button-create *ngIf="canEditEvent" style="margin-left: 15px; margin-top: 2px; margin-bottom: 2px;" (click)="openEventDialogCreate()" [title]="'EVENT.CREATE_EVENT' | translate">
                         </tds-button-create>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>

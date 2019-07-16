@@ -37,7 +37,7 @@
 
                             <td valign="top" class="value">
                                 <ul>
-                                    <li *ngFor="let bundle of savedModel?.moveBundle"><a>{{bundle.name}}</a></li>
+                                    <li *ngFor="let bundle of savedModel?.moveBundle"><a routerLink="bundle/list" [queryParams]="{'show':bundle.id}">{{bundle.name}}</a></li>
                                 </ul>
                             </td>
                         </tr>
@@ -199,8 +199,8 @@
                     <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
                     <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteEvent()"></tds-button-delete>
                     <button class="btn btn-primary pull-left" (click)="confirmMarkAssetsMoved()">Mark Assets Moved</button>
-                    <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
                 </div>
+                <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
             </div>
         </div>
     </div>

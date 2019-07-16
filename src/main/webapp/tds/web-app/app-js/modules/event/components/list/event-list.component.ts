@@ -1,5 +1,5 @@
 // Angular
-import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -9,12 +9,11 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 // Models
 import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
 // Kendo
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
 import {EventColumnModel, EventModel} from '../../model/event.model';
-import {EventService} from '../../service/event.service';
+import {EventsService} from '../../service/events.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {EventCreateComponent} from '../create/event-create.component';
 import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
@@ -48,11 +47,12 @@ export class EventListComponent implements OnInit {
 	public resultSet: EventModel[];
 	public selectedRows = [];
 	public dateFormat = '';
+	public canEditEvent = false;
 
 	constructor(
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private eventService: EventService,
+		private eventsService: EventsService,
 		private prompt: UIPromptService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
@@ -71,6 +71,10 @@ export class EventListComponent implements OnInit {
 				this.eventColumnModel = new EventColumnModel(`{0:${dateFormat}}`);
 				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
 			})
+		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
+		if (this.route.snapshot.queryParams['show']) {
+			this.showEvent(this.route.snapshot.queryParams['show']);
+		}
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -84,12 +88,12 @@ export class EventListComponent implements OnInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.eventService.filterColumn(column, this.state);
+		const root = this.eventsService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		this.eventService.clearFilter(column, this.state);
+		this.eventsService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
@@ -97,15 +101,14 @@ export class EventListComponent implements OnInit {
 	 * Catch the Selected Row
 	 * @param {SelectionEvent} event
 	 */
-	/* protected cellClick(event: CellClickEvent): void {
+	protected cellClick(event: CellClickEvent): void {
 		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openEventDialogViewEdit(event['dataItem'], ActionType.VIEW);
+			this.showEvent(event['dataItem'].id);
 		}
-	}*/
+	}
 
 	protected reloadData(): void {
-		this.eventService.getEvents().subscribe(
+		this.eventsService.getEventsForList().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -124,7 +127,7 @@ export class EventListComponent implements OnInit {
 		this.renderer.setStyle(target, 'height', '36px');
 	}
 
-	private openEventDialogCreate(): void {
+	protected openEventDialogCreate(): void {
 		this.dialogService.open(EventCreateComponent, []).then(result => {
 			// update the list to reflect changes, it keeps the filter
 			this.reloadData();
@@ -133,7 +136,7 @@ export class EventListComponent implements OnInit {
 		});
 	}
 
-	private selectRow(dataItemId: number): void {
+	protected selectRow(dataItemId: number): void {
 		this.selectedRows = [];
 		this.selectedRows.push(dataItemId);
 	}
