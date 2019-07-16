@@ -95,7 +95,7 @@ class UserService implements ServiceMethods {
 
 		boolean autoProvision = domain.autoProvision
 		Long defaultProject = domain.defaultProject
-		String defaultRole = 'ROLE_' + domain.defaultRole ?: ''
+		String defaultRole = RoleType.ROLE_PREFIX + domain.defaultRole ?: ''
 		String defaultTimezone = domain.defaultTimezone ?: ''
 
 		PartyGroup company = PartyGroup.get(userInfo.companyId)

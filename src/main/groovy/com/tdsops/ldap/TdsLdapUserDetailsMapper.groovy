@@ -7,6 +7,7 @@ import grails.core.support.GrailsApplicationAware
 import groovy.util.logging.Slf4j
 import net.transitionmanager.exception.NoRolesException
 import net.transitionmanager.person.UserService
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.ldap.core.DirContextAdapter
@@ -72,12 +73,12 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
             }
             ldapRoles.each { String role ->
                 if (roleMap.containsKey(role)) {
-                    roles.add('ROLE_' + roleMap.get(role).toUpperCase())
+                    roles.add(RoleType.ROLE_PREFIX + roleMap.get(role).toUpperCase())
                 }
             }
         } else {
             if (domain.defaultRole) {
-                roles.add('ROLE_' + domain.defaultRole.toUpperCase())
+                roles.add(RoleType.ROLE_PREFIX + domain.defaultRole.toUpperCase())
             }
         }
 
