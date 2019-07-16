@@ -65,7 +65,7 @@
                         <div class="dashboard-bar-graph" [style.width]="planningDashboardModel.analysis.assignedAppPerc+'%'"></div>
                         <div class="percentage-bar-text">
                             <b> {{planningDashboardModel.analysis.assignedAppPerc}}% </b>
-                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'Assigned'}">Applications Assigned</a>
+                            <a [routerLink]="['/asset','views',7,'show']" [queryParams]="{common_planStatus:'=Assigned'}">Applications Assigned</a>
                         </div>
 
                     </td>
@@ -111,12 +111,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod:'Unknown', _ufp: 'true'}">{{planningDashboardModel.analysis.activeTasks}}</a></td>
-                        <td><a [routerLink]="['/asset','views',7,'show']" [queryParams]="{_planMethod:'Unknown', _ufp: 'true'}">Active Tasks</a></td>
+                        <td><a href="/tdstm/assetEntity/listTasks?filter=analysisIssue&moveEvent=0&justRemaining=0">{{planningDashboardModel.analysis.activeTasks}}</a></td>
+                        <td><a href="/tdstm/assetEntity/listTasks?filter=analysisIssue&moveEvent=0&justRemaining=0">Active Tasks</a></td>
                     </tr>
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
-                        <td><a href="/tdstm/application/list?filter=dueOpenIssue&planMethodology=Unknown&ufp=true">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
-                        <td><a href="/tdstm/application/list?filter=dueOpenIssue&planMethodology=Unknown&ufp=true">Overdue Tasks</a></td>
+                        <td><a href="/tdstm/assetEntity/listTasks?filter=generalOverDue&moveEvent=0&justRemaining=1">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
+                        <td><a href="/tdstm/assetEntity/listTasks?filter=generalOverDue&moveEvent=0&justRemaining=1">Overdue Tasks</a></td>
                     </tr>
                 </table>
             </div>

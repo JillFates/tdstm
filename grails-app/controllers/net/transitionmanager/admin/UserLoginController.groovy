@@ -108,8 +108,8 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 			FROM person p
 			LEFT OUTER JOIN party_role pr on p.person_id=pr.party_id
 			LEFT OUTER JOIN user_login u on u.person_id=p.person_id
-			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='ROLE_STAFF'
-				AND role_type_code_from_id='ROLE_COMPANY' AND role_type_code_to_id='ROLE_STAFF' AND party_id_to_id=p.person_id
+			LEFT OUTER JOIN party_relationship r ON r.party_relationship_type_id='STAFF'
+				AND role_type_code_from_id='$RoleType.CODE_PARTY_COMPANY' AND role_type_code_to_id='$RoleType.CODE_PARTY_STAFF' AND party_id_to_id=p.person_id
 			LEFT OUTER JOIN party_group pg ON pg.party_group_id=r.party_id_from_id
 			WHERE u.active = :ulActive """)
 
@@ -205,7 +205,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		}
 
 		List roleList = RoleType.where {
-            type == RoleType.SECURITY
+            type == RoleType.TYPE_SECURITY
         }.list()
 
 		String cellValue = [
@@ -262,7 +262,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		def availableRoles = securityService.getAvailableRoles(person)
 		def assignedRoles = securityService.getAssignedRoles(person)
         def roleList = RoleType.where {
-            type == RoleType.SECURITY
+            type == RoleType.TYPE_SECURITY
         }.list()
 		def projectList = personService.getAvailableProjects(person, null, false, new Date() - 30)
 		def projectId = userPreferenceService.getPreference(editUser, PREF.CURR_PROJ)
@@ -344,7 +344,7 @@ class UserLoginController implements ControllerMethods, PaginationMethods {
 		UserLogin createUser = new UserLogin(params)
 		createUser.expiryDate = new Date(System.currentTimeMillis() + 7776000000) // 3 Months
         def roleList = RoleType.where {
-            type == RoleType.SECURITY
+            type == RoleType.TYPE_SECURITY
         }.list()
 
         Person currentPerson = securityService.userLoginPerson

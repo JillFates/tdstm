@@ -1,5 +1,5 @@
 import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {EventService} from '../../service/event.service';
+import {EventsService} from '../../service/events.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -24,7 +24,7 @@ export class EventViewEditComponent implements OnInit {
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
-		private eventService: EventService,
+		private eventsService: EventsService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
@@ -44,7 +44,7 @@ export class EventViewEditComponent implements OnInit {
 			runbookStatus: '',
 			runbookBridge1: '',
 			runbookBridge2: '',
-			videoLink: '',
+			videolink: '',
 			estStartTime: '',
 			estCompletionTime: '',
 			apiActionBypass: false
@@ -68,7 +68,7 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	private deleteEvent() {
-		this.eventService.deleteEvent(this.eventId)
+		this.eventsService.deleteEvent(this.eventId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
 					this.activeDialog.close(result);
@@ -87,7 +87,7 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	private getModel(id) {
-		this.eventService.getModelForEventViewEdit(id)
+		this.eventsService.getModelForEventViewEdit(id)
 			.subscribe((result) => {
 				let data = result;
 				let eventModel = this.eventModel;
@@ -101,7 +101,7 @@ export class EventViewEditComponent implements OnInit {
 				this.availableBundles = data.availableBundles;
 				this.availableTags = data.tags;
 				this.runbookStatuses = data.runbookStatuses;
-				if(data.selectedTags) {
+				if (data.selectedTags) {
 					data.selectedTags.forEach((item) => {
 						this.availableTags.forEach((availableTag) => {
 							if (item.id === availableTag.id) {
@@ -126,12 +126,25 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.eventService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.updateSavedFields();
-				this.editing = false;
-			}
-		});
+		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime)) {
+			this.eventsService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.updateSavedFields();
+					this.editing = false;
+				}
+			});
+		}
+	}
+
+	private validateTimes(startTime: Date, completionTime: Date): boolean {
+		if (!startTime || !completionTime) {
+			return true;
+		} else if (startTime > completionTime) {
+			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	public confirmMarkAssetsMoved() {
@@ -148,9 +161,9 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	public markAssetsMoved() {
-		this.eventService.markAssetsMoved(this.eventId).subscribe((result: any) => {
+		this.eventsService.markAssetsMoved(this.eventId).subscribe((result: any) => {
 			if (result.status === 'success') {
-				alert("wow you did it");
+				alert('Assets successfully marked as moved.');
 			}
 		});
 	}

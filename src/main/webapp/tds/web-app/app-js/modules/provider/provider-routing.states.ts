@@ -5,7 +5,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {ProvidersResolveService} from './resolve/providers-resolve.service';
 // Services
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {ProviderListComponent} from './components/list/provider-list.component';
 

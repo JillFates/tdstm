@@ -7,13 +7,14 @@ export const Paths = {
 };
 
 export const TDSAppRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: 'security'},
+	{path: '', pathMatch: 'full', redirectTo: 'auth'},
 	{path: 'security', loadChildren: '../modules/security/security.module#SecurityModule'},
 	{path: 'tag', loadChildren: '../modules/assetTags/asset-tags.module#AssetTagsModule'},
 	{path: 'assetcomment', loadChildren: '../modules/assetComment/asset-comment.module#AssetCommentModule'},
 	{path: 'assetsummary', loadChildren: '../modules/assetSummary/asset-summary.module#AssetSummaryModule'},
 	{path: 'asset', loadChildren: '../modules/assetManager/asset-manager.module#AssetManagerModule'},
 	{path: 'event', loadChildren: '../modules/event/event.module#EventModule'},
+	{path: 'bundle', loadChildren: '../modules/bundle/bundle.module#BundleModule'},
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},
 	{path: 'planning', loadChildren: '../modules/planning/planning.module#PlanningModule'},

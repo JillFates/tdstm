@@ -8,18 +8,13 @@ import com.tdssrc.grails.StringUtil
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEventStaff
-import net.transitionmanager.party.Party
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.party.PartyRelationship
-import net.transitionmanager.party.PartyRelationshipType
-import net.transitionmanager.party.PartyRole
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
 import net.transitionmanager.security.RoleType
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -81,7 +76,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return the PartyRelationship that was created or null if the creation failed
 	 */
 	PartyRelationship assignClientToCompany(PartyGroup client, PartyGroup company) {
-		savePartyRelationship("CLIENTS", company, "ROLE_COMPANY", client, "ROLE_CLIENT")
+		savePartyRelationship("CLIENTS", company, RoleType.CODE_PARTY_COMPANY, client, RoleType.CODE_PARTY_CLIENT)
 	}
 
 	/**
@@ -91,7 +86,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return the PartyRelationship that was created or null if the creation failed
 	 */
 	PartyRelationship assignPartnerToCompany(PartyGroup partner, PartyGroup company) {
-		savePartyRelationship("PARTNERS", company, "ROLE_COMPANY", partner, "ROLE_PARTNER")
+		savePartyRelationship("PARTNERS", company, RoleType.CODE_PARTY_COMPANY, partner, RoleType.CODE_PARTY_PARTNER)
 	}
 
 	/**
@@ -101,7 +96,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return the PartyRelationship that was created or null if the creation failed
 	 */
 	PartyRelationship assignPartnerToProject(PartyGroup partner, Project project) {
-		savePartyRelationship("PROJ_PARTNER", project, "ROLE_PROJECT", partner, "ROLE_PARTNER")
+		savePartyRelationship("PROJ_PARTNER", project, RoleType.CODE_PARTY_PROJECT, partner, RoleType.CODE_PARTY_PARTNER)
 	}
 
 	/**
@@ -112,10 +107,10 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<PartyRelationship> getCompanyClients(Party company, String sortOn = 'name') {
 		List<PartyRelationship> clients = PartyRelationship.findAllWhere(
-				partyRelationshipType: PartyRelationshipType.load('CLIENTS'),
-				partyIdFrom: company,
-				roleTypeCodeFrom: RoleType.load('ROLE_COMPANY'),
-				roleTypeCodeTo: RoleType.load('ROLE_CLIENT'))
+			partyRelationshipType: PartyRelationshipType.load('CLIENTS'),
+			partyIdFrom: company,
+			roleTypeCodeFrom: RoleType.load(RoleType.CODE_PARTY_COMPANY),
+			roleTypeCodeTo: RoleType.load(RoleType.CODE_PARTY_CLIENT))
 
 		if (clients && sortOn) {
 			//OLB: Check the imports, some Functional programming Magic
@@ -132,10 +127,10 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<PartyRelationship> getCompanyPartners(Party company, String sortOn = 'name') {
 		List<PartyRelationship> partners = PartyRelationship.findAllWhere(
-				partyRelationshipType: PartyRelationshipType.load('PARTNERS'),
-				partyIdFrom: company,
-				roleTypeCodeFrom: RoleType.load('ROLE_COMPANY'),
-				roleTypeCodeTo: RoleType.load('ROLE_PARTNER'))
+			partyRelationshipType: PartyRelationshipType.load('PARTNERS'),
+			partyIdFrom: company,
+			roleTypeCodeFrom: RoleType.load(RoleType.CODE_PARTY_COMPANY),
+			roleTypeCodeTo: RoleType.load(RoleType.CODE_PARTY_PARTNER))
 
 		if (partners && sortOn) {
 			partners.sort { it.partyIdTo[sortOn] }
@@ -152,13 +147,13 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<Party> getProjectPartners(Project project, String sortOn = 'name') {
 
-		List<Party> partners = Party.executeQuery('''
+		List<Party> partners = Party.executeQuery("""
 			select pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType = 'PROJ_PARTNER'
 			  and pr.partyIdFrom = :project
-			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-			  and pr.roleTypeCodeTo = 'ROLE_PARTNER'
-		''', [project: project])
+			  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+			  and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_PARTNER'
+		""".toString(), [project: project])
 
 		if (partners && sortOn) {
 			partners.sort { it[sortOn] }
@@ -175,14 +170,14 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<Person> getCompanyStaff(company, boolean includeDisabled = false) {
 		company = StringUtil.toLongIfString(company)
-		def list = Person.executeQuery('''
+		def list = Person.executeQuery("""
 			from Person where id in (select partyIdTo.id from PartyRelationship
 				where partyRelationshipType = 'STAFF'
 					and partyIdFrom.id = :companyId
-					and roleTypeCodeFrom = 'ROLE_COMPANY'
-					and roleTypeCodeTo = 'ROLE_STAFF')
+					and roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+					and roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF')
 			order by lastName, firstName
-		''', [companyId: company instanceof Long ? company : company.id])
+		""".toString(), [companyId: company instanceof Long ? company : company.id])
 
 		if (includeDisabled) {
 			list
@@ -203,7 +198,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return The PartyRelationship record or null if it failed
 	 */
 	PartyRelationship addCompanyStaff(Party company, Person person) {
-		updatePartyRelationshipPartyIdFrom('STAFF', company, 'ROLE_COMPANY', person, 'ROLE_STAFF')
+		updatePartyRelationshipPartyIdFrom('STAFF', company, RoleType.CODE_PARTY_COMPANY, person, RoleType.CODE_PARTY_STAFF)
 	}
 
 	/*
@@ -213,7 +208,7 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return The PartyRelationship record or null if it failed
 	 */
 	PartyRelationship addProjectStaff(Project project, Person person) {
-		updatePartyRelationshipPartyIdFrom('PROJ_STAFF', project, 'ROLE_PROJECT', person, 'ROLE_STAFF')
+		updatePartyRelationshipPartyIdFrom('PROJ_STAFF', project, RoleType.CODE_PARTY_PROJECT, person, RoleType.CODE_PARTY_STAFF)
 	}
 
 	/**
@@ -270,10 +265,10 @@ class PartyRelationshipService implements ServiceMethods {
 				from PartyRelationship
 				where partyRelationshipType = :relationshipType
 				  and partyIdFrom.id = :partyIdFromId
-				  and partyIdTo.id = :partyIdTo
+				  and partyIdTo.id = :partyIdToId
 				  and roleTypeCodeFrom = :roleTypeIdFrom
 				  and roleTypeCodeTo = :roleTypeIdTo
-			''', [relationshipType: relationshipType, roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo,
+			''', [relationshipType: PartyRelationshipType.load(relationshipType), roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo),
 			      partyIdFromId: NumberUtil.toLong(partyIdFrom), partyIdToId: NumberUtil.toLong(partyIdTo)], [max: 1])[0]
 
 			// condition to check whether relationship has changed or not
@@ -284,8 +279,8 @@ class PartyRelationshipService implements ServiceMethods {
 					  and partyIdFrom.id = :partyIdFromId
 					  and roleTypeCodeFrom = :roleTypeIdFrom
 					  and roleTypeCodeTo = :roleTypeIdTo
-				''', [relationshipType: relationshipType, partyIdFromId: NumberUtil.toLong(partyIdFrom),
-				      roleTypeIdFrom: roleTypeIdFrom, roleTypeIdTo: roleTypeIdTo], [max: 1])[0]
+				''', [relationshipType: PartyRelationshipType.load(relationshipType), partyIdFromId: NumberUtil.toLong(partyIdFrom),
+				      roleTypeIdFrom: RoleType.load(roleTypeIdFrom), roleTypeIdTo: RoleType.load(roleTypeIdTo)], [max: 1])[0]
 
 				if (otherRelationship) {
 					otherRelationship.delete(flush:true)
@@ -293,9 +288,9 @@ class PartyRelationshipService implements ServiceMethods {
 
 				new PartyRelationship(
 						partyRelationshipType: PartyRelationshipType.load(relationshipType),
-						partyIdFrom: Party.load(NumberUtil.toLong(partyIdFrom)),
+						partyIdFrom: Party.load(partyIdFrom),
 						roleTypeCodeFrom: RoleType.load(roleTypeIdFrom),
-						partyIdTo: Party.load(NumberUtil.toLong(partyIdTo)),
+						partyIdTo: Party.load(partyIdTo),
 						roleTypeCodeTo: RoleType.load(roleTypeIdTo),
 						statusCode: 'ENABLED').save()
 			}
@@ -349,16 +344,16 @@ class PartyRelationshipService implements ServiceMethods {
 		List<PartyRelationship> projectStaff = PartyRelationship.findAllWhere(
 				partyRelationshipType: PartyRelationshipType.load('PROJ_STAFF'),
 				partyIdFrom: Party.load(NumberUtil.toLong(projectId)),
-				roleTypeCodeFrom: RoleType.load('ROLE_PROJECT'))
+				roleTypeCodeFrom: RoleType.load(RoleType.CODE_PARTY_PROJECT))
 
 		for (PartyRelationship staff in projectStaff) {
-			def company = PartyRelationship.executeQuery('''
+			def company = PartyRelationship.executeQuery("""
 				select pr.partyIdFrom from PartyRelationship pr
 				where pr.partyRelationshipType = 'STAFF'
 				  and pr.partyIdTo = :partyTo
-				  and pr.roleTypeCodeFrom = 'ROLE_COMPANY'
-				  and pr.roleTypeCodeTo = 'ROLE_STAFF'
-			''', [partyTo: staff.partyIdTo], [max: 1])[0]
+				  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+				  and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+			""".toString(), [partyTo: staff.partyIdTo], [max: 1])[0]
 
 			list << [company: company, name: staff.partyIdTo.toString(),
 			         role: staff.roleTypeCodeTo, staff: staff.partyIdTo]
@@ -374,13 +369,13 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<Person> getAllCompaniesStaffPersons(companies) {
 
-		Person.executeQuery('''
+		Person.executeQuery("""
 			select pr.partyIdTo from PartyRelationship pr
 			where pr.partyRelationshipType='STAFF'
 			  AND pr.partyIdFrom IN (:companies)
-			  AND pr.roleTypeCodeFrom='ROLE_COMPANY'
-			  AND pr.roleTypeCodeTo='ROLE_STAFF'
-		''', [companies: CollectionUtils.asList(companies)], [sort: 'partyIdTo'])
+			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_COMPANY'
+			  AND pr.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF'
+		""".toString(), [companies: CollectionUtils.asList(companies)], [sort: 'partyIdTo'])
 
 		// def persons = staffing*.partyIdTo
 
@@ -395,12 +390,12 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return  maps with the following properties [company, staff, name, role]
 	 */
 	List<Map> getAvailableProjectStaff(Project project, excludeStaff = null, boolean clientStaffOnly = false) {
-		String query = '''
+		String query = """
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom = :project
-			  and roleTypeCodeFrom = 'ROLE_PROJECT'
-			'''
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+			"""
 		Map args = [project: project]
 
 		// Filter out staff if specified
@@ -426,9 +421,9 @@ class PartyRelationshipService implements ServiceMethods {
             where \
             	p.partyRelationshipType = 'PROJ_PARTNER' and \
                 p.partyIdTo = :party and \
-                p.roleTypeCodeFrom = 'ROLE_PROJECT' and \
-                p.roleTypeCodeTo = 'ROLE_PARTNER'\
-            "
+                p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT' and \
+                p.roleTypeCodeTo = '$RoleType.CODE_PARTY_PARTNER'\
+            ".toString()
 
         def dependents = PartyRelationship.findAll( query, [party:party] )
         List<Project> projects = dependents.collect{ it.partyIdFrom }
@@ -463,20 +458,20 @@ class PartyRelationshipService implements ServiceMethods {
 	def getProjectTeamStaff(project, teamMembers) {
 		def list = []
 		if (teamMembers) {
-			List<PartyRelationship> relationships = PartyRelationship.executeQuery('''
+			List<PartyRelationship> relationships = PartyRelationship.executeQuery("""
 				from PartyRelationship
 				where partyRelationshipType = 'PROJ_STAFF'
 				  and partyIdFrom = :partyIdFrom
-				  and roleTypeCodeFrom = 'ROLE_PROJECT'
+				  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
 				  and partyIdTo in (:team)
-				''', [team: teamMembers.collect { "'" + it + "'" }.join(','), partyIdFrom: project])
+				""".toString(), [team: teamMembers.collect { "'" + it + "'" }.join(','), partyIdFrom: project])
 
 			for (PartyRelationship staff in relationships) {
 				def company = PartyRelationship.findWhere(
-						partyRelationshipType: PartyRelationshipType.load('STAFF'),
-						partyIdTo: staff.partyIdTo,
-						roleTypeCodeFrom: RoleType.load('ROLE_COMPANY'),
-						roleTypeCodeTo: RoleType.load('ROLE_STAFF'))
+					partyRelationshipType: PartyRelationshipType.load('STAFF'),
+					partyIdTo: staff.partyIdTo,
+					roleTypeCodeFrom: RoleType.load(RoleType.CODE_PARTY_COMPANY),
+					roleTypeCodeTo: RoleType.load(RoleType.CODE_PARTY_STAFF))
 				list << [company: company.partyIdFrom, name: staff.toString(),
 				         role: staff.roleTypeCodeTo, staff: staff.partyIdTo]
 			}
@@ -493,46 +488,46 @@ class PartyRelationshipService implements ServiceMethods {
 		def list = []
 		Project project = Project.get(projectId)
 
-		def projectCompanyQuery = '''
+		def projectCompanyQuery = """
 			select pr.partyIdTo
 			from PartyRelationship pr
 			where pr.partyRelationshipType in ('PROJ_CLIENT','PROJ_COMPANY','PROJ_PARTNER','PROJ_VENDOR')
 			  and pr.partyIdFrom = $projectId
-			  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-		'''
+			  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+		"""
 
-		def query = '''
+		def query = """
 			from PartyRelationship p
 			where p.partyRelationshipType = 'STAFF'
 			  and (p.partyIdFrom in ($projectCompanyQuery) or p.partyIdFrom = $project.client.id)
-			  and p.roleTypeCodeFrom = 'ROLE_COMPANY'
-			  and p.roleTypeCodeTo = 'STAFF'
-		'''
+			  and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+			  and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+		"""
 
 		if (generate) {
 			return PartyRelationship.findAll(query)
 		}
 
 		if (!all) {
-			def projectStaffQuery = '''
+			def projectStaffQuery = """
 				select pr.partyIdTo
 				from PartyRelationship pr
 				where pr.partyRelationshipType = 'PROJ_STAFF'
 				  and pr.partyIdFrom = :projectId
-				  and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-			'''
+				  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+			"""
 			query += ' and  p.partyIdTo not in (' + projectStaffQuery + ')'
 			args.projectId = projectId
 		}
 
 		PartyRelationship.executeQuery(query).each { staff ->
-			def company = PartyRelationship.findAll('''
+			def company = PartyRelationship.findAll("""
 				from PartyRelationship p
 				where p.partyRelationshipType = 'STAFF'
 				  and p.partyIdTo = $staff.partyIdTo.id
-				  and p.roleTypeCodeFrom = 'ROLE_COMPANY'
-				  and p.roleTypeCodeTo = 'ROLE_STAFF'
-			''', [:])
+				  and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+				  and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+			""".toString(), [:])
 			list << [company: company.partyIdFrom, staff: staff.partyIdTo,
 			         name: staff.partyIdTo.firstName + " " + staff.partyIdTo.lastName]
 		}
@@ -550,7 +545,7 @@ class PartyRelationshipService implements ServiceMethods {
 		if (project) {
 			companies = PartyRelationship.where {
 				partyIdFrom == project
-				roleTypeCodeFrom.id == RoleType.PROJECT
+				roleTypeCodeFrom.id == RoleType.TYPE_PROJECT
 				partyRelationshipType.id in ['PROJ_CLIENT', 'PROJ_COMPANY', 'PROJ_VENDOR', 'PROJ_PARTNER']
 			}.projections {property('partyIdTo')}.list()
 
@@ -567,28 +562,28 @@ class PartyRelationshipService implements ServiceMethods {
 
 	void createBundleTeamMembers(ProjectTeam projectTeam, teamMemberIds) {
 		for (teamMemberId in teamMemberIds) {
-			savePartyRelationship("PROJ_TEAM", projectTeam, "ROLE_TEAM", Party.load(teamMemberId), "ROLE_TEAM_MEMBER")
+			savePartyRelationship("PROJ_TEAM", projectTeam, RoleType.CODE_PARTY_TEAM, Party.load(teamMemberId), RoleType.CODE_TEAM_MEMBER)
 		}
 	}
 
 	List<Map<String, Object>> getBundleTeamMembers(ProjectTeam bundleTeam) {
 		List<Map<String, Object>> members = []
 
-		PartyRelationship.executeQuery('''
+		PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_TEAM'
 			  and partyIdFrom = :team
-			  and roleTypeCodeFrom = 'ROLE_TEAM'
-		''', [team: bundleTeam]).each { PartyRelationship team ->
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_TEAM'
+		""".toString(), [team: bundleTeam]).each { PartyRelationship team ->
 
 			Person person = (Person)team.partyIdTo
-			def company = PartyRelationship.executeQuery('''
+			def company = PartyRelationship.executeQuery("""
 				select p.partyIdFrom from PartyRelationship p
 				where p.partyRelationshipType = 'STAFF'
 				and p.partyIdTo = :person
-				and p.roleTypeCodeFrom = 'ROLE_COMPANY'
-				and p.roleTypeCodeTo = 'ROLE_STAFF'
-			''', [person: person])
+				and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+				and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+			""".toString(), [person: person])
 
 			members << [company: company, name: person.firstName + ' ' + person.lastName,
 			            role: team.roleTypeCodeTo, staff: person, id: person?.id]
@@ -602,27 +597,27 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	def getAvailableTeamMembers(long projectId, ProjectTeam projectTeam) {
 		def list = []
-		List<PartyRelationship> projectStaff = PartyRelationship.executeQuery('''
+		List<PartyRelationship> projectStaff = PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id = :projectId
-			  and roleTypeCodeFrom = 'ROLE_PROJECT'
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
 			  and partyIdTo not in (select pr.partyIdTo from PartyRelationship pr
 			                        where pr.partyRelationshipType = 'PROJ_TEAM'
 			                          and pr.partyIdFrom = :projectTeam
-			                          and pr.roleTypeCodeFrom = 'ROLE_TEAM')
-		''', [projectId: projectId, projectTeam: projectTeam])
+			                          and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_TEAM')
+		""".toString(), [projectId: projectId, projectTeam: projectTeam])
 
 		for (PartyRelationship staff in projectStaff) {
 			Person person = (Person) staff.partyIdTo
-			def company = PartyRelationship.executeQuery('''
+			def company = PartyRelationship.executeQuery("""
 				select pr.partyIdFrom
 				from PartyRelationship pr
 				where pr.partyRelationshipType = 'STAFF'
 				  and pr.partyIdTo = :person
-				  and pr.roleTypeCodeFrom = 'ROLE_COMPANY'
-				  and pr.roleTypeCodeTo = 'ROLE_STAFF'
-			''', [:])
+				  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+				  and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+			""".toString(), [:])
 			list << [company: company, name: person.firstName + ' ' + person.lastName,
 			         role: staff.roleTypeCodeTo, staff: person]
 		}
@@ -660,24 +655,24 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	String getTeamMemberNames(ProjectTeam projectTeam) {
 
-		List<Person> teamMembers = Person.executeQuery('''
+		List<Person> teamMembers = Person.executeQuery("""
 			select pr.partyIdTo
 			from PartyRelationship pr
 			where pr.partyIdFrom = :projectTeam
-			  and pr.roleTypeCodeTo = 'ROLE_TEAM_MEMBER'
-		''', ["projectTeam": projectTeam])
+			  and pr.roleTypeCodeTo = '$RoleType.CODE_TEAM_MEMBER'
+		""".toString(), ["projectTeam": projectTeam])
 
 		teamMembers.collect { Person p -> p.firstName << ' ' << p.lastName }.join('/')
 	}
 
 	List<PartyRelationship> getTeamMembers(ProjectTeam team) {
-		PartyRelationship.executeQuery('''
+		PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_TEAM'
-			  and roleTypeCodeFrom = 'ROLE_TEAM'
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_TEAM'
 			  and partyIdFrom = :team
-			  and roleTypeCodeTo = 'ROLE_TEAM_MEMBER'
-		''', [team: team])
+			  and roleTypeCodeTo = '$RoleType.CODE_TEAM_MEMBER'
+		""".toString(), [team: team])
 	}
 
 	/**
@@ -699,15 +694,15 @@ class PartyRelationshipService implements ServiceMethods {
 		    staffId: staff instanceof Long ? staff : staff.id
 		]
 
-		StringBuilder query = new StringBuilder('''
+		StringBuilder query = new StringBuilder("""
 			select pr.roleTypeCodeTo
 			from PartyRelationship pr
 			where pr.partyRelationshipType='STAFF'
-			  and pr.roleTypeCodeFrom = 'ROLE_COMPANY'
-			  and pr.roleTypeCodeTo != 'ROLE_STAFF'
+			  and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY'
+			  and pr.roleTypeCodeTo != '$RoleType.CODE_PARTY_STAFF'
 			  and pr.partyIdFrom.id = :companyId
 			  and pr.partyIdTo.id = :staffId
-		''')
+		""")
 
 		if (teamCode) {
 			query.append(" and pr.roleTypeCodeTo.id = :teamCode")
@@ -729,15 +724,15 @@ class PartyRelationshipService implements ServiceMethods {
 		project = StringUtil.toLongIfString(project)
 		staff = StringUtil.toLongIfString(staff)
 
-		String query = '''
-			select pr.roleTypeCodeTo''' + (queryJustId ? '.id' : '') + '''
+		String query = """
+			select pr.roleTypeCodeTo""" + (queryJustId ? '.id' : '') + """
 			from PartyRelationship pr
 			where pr.partyRelationshipType='PROJ_STAFF'
-			  and pr.roleTypeCodeFrom='ROLE_PROJECT'
+			  and pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			  and pr.partyIdFrom.id = :projectId
 			  and pr.partyIdTo.id = :staffId
 			order by pr.roleTypeCodeTo
-		'''
+		"""
 
 		[query, [projectId: project instanceof Long ? project : project.id,
 		         staffId: staff instanceof Long ? staff : staff.id]]
@@ -767,25 +762,25 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return boolean
 	 */
 	boolean staffHasFunction(Project project, staffId, functionCodes) {
-		PartyRelationship.executeQuery('''
+		PartyRelationship.executeQuery("""
 			select count(*) from PartyRelationship
 			where partyRelationshipType.id='PROJ_STAFF'
-			  and roleTypeCodeFrom.id='ROLE_PROJECT'
+			  and roleTypeCodeFrom.id='$RoleType.CODE_PARTY_PROJECT'
 			  and partyIdFrom=:project
 			  and partyIdTo.id=:staffId
 			  and roleTypeCodeTo in (:codes)
-		''', [project: project, staffId: NumberUtil.toLong(staffId),
+		""".toString(), [project: project, staffId: NumberUtil.toLong(staffId),
 			  codes: RoleType.getAll(CollectionUtils.asCollection(functionCodes)).findAll()])[0] > 0
 	}
 
 	String getProjectManagers(Project project) {
-		def projectManagers = PartyRelationship.executeQuery('''
+		def projectManagers = PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
-			  and roleTypeCodeFrom='ROLE_PROJECT'
+			  and roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			  and partyIdFrom = :project
-			  and roleTypeCodeTo = 'ROLE_PROJ_MGR'
-		''', [project: project])
+			  and roleTypeCodeTo = '$RoleType.CODE_TEAM_PROJ_MGR'
+		""".toString(), [project: project])
 
 		def managerNames = new StringBuilder()
 		projectManagers.each { PartyRelationship staff ->
@@ -835,8 +830,8 @@ class PartyRelationshipService implements ServiceMethods {
 		def projStaffPRType = PartyRelationshipType.read('PROJ_STAFF')
 		def companyPRType = PartyRelationshipType.read('COMPANY')
 
-		RoleType coRoleType = RoleType.read('ROLE_COMPANY')
-		RoleType projRoleType = RoleType.read('ROLE_PROJECT')
+		RoleType coRoleType = RoleType.read(RoleType.CODE_PARTY_COMPANY)
+		RoleType projRoleType = RoleType.read(RoleType.CODE_PARTY_PROJECT)
 		RoleType functionRoleType = RoleType.read(functionName)
 
 		String msg
@@ -893,10 +888,10 @@ class PartyRelationshipService implements ServiceMethods {
 
 		boolean debugEnabled = log.debugEnabled
 
-		// ROLE_STAFF is not a Team Code (not grouped under ROLE_TEAM), so remove it if it exists
-		teamCodes.removeAll {it == RoleType.ROLE_STAFF}
+		// STAFF is not a Team Code (not grouped under TEAM), so remove it if it exists
+		teamCodes.removeAll {it == RoleType.CODE_PARTY_STAFF}
 
-		// Get all Role Types that are grouped under 'ROLE_TEAM' (Team Codes)
+		// Get all Role Types that are grouped under 'TEAM' (Team Codes)
 		List<String> allTeamCodes = getTeamCodes()
 		//if there are codes that are not part of TEAMCODES those CANNOT be assigned.
 		List<String> invalidTeamCodes = teamCodes ? teamCodes - allTeamCodes : []
@@ -915,7 +910,7 @@ class PartyRelationshipService implements ServiceMethods {
 
 		// Remove any Team assignment that the person has assigned that are not in the teamCodes list
 		List<PartyRelationship> toDelete = PartyRelationship.executeQuery(query,
-				[type: 'STAFF', typeFrom: 'ROLE_COMPANY', person: person, teams: teamsToRemove])
+				[type: 'STAFF', typeFrom: RoleType.CODE_PARTY_COMPANY, person: person, teams: teamsToRemove])
 		if (toDelete) {
 			log.debug 'updateAssignedTeams() for {} - removing Company Team assignments {}', person, toDelete*.roleTypeCodeTo.id
 			toDelete*.delete()
@@ -923,7 +918,7 @@ class PartyRelationshipService implements ServiceMethods {
 
 		// Remove Team assignments to any projects
 		toDelete = PartyRelationship.executeQuery(query,
-				[type: 'PROJ_STAFF', typeFrom: 'ROLE_PROJECT', person: person, teams: teamsToRemove])
+				[type: 'PROJ_STAFF', typeFrom: RoleType.CODE_PARTY_PROJECT, person: person, teams: teamsToRemove])
 		if (toDelete) {
 			if (debugEnabled) {
 				List deleteDetail = toDelete.collect { "Project: $it.partyIdFrom Team: $it.roleTypeCodeTo.id" }
@@ -952,7 +947,7 @@ class PartyRelationshipService implements ServiceMethods {
 			if (teamsToAssign) {
 				log.debug 'updateAssignedTeams() for {} - adding team assignments {}', person, teamsToAssign
 				PartyRelationshipType coStaffPRType = PartyRelationshipType.load('STAFF')
-				RoleType coRoleType = RoleType.load('ROLE_COMPANY')
+				RoleType coRoleType = RoleType.load(RoleType.CODE_PARTY_COMPANY)
 
 				for (String teamCode in teamsToAssign) {
 					new PartyRelationship(
@@ -973,14 +968,14 @@ class PartyRelationshipService implements ServiceMethods {
 	 * @return a list of the persons associate to the specified team code for the project
 	 */
 	List<Person> getProjectStaffByFunction(RoleType function, Project project) {
-		Person.executeQuery('''
+		Person.executeQuery("""
 			select pr.partyIdTo
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id='PROJ_STAFF'
-			  and pr.roleTypeCodeFrom.id='ROLE_PROJECT'
+			  and pr.roleTypeCodeFrom.id='$RoleType.CODE_PARTY_PROJECT'
 			  and pr.roleTypeCodeTo=:function
 			  and pr.partyIdFrom=:project
-		''', [project: project, function: function] )
+		""".toString(), [project: project, function: function] )
 	}
 
 	/**
@@ -993,8 +988,8 @@ class PartyRelationshipService implements ServiceMethods {
 			SELECT party_id_to_id as personId FROM party_relationship p
 				WHERE p.party_id_from_id = 18
 					AND p.party_relationship_type_id = 'STAFF'
-					AND p.role_type_code_from_id = 'ROLE_COMPANY'
-					AND p.role_type_code_to_id = 'ROLE_STAFF'
+					AND p.role_type_code_from_id = '$RoleType.CODE_PARTY_COMPANY'
+					AND p.role_type_code_to_id = '$RoleType.CODE_PARTY_STAFF'
 		""")
 		return personId in tdsEmployees.personId
 	}
@@ -1006,10 +1001,10 @@ class PartyRelationshipService implements ServiceMethods {
 	 */
 	List<RoleType> getTeamRoleTypes(boolean includeAuto=false) {
 		RoleType.withCriteria {
-			eq ('type', RoleType.TEAM)
+			eq ('type', RoleType.TYPE_TEAM)
 			if (! includeAuto) {
 				and {
-					ne('id', 'ROLE_AUTO')
+					ne('id', RoleType.CODE_TEAM_AUTO)
 				}
 			}
 			//The sort was removed and replaced for a 'code' sort since the mix name (:) miss to sort some names and it's cheap
@@ -1061,14 +1056,14 @@ class PartyRelationshipService implements ServiceMethods {
 
 		String query = """select pr.partyIdFrom from PartyRelationship pr where
 			(	pr.partyRelationshipType = 'PROJ_COMPANY'
-				and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-				and pr.roleTypeCodeTo = 'ROLE_COMPANY'
+				and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+				and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_COMPANY'
 				and pr.partyIdTo = :company
 				${project ? 'and pr.partyIdFrom = :project' : ''}
 			) or
 			( 	pr.partyRelationshipType = 'PROJ_PARTNER'
-				and pr.roleTypeCodeFrom = 'ROLE_PROJECT'
-				and pr.roleTypeCodeTo = 'ROLE_PARTNER'
+				and pr.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+				and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_PARTNER'
 				and pr.partyIdTo = :company
 				${project ? 'and pr.partyIdFrom = :project' : ''}
 			)"""
@@ -1126,8 +1121,8 @@ class PartyRelationshipService implements ServiceMethods {
 					INNER JOIN party_relationship pr2 ON pr2.party_id_to_id = pr.party_id_to_id
 						AND pr2.role_type_code_to_id = pr.role_type_code_to_id
 						AND pr2.party_id_from_id = $project.id
-						AND pr2.role_type_code_from_id = 'ROLE_PROJECT'
-				WHERE pr.role_type_code_from_id in ('ROLE_COMPANY')
+						AND pr2.role_type_code_from_id = '$RoleType.CODE_PARTY_PROJECT'
+				WHERE pr.role_type_code_from_id in ('$RoleType.CODE_PARTY_COMPANY')
 					AND pr.party_relationship_type_id in ('STAFF')
 					AND pr.party_id_from_id IN ($companyIds)
 					AND p.active = 'Y'
@@ -1145,8 +1140,8 @@ class PartyRelationshipService implements ServiceMethods {
 				FROM party_relationship pr
 					INNER JOIN person p ON p.person_id = pr.party_id_to_id and p.active='Y'
 					INNER JOIN party_group pg ON pg.party_group_id = pr.party_id_from_id
-				WHERE pr.role_type_code_to_id in ('ROLE_STAFF')
-					AND pr.role_type_code_from_id in ('ROLE_COMPANY')
+				WHERE pr.role_type_code_to_id in ('$RoleType.CODE_PARTY_STAFF')
+					AND pr.role_type_code_from_id in ('$RoleType.CODE_PARTY_COMPANY')
 					AND pr.party_relationship_type_id in ('STAFF')
 					AND pr.party_id_from_id IN ($project.client.id)
 					AND p.active = 'Y'

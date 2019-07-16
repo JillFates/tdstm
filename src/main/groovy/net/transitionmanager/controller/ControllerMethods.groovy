@@ -2,6 +2,7 @@ package net.transitionmanager.controller
 
 import au.com.bytecode.opencsv.CSVWriter
 import com.google.gson.JsonSyntaxException
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import net.transitionmanager.exception.InvalidLicenseException
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
@@ -11,6 +12,7 @@ import com.tdssrc.grails.WebUtil
 import grails.converters.JSON
 import grails.validation.ValidationException
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -25,6 +27,7 @@ import net.transitionmanager.exception.ProjectRequiredException
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.security.UserLogin
 import org.grails.web.databinding.bindingsource.InvalidRequestBodyException
 import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
@@ -54,9 +57,11 @@ trait ControllerMethods {
 	// TODO : JPM 2/2018 : Remove licenseAdminService declaration - fix controllers that use but don't declare
 	LicenseAdminService licenseAdminService
 
+	ProjectService projectService
+
 	SecurityService securityService
 
-	ProjectService projectService
+	UserPreferenceService userPreferenceService
 
 	static final String ERROR_MESG_HEADER = 'X-TM-Error-Message'
 
@@ -584,5 +589,35 @@ trait ControllerMethods {
 	 */
 	Person currentPerson() {
 		securityService.loadCurrentPerson()
+	}
+
+
+	/**
+	 * Analyze the request in search of the given parameter, either as part of the request body
+	 * or as a query param. If it isn't found, the given UserPreference will be returned.
+	 *
+	 * This method considers that the parameter can be null, an empty string, false, etc.
+	 * @param param - the name of the parameter to look for.
+	 * @param userPreference - the UserPreference code
+	 * @return the value of the parameter or the corresponding user preference's.
+	 */
+	def getParamOrPreference(String param, UserPreferenceEnum userPreference) {
+		UserLogin userLogin = securityService.getUserLogin()
+		def paramValue
+		// Flag that is used to signal that the given parameter has been found.
+		boolean paramIsPresent = false
+		// Check if the parameter is part of the request body.
+		if (request.JSON) {
+			if (request.JSON.containsKey(param)) {
+				paramValue = request.JSON[param]
+				paramIsPresent = true
+			}
+		// Check if the param is present in the query params.
+		} else if (params.containsKey(param)) {
+			paramValue = params[param]
+			paramIsPresent = true
+		}
+
+		return paramIsPresent ? paramValue : userPreferenceService.getPreference(userLogin, userPreference)
 	}
 }

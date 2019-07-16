@@ -14,8 +14,8 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 
 declare var jQuery: any;

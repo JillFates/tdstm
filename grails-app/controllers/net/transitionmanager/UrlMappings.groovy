@@ -208,6 +208,11 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
+		"/ws/moveEvent/dashboardModel" {
+			controller = "wsEvent"
+			action = [GET: "getEventDashboardModel"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
@@ -509,6 +514,16 @@ class UrlMappings {
 			action = [
 				GET: 'context'
 			]
+		}
+
+		"/auth/loginInfo" {
+			controller = "auth"
+			action = [GET: "getLoginInfo"]
+		}
+
+		"/auth/sendResetPasswordEmail" {
+			controller = "auth"
+			action = [GET: "sendResetPasswordEmail"]
 		}
 
 		"/ws/user/modelForPreferenceManager" {
@@ -1330,6 +1345,41 @@ class UrlMappings {
                     GET: "moveBundles"
             ]
         }
+
+		"/ws/reports/viewEditBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleViewEdit"
+			]
+		}
+
+		"/ws/reports/createBundleModel" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleCreate"
+			]
+		}
+
+		"/ws/reports/saveBundle/$moveBundleId?" {
+			controller = "wsReports"
+			action = [
+					POST: "saveBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundleAndAssets/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundleAndAssets"
+			]
+		}
 
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"

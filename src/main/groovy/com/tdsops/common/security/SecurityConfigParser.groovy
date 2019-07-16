@@ -119,6 +119,7 @@ class SecurityConfigParser {
 	/**
 	 * Parses the properties read from the configuration file and constructs the appropriate map for the Login form properties
 	 * @param properties - the configuration mapping for security properties
+	 * @param forLogin - flag that signals whether or not the map being created is going to be used by the login page.
 	 * @return A map of all of the necessary parameters
 	 *		authorityPrompt - na=n/a, select=select dropdown, prompt=Input field, hidden=Hidden field populated with authorityName
 	 *		authorityLabel - used as the label for the authority prompt in login form
@@ -126,7 +127,7 @@ class SecurityConfigParser {
 	 *		autorityList - a list of all of the defined LDAP domain labels
 	 * 		usernamePlaceholder -  Text used to override the placeholder value in the username input field
 	 */
-	static Map parseLoginSettings(properties) {
+	static Map parseLoginSettings(properties, boolean forLogin = false) {
 		// Default values
 		Map map = [authorityPrompt: 'na', authorityLabel: 'Domain', authorityName: '', authorityList: [],
 		           usernamePlaceholder: 'Enter your username']
@@ -169,8 +170,10 @@ class SecurityConfigParser {
 			map.usernamePlaceholder = uph
 		}
 
-		map.inactiveDaysLockout = prop(props.inactiveDaysLockout ?: null, DEFAULT_INACTIVITY_DAYS_LOCKOUT)
-		map.inactivityWhitelist = prop(props.inactivityWhitelist ?: null, [])
+		if (!forLogin) {
+			map.inactiveDaysLockout = prop(props.inactiveDaysLockout ?: null, DEFAULT_INACTIVITY_DAYS_LOCKOUT)
+			map.inactivityWhitelist = prop(props.inactivityWhitelist ?: null, [])
+		}
 
 		return map
 	}

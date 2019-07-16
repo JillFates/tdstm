@@ -7,6 +7,7 @@ import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import spock.lang.Shared
@@ -54,7 +55,7 @@ class PartyGroupServiceIntegrationSpec extends Specification {
 			assert adminPerson
 
 			// Assign the admin to the project
-			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 			adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			assert adminUser

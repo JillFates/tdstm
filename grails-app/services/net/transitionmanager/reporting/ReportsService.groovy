@@ -651,13 +651,13 @@ class ReportsService implements ServiceMethods {
                         a.name?.toString() <=> b.name?.toString()
         }
 
-        def projectStaff = PartyRelationship.executeQuery('''
+        def projectStaff = PartyRelationship.executeQuery("""
 			from PartyRelationship
 			where partyRelationshipType = 'PROJ_STAFF'
 			  and partyIdFrom.id=?
-			  and roleTypeCodeFrom = 'ROLE_PROJECT'
-			  and roleTypeCodeTo = 'ROLE_STAFF'
-		''', [currProj.toLong()])
+			  and roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT'
+			  and roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+		""".toString(), [currProj.toLong()])
 
         String userLoginError = ''
 
@@ -674,15 +674,15 @@ class ReportsService implements ServiceMethods {
             }
         }
 
-        List<Person> persons = Person.executeQuery('''
+        List<Person> persons = Person.executeQuery("""
 			from Person where
 			id in (select p.partyIdTo from PartyRelationship p
 			       where p.partyRelationshipType='STAFF'
 			         and p.partyIdFrom.id=:clientId
-			         and p.roleTypeCodeFrom= 'ROLE_COMPANY'
-			         and p.roleTypeCodeTo='ROLE_STAFF')
+			         and p.roleTypeCodeFrom= '$RoleType.CODE_PARTY_COMPANY'
+			         and p.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF')
 			order by lastName
-		''', [clientId: project.clientId])
+		""".toString(), [clientId: project.clientId])
 
         String clientAccess
         if (!persons) {

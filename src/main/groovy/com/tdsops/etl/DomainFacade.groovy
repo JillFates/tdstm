@@ -35,5 +35,19 @@ class DomainFacade {
 	RowResult currentRowMap(){
 		return this.result.currentRow()
 	}
+
+	@Override
+	String toString() {
+
+		List<?> fieldsMap = this.result.currentRow()?.fields?.collect {String fieldName, FieldResult fieldResult ->
+			[(fieldName): [
+				init: fieldResult.value,
+				value: fieldResult.value
+			]]
+		}
+		return """DOMAIN {
+		 	fields=${fieldsMap}
+		}"""
+	}
 }
 

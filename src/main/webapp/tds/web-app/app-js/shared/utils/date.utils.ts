@@ -349,4 +349,12 @@ export class DateUtils {
 		return null;
 	}
 
+	/**
+	 * Could receive a string or date, based in the type make sure returns a date  object
+	 * @param {any} value:  String or Date to cast
+	 * @returns {Date}
+	 */
+	public static stringDateToDate(date: any): any {
+		return (date && date.toDateString) ? date : DateUtils.toDateUsingFormat(date, DateUtils.SERVER_FORMAT_DATE)
+	}
 }

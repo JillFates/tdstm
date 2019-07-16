@@ -4,6 +4,7 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -52,7 +53,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
-				redirectUri = '/auth/login'
+				redirectUri = '/module/auth/login'
 			} else {
 				userService.updateLastLogin(userLogin)
 				userService.resetFailedLoginAttempts(userLogin)
@@ -71,10 +72,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?:
-							authentication.targetUri ?:
-									requestCache.getRequest(request, response)?.redirectUrl ?:
-											redirectToPrefPage()
+					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage()
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
@@ -89,11 +87,19 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
 			}
 
-			if (hasUnacknowledgedNotices) {
-				redirectStrategy.sendRedirect request, response, unacknowledgedNoticesUri
-			} else {
-				redirectStrategy.sendRedirect request, response, redirectUri
-			}
+			// This map will contain all the user-related data that needs to be sent in the response's payload.
+			Map signInInfoMap = [
+			    userContext: userService.getUserContext().toMap(),
+				notices: [
+					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
+					redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
+				]
+			]
+			response.setHeader('content-type', 'application/json')
+			PrintWriter responseWriter = response.getWriter()
+			responseWriter.print(JsonUtil.toJson(signInInfoMap))
+			responseWriter.flush()
+
 		} finally {
 			// always remove the saved request
 			requestCache.removeRequest request, response

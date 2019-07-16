@@ -46,6 +46,11 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
+
+			function clearStorage() {
+				localStorage.removeItem('@@STATE');
+			}
+
 		</script>
 	</head>
 <%
@@ -478,7 +483,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</td>
 			<td style="vertical-align:top">
 				<ul>
-					<li><g:link class="mmlink" controller="auth" action="signOut">Sign out</g:link></li>
+					<li><g:link class="mmlink" controller="auth" action="signOut" onclick="clearStorage()">Sign out</g:link></li>
 				</ul>
 			</td>
 			</tr></table>

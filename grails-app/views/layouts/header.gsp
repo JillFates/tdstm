@@ -31,24 +31,11 @@
 
 </head>
 
-<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
     <div class="wrapper">
-
         <!-- / Injects the BODY -->
         <g:layoutBody />
-
-        <!-- /.content-wrapper -->
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <span>${buildInfo}</span>
-            </div>
-            <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} .</strong> All rights reserved.
-        <!-- /.container -->
-        </footer>
     </div>
-
     <g:render template="/layouts/chromeAutofillBug" />
-
 </body>
 </html>

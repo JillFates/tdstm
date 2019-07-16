@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {EventService} from '../../service/event.service';
+import {EventsService} from '../../service/events.service';
 import {EventModel} from '../../model/event.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -16,7 +16,7 @@ export class EventCreateComponent implements OnInit {
 	private defaultModel = null;
 
 	constructor(
-		private eventService: EventService,
+		private eventsService: EventsService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService) {
 	}
@@ -41,7 +41,7 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	private getModel() {
-		this.eventService.getModelForEventCreate().subscribe((result: any) => {
+		this.eventsService.getModelForEventCreate().subscribe((result: any) => {
 			this.bundles = result.bundles;
 			this.runbookStatuses = result.runbookStatuses;
 			this.assetTags = result.tags;
@@ -53,11 +53,24 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.eventService.saveEvent(this.eventModel).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.activeDialog.close();
-			}
-		});
+		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime)) {
+			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.activeDialog.close();
+				}
+			});
+		}
+	}
+
+	private validateTimes(startTime: Date, completionTime: Date): boolean {
+		if (!startTime || !completionTime) {
+			return true;
+		} else if (startTime > completionTime) {
+			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**

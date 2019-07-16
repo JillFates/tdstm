@@ -282,13 +282,8 @@
                             <li class="divider"></li>
                             <li class="menu-parent-item">Bundles</li>
                             <li class="menu-child-item menu-parent-planning-list-bundles">
-                                <g:link controller="moveBundle" action="list">List Bundles</g:link>
+                                <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
-                            <g:if test="${currProject && moveBundle}">
-                                <li class="menu-child-item menu-parent-planning-selected-bundle">
-                                    <g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link>
-                                </li>
-                            </g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -353,7 +348,7 @@
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                                <g:link controller="dashboard">Event Dashboard</g:link>
+                                <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
                             </li>
                             <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">

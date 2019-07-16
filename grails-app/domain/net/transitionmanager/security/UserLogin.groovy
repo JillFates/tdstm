@@ -212,7 +212,7 @@ class UserLogin {
 			SELECT roleType.id FROM PartyRole
 			WHERE party=:party and roleType.type=:type
 			ORDER BY roleType.level desc
-		''', [party: person, type: RoleType.SECURITY])
+		''', [party: person, type: RoleType.TYPE_SECURITY])
 	}
 
 	Project getCurrentProject() {

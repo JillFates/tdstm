@@ -5,7 +5,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 // Services
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {PreEventCheckListSelectorComponent} from './components/event-checklist/pre-event-checklist.component';
 import {ApplicationConflictsComponent} from './components/application-conflicts/application-conflicts.component';

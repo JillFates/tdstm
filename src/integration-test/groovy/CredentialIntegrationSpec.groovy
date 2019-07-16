@@ -5,6 +5,7 @@ import net.transitionmanager.action.Credential
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
@@ -51,7 +52,7 @@ class CredentialIntegrationSpec extends Specification {
 		setup:
 			Project project = projectHelper.createProjectWithDefaultBundle()
 			Person adminPerson = personHelper.createStaff(projectService.getOwner(project))
-			projectService.addTeamMember(project, adminPerson, ['ROLE_PROJ_MGR'])
+			projectService.addTeamMember(project, adminPerson, [RoleType.CODE_TEAM_PROJ_MGR])
 
 			UserLogin adminUser = personHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
 			securityService.assumeUserIdentity(adminUser.username, false)
