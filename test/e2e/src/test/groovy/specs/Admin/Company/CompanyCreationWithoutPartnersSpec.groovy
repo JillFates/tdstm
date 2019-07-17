@@ -28,6 +28,7 @@ class CompanyCreationWithoutPartnersSpec extends GebReportingSpec {
 
     def setupSpec() {
         testCount = 0
+        Thread.sleep(5000)
         to LoginPage
         login()
         at MenuPage
