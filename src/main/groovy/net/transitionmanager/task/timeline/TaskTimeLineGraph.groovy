@@ -1,7 +1,10 @@
 package net.transitionmanager.task.timeline
 
+
 import groovy.transform.CompileStatic
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskDependency
 
 @CompileStatic
 class TaskTimeLineGraph {
@@ -57,7 +60,7 @@ class TaskTimeLineGraph {
 	 * @return
 	 */
 	TaskVertex getVertex(TaskVertex taskVertex) {
-		return this.getVertex(taskVertex.taskNumber)
+		return this.getVertex(taskVertex.taskComment)
 	}
 	/**
 	 * Adds a new edge with successor and predecessor
@@ -69,58 +72,170 @@ class TaskTimeLineGraph {
 		from.addSuccessor(to)
 		return this
 	}
-	/**
-	 * Builder pattern for {@code TaskTimeLineGraph}
-	 */
-	static class Builder {
 
-		List<Map<String, ?>> vertices = []
-		Map<String, ?> currentVertex
+	/**
+	 * SimpleBuilder pattern for {@code TaskTimeLineGraph}
+	 */
+	static class SimpleBuilder {
+
+		Map<Integer, TaskVertex> taskVertexMapByTaskNumber = [:]
+		Map<String, TaskVertex> taskVertexMapByTaskComment = [:]
+
+		List<Tuple2<Integer, Integer>> edgesByTaskNumber = []
+		List<Tuple2<String, String>> edgesByTaskComment = []
+		/**
+		 * Current Task Vertex used in Builder Pattern
+		 */
+		TaskVertex currentVertex
 
 		/**
-		 * Adds a new vertex with parameters: taskId, description and duration
-		 * @param taskId
-		 * @param description
+		 * <p>Check status of {@code Builder#currentVertex}
+		 * It also prepares an internal structure for this builder:</p>
+		 * 1) A Map with taskNumber as Key and TaskVertex as Value<BR/>
+		 * 2) A Map with taskComment as Key and TaskVertex as Value<BR/>
+		 */
+		private void checkAndAddCurrentVertex() {
+			if (currentVertex) {
+				taskVertexMapByTaskNumber[currentVertex.taskNumber] = currentVertex
+				taskVertexMapByTaskComment[currentVertex.taskComment] = currentVertex
+			}
+		}
+		/**
+		 * Adds a new vertex with parameters: taskComment, description and duration
+		 * @param taskComment * @param description
 		 * @param duration
 		 * @return
 		 */
-		Builder withVertex(Long id, String taskId, String description, Integer duration) {
-			if (currentVertex) {
-				vertices.add(currentVertex)
-			}
-			currentVertex = [
-				id         : id,
-				taskId     : taskId,
-				duration   : duration,
-				description: description,
-				successors : []
-			]
+		SimpleBuilder withVertex(Integer taskNumber, String taskComment, String description, Integer duration) {
+
+			checkAndAddCurrentVertex()
+			currentVertex = new TaskVertex(
+				taskNumber,
+				taskComment,
+				duration
+			)
 			return this
 		}
-
 		/**
-		 * Adds a new vertex with parameters: taskId and duration
-		 * @param taskId
-		 * @param duration
-		 * @return same instance of {@code TaskTimeLineGraph.Builder}
+		 * Adds a new {@code AssetComment} task in
+		 * {@code TaskTimeLineGraph} builder creation.
+		 *
+		 * @param task a instance of {@code AssetComment}
+		 * @return current instance of {@code SimpleBuilder}
 		 */
-		Builder withVertex(Long id, String taskId, Integer duration) {
-			withVertex(id, taskId, '', duration)
-		}
+		SimpleBuilder withVertex(AssetComment task) {
 
-		Builder addEdgeTo(String taskId) {
-			if (!currentVertex) {
-				throw new InvalidParamException('Cannot add an edge without a previous vertex')
-			}
-			(currentVertex.successors as List).add(taskId)
+			checkAndAddCurrentVertex()
+			currentVertex = new TaskVertex(
+				task.taskNumber,
+				task.comment,
+				task.duration,
+				task.status,
+				task.actStart
+			)
 			return this
 		}
-
-		Builder addEdgesTo(String... taskIds) {
+		/**
+		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
+		 * It used {@code TaskDependency#predecessor} and
+		 * {@code TaskDependency#successor} as edge relation
+		 *
+		 * @param taskDependency an instance of {@code TaskDependency}
+		 * @return
+		 */
+		SimpleBuilder withEdge(TaskDependency taskDependency) {
+			edgesByTaskNumber.add(new Tuple2<>(taskDependency.predecessor.taskNumber, taskDependency.successor.taskNumber))
+			return this
+		}
+		/**
+		 * Adds a new vertex with parameters: taskComment and duration
+		 * @param taskComment
+		 * @param duration
+		 * @return current instance of {@code TaskTimeLineGraph.SimpleBuilder}
+		 */
+		SimpleBuilder withVertex(Integer taskNumber, String taskComment, Integer duration) {
+			withVertex(taskNumber, taskComment, '', duration)
+		}
+		/**
+		 * Add Edges to a {@code TaskTimeLineGraph} using
+		 * {@code TaskTimeLineGraph#SimpleBuilder#currentVertex}
+		 * and a task comment.
+		 * <pre>
+		 * 	TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+		 * 				.withVertex(1, A, 3).addEdgeTo(B)
+		 * 				.withVertex(2, B, 4)
+		 * 				.build()
+		 * <pre>
+		 * @param taskNumber {@code String} task comment
+		 * @return current instance of {@code TaskTimeLineGraph.SimpleBuilder}
+		 */
+		SimpleBuilder addEdgeTo(String taskComment) {
 			if (!currentVertex) {
 				throw new InvalidParamException('Cannot add an edge without a previous vertex')
 			}
-			taskIds.each { (currentVertex.successors as List).add(it) }
+			edgesByTaskComment.add(new Tuple2<>(currentVertex.taskComment, taskComment))
+			return this
+		}
+		/**
+		 * Add Edges to a {@code TaskTimeLineGraph} using
+		 * {@code TaskTimeLineGraph#SimpleBuilder#currentVertex}
+		 * and a list of task comments.
+		 * <pre>
+		 * 	TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+		 * 				.withVertex(1, A, 3).addEdgesTo(B, C)
+		 * 				.withVertex(2, B, 4)
+		 * 	 			.withVertex(3, C, 5)
+		 * 				.build()
+		 * <pre>
+		 * @param taskComments a {@code List} of {@code String} task comments
+		 * @return current instance of {@code TaskTimeLineGraph.SimpleBuilder}
+		 */
+		SimpleBuilder addEdgesTo(String... taskComments) {
+			if (!currentVertex) {
+				throw new InvalidParamException('Cannot add an edge without a previous vertex')
+			}
+			taskComments.each { String taskComment -> addEdgeTo(taskComment) }
+			return this
+		}
+		/**
+		 * Add Edges to a {@code TaskTimeLineGraph} using
+		 * {@code TaskTimeLineGraph#SimpleBuilder#currentVertex}
+		 * and a task number.
+		 * <pre>
+		 * 	TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+		 * 				.withVertex(1, A, 3).addEdgeTo(2)
+		 * 				.withVertex(2, B, 4)
+		 * 				.build()
+		 * <pre>
+		 * @param taskNumber {@code Integer} task number
+		 * @return current instance of {@code TaskTimeLineGraph.SimpleBuilder}
+		 */
+		SimpleBuilder addEdgeTo(Integer taskNumber) {
+			if (!currentVertex) {
+				throw new InvalidParamException('Cannot add an edge without a previous vertex')
+			}
+			edgesByTaskNumber.add(new Tuple2<>(currentVertex.taskNumber, taskNumber))
+			return this
+		}
+		/**
+		 * Add Edges to a {@code TaskTimeLineGraph} using
+		 * {@code TaskTimeLineGraph#SimpleBuilder#currentVertex}
+		 * and a list of task numbers.
+		 * <pre>
+		 * 	TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+		 * 				.withVertex(1, A, 3).addEdgesTo(2, 3)
+		 * 				.withVertex(2, B, 4)
+		 * 	 			.withVertex(3, C, 5)
+		 * 				.build()
+		 * <pre>
+		 * @param taskNumbers a {@code List} of {@code Integer} task numbers
+		 * @return current instance of {@code TaskTimeLineGraph.SimpleBuilder}
+		 */
+		SimpleBuilder addEdgesTo(Integer... taskNumbers) {
+			if (!currentVertex) {
+				throw new InvalidParamException('Cannot add an edge without a previous vertex')
+			}
+			taskNumbers.each { Integer taskNumber -> addEdgeTo(taskNumber) }
 			return this
 		}
 
@@ -131,30 +246,21 @@ class TaskTimeLineGraph {
 		 */
 		TaskTimeLineGraph build() {
 
-			if (currentVertex) {
-				vertices.add(currentVertex)
+			checkAndAddCurrentVertex()
+
+			edgesByTaskNumber.each { Tuple2<Integer, Integer> tuple ->
+				TaskVertex predecessor = taskVertexMapByTaskNumber[tuple.first]
+				TaskVertex sucessor = taskVertexMapByTaskNumber[tuple.second]
+				predecessor.addSuccessor(sucessor)
 			}
-			Map<String, TaskVertex> taskVertices =
-				vertices.collectEntries { Map<String, ?> vertexMap ->
 
-					TaskVertex taskVertex = new TaskVertex(vertexMap.id as Long, vertexMap.taskId.toString(), vertexMap.duration as Integer)
-					if (vertexMap.description) {
-						taskVertex.comment = vertexMap.description
-					}
-
-					[(vertexMap.taskId): taskVertex]
-				}
-
-			vertices.each { Map<String, ?> vertexMap ->
-				vertexMap.successors.each { String successorId ->
-					TaskVertex successor = taskVertices[successorId]
-					if (!successor) {
-						throw new InvalidParamException("TaskVertex: ${successorId} was not found")
-					}
-					taskVertices[vertexMap.taskId.toString()].addSuccessor(successor)
-				}
+			edgesByTaskComment.each { Tuple2<String, String> tuple ->
+				TaskVertex predecessor = taskVertexMapByTaskComment[tuple.first]
+				TaskVertex sucessor = taskVertexMapByTaskComment[tuple.second]
+				predecessor.addSuccessor(sucessor)
 			}
-			return new TaskTimeLineGraph(taskVertices.values().toSet())
+
+			return new TaskTimeLineGraph(taskVertexMapByTaskNumber.values().toSet())
 		}
 	}
 }

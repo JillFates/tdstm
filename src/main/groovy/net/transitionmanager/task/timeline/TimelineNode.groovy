@@ -40,7 +40,7 @@ class TimelineNode {
 		earliestStart = earliest
 		latestStart = latest
 
-		this.duration = vertex.remainingDurationInMinutes()
+		this.duration = vertex.remainingDurationInMinutes(startDate)
 
 		if (vertex.isStart()) {
 			// TODO: dcorrea review this logic.

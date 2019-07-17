@@ -41,6 +41,9 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.TimeLine
+import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -983,6 +986,14 @@ digraph runbook {
 		}
 		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
 		def deps = runbookService.getTaskDependencies(tasks)
+
+
+//		TaskTimeLineGraph graph = new TaskTimeLineGraph.SimpleBuilder()
+//			.withVertices(tasks)
+//			.withEdges(deps)
+//			.build()
+//
+//		TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(defaultEstStart)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {

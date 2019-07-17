@@ -1,23 +1,14 @@
 package net.transitionmanager.task.timeline
 
-import grails.testing.gorm.DataTest
-import net.transitionmanager.project.MoveBundle
+
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
-import test.helper.MoveBundleTestHelper
-import test.helper.ProjectTestHelper
 
-class TaskTimeLineGraphSpec extends Specification implements DataTest {
-
-	@Shared
-	MoveBundleTestHelper moveBundleTestHelper = new MoveBundleTestHelper()
-
-	@Shared
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
+class TaskTimeLineGraphSpec extends Specification {
 
 	@Shared
 	TaskTimeLineGraphTestHelper taskTimeLineGraphTestHelper = new TaskTimeLineGraphTestHelper()
@@ -25,16 +16,9 @@ class TaskTimeLineGraphSpec extends Specification implements DataTest {
 	@Shared
 	Project project
 
-	@Shared
-	MoveBundle moveBundle
-
-	void setupSpec() {
-		mockDomains Project, AssetComment, TaskDependency
-	}
-
 	void setup() {
-		project = projectTestHelper.createProject()
-		moveBundle = moveBundleTestHelper.createBundle(project, null)
+		project = Mock(Project)
+		project.getId() >> 125612l
 	}
 
 	void 'can calculate vertices for a TaskTimeLineGraph'() {

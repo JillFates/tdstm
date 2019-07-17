@@ -1,18 +1,21 @@
 package net.transitionmanager.task.timeline
 
-import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.TimeUtil
+import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 
 @CompileStatic
 class TaskVertex {
 
-	Long id
-	String taskNumber
+	Integer taskNumber
+	String taskComment
 	/**
 	 * Time to complete a Task {@code AssetComment}
+	 * In minutes
 	 */
 	int duration
-	TimeScale durationScale
 
 	String comment
 	String description
@@ -25,11 +28,17 @@ class TaskVertex {
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
 
-	TaskVertex(Long id, String taskNumber, int duration = 0, TimeScale durationScale = TimeScale.M) {
-		this.id = id
+	TaskVertex(Integer taskNumber,
+			   String taskComment,
+			   int duration = 0,
+			   String status = AssetCommentStatus.PLANNED,
+			   Date actualStart = null) {
+
 		this.taskNumber = taskNumber
+		this.taskComment = taskComment
 		this.duration = duration
-		this.durationScale = durationScale
+		this.status = status
+		this.actualStart = actualStart
 	}
 
 	/**
@@ -54,16 +63,29 @@ class TaskVertex {
 		return predecessors.contains(taskVertex)
 	}
 
-	Integer remainingDurationInMinutes() {
-		//      if (status in [COMPLETED, TERMINATED]){
-//		return 0
-//	   } else if (vertex.startTime != null) {
-//			return this.duration = duration - ((NOW - actualStart)? :)
-//		} else {
-//			return this.duration
-//		}
+	/**
+	 * <p>Calculates remaining duration for a {@code TaskVertex}
+	 * in  minutes based on 3 scenarios:</p>
+	 * 1) COMPLETED/TERMINATED task. <BR/>
+	 * 2) Started Task with elapsed time but did not finished. <BR/>
+	 * 3) Duration time defined at task creation time. <BR/>
+	 *
+	 * @return {@code Integer} value with remaining time
+	 */
+	@CompileStatic(TypeCheckingMode.SKIP)
+	Integer remainingDurationInMinutes(Date pointInTime) {
 
-		return duration
+		if (status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]) {
+			return 0
+		} else if (actualStart != null) {
+			Integer elapsedTime = 0
+			use(TimeCategory) {
+				elapsedTime = (pointInTime - actualStart).minutes
+			}
+			return this.duration = this.duration - elapsedTime
+		} else {
+			return this.duration
+		}
 	}
 
 	/**
@@ -90,20 +112,20 @@ class TaskVertex {
 
 		TaskVertex that = (TaskVertex) o
 
-		if (id != that.id) return false
+		if (taskNumber != that.taskNumber) return false
 
 		return true
 	}
 
 	int hashCode() {
-		return id.hashCode()
+		return taskNumber.hashCode()
 	}
 
 	@Override
 	String toString() {
 		return "TaskVertex { " +
-			"id='" + id + '\'' +
 			"taskNumber='" + taskNumber + '\'' +
+			"taskComment='" + taskComment + '\'' +
 			", description='" + (description ?: '') + '\'' +
 			", duration=" + duration +
 			' }';

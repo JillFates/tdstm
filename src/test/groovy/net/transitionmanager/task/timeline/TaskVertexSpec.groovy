@@ -1,7 +1,9 @@
 package net.transitionmanager.task.timeline
 
-import com.tdsops.tm.enums.domain.TimeScale
+import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.TimeUtil
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class TaskVertexSpec extends Specification {
 
@@ -15,41 +17,63 @@ class TaskVertexSpec extends Specification {
 				id == id
 				taskNumber == taskNumber
 				duration == 0
-				durationScale == TimeScale.M
 			}
 
 		where:
-			id       | taskNumber
-			1234567l | 'Task III'
-			1234997l | ''
+			id      | taskNumber
+			1234567 | 'Task III'
+			1234997 | ''
 	}
 
-	void 'test can create a TaskVertex with duration and time scale'() {
+	@Unroll
+	void 'test can calculate remaining time duration in minutes based on duration = #duration, durationScale = #durationScale, actual start = #actualStart and status = #status'() {
 
 		setup:
-			TaskVertex taskVertex = new TaskVertex(id, taskNumber, duration, timeScale)
+			Date pointInTime = TimeUtil.nowGMT()
 
 		expect:
-			with(taskVertex, TaskVertex) {
-				id == id
-				taskNumber == taskNumber
-				duration == duration
-				timeScale == timeScale
-			}
+			new TaskVertex(12345,
+				'TASK III',
+				duration,
+				status,
+				actualStart
+			).remainingDurationInMinutes(pointInTime) == taskDuration
 
 		where:
-			id       | taskNumber | duration | timeScale
-			1234567l | 'Task III' | 360      | TimeScale.M
-			1234599l | ''         | 1500     | TimeScale.H
+			duration | status                        | actualStart || taskDuration
+			1        | AssetCommentStatus.PLANNED    | null        || 1
+			1        | AssetCommentStatus.COMPLETED  | null        || 0
+			1        | AssetCommentStatus.TERMINATED | null        || 0
+	}
+
+	void 'test can calculate remaining time for task already started'() {
+
+		given: 'a task with duration 30 minutes and started 10 minutes before'
+			Date pointInTime = TimeUtil.nowGMT()
+			Date taskActualStart = TimeUtil.dateFromUsingMinutes(-10, pointInTime)
+
+		and:
+			TaskVertex taskVertex = new TaskVertex(12345,
+				'TASK III',
+				30,
+				AssetCommentStatus.STARTED,
+				taskActualStart
+			)
+
+		when: 'remaining duration time is calculated'
+			Integer remainingMinutes = taskVertex.remainingDurationInMinutes(pointInTime)
+
+		then: 'remaining duration is less than 20 minutes'
+			remainingMinutes == 20
 	}
 
 	void 'test can add predecessor to a TaskVertex'() {
 
 		given: 'a TaskVertex instance'
-			TaskVertex taskVertex = new TaskVertex(1234l, 'Task III', 360)
+			TaskVertex taskVertex = new TaskVertex(1234, 'Task III', 360)
 
 		and: 'another TaskVertex'
-			TaskVertex predecessor = new TaskVertex(4321l, 'Task V', 1600)
+			TaskVertex predecessor = new TaskVertex(4321, 'Task V', 1600)
 
 		when: 'a predecessor is added'
 			taskVertex.addPredecessor(predecessor)
@@ -64,10 +88,10 @@ class TaskVertexSpec extends Specification {
 	void 'test can add successor to a TaskVertex'() {
 
 		given: 'a TaskVertex instance'
-			TaskVertex taskVertex = new TaskVertex(1234l, 'Task III', 360)
+			TaskVertex taskVertex = new TaskVertex(1234, 'Task III', 360)
 
 		and: 'another TaskVertex'
-			TaskVertex successor = new TaskVertex(4321l, 'Task V', 1600)
+			TaskVertex successor = new TaskVertex(4321, 'Task V', 1600)
 
 		when: 'a successor is added'
 			taskVertex.addSuccessor(successor)
