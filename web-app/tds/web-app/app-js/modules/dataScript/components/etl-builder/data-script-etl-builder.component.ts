@@ -254,7 +254,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	protected isScriptDirty(): boolean {
-		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
+		return (this.dataScriptModel.etlSourceCode) ? this.dataScriptModel.etlSourceCode !== this.script : this.script.length > 0;
 	}
 
 	private onScriptChange(event: { newValue: string, oldValue: string }) {
