@@ -61,8 +61,8 @@ class TdsLdapUserDetailsMapperSpec extends Specification {
 				it.mobile == "3308675309" &&
 				it.guid == "fd4d2201fd02fd40fd60fdfdfd" &&
 				it.roles.size() == 2 &&
-				it.roles.contains("editor") &&
-				it.roles.contains("client_mgr")
+				it.roles.contains("ROLE_EDITOR") &&
+				it.roles.contains("ROLE_CLIENT_MGR")
 			}, config, "TDS")
 			1 * mapper.userDetailsService.loadUserByUsername("foobar")
 
@@ -112,7 +112,7 @@ class TdsLdapUserDetailsMapperSpec extends Specification {
 						it.mobile == "3308675309" &&
 						it.guid == "fd4d2201fd02fd40fd60fdfdfd" &&
 						it.roles.size() == 1 &&
-						it.roles.contains("client_mgr")
+						it.roles.contains("ROLE_CLIENT_MGR")
 			}, config, "TDS")
 			1 * mapper.userDetailsService.loadUserByUsername("newuser")
     }

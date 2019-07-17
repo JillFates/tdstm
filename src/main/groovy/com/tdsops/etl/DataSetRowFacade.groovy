@@ -22,4 +22,12 @@ class DataSetRowFacade {
 		}
 		return new SourceField(row[name.toLowerCase()])
 	}
+
+
+	@Override
+	String toString() {
+		return """SOURCE {
+			row=${row}
+		}"""
+	}
 }

@@ -24,7 +24,7 @@ export class LoginService {
 	 * Get the Login Basic Information
 	 * @returns {Observable<R>}
 	 */
-	getLoginInfo(): Observable<any[]> {
+	public getLoginInfo(): Observable<any[]> {
 		return this.http.get(this.authUrl + 'loginInfo')
 			.map((response: any) => {
 				return response && response.data;
@@ -36,7 +36,7 @@ export class LoginService {
 	 * Send an email to restore password
 	 * @returns {Observable<R>}
 	 */
-	forgotPassword(userEmail: string): Observable<any[]> {
+	public forgotPassword(userEmail: string): Observable<any[]> {
 		return this.http.get(`${this.authUrl}sendResetPasswordEmail?email=${userEmail}`)
 			.map((response: any) => {
 				return response && response.data;

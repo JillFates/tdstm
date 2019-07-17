@@ -1,15 +1,15 @@
-<%@ page import="com.tdssrc.grails.GormUtil" %>
+<%@ page import="net.transitionmanager.security.RoleType; com.tdssrc.grails.GormUtil" %>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="topNav" />
-    <title>Create RoleType</title>
+    <title>Create Team</title>
   </head>
   <body>
-    <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Role Type','Create']"/><br />
+    <tds:subHeader title="Create Team" crumbs="['Admin','Portal','Team','Create']"/><br />
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
-            	<span class="menuButton"><g:link class="list" action="list">RoleType List</g:link></span>
+            	<span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>
 	  </div>
 	  <br/>
       <g:if test="${flash.message}">
@@ -21,16 +21,6 @@
 				<tr>
 					<td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
 				</tr>
-
-              <tr class="prop">
-                  <td valign="top" class="name"><label for="id"><b>Type:&nbsp;<span style="color: red">*</span></b></label></td>
-                  <td>
-                    <g:select id="type" name="type"
-                              from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(roleTypeInstance.class).type.inList}" value="${roleTypeInstance.type}"
-                              noSelection="${['':'Please select']}" onchange="typeChanged()">
-                    </g:select>
-                  </td>
-              </tr>
 
               <tr class="prop" id="levelRow">
                 <td valign="top" class="name"><label for="id"><b>Level:</b></label></td>
@@ -85,19 +75,5 @@
         </div>
         <div class="buttons"><span class="button"><input class="save" type="submit" value="Save" /></span></div>
     </g:form></div>
-    <script>
-
-
-    function typeChanged(){
-      var type = $("#type").val()
-      if(type == "SECURITY"){
-        $("#levelRow").css("display", "")
-        $("#level").val("")
-      }else{
-        $("#level").val("0")
-        $("#levelRow").css("display", "none")
-      }
-    }
-    </script>
   </body>
 </html>

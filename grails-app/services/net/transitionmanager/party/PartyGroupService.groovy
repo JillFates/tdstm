@@ -7,6 +7,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -42,11 +43,11 @@ class PartyGroupService implements ServiceMethods {
 					SELECT new map(pg.name as companyName, pg.id as companyId, p.dateCreated as dateCreated, p.lastUpdated AS lastUpdated, (CASE WHEN pr.partyIdFrom.id is NULL THEN '' ELSE 'Yes' END)as partner)
 					FROM PartyGroup pg
 					INNER JOIN Party p ON p.partyType.id='COMPANY' AND p.id=pg.id
-					LEFT JOIN PartyRelationship pr ON pr.partyRelationshipType.id = 'PARTNERS' AND pr.roleTypeCodeFrom.id = 'ROLE_COMPANY' and pr.roleTypeCodeTo.id = 'ROLE_PARTNER' and pr.partyIdTo.id = pg.id
+					LEFT JOIN PartyRelationship pr ON pr.partyRelationshipType.id = 'PARTNERS' AND pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY' and pr.roleTypeCodeTo.id = 'PARTNER' and pr.partyIdTo.id = pg.id
 					WHERE pg.id in (
 						SELECT partyIdTo.id FROM PartyRelationship
-						WHERE partyRelationshipType.id = 'CLIENTS' AND roleTypeCodeFrom.id='ROLE_COMPANY'
-						AND roleTypeCodeTo.id='ROLE_CLIENT' AND partyIdFrom.id=:whomCompanyId
+						WHERE partyRelationshipType.id = 'CLIENTS' AND roleTypeCodeFrom.id='$RoleType.CODE_PARTY_COMPANY'
+						AND roleTypeCodeTo.id='$RoleType.CODE_PARTY_CLIENT' AND partyIdFrom.id=:whomCompanyId
 						) OR pg.id =:whomCompanyId
 					GROUP BY pg.id, pr.id 
 		""")
@@ -170,9 +171,9 @@ class PartyGroupService implements ServiceMethods {
 
 				if (company) {
 					if (params.partner && params.partner == "Y" && !isAPartner(partyGroup)) {
-						partyRelationshipService.savePartyRelationship("PARTNERS", company, "ROLE_COMPANY", partyGroup, "ROLE_PARTNER")
+						partyRelationshipService.savePartyRelationship("PARTNERS", company, RoleType.CODE_PARTY_COMPANY, partyGroup, RoleType.CODE_PARTY_PARTNER)
 					} else if (!params.partner && !isAProjectPartner(partyGroup)) {
-						partyRelationshipService.deletePartyRelationship("PARTNERS", company, "ROLE_COMPANY", partyGroup, "ROLE_PARTNER")
+						partyRelationshipService.deletePartyRelationship("PARTNERS", company, RoleType.CODE_PARTY_COMPANY, partyGroup, RoleType.CODE_PARTY_PARTNER)
 					}
 				}
 			}
@@ -205,12 +206,12 @@ class PartyGroupService implements ServiceMethods {
 			if (partyType.id == "COMPANY") {
 
 				def companyParty = whom.company
-				partyRelationshipService.savePartyRelationship("CLIENTS", companyParty, "ROLE_COMPANY", partyGroup, "ROLE_CLIENT")
+				partyRelationshipService.savePartyRelationship("CLIENTS", companyParty, RoleType.CODE_PARTY_COMPANY, partyGroup, RoleType.CODE_PARTY_CLIENT)
 
 				if (partner && partner == "Y") {
 					def company = securityService.loadCurrentPerson().company
 					if (company) {
-						partyRelationshipService.savePartyRelationship("PARTNERS", company, "ROLE_COMPANY", partyGroup, "ROLE_PARTNER")
+						partyRelationshipService.savePartyRelationship("PARTNERS", company, RoleType.CODE_PARTY_COMPANY, partyGroup, RoleType.CODE_PARTY_PARTNER)
 					}
 				}
 			}
@@ -243,14 +244,14 @@ class PartyGroupService implements ServiceMethods {
 	boolean isAPartner(PartyGroup partyGroup) {
 		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
-			PartyRelationship.executeQuery('''
+			PartyRelationship.executeQuery("""
    				select count(p) from PartyRelationship p
    				where p.partyRelationshipType = 'PARTNERS'
    				  and p.partyIdFrom.id = :companyId
-   				  and p.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-   				  and p.roleTypeCodeTo.id = 'ROLE_PARTNER'
+   				  and p.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY'
+   				  and p.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_PARTNER'
    				  and	p.partyIdTo = :partyGroup
-   			''', [partyGroup: partyGroup, companyId: personCompany.id])[0] > 0
+   			""".toString(), [partyGroup: partyGroup, companyId: personCompany.id])[0] > 0
 		} else {
 			false
 		}
@@ -266,13 +267,13 @@ class PartyGroupService implements ServiceMethods {
 	boolean isAProjectPartner(PartyGroup partyGroup) {
 		Party personCompany = securityService.userLoginPerson.company
 		if (personCompany) {
-			PartyRelationship.executeQuery('''
+			PartyRelationship.executeQuery("""
    				select count(1) from PartyRelationship p
    				where p.partyRelationshipType = 'PROJ_PARTNER'
-   				  and p.roleTypeCodeFrom.id = 'ROLE_PROJECT'
-   				  and p.roleTypeCodeTo.id = 'ROLE_PARTNER'
+   				  and p.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_PROJECT'
+   				  and p.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_PARTNER'
    				  and p.partyIdTo = :partyGroup
-   			''', [partyGroup: partyGroup])[0] > 0
+   			""".toString(), [partyGroup: partyGroup])[0] > 0
 		} else {
 			false
 		}

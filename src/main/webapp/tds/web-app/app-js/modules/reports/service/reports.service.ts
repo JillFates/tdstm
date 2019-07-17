@@ -143,11 +143,14 @@ export class ReportsService {
 	/**
 	 *
 	 * Get the report prevents checklist
-	 * @param {string} eventId Report id to generate
+	 * @param {string} eventId  Report id to generate
+	 * @param {string} includeUnpublishedTasks  Whether to include or not unpublished tasks in the report
 	 * @returns {Observable<any>}
 	 */
-	getPreventsCheckList(eventId: string): Observable<any> {
-		const payload = { moveEvent: eventId };
+	getPreventsCheckList(
+		eventId: string,
+		includeUnpublishedTasks = false): Observable<any> {
+		const payload = { moveEvent: eventId, viewUnpublished: includeUnpublishedTasks };
 		return this.http.post(`${this.baseURL}/reports/generateCheckList`, JSON.stringify(payload), {responseType: 'text'})
 			.map((response: any) => {
 				return response && response || '';
@@ -379,7 +382,7 @@ export class ReportsService {
 	 * @param {boolean} missing: Flag to get missing applications
 	 * @param {boolean} unresolved: Flag to get dependencies with status Unknown or Questioned
 	 * @param {boolean} unsupported: Flag to get having no Requires dependency indication where database resides
-	 * @param {number} max: Max number of records to retrive
+	 * @param {number} max: Max number of records to retrieve
 	*/
 	getDatabaseConflicts(
 		bundle: string,
@@ -408,7 +411,7 @@ export class ReportsService {
 	}
 
 	/**
-	 * Map the resuls provided for the endpoint to get the conflicts, to the correspondint db or app reports
+	 * Map the results provided for the endpoint to get the conflicts, to the corresponding db or app reports
 	 * @param data Endpoint results
 	 * @param entity Name of the entity, it could be (app or db)
 	 * @param bundleList List of bundles related to the report

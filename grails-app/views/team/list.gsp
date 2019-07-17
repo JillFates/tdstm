@@ -4,10 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
         
-        <title>Team (RoleType) List</title>
+        <title>Team List</title>
     </head>
     <body>
-        <tds:subHeader title="Teams" crumbs="['Admin','Portal','Role Type','List']"/><br/>
+        <tds:subHeader title="Teams" crumbs="['Admin','Portal','Team','List']"/><br/>
         <div class="body">
             <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -44,7 +44,7 @@
 
             <div class="buttons">
                 <g:form>
-                    <span class="button"><g:actionSubmit class="create" action="Create" value="Create Role Type"/></span>
+                    <span class="button"><g:actionSubmit class="create" action="Create" value="Create Team"/></span>
                 </g:form>
             </div>
         </div>

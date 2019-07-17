@@ -20,6 +20,8 @@ class LoginSpec extends GebReportingSpec {
             login() //credentials are taken from config file inside method
         then: "The user should be logged in and menu should be displayed"
             at MenuPage
+        and: "The User logs out"
+            commonsModule.logout()
     }
 
     def "2. Login to Transition Manager with a wrong password twice - Negative Scenario"(){
@@ -32,6 +34,8 @@ class LoginSpec extends GebReportingSpec {
             login(6,7)
         then: "The user is successfully logged in"
             at MenuPage
+        and: "The User logs out"
+            waitFor(30){commonsModule.logout()}
     }
 
     def "3. Login to Transition Manager with an invalid username a random number of times - Negative Scenario"(){
@@ -44,6 +48,8 @@ class LoginSpec extends GebReportingSpec {
             login(6,7)
         then: "The user is successfully logged in"
             at MenuPage
+        and: "The user logs out"
+            waitFor(30){commonsModule.logout()}
     }
 
     def "4. Lock the login_e2e_test_user@tdsi.com user"(){
@@ -102,6 +108,8 @@ class LoginSpec extends GebReportingSpec {
             at UserDetailsPage
             driver.navigate().refresh()
             waitFor(30){verifyNotLockedOut()}
+        and: "We log out"
+            waitFor(30){commonsModule.logout()}
     }
 
     def "8. Verify the previously-locked-user now can login again"(){

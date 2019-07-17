@@ -6,18 +6,9 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.MoveBundleStep
-import net.transitionmanager.project.Project
 import net.transitionmanager.security.RoleType
-import net.transitionmanager.project.StepSnapshot
-import net.transitionmanager.project.Swimlane
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
-import net.transitionmanager.project.WorkflowTransitionMap
 import net.transitionmanager.security.Permission
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.project.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 // TODO BB all called
 
@@ -112,7 +103,7 @@ class WorkflowController implements ControllerMethods {
 
 				/* create Standard Workflow transitions to the workflow */
 				def stdWorkflowTransitions = WorkflowTransition.findAllByWorkflow(stdWorkflow)
-				def defaultRole = RoleType.read('ROLE_PROJ_MGR')
+				def defaultRole = RoleType.read(RoleType.CODE_TEAM_PROJ_MGR)
 				for (stdWorkflowTransition in stdWorkflowTransitions) {
 					def workflowTransition = new WorkflowTransition(
 							workflow: workflow,
