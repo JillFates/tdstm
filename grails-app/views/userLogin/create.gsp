@@ -166,7 +166,7 @@
 									</g:else>
 								</td>
 							</tr>
-							<tr class="prop">
+							<tr class="prop passwordExpiration">
 								<td valign="top" class="name">
 									<label for="passwordExpirationDateId"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</label>
 								</td>
@@ -226,107 +226,6 @@
 									</td>
 								</tr>
 							</g:each>
-                            <%--<tr class="prop">
-                              <td valign="top" class="value" >
-                              	<table style="border: none;">
-
-
-                              	</table>
-                              </td>
-                            </tr>
-                            --%><%--<tr class="prop">
-                                <td valign="top" class="value" colspan="2">
-
-                                <table style="border: none;">
-
-                                <tr>
-
-                               <td valign="top" class="name">
-
-                                    <label >Available Roles:</label>
-
-                                </td>
-
-                                <td valign="top" class="name">
-
-                                    <label >&nbsp;</label>
-
-                                </td>
-
-                                <td valign="top" class="name">
-
-                                    <label >Assigned Roles:</label>
-
-                                </td>
-
-                                </tr>
-
-                                <tr>
-
-	                                <td valign="top" class="name">
-
-		                                <select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
-
-			                                <g:each in="${roleList}" var="availableRoles">
-
-			                                	<option value="${availableRoles.id}">${availableRoles}</option>
-
-			                                </g:each>
-
-		                                </select>
-
-	                                </td>
-
-	                                <td valign="middle" style="vertical-align:middle" >
-
-		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-
-										<asset:image src="images/right-arrow.png" style="float: left; border: none;"/>
-
-										</a></span><br/><br/><br/><br/>
-
-		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
-
-		                                <asset:image src="images/left-arrow.png" style="float: left; border: none;"/>
-
-		                                </a></span>
-
-	                                </td>
-
-	                                <td valign="top" class="name">
-
-		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
-
-			                                <g:if test="${assignedRole}">
-
-				                                <g:each in="${assignedRole}" var="assignedRole">
-
-				                                	<option value="${assignedRole}" selected="selected">${RoleType.get(assignedRole)}</option>
-
-				                                </g:each>
-
-			                                </g:if>
-
-			                                <g:else>
-
-			                                	<option value="USER" selected="selected">${RoleType.get('USER')}</option>
-
-			                                </g:else>
-
-		                                </select>
-
-	                                </td>
-
-                                </tr>
-
-                                </table>
-
-                                </td>
-
-
-                            </tr> --%>
-
-
 						</tbody>
 					</table>
 				</div>
@@ -339,15 +238,17 @@
 
         function checkIfDisableSave() {
             var empty = false;
+	        var isLocal = $("#isLocal").is(":checked");
+	        //debugger;
             $('.requiredInput').each(function () {
                 if ($(this).val().length == 0) {
-                    empty = true;
+	                empty = true;
                 }
             });
 
             var passwordsMatch = $('#passwordId').val() == $('#confirmPasswordId').val();
 
-            if (empty || !passwordsMatch) {
+            if ((!isLocal && empty) || (isLocal && (empty || !passwordsMatch))) {
                 $('.save').attr('disabled', 'disabled');
                 $('.save').addClass('disableButton');
             } else {
@@ -399,11 +300,13 @@
 				if (!isChecked) {
 					$me.val(false)
 					$(".passwordsEditFields").hide();
+					$(".passwordExpiration").hide();
 					$("#emailFieldId").hide();
 					$("#emailDisplayId").show();
 				} else {
 					$me.val(true)
 					$(".passwordsEditFields").show();
+					$(".passwordExpiration").show();
 					$("#emailFieldId").show();
 					$("#emailDisplayId").hide();
 				}
