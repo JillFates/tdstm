@@ -62,11 +62,6 @@ export class LoginComponent implements OnInit {
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
-			if (this.loginInfo.notices) {
-				this.loginInfo.notices.map((notice: any) => {
-					return this.loginService.cleanNotice(notice);
-				})
-			}
 			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
 			this.setFocus();
 		});
