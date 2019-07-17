@@ -144,7 +144,6 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	 * @param {SimpleChanges} changes
 	 */
 	ngOnChanges(changes: SimpleChanges) {
-		console.log(changes);
 		if (changes['model'] && changes['model'].currentValue !== changes['model'].previousValue && !changes['model'].isFirstChange()) {
 			// Do something if the model change, like modify the this.assetSelectorModel.tags and the this.assetSelectorModel.switch
 		}
