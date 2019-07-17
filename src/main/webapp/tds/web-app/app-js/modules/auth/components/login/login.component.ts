@@ -11,6 +11,9 @@ import {UserContextModel} from '../../model/user-context.model';
 import {Router} from '@angular/router';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {WindowService} from '../../../../shared/services/window.service';
+import {NoticeModel} from "../../../noticeManager/model/notice.model";
+import {StringUtils} from "../../../../shared/utils/string.utils";
+import {DateUtils} from "../../../../shared/utils/date.utils";
 
 @Component({
 	selector: 'tds-login',
@@ -62,6 +65,11 @@ export class LoginComponent implements OnInit {
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
+			if (this.loginInfo.notices){
+				this.loginInfo.notices.map((notice: any) => {
+					return this.cleanNotice(notice);
+				})
+			}
 			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
 			this.setFocus();
 		});
@@ -121,5 +129,17 @@ export class LoginComponent implements OnInit {
 				})
 			);
 		}
+	}
+
+	cleanNotice(notice: NoticeModel): any {
+		notice.typeId = notice.typeId.toString();
+		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		notice.activationDate = notice.activationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.activationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		notice.expirationDate = notice.expirationDate
+			? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(notice.expirationDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+		return notice;
 	}
 }
