@@ -4,6 +4,7 @@ import net.transitionmanager.party.PartyRole
 
 class RoleType {
 
+	static final String ROLE_PREFIX = 'ROLE_'
 
 	/* Role Types | Each of this works as a category that groups one or more Role Type Codes */
 	/* Code that represent User Security Group types */
