@@ -11,9 +11,9 @@ import {UserContextModel} from '../../model/user-context.model';
 import {Router} from '@angular/router';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {WindowService} from '../../../../shared/services/window.service';
-import {NoticeModel} from "../../../noticeManager/model/notice.model";
-import {StringUtils} from "../../../../shared/utils/string.utils";
-import {DateUtils} from "../../../../shared/utils/date.utils";
+import {NoticeModel} from '../../../noticeManager/model/notice.model';
+import {StringUtils} from '../../../../shared/utils/string.utils';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'tds-login',
