@@ -36,13 +36,13 @@ export class BundleColumnModel {
 				label: 'Planning',
 				property: 'planning',
 				type: 'boolean',
-				width: 70
+				width: 80
 			},
 			{
-				label: 'Asset Qty',
+				label: 'Asset Quantity',
 				property: 'assetqty',
 				type: 'number',
-				width: 'auto'
+				width: 225
 			},
 			{
 				label: 'Start Time',
