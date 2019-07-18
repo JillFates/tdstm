@@ -125,6 +125,14 @@ class UserLogin {
 		expiryDate <= TimeUtil.nowGMT()
 	}
 
+	boolean hasPasswordExpired() {
+		if ((isLocal && passwordExpirationDate < new Date()) || passwordNeverExpires) {
+			return false
+		} else {
+			return true
+		}
+	}
+
 	boolean isDisabled() {
 		active != 'Y' || person.active != 'Y'
 	}
