@@ -33,6 +33,7 @@
                             id="selectType"
                             class="form-control"
                             [(ngModel)]="noticeType"
+                            (valueChange)="onChangeNoticeType($event)"
                             requiredComplexValue propertyName="typeId" required>
                         </kendo-dropdownlist>
 
