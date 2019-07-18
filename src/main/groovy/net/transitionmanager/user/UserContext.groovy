@@ -44,6 +44,15 @@ class UserContext {
 				name: moveBundle.name
 			]
 		}
+
+		Map projectMap = null
+		if (project) {
+			projectMap = [
+				id: project.id,
+				name: project.name,
+				logoUrl: logoUrl
+			]
+		}
 		return [
 		    user: [
 		        id: userLogin.id,
@@ -54,11 +63,7 @@ class UserContext {
 				firstName: person.firstName,
 				fullName: person.toString()
 			],
-			project: [
-			    id: project.id,
-				name: project.name,
-				logoUrl: logoUrl
-			],
+			project: projectMap,
 			event: eventMap,
 			bundle: bundleMap,
 			timezone: timezone,

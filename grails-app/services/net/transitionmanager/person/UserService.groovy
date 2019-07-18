@@ -739,14 +739,22 @@ class UserService implements ServiceMethods {
 		UserLogin userLogin = securityService.getUserLogin()
 		Person person = securityService.loadCurrentPerson()
 		MoveEvent moveEvent
-		String eventPref = userPreferenceService.getMoveEventId(userLogin)
-		if (eventPref) {
-			moveEvent = GormUtil.findInProject(project, MoveEvent, NumberUtil.toPositiveLong(eventPref), true)
-		}
 		MoveBundle moveBundle
-		String bundlePref = userPreferenceService.getMoveBundleId()
-		if (bundlePref) {
-			moveBundle = GormUtil.findInProject(project, MoveBundle, NumberUtil.toPositiveLong(bundlePref), true)
+		String logoUrl = null
+
+		if (project) {
+			String eventPref = userPreferenceService.getMoveEventId(userLogin)
+			if (eventPref) {
+				moveEvent = GormUtil.findInProject(project, MoveEvent, NumberUtil.toPositiveLong(eventPref), true)
+			}
+
+			String bundlePref = userPreferenceService.getMoveBundleId()
+			if (bundlePref) {
+				moveBundle = GormUtil.findInProject(project, MoveBundle, NumberUtil.toPositiveLong(bundlePref), true)
+			}
+
+			logoUrl = projectService.getProjectLogoUrl(project)
+
 		}
 
 		String timezone = userPreferenceService.getTimeZone(userLogin, TimeUtil.defaultTimeZone)
@@ -762,7 +770,7 @@ class UserService implements ServiceMethods {
 			moveBundle: moveBundle,
 			timezone: timezone,
 			dateFormat: dateFormat,
-			logoUrl: projectService.getProjectLogoUrl(project)
+			logoUrl: logoUrl
 		]
 		return new UserContext(contextParams)
 	}

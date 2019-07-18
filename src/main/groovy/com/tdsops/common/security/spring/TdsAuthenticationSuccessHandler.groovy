@@ -65,6 +65,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')
 				boolean browserTest = userAgent.toLowerCase().contains('mobile')
 
+				Project project = securityService.userCurrentProject
+
 				if (browserTest) {
 					if (browserTestiPad) {
 						redirectUri = '/projectUtil'
@@ -72,16 +74,18 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage()
+					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
 				}
 
-				// check if user has unacknowledged notices, if so, redirect user to notices page
-				Project project = securityService.userCurrentProject
-				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
-				if (hasUnacknowledgedNotices) {
-					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
-					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
+				// check if user has unacknowledged notices, if so, redirect user to notices page only if the user has a selected project.
+				if (project) {
+					hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
+					if (hasUnacknowledgedNotices) {
+						addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
+					}
 				}
+
+				addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
 
 				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
@@ -106,9 +110,11 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		}
 	}
 
-	private String redirectToPrefPage() {
+	private String redirectToPrefPage(Project project) {
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
-		if (userPreferenceService.getCurrentProjectId()) {
+
+
+		if (project) {
 			if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
 				return '/projectUtil'
 			}
@@ -118,13 +124,15 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				return '/admin/home'
 			}
+		} else {
+			return '/projectUtil'
 		}
 
 		if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-			'/module/user/dashboard'
+			return '/module/user/dashboard'
 		}
 		else {
-			'/projectUtil'
+			return '/projectUtil'
 		}
 	}
 

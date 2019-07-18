@@ -13,3 +13,4 @@
 //= require  resources/timezone/jquery.maphilight.min
 //= require  resources/timezone/jquery.timezone-picker.min
 //= require  resources/person
+//= require  resources/stateManagement
