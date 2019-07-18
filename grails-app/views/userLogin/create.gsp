@@ -166,7 +166,7 @@
 									</g:else>
 								</td>
 							</tr>
-							<tr class="prop passwordExpiration">
+							<tr class="prop passwordsEditFields">
 								<td valign="top" class="name">
 									<label for="passwordExpirationDateId"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</label>
 								</td>
@@ -300,13 +300,11 @@
 				if (!isChecked) {
 					$me.val(false)
 					$(".passwordsEditFields").hide();
-					$(".passwordExpiration").hide();
 					$("#emailFieldId").hide();
 					$("#emailDisplayId").show();
 				} else {
 					$me.val(true)
 					$(".passwordsEditFields").show();
-					$(".passwordExpiration").show();
 					$("#emailFieldId").show();
 					$("#emailDisplayId").hide();
 				}
