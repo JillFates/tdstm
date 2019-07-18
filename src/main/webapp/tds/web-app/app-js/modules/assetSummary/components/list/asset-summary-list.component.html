@@ -8,8 +8,8 @@
                         [resizable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                         <div class="checkbox just-planning">
-                            <label style="margin-left: 4px;">
-                                <input id="justPlanning" type="checkbox" [(ngModel)]="justPlanning" (change)="onChangeJustPlanning($event.currentTarget.checked)" name="justPlanning" class="component-action-just-planning">
+                            <input id="justPlanning" type="checkbox" [(ngModel)]="justPlanning" (change)="onChangeJustPlanning($event.currentTarget.checked)" name="justPlanning" class="component-action-just-planning">
+                            <label for="justPlanning" class="just-planing-label">
                                 Just Planning
                             </label>
                         </div>
