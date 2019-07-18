@@ -443,7 +443,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 					A		3		0		3		0		3		0		true
 					B		4		3		7		3		7		0		true
 					C		2		3		5		3		5		0		true
-					D		5		7		12		7		12		0	 	true
+					D		5		7		12		7		12		0		true
 					E		1		5		6		11		12		6		false
 					F		2		5		7		5		7		0		true
 					G		4		12		16		12		16		0		true

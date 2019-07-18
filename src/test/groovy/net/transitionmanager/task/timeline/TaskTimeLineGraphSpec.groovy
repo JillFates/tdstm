@@ -37,7 +37,7 @@ class TaskTimeLineGraphSpec extends Specification {
 
 		then: 'start can be calculated'
 			graph.starts.size() == 1
-			graph.starts[0].taskNumber == 'A'
+			graph.starts[0].taskComment == 'A'
 	}
 
 	void 'can calculate sink for a TaskTimeLineGraph with one start and one sink'() {
@@ -47,7 +47,7 @@ class TaskTimeLineGraphSpec extends Specification {
 
 		then: 'sink can be calculated'
 			graph.sinks.size() == 1
-			graph.sinks[0].taskNumber == 'H'
+			graph.sinks[0].taskComment == 'H'
 	}
 
 	void 'can retrieve a for a TaskTimeLineGraph with one start and one sink by taskId'() {
@@ -57,11 +57,11 @@ class TaskTimeLineGraphSpec extends Specification {
 
 		then: 'a vertex can be retrieved'
 			graph.starts.size() == 1
-			graph.starts[0].taskNumber == 'A'
+			graph.starts[0].taskComment == 'A'
 
 		and:
 			graph.sinks.size() == 1
-			graph.sinks[0].taskNumber == 'H'
+			graph.sinks[0].taskComment == 'H'
 	}
 
 	void 'can retrieve a for a TaskTimeLineGraph with one start and one sink by an instance of TaskTimeLineVertex'() {
@@ -70,7 +70,7 @@ class TaskTimeLineGraphSpec extends Specification {
 			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'a vertex can be retrieved'
-			graph.getVertex(graph.vertices.first()).taskNumber == 'A'
+			graph.getVertex(graph.vertices.first()).taskComment == 'A'
 	}
 
 	void 'can calculate start and sink for a TaskTimeLineGraph with two starts and one sink'() {
@@ -80,12 +80,12 @@ class TaskTimeLineGraphSpec extends Specification {
 
 		then: 'start can be calculated'
 			graph.starts.size() == 2
-			graph.starts[0].taskNumber == 'B'
-			graph.starts[1].taskNumber == 'C'
+			graph.starts[0].taskComment == 'B'
+			graph.starts[1].taskComment == 'C'
 
 		then: 'sink can be calculated'
 			graph.sinks.size() == 1
-			graph.sinks[0].taskNumber == 'H'
+			graph.sinks[0].taskComment == 'H'
 	}
 
 	void 'can calculate start and sink for a TaskTimeLineGraph with one start and two sinks'() {
@@ -95,12 +95,12 @@ class TaskTimeLineGraphSpec extends Specification {
 
 		then: 'start can be calculated'
 			graph.starts.size() == 1
-			graph.starts[0].taskNumber == 'A'
+			graph.starts[0].taskComment == 'A'
 
 		and: 'sink can be calculated'
 			graph.sinks.size() == 2
-			graph.sinks[0].taskNumber == 'G'
-			graph.sinks[1].taskNumber == 'H'
+			graph.sinks[0].taskComment == 'G'
+			graph.sinks[1].taskComment == 'H'
 	}
 
 	void 'test can create a TimeLineNodeGraph using AssetComment and TaskDependency'() {

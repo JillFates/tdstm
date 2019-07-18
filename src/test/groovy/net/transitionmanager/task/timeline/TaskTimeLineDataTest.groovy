@@ -56,7 +56,7 @@ trait TaskTimeLineDataTest {
 		assert target.nodesMap.size() == resultList.size() - 1
 
 		resultList.takeRight(resultList.size() - 1).eachWithIndex { String row, int index ->
-			List<String> rowValues = row.trim().split('\t\t').toList()
+			List<String> rowValues = row.trim().split('\\s+').toList()
 			Map.Entry<TaskVertex, TimelineNode> entry = target.nodesMap.find { it.key.taskComment == rowValues[0] }
 			TaskVertex vertex = entry.key
 			TimelineNode timelineNode = entry.value

@@ -24,11 +24,6 @@ class TaskVertex {
 	Date actualStart
 	String status
 
-	/**
-	 * TimeLinde Node Fields
-	 */
-
-
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
 

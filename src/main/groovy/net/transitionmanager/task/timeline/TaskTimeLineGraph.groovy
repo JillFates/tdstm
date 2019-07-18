@@ -9,7 +9,7 @@ import net.transitionmanager.task.TaskDependency
 @CompileStatic
 class TaskTimeLineGraph {
 
-	Map<String, TaskVertex> verticesMap
+	Map<Integer, TaskVertex> verticesMap
 
 	Set<TaskVertex> vertices
 	List<TaskVertex> starts = []
@@ -47,11 +47,11 @@ class TaskTimeLineGraph {
 
 	/**
 	 *
-	 * @param taskId
+	 * @param taskNumber
 	 * @return
 	 */
-	TaskVertex getVertex(String taskId) {
-		return this.verticesMap[taskId]
+	TaskVertex getVertex(Integer taskNumber) {
+		return this.verticesMap[taskNumber]
 	}
 
 	/**
@@ -60,7 +60,7 @@ class TaskTimeLineGraph {
 	 * @return
 	 */
 	TaskVertex getVertex(TaskVertex taskVertex) {
-		return this.getVertex(taskVertex.taskComment)
+		return this.getVertex(taskVertex.taskNumber)
 	}
 	/**
 	 * Adds a new edge with successor and predecessor
