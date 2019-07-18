@@ -1,7 +1,6 @@
 package net.transitionmanager.task.timeline
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -24,6 +23,11 @@ class TaskVertex {
 	Date estimatedFinish
 	Date actualStart
 	String status
+
+	/**
+	 * TimeLinde Node Fields
+	 */
+
 
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []

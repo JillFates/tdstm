@@ -42,11 +42,11 @@ trait TaskTimeLineDataTest {
 	 * Asserts several values from a {@code TaskTimeLineGraph#vertices}
 	 * from a custom table in a GString defined like te following example:
 	 * <pre>
-	 * 	Task	dur.	es.		ef.		ls.		lf.		CriticalPath?
-	 * 	A		3		0		3		0		3		true
-	 * 	B		4		3		3		7		7		true
-	 * 	C		2		3		5		5		7		false
-	 * 	D		5		7		7		12		12		true
+	 * 	Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
+	 * 	A		3		0		3		0		3		0		true
+	 * 	B		4		3		3		7		7		4		false
+	 * 	C		2		3		5		5		7		2		false
+	 * 	D		5		7		7		12		12		0		true
 	 * </pre>
 	 * @param target
 	 * @param tableResults
@@ -67,6 +67,8 @@ trait TaskTimeLineDataTest {
 			assert rowValues[3].toInteger() == timelineNode.earliestFinish, "Incorrect earliestFinish for row number $index"
 			assert rowValues[4].toInteger() == timelineNode.latestStart, "Incorrect latestStart for row number $index"
 			assert rowValues[5].toInteger() == timelineNode.latestFinish, "Incorrect latestFinish for row number $index"
+			assert rowValues[6].toInteger() == timelineNode.getSlack(), "Incorrect slack for row number $index"
+			assert new Boolean(rowValues[7]) == timelineNode.isCriticalPath(), "Incorrect isCriticalPath() for row number $index"
 		}
 		return true
 	}

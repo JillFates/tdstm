@@ -199,6 +199,80 @@ class TaskTimeLineGraphTestHelper {
 	}
 
 	/*
+							 +-+
+							 |D|
+				  +--------+>+-+------------+
+				  |          |5|            v
+				 +++         +++           +-+
+				 |B|                       |G|
+				 +-+          			   +-+
+				 |4|                       |4|
+				 +-+         +++           +-+
+							 |E|
+				  +--------+>+-+
+				  |          |1|       		+-+
+				 +++         +-+       	 	|H|
+				 |C|                   +--->+-+
+				 +-+                   |	|3|
+				 |2|                   |	+-+
+				 +++         +-+       |
+				  |          |F|       |
+				  +--------+>+-+-------+
+							 |2|
+							 +-+
+*/
+
+	TaskTimeLineGraph createAcyclicDirectedGraphWithTwoSubGraphs() {
+
+		return new TaskTimeLineGraph.SimpleBuilder()
+			.withVertex(1, 'B', 4).addEdgeTo('D')
+			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
+			.withVertex(3, 'D', 5).addEdgeTo('G')
+			.withVertex(4, 'E', 1)
+			.withVertex(5, 'F', 2).addEdgeTo('H')
+			.withVertex(6, 'G', 4)
+			.withVertex(7, 'H', 3)
+			.build()
+	}
+
+	/*
+							 +-+
+							 |D|
+				  +--------+>+-+------------+
+				  |          |1|            v
+				 +++         +++           +-+
+				 |B|                       |G|
+				 +-+          +----------+>+-+
+				 |2|          |            |4|
+				 +-+         +++           +-+
+							 |E|
+				  +--------+>+-+
+				  |          |1|       		+-+
+				 +++         +-+       	 	|H|
+				 |C|                   +--->+-+
+				 +-+                   |	|3|
+				 |2|                   |	+-+
+				 +++         +-+       |
+				  |          |F|       |
+				  +--------+>+-+-------+
+							 |2|
+							 +-+
+*/
+
+	TaskTimeLineGraph createAcyclicDirectedGraphWithMultiplesCriticalPaths() {
+
+		return new TaskTimeLineGraph.SimpleBuilder()
+			.withVertex(1, 'B', 2).addEdgeTo('D')
+			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
+			.withVertex(3, 'D', 1).addEdgeTo('G')
+			.withVertex(4, 'E', 1).addEdgeTo('G')
+			.withVertex(5, 'F', 2).addEdgeTo('H')
+			.withVertex(6, 'G', 4)
+			.withVertex(7, 'H', 3)
+			.build()
+	}
+
+	/*
 		  +++       +++
 		  |0|+----->|1|
 		  +-+       +++

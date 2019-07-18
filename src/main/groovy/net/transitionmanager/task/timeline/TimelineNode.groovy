@@ -52,6 +52,20 @@ class TimelineNode {
 	}
 
 	/**
+	 * Defines if this activity belongs to the Critical Path
+	 */
+	Boolean isCriticalPath() {
+		return (earliestStart - latestStart == 0) && (earliestFinish - latestFinish == 0)
+	}
+	/**
+	 * Slack for the current task is the difference between
+	 * the latest start time and the earliest start time.
+	 */
+	Integer getSlack() {
+		return latestStart - earliestStart
+	}
+
+	/**
 	 * This method transform the earliest/latest start/finish times into the
 	 * corresponding date values.
 	 * It also calculates the slack for the current task as the difference between
