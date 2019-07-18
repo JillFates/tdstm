@@ -6,6 +6,8 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {NoticeModel} from '../../noticeManager/model/notice.model';
+import {StringUtils} from '../../../shared/utils/string.utils';
 
 /**
  * @name LoginService
@@ -27,6 +29,11 @@ export class LoginService {
 	public getLoginInfo(): Observable<any[]> {
 		return this.http.get(this.authUrl + 'loginInfo')
 			.map((response: any) => {
+				if (response.data && response.data.notices) {
+					response.data.notices = response.data.notices.map((notice: any) => {
+						return this.cleanNotice(notice);
+					});
+				}
 				return response && response.data;
 			})
 			.catch((error: any) => error);
@@ -42,5 +49,15 @@ export class LoginService {
 				return response && response.data;
 			})
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * Clean the html content coming in the notice(s) removing the scape sequences
+	 * @returns {any}
+	 */
+	private cleanNotice(notice: NoticeModel): any {
+		notice.typeId = notice.typeId.toString();
+		notice.htmlText = StringUtils.removeScapeSequences(notice.htmlText);
+		return notice;
 	}
 }
