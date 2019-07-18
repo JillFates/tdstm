@@ -907,6 +907,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/customDomain/fieldSpec/ASSETS/DELETE" {
+			controller = "wsCustomDomain"
+			action = [
+				POST: "clearFieldSpecsData"
+			]
+		}
+
 		"/ws/customDomain/fieldSpec/$domain" {
 			controller = "wsCustomDomain"
 			action = [

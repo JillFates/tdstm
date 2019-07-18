@@ -58,4 +58,10 @@ class WsCustomDomainController implements ControllerMethods {
         setContentTypeJson()
         render(data)
     }
+
+    def clearFieldSpecsData() {
+        Project project = getProjectForWs()
+        customDomainService.clearFieldSpecsData(project, request.JSON)
+        renderSuccessJson()
+    }
 }
