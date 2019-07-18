@@ -239,7 +239,6 @@
         function checkIfDisableSave() {
             var empty = false;
 	        var isLocal = $("#isLocal").is(":checked");
-	        //debugger;
             $('.requiredInput').each(function () {
                 if ($(this).val().length == 0) {
 	                empty = true;
