@@ -290,6 +290,13 @@ class CommentService implements ServiceMethods {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
 				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
 			}
+			if (params.percentageComplete) {
+				if (NumberUtil.isaNumber(params.percentageComplete)) {
+					assetComment.percentageComplete = params.percentageComplete
+				} else {
+					assetComment.percentageComplete = Integer.parseInt(params.percentageComplete)
+				}
+			}
 
 			// Issues (aka tasks) have a number of additional properties to be managed
 			if (assetComment.commentType == AssetCommentType.TASK) {

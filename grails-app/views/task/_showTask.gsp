@@ -110,7 +110,7 @@
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>
 					</tr>
-					<tr id="completitionPercent" ng-if="acData.apiAction.id && acData.apiActionInvokedAt">
+					<tr id="completitionPercent">
 						<td valign="top" class="name" ><label>Completion %:</label></td>
 						<td colspan="1" class="progress-container">
 							<div class="progress">
