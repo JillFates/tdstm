@@ -501,8 +501,7 @@ class TaskService implements ServiceMethods {
 		Map jwt = securityService.generateJWT()
 		actionRequestMap.options.callback = [
 			siteUrl: url,
-			token: jwt.access_token,
-			refreshToken: jwt.refresh_token
+			token: jwt.access_token
 		]
 
 		// check if api action has credentials so to include credentials password unencrypted
