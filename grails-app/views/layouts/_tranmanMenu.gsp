@@ -227,15 +227,19 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="divider"></li>
+                            <tds:hasPermission permission="${Permission.DataTransferBatchView}">
+                                <li class="divider"></li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
                                     <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                                <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
-                            </li>
+                            <tds:hasPermission permission="${Permission.AssetImport}">
+                                <li class="menu-child-item menu-parent-assets-import-assets-etl">
+                                    <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
                                     <g:link controller="assetEntity" action="assetImport">Import Assets (TM Excel)</g:link>
