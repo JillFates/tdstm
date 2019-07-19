@@ -4,10 +4,12 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.reporting.DashboardService
 import net.transitionmanager.security.Permission
@@ -73,5 +75,35 @@ class WsEventController implements ControllerMethods {
 		userPreferenceService.setMoveEventId(moveEvent.id)
 
 		renderSuccessJson([model: dashboardService.getEventDashboardModel(project, moveEvent, viewUnpublished)])
+	}
+
+
+	/*
+	 * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+	 * @param  : moveEventId and moveEvent dialIndicatorValue
+	 */
+	@HasPermission(Permission.EventEdit)
+	def updateEventSummary() {
+		Map requestParams  = request.JSON ?: params
+
+		MoveEvent moveEvent = MoveEvent.get(requestParams.moveEventId)
+		Integer dialIndicator
+		if (StringUtil.toBoolean(requestParams.checkbox)) {
+			dialIndicator = NumberUtil.toPositiveInteger(requestParams.value)
+		}
+		if (dialIndicator  || dialIndicator == 0) {
+			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
+				dialIndicator: dialIndicator, type: 'P')
+			saveWithWarnings moveEventSnapshot
+			if (moveEventSnapshot.hasErrors()) {
+				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+			}
+			else {
+				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
+			}
+
+			saveWithWarnings moveEvent
+		}
+		renderSuccessJson("success")
 	}
 }
