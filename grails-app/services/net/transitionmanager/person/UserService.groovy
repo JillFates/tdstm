@@ -253,6 +253,7 @@ class UserService implements ServiceMethods {
 			if (domain.updateRoles) {
 
 				List roleTypeCodes = SecurityConfigParser.getDomainRoleTypeCodes(config, authority)
+				roleTypeCodes = roleTypeCodes.collect{String role -> RoleType.ROLE_PREFIX + role.toUpperCase()}
 				List roleTypes = RoleType.getAll(roleTypeCodes).findAll()
 
 				// Get the user roles from DB and compare
