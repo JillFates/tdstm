@@ -295,7 +295,7 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.EventEdit)
 	def updateEventSumamry() {
-		Map requestParams  = (request.format == 'json' ? request.JSON : request)
+		Map requestParams  = request.JSON ?: params
 
 		MoveEvent moveEvent = MoveEvent.get(requestParams.moveEventId)
 		def dialIndicator
