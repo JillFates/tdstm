@@ -713,7 +713,8 @@ class TaskService implements ServiceMethods {
 		}
 
 		// Trigger the action if it is automatic and the action is local
-		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally()) {
+		// and task already exist (it fails with task not found when task has not been saved yet)
+		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally() && task.id) {
 			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
