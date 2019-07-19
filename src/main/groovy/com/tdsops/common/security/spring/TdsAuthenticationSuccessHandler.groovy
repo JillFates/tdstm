@@ -49,11 +49,19 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			UserLogin userLogin = securityService.userLogin
 			auditService.saveUserAudit UserAuditBuilder.login()
 
+			// This map will contain all the user-related data that needs to be sent in the response's payload.
+			Map signInInfoMap = [
+				userContext: userService.getUserContext().toMap()
+			]
+
 			if (securityService.shouldLockoutAccount(userLogin)) {
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
-				redirectUri = '/module/auth/login'
+
+				signInInfoMap.notices = [
+					redirectUrl: '/module/auth/login'
+				]
 			} else {
 				userService.updateLastLogin(userLogin)
 				userService.resetFailedLoginAttempts(userLogin)
@@ -89,16 +97,14 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
-			}
 
-			// This map will contain all the user-related data that needs to be sent in the response's payload.
-			Map signInInfoMap = [
-			    userContext: userService.getUserContext().toMap(),
-				notices: [
+				signInInfoMap.notices = [
 					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
 					redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
 				]
-			]
+			}
+
+
 			response.setHeader('content-type', 'application/json')
 			PrintWriter responseWriter = response.getWriter()
 			responseWriter.print(JsonUtil.toJson(signInInfoMap))
