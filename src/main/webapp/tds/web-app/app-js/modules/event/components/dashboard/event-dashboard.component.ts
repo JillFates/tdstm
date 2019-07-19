@@ -135,14 +135,18 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	/**
-	 * Passing and event id search for it in the event list
+	 * Passing and event id search for it in the event list, on not found it returns
+	 * the first list element whenever the list has elements, otherwise it returns null
  	 * @param {number} id  Event id
 	 * @returns {any} Event found otherwhise null
 	*/
 	private getDefaultEvent(id: string): any {
 		if (id) {
 			return this.eventList.find((event) => event.id.toString() === id) || null;
+		} else if (this.eventList.length)  {
+			return this.eventList[0];
 		}
+
 		return null;
 	}
 
