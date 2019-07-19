@@ -4,14 +4,54 @@
  */
 var stateManagement = function () {
 
-    var stateKey = '@@STATE';
+    var stateKey = '@@STATE-' + window.location.hostname;
     var state = JSON.parse(localStorage.getItem(stateKey));
 
-    var setProject = function (project) {
+    /**
+     * Update the project, it also set to null the event and bundle
+     * @param id
+     * @param name
+     * @param logoUrl
+     */
+    var setProject = function (id, name, logoUrl) {
         if (state && state.TDSApp && state.TDSApp.userContext) {
-            state.TDSApp.userContext.project = project;
+            state.TDSApp.userContext.project = { id: id, name: name, logoUrl: logoUrl};
+            state.TDSApp.userContext.event = null;
+            state.TDSApp.userContext.bundle = null;
             updateState();
         }
+    };
+
+    /**
+     * Update the event, it also set to null the bundle
+     * @param id
+     * @param name
+     */
+    var setEvent = function (id, name) {
+        if (state && state.TDSApp && state.TDSApp.userContext) {
+            state.TDSApp.userContext.event = { id: id, name: name};
+            state.TDSApp.userContext.bundle = null;
+            updateState();
+        }
+    };
+
+    /**
+     * Update the bundle
+     * @param id
+     * @param name
+     */
+    var setBundle = function (id, name) {
+        if (state && state.TDSApp && state.TDSApp.userContext) {
+            state.TDSApp.userContext.bundle = {id: id, name: name};
+            updateState();
+        }
+    };
+
+    /**
+     * To destroy the Local on Logout
+     */
+    var destroyState = function () {
+        localStorage.removeItem(stateKey);
     };
 
     /**
@@ -22,8 +62,10 @@ var stateManagement = function () {
     };
 
     return {
+        stateKey: stateKey,
+        destroyState: destroyState,
         setProject: setProject,
+        setEvent: setEvent,
+        setBundle: setBundle
     }
-}()
-
-
+}();
