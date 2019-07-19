@@ -4,7 +4,17 @@
     <div class="title">Event Status vs. Plan</div>
 
     <div *ngIf="showEditControl" class="update-controls">
-            <input type="number" [(ngModel)]="progress" #progressInput>
-            <tds-button-save (click)="onSave(progressInput.value)" class="btn-primary"></tds-button-save>
+       <kendo-numerictextbox
+            #progressInput
+            name="currentStatus"
+            [format]="'n'"
+            [format]="'n'"
+            [min]="0"
+            [max]="100"
+            [autoCorrect]=true
+            [(ngModel)]="progress">
+        </kendo-numerictextbox>
+
+        <tds-button-save (click)="onSave(progressInput.value)" class="btn-primary"></tds-button-save>
     </div>
 </div>

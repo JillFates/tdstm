@@ -35,4 +35,11 @@ export class PlanVersusStatusComponent implements OnChanges {
 	public onClickChart() {
 		this.showEditControl = !this.showEditControl;
 	}
+
+	/**
+	 * Reset the statue of the control
+	*/
+	public reset() {
+		this.showEditControl = false;
+	}
 }

@@ -12,8 +12,10 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { EventsService } from './../../service/events.service';
 import { NewsModel, NewsDetailModel } from './../../model/news.model';
 import { EventModel, EventPlanStatus } from './../../model/event.model';
+
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
+import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
 
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
@@ -24,6 +26,7 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 })
 
 export class EventDashboardComponent implements OnInit {
+	@ViewChild('planVersusStatus') public planVersusStatus: PlanVersusStatusComponent;
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;

@@ -25,7 +25,9 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-2">
-                    <tds-plan-versus-status (changeProgress)="onChangeStatus($event)"
+                    <tds-plan-versus-status 
+                        #planVersusStatus
+                        (changeProgress)="onChangeStatus($event)"
                         [currentProgress]="eventPlanStatus.dialIndicator">
                     </tds-plan-versus-status>
                 </div>
