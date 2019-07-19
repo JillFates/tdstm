@@ -288,7 +288,12 @@
         $(document).ready(function () {
             $("#bForBundle").dialog({autoOpen: false})
 
-        })
+        });
+
+        // Every time we land on a page that update the state, we make the proper change inside the model
+        if (stateManagement ) {
+            stateManagement.setBundle(${moveBundleInstance?.id}, '${moveBundleInstance?.name}');
+        }
     </script>
 </div>
 </body>

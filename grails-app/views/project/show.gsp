@@ -145,13 +145,7 @@
 			$('.menu-parent-projects').addClass('active');
 			// Every time we land on a page that update the state, we make the proper change inside the model
 			if (stateManagement ) {
-				stateManagement.setProject(
-						{
-							id: ${projectInstance?.id},
-							name: '${projectInstance.name}',
-							logoUrl: '${projectLogoUrl}'
-						}
-				);
+				stateManagement.setProject(${projectInstance?.id}, '${projectInstance.name}', '${projectLogoUrl}');
 			}
 		</script>
 	</body>

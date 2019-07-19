@@ -108,6 +108,12 @@
 	$(".menu-parent-planning-event-detail-list").addClass('active');
 	$(".menu-parent-planning").addClass('active');
 
+	// Every time we land on a page that update the state, we make the proper change inside the model
+	if (stateManagement ) {
+		stateManagement.setEvent(${moveEventInstance?.id}, '${moveEventInstance?.name}');
+	}
+
+
    	function markAssetsMoved( moveEventId ){
    		 $("#messageDiv").hide();
      	 $("#messageDiv").html("");
