@@ -1,26 +1,32 @@
+// Angular
 import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {GridDataResult} from '@progress/kendo-angular-grid';
+import {ActivatedRoute} from '@angular/router';
+// Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+// Components
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+// Models
+import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+// Kendo
+import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
+import {EventColumnModel, EventModel} from '../../model/event.model';
+import {EventsService} from '../../service/events.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute} from '@angular/router';
-import {BundleService} from '../../service/bundle.service';
-import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
-import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
-import {BundleCreateComponent} from '../create/bundle-create.component';
-import {BundleViewEditComponent} from '../view-edit/bundle-view-edit.component';
+import {EventCreateComponent} from '../create/event-create.component';
+import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
 
 declare var jQuery: any;
 
 @Component({
-	selector: `bundle-list`,
-	templateUrl: 'bundle-list.component.html',
+	selector: 'event-list',
+	templateUrl: 'event-list.component.html',
 })
-export class BundleListComponent implements OnInit, AfterContentInit {
+export class EventListComponent implements OnInit, AfterContentInit {
+	protected gridColumns: any[];
+
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -34,28 +40,27 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
-	public bundleColumnModel = null;
+	public eventColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
 	public actionType = ActionType;
 	public gridData: GridDataResult;
-	public resultSet: BundleModel[];
-	public canEditBundle;
+	public resultSet: EventModel[];
+	public selectedRows = [];
 	public dateFormat = '';
-	public booleanFilterData = BooleanFilterData;
-	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	public canEditEvent = false;
 
 	constructor(
 		private dialogService: UIDialogService,
 		private permissionService: PermissionService,
-		private bundleService: BundleService,
+		private eventsService: EventsService,
 		private prompt: UIPromptService,
-		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2) {
+		private renderer: Renderer2,
+		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
-		this.resultSet = this.route.snapshot.data['bundles'];
+		this.resultSet = this.route.snapshot.data['events'];
 		this.gridData = process(this.resultSet, this.state);
 	}
 
@@ -63,14 +68,15 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
-				this.bundleColumnModel = new BundleColumnModel(`{0:${dateFormat}}`);
-			});
-		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
+				this.eventColumnModel = new EventColumnModel(`{0:${dateFormat}}`);
+				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
+			})
+		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 	}
 
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
-			this.showBundle(this.route.snapshot.queryParams['show']);
+			this.showEvent(this.route.snapshot.queryParams['show']);
 		}
 	}
 
@@ -85,35 +91,27 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	}
 
 	protected onFilter(column: any): void {
-		const root = this.bundleService.filterColumn(column, this.state);
+		const root = this.eventsService.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
 
 	protected clearValue(column: any): void {
-		this.bundleService.clearFilter(column, this.state);
+		this.eventsService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
 	}
 
-	protected showBundle(id): void {
-		this.dialogService.open(BundleViewEditComponent,
-			[{provide: 'id', useValue: id}]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
-	}
-
-	protected openCreateBundle(): void {
-		this.dialogService.open(BundleCreateComponent,
-			[]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
+	/**
+	 * Catch the Selected Row
+	 * @param {SelectionEvent} event
+	 */
+	protected cellClick(event: CellClickEvent): void {
+		if (event.columnIndex > 0) {
+			this.showEvent(event['dataItem'].id);
+		}
 	}
 
 	protected reloadData(): void {
-		this.bundleService.getBundles().subscribe(
+		this.eventsService.getEventsForList().subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -132,6 +130,20 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		this.renderer.setStyle(target, 'height', '36px');
 	}
 
+	protected openEventDialogCreate(): void {
+		this.dialogService.open(EventCreateComponent, []).then(result => {
+			// update the list to reflect changes, it keeps the filter
+			this.reloadData();
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+
+	protected selectRow(dataItemId: number): void {
+		this.selectedRows = [];
+		this.selectedRows.push(dataItemId);
+	}
+
 	/**
 	 * Make the entire header clickable on Grid
 	 * @param event: any
@@ -140,6 +152,15 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		if (event.target && event.target.parentNode) {
 			event.target.parentNode.click();
 		}
+	}
+
+	protected showEvent(id): void {
+		this.dialogService.open(EventViewEditComponent,
+			[{provide: 'id', useValue: id}]).then(result => {
+			this.reloadData();
+		}).catch(result => {
+			this.reloadData();
+		});
 	}
 
 	/**

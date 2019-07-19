@@ -78,7 +78,7 @@
                             <td valign="top" class="name">Event:</td>
 
                             <td valign="top" class="value">
-                                <a href="/tdstm/moveEvent/show/{{savedModel?.moveEventid}}">{{savedModel?.moveEventId}}</a>
+                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEventid}">{{savedModel?.moveEventId}}</a>
                             </td>
 
                         </tr>

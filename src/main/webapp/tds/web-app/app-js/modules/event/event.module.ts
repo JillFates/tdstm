@@ -25,11 +25,15 @@ import {PlanVersusStatusComponent} from './components/plan-versus-status/plan-ve
 import {EventResumeComponent} from './components/event-resume/event-resume.component';
 import {TeamTaskPercentsComponent} from './components/team-task-percents/team-task-percents.component';
 import {BundleStepsComponent} from './components/bundle-steps/bundle-steps.component';
+import {EventListComponent} from './components/list/event-list.component';
+import {EventCreateComponent} from './components/create/event-create.component';
+import {EventViewEditComponent} from './components/view-edit/event-view-edit.component';
 
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Services
 import {EventsService} from './service/events.service';
+import {EventsResolveService} from './resolve/events-resolve.service';
 
 @NgModule({
 	imports: [
@@ -42,6 +46,8 @@ import {EventsService} from './service/events.service';
 		DropDownsModule,
 		GridModule,
 		PopupModule,
+		InputsModule,
+		DateInputsModule,
 		SortableModule,
 		IntlModule,
 		InputsModule,
@@ -52,6 +58,9 @@ import {EventsService} from './service/events.service';
 		EventRouteModule
 	],
 	declarations: [
+		EventListComponent,
+		EventCreateComponent,
+		EventViewEditComponent,
 		EventDashboardComponent,
 		NewsCreateEditComponent,
 		NewsComponent,
@@ -63,10 +72,19 @@ import {EventsService} from './service/events.service';
 	providers: [
 		// Resolve
 		ModuleResolveService,
+		EventsResolveService,
 		// Service
 		EventsService
 	],
+	entryComponents: [
+		EventCreateComponent,
+		EventViewEditComponent,
+		NewsCreateEditComponent
+	],
 	exports: [
+		EventListComponent,
+		EventCreateComponent,
+		EventViewEditComponent,
 		EventDashboardComponent,
 		NewsCreateEditComponent,
 		NewsComponent,
@@ -74,12 +92,8 @@ import {EventsService} from './service/events.service';
 		EventResumeComponent,
 		TeamTaskPercentsComponent,
 		BundleStepsComponent
-	],
-	entryComponents: [
-		NewsCreateEditComponent
 	]
 })
 
 export class EventModule {
-
 }

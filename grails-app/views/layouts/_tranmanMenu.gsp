@@ -264,11 +264,11 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Events</li>
                             <li class="menu-child-item menu-parent-planning-event-list">
-                                <g:link controller="moveEvent" action="list">List Events</g:link>
+                                <g:link controller="module" action="event" id="list">List Events</g:link>
                             </li>
                             <g:if test="${currProject && moveEvent}">
                                 <li class="menu-child-item menu-parent-planning-event-detail-list">
-                                    <g:link controller="moveEvent" action="show" id="${moveEvent.id}">${moveEvent.name} Event Details</g:link>
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">${moveEvent.name} Event Details</a>
                                 </li>
                             </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">

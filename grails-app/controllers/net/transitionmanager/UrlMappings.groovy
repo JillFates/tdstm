@@ -218,6 +218,31 @@ class UrlMappings {
 			action = [GET: "listEvents"]
 		}
 
+		"/ws/moveEvent/createModel" {
+			controller = "wsEvent"
+			action = [GET:"getModelForCreate"]
+		}
+
+		"/ws/moveEvent/viewEditModel/$id" {
+			controller = "wsEvent"
+			action = [GET:"getModelForViewEdit"]
+		}
+
+		"/ws/moveEvent/saveEvent/$id?" {
+			controller = "wsEvent"
+			action = [POST:"saveEvent"]
+		}
+
+		"/ws/moveEvent/markAssetsMoved/$id" {
+			controller = "wsEvent"
+			action = [PUT:"markEventAssetAsMoved"]
+		}
+
+		"/ws/moveEvent/deleteEvent/$id" {
+			controller = "wsEvent"
+			action = [DELETE:"deleteEvent"]
+		}
+
 		"/ws/moveEventNews/$id?" {
 			controller = "moveEventNews"
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
@@ -307,7 +332,6 @@ class UrlMappings {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
 		}
-
 
 		/***************************/
 

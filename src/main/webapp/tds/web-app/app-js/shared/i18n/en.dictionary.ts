@@ -205,6 +205,15 @@ export const en_DICTIONARY: Object = {
 		'PLURAL_NAME': 'Dependencies',
 		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
+	'EVENT': {
+		'EVENT': 'Event',
+		'EVENTS': 'Events',
+		'CREATE_EVENT': 'Create Event',
+		'LIST': 'Event List',
+		'TITLE_DASHBOARD': 'Event Dashboard',
+		'DASHBOARD': 'Dashboard',
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
@@ -289,12 +298,6 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
-	},
-	'EVENT': {
-		'TITLE_DASHBOARD': 'Event Dashboard',
-		'DASHBOARD': 'Dashboard',
-		'EVENT': 'Event',
-		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
 	},
 	'NEWS': {
 		'EDIT_NEWS': 'News Edit',

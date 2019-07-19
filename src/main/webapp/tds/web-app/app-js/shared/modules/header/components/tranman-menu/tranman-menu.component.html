@@ -219,10 +219,10 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Events</li>
                     <li class="menu-child-item menu-parent-planning-event-list">
-                        <a href="/tdstm/moveEvent/list">List Events</a>
+                        <a href="/tdstm/module/event/list">List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
-                        <a href="/tdstm/moveEvent/show/{{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
+                        <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
                         <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
@@ -237,6 +237,9 @@
                     <li class="menu-parent-item">Bundles</li>
                     <li class="menu-child-item menu-parent-planning-list-bundles">
                         <a href="/tdstm/module/bundle/list">List Bundles</a>
+                    </li>
+                    <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
+                        <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
                     </li>
                 </ul>
             </li>
