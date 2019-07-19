@@ -21,6 +21,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes && changes.currentProgress) {
 			this.progress = changes.currentProgress.currentValue;
+			this.currentProgress = this.progress;
 			this.reset();
 		}
 	}
@@ -29,7 +30,8 @@ export class PlanVersusStatusComponent implements OnChanges {
 	 * Save the status value
  	 * @param {string} value  Status value
 	*/
-	public onSave(value: string): void {
+	public onSave(value: number): void {
+		this.currentProgress = value;
 		this.changeProgress.emit(this.progress);
 		this.reset();
 	}
@@ -45,6 +47,21 @@ export class PlanVersusStatusComponent implements OnChanges {
 	 * Reset the statue of the control
 	*/
 	public reset() {
-		this.form.controls['currentStatus'].markAsPristine();
+		if (this.form && this.form.controls) {
+			this.form.controls['currentStatus'].markAsPristine();
+		}
+	}
+
+	/**
+	 * Based on the current progress get the corresponding image number
+	 * for pairs numbers return the value otherwise return the value - 1
+ 	 * @param {number} progress  Current status percent progress
+	*/
+	public getImageDial(progress: number): number  {
+		if (progress) {
+			return (progress % 2 === 0) ? progress : progress - 1;
+		}
+
+		return progress;
 	}
 }

@@ -89,7 +89,6 @@ export class EventDashboardComponent implements OnInit {
  	 * @param {number} id  Event id
 	*/
 	public onSelectedEvent(id: number): void {
-		this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 		this.getNewsFromEvent(id);
 
 		this.eventsService.getEventDetails(id, true)
@@ -100,6 +99,7 @@ export class EventDashboardComponent implements OnInit {
 				if (bundles.length) {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
+
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						this.bundleSteps = this.eventsService.getBundleSteps(
@@ -118,6 +118,9 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
 						this.eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
 					});
+				} else {
+					this.bundleSteps = this.eventsService.getEmptyBundleSteps();
+					this.eventPlanStatus = new EventPlanStatus();
 				}
 			});
 	}
