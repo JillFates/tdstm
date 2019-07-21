@@ -220,4 +220,12 @@ export class EventDashboardComponent implements OnInit {
 	public onTimeout(): void {
 		this.onSelectedEvent(this.selectedEvent.id);
 	}
+
+	/**
+	 * Determine if the current event has bundle steps
+	*/
+	public hasBundleSteps(): boolean {
+		return this.bundleSteps && this.bundleSteps.moveBundleList.length > 0;
+	}
+
 }

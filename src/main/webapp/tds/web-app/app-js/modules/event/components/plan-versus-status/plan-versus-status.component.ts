@@ -9,6 +9,7 @@ import {NgForm, Form} from '@angular/forms';
 export class PlanVersusStatusComponent implements OnChanges {
 	@ViewChild('form') form: NgForm ;
 	@Input() currentProgress = 0;
+	@Input() hasBundleSteps: boolean;
 	@Output() changeProgress: EventEmitter<number> = new EventEmitter<number>();
 	public progress = 0;
 	public showEditControl = false;
@@ -23,6 +24,9 @@ export class PlanVersusStatusComponent implements OnChanges {
 			this.progress = changes.currentProgress.currentValue;
 			this.currentProgress = this.progress;
 			this.reset();
+		}
+		if (changes && changes.hasBundleSteps) {
+			this.hasBundleSteps = changes.hasBundleSteps.currentValue;
 		}
 	}
 
@@ -49,6 +53,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	public reset() {
 		if (this.form && this.form.controls) {
 			this.form.controls['currentStatus'].markAsPristine();
+			this.showEditControl = false;
 		}
 	}
 
