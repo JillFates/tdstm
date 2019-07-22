@@ -95,7 +95,7 @@ class UserService implements ServiceMethods {
 
 		boolean autoProvision = domain.autoProvision
 		Long defaultProject = domain.defaultProject
-		String defaultRole = RoleType.ROLE_PREFIX + domain.defaultRole ?: ''
+		String defaultRole = domain.defaultRole ? RoleType.ROLE_PREFIX + domain.defaultRole.toUpperCase() : ''
 		String defaultTimezone = domain.defaultTimezone ?: ''
 
 		PartyGroup company = PartyGroup.get(userInfo.companyId)
@@ -228,10 +228,8 @@ class UserService implements ServiceMethods {
 
 		// Setup what the user roles should be based on the configuration and what came back from the userInfo
 		List newUserRoles = userInfo.roles.size() ? userInfo.roles : []
-		if (defaultRole) {
-			if (!newUserRoles.contains(defaultRole)) {
-				newUserRoles << defaultRole
-			}
+		if (defaultRole && !newUserRoles) {
+			newUserRoles << defaultRole
 		}
 
 		if (createUser) {
