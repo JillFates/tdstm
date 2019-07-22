@@ -1,18 +1,17 @@
 package com.tdsops.etl
 
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+import grails.test.mixin.Mock
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.ScriptExpressionChecker
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -188,7 +187,6 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -234,7 +232,6 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -335,7 +332,6 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 			customizer.addStaticStars(Math.name)
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -472,81 +468,4 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 		152255,Mozilla,NGM,ACME Data Center
 	""".stripIndent()
 
-	void 'test scripts with prohibited and non prohibited methods for strings and objects'() {
-		given:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				simpleDataSet,
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
-
-		and:
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.closuresAllowed = false             // allow closure creation for the ETL iterate command
-			secureASTCustomizer.methodDefinitionAllowed = false     // disallow method definitions
-			secureASTCustomizer.importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']  // Empty withe list means forbid imports
-
-			ImportCustomizer customizer = new ImportCustomizer()
-			customizer.addStaticStars(Math.name)
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
-		when: 'A script with a prohibited string method is called'
-			etlProcessor.evaluate("""
-			'ls /'.execute().text
-		""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			etlProcessor.evaluate("""
-			'www.google.com'.toURI()
-		""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			etlProcessor.evaluate("""
-			'ls /'.execute().toURL()
-		""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			etlProcessor.evaluate("""
-			'5'.asType(Integer)
-		""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a non-prohibited string method is called'
-			etlProcessor.evaluate("""
-			'test'.toUpperCase()
-		""".stripIndent(), configuration)
-
-		then: 'no exception is thrown'
-			noExceptionThrown()
-
-		when: 'A script with a non-prohibited object method is called'
-			etlProcessor.evaluate("""
-			new Object().asBoolean()
-		""".stripIndent(), configuration)
-
-		then: 'no exception is thrown'
-			noExceptionThrown()
-
-		when: 'A script with a non-prohibited string method is called'
-			etlProcessor.evaluate("""
-			new Object().addShutdownHook({})
-		""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-	}
 }

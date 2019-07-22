@@ -88,7 +88,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'Actions',
 	},
 	'ASSET_EXPLORER': {
-		'ASSET_EXPLORER': 'View Manager',
+		'ASSET_EXPLORER': 'Manage Views',
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'SHOW': 'Show View',
@@ -205,6 +205,15 @@ export const en_DICTIONARY: Object = {
 		'PLURAL_NAME': 'Dependencies',
 		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
+	'EVENT': {
+		'EVENT': 'Event',
+		'EVENTS': 'Events',
+		'CREATE_EVENT': 'Create Event',
+		'LIST': 'Event List',
+		'TITLE_DASHBOARD': 'Event Dashboard',
+		'DASHBOARD': 'Dashboard',
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
@@ -217,7 +226,11 @@ export const en_DICTIONARY: Object = {
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'BUNDLES': {
+			'BUNDLES': 'Bundles',
+			'LIST': 'Bundle List',
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
@@ -285,6 +298,10 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
+	},
+	'NEWS': {
+		'EDIT_NEWS': 'News Edit',
+		'CREATE_NEWS': 'News Create'
 	},
 	'LOGIN': {
 		'BACK_TO_LOGIN': 'Back to Login',

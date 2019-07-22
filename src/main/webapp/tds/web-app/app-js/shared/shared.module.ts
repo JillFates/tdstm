@@ -93,6 +93,7 @@ import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-
 import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
+import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
@@ -170,6 +171,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
+		PieCountdownComponent,
 		TDSFilterInputComponent
 	],
 	exports: [
@@ -230,6 +232,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
+		PieCountdownComponent,
 		TDSFilterInputComponent
 	],
 	entryComponents: [

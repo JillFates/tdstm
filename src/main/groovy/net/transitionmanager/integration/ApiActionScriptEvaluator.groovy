@@ -1,8 +1,6 @@
 package net.transitionmanager.integration
 
-
 import groovy.transform.TimedInterrupt
-import net.transitionmanager.security.ScriptExpressionChecker
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -29,6 +27,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS
 import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
+
 /**
  * Evaluate and check API action scripts.
  *
@@ -97,7 +96,6 @@ class ApiActionScriptEvaluator {
 
 		ImportCustomizer customizer = new ImportCustomizer()
 
-		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
 		return configuration

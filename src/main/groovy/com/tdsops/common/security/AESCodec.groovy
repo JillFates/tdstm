@@ -33,7 +33,6 @@ class AESCodec {
 	private static final int ITERATION_COUNT = 65536
 	private static final String SECRET_KEY_ALGORITHM = 'PBKDF2WithHmacSHA256'
 	private static final String AES_ALGORITHM = 'AES'
-	private static final String AES_PROVIDER = 'SunJCE'
 	private static final String AES_WITH_CBC_ALGORITHM = 'AES/CBC/PKCS5Padding'
 
 	/*
@@ -237,7 +236,7 @@ class AESCodec {
 	 * @return a cryptographic cipher for encryption and decryption
 	 */
 	private Cipher getCipher(int mode, String secretKey) {
-		Cipher cipher = Cipher.getInstance(AES_ALGORITHM, AES_PROVIDER)
+		Cipher cipher = Cipher.getInstance(AES_ALGORITHM)
 		cipher.init(mode, deriveSecretKey(secretKey))
 		return cipher
 	}
@@ -254,7 +253,7 @@ class AESCodec {
 	 */
 	private SecretKey deriveSecretKey(String secretKey, String salt) {
 		// Derive the key, given secretKey and salt
-		SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_ALGORITHM, AES_PROVIDER)
+		SecretKeyFactory factory = SecretKeyFactory.getInstance(SECRET_KEY_ALGORITHM)
 		KeySpec spec = new PBEKeySpec(secretKey.toCharArray(), salt.bytes, ITERATION_COUNT, KEYLEN_BITS)
 		SecretKey tmp = factory.generateSecret(spec)
 		SecretKey secret = new SecretKeySpec(tmp.getEncoded(), AES_ALGORITHM)
@@ -271,7 +270,7 @@ class AESCodec {
 	 * @return a cryptographic cipher for encryption and decryption
 	 */
 	private Cipher getCipherWithBlockChaining(int mode, String secretKey, String salt, byte[] initializationVector) {
-		Cipher cipher = Cipher.getInstance(AES_WITH_CBC_ALGORITHM, AES_PROVIDER)
+		Cipher cipher = Cipher.getInstance(AES_WITH_CBC_ALGORITHM)
 		if (Cipher.ENCRYPT_MODE == mode) {
 			cipher.init(mode, deriveSecretKey(secretKey, salt))
 		} else {

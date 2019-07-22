@@ -29,6 +29,7 @@ class DashboardController implements ControllerMethods {
 	UserService userService
 	MoveEventService moveEventService
 
+	@Deprecated
 	@HasPermission(Permission.DashboardMenuView)
 	def index() {
 		licenseAdminService.checkValidForLicenseOrThrowException()

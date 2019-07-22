@@ -31,7 +31,7 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
-        waitFor(30){planningModule.goToListEvents()}
+        planningModule.goToListEvents()
         at ListEventsPage
 
     }
