@@ -8,7 +8,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {EventsService} from '../../service/events.service';
 
 // Model
-import {NewsDetailModel} from '../../model/news.model';
+import {NewsDetailModel, CommentType} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -16,12 +16,15 @@ import {Permission} from '../../../../shared/model/permission.model';
 	templateUrl: 'news-create-edit.component.html'
 })
 export class NewsCreateEditComponent {
+	public commentType: string;
+
 	constructor(
 		public model: NewsDetailModel,
 		public activeDialog: UIActiveDialogService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService,
 		private eventsService: EventsService) {
+			this.commentType = CommentType[model.commentType];
 	}
 
 	/**

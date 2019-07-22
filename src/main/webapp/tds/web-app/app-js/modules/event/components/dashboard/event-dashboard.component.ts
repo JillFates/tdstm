@@ -127,15 +127,17 @@ export class EventDashboardComponent implements OnInit {
 
 	/**
 	 * On click over a news title get the news details and with that show the create/edit news views
- 	 * @param {number} id  News id
+ 	 * @param {any} news selected
 	*/
-	public onSelectedNews(id: number): void {
-		const getNewsDetail = id ? this.eventsService.getNewsDetail(id) : Observable.of(new NewsDetailModel());
+	public onSelectedNews(selectedNews: any): void {
+		const getNewsDetail = selectedNews.id ?
+			this.eventsService.getNewsDetail(selectedNews.id, selectedNews.type) : Observable.of(new NewsDetailModel());
 		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
-				if (news.commentObject) {
+				if (news.commentObject && news.commentObject.moveEvent) {
 					news.commentObject.moveEvent.id = this.selectedEvent.id;
 				}
+				news.commentType = selectedNews.type;
 				this.openCreateEditNews(news)
 			})
 	}

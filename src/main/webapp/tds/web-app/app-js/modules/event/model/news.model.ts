@@ -27,6 +27,7 @@ export class NewsDetailModel {
 	dtCreated: string;
 	dtResolved: string;
 	assetName: string;
+	commentType: string;
 
 	constructor() {
 		this.commentObject = {
@@ -50,4 +51,9 @@ export class NewsDetailModel {
 		this.dtResolved = '';
 		this.assetName = '';
 	}
+}
+
+export const CommentType = {
+	'N': 'News',
+	'I': 'Issue'
 }

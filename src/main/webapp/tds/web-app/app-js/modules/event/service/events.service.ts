@@ -77,8 +77,8 @@ export class EventsService {
  	 * @param {number} newsid News Id
 	 * @returns {Observable<NewsDetailModel>}
 	 */
-	getNewsDetail(newsId: number): Observable<NewsDetailModel> {
-		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=N`)
+	getNewsDetail(newsId: number, commentType: string): Observable<NewsDetailModel> {
+		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=${commentType}`)
 			.map((response: any) => {
 				return response && response.shift() || null;
 			})
