@@ -32,7 +32,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithOneStartAndOneSink() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'A', 3).addEdgesTo('B', 'C')
 			.withVertex(2, 'B', 4).addEdgeTo('D')
 			.withVertex(3, 'C', 2).addEdgesTo('E', 'F')
@@ -46,7 +46,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createCyclicDirectedGraphWithOneStartAndOneSink() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'A', 3).addEdgesTo('B', 'C')
 			.withVertex(2, 'B', 4).addEdgeTo('D')
 			.withVertex(3, 'C', 2).addEdgesTo('E', 'F')
@@ -85,7 +85,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithTwoStartsAndOneSink() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'B', 4).addEdgeTo('D')
 			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
 			.withVertex(3, 'D', 5).addEdgeTo('G')
@@ -98,7 +98,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createCyclicDirectedGraphWithTwoStartsAndOneSink() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'B', 4).addEdgeTo('D')
 			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
 			.withVertex(3, 'D', 5).addEdgeTo('G')
@@ -135,7 +135,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithOneStartAndTwoSinks() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'A', 3).addEdgesTo('B', 'C')
 			.withVertex(2, 'B', 4).addEdgeTo('D')
 			.withVertex(3, 'C', 2).addEdgesTo('E', 'F')
@@ -149,7 +149,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createCyclicDirectedGraphWithOneStartAndTwoSinks() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'A', 3).addEdgesTo('B', 'C')
 			.withVertex(2, 'B', 4).addEdgeTo('D')
 			.withVertex(3, 'C', 2).addEdgesTo('E', 'F')
@@ -187,7 +187,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithTwoStartsAndTwoSinks() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'B', 4).addEdgeTo('D')
 			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
 			.withVertex(3, 'D', 5).addEdgeTo('G')
@@ -224,7 +224,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithTwoSubGraphs() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'B', 4).addEdgeTo('D')
 			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
 			.withVertex(3, 'D', 5).addEdgeTo('G')
@@ -232,6 +232,51 @@ class TaskTimeLineGraphTestHelper {
 			.withVertex(5, 'F', 2).addEdgeTo('H')
 			.withVertex(6, 'G', 4)
 			.withVertex(7, 'H', 3)
+			.build()
+	}
+
+	/*
+						 +-+
+						 |D|
+			  +--------+>+-+------------+
+			  |          |5|            v
+			 +++         +++           +-+
+			 |B|                       |G|
+			 +-+          			   +-+
+			 |4|                       |4|
+			 +-+         +++           +-+
+						 |E|
+			  +--------+>+-+
+			  |          |1|       		+-+
+			 +++         +-+       	 	|H|
+			 |C|                   +--->+-+
+			 +-+                   |	|3|
+			 |2|                   |	+-+
+			 +++         +-+       |
+			  |          |F|       |
+			  +--------+>+-+-------+
+						 |2|
+						 +-+
+
+						 +-+
+						 |I|
+						 +-+
+						 |8|
+						 +-+
+
+*/
+
+	TaskTimeLineGraph createAcyclicDirectedGraphWithThreeSubGraphs() {
+
+		return new TaskTimeLineGraph.Builder()
+			.withVertex(1, 'B', 4).addEdgeTo('D')
+			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
+			.withVertex(3, 'D', 5).addEdgeTo('G')
+			.withVertex(4, 'E', 1)
+			.withVertex(5, 'F', 2).addEdgeTo('H')
+			.withVertex(6, 'G', 4)
+			.withVertex(7, 'H', 3)
+			.withVertex(8, 'I', 8)
 			.build()
 	}
 
@@ -261,7 +306,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createAcyclicDirectedGraphWithMultiplesCriticalPaths() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, 'B', 2).addEdgeTo('D')
 			.withVertex(2, 'C', 2).addEdgesTo('E', 'F')
 			.withVertex(3, 'D', 1).addEdgeTo('G')
@@ -286,7 +331,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createCyclicDirectedGraph() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, '0', 3).addEdgesTo('1', '2')
 			.withVertex(2, '1', 4).addEdgeTo('2')
 			.withVertex(3, '2', 2).addEdgesTo('0', '3')
@@ -309,7 +354,7 @@ class TaskTimeLineGraphTestHelper {
 	 */
 
 	TaskTimeLineGraph createCyclicDirectedGraphWithSelfLoop() {
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, '0', 3).addEdgesTo('1', '2')
 			.withVertex(2, '1', 4).addEdgeTo('2')
 			.withVertex(3, '2', 2).addEdgeTo('3')
@@ -319,7 +364,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createTaskAndDependenciesExample() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, '1', 'A', 5).addEdgeTo('8')
 			.withVertex(2, '2', 'B', 2).addEdgeTo('9')
 			.withVertex(3, '3', 'C', 8).addEdgesTo('11', '19')
@@ -344,7 +389,7 @@ class TaskTimeLineGraphTestHelper {
 
 	TaskTimeLineGraph createTaskAndDependenciesExampleWithCycles() {
 
-		return new TaskTimeLineGraph.SimpleBuilder()
+		return new TaskTimeLineGraph.Builder()
 			.withVertex(1, '1', 'A', 5).addEdgeTo('8')
 			.withVertex(2, '2', 'B', 2).addEdgeTo('9')
 			.withVertex(3, '3', 'C', 8).addEdgesTo('11', '19')

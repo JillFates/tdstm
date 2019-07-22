@@ -988,7 +988,7 @@ digraph runbook {
 		def deps = runbookService.getTaskDependencies(tasks)
 
 
-//		TaskTimeLineGraph graph = new TaskTimeLineGraph.SimpleBuilder()
+//		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
 //			.withVertices(tasks)
 //			.withEdges(deps)
 //			.build()

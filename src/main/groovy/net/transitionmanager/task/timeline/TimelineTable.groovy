@@ -7,8 +7,6 @@ class TimelineTable {
 	TimelineTable(TaskTimeLineGraph graph, Date startDate) {
 		nodesMap = [:]
 		graph.vertices.each { TaskVertex vertex ->
-			//todo: dcorrea. Add in constructor
-			vertex.actualStart = startDate
 			nodesMap[vertex] = new TimelineNode(vertex, startDate)
 		}
 	}
@@ -69,14 +67,19 @@ class TimelineTable {
 	 * @param timelineSummary
 	 */
 	void calculateAllPaths(TaskTimeLineGraph taskGraph, TimelineSummary timelineSummary) {
-		Integer criticalFinish = Integer.MIN_VALUE
 
 		taskGraph.sinks.each { TaskVertex sink ->
 			TimelineNode sinkNode = nodesMap[sink]
 			List<TaskVertex> earliestPath = getPath(sink, 'earliestPredecessor')
-			if (sinkNode.latestFinish > criticalFinish) {
-				criticalFinish = sinkNode.latestFinish
-				timelineSummary.criticalPath = earliestPath
+
+			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(earliestPath, sinkNode.latestFinish)
+			CriticalPathRoute criticalPathRoute = timelineSummary.criticalPathRoutes.find { it.intersectsPath(newCriticalPathRoute) }
+
+			if (!criticalPathRoute){
+				// new critical path for a different sub-graph
+				timelineSummary.addCriticalPathRoute(newCriticalPathRoute)
+			} else if (newCriticalPathRoute.isGreatherEqualsThan(criticalPathRoute)){
+				timelineSummary.replaceCriticalPathRouteBy(criticalPathRoute, newCriticalPathRoute)
 			}
 		}
 	}
@@ -85,6 +88,7 @@ class TimelineTable {
 	/**
 	 * Starting from a sink, traverse the timeline table building the path corresponding
 	 * to the earliest/latest times.
+	 *
 	 * @param sink
 	 * @param predecessorField
 	 * @return
@@ -99,8 +103,14 @@ class TimelineTable {
 		return path.reverse()
 	}
 
+	/**
+	 * Updates a sink {@code TaskVertex} latest finish
+	 * and latest start before calculate backwards
+	 * critical path algorithm.
+	 * @param sink an instance of {@code TaskVertex}
+	 * @see TimeLine#doDijkstraForLatestTimes(net.transitionmanager.task.timeline.TaskVertex, net.transitionmanager.task.timeline.TimeLine.GraphPath)
+	 */
 	void updateSinkLatestTimes(TaskVertex sink) {
-
 		TimelineNode sinkNode = nodesMap[sink]
 		sinkNode.latestFinish = sinkNode.earliestFinish
 		sinkNode.latestStart = sinkNode.latestFinish - sinkNode.duration

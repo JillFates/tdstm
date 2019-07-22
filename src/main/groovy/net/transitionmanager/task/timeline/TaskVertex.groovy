@@ -19,10 +19,10 @@ class TaskVertex {
 	String comment
 	String description
 
-	Date estimatedStart
-	Date estimatedFinish
 	Date actualStart
 	String status
+
+	Boolean criticalPath = false
 
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
@@ -103,6 +103,24 @@ class TaskVertex {
 	 */
 	Boolean isSink() {
 		return successors.isEmpty()
+	}
+
+	Boolean isCriticalPath() {
+		return criticalPath
+	}
+
+	/**
+	 * Defines this {@code TaskVertex} as a Critical Path Node.
+	 */
+	void markAsCriticalPath() {
+		this.criticalPath = true
+	}
+
+	/**
+	 * Defines this {@code TaskVertex} as a not Critical Path Node.
+	 */
+	void unmarkAsCriticalPath() {
+		this.criticalPath = false
 	}
 
 	boolean equals(o) {

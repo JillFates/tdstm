@@ -8,6 +8,8 @@ import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.text.SimpleDateFormat
+
 class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDataTest {
 
 	@Shared
@@ -15,6 +17,9 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 
 	@Shared
 	Project project
+
+	@Shared
+	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
 
 	/**
 	 * Common TaskVertex Ids used in several test cases.
@@ -37,14 +42,14 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 0
+				criticalPathRoutes.size() == 0
 			}
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3)
 				.build()
 
@@ -54,15 +59,15 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 1
-				criticalPath.collect { it.taskComment } == [A]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A]
 			}
 	}
 
 	void 'test can calculate critical path for a graph with two TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgeTo(B)
 				.withVertex(2, B, 4)
 				.build()
@@ -76,15 +81,15 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 2
-				criticalPath.collect { it.taskComment } == [A, B]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B]
 			}
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a bigger duration'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgeTo(B)
 				.withVertex(2, B, 4)
 				.withVertex(3, C, 15)
@@ -99,15 +104,16 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 1
-				criticalPath.collect { it.taskComment } == [C]
+				criticalPathRoutes.size() == 2
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B]
+				criticalPathRoutes[1].vertices.collect { it.taskComment } == [C]
 			}
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a smaller duration'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgeTo(B)
 				.withVertex(2, B, 4)
 				.withVertex(3, C, 3)
@@ -122,8 +128,9 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 2
-				criticalPath.collect { it.taskComment } == [A, B]
+				criticalPathRoutes.size() == 2
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B]
+				criticalPathRoutes[1].vertices.collect { it.taskComment } == [C]
 			}
 	}
 
@@ -132,7 +139,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 			Date pointInTime = TimeUtil.nowGMT()
 
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, C)
 				.withVertex(2, B, 4)
 				.withVertex(3, C, 2)
@@ -144,44 +151,46 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 2
-				criticalPath.collect { it.taskComment } == [A, B]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B]
 			}
 	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex defining one start and one task already started'() {
+	void 'test can calculate critical path for a graph with three TaskVertex with all task in the future'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 
-			AssetComment A = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 3)
-			AssetComment B = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 4)
-			AssetComment C = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 2)
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			Date startDate = pointInTime('06/01/2019 06:00')
+
+			AssetComment A = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
+			AssetComment B = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			AssetComment C = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20)
 			TaskDependency A_B = new TaskDependency(id: 101, predecessor: A, assetComment: B, type: 'SS')
 			TaskDependency A_C = new TaskDependency(id: 101, predecessor: A, assetComment: C, type: 'SS')
 
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
-				.withVertex(A)
-				.withVertex(B)
-				.withVertex(C)
-				.withEdge(A_B)
-				.withEdge(A_C)
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(A, B, C)
+				.withEdges(A_B, A_C)
 				.build()
 
 		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(startDate)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 2
-				criticalPath.collect { it.taskNumber } == [A.taskNumber, B.taskNumber]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A.comment, B.comment]
 			}
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex defining one sink'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, B, 4).addEdgeTo(D)
 				.withVertex(2, C, 2).addEdgeTo(D)
 				.withVertex(3, D, 5)
@@ -193,15 +202,15 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 2
-				criticalPath.collect { it.taskComment } == [B, D]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [B, D]
 			}
 	}
 
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, D, C)
 				.withVertex(2, B, 4).addEdgeTo(D)
 				.withVertex(3, C, 2).addEdgeTo(D)
@@ -214,8 +223,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [A, B, D]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
 				withTimeLineTable(timelineSummary.timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
 					A		3		0		3		0		3		0		true
@@ -229,7 +238,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink and using a TaskVertex with duration equals zero in critical path'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, C)
 				.withVertex(2, B, 4).addEdgeTo(E)
 				.withVertex(3, E, 0).addEdgeTo(D) // Task with duration zero in critical path
@@ -245,8 +254,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 4
-				criticalPath.collect { it.taskComment } == [A, B, E, D]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, E, D]
 			}
 
 			withTimeLineTable(timelineSummary.timelineTable, """
@@ -262,7 +271,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink and using a TaskVertex with duration equals zero NOT in critical path'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, C)
 				.withVertex(2, B, 4).addEdgeTo(D)
 				.withVertex(3, E, 0).addEdgeTo(D) // Task with duration zero, NOT in critical path
@@ -276,8 +285,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [A, B, D]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
 					A		3		0		3		0		3		0		true
@@ -292,7 +301,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink after randomize vertices order'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.SimpleBuilder()
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, B, 4).addEdgeTo(D)
 				.withVertex(2, D, 5)
 				.withVertex(3, C, 2).addEdgeTo(D)
@@ -305,8 +314,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [A, B, D]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
 					B		4		3		7		3		7		0		true
@@ -328,8 +337,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 5
-				criticalPath.collect { it.taskComment } == [A, B, D, G, H]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G, H]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
 					A		3		0		3		0		3		0		true
@@ -356,8 +365,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 1
 				cycles[0].collect { it.taskComment } == [B, D, G]
-				criticalPath.size() == 5
-				criticalPath.collect { it.taskComment } == [A, B, D, G, H]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G, H]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
 					A		3		0		3		0		3		0		true
@@ -383,8 +392,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 4
-				criticalPath.collect { it.taskComment } == [B, D, G, H]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [B, D, G, H]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
 					B		4		0		4		0		4		0		true
@@ -410,8 +419,8 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 1
 				cycles[0].collect { it.taskComment } == [D, G]
-				criticalPath.size() == 4
-				criticalPath.collect { it.taskComment } == [B, D, G, H]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [B, D, G, H]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
 					B		4		0		4		0		4		0		true
@@ -436,18 +445,18 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 4
-				criticalPath.collect { it.taskComment } == [A, B, D, G]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
 					A		3		0		3		0		3		0		true
 					B		4		3		7		3		7		0		true
-					C		2		3		5		3		5		0		true
+					C		2		3		5		3		5		0		false
 					D		5		7		12		7		12		0		true
 					E		1		5		6		11		12		6		false
-					F		2		5		7		5		7		0		true
+					F		2		5		7		5		7		0		false
 					G		4		12		16		12		16		0		true
-					H		3		7		10		7		10		0		true
+					H		3		7		10		7		10		0		false
 				""")
 			}
 	}
@@ -464,18 +473,18 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 1
 				cycles[0].collect { it.taskComment } == [B, D]
-				criticalPath.size() == 4
-				criticalPath.collect { it.taskComment } == [A, B, D, G]
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G]
 				withTimeLineTable(timelineTable, """
 					Task	dur.	et.		ef.		ls.		lf.		slack	Critical Path
 					A		3		0		3		0		3		0		true
 					B		4		3		7		3		7		0		true
-					C		2		3		5		3		5		0		true
+					C		2		3		5		3		5		0		false
 					D		5		7		12		7		12		0		true
 					E		1		5		6		11		12		6		false
-					F		2		5		7		5		7		0		true
+					F		2		5		7		5		7		0		false
 					G		4		12		16		12		16		0		true
-					H		3		7		10		7		10		0		true
+					H		3		7		10		7		10		0		false
 				""")
 			}
 	}
@@ -491,8 +500,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [B, D, G]
+				criticalPathRoutes.size() == 2
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
 					B		4		0		4		0		4		0		true
@@ -517,17 +525,42 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [B, D, G]
+				criticalPathRoutes.size() == 2
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
 					B		2		0		2		0		2		0		true
 					C		2		0		2		0		2		0		true
 					D		1		2		3		2		3		0		true
-					E		1		2		3		2		3		0		true
+					E		1		2		3		2		3		0		false
 					F		2		2		4		2		4		0		true
 					G		4		3		7		3		7		0		true
 					H		3		4		7		4		7		0		true
+				""")
+			}
+	}
+
+	void 'test can calculate critical path method for an acyclic directed graph with three sub-graphs'() {
+
+		given:
+			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithThreeSubGraphs()
+
+		when:
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+
+		then:
+			with(timelineSummary, TimelineSummary) {
+				cycles.size() == 0
+				criticalPathRoutes.size() == 3
+				withTimeLineTable(timelineTable, """
+					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
+					B		4		0		4		0		4		0		true
+					C		2		0		2		0		2		0		true
+					D		5		4		9		4		9		0		true
+					E		1		2		3		2		3		0		false
+					F		2		2		4		2		4		0		true
+					G		4		9		13		9		13		0		true
+					H		3		4		7		4		7		0		true
+					I		8		0		8		0		8		0		true
 				""")
 			}
 	}
@@ -543,14 +576,13 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 3
-				criticalPath.collect { it.taskComment } == [B, D, G]
+				criticalPathRoutes.size() == 2
 				withTimeLineTable(timelineTable, """
 					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
 					B		4		0		4		0		4		0		true
 					C		2		0		2		0		2		0		true
 					D		5		4		9		4		9		0		true
-					E		1		2		3		2		3		0		true
+					E		1		2		3		2		3		0		false
 					F		2		2		4		2		4		0		true
 					G		4		9		13		9		13		0		true
 					H		3		4		7		4		7		0		true
@@ -569,8 +601,12 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
-				criticalPath.size() == 6
-				criticalPath.collect { it.taskComment } == ['6', '7', '4', '11', '13', '16']
+				criticalPathRoutes.size() == 3
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == ['6', '7', '4', '11', '13', '16']
 			}
+	}
+
+	private Date pointInTime(String dateTime) {
+		return formatter.parse(dateTime)
 	}
 }

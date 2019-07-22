@@ -68,7 +68,7 @@ trait TaskTimeLineDataTest {
 			assert rowValues[4].toInteger() == timelineNode.latestStart, "Incorrect latestStart for row number $index"
 			assert rowValues[5].toInteger() == timelineNode.latestFinish, "Incorrect latestFinish for row number $index"
 			assert rowValues[6].toInteger() == timelineNode.getSlack(), "Incorrect slack for row number $index"
-			assert new Boolean(rowValues[7]) == timelineNode.isCriticalPath(), "Incorrect isCriticalPath() for row number $index"
+			assert new Boolean(rowValues[7]) == vertex.isCriticalPath(), "Incorrect isCriticalPath() for row number $index"
 		}
 		return true
 	}
