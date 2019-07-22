@@ -33,10 +33,15 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 	void 'test can calculate critical path for an empty list of TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with an empty list of TaskVertex'
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			Date startDate = pointInTime('06/01/2019 06:00')
+
 			TaskTimeLineGraph emptyGraph = new TaskTimeLineGraph([] as Set)
 
 		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(emptyGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(emptyGraph).calculate(startDate)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -48,12 +53,17 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 	void 'test can calculate critical path for a graph with only one TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			Date startDate = pointInTime('06/01/2019 06:00')
+
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 30)
 				.build()
 
 		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(startDate)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -90,7 +100,7 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			TimeLine timeLine = new TimeLine(taskTimeLineGraph)
 
 		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = timeLine.calculate()
+			TimelineSummary timelineSummary = timeLine.calculate(startDate)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
