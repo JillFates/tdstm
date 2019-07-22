@@ -2061,7 +2061,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		Project project = securityService.userCurrentProject
 		def viewId = params.forView
-		def format = params.format
 		def selectedId = 0
 		Person person
 
@@ -2088,15 +2087,24 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 		list.sort { it.sortOn }
 
-		if (format == 'json') {
-			renderSuccessJson(list)
-			return
-		}
+		withFormat {
+					js {
+						renderSuccessJson(list)
+						return
+					}
 
-		render HtmlUtil.generateSelect(selectId: viewId, selectName: viewId, options: list, optionKey: 'id',
-		                               optionValue: 'nameRole', optionSelected: selectedId,
-		                               firstOption: [value: '0', display: 'Unassigned'])
-	}
+					html {
+						render HtmlUtil.generateSelect(
+							selectId: viewId,
+							selectName: viewId,
+							options: list,
+							optionKey: 'id',
+							optionValue: 'nameRole',
+							optionSelected: selectedId,
+							firstOption: [value  : '0', display: 'Unassigned'])
+					}
+				}
+			}
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def isAllowToChangeStatus() {
