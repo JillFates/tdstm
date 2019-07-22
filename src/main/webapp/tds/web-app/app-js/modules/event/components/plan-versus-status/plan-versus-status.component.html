@@ -1,10 +1,18 @@
 <div class="plan-versus-status-component">
-    <img src="/tdstm/assets/i/dials/dial-{{currentProgress || 0}}.png" 
+    <img src="/tdstm/assets/i/dials/dial-{{getImageDial(currentProgress || 0)}}.png" 
         (click)="onClickChart()">
     <div class="title">Event Status vs. Plan</div>
-
-    <div *ngIf="showEditControl" class="update-controls">
-            <input type="number" [(ngModel)]="progress" #progressInput>
-            <tds-button-save (click)="onSave(progressInput.value)" class="btn-primary"></tds-button-save>
-    </div>
+    <form  *ngIf="showEditControl" name="statusForm" role="form" data-toggle="validator" #form='ngForm' class="form-horizontal left-alignment update-controls">
+        <kendo-numerictextbox
+            #progressInput
+            name="currentStatus"
+            [format]="'n'"
+            [min]="0"
+            [max]="100"
+            [disabled]="!hasBundleSteps"
+            [autoCorrect]=true
+            [(ngModel)]="progress">
+        </kendo-numerictextbox>
+        <tds-button-save [disabled]="form && !form.dirty" (click)="onSave(progressInput.value)" class="btn-primary"></tds-button-save>
+    </form>
 </div>
