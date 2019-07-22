@@ -2,7 +2,7 @@ package net.transitionmanager.task.timeline
 
 class TimelineTable {
 
-	Map<TaskVertex, TimelineNode> nodesMap
+	private Map<TaskVertex, TimelineNode> nodesMap
 
 	TimelineTable(TaskTimeLineGraph graph, Date startDate) {
 		nodesMap = [:]
@@ -55,7 +55,7 @@ class TimelineTable {
 	 */
 	void calculateDatesAndSlacks(Date startDate) {
 		nodesMap.each { TaskVertex vertex, TimelineNode timelineNode ->
-			timelineNode.calculateDatesAndSlack(startDate)
+			timelineNode.calculateDatesAndSlack(startDate, vertex)
 		}
 	}
 
@@ -114,6 +114,9 @@ class TimelineTable {
 		TimelineNode sinkNode = nodesMap[sink]
 		sinkNode.latestFinish = sinkNode.earliestFinish
 		sinkNode.latestStart = sinkNode.latestFinish - sinkNode.duration
+	}
 
+	Map<TaskVertex, TimelineNode> getNodesMap() {
+		return nodesMap
 	}
 }

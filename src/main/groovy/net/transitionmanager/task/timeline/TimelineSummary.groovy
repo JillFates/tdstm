@@ -9,6 +9,9 @@ import net.transitionmanager.project.MoveEvent
 class TimelineSummary {
 
 	Date startDate
+	Date windowStartDate
+	Date windowEndDate
+
 	MoveEvent moveEvent
 
 	TimelineTable timelineTable

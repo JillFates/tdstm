@@ -24,6 +24,11 @@ class TaskVertex {
 
 	Boolean criticalPath = false
 
+	Date earliestStart
+	Date earliestFinish
+	Date latestStart
+	Date latestFinish
+
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
 

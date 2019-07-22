@@ -29,11 +29,6 @@ class TimelineNode {
 	/* The following fields are only needed if start/finish times must be presented as dates. */
 	Integer slack = 0
 
-	Date earliestStartDate
-	Date earliestFinishDate
-	Date latestStartDate
-	Date latestFinishDate
-
 	TimelineNode(TaskVertex vertex, Date startDate) {
 		Integer earliest = 0
 		Integer latest = 0
@@ -73,13 +68,13 @@ class TimelineNode {
 	 *
 	 * @param startDate
 	 */
-	void calculateDatesAndSlack(Date startDate) {
+	void calculateDatesAndSlack(Date startDate, TaskVertex vertex) {
 		slack = latestStart - earliestStart
 		use(TimeCategory) {
-			earliestStartDate = startDate + earliestStart.minutes
-			earliestFinishDate = startDate + earliestFinish.minutes
-			latestStartDate = startDate + latestStart.minutes
-			latestFinishDate = startDate + latestFinish.minutes
+			vertex.earliestStart = startDate + earliestStart.minutes
+			vertex.earliestFinish = startDate + earliestFinish.minutes
+			vertex.latestStart = startDate + latestStart.minutes
+			vertex.latestFinish = startDate + latestFinish.minutes
 		}
 	}
 
