@@ -192,11 +192,11 @@
                             <img src="/tdstm/assets/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph"> Architecture Graph
                         </a>
                     </li>
-                    <li class="divider"></li>
+                    <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
                         <a href="/tdstm/assetEntity/exportAssets">Export Assets</a>
                     </li>
-                    <li class="menu-child-item menu-parent-assets-import-assets-etl">
+                    <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets-etl">
                         <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets">
