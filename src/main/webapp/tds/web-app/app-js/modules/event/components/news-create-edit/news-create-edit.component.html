@@ -8,33 +8,48 @@
             <div class="box-body">
                 <div *ngIf="!isCreate()">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label required-field">Created At:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Created At:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{model.dtCreated}}</label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label required-field">Created By:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Created By:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{model.personCreateObj}}</label>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label required-field">Comment Type:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Comment Type:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{commentType}}</label>
                         </div>
                     </div>
                     <div class="form-group" *ngIf="model.assetName">
-                        <label class="col-sm-3 control-label required-field">Asset:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Asset:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{model.assetName}}</label>
+                        </div>
+                    </div>
+                    <div class="form-group" *ngIf="model.assetName">
+                        <label class="col-sm-4 control-label required-field">User/Generic comment:</label>
+                        <div class="col-sm-8 label-value user-generic">
+                            <label class="label-detail">
+                                    <input type="radio" class="radio-aligned" name="userGenericComment" 
+                                        [value]="'U'" [(ngModel)]="model.userGenericComment" 
+                                        checked> User Comment 
+                            </label>
+                            <label class="label-detail">
+                                    <input type="radio" class="radio-aligned" name="userGenericComment" 
+                                        [value]="'G'" [(ngModel)]="model.userGenericComment" 
+                                        checked> Generic Comment 
+                            </label>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label required-field">Message:</label>
-                    <div class="col-sm-9 label-value">
+                    <label class="col-sm-4 control-label required-field">Message:</label>
+                    <div class="col-sm-8 label-value">
                         <textarea name="message" 
                             rows="3" 
                             required
@@ -47,14 +62,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label required-field">Resolved / Archived:</label>
-                    <div class="col-sm-9 label-value">
+                    <label class="col-sm-4 control-label required-field">Resolved / Archived:</label>
+                    <div class="col-sm-8 label-value">
                         <input type="checkbox" name="isArchived" [(ngModel)]="model.commentObject.isArchived">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label required-field">Resolution:</label>
-                    <div class="col-sm-9 label-value">
+                    <label class="col-sm-4 control-label required-field">Resolution:</label>
+                    <div class="col-sm-8 label-value">
                         <textarea name="resolution" 
                             rows="3" [(ngModel)]="model.commentObject.resolution">
                         </textarea>
@@ -62,15 +77,15 @@
                 </div>
                 <div *ngIf="!isCreate()">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label required-field">Resolved At:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Resolved At:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{model.dtResolved}}</label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-3 control-label required-field">Resolved By:</label>
-                        <div class="col-sm-9 label-value">
+                        <label class="col-sm-4 control-label required-field">Resolved By:</label>
+                        <div class="col-sm-8 label-value">
                             <label>{{model.personResolvedObj}}</label>
                         </div>
                     </div>
