@@ -8,7 +8,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {EventsService} from '../../service/events.service';
 
 // Model
-import {NewsDetailModel, CommentType} from '../../model/news.model';
+import {NewsDetailModel, CommentType, DisplayOptions} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
@@ -72,6 +72,10 @@ export class NewsCreateEditComponent {
 			isArchived: this.model.commentObject.isArchived ? 1 : 0,
 			resolution: this.model.commentObject.resolution
 		};
+
+		if (this.model.commentObject.displayOption) {
+			payload['displayOption'] = this.model.commentObject.displayOption;
+		}
 
 		if (this.isCreate()) {
 			payload['moveEventId'] = this.model.commentObject.moveEvent.id;

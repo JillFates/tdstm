@@ -138,6 +138,9 @@ export class EventDashboardComponent implements OnInit {
 					news.commentObject.moveEvent.id = this.selectedEvent.id;
 				}
 				news.commentType = selectedNews.type;
+				if (news.commentObject.commentType === 'issue') {
+					news.commentObject.message = news.commentObject.comment;
+				}
 				this.openCreateEditNews(news)
 			})
 	}

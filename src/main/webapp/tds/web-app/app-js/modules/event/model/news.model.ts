@@ -12,8 +12,11 @@ export class NewsDetailModel {
 		message: string;
 		resolution: string;
 		dateCreated: string;
-		isArchived: number,
+		isArchived: number;
+		commentType: string;
 		archivedBy: string;
+		comment: string;
+		displayOption: string;
 		createdBy: {
 			id: number
 		},
@@ -37,6 +40,9 @@ export class NewsDetailModel {
 			dateCreated: '',
 			isArchived: null,
 			archivedBy: '',
+			comment: '',
+			displayOption: '',
+			commentType: '',
 			createdBy: {
 				id: null
 			},
@@ -56,4 +62,9 @@ export class NewsDetailModel {
 export const CommentType = {
 	'N': 'News',
 	'I': 'Issue'
+}
+
+export const DisplayOptions = {
+	'G': 'Generic Comment',
+	'U': 'UserComment'
 }

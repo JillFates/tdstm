@@ -31,17 +31,17 @@
                             <label>{{model.assetName}}</label>
                         </div>
                     </div>
-                    <div class="form-group" *ngIf="model.assetName">
+                    <div class="form-group" *ngIf="model.commentObject.displayOption">
                         <label class="col-sm-4 control-label required-field">User/Generic comment:</label>
                         <div class="col-sm-8 label-value user-generic">
                             <label class="label-detail">
-                                    <input type="radio" class="radio-aligned" name="userGenericComment" 
-                                        [value]="'U'" [(ngModel)]="model.userGenericComment" 
+                                    <input type="radio" class="radio-aligned" name="displayOption" 
+                                        [value]="'U'" [(ngModel)]="model.commentObject.displayOption" 
                                         checked> User Comment 
                             </label>
                             <label class="label-detail">
-                                    <input type="radio" class="radio-aligned" name="userGenericComment" 
-                                        [value]="'G'" [(ngModel)]="model.userGenericComment" 
+                                    <input type="radio" class="radio-aligned" name="displayOption" 
+                                        [value]="'G'" [(ngModel)]="model.commentObject.displayOption" 
                                         checked> Generic Comment 
                             </label>
                         </div>
