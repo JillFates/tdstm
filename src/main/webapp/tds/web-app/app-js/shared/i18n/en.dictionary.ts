@@ -332,7 +332,7 @@ export const en_DICTIONARY: Object = {
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
 		'POST_NOTICES': 'Post Notices',
 		'TOOLTIP_TITLE': 'Notice title',
-		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
+		'TOOLTIP_NOTICE_TYPES': `Pre Login: Appear on Login Form
 Post Login: Used for general notices after Login
 Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
 		'TOOLTIP_ACTIVE': 'Notice will only appear when Active as long as it is within the Activation/Expiration date range if set',
