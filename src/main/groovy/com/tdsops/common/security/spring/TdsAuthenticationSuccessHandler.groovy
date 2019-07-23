@@ -55,11 +55,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				userContext: userService.getUserContext().toMap()
 			]
 
-			if (userLogin.forcePasswordChange == 'Y') {
-				signInInfoMap.notices = [
-					redirectUrl: "/userLogin/changePassword?userLoginInstance=${userLogin.username}"
-				]
-			} else if (securityService.shouldLockoutAccount(userLogin)) {
+			if (securityService.shouldLockoutAccount(userLogin)) {
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
@@ -86,6 +82,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					} else {
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
+				} else if (userLogin.forcePasswordChange == 'Y') {
+					redirectUri = "/userLogin/changePassword?userLoginInstance=${userLogin.username}"
 				} else {
 					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
 				}
