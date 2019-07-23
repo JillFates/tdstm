@@ -6,6 +6,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {EventsService} from '../../service/events.service';
+import {DisplayOptionGeneric, DisplayOptionUser} from '../../model/news.model';
 
 // Model
 import {NewsDetailModel, CommentType, DisplayOptions} from '../../model/news.model';
@@ -17,6 +18,8 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class NewsCreateEditComponent {
 	public commentType: string;
+	public optionGeneric = DisplayOptionGeneric;
+	public optionUser = DisplayOptionUser;
 
 	constructor(
 		public model: NewsDetailModel,

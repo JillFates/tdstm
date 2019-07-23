@@ -64,7 +64,10 @@ export const CommentType = {
 	'I': 'Issue'
 }
 
+export const DisplayOptionGeneric = 'G';
+export const DisplayOptionUser = 'U';
+
 export const DisplayOptions = {
-	'G': 'Generic Comment',
-	'U': 'UserComment'
+	DisplayOptionGeneric: 'Generic Comment',
+	DisplayOptionUser: 'UserComment'
 }
