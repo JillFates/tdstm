@@ -592,26 +592,47 @@ class CustomDomainService implements ServiceMethods {
         return entity
     }
 
-    def clearFieldSpecsData(Project project, Map fieldSpec) {
+    /**
+     * Used to clear all (NULL) custom asset values
+     * This function first filters all fields given for those that are CustomFields
+     * @param project
+     * @param fieldSpec
+     * @return
+     */
+    Map <String, JSONArray> clearFieldSpecsData(Project project, Map fieldSpec) {
+        Map <String, JSONArray> clearedFields = [:]
+        FieldSpecProject fieldSpecProject
+
         fieldSpec.each { assetClassName, fieldNames ->
             AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
-
             if (fieldNames) {
-                String sql = 'update AssetEntity set '
+                if (! fieldSpecProject) {
+                    fieldSpecProject = createFieldSpecProject(project)
+                }
 
-                sql += fieldNames.collect {
-                    "$it = NULL"
-                }.join(', ')
+                fieldNames = fieldNames.findAll {
+                    fieldSpecProject.isCustomField(assetClassName, it)
+                }
 
-                sql += ' where project=:project and assetClass=:assetClass'
+                if (fieldNames) {
+                    String sql = 'update AssetEntity set '
 
-                AssetEntity.executeUpdate(
-                        sql,
-                        [project: project, assetClass: assetClass]
-                )
+                    sql += fieldNames.collect {
+                        "$it = NULL"
+                    }.join(', ')
+
+                    sql += ' where project=:project and assetClass=:assetClass'
+
+                    AssetEntity.executeUpdate(
+                            sql,
+                            [project: project, assetClass: assetClass]
+                    )
+
+                    clearedFields[assetClassName] = fieldNames
+                }
             }
         }
 
-        return true
+        return clearedFields
     }
 }
