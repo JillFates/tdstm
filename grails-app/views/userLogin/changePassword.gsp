@@ -24,6 +24,8 @@
 	<asset:stylesheet href="css/spinner.css" />
 
 	<g:javascript src="PasswordValidation.js" />
+
+    <asset:javascript src="resources/stateManagement.js"/>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
@@ -56,7 +58,7 @@
 				<!-- /.col -->
 			</div>
 		</g:form>
-		<a href="/tdstm/module/auth/login" class="light">Back to Login</a>
+		<a href="/tdstm/module/auth/login" class="light" onclick="clearStorage()">Back to Login</a>
 	</div>
 </div>
 <!-- /.login-box-body -->
@@ -86,6 +88,10 @@
 			$("#overlay").css('display', 'inline');
 		});
 	});
+
+    function clearStorage() {
+        stateManagement.destroyState();
+    }
 
 </script>
 
