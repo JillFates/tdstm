@@ -24,6 +24,9 @@ export interface TaskActionsOptions {
             <button  *ngIf="options && options.showDone" (click)="onDone()" class="btn btn-default" type="button" title="Done">
                 <i class="fa fa-med fa-check"></i> <span>Done</span>
             </button>
+						<button  *ngIf="options && options.showReset" (click)="onReset()" class="btn btn-default" type="button" title="Reset">
+							<i class="fa fa-med fa-power-off"></i> <span>Reset Action</span>
+						</button>
             <button  *ngIf="options && options.showAssignToMe" (click)="onAssignToMe()" class="btn btn-default" type="button" title="Assign To Me">
                 <i class="fa fa-med fa-user"></i> <span>Assign To Me</span>
             </button>
@@ -44,6 +47,7 @@ export class TaskActionsComponent implements OnInit {
 	@Output() invoke: EventEmitter<void> = new EventEmitter<void>();
 	@Output() assignToMe: EventEmitter<void> = new EventEmitter<void>();
 	@Output() neighborhood: EventEmitter<void>  = new EventEmitter<void>();
+	@Output() reset: EventEmitter<void> = new EventEmitter<void>();
 
 	hasInvokePermission = false;
 	constructor(private permissionService: PermissionService) {
@@ -87,6 +91,13 @@ export class TaskActionsComponent implements OnInit {
 	 */
 	onInvoke(): void {
 		this.invoke.emit();
+	}
+
+	/**
+	 * Emit the reset event
+	 */
+	onReset(): void {
+		this.reset.emit();
 	}
 
 }

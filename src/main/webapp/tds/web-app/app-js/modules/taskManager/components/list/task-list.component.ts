@@ -4,7 +4,7 @@ import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { GridComponent, GridDataResult } from '@progress/kendo-angular-grid';
 import { ReportsService } from '../../../reports/service/reports.service';
 import { TaskService } from '../../service/task.service';
-import { GRID_DEFAULT_PAGE_SIZE, ModalType } from '../../../../shared/model/constants';
+import { DIALOG_SIZE, GRID_DEFAULT_PAGE_SIZE, ModalType } from '../../../../shared/model/constants';
 import { forkJoin } from 'rxjs';
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
@@ -20,6 +20,9 @@ import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.help
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone } from 'ramda';
+import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
+import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
+import { TaskCreateComponent } from '../create/task-create.component';
 
 @Component({
 	selector: 'task-list',
@@ -69,7 +72,7 @@ import { clone } from 'ramda';
 						</div>
 						<div class="col-sm-6 text-right">
 							<tds-button-custom class="btn-primary"
-																 (click)="onGenerateReport()"
+																 (click)="onViewTaskGraphHandler()"
 																 title="View Task Graph"
 																 tooltip="View Task Graph"
 																 icon="table">
@@ -106,12 +109,12 @@ import { clone } from 'ramda';
 						[columnMenu]="true"
 						[sort]="grid.state.sort"
 						[sortable]="{mode:'single'}"
-						(sortChange)="grid.sortChange($event)"
-						(cellClick)="onTaskDetailViewHandler($event)">
+						(detailExpand)="onRowDetailExpandHandler($event)"
+						(sortChange)="grid.sortChange($event)">
 						<!-- Column Menu -->
 						<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
 							<div class="k-column-list">
-								<label *ngFor="let custom of customColumns;"
+								<label *ngFor="let custom of allAvailableCustomColumns;"
 											 [ngClass]="{'invisible': custom.property === currentCustomColumns[column.field]}"
 											 class="k-column-list-item ng-star-inserted">
 									<input type="radio"
@@ -125,15 +128,13 @@ import { clone } from 'ramda';
 						<!-- Toolbar -->
 						<ng-template kendoGridToolbarTemplate [position]="'top'">
 							<tds-button-create
-								(click)="confirmDelete()"
+								(click)="onCreateTaskHandler()"
 								[title]="'Create Task'">
 							</tds-button-create>
 							<tds-button-edit
-								(click)="confirmDelete()"
 								[title]="'Bulk Edit'">
 							</tds-button-edit>
 							<tds-button-cancel
-								(click)="confirmDelete()"
 								[title]="'Clear Filters'">
 							</tds-button-cancel>
 							<label class="reload-grid-button pull-right" title="Reload Batch List" (click)="onFiltersChange()">
@@ -155,13 +156,18 @@ import { clone } from 'ramda';
 									(click)="updateTaskStatus(dataItem.id,'Completed')">
 									Done
 								</button>
+								<button class="btn btn-primary btn-xs"
+												*ngIf="dataItem.apiActionId && dataItem.status === 'Hold'"
+												(click)="onResetTaskHandler(dataItem)">
+									Reset Action
+								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="openTaskDetailView(dataItem)">
+									(click)="onOpenTaskDetailHandler(dataItem)">
 									Details...
 								</button>
 							</div>
-							<div *ngIf="dataItem.status=='Ready'" class="task-action-buttons">
+							<div *ngIf="dataItem.status ==='Ready'" class="task-action-buttons">
 								<span style="margin-right:16px">Delay for:</span>
 								<button
 									class="btn btn-primary btn-xs"
@@ -179,32 +185,23 @@ import { clone } from 'ramda';
 									7 day
 								</button>
 							</div>
+							<button *ngIf="dataItem.loadedActions && userContext.person.id !== dataItem.assignedTo
+							&& (dataItem.status === 'Pending' || dataItem.status === 'Ready' || dataItem.status === 'Started')"
+											(click)="onAssignToMeHandler(dataItem)"
+											class="btn btn-primary btn-xs">
+								Assign To Me
+							</button>
 							<button *ngIf="dataItem.successors > 0 || dataItem.predecessors > 0"
-											(click)="openLinkInNewTab('../task/taskGraph?neighborhoodTaskId=' + dataItem.id)"
+											(click)="onViewTaskNeighborHandler(dataItem)"
 											class="btn btn-primary btn-xs">
 								Neighborhood
 							</button>
-							<button *ngIf="dataItem.parsedInstructions" class="btn btn-primary btn-xs"
+							<button *ngIf="dataItem.parsedInstructions"
+											class="btn btn-primary btn-xs"
 											(click)="openLinkInNewTab(dataItem.parsedInstructions[1])">
 								{{dataItem.parsedInstructions[0]}}
 							</button>
 						</div>
-						<!-- Action -->
-						<!--<kendo-grid-command-column [width]="50" [locked]="true" [columnMenu]="false">-->
-							<!--<ng-template kendoGridHeaderTemplate>-->
-								<!--<div class="text-center">-->
-									<!--<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>-->
-								<!--</div>-->
-							<!--</ng-template>-->
-							<!--<ng-template kendoGridCellTemplate-->
-													 <!--let-dataItem-->
-													 <!--let-rowIndex="rowIndex">-->
-								<!--<div class="tds-action-button-set">-->
-									<!--<tds-button-edit (click)="onEditTaskHandler(dataItem)"></tds-button-edit>-->
-								<!--</div>-->
-							<!--</ng-template>-->
-						<!--</kendo-grid-command-column>-->
-						<!-- Columns -->
 						<kendo-grid-column *ngFor="let column of columnsModel"
 															 field="{{column.property}}"
 															 [locked]="column.locked"
@@ -224,7 +221,13 @@ import { clone } from 'ramda';
 							</ng-template>
 							<!-- task Number -->
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>
-								<span style="font-weight: bold; cursor: pointer;">{{dataItem.taskNumber}}</span>
+								<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)">{{dataItem.taskNumber}}</span>
+							</ng-template>
+							<!-- asset name -->
+							<ng-template kendoGridCellTemplate *ngIf="currentCustomColumns[column.property] === 'assetName'"
+													 let-dataItem>
+								<span class="is-grid-link"
+											(click)="onOpenAssetDetailHandler(dataItem)">{{dataItem[column.property]}}</span>
 							</ng-template>
 							<!-- updated -->
 							<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
@@ -269,7 +272,7 @@ export class TaskListComponent {
 	hideGrid = true;
 	private pageSize: number;
 	private currentCustomColumns: any = {};
-	private customColumns: Array<any>;
+	private allAvailableCustomColumns: Array<any>;
 	selectedCustomColumn = {};
 	private userContext: UserContextModel;
 
@@ -281,14 +284,16 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe) {
 		this.onLoad();
-		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
-			this.userContext = userContext;
-			console.log(this.userContext);
-		});
 	}
 
+	/**
+	 * Load all the user preferences to populate the task manager grid.
+	 */
 	private onLoad(): void {
 		this.loading = true;
+		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
@@ -346,11 +351,12 @@ export class TaskListComponent {
 			match.label = assetCommentFields[custom];
 			this.currentCustomColumns[column] = custom;
 		});
-		this.customColumns = [];
+		this.allAvailableCustomColumns = [];
 		Object.entries(assetCommentFields).forEach(entry => {
-			this.customColumns.push({ property: entry[0], label: entry[1] });
+			this.allAvailableCustomColumns.push({ property: entry[0], label: entry[1] });
 		});
-		this.customColumns = this.customColumns.sort((a, b) => SortUtils.compareByProperty(a, b, 'label'));
+		this.allAvailableCustomColumns = this.allAvailableCustomColumns.sort((a, b) => SortUtils.compareByProperty(a, b, 'label'));
+		console.log(this.currentCustomColumns);
 	}
 
 	/**
@@ -366,6 +372,12 @@ export class TaskListComponent {
 		});
 	}
 
+	/**
+	 * On Custom Column configuration change. Set the new column configuration and reload the task list.
+	 * @param customColumn
+	 * @param newColumn
+	 * @param service
+	 */
 	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
 		service.close();
 		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
@@ -398,6 +410,10 @@ export class TaskListComponent {
 		});
 	}
 
+	/**
+	 * On Edit Task Button Handler open the task edit modal.
+	 * @param taskRow: any
+	 */
 	onEditTaskHandler(taskRow: any): void {
 		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
 		this.taskService.getTaskDetails(taskRow.id)
@@ -423,25 +439,52 @@ export class TaskListComponent {
 					.then(result => {
 						if (result) {
 							if (result.isDeleted) {
-								console.log('task deleted');
+								this.search()
 							} else {
-								console.log(result);
+								this.search(taskRow.id)
 							}
 						}
-						this.search();
 					}).catch(result => {
 					console.log(result);
 				});
 			});
 	}
 
-	onTaskDetailViewHandler($event: any): void {
-		if ($event.columnIndex === 0) {
-			this.openTaskDetailView($event.dataItem);
-		}
+	/**
+	 * On Create Task button handler open the Create task modal.
+	 */
+	onCreateTaskHandler(): void {
+		let taskCreateModel: TaskDetailModel = {
+			id: '',
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: '',
+				assetEntity: '',
+				assetName:  '',
+				currentUserId: this.userContext.user.id
+			}
+		};
+		this.dialogService.extra(TaskCreateComponent, [
+			{ provide: TaskDetailModel, useValue: taskCreateModel }
+		]).then((result) => {
+			if (result) {
+				this.search();
+			}
+		}).catch(result => {
+			if (result) {
+				console.log(result);
+			}
+		});
 	}
 
-	openTaskDetailView(taskRow: any): void {
+	/**
+	 * On Taks Detail button handler oepn the task detail modal.
+	 * @param taskRow: any
+	 */
+	onOpenTaskDetailHandler(taskRow: any): void {
 		let taskDetailModel: TaskDetailModel = {
 			id: taskRow.id,
 			modal: {
@@ -462,21 +505,119 @@ export class TaskListComponent {
 		});
 	}
 
-	changeTimeEst(id, days) {
+	/**
+	 * Changes the time estimation of a task.
+	 * @param id: string
+	 * @param days: string
+	 */
+	changeTimeEst(id: string, days: string) {
 		this.taskService.changeTimeEst(id, days)
 			.subscribe(() => {
-				this.search(id);
+				this.search(parseInt(id, 0));
 			});
 	}
 
+	/**
+	 * On View Timeline button handler.
+	 */
+	onViewTimelineHandler(): void {
+		this.openLinkInNewTab('/tdstm/task/taskTimeline');
+	}
+
+	/**
+	 * On View Neighborhood button handler.
+	 */
+	onViewTaskNeighborHandler(dataItem): void {
+		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
+	}
+
+	/**
+	 * On View Task Graph button handler.
+	 */
+	onViewTaskGraphHandler(): void {
+		const url = `/tdstm/task/taskGraph?moveEventId=${ this.selectedEvent.id }&viewUnpublished=${ this.viewUnpublished }`;
+		this.openLinkInNewTab(url);
+	}
+
+	/**
+	 * Opens a link in a new browser tab
+ 	 * @param url
+	 */
 	openLinkInNewTab(url): void {
 		window.open(url, '_blank');
 	}
 
-	updateTaskStatus(id, status): void {
+	/**
+	 * Show the asset popup detail.
+	 * @param assetId: number
+	 * @param assetClass: string
+	 */
+	onOpenAssetDetailHandler(taskRow: any) {
+		console.log(taskRow);
+		this.dialogService.open(AssetShowComponent,
+			[UIDialogService,
+				{ provide: 'ID', useValue: taskRow.assetEntityId },
+				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
+				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
+			], DIALOG_SIZE.LG).then(result => {
+			console.log('success: ' + result);
+		}).catch(result => {
+			console.log('rejected: ' + result);
+		});
+	}
+
+	/**
+	 * Update the task status.
+	 * @param id: string
+	 * @param status: string
+	 */
+	updateTaskStatus(id: string, status: string): void {
 		this.taskService.updateStatus(id, status)
 			.subscribe(() => {
-				this.search(id);
+				this.search(parseInt(id, 0));
 			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: any): void {
+		const taskRow = $event.dataItem;
+		if (!taskRow.loadedActions) {
+			this.taskService.getTaskActionInfo(taskRow.id).subscribe(result => {
+				taskRow.loadedActions = true;
+				taskRow.predecessors = result.predecessorsCount;
+				taskRow.sucessors = result.successorsCount;
+				taskRow.assignedTo = result.assignedTo;
+				taskRow.apiActionId = result.apiActionId;
+			});
+		}
+	}
+
+	/**
+	 * On AssignToMe button Handler, reassigns the task to current user.
+	 * @param taskRow: any
+	 */
+	onAssignToMeHandler(taskRow: any): void {
+		const request = {
+			id: taskRow.id.toString(),
+			status: taskRow.status
+		}
+		this.taskService.assignToMe(request)
+			.subscribe(result => {
+				console.log(result);
+				taskRow.assignedTo = this.userContext.person.id;
+			});
+	}
+
+	/**
+	 * On Reset button click handler.
+	 * @param taskRow: any
+	 */
+	onResetTaskHandler(taskRow: any): void {
+		this.taskService.resetTaskAction(taskRow.id).subscribe(result => {
+			this.search(taskRow.id);
+		});
 	}
 }
