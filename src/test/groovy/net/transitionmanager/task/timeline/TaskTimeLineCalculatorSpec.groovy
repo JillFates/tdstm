@@ -471,6 +471,66 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 			}
 	}
 
+	void 'test can calculate critical path for a graph with three TaskVertex with all task finished'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.TERMINATED)
+			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
+				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.TERMINATED)
+			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
+				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.TERMINATED)
+
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB, taskC)
+				.withEdges(edgeAB, edgeAC)
+				.build()
+
+		when: 'TimeLine tries to calculate its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(pointInTime('06/01/2019 07:30'))
+
+		then:
+			with(timelineSummary, TimelineSummary) {
+				cycles.size() == 0
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskC.comment]
+			}
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				taskNumber == 1
+				taskComment == A
+				duration == 30
+				earliestStart == pointInTime('06/01/2019 07:30')
+				earliestFinish == pointInTime('06/01/2019 07:30')
+				latestStart == pointInTime('06/01/2019 07:30')
+				latestFinish == pointInTime('06/01/2019 07:30')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				taskNumber == 2
+				taskComment == B
+				duration == 40
+				earliestStart == pointInTime('06/01/2019 07:30')
+				earliestFinish == pointInTime('06/01/2019 07:30')
+				latestStart == pointInTime('06/01/2019 07:30')
+				latestFinish == pointInTime('06/01/2019 07:30')
+			}
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				taskNumber == 3
+				taskComment == C
+				duration == 20
+				earliestStart == pointInTime('06/01/2019 07:30')
+				earliestFinish == pointInTime('06/01/2019 07:30')
+				latestStart == pointInTime('06/01/2019 07:30')
+				latestFinish == pointInTime('06/01/2019 07:30')
+			}
+	}
+
 	void 'test can calculate critical path for a graph with three TaskVertex defining one sink'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
