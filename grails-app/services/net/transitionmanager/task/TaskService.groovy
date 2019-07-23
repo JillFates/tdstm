@@ -20,6 +20,7 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
@@ -42,6 +43,7 @@ import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidConfigurationException
@@ -486,6 +488,8 @@ class TaskService implements ServiceMethods {
 	 * @param taskId The task that the action command it tied to.
 	 * @param currentPerson The currently logged in person.
 	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
+	 *
+	 * TODO possibly move this to the TaskActionService, so that it and renderscript can be made unit testable...
 	 */
 	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom, String publicKey) {
 		AssetComment task = fetchTaskById(taskId, whom)
@@ -495,6 +499,9 @@ class TaskService implements ServiceMethods {
 		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
 
 		Map<String,?> actionRequestMap = actionRequest.toMap()
+		String script = (String) actionRequestMap.options.apiAction.script
+
+		actionRequestMap.options.apiAction.script = renderScript(script, task)
 
 		// Store Callback information into the options
 		String url = coreService.getApplicationUrl()
@@ -521,6 +528,22 @@ class TaskService implements ServiceMethods {
 		actionRequestMap.task = task.taskToMap()
 
 		return actionRequestMap
+	}
+
+	/**
+	 * Renders parameters into a script that had parameters in the form of {paramName}
+	 *
+	 * @param script The String to substitute params into
+	 * @param task The task to get the action and build the parameters map with.
+	 * @return The script with the parameters filled in
+	 */
+	String renderScript(String script,  AssetComment task) {
+		AbstractConnector connector = apiActionService.connectorInstanceForAction(task.apiAction)
+		Map params = connector.buildMethodParamsWithContext(task.apiAction, task)
+		params.username = '{username}'
+		params.password = '{password}'
+
+		return StringUtil.replacePlaceholders(script, params)
 	}
 
 	/**

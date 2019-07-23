@@ -1118,7 +1118,7 @@ digraph runbook {
 
 			Map apiActionPayload = [
 				name: apiAction.name,
-				script: apiAction.script,
+				script: taskService.renderScript(apiAction.script, assetComment),
 				isRemote: apiAction.isRemote,
 				type: apiAction.actionType.type,
 				connector : connector.name,
