@@ -46,6 +46,11 @@
 				$("#head_crawler").addClass(newsAndStatus[0].cssClass)
 				$("#moveEventStatus").html(newsAndStatus[0].status)
 			}
+
+			function clearStorage() {
+				localStorage.removeItem('@@STATE');
+			}
+
 		</script>
 	</head>
 <%
@@ -324,11 +329,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<table class="mmtable " ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 						<ul>
-							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
-							<g:if test="${currProject && moveEvent}">
-								<span class="megamenuSection"> </span>
-								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEvent.id}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEvent.name} Event Details</g:link></li>
-							</g:if>
+							<li><g:link class="mmlink" controller="module" action="event" link="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
 							<tds:hasPermission permission="${Permission.ShowListNews}">
 							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List Event News</g:link></li>
 							</tds:hasPermission>
@@ -482,7 +483,7 @@ int minPasswordLength = tds.minPasswordLength()
 			</td>
 			<td style="vertical-align:top">
 				<ul>
-					<li><g:link class="mmlink" controller="auth" action="signOut">Sign out</g:link></li>
+					<li><g:link class="mmlink" controller="auth" action="signOut" onclick="clearStorage()">Sign out</g:link></li>
 				</ul>
 			</td>
 			</tr></table>

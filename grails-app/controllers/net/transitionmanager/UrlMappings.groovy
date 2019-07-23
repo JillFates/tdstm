@@ -208,9 +208,39 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
+		"/ws/moveEvent/dashboardModel" {
+			controller = "wsEvent"
+			action = [GET: "getEventDashboardModel"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
+		}
+
+		"/ws/moveEvent/createModel" {
+			controller = "wsEvent"
+			action = [GET:"getModelForCreate"]
+		}
+
+		"/ws/moveEvent/viewEditModel/$id" {
+			controller = "wsEvent"
+			action = [GET:"getModelForViewEdit"]
+		}
+
+		"/ws/moveEvent/saveEvent/$id?" {
+			controller = "wsEvent"
+			action = [POST:"saveEvent"]
+		}
+
+		"/ws/moveEvent/markAssetsMoved/$id" {
+			controller = "wsEvent"
+			action = [PUT:"markEventAssetAsMoved"]
+		}
+
+		"/ws/moveEvent/deleteEvent/$id" {
+			controller = "wsEvent"
+			action = [DELETE:"deleteEvent"]
 		}
 
 		"/ws/moveEventNews/$id?" {
@@ -302,7 +332,6 @@ class UrlMappings {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
 		}
-
 
 		/***************************/
 
@@ -498,6 +527,16 @@ class UrlMappings {
 			action = [
 				GET: 'context'
 			]
+		}
+
+		"/auth/loginInfo" {
+			controller = "auth"
+			action = [GET: "getLoginInfo"]
+		}
+
+		"/auth/sendResetPasswordEmail" {
+			controller = "auth"
+			action = [GET: "sendResetPasswordEmail"]
 		}
 
 		"/ws/user/modelForPreferenceManager" {

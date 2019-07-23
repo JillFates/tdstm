@@ -1,11 +1,5 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetOptions
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.TimeUtil
@@ -17,15 +11,21 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -3030,4 +3030,81 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-15257')
+	void 'test can enable console and log SOURCE variable'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description
+				xraysrv01,100,XRay SRV
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName'
+				   console on
+				   log SOURCE
+				   console off
+				}
+				""".stripIndent())
+
+
+		then: 'A console content could be recovered after processing an ETL Script'
+			etlProcessor.debugConsole.buffer.toString().contains('row=[name:xraysrv01, cpu:100, description:XRay SRV]')
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15257')
+	void 'test can enable console and log DOMAIN variable'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,cpu,description
+				xraysrv01,100,XRay SRV
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor
+				.evaluate("""
+				read labels
+				domain Device
+				iterate {
+				   extract 'name' load 'assetName'
+				   console on
+				   log DOMAIN
+				   console off
+				}
+				""".stripIndent())
+
+
+		then: 'A console content could be recovered after processing an ETL Script'
+			etlProcessor.debugConsole.buffer.toString().contains('fields=[[assetName:[init:xraysrv01, value:xraysrv01]]]')
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
 }

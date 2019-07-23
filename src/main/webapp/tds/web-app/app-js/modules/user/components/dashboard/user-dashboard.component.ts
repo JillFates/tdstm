@@ -4,7 +4,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserService} from '../../service/user.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 // Components
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
@@ -21,7 +21,7 @@ import {
 import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GridComponent} from '@progress/kendo-angular-grid';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ContextMenuComponent} from '@progress/kendo-angular-menu';
 
 @Component({
@@ -176,7 +176,7 @@ export class UserDashboardComponent implements OnInit {
 		this.userService.getAssignedTasks()
 			.subscribe((result) => {
 				this.taskList = result.tasks;
-				this.summaryDetail = result.summaryDetail
+				this.summaryDetail = result.summaryDetail === 'No active tasks were found.' ? '' : result.summaryDetail;
 				for (let i = 0; i < this.taskList.length; i++) {
 					this.taskList[i].parsedInstructions = this.getMarkupUrlData(this.taskList[i].instructionsLink);
 				}

@@ -2,6 +2,7 @@ package net.transitionmanager.project
 
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.security.RoleType
 
 class ProjectTeam extends PartyGroup {
 
@@ -17,7 +18,7 @@ class ProjectTeam extends PartyGroup {
 		teamCode blank: false, unique: 'moveBundle'
 		latestAsset nullable: true
 		isDisbanded nullable: true, inList: ['Y', 'N']
-		role nullable: true, inList: ['ROLE_MOVE_TECH', 'ROLE_CLEANER', 'ROLE_SYS_ADMIN', 'ROLE_DB_ADMIN']
+		role nullable: true, inList: [RoleType.CODE_TEAM_MOVE_TECH, RoleType.CODE_TEAM_CLEANER, RoleType.CODE_TEAM_SYS_ADMIN, RoleType.CODE_TEAM_DB_ADMIN]
 	}
 
 	static mapping = {

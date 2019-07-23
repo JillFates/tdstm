@@ -477,7 +477,7 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 			Workflow workflow = new Workflow(process: 'process')
 			workflow.save(flush: true)
 
-			RoleType role = new RoleType(id: 'ROLE_SECURITY', type: 'ROLE_SECURITY', level: 0)
+			RoleType role = new RoleType(id: 'SECURITY', type: 'SECURITY', level: 0)
 			role.save(flush: true)
 
 			WorkflowTransition workflowTransition = new WorkflowTransition(

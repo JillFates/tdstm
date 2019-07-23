@@ -40,6 +40,7 @@ export const en_DICTIONARY: Object = {
 		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
+		'CLEAR_FILTER': 'Clear filter',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
@@ -87,7 +88,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'Actions',
 	},
 	'ASSET_EXPLORER': {
-		'ASSET_EXPLORER': 'View Manager',
+		'ASSET_EXPLORER': 'Manage Views',
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'SHOW': 'Show View',
@@ -204,6 +205,15 @@ export const en_DICTIONARY: Object = {
 		'PLURAL_NAME': 'Dependencies',
 		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
+	'EVENT': {
+		'EVENT': 'Event',
+		'EVENTS': 'Events',
+		'CREATE_EVENT': 'Create Event',
+		'LIST': 'Event List',
+		'TITLE_DASHBOARD': 'Event Dashboard',
+		'DASHBOARD': 'Dashboard',
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
@@ -288,6 +298,26 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_TOGGLE_IGNORE': 'Click to toggle selected records status to/from IGNORED state. Ignored records will not be posted to the database.',
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
+	},
+	'NEWS': {
+		'EDIT_NEWS': 'News Edit',
+		'CREATE_NEWS': 'News Create'
+	},
+	'LOGIN': {
+		'BACK_TO_LOGIN': 'Back to Login',
+		'CHECK_YOUR_EMAIL': 'Check Your Email',
+		'DOMAIN': 'Domain',
+		'FORGOT_PASSWORD': 'Forgot Password',
+		'LOGIN': 'Login',
+		'PLEASE_SELECT': 'Please select',
+		'SEND': 'Send',
+		'START_YOUR_SESSION': 'Sign in to start your session',
+		'SESSION_EXPIRED': 'Your session has expired. Please log in.',
+		'PASSWORD_ASSISTANT': 'Password Assistant',
+		'THANKS_FOR_REQUEST': 'Thank you for requesting a password reset. If your account is currently active,\n' +
+			'\t\t\tyou will receive an email with a reset link. If you do not receive this email,\n' +
+			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
+		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
 	},
 	'NOTICE': {
 		'ADMIN': 'Admin',

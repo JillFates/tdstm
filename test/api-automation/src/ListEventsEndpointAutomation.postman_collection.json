@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "69eb31b0-c682-4e4a-82d5-659a8310e7a1",
+		"_postman_id": "e045c59d-c4ae-4dc4-860b-c4d06401aa15",
 		"name": "ListEvents",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -13,20 +13,15 @@
 					"script": {
 						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
 						"exec": [
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
-							"});",
-							"",
-							"pm.test(\"User Menu is displayed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
-							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
-							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
-							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
-							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
-							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
-							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
-							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
-							"    ",
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -38,7 +33,9 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					},
 					{
 						"key": "Accept",
@@ -46,19 +43,8 @@
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "api_test_user",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "api_password",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
@@ -288,20 +274,15 @@
 					"script": {
 						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
 						"exec": [
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"/tdstm/auth/signOut\");",
-							"});",
-							"",
-							"pm.test(\"User Menu is displayed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
-							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
-							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
-							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
-							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
-							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
-							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
-							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
-							"    ",
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -313,7 +294,9 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					},
 					{
 						"key": "Accept",
@@ -321,19 +304,8 @@
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "tdsadmin",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "zelda123!",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

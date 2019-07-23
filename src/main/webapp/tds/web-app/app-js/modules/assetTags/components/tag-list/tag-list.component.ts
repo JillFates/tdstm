@@ -3,7 +3,7 @@ import {Component} from '@angular/core';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Components
 import {TagMergeDialogComponent} from '../tag-merge/tag-merge-dialog.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
@@ -12,7 +12,7 @@ import {TagModel} from '../../model/tag.model';
 import {TagListColumnsModel} from '../../model/tag-list-columns.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Permission} from '../../../../shared/model/permission.model';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DIALOG_SIZE, PROMPT_CANCEL, PROMPT_CONFIRM, PROMPT_DEFAULT_TITLE_KEY} from '../../../../shared/model/constants';
 // Others
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';

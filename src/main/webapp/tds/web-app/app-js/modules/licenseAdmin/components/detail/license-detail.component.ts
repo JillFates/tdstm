@@ -8,14 +8,14 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {LicenseAdminService} from '../../service/license-admin.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
 import {LicenseModel, MethodOptions, LicenseStatus} from '../../model/license.model';
 // Other
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {ManualRequestComponent} from '../manual-request/manual-request.component';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: 'tds-license-detail',

@@ -2,12 +2,13 @@ package com.tdsops.ldap
 
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
-import groovy.util.logging.Slf4j
-import net.transitionmanager.exception.NoRolesException
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.person.UserService
 import grails.core.GrailsApplication
 import grails.core.support.GrailsApplicationAware
+import groovy.util.logging.Slf4j
+import net.transitionmanager.exception.NoRolesException
+import net.transitionmanager.person.UserService
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.ldap.core.DirContextAdapter
 import org.springframework.ldap.core.DirContextOperations
@@ -32,7 +33,6 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
 
     @Override
     UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
-
         String authority = ctx.getStringAttribute(TdsBindAuthenticator.SOURCE_KEY)
         Map domain = (Map)ldap.domains[authority]
         String company = domain.company
@@ -73,12 +73,12 @@ class TdsLdapUserDetailsMapper implements UserDetailsContextMapper, GrailsApplic
             }
             ldapRoles.each { String role ->
                 if (roleMap.containsKey(role)) {
-                    roles.add(roleMap.get(role))
+                    roles.add(RoleType.ROLE_PREFIX + roleMap.get(role).toUpperCase())
                 }
             }
         } else {
             if (domain.defaultRole) {
-                roles.add(domain.defaultRole)
+                roles.add(RoleType.ROLE_PREFIX + domain.defaultRole.toUpperCase())
             }
         }
 

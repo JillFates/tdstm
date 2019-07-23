@@ -9,7 +9,7 @@ import {ReportsResolveService} from './resolve/reports-resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
 import {TagsResolveService} from './resolve/tags-resolve.service';
 // Services
-import {AuthGuardService} from '../security/services/auth.guard.service';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 // Components
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';

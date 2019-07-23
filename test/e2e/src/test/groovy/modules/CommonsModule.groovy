@@ -8,14 +8,14 @@ import utils.CommonActions
 class CommonsModule extends Module {
 
     static content = {
-        modalDialog {$('div#tdsUiDialog')}
-        prompDialog {$('div#tdsUiPrompt')}
-        prompDialogButton {prompDialog.find("button")}
+        modalDialog {$("tds-ui-dialog")}
+        promptDialog {$('div#tdsUiPrompt')}
+        promptDialogButton {promptDialog.find("button")}
         modalDialogButton {modalDialog.find("button")}
-        confirmationAlertMessage {prompDialog.find(".box-body p")}
-        confirmationDialogTitle {prompDialog.find(".modal-title")}
-        deleteAlertNoButton {prompDialog.find("button", text: contains("No"))}
-        deleteAlertYesButton {prompDialog.find("button", text: contains("Yes"))}
+        confirmationAlertMessage {promptDialog.find(".box-body p")}
+        confirmationDialogTitle {promptDialog.find(".modal-title")}
+        deleteAlertNoButton {promptDialog.find("button", text: contains("No"))}
+        deleteAlertYesButton {promptDialog.find("button", text: contains("Yes"))}
         kendoDateFilter { $('kendo-popup td[role=gridcell]')}
         loadingIndicator { $('.loading-indicator')}
         kendoGridPaginationContainer { $('kendo-pager')}
@@ -25,6 +25,22 @@ class CommonsModule extends Module {
         kendoMultiselectTagsListOptions { kendoDropdownList.find("div.asset-tag-selector-single-item")}
         kendoMultiselectSelectedList { $("#asset-tag-selector-component kendo-taglist li div")}
         kendoDropdownListOptions { kendoDropdownList.find("li.k-item")}
+        userMenu {$("nav.navbar-static-top").find("div.navbar-custom-menu").find("li.user-menu")}
+        logoutBtn {userMenu.find(class:"pull-right")}
+    }
+
+    def clickUserMenu(){
+        //waitForLoader(5)
+        userMenu.click()
+    }
+
+    def logout(){
+        waitFor(30){clickUserMenu()}
+        waitFor(30){logoutBtn.displayed}
+        waitForLoader(3)
+        waitFor(30){logoutBtn.click()}
+        true
+
     }
 
     def waitForLoader(Integer secondsToWait = null) {
@@ -88,7 +104,7 @@ class CommonsModule extends Module {
     }
 
     def waitForDialogModalDisplayed(){
-        waitFor{modalDialog.jquery.attr("class").contains("in")}
+        waitFor{modalDialog.find(".modal-content.ui-draggable")}
     }
 
     def clickOnButtonDialogModalByText(text){
@@ -101,15 +117,15 @@ class CommonsModule extends Module {
     }
 
     def waitForPromptModalHidden(){
-        waitFor{!prompDialog.jquery.attr("class").contains("in")}
+        waitFor{!promptDialog.jquery.attr("class").contains("in")}
     }
 
     def waitForPromptModalDisplayed(){
-        waitFor{prompDialog.jquery.attr("class").contains("in")}
+        waitFor{promptDialog.jquery.attr("class").contains("in")}
     }
 
     def clickOnButtonPromptModalByText(text){
-        waitFor{prompDialogButton.find{it.text().contains(text)}.click()}
+        waitFor{promptDialogButton.find{it.text().contains(text)}.click()}
         waitForPromptModalHidden()
     }
 
@@ -133,7 +149,7 @@ class CommonsModule extends Module {
         confirmationAlertMessage.text()
     }
 
-    def verifyConfirmationPrompDialogMessage(text){
+    def verifyConfirmationPromptDialogMessage(text){
         getConfirmationAlertMessageText().contains text
     }
 

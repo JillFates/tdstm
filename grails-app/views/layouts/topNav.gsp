@@ -79,6 +79,10 @@
             $("#moveEventStatus").html(newsAndStatus[0].status)
         }
 
+        function clearStorage() {
+			localStorage.removeItem('@@STATE');
+        }
+
     </script>
 </head>
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
@@ -159,7 +163,7 @@
                                     <!-- Menu Footer-->
                                     <li class="user-footer">
                                         <div class="pull-right">
-                                            <g:link controller="auth" action="signOut" class="btn btn-default btn-flat"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</g:link>
+                                            <g:link controller="auth" action="signOut" class="btn btn-default btn-flat" onclick="clearStorage()"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</g:link>
                                         </div>
                                     </li>
                                 </ul>

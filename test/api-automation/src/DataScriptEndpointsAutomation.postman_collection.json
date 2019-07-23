@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "488945f5-5187-4f6e-be81-eb642c1ffe66",
+		"_postman_id": "3a839bc5-3dd1-4bae-82a7-826f8e8f7c03",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -13,21 +13,15 @@
 					"script": {
 						"id": "e7c1e1df-9ff3-43ee-ac8d-9eeebe5dc11e",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"",
-							"pm.test(\"User Menu is displayed\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Admin\");",
-							"    pm.expect(pm.response.text()).to.include(\"Projects\");",
-							"    pm.expect(pm.response.text()).to.include(\"Locations\");",
-							"    pm.expect(pm.response.text()).to.include(\"Assets\");",
-							"    pm.expect(pm.response.text()).to.include(\"Planning\");",
-							"    pm.expect(pm.response.text()).to.include(\"Tasks\");",
-							"    pm.expect(pm.response.text()).to.include(\"Dashboards\");",
-							"    pm.expect(pm.response.text()).to.include(\"Reports\");",
-							"    ",
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
 							"});",
 							""
 						],
@@ -40,7 +34,9 @@
 				"header": [
 					{
 						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
 					},
 					{
 						"key": "Accept",
@@ -48,19 +44,8 @@
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "api_test_user",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "api_password",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

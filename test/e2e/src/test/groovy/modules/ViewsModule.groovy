@@ -64,13 +64,11 @@ class ViewsModule extends Module {
     }
 
     def confirmationRequiredIsDisplayed(){
-        waitFor{($("h4.modal-title")).isDisplayed()}
-        closeDeleteModal.click()
+        common.waitForPromptModalDisplayed()
+        common.clickOnButtonPromptModalByText("No")
     }
 
-    def closeDeleteModal(){
-        closeDeleteModal.click()
-    }
+
     /**
      * Checks that no star is  void, since this is  the FAVS section
      * returns false if a void star is displayed.

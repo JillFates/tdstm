@@ -38,14 +38,14 @@ import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asse
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
-import {UserService} from '../../../security/services/user.service';
+import {UserService} from '../../../auth/service/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/components/number/number-configuration-constraints.model';
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -103,7 +103,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	public fieldNotFound = FIELD_NOT_FOUND;
 	gridData: GridDataResult;
 	selectAll = false;
-	private columnFiltersOldValues = [];
 	protected tagList: Array<TagModel> = [];
 	public bulkItems: number[] = [];
 	protected selectedAssetsForBulk: Array<any>;
@@ -237,60 +236,27 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length > 0 || this.hiddenFilters;
 	}
 
-	clearText(column: ViewColumn): void {
-		this.bulkCheckboxService.handleFiltering();
-		if (column.filter) {
-			column.filter = '';
-			this.updateGridState({skip: 0});
-			if ( this.preventFilterSearch(column)) {
-				return; // prevent search
-			}
-			this.onReload();
-		}
-	}
-
 	onReload(): void {
 		this.modelChange.emit();
 	}
 
-	onFilter(): void {
+	/**
+	 * Set the filter value to the new search string and start off the filtering process
+	 * @param {string} search - Current search value
+	 * @param {ViewColumn} column - Column of the datagrid which threw the event
+	*/
+	public setFilter(search: string, column: ViewColumn): void {
+		column.filter = search;
+		this.onFilter();
+	}
+
+	/**
+	 * Notify to the bulkcheckbox service about a datagrid operation and execute the datagrid update
+	*/
+	private onFilter(): void {
+		this.bulkCheckboxService.handleFiltering();
 		this.updateGridState({skip: 0});
 		this.onReload();
-	}
-
-	private preventFilterSearch(column: ViewColumn): boolean {
-		let key = `${column.domain}_${column.property}`;
-		let oldVal = this.columnFiltersOldValues[key];
-		this.columnFiltersOldValues[key] = column.filter;
-		return oldVal === column.filter;
-	}
-
-	protected onFilterKeyUp(e: KeyboardEvent, column?: any): void {
-		if ( this.preventFilterSearch(column)) {
-			return; // prevent search
-		}
-		if (e.code === KEYSTROKE.ENTER) {
-			this.onFilter();
-		} else if (!this.notAllowedCharRegex.test(e.code)) {
-			clearTimeout(this.typingTimeout);
-			this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
-		}
-	}
-
-	protected onPaste(column?: any): void {
-		if ( this.preventFilterSearch(column)) {
-			return; // prevent search
-		}
-		clearTimeout(this.typingTimeout);
-		this.typingTimeout = setTimeout(() => this.onFilter(), SEARCH_QUITE_PERIOD);
-	}
-
-	protected onFilterKeyDown(e: KeyboardEvent): void {
-		this.bulkCheckboxService.handleFiltering();
-
-		if (!this.notAllowedCharRegex.test(e.code)) {
-			clearTimeout(this.typingTimeout);
-		}
 	}
 
 	private applyData(data: any): void {
