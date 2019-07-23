@@ -54,7 +54,7 @@ class Project extends PartyGroup {
 		depConsoleCriteria nullable: true
 		description nullable: true
 		lastAssetId nullable: true
-		projectCode blank: false, unique: 'client'
+		projectCode blank: false, unique: 'client', maxSize: 20
 		projectType blank: false, inList: ['Standard', 'Template', 'Demo']
 		runbookOn nullable: true
 		startDate nullable: true
