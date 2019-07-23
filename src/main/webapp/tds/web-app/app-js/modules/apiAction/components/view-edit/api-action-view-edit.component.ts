@@ -490,6 +490,7 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 
 		if (tab === NavigationTab.Script) {
+			this.disableCodeMirrors();
 			if (!this.formValidStates.scriptForm.isConfiguredValidators) {
 				setTimeout(() => {
 					if (this.scriptForm) {
@@ -508,19 +509,26 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 
 		if (tab === NavigationTab.Reactions) {
-			this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
-				comps.forEach((child) => {
-					this.codeMirrorComponent = child;
-					setTimeout(() => {
-						child.setDisabled(this.modalType === ActionType.VIEW);
-					}, 100);
-				});
-			});
+			this.disableCodeMirrors();
 		}
 
 		this.currentTab = tab;
 	}
 
+	/**
+	 * Disables codemirrors on the current tab if not in edit state
+	 */
+	private disableCodeMirrors () {
+		this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
+			comps.forEach((child) => {
+				this.codeMirrorComponent = child;
+				setTimeout(() => {
+					child.setDisabled(this.modalType === ActionType.VIEW);
+				}, 100);
+			});
+		});
+	}
+	
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
