@@ -10,7 +10,7 @@ import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
-class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDataTest {
+class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 	@Shared
 	TaskTimeLineGraphTestHelper taskTimeLineGraphTestHelper = new TaskTimeLineGraphTestHelper()
