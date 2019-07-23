@@ -56,7 +56,7 @@
 				<!-- /.col -->
 			</div>
 		</g:form>
-		<a href="/tdstm/auth/login" class="light">Back to Login</a>
+		<a href="/tdstm/module/auth/login" class="light">Back to Login</a>
 	</div>
 </div>
 <!-- /.login-box-body -->
