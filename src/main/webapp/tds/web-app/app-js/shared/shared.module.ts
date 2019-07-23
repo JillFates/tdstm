@@ -53,6 +53,7 @@ import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
 import {TranslatePipe} from './pipes/translate.pipe';
 import {FilterPipe} from './pipes/filter.pipe';
 import {UtilsPipe} from './pipes/utils.pipe';
+import {SafeHtmlPipe} from './pipes/safe-html.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
@@ -122,6 +123,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
+		SafeHtmlPipe,
 		DatePipe,
 		NumericPipe,
 		EscapeUrlEncodingPipe,
@@ -232,7 +234,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
 		PieCountdownComponent,
-		TDSFilterInputComponent
+		TDSFilterInputComponent,
+		SafeHtmlPipe
 	],
 	entryComponents: [
 		DynamicComponent,
