@@ -779,14 +779,16 @@
 									<div class="form-group">
 										<label for="scriptCode" class="col-sm-2 control-label">Script:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
-											<code-mirror *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
+											<code-mirror #codeMirror
+														*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
 											             id="scriptCode"
 											             [mode]="codeMirror.mode"
 											             [(model)]="apiActionModel.script">
 											</code-mirror>
 										</div>
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
-											<code-mirror *ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
+											<code-mirror #codeMirror
+														*ngIf="hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Script)"
 											             id="scriptCodeReadOnly"
 											             [mode]="getClonedCodeMirrorSettings({readOnly: true})"
 											             [(model)]="apiActionModel.script">
