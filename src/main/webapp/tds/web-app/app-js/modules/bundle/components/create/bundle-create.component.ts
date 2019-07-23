@@ -54,11 +54,24 @@ export class BundleCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.activeDialog.close();
-			}
-		});
+		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+			this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.activeDialog.close();
+				}
+			});
+		}
+	}
+
+	private validateTimes(startTime: Date, completionTime: Date): boolean {
+		if (!startTime || !completionTime) {
+			return true;
+		} else if (startTime > completionTime) {
+			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
