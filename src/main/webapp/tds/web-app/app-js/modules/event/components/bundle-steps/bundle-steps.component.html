@@ -3,17 +3,22 @@
         <div class="col-md-2"></div>
         <div class="col-md-1 column-navigation"></div>
         <div class="col-md-8">
-            <kendo-tabstrip (tabSelect)="onChangeTab($event)">
-                <kendo-tabstrip-tab 
-                    [title]="bundle.name" 
-                    class="tab-item"
-                    [selected]="bundle.id === bundleSteps.selectedBundleId"
-                    *ngFor="let bundle of bundleSteps.moveBundleList">
-                </kendo-tabstrip-tab>
-            </kendo-tabstrip>
+            <div class="row">
+                <div class="col-md-{{colSize}}">
+                    <kendo-tabstrip (tabSelect)="onChangeTab($event)">
+                        <kendo-tabstrip-tab 
+                            [title]="bundle.name" 
+                            class="tab-item"
+                            [selected]="bundle.id === bundleSteps.selectedBundleId"
+                            *ngFor="let bundle of bundleSteps.moveBundleList">
+                        </kendo-tabstrip-tab>
+                    </kendo-tabstrip>
+                </div>
+            </div>
         </div>
         <div class="col-md-1 column-navigation"></div>
     </div>
+
     <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
         <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}}</div>
         <div class="col-md-1 column-navigation">
@@ -23,10 +28,14 @@
                       (click)="onBack()">
                 </span>
         </div>
-        <div *ngFor="let column of getColumns(row);" 
-                class="col-md-{{colSize}} {{column.classes}}" 
-                [ngClass]="{'heading': rowIndex === 0}">
-                <span [innerHtml]="column.text"></span>
+        <div class="col-md-8">
+            <div class="row">
+                <div *ngFor="let column of getColumns(row);" 
+                        class="col-md-{{colSize}} {{column.classes}}" 
+                        [ngClass]="{'heading': rowIndex === 0}">
+                        <span [innerHtml]="column.text"></span>
+                </div>
+            </div>
         </div>
         <div class="col-md-1 column-navigation">
                 <span *ngIf="rowIndex == 0" 

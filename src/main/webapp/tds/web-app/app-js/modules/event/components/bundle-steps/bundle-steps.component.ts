@@ -32,9 +32,9 @@ export class BundleStepsComponent {
 	 * Set the initial configuration to determine how many elements to show
 	*/
 	private setInitialConfiguration(): void {
-		this.colSize = 1;
+		this.colSize = 2;
 		this.showFrom = 0;
-		this.elementsToShow = 9;
+		this.elementsToShow = 6;
 	}
 
 	/**
