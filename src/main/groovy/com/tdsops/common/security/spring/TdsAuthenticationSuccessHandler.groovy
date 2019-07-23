@@ -42,6 +42,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 		try {
 			String redirectUri
+			String redirectReason
 			String unacknowledgedNoticesUri = '/module/notice'
 			Boolean hasUnacknowledgedNotices = false
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
@@ -54,7 +55,11 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				userContext: userService.getUserContext().toMap()
 			]
 
-			if (securityService.shouldLockoutAccount(userLogin)) {
+			if (userLogin.forcePasswordChange == 'Y') {
+				signInInfoMap.notices = [
+					redirectUrl: "/userLogin/changePassword?userLoginInstance=${userLogin.username}"
+				]
+			} else if (securityService.shouldLockoutAccount(userLogin)) {
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
