@@ -1,6 +1,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {ValidationUtils} from '../utils/validation.utils';
 import {ObjectUtils} from '../utils/object.utils';
+import {DomSanitizer} from '@angular/platform-browser';
 
 export const NULL_OBJECT_PIPE = 'nullObjectFilter';
 export const OBJECT_OR_LIST_PIPE = 'objectOrListFilter';
@@ -31,4 +32,17 @@ export class UtilsPipe implements PipeTransform {
 	private getValueOrObjectOrListString(value: any): string {
 		return ObjectUtils.getValueOrObjectOrListString(value);
 	}
+}
+
+@Pipe({
+	name: 'safeHtml',
+})
+export class SafeHtmlPipe implements PipeTransform {
+
+	constructor(private sanitizer:DomSanitizer){}
+
+	transform(html) {
+		return this.sanitizer.bypassSecurityTrustHtml(html);
+	}
+
 }
