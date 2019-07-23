@@ -74,9 +74,11 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
+	private displayCreateButton: boolean;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
+		this.displayCreateButton = this.getDisplayCreateButton(),
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
@@ -111,6 +113,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	protected fieldPipeMap: {pipe: any, metadata: any};
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 	protected SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
+	private canCreateAssets: boolean;
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -134,6 +137,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 			data: [],
 			total: 0
 		};
+		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 
 		this.selectedAssetsForBulk = [];
 		this.getPreferences().subscribe((preferences: any) => {
@@ -382,10 +386,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		}
 	}
 
-	protected canCreateAssets(): boolean {
-		return this.permissionService.hasPermission(Permission.AssetExplorerCreate);
-	}
-
 	protected showTask(dataItem: any, rowIndex: number) {
 		this.highlightGridRow(rowIndex);
 		const assetModalModel: AssetModalModel = {
@@ -570,7 +570,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	 * Validates if should display the create button, depends on the view
 	 * that is trying to show.
 	 */
-	protected displayCreateButton() {
+	protected getDisplayCreateButton() {
 		return this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS ||
 			this._viewId === this.ASSET_ENTITY_MENU.All_APPLICATIONS ||
 			this._viewId === this.ASSET_ENTITY_MENU.All_DATABASES ||
@@ -578,6 +578,20 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_PHYSICAL ||
 			this._viewId === this.ASSET_ENTITY_MENU.All_SERVERS ||
 			this._viewId === this.ASSET_ENTITY_MENU.All_STORAGE_VIRTUAL;
+	}
+
+	/**
+	 * Group all the dynamic informaction required by the view in just one function
+	 * @return {any} Object with the values required dynamically by the view
+	 */
+	public getDynamicConfiguration(): any {
+		return {
+			displayCreateButton: this.displayCreateButton,
+			canCreateAssets: this.canCreateAssets,
+			hasFilterApplied: this.hasFilterApplied(),
+			hasSelectedItems: this.hasSelectedItems(),
+			getSelectedItemsCount: this.getSelectedItemsCount()
+		}
 	}
 
 	/**
