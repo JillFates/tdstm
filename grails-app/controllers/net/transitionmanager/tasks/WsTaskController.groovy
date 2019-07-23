@@ -9,6 +9,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
@@ -37,6 +38,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	CommentService commentService
 	QzSignService qzSignService
 	TaskService taskService
+	TaskActionService taskActionService
 	ApiActionService apiActionService
 	CredentialService credentialService
     UserPreferenceService userPreferenceService
@@ -172,7 +174,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
 	def recordRemoteActionStarted(Long id, RecordRemoteActionStartedCommand commandObject) {
-		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
+		Map actionRequest = taskActionService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
@@ -183,7 +185,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
-		AssetComment task = taskService.resetAction(id, currentPerson())
+		AssetComment task = taskActionService.resetAction(id, currentPerson())
 		renderAsJson([
 			assetComment: task,
 			task: task.taskToMap(),

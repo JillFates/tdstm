@@ -13,6 +13,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
@@ -86,6 +87,7 @@ class TaskController implements ControllerMethods {
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
+	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
@@ -1118,7 +1120,7 @@ digraph runbook {
 
 			Map apiActionPayload = [
 				name: apiAction.name,
-				script: taskService.renderScript(apiAction.script, assetComment),
+				script: taskActionService.renderScript(apiAction.script, assetComment),
 				isRemote: apiAction.isRemote,
 				type: apiAction.actionType.type,
 				connector : connector.name,
