@@ -1,15 +1,23 @@
 // Angular
 import {Injectable} from '@angular/core';
 import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+// State
+import {Logout} from '../action/login.actions';
+import {Store} from '@ngxs/store';
 // Services
 import {PermissionService} from '../../../shared/services/permission.service';
+// Models
+import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
 // Others
 import {Observable} from 'rxjs';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
 
-	constructor(private permissionService: PermissionService, private router: Router) {
+	constructor(
+		private permissionService: PermissionService,
+		private router: Router,
+		private store: Store) {
 	}
 
 	/**
@@ -33,8 +41,10 @@ export class AuthGuardService implements CanActivate {
 			}
 			return true;
 		}).catch((err) => {
+			// If you don't have permission, kick it from the application
 			console.error('AuthGuardService:', err);
-			this.router.navigate(['/security/error']);
+			localStorage.removeItem(APP_STATE_KEY);
+			this.store.dispatch(new Logout());
 			return Observable.of(false);
 		});
 	}
