@@ -1,5 +1,6 @@
 package net.transitionmanager.task.timeline
 
+import com.tdsops.tm.enums.domain.AssetCommentStatus
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
@@ -349,6 +350,123 @@ class TaskTimeLineCalculatorSpec extends Specification implements TaskTimeLineDa
 				earliestStart == pointInTime('06/01/2019 06:30')
 				earliestFinish == pointInTime('06/01/2019 06:50')
 				latestStart == pointInTime('06/01/2019 06:30')
+				latestFinish == pointInTime('06/01/2019 06:50')
+			}
+	}
+
+	void 'test can calculate critical path for a graph with three TaskVertex with one task already started'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
+			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20)
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB, taskC)
+				.withEdges(edgeAB, edgeAC)
+				.build()
+
+		when: 'TimeLine tries to calculate its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(pointInTime('06/01/2019 06:20'))
+
+		then:
+			with(timelineSummary, TimelineSummary) {
+				cycles.size() == 0
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskB.comment]
+			}
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				taskNumber == 1
+				taskComment == A
+				duration == 30
+				earliestStart == pointInTime('06/01/2019 06:20')
+				earliestFinish == pointInTime('06/01/2019 06:30')
+				latestStart == pointInTime('06/01/2019 06:20')
+				latestFinish == pointInTime('06/01/2019 06:30')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				taskNumber == 2
+				taskComment == B
+				duration == 40
+				earliestStart == pointInTime('06/01/2019 06:30')
+				earliestFinish == pointInTime('06/01/2019 07:10')
+				latestStart == pointInTime('06/01/2019 06:30')
+				latestFinish == pointInTime('06/01/2019 07:10')
+			}
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				taskNumber == 3
+				taskComment == C
+				duration == 20
+				earliestStart == pointInTime('06/01/2019 06:30')
+				earliestFinish == pointInTime('06/01/2019 06:50')
+				latestStart == pointInTime('06/01/2019 06:30')
+				latestFinish == pointInTime('06/01/2019 06:50')
+			}
+	}
+
+	void 'test can calculate critical path for a graph with three TaskVertex with one finished and two tasks already started'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+
+			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+
+			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.TERMINATED)
+			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
+				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.STARTED)
+			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
+				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.STARTED)
+
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB, taskC)
+				.withEdges(edgeAB, edgeAC)
+				.build()
+
+		when: 'TimeLine tries to calculate its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(pointInTime('06/01/2019 06:40'))
+
+		then:
+			with(timelineSummary, TimelineSummary) {
+				cycles.size() == 0
+				criticalPathRoutes.size() == 1
+				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskB.comment]
+			}
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				taskNumber == 1
+				taskComment == A
+				duration == 30
+				earliestStart == pointInTime('06/01/2019 06:40')
+				earliestFinish == pointInTime('06/01/2019 06:40')
+				latestStart == pointInTime('06/01/2019 06:40')
+				latestFinish == pointInTime('06/01/2019 06:40')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				taskNumber == 2
+				taskComment == B
+				duration == 40
+				earliestStart == pointInTime('06/01/2019 06:40')
+				earliestFinish == pointInTime('06/01/2019 07:10')
+				latestStart == pointInTime('06/01/2019 06:40')
+				latestFinish == pointInTime('06/01/2019 07:10')
+			}
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				taskNumber == 3
+				taskComment == C
+				duration == 20
+				earliestStart == pointInTime('06/01/2019 06:40')
+				earliestFinish == pointInTime('06/01/2019 06:50')
+				latestStart == pointInTime('06/01/2019 06:40')
 				latestFinish == pointInTime('06/01/2019 06:50')
 			}
 	}

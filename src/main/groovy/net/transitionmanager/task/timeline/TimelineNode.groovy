@@ -42,22 +42,16 @@ class TimelineNode {
 			//Integer startTime = TimeUtil.toMinutes(TimeUtil.elapsed(startDate, vertex.actualStart))
 			earliestStart = 0 //startTime
 			//latestStart = startTime
-			earliestFinish = earliestStart + vertex.duration
+			earliestFinish = earliestStart + this.duration
 		}
 	}
 
-	/**
-	 * Defines if this activity belongs to the Critical Path
-	 */
-	Boolean isCriticalPath() {
-		return (earliestStart - latestStart == 0) && (earliestFinish - latestFinish == 0)
-	}
 	/**
 	 * Slack for the current task is the difference between
 	 * the latest start time and the earliest start time.
 	 */
 	Integer getSlack() {
-		return latestStart - earliestStart
+		return slack
 	}
 
 	/**

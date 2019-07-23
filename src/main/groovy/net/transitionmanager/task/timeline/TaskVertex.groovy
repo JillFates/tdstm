@@ -14,7 +14,8 @@ class TaskVertex {
 	 * Time to complete a Task {@code AssetComment}
 	 * In minutes
 	 */
-	int duration
+	Integer duration
+	Integer remainingDuration
 
 	String comment
 	String description
@@ -40,9 +41,9 @@ class TaskVertex {
 
 		this.taskNumber = taskNumber
 		this.taskComment = taskComment
-		this.duration = duration
 		this.status = status
 		this.actualStart = actualStart
+		this.duration = duration
 	}
 
 	/**
@@ -86,7 +87,7 @@ class TaskVertex {
 			use(TimeCategory) {
 				elapsedTime = (pointInTime - actualStart).minutes
 			}
-			return this.duration = this.duration - elapsedTime
+			return this.duration - elapsedTime
 		} else {
 			return this.duration
 		}
