@@ -166,7 +166,7 @@
 						<input type="hidden" name="companyId" value="${companyId}" />
 						<span class="button"><g:actionSubmit class="edit" value="Edit" /></span>
 						<tds:hasPermission permission="${Permission.UserDelete}">
-							<span class="button"><g:actionSubmit class="delete" onclick="return confirm('Are you sure?');" value="Delete" /></span>
+							<span class="button"><g:actionSubmit class="delete" id="delete-btn" onclick="return confirm('Are you sure?');" value="Delete" /></span>
 						</tds:hasPermission>
 						<tds:hasPermission permission="${Permission.UserResetPassword}">
 							<span class="button"><input type="button" value="Send Password Reset" id="resetPassword"  <g:if test="${!canResetPasswordByAdmin}"> class="save disableButton" disabled</g:if> <g:else>class="save"</g:else> /></span>
@@ -175,7 +175,7 @@
 				</div>
 			</tds:hasPermission>
 		</div>
-		<script>
+		<script >
 			currentMenuId = "#adminMenu";
 
 			$('.menu-list-users').addClass('active');
@@ -217,6 +217,12 @@
 						}
 					})
 				})
+
+				var person = "${userLoginInstance?.person}";
+				var currentPerson = "${tds.currentPerson()}";
+				if (person && currentPerson && person === currentPerson) {
+					$('#delete-btn').prop('disabled', true);
+				}
 			});
 		</script>
 
