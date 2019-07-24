@@ -1119,7 +1119,7 @@ digraph runbook {
 				script            : apiAction.script,
 				isRemote          : apiAction.isRemote,
 				type              : apiAction.actionType.type,
-				connector         : apiAction.connectorMethod,
+				connector         : connector.name,
 				method            : apiAction.connectorMethod,
 				description       : apiAction?.description,
 				methodParams      : methodParamsList,
