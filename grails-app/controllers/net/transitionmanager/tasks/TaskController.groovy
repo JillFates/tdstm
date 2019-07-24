@@ -22,7 +22,6 @@ import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
 import net.transitionmanager.connector.AbstractConnector
-import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -1110,21 +1109,20 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
-			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
-				name: apiAction.name,
-				script: apiAction.script,
-				isRemote: apiAction.isRemote,
-				type: apiAction.actionType.type,
-				connector : connector.name,
-				method      : methodInfo?.name,
-				description : apiAction?.description,
-				methodParams: methodParamsList,
+				name              : apiAction.name,
+				script            : apiAction.script,
+				isRemote          : apiAction.isRemote,
+				type              : apiAction.actionType.type,
+				connector         : apiAction.connectorMethod,
+				method            : apiAction.connectorMethod,
+				description       : apiAction?.description,
+				methodParams      : methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
