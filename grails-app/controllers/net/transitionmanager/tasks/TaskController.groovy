@@ -22,6 +22,7 @@ import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
+import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -1110,6 +1111,7 @@ digraph runbook {
 
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
@@ -1119,8 +1121,8 @@ digraph runbook {
 				script            : taskActionService.renderScript(apiAction.script, assetComment),
 				isRemote          : apiAction.isRemote,
 				type              : apiAction.actionType.type,
-				connector         : apiAction.connectorMethod,
-				method            : apiAction?.name,
+				connector         : connector.name,
+				method            : apiAction.connectorMethod,
 				description       : apiAction?.description,
 				methodParams      : methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
