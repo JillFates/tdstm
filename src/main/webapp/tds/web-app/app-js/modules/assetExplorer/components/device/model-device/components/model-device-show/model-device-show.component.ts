@@ -4,6 +4,7 @@ import {DeviceModel} from '../../model/device-model.model';
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
+import {TDSModalHtmlWrapperComponent} from '../../../../../../../shared/components/modal-html-wrapper/modal-html-wrapper.component';
 
 @Component({
 	selector: 'model-device-show',
@@ -54,9 +55,20 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 			return;
 		}
 
+		this.dialogService.extra(TDSModalHtmlWrapperComponent,
+			[
+				{provide: 'title', useValue: 'Edit Model'},
+				{provide: 'html', useValue: '<b>hello super world!</b>'}
+			], false, false)
+		.then((result) => {
+			this.close(result);
+		}).catch((error) => console.log(error))
+
+		/*
 		// fix issue preventing submit form from bootstrap modal
 		document.getElementById('editModelForm')['submit']();
 		this.close();
+		*/
 	}
 
 }
