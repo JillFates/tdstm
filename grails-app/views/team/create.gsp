@@ -3,10 +3,10 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="layout" content="topNav" />
-    <title>Create RoleType</title>
+    <title>Create Team</title>
   </head>
   <body>
-    <tds:subHeader title="Create RoleType" crumbs="['Admin','Portal','Team','Create']"/><br />
+    <tds:subHeader title="Create Team" crumbs="['Admin','Portal','Team','Create']"/><br />
     <div class="body">
       <div class="nav" style="border: 1px solid #CCCCCC; height: 24px">
             	<span class="menuButton"><g:link class="list" action="list">Team List</g:link></span>

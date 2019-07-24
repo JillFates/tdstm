@@ -46,7 +46,7 @@ class ViewPage extends Page{
         allItemsCheckbox(wait: true) {$("label",class:"selectall-checkbox-column").find("input",type:"checkbox")}
         firstElementName(required:false) {$("div", class:"k-grid-content-locked element-height-100-per-i").find("div", role:"presentation").find("table",class:"k-grid-table").find("tbody",role:"presentation").find("tr")[0].find("td")[1]}
         firstElementAssetClass(required:false) {$("#k-grid5-r2c3").find("span")}
-        nameFilter {$('#k-grid5-r1c2').find("div").find("input", type:"text")}
+        nameFilter {$("input", name:'common.assetName')}
         nameFilterXicon { nameFilter.next("span.component-action-clear-filter")}
         assetClassFilter {$('#k-grid5-r1c3').find("div").find("input", type:"text")}
         assetClassFilterXicon { assetClassFilter.next("span.component-action-clear-filter")}
@@ -60,7 +60,7 @@ class ViewPage extends Page{
         refreshBtn {$("button.tds-action-button--just-icon",title:"Refresh")}
         assetNames {$(".asset-detail-name-column")}
         rows {$("[kendogridtablebody]")[1]}
-        noRecords {$("div.grid-message label")}
+        noRecords (required:false) {$("div.grid-message label")}
         assetsDisplayedInPager {$("kendo-pager-info")}
         paginationSizes {$("kendo-pager-page-sizes select")}
         selectedAssets {$("div.bulk-change-counter")}

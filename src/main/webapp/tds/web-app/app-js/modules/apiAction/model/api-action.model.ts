@@ -33,7 +33,7 @@ export class APIActionColumnModel {
 			},
 			{
 				label: 'Type',
-				property: 'actionType.name',
+				property: 'actionType',
 				type: 'text',
 				width: 125
 			},

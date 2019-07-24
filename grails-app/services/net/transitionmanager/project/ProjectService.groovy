@@ -418,20 +418,20 @@ class ProjectService implements ServiceMethods {
 		def projectLogoForProject = ProjectLogo.findByProject(projectInstance)
 
 		def partnerStaff
-		def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom = $projectInstance and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_COMPANY' ".toString())
+		def projectCompany = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_COMPANY' and p.partyIdFrom.id = $projectInstance.id and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_COMPANY' ".toString())
 		//def projectClient = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_CLIENT' and p.partyIdFrom = $projectInstance.id and p.roleTypeCodeFrom = 'PROJECT' and p.roleTypeCodeTo = 'CLIENT' ")
 		def projectPartner
 		def projectPartnerId = projectPartner?.partyIdTo?.id
-		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom = $projectInstance and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT' and p.roleTypeCodeTo = '$RoleType.CODE_TEAM_MOVE_MGR' ".toString())
-		def companyStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectCompany.partyIdTo and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' order by p.partyIdTo".toString())
+		def moveManager = PartyRelationship.find("from PartyRelationship p where p.partyRelationshipType = 'PROJ_STAFF' and p.partyIdFrom.id = $projectInstance.id and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_PROJECT' and p.roleTypeCodeTo = '$RoleType.CODE_TEAM_MOVE_MGR' ".toString())
+		def companyStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom.id = $projectCompany.partyIdTo.id and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' order by p.partyIdTo".toString())
 		companyStaff.each {
 			if (it.partyIdTo?.lastName == null) {
 				it.partyIdTo?.lastName = ""
 			}
 		}
 		companyStaff.sort{it.partyIdTo?.lastName}
-		def clientStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom = $projectInstance.client and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' order by p.partyIdTo".toString())
-			clientStaff.each {
+		def clientStaff = PartyRelationship.findAll("from PartyRelationship p where p.partyRelationshipType = 'STAFF' and p.partyIdFrom.id = $projectInstance.client.id and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY' and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' order by p.partyIdTo".toString())
+		clientStaff.each {
 			if (it.partyIdTo?.lastName == null) {
 				it.partyIdTo?.lastName = ""
 			}

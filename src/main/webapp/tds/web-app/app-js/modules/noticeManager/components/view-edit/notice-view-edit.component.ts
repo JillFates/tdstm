@@ -292,4 +292,11 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 		return '';
 	}
+
+	/**
+	 * On change the notice type unpdate get the typeid
+	*/
+	onChangeNoticeType(value: any) {
+		this.model.typeId = (value && value.typeId);
+	}
 }

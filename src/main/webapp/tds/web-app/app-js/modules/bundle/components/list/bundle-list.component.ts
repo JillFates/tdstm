@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
@@ -20,7 +20,7 @@ declare var jQuery: any;
 	selector: `bundle-list`,
 	templateUrl: 'bundle-list.component.html',
 })
-export class BundleListComponent implements OnInit {
+export class BundleListComponent implements OnInit, AfterContentInit {
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -66,6 +66,12 @@ export class BundleListComponent implements OnInit {
 				this.bundleColumnModel = new BundleColumnModel(`{0:${dateFormat}}`);
 			});
 		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
+	}
+
+	ngAfterContentInit() {
+		if (this.route.snapshot.queryParams['show']) {
+			this.showBundle(this.route.snapshot.queryParams['show']);
+		}
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
