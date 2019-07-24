@@ -93,8 +93,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {

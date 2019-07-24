@@ -169,8 +169,8 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.refresh();
