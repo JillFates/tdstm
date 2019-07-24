@@ -19,6 +19,23 @@
 
 				$('#username').focus();
 
+				var requiredInput = $('.requiredInput');
+
+				checkIfDisableSave();
+
+				requiredInput.change(function() {
+					checkIfDisableSave();
+				});
+
+				requiredInput.on('input', function() {
+					checkIfDisableSave();
+				});
+
+				$('.passwordField').on('input', function() {
+					checkIfDisableSave();
+				});
+
+				togglePasswordEditFields($("#isLocal"));
 			});
 
 			function selectAllAssigned(){
@@ -29,15 +46,78 @@
 
 			}
 
-			function togglePasswordFields($me) {
+
+			var localAccount = $("#isLocal");
+
+			function checkIfDisableSave() {
+				var empty = false;
+				var isLocal = localAccount.is(":checked");
+				var save = $('.save');
+				$('.requiredInput').each(function () {
+					if ($(this).val().length === 0) {
+						empty = true;
+					}
+				});
+
+				var passwordsMatch = $('#passwordId').val() === $('#confirmPasswordId').val();
+
+				if ((!isLocal && empty) || (isLocal && (empty || !passwordsMatch))) {
+					save.attr('disabled', 'disabled');
+					save.addClass('disableButton');
+				} else {
+					save.removeAttr('disabled');
+					save.removeClass('disableButton');
+				}
+			}
+
+			function cleanPasswordFields() {
+				var pwd = $("#passwordId");
+				var pwdConfirm = $("#confirmPasswordId");
+				pwd.val("");
+				pwdConfirm.val("");
+				$(".passwordsEditFields").each(function() {
+					var pwdField = $(this);
+					pwdField.hide();
+				});
+			}
+
+			var form = $("form[name='createUserForm']")[0];
+
+			$(form).submit(function(event){
+				var emailValue = $("#emailInputId").val();
+				var errMsg = "";
+				if(localAccount.is(":checked")){
+					if(emailValue){
+						if(!tdsCommon.isValidEmail(emailValue)){
+							errMsg = "Email address is invalid."
+						}
+					}else{
+						errMsg = "Email address is required!"
+					}
+				} else {
+					cleanPasswordFields();
+				}
+
+				if(errMsg.length > 0){
+					event.preventDefault()
+					alert(errMsg)
+				}
+			});
+
+
+			currentMenuId = "#adminMenu";
+			$('.menu-list-users').addClass('active');
+			$('.menu-parent-admin').addClass('active');
+
+			function togglePasswordEditFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
-					$me.val(false)
-					$(".passwordsEditFields").hide();
+					$me.val(false);
+					cleanPasswordFields();
 					$("#emailFieldId").hide();
 					$("#emailDisplayId").show();
 				} else {
-					$me.val(true)
+					$me.val(true);
 					$(".passwordsEditFields").show();
 					$("#emailFieldId").show();
 					$("#emailDisplayId").hide();
@@ -235,84 +315,6 @@
 			</g:form>
 		</div>
 	<script>
-
-        function checkIfDisableSave() {
-            var empty = false;
-	        var isLocal = $("#isLocal").is(":checked");
-            $('.requiredInput').each(function () {
-                if ($(this).val().length == 0) {
-	                empty = true;
-                }
-            });
-
-            var passwordsMatch = $('#passwordId').val() == $('#confirmPasswordId').val();
-
-            if ((!isLocal && empty) || (isLocal && (empty || !passwordsMatch))) {
-                $('.save').attr('disabled', 'disabled');
-                $('.save').addClass('disableButton');
-            } else {
-                $('.save').removeAttr('disabled');
-                $('.save').removeClass('disableButton');
-            }
-        }
-
-        $(document).ready(function() {
-            checkIfDisableSave();
-            $('.requiredInput').change(function() {
-                checkIfDisableSave();
-            });
-            $('.requiredInput').on('input', function() {
-                checkIfDisableSave();
-            });
-            $('.passwordField').on('input', function() {
-                checkIfDisableSave();
-            });
-        });
-
-		var form = $("form[name='createUserForm']")[0]
-		$(form).submit(function(event){
-			var emailValue = $("#emailInputId").val()
-			var errMsg = ""
-			if($("#isLocal").is(":checked")){
-				if(emailValue){
-					if(!tdsCommon.isValidEmail(emailValue)){
-						errMsg = "Email address is invalid."
-					}
-				}else{
-					errMsg = "Email address is required!"
-				}
-			}
-
-	    	if(errMsg.length > 0){
-	    		event.preventDefault()
-	    		alert(errMsg)
-	    	}
-		})
-
-
-		currentMenuId = "#adminMenu";
-		$('.menu-list-users').addClass('active');
-		$('.menu-parent-admin').addClass('active');
-
-		function togglePasswordEditFields($me) {
-				var isChecked = $me.is(":checked")
-				if (!isChecked) {
-					$me.val(false)
-					$(".passwordsEditFields").hide();
-					$("#emailFieldId").hide();
-					$("#emailDisplayId").show();
-				} else {
-					$me.val(true)
-					$(".passwordsEditFields").show();
-					$("#emailFieldId").show();
-					$("#emailDisplayId").hide();
-				}
-		}
-
-		$(document).ready(function(){
-			togglePasswordEditFields($("#isLocal"))
-
-		})
 	</script>
 	</body>
 </html>
