@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import { Observable } from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -103,7 +104,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback: any): void {
+	protected onSaveAll(savingInfo: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
@@ -129,6 +130,18 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				});
 
 				this.fieldService.saveFieldSettings(this.domains)
+					.pipe(
+						switchMap((res: any) => {
+							if (res.status === 'error') {
+								return res;
+							} else {
+								// delete underlaying data
+								return savingInfo.deleteUnderLaying ?
+									this.fieldService.deleteCustomFields(this.fieldsToDelete) :
+									Observable.of(true);
+							}
+						})
+					)
 					.subscribe((res: any) => {
 						if (res.status === 'error') {
 							let message: string = res.errors.join(',');
@@ -138,8 +151,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 							});
 						}
 						this.refresh();
-						callback();
-
+						savingInfo.callback();
 					});
 			} else {
 				this.selectedTab = invalid[0].domain;

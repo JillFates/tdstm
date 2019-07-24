@@ -81,7 +81,11 @@ class FieldSpecProject {
 	 * @see FieldSpec#isCustom()
 	 */
 	Map<String, FieldSpec> getAllCustomFields(String assetClassName){
-		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(AssetClass.getDomainForAssetType(assetClassName).toUpperCase())
+		Map<String, FieldSpec> allFieldSpecs = fieldsSpecMap.get(AssetClass.getDomainNameForAssetType(assetClassName))
 		return allFieldSpecs.findAll { it.value?.isCustom() }
+	}
+
+	boolean isCustomField(String assetClassName, String fieldName) {
+		return fieldsSpecMap.get(AssetClass.getDomainNameForAssetType(assetClassName))?.get(fieldName)?.isCustom()
 	}
 }
