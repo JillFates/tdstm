@@ -1,5 +1,6 @@
 package net.transitionmanager.interceptors
 
+import com.tdssrc.grails.WebUtil
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.SecurityService
 
@@ -14,8 +15,7 @@ class ForcePasswordChangeInterceptor {
 
 	boolean before() {
 		UserLogin userLogin = securityService.userLogin
-
-		if (userLogin?.forcePasswordChange == 'Y') {
+		if (userLogin?.forcePasswordChange == 'Y' && !WebUtil.isAjax(request)) {
 
 			if ((controllerName == 'auth' && ['login', 'signIn', 'signOut'].contains(actionName)) ||
 				(controllerName == 'userLogin' && ['changePassword', 'updatePassword'].contains(actionName))) {
