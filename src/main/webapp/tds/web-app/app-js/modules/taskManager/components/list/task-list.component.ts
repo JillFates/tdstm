@@ -13,8 +13,6 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { UserContextService } from '../../../security/services/user-context.service';
-import { UserContextModel } from '../../../security/model/user-context.model';
 import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
@@ -23,6 +21,8 @@ import { clone } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskCreateComponent } from '../create/task-create.component';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { UserContextService } from '../../../auth/service/user-context.service';
 
 @Component({
 	selector: 'task-list',
