@@ -42,7 +42,6 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 		try {
 			String redirectUri
-			String redirectReason
 			String unacknowledgedNoticesUri = '/module/notice'
 			Boolean hasUnacknowledgedNotices = false
 			UsernamePasswordAuthorityAuthenticationToken authentication = (UsernamePasswordAuthorityAuthenticationToken) auth
