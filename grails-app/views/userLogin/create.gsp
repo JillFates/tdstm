@@ -47,6 +47,7 @@
 			}
 
 
+			// Placeholder for loacl account input
 			var localAccount = $("#isLocal");
 
 			function checkIfDisableSave() {
@@ -70,6 +71,7 @@
 				}
 			}
 
+			// If local account input was checked, then clean passwords field if not empty
 			function cleanPasswordFields() {
 				var pwd = $("#passwordId");
 				var pwdConfirm = $("#confirmPasswordId");
