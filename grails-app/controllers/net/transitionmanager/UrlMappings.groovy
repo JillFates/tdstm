@@ -203,6 +203,13 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event/updateEventSummary" {
+			controller = "wsEvent"
+			action = [
+			    POST: "updateEventSummary"
+			]
+		}
+
 		"/ws/event" {
 			controller = "event"
 			action = [GET: "index"]

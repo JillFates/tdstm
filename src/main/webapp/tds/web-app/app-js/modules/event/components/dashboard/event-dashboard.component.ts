@@ -12,8 +12,10 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { EventsService } from './../../service/events.service';
 import { NewsModel, NewsDetailModel } from './../../model/news.model';
 import { EventModel, EventPlanStatus } from './../../model/event.model';
+
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
+import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
 
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
@@ -24,6 +26,7 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 })
 
 export class EventDashboardComponent implements OnInit {
+	@ViewChild('planVersusStatus') public planVersusStatus: PlanVersusStatusComponent;
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;
@@ -86,7 +89,6 @@ export class EventDashboardComponent implements OnInit {
  	 * @param {number} id  Event id
 	*/
 	public onSelectedEvent(id: number): void {
-		this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 		this.getNewsFromEvent(id);
 
 		this.eventsService.getEventDetails(id, true)
@@ -97,6 +99,7 @@ export class EventDashboardComponent implements OnInit {
 				if (bundles.length) {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
+
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						this.bundleSteps = this.eventsService.getBundleSteps(
@@ -115,6 +118,9 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
 						this.eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
 					});
+				} else {
+					this.bundleSteps = this.eventsService.getEmptyBundleSteps();
+					this.eventPlanStatus = new EventPlanStatus();
 				}
 			});
 	}
@@ -135,14 +141,18 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	/**
-	 * Passing and event id search for it in the event list
+	 * Passing and event id search for it in the event list, on not found it returns
+	 * the first list element whenever the list has elements, otherwise it returns null
  	 * @param {number} id  Event id
 	 * @returns {any} Event found otherwhise null
 	*/
 	private getDefaultEvent(id: string): any {
 		if (id) {
 			return this.eventList.find((event) => event.id.toString() === id) || null;
+		} else if (this.eventList.length)  {
+			return this.eventList[0];
 		}
+
 		return null;
 	}
 
@@ -210,4 +220,12 @@ export class EventDashboardComponent implements OnInit {
 	public onTimeout(): void {
 		this.onSelectedEvent(this.selectedEvent.id);
 	}
+
+	/**
+	 * Determine if the current event has bundle steps
+	*/
+	public hasBundleSteps(): boolean {
+		return this.bundleSteps && this.bundleSteps.moveBundleList.length > 0;
+	}
+
 }
