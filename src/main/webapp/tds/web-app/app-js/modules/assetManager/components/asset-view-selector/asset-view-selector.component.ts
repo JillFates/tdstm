@@ -33,7 +33,7 @@ import {Router} from '@angular/router';
                             [textField]="'name'"
                             class="asset-explorer-view-selector-component">
             <ng-template kendoDropDownListValueTemplate let-dataItem>
-		<span style="cursor:pointer;width:100%;">
+		<span class="asset-explorer-view-selector-views">
 			<div *ngIf="selectedItem !== ''; else noneSelectedItem">
 				{{selectedItem}}
 			</div>

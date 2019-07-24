@@ -197,24 +197,6 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanel" style="min-height: 70px;">
-			<g:if test="${modelTemplate?.rearImage}">
-				<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelTemplate?.id)}" style="max-width:375px; display: ${modelTemplate?.useImage != 1 ? 'none':'block' }"/>
-			</g:if>
-			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${modelConnector.connector}" style="top:${modelConnector.connectorPosY / 2}px ;left:${modelConnector.connectorPosX}px ">
-					<div>
-						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}"/>
-					</div>
-					<div id="labelPositionDiv${modelConnector.connector}" class="connector_${modelConnector.labelPosition}">
-						<span id='connectorLabelText${modelConnector.connector}'>${modelConnector.label}</span>
-					</div>
-				</div>
-			</g:each>
-			<g:each in="${otherConnectors}" var="count">
-				<div id="connector${count}"></div>
-			</g:each>
-		</div>
 		<div id="optionsPanel">
 			<span style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></span>
 		</div>

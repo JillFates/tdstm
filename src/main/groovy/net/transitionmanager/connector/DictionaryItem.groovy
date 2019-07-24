@@ -15,7 +15,6 @@ class DictionaryItem {
 	String endpointUrl
 	String httpMethod
 	String docUrl
-	String method
 	Integer producesData
 	List<LinkedHashMap> params = []
 	// List<DictionaryItemParameter> params = []

@@ -86,7 +86,7 @@ export class NoticeListComponent implements OnInit {
 					{ mode: 'single', checkboxOnly: false}, // selectable config.
 					{ useColumn: 'id' } ); // checkbox config.
 			},
-			(err) => console.log(err));
+			(err) => err && console.error(err));
 	}
 
 	/**
@@ -96,7 +96,7 @@ export class NoticeListComponent implements OnInit {
 		this.noticeService.getNoticesList()
 			.subscribe(
 			(result: any) => this.gridSettings.reloadData(result),
-			(err) => console.error(err));
+			(err) => err && console.error(err));
 	}
 
 	/**
@@ -139,7 +139,7 @@ export class NoticeListComponent implements OnInit {
 					this.noticeService.deleteNotice(dataItem.id)
 					.subscribe(
 						(result) => this.reloadNotices(),
-						(err) => console.error(err)
+						(err) => err && console.error(err)
 					);
 				}
 			});
@@ -154,7 +154,7 @@ export class NoticeListComponent implements OnInit {
 			{provide: NoticeModel, useValue: new NoticeModel()},
 			{provide: Number, useValue: ActionType.Create}
 		]).then(result => this.reloadNotices(),
-			error =>  console.error(error)
+			err =>  err && console.error(err)
 		);
 	}
 
@@ -170,7 +170,7 @@ export class NoticeListComponent implements OnInit {
 					{provide: NoticeModel, useValue: notice as NoticeModel},
 					{provide: Number, useValue: action}
 				]).then(result => this.reloadNotices(),
-					error => console.error(error)
+					err => err && console.error(err)
 				);
 			});
 	}

@@ -215,7 +215,6 @@ class ApiCatalogUtilSpec extends Specification {
 					'       "description": "Hello test method",' +
 					'       "endpointUrl": "http://endpoint.url",' +
 					'       "docUrl": "http://documentation.url",' +
-					'       "method": "invokeHttpRequest",' +
 					'       "producesData": 0,' +
 					'       "params": [{"param1":"value1"}],' +
 					'       "script": {"SUCCESS": "task.done()"}' +
@@ -235,7 +234,6 @@ class ApiCatalogUtilSpec extends Specification {
 					'       "description": "Hello test method",' +
 					'       "endpointUrl": "http://endpoint.url",' +
 					'       "docUrl": "http://documentation.url",' +
-					'       "method": "invokeHttpRequest",' +
 					'       "producesData": 0,' +
 					'       "params": [{"param1":"value1"}],' +
 					'       "scripts": {"SUCCESS": "task.done()"}' +

@@ -211,14 +211,51 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event/updateEventSummary" {
+			controller = "wsEvent"
+			action = [
+			    POST: "updateEventSummary"
+			]
+		}
+
 		"/ws/event" {
 			controller = "event"
 			action = [GET: "index"]
 		}
 
+		"/ws/moveEvent/dashboardModel" {
+			controller = "wsEvent"
+			action = [GET: "getEventDashboardModel"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
+		}
+
+		"/ws/moveEvent/createModel" {
+			controller = "wsEvent"
+			action = [GET:"getModelForCreate"]
+		}
+
+		"/ws/moveEvent/viewEditModel/$id" {
+			controller = "wsEvent"
+			action = [GET:"getModelForViewEdit"]
+		}
+
+		"/ws/moveEvent/saveEvent/$id?" {
+			controller = "wsEvent"
+			action = [POST:"saveEvent"]
+		}
+
+		"/ws/moveEvent/markAssetsMoved/$id" {
+			controller = "wsEvent"
+			action = [PUT:"markEventAssetAsMoved"]
+		}
+
+		"/ws/moveEvent/deleteEvent/$id" {
+			controller = "wsEvent"
+			action = [DELETE:"deleteEvent"]
 		}
 
 		"/ws/moveEventNews/$id?" {
@@ -310,7 +347,6 @@ class UrlMappings {
 			controller = "wsEvent"
 			action = [GET:"listBundles"]
 		}
-
 
 		/***************************/
 
@@ -908,6 +944,13 @@ class UrlMappings {
 			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchProjects"
+			]
+		}
+
+		"/ws/customDomain/fieldSpec/ASSETS/DELETE" {
+			controller = "wsCustomDomain"
+			action = [
+				POST: "clearFieldSpecsData"
 			]
 		}
 

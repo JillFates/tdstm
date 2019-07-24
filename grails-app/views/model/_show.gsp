@@ -146,31 +146,6 @@
 </table>
 </div>
 <div style="float: left;">
-	<div>
-		<div id="cablingPanel" style="min-height: 70px;">
-			<g:if test="${modelInstance.rearImage && modelInstance.useImage == 1}">
-			<img src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" />
-			<script type="text/javascript">
-					$("#cablingPanel").css("background-color","#FFF")
-				</script>
-			</g:if>
-			<g:else>
-				<script type="text/javascript">
-					var usize = "${modelInstance.usize}";
-					usize = (usize=="")?1:usize;
-					$("#cablingPanel").css("height", (usize*30) + "px" )
-				</script>
-			</g:else>
-			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="sConnector${i}" style="position: relative; float: left; margin-right: 20px;">
-
-					<div>
-					<span>${modelConnector.label}</span>
-					</div>
-				</div>
-			</g:each>
-		</div>
-	</div>
 	<div style="clear: both;"></div>
 	<div class="list" style="border: 1px solid #5F9FCF;margin-bottom: 10px;margin-right: 5px;">
 		<table style="border: 0px;">

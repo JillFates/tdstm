@@ -48,7 +48,7 @@
 			}
 
 			function clearStorage() {
-				localStorage.removeItem('@@STATE');
+				stateManagement.destroyState();
 			}
 
 		</script>
@@ -329,11 +329,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<table class="mmtable " ><tr>
 					<td style="vertical-align:top"><span class="megamenuSection">Events</span><br />
 						<ul>
-							<li><g:link class="mmlink" controller="moveEvent" action="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
-							<g:if test="${currProject && moveEvent}">
-								<span class="megamenuSection"> </span>
-								<li style="white-space:nowrap;"><g:link class="mmlink" controller="moveEvent" action="show" id="${moveEvent.id}" onclick="hideMegaMenu('bundleMegaMenu')">${moveEvent.name} Event Details</g:link></li>
-							</g:if>
+							<li><g:link class="mmlink" controller="module" action="event" link="list" onclick="hideMegaMenu('bundleMegaMenu')" >List Events</g:link> </li>
 							<tds:hasPermission permission="${Permission.ShowListNews}">
 							<li><g:link class="mmlink" controller="newsEditor"  onclick="hideMegaMenu('consoleMegaMenu')">List Event News</g:link></li>
 							</tds:hasPermission>

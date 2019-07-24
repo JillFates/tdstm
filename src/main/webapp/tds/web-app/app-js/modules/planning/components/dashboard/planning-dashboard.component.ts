@@ -22,8 +22,8 @@ export class PlanningDashboardComponent {
 						type: 'Applications',
 						img: '/tdstm/assets/icons/svg/application_menu.svg',
 						link: ['/asset', 'views', 7, 'show'],
-						queryParamMain: {},
-						queryParam: {common_validation: 'Unknown'},
+						queryParamMain: {_ufp: 'true'},
+						queryParam: {common_validation: 'Unknown',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -31,8 +31,8 @@ export class PlanningDashboardComponent {
 						type: 'Physical Servers',
 						img: '/tdstm/assets/icons/svg/serverPhysical_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_assetType: 'physicalServer'},
-						queryParam: {common_validation: 'Unknown', _assetType: 'physicalServer'},
+						queryParamMain: {_assetType: 'physicalServer',  _ufp: 'true'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'physicalServer',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -40,8 +40,8 @@ export class PlanningDashboardComponent {
 						type: 'Virtual Servers',
 						img: '/tdstm/assets/icons/svg/serverVirtual_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_assetType: 'virtualServer'},
-						queryParam: {common_validation: 'Unknown', _assetType: 'virtualServer'},
+						queryParamMain: {_assetType: 'virtualServer',  _ufp: 'true'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'virtualServer',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -49,8 +49,8 @@ export class PlanningDashboardComponent {
 						type: 'Databases',
 						img: '/tdstm/assets/icons/svg/database_menu.svg',
 						link: ['/asset', 'views', 2, 'show'],
-						queryParamMain: {},
-						queryParam: {common_validation: 'Unknown'},
+						queryParamMain: {_ufp: 'true'},
+						queryParam: {common_validation: 'Unknown',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -58,8 +58,8 @@ export class PlanningDashboardComponent {
 						type: 'Physical Storage',
 						img: '/tdstm/assets/icons/svg/storagePhysical_menu.svg',
 						link: ['/asset', 'views', 5, 'show'],
-						queryParamMain: {},
-						queryParam: {common_validation: 'Unknown'},
+						queryParamMain: {_ufp: 'true'},
+						queryParam: {common_validation: 'Unknown',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -67,8 +67,8 @@ export class PlanningDashboardComponent {
 						type: 'Logical Storage',
 						img: '/tdstm/assets/icons/svg/storageLogical_menu.svg',
 						link: ['/asset', 'views', 6, 'show'],
-						queryParamMain: {},
-						queryParam: {common_validation: 'Unknown'},
+						queryParamMain: {_ufp: 'true'},
+						queryParam: {common_validation: 'Unknown',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					},
@@ -76,8 +76,8 @@ export class PlanningDashboardComponent {
 						type: 'Other Devices',
 						img: '/tdstm/assets/icons/svg/other_menu.svg',
 						link: ['/asset', 'views', 4, 'show'],
-						queryParamMain: {_assetType: 'other'},
-						queryParam: {common_validation: 'Unknown', _assetType: 'other'},
+						queryParamMain: {_assetType: 'other', _ufp: 'true'},
+						queryParam: {common_validation: 'Unknown', _assetType: 'other',  _ufp: 'true'},
 						total: 0,
 						toValidate: 0
 					}

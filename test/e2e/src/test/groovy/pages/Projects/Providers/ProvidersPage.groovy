@@ -31,9 +31,7 @@ class ProvidersPage extends Page{
         noRecordsMessage {noRecordsRow.find("td")}
         projectsModule { module ProjectsMenuModule}
         arrayOfProviders {$(class:"k-virtual-content").find(class:"k-grid-table-wrap", role:"presentation").find("tbody", role:"presentation").find("tr")}
-        deleteConfirmationModal(required: false) {$(id:"providerAssociated").find(class:"modal-md").find(class:"modal-content")}
-        deleteConfirmationNoBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-right")}
-        deleteConfirmationYesBtn {deleteConfirmationModal.find(class:"form-group").find("button", class:"pull-left")}
+
     }
 
     def filterByName(provName){
@@ -82,8 +80,8 @@ class ProvidersPage extends Page{
             while(providersToDelete!=0)
             {
                 clickOnFirstProviderDeleteActionButton()
-                waitFor(30){deleteConfirmationModal.isDisplayed()}
-                waitFor(30){deleteConfirmationYesBtn.click()}
+                commonsModule.waitForDialogModalDisplayed()
+                commonsModule.clickOnButtonDialogModalByText("Yes")
                 providersToDelete--
             }
         }

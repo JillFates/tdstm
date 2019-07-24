@@ -80,7 +80,7 @@
         }
 
         function clearStorage() {
-			localStorage.removeItem('@@STATE');
+			stateManagement.destroyState();
         }
 
     </script>

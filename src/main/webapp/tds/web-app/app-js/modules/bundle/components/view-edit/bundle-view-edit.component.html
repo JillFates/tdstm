@@ -78,7 +78,7 @@
                             <td valign="top" class="name">Event:</td>
 
                             <td valign="top" class="value">
-                                <a href="/tdstm/moveEvent/show/{{savedModel?.moveEventid}}">{{savedModel?.moveEventId}}</a>
+                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEventid}">{{savedModel?.moveEventId}}</a>
                             </td>
 
                         </tr>
@@ -100,9 +100,9 @@
                             <td valign="top" class="name">Use For Planning:</td>
 
                             <td valign="top" class="value">
-                                <input *ngIf="savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"
+                                <input *ngIf="savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked" style="margin: 0px"
                                        disabled="disabled"/>
-                                <input *ngIf="!savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled"/>
+                                <input *ngIf="!savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" style="margin: 0px" disabled="disabled"/>
                             </td>
                         </tr>
                         </tbody>
@@ -145,19 +145,13 @@
                         <tr class="prop">
                             <td valign="top" class="name">From:</td>
                             <td valign="top" class="value">
-                                <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.fromId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                                </select>
+                                <kendo-dropdownlist id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.fromId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
                             </td>
                         </tr>
                         <tr class="prop">
                             <td valign="top" class="name">To:</td>
                             <td valign="top" class="value">
-                                <select id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.toId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                                </select>
+                                <kendo-dropdownlist id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.toId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
                             </td>
                         </tr>
 
@@ -178,44 +172,33 @@
                         <tr class="prop">
                             <td valign="top" class="name">Project Manager:</td>
                             <td valign="top" class="value">
-                                <select id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                                </select>
+                                <kendo-dropdownlist id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId"  [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'" [data]="managers"></kendo-dropdownlist>
                             </td>
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Event Manager:</td>
                             <td valign="top" class="value">
-                                <select id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId">
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                                </select>
+                                <kendo-dropdownlist id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId"  [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'" [data]="managers"></kendo-dropdownlist>
                             </td>
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Order:</td>
                             <td valign="top" class="value">
-                                <select id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" >
-                                    <option *ngFor="let order of orderNums" [value]="order">{{order}}</option>
-                                </select>
+                                <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
                             </td>
                         </tr>
                         <tr>
                             <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
                             <td valign="top" class="value">
-                                <select id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode">
-                                    <option value="" selected="selected">Please Select</option>
-                                    <option *ngFor="let code of workflowCodes" [value]="code">{{code}}</option>
-                                </select>
+                                <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode" [data]="workflowCodes"></kendo-dropdownlist>
                             </td>
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Use for Planning:</td>
-                            <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" [(ngModel)]="bundleModel.useForPlanning"/></td>
+                            <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" style="margin: 0px" [(ngModel)]="bundleModel.useForPlanning"/></td>
                         </tr>
                         </tbody>
                     </table>

@@ -131,7 +131,8 @@ class ProjectController implements ControllerMethods {
 			projectManagers      : projectService.getProjectManagers(project),
 			projectLogoForProject: projectLogo,
 			isDeleteable         : isDeleteable,
-			planMethodology      : planMethodology
+			planMethodology      : planMethodology,
+			projectLogoUrl		 : projectService.getProjectLogoUrl(project),
 		]
 	}
 

@@ -163,12 +163,25 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.updateSavedFields();
-				this.editing = false;
-			}
-		});
+		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.updateSavedFields();
+					this.editing = false;
+				}
+			});
+		}
+	}
+
+	private validateTimes(startTime: Date, completionTime: Date): boolean {
+		if (!startTime || !completionTime) {
+			return true;
+		} else if (startTime > completionTime) {
+			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -185,8 +198,8 @@ export class BundleViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
@@ -202,8 +215,8 @@ export class BundleViewEditComponent implements OnInit {
 	public cancelEdit(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {

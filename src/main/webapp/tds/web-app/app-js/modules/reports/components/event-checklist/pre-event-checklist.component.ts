@@ -51,6 +51,14 @@ declare var jQuery: any;
 										</kendo-dropdownlist>
 									</div>
 								</div>
+								<div class="form-group row checkboxes">
+									<div class="col-sm-5 col-sm-offset-2">
+										<label for="one">
+											<input type="checkbox" name="one" title="Include Unpublished Tasks in the Report" id="one" [(ngModel)]="includeUnpublished">
+											Include Unpublished
+										</label>
+									</div>
+								</div>
 								<div class="form-group row">
 									<div class="col-sm-offset-2 col-sm-3">
 										<tds-button-custom
@@ -80,6 +88,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		defaultEvent: {id: null, text: ''}
 	};
 	html: SafeHtml;
+	includeUnpublished = false;
 
 	constructor(
 		dialogService: UIDialogService,
@@ -108,7 +117,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 	 */
 	onGenerateReport(): void {
 
-		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id)
+		this.reportsService.getPreventsCheckList(this.model.defaultEvent.id, this.includeUnpublished)
 			.subscribe((content) => {
 				let errorMessage = 'Unknown error';
 				this.generatedReport = true;
