@@ -53,21 +53,19 @@ trait TaskTimeLineDataTest {
 	 */
 	Boolean withTimeLineTable(TimelineTable target, String tableResults) {
 		List<String> resultList = tableResults.trim().stripIndent().split('\n')
-		assert target.nodesMap.size() == resultList.size() - 1
+		assert target.vertices.size() == resultList.size() - 1
 
 		resultList.takeRight(resultList.size() - 1).eachWithIndex { String row, int index ->
 			List<String> rowValues = row.trim().split('\\s+').toList()
-			Map.Entry<TaskVertex, TimelineNode> entry = target.nodesMap.find { it.key.taskComment == rowValues[0] }
-			TaskVertex vertex = entry.key
-			TimelineNode timelineNode = entry.value
+			TaskVertex vertex = target.vertices.find { it.taskComment == rowValues[0] }
 
-			assert timelineNode
+			assert vertex
 			assert rowValues[1].toInteger() == vertex.duration, "Incorrect duration for row number $index"
-			assert rowValues[2].toInteger() == timelineNode.earliestStart, "Incorrect earliestStart for row number $index"
-			assert rowValues[3].toInteger() == timelineNode.earliestFinish, "Incorrect earliestFinish for row number $index"
-			assert rowValues[4].toInteger() == timelineNode.latestStart, "Incorrect latestStart for row number $index"
-			assert rowValues[5].toInteger() == timelineNode.latestFinish, "Incorrect latestFinish for row number $index"
-			assert rowValues[6].toInteger() == timelineNode.getSlack(), "Incorrect slack for row number $index"
+			assert rowValues[2].toInteger() == vertex.earliestStart, "Incorrect earliestStart for row number $index"
+			assert rowValues[3].toInteger() == vertex.earliestFinish, "Incorrect earliestFinish for row number $index"
+			assert rowValues[4].toInteger() == vertex.latestStart, "Incorrect latestStart for row number $index"
+			assert rowValues[5].toInteger() == vertex.latestFinish, "Incorrect latestFinish for row number $index"
+			assert rowValues[6].toInteger() == vertex.getSlack(), "Incorrect slack for row number $index"
 			assert new Boolean(rowValues[7]) == vertex.isCriticalPath(), "Incorrect isCriticalPath() for row number $index"
 		}
 		return true

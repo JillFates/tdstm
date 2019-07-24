@@ -77,10 +77,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 	}
 
@@ -114,19 +114,19 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 	}
 
@@ -161,28 +161,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 120
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 08:00')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 08:00')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 08:00')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 08:00')
 			}
 	}
 
@@ -218,28 +218,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 	}
 
@@ -270,28 +270,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 20
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 06:50')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 06:50')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 06:50')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 06:50')
 			}
 
 	}
@@ -301,7 +301,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 
 			Date windowTimeStart = pointInTime('06/01/2019 05:00')
-			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
+			Date windowEndTime = pointInTime('06/01/2019 7:30')
 
 			Date startDate = pointInTime('06/01/2019 06:00')
 
@@ -309,7 +309,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
 			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
-			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
+			TaskDependency edgeAC = new TaskDependency(id: 102, predecessor: taskA, assetComment: taskC, type: 'SS')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertices(taskA, taskB, taskC)
@@ -329,28 +329,33 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:00')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:00')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				remainingDuration == 30
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				remainingDuration == 40
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				criticalPath == true
 				taskNumber == 3
 				taskComment == C
 				duration == 20
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 06:50')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 06:50')
+				remainingDuration == 20
+				slack == 40
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 06:50')
+				latestStartDate == pointInTime('06/01/2019 07:10')
+				latestFinishDate == pointInTime('06/01/2019 07:30')
 			}
 	}
 
@@ -358,7 +363,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
 
-			Date windowTimeStart = pointInTime('06/01/2019 05:00')
+			Date windowTimeStart = pointInTime('06/01/2019 06:20')
 			Date windowTimeEnd = pointInTime('06/01/2019 10:00')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
@@ -386,28 +391,29 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:20')
-				earliestFinish == pointInTime('06/01/2019 06:30')
-				latestStart == pointInTime('06/01/2019 06:20')
-				latestFinish == pointInTime('06/01/2019 06:30')
+				remainingDuration == 10
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 06:30')
+				latestStartDate == pointInTime('06/01/2019 06:00')
+				latestFinishDate == pointInTime('06/01/2019 06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 20
-				earliestStart == pointInTime('06/01/2019 06:30')
-				earliestFinish == pointInTime('06/01/2019 06:50')
-				latestStart == pointInTime('06/01/2019 06:30')
-				latestFinish == pointInTime('06/01/2019 06:50')
+				earliestStartDate == pointInTime('06/01/2019 06:30')
+				earliestFinishDate == pointInTime('06/01/2019 06:50')
+				latestStartDate == pointInTime('06/01/2019 06:30')
+				latestFinishDate == pointInTime('06/01/2019 06:50')
 			}
 	}
 
@@ -446,28 +452,31 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 06:40')
-				earliestFinish == pointInTime('06/01/2019 06:40')
-				latestStart == pointInTime('06/01/2019 06:40')
-				latestFinish == pointInTime('06/01/2019 06:40')
+				remainingDuration == 0
+				earliestStartDate == pointInTime('06/01/2019 06:40')
+				earliestFinishDate == pointInTime('06/01/2019 06:40')
+				latestStartDate == pointInTime('06/01/2019 06:40')
+				latestFinishDate == pointInTime('06/01/2019 06:40')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 06:40')
-				earliestFinish == pointInTime('06/01/2019 07:10')
-				latestStart == pointInTime('06/01/2019 06:40')
-				latestFinish == pointInTime('06/01/2019 07:10')
+				remainingDuration == 30
+				earliestStartDate == pointInTime('06/01/2019 06:40')
+				earliestFinishDate == pointInTime('06/01/2019 07:10')
+				latestStartDate == pointInTime('06/01/2019 06:40')
+				latestFinishDate == pointInTime('06/01/2019 07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 20
-				earliestStart == pointInTime('06/01/2019 06:40')
-				earliestFinish == pointInTime('06/01/2019 06:50')
-				latestStart == pointInTime('06/01/2019 06:40')
-				latestFinish == pointInTime('06/01/2019 06:50')
+				remainingDuration == 10
+				earliestStartDate == pointInTime('06/01/2019 06:40')
+				earliestFinishDate == pointInTime('06/01/2019 06:50')
+				latestStartDate == pointInTime('06/01/2019 06:40')
+				latestFinishDate == pointInTime('06/01/2019 06:50')
 			}
 	}
 
@@ -506,28 +515,31 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskNumber == 1
 				taskComment == A
 				duration == 30
-				earliestStart == pointInTime('06/01/2019 07:30')
-				earliestFinish == pointInTime('06/01/2019 07:30')
-				latestStart == pointInTime('06/01/2019 07:30')
-				latestFinish == pointInTime('06/01/2019 07:30')
+				remainingDuration == 0
+				earliestStartDate == pointInTime('06/01/2019 06:00')
+				earliestFinishDate == pointInTime('06/01/2019 07:30')
+				latestStartDate == pointInTime('06/01/2019 07:30')
+				latestFinishDate == pointInTime('06/01/2019 07:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
 				taskComment == B
 				duration == 40
-				earliestStart == pointInTime('06/01/2019 07:30')
-				earliestFinish == pointInTime('06/01/2019 07:30')
-				latestStart == pointInTime('06/01/2019 07:30')
-				latestFinish == pointInTime('06/01/2019 07:30')
+				remainingDuration == 0
+				earliestStartDate == pointInTime('06/01/2019 07:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:30')
+				latestStartDate == pointInTime('06/01/2019 07:30')
+				latestFinishDate == pointInTime('06/01/2019 07:30')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				taskNumber == 3
 				taskComment == C
 				duration == 20
-				earliestStart == pointInTime('06/01/2019 07:30')
-				earliestFinish == pointInTime('06/01/2019 07:30')
-				latestStart == pointInTime('06/01/2019 07:30')
-				latestFinish == pointInTime('06/01/2019 07:30')
+				remainingDuration == 0
+				earliestStartDate == pointInTime('06/01/2019 07:30')
+				earliestFinishDate == pointInTime('06/01/2019 07:30')
+				latestStartDate == pointInTime('06/01/2019 07:30')
+				latestFinishDate == pointInTime('06/01/2019 07:30')
 			}
 	}
 

@@ -146,6 +146,15 @@ class TaskTimeLineGraph {
 			return this
 		}
 		/**
+		 * Add a {@code List} of {@code}
+		 * @param tasks
+		 * @return current instance of {@code Builder}
+		 */
+		Builder withVertices(List<AssetComment> tasks) {
+			tasks.each { AssetComment task -> withVertex(task) }
+			return this
+		}
+		/**
 		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
 		 * It used {@code TaskDependency#predecessor} and
 		 * {@code TaskDependency#successor} as edge relation
@@ -166,6 +175,18 @@ class TaskTimeLineGraph {
 		 * @return
 		 */
 		Builder withEdges(TaskDependency... taskDependencies) {
+			taskDependencies.each { TaskDependency taskDependency -> withEdge(taskDependency) }
+			return this
+		}
+		/**
+		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
+		 * It used {@code TaskDependency#predecessor} and
+		 * {@code TaskDependency#successor} as edge relation
+		 *
+		 * @param taskDependencies a List of of {@code TaskDependency}
+		 * @return
+		 */
+		Builder withEdges(List<TaskDependency> taskDependencies) {
 			taskDependencies.each { TaskDependency taskDependency -> withEdge(taskDependency) }
 			return this
 		}

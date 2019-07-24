@@ -1,13 +1,19 @@
 package net.transitionmanager.task.timeline
-
+/**
+ * Calculates following values for vertices in critical path calculation:
+ * 1) Earliest start
+ * 2) Earliest finish
+ * 3) Latest start
+ * 4) Latest finish
+ */
 class TimelineTable {
 
-	private Map<TaskVertex, TimelineNode> nodesMap
+	Set<TaskVertex> vertices
 
 	TimelineTable(TaskTimeLineGraph graph, Date startDate) {
-		nodesMap = [:]
-		graph.vertices.each { TaskVertex vertex ->
-			nodesMap[vertex] = new TimelineNode(vertex, startDate)
+		vertices = graph.vertices
+		vertices.each { TaskVertex vertex ->
+			vertex.initialize(startDate)
 		}
 	}
 
@@ -20,13 +26,10 @@ class TimelineTable {
 	boolean checkAndUpdateEarliestTimes(TaskVertex vertex, TaskVertex successor) {
 		boolean timesUpdated = false
 
-		TimelineNode currentNode = nodesMap[vertex]
-		TimelineNode successorNode = nodesMap[successor]
-
-		if (successorNode.earliestStart == 0 || (currentNode.earliestFinish > successorNode.earliestStart)) {
-			successorNode.earliestStart = currentNode.earliestFinish
-			successorNode.earliestFinish = successorNode.earliestStart + successorNode.duration
-			successorNode.earliestPredecessor = vertex
+		if (successor.earliestStart == 0 || (vertex.earliestFinish > successor.earliestStart)) {
+			successor.earliestStart = vertex.earliestFinish
+			successor.earliestFinish = successor.earliestStart + successor.remainingDuration
+			successor.earliestPredecessor = vertex
 
 			timesUpdated = true
 		}
@@ -34,16 +37,20 @@ class TimelineTable {
 		return timesUpdated
 	}
 
+	/**
+	 *
+	 * @param predecessor
+	 * @param vertex
+	 * @return
+	 */
 	boolean checkAndUpdateLatestTimes(TaskVertex predecessor, TaskVertex vertex) {
 
 		boolean timesUpdated = false
-		TimelineNode predecessorNode = nodesMap[predecessor]
-		TimelineNode currentNode = nodesMap[vertex]
 
-		if (predecessorNode.latestFinish > currentNode.latestStart) {
-			predecessorNode.latestFinish = currentNode.latestStart
-			predecessorNode.latestStart = predecessorNode.latestFinish - predecessorNode.duration
-			predecessorNode.latestPredecessor = predecessor
+		if (predecessor.latestFinish > vertex.latestStart) {
+			predecessor.latestFinish = vertex.latestStart
+			predecessor.latestStart = predecessor.latestFinish - predecessor.remainingDuration
+			predecessor.latestPredecessor = predecessor
 			timesUpdated = true
 		}
 		return timesUpdated
@@ -54,8 +61,8 @@ class TimelineTable {
 	 * Transform the earliest/latest times into the corresponding duration
 	 */
 	void calculateDatesAndSlacks(Date startDate) {
-		nodesMap.each { TaskVertex vertex, TimelineNode timelineNode ->
-			timelineNode.calculateDatesAndSlack(startDate, vertex)
+		vertices.each { TaskVertex vertex ->
+			vertex.calculateDatesAndSlack(startDate)
 		}
 	}
 
@@ -69,16 +76,17 @@ class TimelineTable {
 	void calculateAllPaths(TaskTimeLineGraph taskGraph, TimelineSummary timelineSummary) {
 
 		taskGraph.sinks.each { TaskVertex sink ->
-			TimelineNode sinkNode = nodesMap[sink]
 			List<TaskVertex> earliestPath = getPath(sink, 'earliestPredecessor')
 
-			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(earliestPath, sinkNode.latestFinish)
-			CriticalPathRoute criticalPathRoute = timelineSummary.criticalPathRoutes.find { it.intersectsPath(newCriticalPathRoute) }
+			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(earliestPath, sink.latestFinish)
+			CriticalPathRoute criticalPathRoute = timelineSummary.criticalPathRoutes.find {
+				it.intersectsPath(newCriticalPathRoute)
+			}
 
-			if (!criticalPathRoute){
+			if (!criticalPathRoute) {
 				// new critical path for a different sub-graph
 				timelineSummary.addCriticalPathRoute(newCriticalPathRoute)
-			} else if (newCriticalPathRoute.isGreatherEqualsThan(criticalPathRoute)){
+			} else if (newCriticalPathRoute.isGreatherEqualsThan(criticalPathRoute)) {
 				timelineSummary.replaceCriticalPathRouteBy(criticalPathRoute, newCriticalPathRoute)
 			}
 		}
@@ -98,7 +106,7 @@ class TimelineTable {
 		TaskVertex vertex = sink
 		while (vertex != null) {
 			path.add(vertex)
-			vertex = (TaskVertex) nodesMap[vertex][predecessorField]
+			vertex = (TaskVertex) vertex[predecessorField]
 		}
 		return path.reverse()
 	}
@@ -111,12 +119,9 @@ class TimelineTable {
 	 * @see TimeLine#doDijkstraForLatestTimes(net.transitionmanager.task.timeline.TaskVertex, net.transitionmanager.task.timeline.TimeLine.GraphPath)
 	 */
 	void updateSinkLatestTimes(TaskVertex sink) {
-		TimelineNode sinkNode = nodesMap[sink]
-		sinkNode.latestFinish = sinkNode.earliestFinish
-		sinkNode.latestStart = sinkNode.latestFinish - sinkNode.duration
+		sink.latestFinish = sink.earliestFinish
+		sink.latestStart = sink.latestFinish - sink.remainingDuration
+
 	}
 
-	Map<TaskVertex, TimelineNode> getNodesMap() {
-		return nodesMap
-	}
 }

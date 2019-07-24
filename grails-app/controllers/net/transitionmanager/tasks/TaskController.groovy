@@ -984,16 +984,15 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
+		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
+			.withVertices(tasks)
+			.withEdges(deps)
+			.build()
 
-//		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
-//			.withVertices(tasks)
-//			.withEdges(deps)
-//			.build()
-//
-//		TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(defaultEstStart)
+		TimelineSummary timelineSummary = new TimeLine(graph).calculate(defaultEstStart)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
