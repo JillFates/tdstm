@@ -9,7 +9,7 @@ class ForcePasswordChangeInterceptor {
 	SecurityService securityService
 
 	// controllerNames in this list must be excluded. Otherwise they may cause weird behavior like multiple redirects.
-	static final List excludedControllerNames = [null, 'css', 'dist', 'images'].asImmutable()
+	static final List EXCLUDED_CONTROLLER_NAMES = [null, 'css', 'dist', 'images'].asImmutable()
 
 	ForcePasswordChangeInterceptor() {
 		matchAll()
@@ -20,7 +20,7 @@ class ForcePasswordChangeInterceptor {
 		UserLogin userLogin = securityService.userLogin
 
 		// Check if the user is being forced to update their password (and the request is not AJAX).
-		if (userLogin?.forcePasswordChange == 'Y' && !WebUtil.isAjax(request) && !excludedControllerNames.contains(controllerName)) {
+		if (userLogin?.forcePasswordChange == 'Y' && !WebUtil.isAjax(request) && !EXCLUDED_CONTROLLER_NAMES.contains(controllerName)) {
 
 			if ((controllerName == 'auth' && ['login', 'signIn', 'signOut'].contains(actionName)) ||
 				(controllerName == 'userLogin' && ['changePassword', 'updatePassword'].contains(actionName))) {
