@@ -313,7 +313,7 @@ class SecurityConfigParser {
 	 */
 	static List getDomainRoleTypeCodes(Map map, String domain) {
 		List list = []
-		domain = domain.toLowerCase()
+		domain = domain.toUpperCase()
 		if (map.domains.containsKey(domain) && map.domains[domain].containsKey('roleMap')) {
 			list = map.domains[domain].roleMap.keySet() as String[]
 		}
