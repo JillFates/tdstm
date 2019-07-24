@@ -15,7 +15,10 @@ class ForcePasswordChangeInterceptor {
 
 	boolean before() {
 		UserLogin userLogin = securityService.userLogin
-		if (userLogin?.forcePasswordChange == 'Y' && !WebUtil.isAjax(request)) {
+		// controllerNames in this list shouldn't be excluded. Otherwise they may cause weird behavior like multiple redirects.
+		List excludedControllerNames = [null, 'css', 'dist', 'images']
+		// Check if the user is being forced to update their password (and the request is not AJAX).
+		if (userLogin?.forcePasswordChange == 'Y' && !WebUtil.isAjax(request) && !excludedControllerNames.contains(controllerName)) {
 
 			if ((controllerName == 'auth' && ['login', 'signIn', 'signOut'].contains(actionName)) ||
 				(controllerName == 'userLogin' && ['changePassword', 'updatePassword'].contains(actionName))) {
