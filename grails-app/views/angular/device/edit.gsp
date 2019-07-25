@@ -28,16 +28,16 @@
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset.assetName}"/>
                                     <td colspan="3">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
+                                        <tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset.description}"/>
                                     <td colspan="3">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${asset.description}" ngmodel="model.asset.description"/>
+                                        <tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="2" value="${asset.description}" ngmodel="model.asset.description"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetType}" value="${asset.assetType}"/>
-                                    <td class="tm-input-control-container  ${standardFieldSpecs.assetType.imp ?: ''}" data-for="model" tabindex="13">
+                                    <td class="tm-input-control-container  ${standardFieldSpecs.assetType.imp ?: ''}" data-for="model" tabindex="3">
                                         <tds-combobox
                                                 [(model)]="model.asset.assetTypeSelectValue"
                                                 [serviceRequest]="searchAssetTypes"
@@ -46,7 +46,7 @@
                                                 (valueChange)="onAssetTypeValueChange($event)">
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="4" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                                     <td colspan="1"></td>
                                     <td class="label_sm">Source</td>
                                     <td class="label_sm">Target</td>
@@ -59,7 +59,7 @@
                                             <label>Manufacturer</label>
                                         </label>
                                     </td>
-                                    <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="14">
+                                    <td class="tm-input-control-container  ${standardFieldSpecs.manufacturer.imp ?: ''}" data-for="manufacturer" tabindex="5">
                                         <tds-combobox
                                                 [(model)]="model.asset.manufacturerSelectValue"
                                                 [serviceRequest]="searchManufacturers"
@@ -68,7 +68,7 @@
                                                 (valueChange)="onManufacturerValueChange($event)" >
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.priority}" value="${asset.priority}" tabindex="22" blankOptionListText="Please Select..." ngmodel="model.asset.priority" />
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.priority}" value="${asset.priority}" tabindex="6" blankOptionListText="Please Select..." ngmodel="model.asset.priority" />
                                     <td class="label ${standardFieldSpecs.roomSource.imp?:''}"
                                         [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="roomSource" /> }"
                                         nowrap="nowrap">
@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="${standardFieldSpecs.roomSource.imp ?: ''}" data-for="roomSource"  style="vertical-align: text-top;">
                                         <kendo-dropdownlist
-                                                [tabIndex]="31"
+                                                [tabIndex]="7"
                                                 class="tm-input-control"
                                                 name="roomSourceId"
                                                 [(ngModel)]="model.asset.roomSource"
@@ -87,13 +87,13 @@
                                         </kendo-dropdownlist>
                                         <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                         <span *ngIf="model.asset.roomSource && model.asset.roomSource.id === -1" class="newRoomS">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" size="10" tabindex="32" placeholder="Location" ngmodel="model.asset.locationSource"> </tdsAngular:inputControl>
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" size="10" tabindex="33" placeholder="Room Name" ngmodel="model.asset.newRoomSource"> </tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" size="10" tabindex="8" placeholder="Location" ngmodel="model.asset.locationSource"> </tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" size="10" tabindex="9" placeholder="Room Name" ngmodel="model.asset.newRoomSource"> </tdsAngular:inputControl>
                                         </span>
                                     </td>
                                     <td class="${standardFieldSpecs.roomTarget.imp ?: ''}" data-for="roomTarget" style="vertical-align: text-top;">
                                         <kendo-dropdownlist
-                                                [tabIndex]="41"
+                                                [tabIndex]="10"
                                                 class="tm-input-control"
                                                 name="roomTargetId"
                                                 [(ngModel)]="model.asset.roomTarget"
@@ -104,14 +104,14 @@
                                         </kendo-dropdownlist>
                                         <%-- Theses fields are used to allow user to create a source room on the fly --%>
                                         <span *ngIf="model.asset.roomTarget && model.asset.roomTarget.id === -1" class="newRoomT">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.locationTarget}" size="10" tabindex="42" placeholder="Location" ngmodel="model.asset.locationTarget"></tdsAngular:inputControl>
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" size="10" tabindex="43" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.locationTarget}" size="10" tabindex="11" placeholder="Location" ngmodel="model.asset.locationTarget"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" size="10" tabindex="12" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
-                                    <td class="tm-input-control-container ${standardFieldSpecs.model.imp ?: ''}" data-for="assetType" tabindex="15">
+                                    <td class="tm-input-control-container ${standardFieldSpecs.model.imp ?: ''}" data-for="assetType" tabindex="13">
                                         <tds-combobox
                                                 [(model)]="model.asset.modelSelectValue"
                                                 [serviceRequest]="searchModels"
@@ -120,7 +120,7 @@
                                                 (valueChange)="onModelValueChange($event)">
                                         </tds-combobox>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" tabindex="23" ngmodel="model.asset.ipAddress"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" tabindex="14" ngmodel="model.asset.ipAddress"/>
 
                                     <!-- Rack Source/Target Select & New Fields -->
                                     <td *ngIf="showRackFields" class="label rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}"
@@ -131,7 +131,7 @@
                                     <td  *ngIf="showRackFields"  data-for="rackSource"  class="rackLabel ${standardFieldSpecs.rackSource.imp ?: ''}">
                                         <div *ngIf="showRackSourceInput === 'select'">
                                             <kendo-dropdownlist
-                                                    [tabIndex]="34"
+                                                    [tabIndex]="15"
                                                     class="tm-input-control useRackS"
                                                     name="modelAssetRackSource"
                                                     [(ngModel)]="model.asset.rackSource"
@@ -140,17 +140,17 @@
                                                     [valueField]="'id'">
                                             </kendo-dropdownlist>
                                             <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === -1">
-                                                <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" size="20" tabindex="35" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
+                                                <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" size="20" tabindex="16" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
                                             </span>
                                         </div>
                                         <div *ngIf="showRackSourceInput === 'new'">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="36" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="17" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                     <td *ngIf="showRackFields" data-for="rackTarget" class="rackLabel ${standardFieldSpecs.rackTarget.imp ?: ''}">
                                         <div *ngIf="showRackTargetInput === 'select'">
                                             <kendo-dropdownlist
-                                                    [tabIndex]="44"
+                                                    [tabIndex]="18"
                                                     class="tm-input-control useRackT"
                                                     name="modelAssetRackTarget"
                                                     [(ngModel)]="model.asset.rackTarget"
@@ -160,14 +160,14 @@
                                             </kendo-dropdownlist>
                                             <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === -1">
                                                 <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}"
-                                                                         size="20" tabindex="45" placeholder="New Rack Name"
+                                                                         size="20" tabindex="19" placeholder="New Rack Name"
                                                                          value=""
                                                                          ngmodel="model.asset.newRackTarget">
                                                 </tdsAngular:inputControl>
                                             </span>
                                         </div>
                                         <div *ngIf="showRackTargetInput === 'new'">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="46" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="20" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                     <!-- Blade Source/Target Select Fields -->
@@ -200,8 +200,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${asset.shortName}" tabindex="16" ngmodel="model.asset.shortName"/>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${asset.os}" tabindex="24" ngmodel="model.asset.os" />
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${asset.shortName}" tabindex="21" ngmodel="model.asset.shortName"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.os}" value="${asset.os}" tabindex="22" ngmodel="model.asset.os" />
                                     <td *ngIf="showBladeFields || showRackFields" class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp ?: ''}"
                                         [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${asset}" fieldName="sourceRackPosition" /> }"
                                         nowrap="nowrap">
@@ -210,33 +210,33 @@
                                     <%-- Rack Source/Target Position Fields --%>
                                     <td *ngIf="showRackFields" class="rackLabel">
                                         <div *ngIf="(showRackSourceInput === 'new' || (model.asset.rackSource && (model.asset.rackSource.id === -1 || model.asset.rackSource.id > 0)))" >
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}" size="10" tabindex="37" placeholder="U Position" value="${asset.sourceRackPosition}" ngmodel="model.asset.sourceRackPosition"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}" size="10" tabindex="23" placeholder="U Position" value="${asset.sourceRackPosition}" ngmodel="model.asset.sourceRackPosition"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                     <td *ngIf="showRackFields" class="rackLabel">
                                         <div *ngIf="(showRackTargetInput === 'new' || (model.asset.rackTarget && (model.asset.rackTarget.id === -1 || model.asset.rackTarget.id > 0)))">
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}" placeholder="U Position" size="10" tabindex="47" value="${asset.targetRackPosition}"  ngmodel="model.asset.targetRackPosition"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}" placeholder="U Position" size="10" tabindex="24" value="${asset.targetRackPosition}"  ngmodel="model.asset.targetRackPosition"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                     <%-- Blade Source/Target Position Fields --%>
                                     <td *ngIf="showBladeFields" class="bladeLabel">
                                         <div *ngIf="model.asset.sourceChassis && model.asset.sourceChassis.id > 0" >
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceBladePosition}" size="10" tabindex="48" value="${asset.sourceBladePosition}" ngmodel="model.asset.sourceBladePosition"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceBladePosition}" size="10" tabindex="25" value="${asset.sourceBladePosition}" ngmodel="model.asset.sourceBladePosition"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                     <td *ngIf="showBladeFields" class="bladeLabel">
                                         <div *ngIf="model.asset.targetChassis && model.asset.targetChassis.id > 0" >
-                                            <tdsAngular:inputControl field="${standardFieldSpecs.targetBladePosition}" size="10" tabindex="52" value="${asset.targetBladePosition}" ngmodel="model.asset.targetBladePosition"></tdsAngular:inputControl>
+                                            <tdsAngular:inputControl field="${standardFieldSpecs.targetBladePosition}" size="10" tabindex="26" value="${asset.targetBladePosition}" ngmodel="model.asset.targetBladePosition"></tdsAngular:inputControl>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" tabindex="17" ngmodel="model.asset.serialNumber"/>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}" tabindex="25" ngmodel="model.asset.supportType"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" tabindex="27" ngmodel="model.asset.serialNumber"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}" tabindex="28" ngmodel="model.asset.supportType"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
                                     <td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
                                         <kendo-dropdownlist
-                                                [tabIndex]="38"
+                                                [tabIndex]="29"
                                                 class="tm-input-control"
                                                 name="modelAssetMoveBundle"
                                                 [data]="model.moveBundleList"
@@ -248,32 +248,31 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset.size}"/>
                                     <td data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
                                         <kendo-numerictextbox
-                                                [tabIndex]="49"
+                                                [tabIndex]="30"
                                                 name="deviceSize"
                                                 [format]="'n'"
                                                 [min]="0"
                                                 [autoCorrect]=true
-                                                tabindex="410"
                                                 [(ngModel)]="model.asset.size">
                                         </kendo-numerictextbox>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="18" ngmodel="model.asset.assetTag"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="31" ngmodel="model.asset.assetTag"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset?.retireDate}"/>
                                     <td data-for="retireDate" valign="top" class="value ${hasErrors(bean:asset,field:'retireDate','errors')} ${standardFieldSpecs.retireDate.imp ?: ''}">
                                         <tds-date-control
                                             [(ngModel)]="model.asset.retireDate"
                                             class="tm-input-control"
                                             name="modelAssetRetireDate"
-                                            [tabindex]="26"
+                                            [tabindex]="32"
                                             [value]="model.asset.retireDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
                                     <td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
                                         <kendo-dropdownlist
-                                                [tabIndex]="39"
+                                                [tabIndex]="33"
                                                 class="tm-input-control"
                                                 name="modelAssetPlanStatus"
                                                 [data]="model.planStatusOptions"
@@ -283,7 +282,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset.scale}"/>
                                     <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                         <kendo-dropdownlist
-                                                [tabIndex]="50"
+                                                [tabIndex]="34"
                                                 class="tm-input-control"
                                                 name="modelAssetScaleName"
                                                 [data]="${SizeScale.getAsJsonList() as JSON}"
@@ -297,7 +296,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.railType}" value="${asset.railType}"/>
                                     <td class="${standardFieldSpecs.railType.imp ?: ''}" data-for="railType">
                                         <kendo-dropdownlist
-                                                [tabIndex]="19"
+                                                [tabIndex]="35"
                                                 class="tm-input-control"
                                                 name="modelAssetRailType"
                                                 [data]="model.railTypeOption"
@@ -310,30 +309,30 @@
                                             [(ngModel)]="model.asset.maintExpDate"
                                             class="tm-input-control"
                                             name="modelAssetMaintExpDate"
-                                            [tabindex]="27"
+                                            [tabindex]="36"
                                             [value]="model.asset.maintExpDate">
                                         </tds-date-control>
                                     </td>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
                                     <td colspan="1" class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
                                         <kendo-dropdownlist
-                                                [tabIndex]="40"
+                                                [tabIndex]="37"
                                                 class="tm-input-control"
                                                 name="modelAssetValidation"
                                                 [data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(asset.class).validation.inList as JSON}"
                                                 [(ngModel)]="model.asset.validation">
                                         </kendo-dropdownlist>
                                     </td>
-                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="51" ngmodel="model.asset.rateOfChange"/>
+                                    <tdsAngular:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"  tabindex="38" ngmodel="model.asset.rateOfChange"/>
                                 </tr>
                                 <tr>
                                     <tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}"
-                                                                   tabindex="20" ngmodel="model.asset.externalRefId"/>
+                                                                   tabindex="39" ngmodel="model.asset.externalRefId"/>
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.truck}" value="${asset.truck}"/>
                                     <td class="truck-input-group">
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.truck}" size="3" tabindex="28" value="${asset.truck}" ngmodel="model.asset.truck"/>
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.cart}" size="3" tabindex="29" value="${asset.cart}" ngmodel="model.asset.cart"/>
-                                        <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" size="2" tabindex="30" value="${asset.shelf}" ngmodel="model.asset.shelf"/>
+                                        <tdsAngular:inputControl field="${standardFieldSpecs.truck}" size="3" tabindex="40" value="${asset.truck}" ngmodel="model.asset.truck"/>
+                                        <tdsAngular:inputControl field="${standardFieldSpecs.cart}" size="3" tabindex="41" value="${asset.cart}" ngmodel="model.asset.cart"/>
+                                        <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" size="2" tabindex="42" value="${asset.shelf}" ngmodel="model.asset.shelf"/>
                                     </td>
                                 </tr>
                                 <g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
