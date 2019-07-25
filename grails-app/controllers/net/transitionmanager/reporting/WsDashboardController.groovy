@@ -365,7 +365,7 @@ class WsDashboardController implements ControllerMethods {
 		// Forming query for multi-uses
 		def baseWhere = 'WHERE ae.project=:project AND ae.moveBundle IN (:moveBundles)'
 		def selectCount = 'SELECT count(ae)'
-		def countArgs = [project:project, moveBundles: moveBundleList]
+		def countArgs = [project:project, moveBundles:moveBundleList]
 
 		String countQuery = "$selectCount FROM AssetEntity ae $baseWhere"
 		String appQuery = "FROM Application ae $baseWhere"
@@ -663,19 +663,7 @@ class WsDashboardController implements ControllerMethods {
 
 		// This section could be consolidated to a simple query instead of a bunch
 		def unknown = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.UNKNOWN])[0]
-
-		def validated = Application.executeQuery(
-			"SELECT count(ae) FROM Application ae WHERE ae.project=:project AND ae.validation=:validation",
-			[
-				project: countArgs.project,
-				validation: ValidationType.VALIDATED]
-		)[0]
-		def planReady = Application.executeQuery(
-			"SELECT count(ae) FROM Application ae WHERE ae.project=:project AND ae.validation=:validation",
-			[
-				project: countArgs.project,
-				validation: ValidationType.PLAN_READY]
-		)[0]
+		def planReady = Application.executeQuery(appValidateCountQuery, countArgs+[validation: ValidationType.PLAN_READY])[0]
 
 		countArgs.validation = ValidationType.UNKNOWN
 		def appToValidate = Application.executeQuery(appValidateCountQuery, countArgs)[0]
@@ -686,7 +674,7 @@ class WsDashboardController implements ControllerMethods {
 		def vsToValidate = AssetEntity.executeQuery(validateCountQuery, countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.virtualServerTypes])[0]
 
 		def otherValidateQuery = countQuery + validationQuery + " AND COALESCE(ae.assetType,'') NOT IN (:type) AND ae.assetClass=:assetClass"
-		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs +[assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes])[0]
+		def otherToValidate = AssetEntity.executeQuery(otherValidateQuery, countArgs+[assetClass:AssetClass.DEVICE, type:AssetType.nonOtherTypes])[0]
 
 		def percentageAppToValidate = applicationCount ? percOfCount(appToValidate, applicationCount) : 100
 		def percentagePlanReady = applicationCount ? percOfCount(planReady, applicationCount) : 0
@@ -754,7 +742,7 @@ class WsDashboardController implements ControllerMethods {
 		Map analysis = [
 				assignedAppPerc: assignedAppPerc,
 				confirmedAppPerc: confirmedAppPerc,
-				validated: validated,
+				validated: applicationCount - unknown,
 				planReady: planReady,
 				appDependenciesCount: appDependenciesCount,
 				serverDependenciesCount: serverDependenciesCount,
