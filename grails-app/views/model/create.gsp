@@ -115,10 +115,8 @@
 				<input type="number" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" style="width: 50px;">&nbsp;
 				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${tds.powerType()}" /></td>
 			</td>
-			<td valign="top" class="name">Notes:</td>
-			<td>
-				<input type="text" name="description" id="descriptionId" value="${modelInstance.description}" > </td>
-			</td>
+			<td valign="top" class="name" nowrap="nowrap">CPU Type :</td>
+			<td><input type="text" name="cpuType " id="cpuType" value=""/></td>
 		</tr>
 		<!--<tr>
 			<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
@@ -175,18 +173,44 @@
 					<input type="checkbox" name="sourceTDS" id="sourceTDSId"/>
 				</g:else>
 			</td>
+			<td valign="top" class="name" nowrap="nowrap">CPU Count:</td>
+			<td>
+				<input type="number" min="0" max="10000" name="cpuCount" id="cpuCount" value=""/>
+			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name"><label for="useForPlanning">Room Object:</label></td>
 			<td><input type="checkbox" name="roomObject" id="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/></td>
-			<td valign="top" class="name" nowrap="nowrap">Source URL :</td>
-			<td><input type="text" name="sourceURL " id="sourceURL " value=""/></td>
+			<td valign="top" class="name" nowrap="nowrap">Memory Size:</td>
+			<td>
+				<input type="number" min="0" max="10000" step="any" name="memorySize" id="memorySize" value=""/>
+			</td>
 		</tr>
 		<tr>
 			<td valign="top" class="name" nowrap="nowrap">Validated By:</td>
 			<td>
 				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
 			</td>
+			<td valign="top" class="name" nowrap="nowrap">Storage Size:</td>
+			<td>
+				<input type="number" min="0" max="10000" step="any" name="storageSize" id="storageSize" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td valign="top" class="name">Notes:</td>
+			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" ></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td valign="top" class="name" nowrap="nowrap">Source URL :</td>
+			<td><input type="text" name="sourceURL " id="sourceURL " value=""/></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
 			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
 			<td>
 				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" ></g:select>
