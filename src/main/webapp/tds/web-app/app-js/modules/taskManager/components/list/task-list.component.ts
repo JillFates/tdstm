@@ -83,13 +83,13 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 																 tooltip="View Timeline"
 																 icon="table">
 							</tds-button-custom>
-							<kendo-dropdownlist
-								style="width: 100px"
-								name="timerList"
-								class="form-control"
-								[data]="timerList"
-								[(ngModel)]="timerValue">
-							</kendo-dropdownlist>
+							<!--<kendo-dropdownlist-->
+							<!--style="width: 100px"-->
+							<!--name="timerList"-->
+							<!--class="form-control"-->
+							<!--[data]="timerList"-->
+							<!--[(ngModel)]="timerValue">-->
+							<!--</kendo-dropdownlist>-->
 						</div>
 					</div>
 					<kendo-grid
@@ -132,9 +132,12 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								[title]="'Create Task'">
 							</tds-button-create>
 							<tds-button-edit
-								[title]="'Bulk Edit'">
+								(click)="onBulkActionHandler()"
+								[title]="'Bulk Action'">
 							</tds-button-edit>
 							<tds-button-cancel
+								[disabled]="!isFiltersDirty()"
+								(click)="onClearFiltersHandler()"
 								[title]="'Clear Filters'">
 							</tds-button-cancel>
 							<label class="reload-grid-button pull-right" title="Reload Batch List" (click)="onFiltersChange()">
@@ -238,7 +241,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
 							</ng-template>
 							<ng-template kendoGridFilterCellTemplate let-filter>
-								<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom:0px;">
+								<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
 									<div *ngIf="column.type === 'text'; then stringFilter"></div>
 									<ng-template #stringFilter>
 										<input [(ngModel)]="column.filter" (keyup)="grid.onFilter(column)"
@@ -275,6 +278,7 @@ export class TaskListComponent {
 	private allAvailableCustomColumns: Array<any>;
 	selectedCustomColumn = {};
 	private userContext: UserContextModel;
+	private rowsExpanded = false;
 
 	constructor(
 		private taskService: TaskService,
@@ -463,7 +467,7 @@ export class TaskListComponent {
 			detail: {
 				assetClass: '',
 				assetEntity: '',
-				assetName:  '',
+				assetName: '',
 				currentUserId: this.userContext.user.id
 			}
 		};
@@ -541,7 +545,7 @@ export class TaskListComponent {
 
 	/**
 	 * Opens a link in a new browser tab
- 	 * @param url
+	 * @param url
 	 */
 	openLinkInNewTab(url): void {
 		window.open(url, '_blank');
@@ -619,5 +623,42 @@ export class TaskListComponent {
 		this.taskService.resetTaskAction(taskRow.id).subscribe(result => {
 			this.search(taskRow.id);
 		});
+	}
+
+	/**
+	 * On clear filters button click, clear all available filters.
+	 */
+	onClearFiltersHandler(): void {
+		this.grid.clearAllFilters(this.columnsModel);
+	}
+
+	/**
+	 * Determines if current columns has been filtered (contains value).
+	 */
+	isFiltersDirty(): boolean {
+		return this.columnsModel
+			.filter(column => column.filter).length > 0;
+	}
+
+	/**
+	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
+	 */
+	onBulkActionHandler(): void {
+		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
+		if (!this.rowsExpanded) {
+			taskRows.forEach((taskRow: any, index: number) => {
+				const $event = { dataItem: taskRow };
+				if (taskRow.status === 'Ready' || taskRow.status === 'Started') {
+					this.onRowDetailExpandHandler($event);
+					this.gridComponent.expandRow(index);
+				}
+			});
+			this.rowsExpanded = true;
+		} else {
+			taskRows.forEach((taskRow, index) => {
+				this.gridComponent.collapseRow(index);
+			});
+			this.rowsExpanded = false;
+		}
 	}
 }
