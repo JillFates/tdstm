@@ -1,6 +1,7 @@
 <div class="modal fade in model-device-show-component" tds-handle-escape (escPressed)="cancelCloseDialog()" id="model-device-show-component" data-backdrop="static"
      tabindex="-1" role="dialog">
-	<form id="editModelForm" action="/tdstm/model/edit" method="post" target="_blank">
+	<form id="editModelForm" #myForm="ngForm" action="/tdstm/model/edit" 
+		(ngSubmit)="onEditModel()" method="post" target="model-edit-view">
 		<div class="modal-dialog modal-sm" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -11,6 +12,7 @@
 				</div>
 				<div class="modal-body">
 					<div class="modal-body-container">
+						<iframe name="model-edit-view"></iframe>
 						<div class="box-body">
 							<div class="row">
 								<div class="form-group">
@@ -69,7 +71,7 @@
 				</div>
 				<div class="modal-footer form-group-center">
 					<input name="id" type="hidden" id="show_modelId" value="{{deviceModel.id}}">
-					<button type="submit" [disabled]="!canEditModel()" class="btn btn-primary pull-left" (click)="onEditModel()">
+					<button type="submit" [disabled]="!canEditModel()" class="btn btn-primary pull-left">
 						<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 					<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
 						<span class="glyphicon glyphicon-ban-circle"></span> Close</button>

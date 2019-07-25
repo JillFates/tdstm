@@ -7,7 +7,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 	<div class="modal fade in model-html-wrapper-component"
 		tds-handle-escape (escPressed)="cancelCloseDialog()"
 		id="modal-html-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
-		<div class="modal-dialog modal-md" role="document">
+		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
@@ -17,9 +17,19 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 				</div>
 				<div class="modal-body">
 					<div class="modal-body-container">
+					<form id="wrapperForm"
+						#myForm="ngForm"
+						action="/tdstm/model/edit?id=3520"
+						method="post"
+						(ngSubmit)="onSubmit()"
+						target="target-frame">
+						<iframe name="model-edit-view"></iframe>
+					</form>
+					<!--
 						<div class="box-body">
-							<div [innerHtml]="html | safeHtml"></div>
+							<div [innerHtml]="html"></div>
 						</div>
+					-->
 				</div>
 				</div>
 				<div class="modal-footer">
@@ -29,12 +39,16 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 	</div>
 `
 })
-export class TDSModalHtmlWrapperComponent extends UIExtraDialog {
+export class TDSModalHtmlWrapperComponent extends UIExtraDialog implements OnInit {
 	constructor(
 		@Inject('title') public title: string,
 		@Inject('html') public html: string) {
 		super('#modal-html-wrapper');
 		console.log('constructor');
+	}
+
+	ngOnInit() {
+		console.log('onInit');
 	}
 
 	public cancelCloseDialog() {

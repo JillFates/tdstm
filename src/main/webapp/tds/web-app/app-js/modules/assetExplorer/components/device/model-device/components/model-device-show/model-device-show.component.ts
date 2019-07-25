@@ -5,6 +5,7 @@ import {AssetExplorerService} from '../../../../../../assetManager/service/asset
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
 import {TDSModalHtmlWrapperComponent} from '../../../../../../../shared/components/modal-html-wrapper/modal-html-wrapper.component';
+import {ModelService} from '../../../../../service/model.service';
 
 @Component({
 	selector: 'model-device-show',
@@ -15,7 +16,8 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		private dialogService: UIDialogService,
 		public deviceModel: DeviceModel,
 		private assetExplorerService: AssetExplorerService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService, 
+		private modelService: ModelService) {
 		super('#model-device-show-component');
 	}
 
@@ -54,21 +56,24 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		if (!this.canEditModel()) {
 			return;
 		}
-
-		this.dialogService.extra(TDSModalHtmlWrapperComponent,
-			[
-				{provide: 'title', useValue: 'Edit Model'},
-				{provide: 'html', useValue: '<b>hello super world!</b>'}
-			], false, false)
-		.then((result) => {
-			this.close(result);
-		}).catch((error) => console.log(error))
-
 		/*
+		this.modelService.editModel(this.deviceModel.id)
+			.subscribe((response) => {
+				console.log(response);
+				this.dialogService.extra(TDSModalHtmlWrapperComponent,
+					[
+						{provide: 'title', useValue: 'Edit Model'},
+						{provide: 'html', useValue: response}
+					], false, false)
+				.then((result) => {
+					this.close(result);
+				}).catch((error) => console.log(error))
+			});
+		*/
+
 		// fix issue preventing submit form from bootstrap modal
 		document.getElementById('editModelForm')['submit']();
-		this.close();
-		*/
+		// this.close();
 	}
 
 }
