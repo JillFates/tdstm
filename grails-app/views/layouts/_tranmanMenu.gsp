@@ -311,6 +311,9 @@
                                 <li class="menu-child-item menu-parent-tasks-task-manager">
                                     <g:link controller="assetEntity" action="listTasks" params="[initSession:true]">Task Manager</g:link>
                                 </li>
+                                <li class="menu-child-item menu-parent-tasks-task-manager">
+                                    <g:link controller="module" action="taskManager" id="list">Task Manager <small>(new)</small></g:link>
+                                </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-task-graph">
