@@ -78,7 +78,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 																 icon="table">
 							</tds-button-custom>
 							<tds-button-custom class="btn-primary"
-																 (click)="onGenerateReport()"
+																 (click)="onViewTimelineHandler()"
 																 title="View Timeline"
 																 tooltip="View Timeline"
 																 icon="table">
@@ -360,7 +360,6 @@ export class TaskListComponent {
 			this.allAvailableCustomColumns.push({ property: entry[0], label: entry[1] });
 		});
 		this.allAvailableCustomColumns = this.allAvailableCustomColumns.sort((a, b) => SortUtils.compareByProperty(a, b, 'label'));
-		console.log(this.currentCustomColumns);
 	}
 
 	/**
@@ -370,7 +369,6 @@ export class TaskListComponent {
 		this.loading = true;
 		this.taskService.getTaskList(this.selectedEvent.id, this.justRemaining, this.justMyTasks, this.viewUnpublished).subscribe(result => {
 			this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
-			console.log(this.grid.gridData);
 			this.loading = false;
 			setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
 		});
@@ -449,7 +447,7 @@ export class TaskListComponent {
 							}
 						}
 					}).catch(result => {
-					console.log(result);
+						console.log(result);
 				});
 			});
 	}
@@ -557,7 +555,6 @@ export class TaskListComponent {
 	 * @param assetClass: string
 	 */
 	onOpenAssetDetailHandler(taskRow: any) {
-		console.log(taskRow);
 		this.dialogService.open(AssetShowComponent,
 			[UIDialogService,
 				{ provide: 'ID', useValue: taskRow.assetEntityId },
@@ -610,7 +607,6 @@ export class TaskListComponent {
 		}
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
-				console.log(result);
 				taskRow.assignedTo = this.userContext.person.id;
 			});
 	}
