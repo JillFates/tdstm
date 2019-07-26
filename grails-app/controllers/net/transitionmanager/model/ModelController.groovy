@@ -158,6 +158,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			def powerUsed = params.float("powerUse", 0f)
 			def powerType = params.powerType
 			def endOfLifeDate = params.endOfLifeDate
+			def memorySize = params.double("memorySize", 0f)
+			def storageSize = params.double("storageSize", 0f)
 
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
@@ -179,6 +181,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			modelInstance.powerUse = powerUsed
 			modelInstance.powerDesign = powerDesign
 			modelInstance.powerNameplate = powerNameplate
+			modelInstance.memorySize = memorySize
+			modelInstance.storageSize = storageSize
 
 			if (params.modelStatus == 'valid') {
 				modelInstance.validatedBy = securityService.loadCurrentPerson()
@@ -337,6 +341,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				def powerDesign = params.float("powerDesign", 0f)
 				def powerUsed = params.float("powerUse", 0f)
 				def powerType = params.powerType
+				def memorySize = params.double("memorySize", 0f)
+				def storageSize = params.double("storageSize", 0f)
 
 				if (powerType == "Amps") {
 					powerNameplate = powerNameplate * 120
@@ -349,6 +355,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				params.powerNameplate = powerNameplate
 				params.powerDesign = powerDesign
 				params.powerUse = powerUsed
+				params.memorySize = memorySize
+				params.storageSize = storageSize
 
 				def frontImage = request.getFile("frontImage")
 				if (frontImage && frontImage?.getBytes()?.getSize() > 0) {
