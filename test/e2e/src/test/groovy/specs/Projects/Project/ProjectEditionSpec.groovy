@@ -95,12 +95,21 @@ class ProjectEditionSpec extends GebReportingSpec {
             waitFor {pdPageMessage.text().contains(projCode + " updated")}
         and: 'Changes are saved'
             waitFor{pdProjectName.text() == projName + " Edited"}
-            //Verifications are done, the following lines set the project back to TM-Demo
+
+    }
+
+    //Verifications are done, the following lines set the project back to TM-Demo
+    def "3. User goes back to TM-Demo"(){
+        given: 'The user goes to Project List'
             projectsModule.goToProjectsActive()
             at ProjectListPage
+        when : 'The user selects TM-Demo'
             waitFor{projectNameGridField}
             filterByName "TM-Demo"
             clickOnFirstListedProject()
+        then:   'The user is led to Project Details Page'
+        at ProjectDetailsPage
+
     }
 
 }
