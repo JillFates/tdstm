@@ -95,7 +95,7 @@ import {TDSCustomValidationErrorsComponent} from './components/custom-control/fi
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
 import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
-import {TDSModalHtmlWrapperComponent} from './components/modal-html-wrapper/modal-html-wrapper.component';
+import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/modal-page-wrapper.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -175,7 +175,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		RichTextEditorComponent,
 		PieCountdownComponent,
 		TDSFilterInputComponent,
-		TDSModalHtmlWrapperComponent
+		TDSModalPageWrapperComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -238,7 +238,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
-		TDSModalHtmlWrapperComponent
+		TDSModalPageWrapperComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -254,7 +254,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UserDateTimezoneComponent,
 		UserManageStaffComponent,
 		PasswordChangeComponent,
-		TDSModalHtmlWrapperComponent
+		TDSModalPageWrapperComponent
 	]
 })
 export class SharedModule {

@@ -4,7 +4,7 @@ import {DeviceModel} from '../../model/device-model.model';
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
-import {TDSModalHtmlWrapperComponent} from '../../../../../../../shared/components/modal-html-wrapper/modal-html-wrapper.component';
+import {TDSModalPageWrapperComponent} from '../../../../../../../shared/components/modal-page-wrapper/modal-page-wrapper.component';
 import {ModelService} from '../../../../../service/model.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		private dialogService: UIDialogService,
 		public deviceModel: DeviceModel,
 		private assetExplorerService: AssetExplorerService,
-		private permissionService: PermissionService, 
+		private permissionService: PermissionService,
 		private modelService: ModelService) {
 		super('#model-device-show-component');
 	}
@@ -57,33 +57,20 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 			return;
 		}
 
-		this.dialogService.extra(TDSModalHtmlWrapperComponent,
-					[
-						{provide: 'title', useValue: 'Edit Model'},
-						{provide: 'html', useValue: ''}
-					], false, false)
-				.then((result) => {
-					this.close(result);
-				}).catch((error) => console.log(error));
-
-		/*
-		this.modelService.editModel(this.deviceModel.id)
-			.subscribe((response) => {
-				console.log(response);
-				this.dialogService.extra(TDSModalHtmlWrapperComponent,
-					[
-						{provide: 'title', useValue: 'Edit Model'},
-						{provide: 'html', useValue: response}
-					], false, false)
-				.then((result) => {
-					this.close(result);
-				}).catch((error) => console.log(error))
-			});
-		*/
-
-		// fix issue preventing submit form from bootstrap modal
-		// document.getElementById('editModelForm')['submit']();
-		// this.close();
+		this.dialogService.extra(TDSModalPageWrapperComponent,
+				[
+					{provide: 'title', useValue: 'Edit Model'},
+					{provide: 'action', useValue: this.getEditModelUrl()}
+				], false, false)
+			.then((result) => {
+				console.log(result);
+			}).catch((error) => console.log(error));
 	}
 
+	/**
+	 * get the url for the model edit view
+	*/
+	private getEditModelUrl(): string {
+		return `/tdstm/model/edit?id=${this.deviceModel.id}&modal=true`;
+	}
 }

@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnInit, AfterViewInit} from '@angular/core';
+import {Component, Inject, Input, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 		tds-handle-escape (escPressed)="cancelCloseDialog()"
 		id="modal-page-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-lg" role="document">
-			<div class="modal-content">
+			<div class="modal-content" [ngStyle]="{'visibility': isVisible ? 'visible' : 'hidden'}">
 				<div class="modal-header">
 					<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 						<span aria-hidden="true">×</span>
@@ -18,11 +18,11 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 				<div class="modal-body">
 					<div class="modal-body-container">
 					<form id="wrapperForm"
-						#myForm="ngForm"
-						action="/tdstm/model/edit?id=3520"
+						#targetForm="ngForm"
+						[action]="action"
 						method="post"
 						target="target-frame">
-						<iframe name="target-frame" class="wrapper-frame"></iframe>
+						<iframe #targetFrame name="target-frame" (load)="onLoad()" class="wrapper-frame"></iframe>
 					</form>
 				</div>
 				</div>
@@ -34,20 +34,36 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 `
 })
 export class TDSModalPageWrapperComponent extends UIExtraDialog implements AfterViewInit {
+	public isVisible = false;
+	private hasBeenSubmited = false;
+	@ViewChild('targetFrame') targetFrame: ElementRef;
 	constructor(
 		@Inject('title') public title: string,
-		@Inject('html') public html: string) {
-		super('#modal-html-wrapper');
-		console.log('constructor');
+		@Inject('action') public action: string,
+		) {
+		super('#modal-page-wrapper');
 	}
 
+	/**
+	 * On load show the view
+	 */
+	onLoad() {
+		if (this.hasBeenSubmited) {
+			this.isVisible = true;
+		}
+	}
+
+	/**
+	 * After view init submit inmediatly the form
+	 */
 	ngAfterViewInit() {
-		setTimeout(() => {
-			console.log('onInit');
-			document.getElementById('wrapperForm')['submit']();
-		}, 3000);
+		document.getElementById('wrapperForm')['submit']();
+		this.hasBeenSubmited = true;
 	}
 
+	/**
+	 * On close the view
+	 */
 	public cancelCloseDialog() {
 		this.close(null);
 	}
