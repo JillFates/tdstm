@@ -36,7 +36,7 @@ class ProjectEditionSpec extends GebReportingSpec {
         login(4,5) // test needs to be done by e2e_projects_user
         at MenuPage
         waitFor{projectsModule}
-        projectsModule.goToProjectsActive()
+        waitFor{projectsModule.goToProjectsActive()}
         at ProjectListPage
         filterByName "QAE2E"
         if( noRecrdsAreDisplayed() ){
