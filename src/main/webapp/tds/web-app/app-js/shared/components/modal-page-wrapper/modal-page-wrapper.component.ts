@@ -1,12 +1,12 @@
-import {Component, Inject, Input, AfterViewInit} from '@angular/core';
+import {Component, Inject, Input, OnInit, AfterViewInit} from '@angular/core';
 import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 
 @Component({
-	selector: 'tds-modal-html-wrapper',
+	selector: 'tds-modal-page-wrapper',
 	template: `
-	<div class="modal fade in modal-html-wrapper-component"
+	<div class="modal fade in modal-page-wrapper-component"
 		tds-handle-escape (escPressed)="cancelCloseDialog()"
-		id="modal-html-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
+		id="modal-page-wrapper" data-backdrop="static" tabindex="-1" role="dialog">
 		<div class="modal-dialog modal-lg" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -24,11 +24,6 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 						target="target-frame">
 						<iframe name="target-frame" class="wrapper-frame"></iframe>
 					</form>
-					<!--
-						<div class="box-body">
-							<div [innerHtml]="html"></div>
-						</div>
-					-->
 				</div>
 				</div>
 				<div class="modal-footer">
@@ -38,7 +33,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 	</div>
 `
 })
-export class TDSModalHtmlWrapperComponent extends UIExtraDialog implements AfterViewInit {
+export class TDSModalPageWrapperComponent extends UIExtraDialog implements AfterViewInit {
 	constructor(
 		@Inject('title') public title: string,
 		@Inject('html') public html: string) {
@@ -46,12 +41,11 @@ export class TDSModalHtmlWrapperComponent extends UIExtraDialog implements After
 		console.log('constructor');
 	}
 
-	ngOnInit() {
-		console.log('onInit');
-	}
-
 	ngAfterViewInit() {
-		document.getElementById('wrapperForm')['submit']();
+		setTimeout(() => {
+			console.log('onInit');
+			document.getElementById('wrapperForm')['submit']();
+		}, 3000);
 	}
 
 	public cancelCloseDialog() {

@@ -56,6 +56,16 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		if (!this.canEditModel()) {
 			return;
 		}
+
+		this.dialogService.extra(TDSModalHtmlWrapperComponent,
+					[
+						{provide: 'title', useValue: 'Edit Model'},
+						{provide: 'html', useValue: ''}
+					], false, false)
+				.then((result) => {
+					this.close(result);
+				}).catch((error) => console.log(error));
+
 		/*
 		this.modelService.editModel(this.deviceModel.id)
 			.subscribe((response) => {
@@ -72,7 +82,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		*/
 
 		// fix issue preventing submit form from bootstrap modal
-		document.getElementById('editModelForm')['submit']();
+		// document.getElementById('editModelForm')['submit']();
 		// this.close();
 	}
 
