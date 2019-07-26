@@ -307,7 +307,7 @@ class ControlAngularTagLib {
 	 * @return the SELECT Component HTML
 	 */
 	private String renderSelectListInput(Map fieldSpec, String value, String ngmodel, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement, String blankOptionListText) {
-		List options = fieldSpec.constraints?.values ?: []
+		List options = fieldSpec.constraints?.values.collect { StringEscapeUtils.escapeXml(it) } ?: []
 
 		StringBuilder sb = new StringBuilder('<kendo-dropdownlist ')
 		sb.append('#' + 'field' + fieldSpec.field + '="ngModel"')

@@ -131,7 +131,7 @@
                     </li>
                     <li class="menu-child-item menu-parent-assets-asset-manager">
                         <a [routerLink]="['/asset','views']">
-                            <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> View Manager
+                            <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> Manage Views
                         </a>
                     </li>
                     <li class="divider"></li>
@@ -192,11 +192,11 @@
                             <img src="/tdstm/assets/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph"> Architecture Graph
                         </a>
                     </li>
-                    <li class="divider"></li>
+                    <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
                         <a href="/tdstm/assetEntity/exportAssets">Export Assets</a>
                     </li>
-                    <li class="menu-child-item menu-parent-assets-import-assets-etl">
+                    <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets-etl">
                         <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets">
@@ -219,10 +219,10 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Events</li>
                     <li class="menu-child-item menu-parent-planning-event-list">
-                        <a href="/tdstm/moveEvent/list">List Events</a>
+                        <a href="/tdstm/module/event/list">List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
-                        <a href="/tdstm/moveEvent/show/{{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
+                        <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
                     </li>
                     <li *ngIf="hasPermission(permission.NewsEdit)" class="menu-child-item menu-parent-planning-event-news">
                         <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
@@ -236,10 +236,10 @@
                     <li class="divider"></li>
                     <li class="menu-parent-item">Bundles</li>
                     <li class="menu-child-item menu-parent-planning-list-bundles">
-                        <a href="/tdstm/moveBundle/list">List Bundles</a>
+                        <a href="/tdstm/module/bundle/list">List Bundles</a>
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
-                        <a href="/tdstm/moveBundle/show/{{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
+                        <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
                     </li>
                 </ul>
             </li>
@@ -285,7 +285,7 @@
                         <a [routerLink]="['/planning','dashboard']">Planning Dashboard</a>
                     </li>
                     <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                        <a href="/tdstm/dashboard/index">Event Dashboard</a>
+                        <a href="/tdstm/module/event/dashboard">Event Dashboard</a>
                     </li>
                 </ul>
             </li>

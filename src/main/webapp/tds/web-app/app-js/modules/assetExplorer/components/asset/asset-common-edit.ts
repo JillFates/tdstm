@@ -171,8 +171,8 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	protected promptSaveChanges(): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'Abandon Changes?',
+			'You have unsaved changes. Click Confirm to abandon your changes.',
 			'Confirm', 'Cancel').then(result => {
 			if (result) {
 				this.cancelCloseDialog();

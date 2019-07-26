@@ -227,15 +227,19 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="divider"></li>
+                            <tds:hasPermission permission="${Permission.DataTransferBatchView}">
+                                <li class="divider"></li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
                                     <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                                <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
-                            </li>
+                            <tds:hasPermission permission="${Permission.AssetImport}">
+                                <li class="menu-child-item menu-parent-assets-import-assets-etl">
+                                    <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
                                     <g:link controller="assetEntity" action="assetImport">Import Assets (TM Excel)</g:link>
@@ -264,11 +268,11 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Events</li>
                             <li class="menu-child-item menu-parent-planning-event-list">
-                                <g:link controller="moveEvent" action="list">List Events</g:link>
+                                <g:link controller="module" action="event" id="list">List Events</g:link>
                             </li>
                             <g:if test="${currProject && moveEvent}">
                                 <li class="menu-child-item menu-parent-planning-event-detail-list">
-                                    <g:link controller="moveEvent" action="show" id="${moveEvent.id}">${moveEvent.name} Event Details</g:link>
+                                    <a href="/tdstm/module/event/list?show=${moveEvent.id}">${moveEvent.name} Event Details</a>
                                 </li>
                             </g:if>
                             <tds:hasPermission permission="${Permission.NewsEdit}">
@@ -287,13 +291,8 @@
                             <li class="divider"></li>
                             <li class="menu-parent-item">Bundles</li>
                             <li class="menu-child-item menu-parent-planning-list-bundles">
-                                <g:link controller="moveBundle" action="list">List Bundles</g:link>
+                                <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
-                            <g:if test="${currProject && moveBundle}">
-                                <li class="menu-child-item menu-parent-planning-selected-bundle">
-                                    <g:link controller="moveBundle" action="show">${moveBundle.name} Bundle Details</g:link>
-                                </li>
-                            </g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>
@@ -358,7 +357,7 @@
                                 </li>
                             </tds:hasPermission>
                             <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                                <g:link controller="dashboard">Event Dashboard</g:link>
+                                <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
                             </li>
                             <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">

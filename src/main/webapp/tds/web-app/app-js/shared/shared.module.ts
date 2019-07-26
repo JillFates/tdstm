@@ -54,6 +54,7 @@ import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
 import {TranslatePipe} from './pipes/translate.pipe';
 import {FilterPipe} from './pipes/filter.pipe';
 import {UtilsPipe} from './pipes/utils.pipe';
+import {SafeHtmlPipe} from './pipes/safe-html.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
@@ -93,6 +94,7 @@ import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-
 import {TDSActionButton} from './components/button/action-button.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
+import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
@@ -122,6 +124,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
+		SafeHtmlPipe,
 		DatePipe,
 		NumericPipe,
 		EscapeUrlEncodingPipe,
@@ -170,6 +173,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
+		PieCountdownComponent,
 		TDSFilterInputComponent
 	],
 	exports: [
@@ -230,7 +234,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSActionButton,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
-		TDSFilterInputComponent
+		PieCountdownComponent,
+		TDSFilterInputComponent,
+		SafeHtmlPipe
 	],
 	entryComponents: [
 		DynamicComponent,

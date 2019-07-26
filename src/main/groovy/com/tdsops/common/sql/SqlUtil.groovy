@@ -1,5 +1,6 @@
 package com.tdsops.common.sql
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.If
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -278,143 +279,143 @@ class SqlUtil {
 	 * 		ab*		=> prop LIKE "ab%"
 	 * 		*ab		=> prop LIKE "%ab"
 	 * 		*ab*	=> prop LIKE "%ab%"
-	 *
-	 *
+	 * Scenario 14:
+	 *      =       => trim(coalesce(prop,'')) = ''
+	 * Scenario 15:
+	 *      !       => trim(coalesce(fieldName,'')) <> ''
+	 * Scenario 16:
+	 *      =null   => prop IS NULL (case insensitive)
+	 * Scenario 17:
+	 *      !null   => prop IS NOT NULL (case insensitive)
 	 *
 	 *
 	 * @param fieldSearchData
 	 */
 	static void parseParameter(FieldSearchData fieldSearchData) {
-
+		// Validate that the FieldSearchData object has been instantiated correctly.
 		String errMsg = fieldSearchData.validate()
 		if (errMsg) {
 			throw new RuntimeException(errMsg)
 		}
 
-		String originalFilter = fieldSearchData.filter
-
-		int filterSize = originalFilter.size()
-
-		// Check for many-to-many before attempting one of the standard filterings.
+		// Check for many-to-many before attempting one of the standard filters.
 		if (fieldSearchData.isManyToMany()) {
 			handleManyToMany(fieldSearchData)
 			return
 		}
 
+		// Check if the field is an enum before attempting one of the standard filters.
 		if (isEnumerationField(fieldSearchData)) {
 			handleEnumerationField(fieldSearchData)
 			return
 		}
 
-		/* We're handling 1-char long filters individually because the
-		* switch below has cases where it asks for the second char, which
-		* would break the app. */
-		if (filterSize == 1) {
-			fieldSearchData.useWildcards = true
-			buildSingleValueParameter(fieldSearchData, 'LIKE')
-			return
-		}
+		String originalFilter = fieldSearchData.filter.trim()
 
-		// At this point we know that the filter is at least 2-char long.
+		switch(originalFilter) {
 
-		switch (originalFilter[0]) {
-		/* Scenario 1: Starts with '=' */
-			case '=':
+			/* Scenario 14: just '=' */
+			case ~ /=/:
+				handleIsEmptyOrNullStringFilter(fieldSearchData, '=')
+				break
+
+			/* Scenario 15: just '!' */
+			case ~ /!/:
+				handleIsEmptyOrNullStringFilter(fieldSearchData, '<>')
+				break
+
+			/* Scenario 16: '=null', '=NULL' */
+			case ~ /(?i)=null/:
+				handleIsNullFilter(fieldSearchData)
+				break
+
+			/* Scenario 17: '!null', '!NULL' */
+			case ~ /(?i)!null/:
+				handleIsNullFilter(fieldSearchData, false)
+				break
+
+			/* Scenario 1: Starts with '=' */
+			case ~ /^=.*/:
+				if (originalFilter.size() == 1) {
+					// TODO handle =empty
+				} else {
+					fieldSearchData.filter = originalFilter.substring(1)
+					buildSingleValueParameter(fieldSearchData, originalFilter[0])
+				}
+				break
+
+			/* Scenario 2: Starts with '<=' or '>=' */
+			case ~ /^(<=|>=).*/:
+				fieldSearchData.filter = originalFilter.substring(2)
+				buildSingleValueParameter(fieldSearchData, originalFilter.substring(0, 2))
+				break
+
+			/* Scenario 3: Starts with '<>' */
+			case ~ /^<>.*/:
+				fieldSearchData.filter = originalFilter.substring(2)
+				buildDistinctParameter(fieldSearchData)
+				break
+
+			/* Scenario 4: Starts with '<' or '>' and any literal follows. */
+			case ~ /^(<|>).*/:
 				fieldSearchData.filter = originalFilter.substring(1)
+				buildSingleValueParameter(fieldSearchData, originalFilter[0])
+				break
+
+			/* Scenario 5: Start with '-' or '!', and it's a list of ':' separated values. */
+			case ~ /^(!|-).*\:.*/:
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildLikeList(fieldSearchData, 'NOT LIKE', 'AND', ':')
+				break
+
+			/* Scenario 6: Start with '-' or '!' and it's a list of '|' separated values. */
+			case ~ /^(!|-).*\|.*/:
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildInList(fieldSearchData, 'NOT IN')
+				break
+
+			/* Scenario 7: Starts with '-' and it isn't a list. */
+			case ~ /^-.*/:
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildDistinctParameter(fieldSearchData)
+				break
+
+			/* Scenario 8: Starts with '!' and it isn't a list. */
+			case ~ /^!.*/:
+				fieldSearchData.filter = originalFilter.substring(1)
+				buildSingleValueParameter(fieldSearchData, '<>')
+				break
+
+			/* Scenario 9: It's a list of '&' separated values. */
+			case ~ /.*&.*/:
+				buildLikeList(fieldSearchData, 'LIKE', 'AND', '&')
+				break
+
+			/* Scenario 10: It's a list of '|' separated values. */
+			case ~ /.*\|.*/:
+				buildInList(fieldSearchData, 'IN')
+				break
+
+			/* Scenario 11: It's a list of ':' separated values. */
+			case ~ /.*:.*/:
+				buildLikeList(fieldSearchData, 'LIKE', 'OR', ':')
+				break
+
+			/* Scenario 12: It starts and ends with double quotation marks. */
+			case ~ /^\".*\"/:
+				fieldSearchData.filter = originalFilter.substring(1, originalFilter.size() - 1)
 				buildSingleValueParameter(fieldSearchData, '=')
 				break
 
-		/* Starts with '<' or '>' */
-			case ['<', '>']:
-
-				/* Scenario 2: Starts with '<=' or '>=' */
-				if (originalFilter[1] == '=') {
-					String operator = originalFilter.substring(0, 2)
-					fieldSearchData.filter = originalFilter.substring(2)
-					buildSingleValueParameter(fieldSearchData, operator)
-
-					/* Scenario 3: Starts with '<>' */
-				} else if (originalFilter ==~ /^<>.*/) {
-					fieldSearchData.filter = originalFilter.substring(2)
-					buildDistinctParameter(fieldSearchData)
-
-					/* Scenario 4: Starts with '<' or '>' and any literal follows. */
-				} else {
-					fieldSearchData.filter = originalFilter.substring(1)
-					String operator = originalFilter[0]
-					buildSingleValueParameter(fieldSearchData, operator)
-				}
-
-				break
-
-		/* Starts with '-' or '!' */
-			case ['-', '!']:
-
-				String rest = originalFilter.substring(1)
-				fieldSearchData.filter = rest
-
-				switch(rest) {
-
-				/* Scenario 5: Start with '-' or '!', and it's a list of ':' separated values. */
-					case ~ /.*:.*/:
-						buildLikeList(fieldSearchData, 'NOT LIKE', 'AND', ':')
-						break
-
-				/* Scenario 6: Start with '-' or '!' and it's a list of '|' separated values. */
-					case ~ /.*\|.*/:
-						buildInList(fieldSearchData, 'NOT IN')
-						break
-
-				/* Starts with '-' or '!' and it isn't a list. */
-					default:
-						fieldSearchData.filter = rest
-						/* Scenario 7: Starts with '-' and it isn't a list. */
-						if (originalFilter[0] == '-') {
-							buildDistinctParameter(fieldSearchData)
-
-							/* Scenario8 : Starts with '!' and it's not a list of values. */
-						} else {
-							buildSingleValueParameter(fieldSearchData, '<>')
-						}
-
-						break
-				}
-				break
-
+			/* Scenario 13: Default scenario (may start and/or finish with *). */
 			default:
-				switch(originalFilter) {
-
-				/* Scenario 9: It's a list of '&' separated values. */
-					case ~ /.*&.*/:
-						buildLikeList(fieldSearchData, 'LIKE', 'AND', '&')
-						break
-
-				/* Scenario 10: It's a list of '|' separated values. */
-					case ~ /.*\|.*/:
-						buildInList(fieldSearchData, 'IN')
-						break
-
-				/* Scenario 11: It's a list of ':' separated values. */
-					case ~ /.*:.*/:
-						buildLikeList(fieldSearchData, 'LIKE', 'OR', ':')
-						break
-
-				/* Scenario 12: It starts and ends with double quotation marks. */
-					case ~ /^\".*\"/:
-						fieldSearchData.filter = originalFilter.substring(1, filterSize - 1)
-						buildSingleValueParameter(fieldSearchData, '=')
-						break
-
-				/* Scenario 13: Default scenario (overriding may be required). */
-					default:
-						fieldSearchData.useWildcards = true
-						buildSingleValueParameter(fieldSearchData, 'LIKE')
-						break
-				}
+				fieldSearchData.useWildcards = true
+				buildSingleValueParameter(fieldSearchData, 'LIKE')
 				break
-		}
 
+		}
 	}
+
 
 	/**
 	 * <p>It handles Enumeration filtering in Asset views.</p>
@@ -541,6 +542,27 @@ class SqlUtil {
 	 */
 	private static String getSingleValueExpression(String column, String namedParameter, String operator) {
 		return column + ' ' + operator + ' :' + namedParameter
+	}
+
+	/**
+	 * Add a SQL Expression to the FieldSearchData instance where the field is (or not) null.
+	 * @param fieldSearchData
+	 * @param isNull - boolean that tells whether to look for null or not null values.
+	 */
+	private static void handleIsNullFilter(FieldSearchData fieldSearchData, boolean isNull = true) {
+		// IS NULL or IS NOT NULL
+		String operator = "IS${isNull ? ' ' : ' NOT '}NULL"
+		fieldSearchData.sqlSearchExpression = "${fieldSearchData.whereProperty} $operator"
+	}
+
+	/**
+	 * Add a SQL Expression to the FieldSearchData instance to look up results where the given
+	 * field is (or is not) empty or null.
+	 * @param fieldSearchData
+	 * @param operator - '=' or '<>'
+	 */
+	private static void handleIsEmptyOrNullStringFilter(FieldSearchData fieldSearchData, String operator) {
+		fieldSearchData.sqlSearchExpression = "trim(coalesce(${fieldSearchData.whereProperty},'')) $operator ''"
 	}
 
 	/**

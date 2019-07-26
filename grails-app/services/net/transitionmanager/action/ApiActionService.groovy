@@ -118,8 +118,6 @@ class ApiActionService implements ServiceMethods {
 		}
 
 		if (context instanceof AssetComment) {
-			// Get the method definition of the Action configured Api Catalog
-			DictionaryItem methodDef = methodDefinition(action)
 
 			// We only need to implement Task for the moment
 			remoteMethodParams = buildMethodParamsWithContext(action, context)
@@ -219,7 +217,7 @@ class ApiActionService implements ServiceMethods {
 						log.info('By passing API Action invocation with following command: {}.{}, request: {}', action.apiCatalog.name, action.connectorMethod, actionRequest)
 						taskFacade.byPassed()
 					} else {
-						connector.invoke(methodDef, actionRequest)
+						connector.invoke(action, actionRequest)
 					}
 				} catch (Exception e) {
 					log.warn(e.message)
@@ -298,11 +296,8 @@ class ApiActionService implements ServiceMethods {
 	 */
 	ApiActionResponse invoke(ApiAction action) {
 		if (!action) {
-			throw InvalidRequestException('No action was provided to the invoke command')
+			throw new InvalidRequestException('No action was provided to the invoke command')
 		}
-
-		// Get the method definition of the Action configured Api Catalog
-		DictionaryItem methodDef = methodDefinition(action)
 
 		// get the connector instance
 		def connector = connectorInstanceForAction(action)
@@ -343,7 +338,7 @@ class ApiActionService implements ServiceMethods {
 		// execute action and return any result that were returned
 		ThreadLocalUtil.setThreadVariable(ActionThreadLocalVariable.ACTION_REQUEST, actionRequest)
 		try {
-			return connector.invoke(methodDef, actionRequest)
+			return connector.invoke(action, actionRequest)
 		} finally {
 			ThreadLocalUtil.destroy(THREAD_LOCAL_VARIABLES)
 		}
