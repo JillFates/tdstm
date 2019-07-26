@@ -98,6 +98,7 @@ class ProjectEditionSpec extends GebReportingSpec {
             //Verifications are done, the following lines set the project back to TM-Demo
             projectsModule.goToProjectsActive()
             at ProjectListPage
+            waitFor{projectNameGridField}
             filterByName "TM-Demo"
             clickOnFirstListedProject()
     }
