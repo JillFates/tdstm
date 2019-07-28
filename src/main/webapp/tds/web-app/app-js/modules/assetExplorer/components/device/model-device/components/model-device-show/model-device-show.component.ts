@@ -71,6 +71,6 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	 * get the url for the model edit view
 	*/
 	private getEditModelUrl(): string {
-		return `/tdstm/model/edit?id=${this.deviceModel.id}&modal=true`;
+		return `/tdstm/model/edit?id=${this.deviceModel.id}&angularModalDialog=true`;
 	}
 }
