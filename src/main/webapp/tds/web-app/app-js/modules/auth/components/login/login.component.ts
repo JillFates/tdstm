@@ -1,9 +1,10 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
 // NGXS
-import {Select, Store} from '@ngxs/store';
+import {Store} from '@ngxs/store';
 // Service
 import {LoginService} from '../../service/login.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 // Models
 import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
 import {Login, LoginInfo} from '../../action/login.actions';
@@ -51,6 +52,7 @@ export class LoginComponent implements OnInit {
 		private loginService: LoginService,
 		private store: Store,
 		private router: Router,
+		private notifierService: NotifierService,
 		private windowService: WindowService) {
 	}
 
@@ -76,6 +78,10 @@ export class LoginComponent implements OnInit {
 					this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
 				}
 			} else if (userContext.error) {
+				// An error has occurred
+				this.notifierService.broadcast({
+					name: 'stopLoader',
+				});
 				this.errMessage = userContext.error;
 			}
 		});
