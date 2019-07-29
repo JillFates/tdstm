@@ -14,7 +14,7 @@
 		(dataStateChange)="dataStateChange($event)"
 		(columnResize)="onWidthChange($event)"
 		(cellClick)="cellClick($event)"
-		[rowClass]="rowCallbackClass" >
+		[rowClass]="rowCallbackClass">
 
 		<!-- Header Toolbar -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
@@ -121,7 +121,7 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="115" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -149,7 +149,7 @@
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
 				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
-				[width]="column.width"
+				[width]="commonShrunkColumns.includes(column.label)? commonShrunkColumnWidth : column.width"
 				[class]="column.domain"
 		>
 			<ng-template kendoGridHeaderTemplate>
@@ -185,25 +185,25 @@
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && !fieldPipeMap.pipe[column.domain+'_'+column.property]">
                <span [ngClass]="getCellClass(column)">
                    {{fieldPipeMap[column.domain+'_'+column.property]}}
-                   {{dataItem[column.domain+'_'+column.property]}}
+				   {{dataItem[column.domain+'_'+column.property]}}
                </span>
 			</ng-template>
             <!-- DateTime Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'DateTime'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
                 </div>
             </ng-template>
             <!-- Date Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Date'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsDate : userDateFormat }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDate : userDateFormat }}
                 </div>
             </ng-template>
             <!-- Number Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Number'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsNumber : fieldPipeMap.metadata[column.domain+'_'+column.property] }}
+					{{dataItem[column.domain+'_'+column.property]| tdsNumber : fieldPipeMap.metadata[column.domain+'_'+column.property] }}
                 </div>
             </ng-template>
 			<!-- Asset Tags Cell Template -->

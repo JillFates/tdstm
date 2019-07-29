@@ -24,7 +24,7 @@
 					</ng-template>
 
 					<!-- Action -->
-					<kendo-grid-command-column [width]="70" [locked]="true">
+					<kendo-grid-command-column  [width]="52" [class]="{'k-custom-command-column': true}" [locked]="true">
 						<ng-template kendoGridHeaderTemplate>
 							<div class="text-center">
 								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -42,7 +42,11 @@
 
 
 					<!-- Configured View Columns (*ngFor) -->
-					<kendo-grid-column *ngFor="let column of gridColumns" field="{{column.property}}" format="{{column.format}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+					<kendo-grid-column
+							*ngFor="let column of gridColumns"
+							field="{{column.property}}"
+							format="{{column.format}}"
+							[width]="commonShrunkColumns.includes(column.label) ? commonShrunkColumnWidth : !column.width ? COLUMN_MIN_WIDTH : column.width">
 						<ng-template kendoGridHeaderTemplate>
 							<div class="sortable-column" (click)="onClickTemplate($event)">
 								<label> {{column.label}}</label>
