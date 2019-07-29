@@ -294,7 +294,6 @@
 						 <script>
 							 $(document).ready(function(){
                                  $(document).on('submit','#modelForm',function(e){
-
 									return false;
 								 });
 							 });

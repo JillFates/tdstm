@@ -1,3 +1,8 @@
+/**
+ * Control to host a external page within an angular modal view
+ * <tds-modal-page-wrapper title='Edit Model' url='tdstm/model/edit?id=10'></tds-modal-page-wrapper>
+ */
+
 import {Component, Inject, Input, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 
@@ -19,7 +24,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 					<div class="modal-body-container">
 					<form id="wrapperForm"
 						#targetForm="ngForm"
-						[action]="action"
+						[action]="url"
 						method="post"
 						target="target-frame">
 						<iframe #targetFrame name="target-frame" (load)="onLoad()" class="wrapper-frame"></iframe>
@@ -39,7 +44,7 @@ export class TDSModalPageWrapperComponent extends UIExtraDialog implements After
 	@ViewChild('targetFrame') targetFrame: ElementRef;
 	constructor(
 		@Inject('title') public title: string,
-		@Inject('action') public action: string,
+		@Inject('url') public url: string,
 		) {
 		super('#modal-page-wrapper');
 	}

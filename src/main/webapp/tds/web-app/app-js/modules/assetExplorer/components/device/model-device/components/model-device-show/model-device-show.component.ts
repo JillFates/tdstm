@@ -60,8 +60,8 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		this.dialogService.extra(TDSModalPageWrapperComponent,
 				[
 					{provide: 'title', useValue: 'Edit Model'},
-					{provide: 'action', useValue: this.getEditModelUrl()}
-				], false, false)
+					{provide: 'url', useValue: this.getEditModelUrl()}
+				], true, false)
 			.then((result) => {
 				console.log(result);
 			}).catch((error) => console.log(error));
