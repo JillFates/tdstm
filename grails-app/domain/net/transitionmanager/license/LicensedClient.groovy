@@ -94,7 +94,9 @@ class LicensedClient {
 				websitename		: websitename,
 				bannerMessage	: bannerMessage,
 				gracePeriodDays : gracePeriodDays,
-				activityList	: []
+				activityList	: [],
+				guid            : guid,
+				collectMetrics : collectMetrics
 		]
 
 		return data
@@ -220,6 +222,13 @@ class LicensedClient {
 			lc.gracePeriodDays = json.gracePeriodDays
 		}
 
+		if(json.guid != null){
+			lc.guid = json.guid
+		}
+
+		if(json.collectMetrics != null){
+			lc.collectMetrics = json.collectMetrics
+		}
 		return lc
 	}
 
