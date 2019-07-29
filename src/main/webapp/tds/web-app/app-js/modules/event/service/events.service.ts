@@ -32,6 +32,7 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
+	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/moveEvent/taskCategoriesStats`;
 	private readonly categories = [
 		'Step',
 		'',
@@ -455,6 +456,17 @@ export class EventsService {
 	 */
 	getJobProgress(progressKey: string): Observable<ApiResponseModel> {
 		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
+			.map((response: any) => response)
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get the relationship among categories and tasks
+ 	 * @param {number} eventId Event id
+	 * @returns {Observable<any>} Category status details
+	*/
+	getTaskCategoriesStats(eventId: number): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
 			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
