@@ -17,6 +17,9 @@ import {
 import {TagModel} from '../../../modules/assetTags/model/tag.model';
 import {MultiSelectComponent} from '@progress/kendo-angular-dropdowns';
 
+import {Observable} from 'rxjs';
+import {switchMap, map} from 'rxjs/operators';
+
 declare var jQuery: any;
 
 @Component({
@@ -37,7 +40,8 @@ declare var jQuery: any;
 		            [(ngModel)]="assetSelectorModel.tags"
 		            [textField]="'name'"
 		            [valueField]="'id'"
-		            (valueChange)="onTagValueChange($event)"
+					(valueChange)="onTagValueChange($event)"
+					[filterable]="true"
 		            (open)="onOpen()">
 		        <ng-template kendoMultiSelectTagTemplate let-dataItem>
 		            <div class="{{dataItem.css}}" [title]="dataItem.name">{{ dataItem.name }}</div>
@@ -58,7 +62,7 @@ declare var jQuery: any;
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	@ViewChild('assetTagSelectorComponent') assetTagSelectorComponent: MultiSelectComponent;
-	@Input('tagList') tagList: Array<TagModel>;
+	@Input('tagList') sourceTagList: Array<TagModel>;
 	// Used to control if the Switch is require for the UI
 	@Input('showSwitch') showSwitch = true;
 	// Output method handlers
@@ -70,6 +74,7 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 
 	// Use to control if the Switch becomes visible
 	private switchVisible = false;
+	public tagList: Array<TagModel> = [];
 
 	private assetSelectorModel = {
 		switch: false,
@@ -77,6 +82,8 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 	};
 
 	ngOnInit(): void {
+		this.tagList = this.sourceTagList.slice();
+
 		if (this.model) {
 			this.assetSelectorModel.tags = this.model.tags;
 			this.assetSelectorModel.switch = this.model.operator === 'ALL' ? true : false;
@@ -92,6 +99,25 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 			this.switchVisible = this.assetSelectorModel.tags.length > 1;
 			this.assetSelectorModel.switch = operatorType === '&';
 		}
+	}
+
+	/**
+	 * Filter tags as user types a search criteria to narrow the number of elements to render
+	 */
+	ngAfterViewInit() {
+		this.assetTagSelectorComponent.filterChange.asObservable()
+		.pipe(
+			switchMap((searchText: string) => Observable.from([this.sourceTagList])
+				.pipe(
+					map((data: Array<TagModel>) => {
+						return data.filter((tag: TagModel) => {
+								return tag.name.toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+						}); }
+					)
+				)
+			)
+		)
+		.subscribe(filteredResults => this.tagList = filteredResults);
 	}
 
 	/**
@@ -121,8 +147,9 @@ export class AssetTagSelectorComponent implements OnChanges, OnInit {
 		if (changes['viewFilterModel'] && changes['viewFilterModel'].currentValue !== changes['viewFilterModel'].previousValue) {
 			// Do something if the View filter Model change
 		}
-		if (changes['tagList'] && changes['tagList'].currentValue !== changes['tagList'].previousValue) {
+		if (changes['sourceTagList'] && changes['sourceTagList'].currentValue !== changes['sourceTagList'].previousValue) {
 			// Do something if the tagList change like clearing the selectedTags or defaulting the switch to false
+			this.tagList = changes['sourceTagList'].currentValue.slice();
 		}
 		this.onShowHideSwitch();
 	}
