@@ -308,6 +308,25 @@
                                             <td colspan="5">
                                             </td>
                                         </tr>
+                                        <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                            <td class="label N edge-cell" nowrap="nowrap">
+                                                <label><span>Completion %</span></label>
+                                            </td>
+
+                                            <td class="valueNW completion">
+                                                <tds-number-control
+                                                        name="percentageComplete"
+                                                        [autoCorrect]="true"
+                                                        [(ngModel)]="model.percentageComplete"
+                                                        [format]="'n'"
+                                                        [min]="0"
+                                                        [max]="100">
+                                                </tds-number-control>
+                                            </td>
+
+                                            <td colspan="5">
+                                        </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
