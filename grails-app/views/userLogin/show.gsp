@@ -221,7 +221,10 @@
 				var person = "${userLoginInstance?.person}";
 				var currentPerson = "${tds.currentPerson()}";
 				if (person && currentPerson && person === currentPerson) {
-					$('#delete-btn').prop('disabled', true);
+					var deleteBtn = $('#delete-btn');
+					deleteBtn.prop('disabled', true);
+					deleteBtn.addClass('disableButton');
+					deleteBtn.css('cursor', 'not-allowed');
 				}
 			});
 		</script>
