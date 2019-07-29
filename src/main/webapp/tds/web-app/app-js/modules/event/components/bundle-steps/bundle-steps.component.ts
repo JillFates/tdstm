@@ -1,19 +1,28 @@
 // Angular
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {EventRowType} from './../../model/event.model';
+import {EventRowType, TaskCategoryCell} from './../../model/event.model';
 
 @Component({
 	selector: 'tds-bundle-steps',
 	templateUrl: 'bundle-steps.component.html'
 })
 export class BundleStepsComponent {
+	// Array<Array<TaskCategoryCell>
 	@Input() bundleSteps: any;
+	@Input() taskCategories: Array<Array<TaskCategoryCell>> = [];
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 
 	public colSize: number;
 	public showFrom: number;
 	public elementsToShow: number;
 	public RowType = EventRowType;
+	public categories = [
+		'Category',
+		'Estimated Start',
+		'Estimated Finish',
+		'Actual Start',
+		'Actual Finish',
+	];
 
 	constructor() {
 		this.setInitialConfiguration();

@@ -37,6 +37,7 @@ export class EventDashboardComponent implements OnInit {
 	public eventDetails = null;
 	public teamTaskMatrix = [];
 	public bundleSteps = null;
+	public taskCategories = null;
 
 	constructor(
 		private eventsService: EventsService,
@@ -93,7 +94,7 @@ export class EventDashboardComponent implements OnInit {
 
 		this.eventsService.getTaskCategoriesStats(id)
 			.subscribe((data: any[]) => {
-				console.log(data);
+				this.taskCategories = data;
 			});
 
 		this.eventsService.getEventDetails(id, true)

@@ -142,6 +142,7 @@
                 <tds-bundle-steps 
                     *ngIf="bundleSteps" 
                     (changeTab)="onChangeStepsTab($event)"
+                    [taskCategories]="taskCategories"
                     [bundleSteps]="bundleSteps">
                 </tds-bundle-steps>
             </div>

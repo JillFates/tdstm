@@ -477,7 +477,7 @@ export class EventsService {
  	 * @param {CategoryTask[]} data  Raw task category results
 	 * @returns {any} Array of task category cells
 	*/
-	formatTaskCategoryResults(data: CategoryTask[]): Array<Array<TaskCategoryCell>> {
+	formatTaskCategoryResults(data: CategoryTask[]): any {
 		const results: Array<Array<TaskCategoryCell>> = [];
 
 		const headerRow: TaskCategoryCell[] = [];
@@ -499,7 +499,7 @@ export class EventsService {
 			results[CatagoryRowType.ActualCompletion][index] = {text: item.actFinish};
 		});
 
-		return results;
+		return {tasks: results, columns: columnsLength};
 	}
 
 	/**
