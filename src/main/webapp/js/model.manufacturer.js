@@ -321,7 +321,6 @@ function createModelManuDetails(controllerName, forWhom) {
 
 
 function showOrEditModelManuDetails(controllerName, id, forWhom, view, name) {
-
 	jQuery.ajax({
 		url: contextPath + '/' + controllerName + '/' + view + '/',
 		data: { 'id': id, 'redirectTo': 'modelDialog' },
