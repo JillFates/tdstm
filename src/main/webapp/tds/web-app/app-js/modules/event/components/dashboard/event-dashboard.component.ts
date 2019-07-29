@@ -92,9 +92,8 @@ export class EventDashboardComponent implements OnInit {
 		this.getNewsFromEvent(id);
 
 		this.eventsService.getTaskCategoriesStats(id)
-			.subscribe((result) => {
-				console.log('The resulting is:');
-				console.log(result);
+			.subscribe((data: any[]) => {
+				console.log(data);
 			});
 
 		this.eventsService.getEventDetails(id, true)

@@ -7,7 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {catchError, map} from 'rxjs/operators';
 
-import {EventModel, EventRowType} from '../model/event.model';
+import {EventModel, EventRowType, CatagoryRowType, CategoryTask, TaskCategoryCell} from '../model/event.model';
 import {NewsModel, NewsDetailModel} from '../model/news.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
@@ -467,7 +467,53 @@ export class EventsService {
 	*/
 	getTaskCategoriesStats(eventId: number): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
-			.map((response: any) => response)
+			.map((response: any) => this.formatTaskCategoryResults(response && response.data || []))
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * Take the raws category results and produce the structure that contains
+	 * the relationship task category
+ 	 * @param {CategoryTask[]} data  Raw task category results
+	 * @returns {any} Array of task category cells
+	*/
+	formatTaskCategoryResults(data: CategoryTask[]): Array<Array<TaskCategoryCell>> {
+		const results: Array<Array<TaskCategoryCell>> = [];
+
+		const headerRow: TaskCategoryCell[] = [];
+		data.forEach((item: CategoryTask) => {
+			headerRow.push({text: item.category});
+		});
+		results.push(headerRow);
+
+		const columnsLength = headerRow.length;
+		results.push(this.getInitialTaskCategoriesCells(columnsLength));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength));
+
+		data.forEach((item: CategoryTask, index: number) => {
+			results[CatagoryRowType.PlannedStart][index] = {text: item.estStart};
+			results[CatagoryRowType.PlannedCompletion][index] = {text: item.estFinish};
+			results[CatagoryRowType.ActualStart][index] = {text: item.actStart};
+			results[CatagoryRowType.ActualCompletion][index] = {text: item.actFinish};
+		});
+
+		return results;
+	}
+
+	/**
+	 * Get the initial task category cells 
+ 	 * @param {number[]} lenght Number of categories
+	 * @returns {any} Array of task category cells
+	*/
+	private getInitialTaskCategoriesCells(lenght: number): TaskCategoryCell[] {
+		const items: TaskCategoryCell[] = [];
+
+		for (let i = 0; i < lenght; i++) {
+			items.push({text: ''})
+		}
+
+		return items;
 	}
 }

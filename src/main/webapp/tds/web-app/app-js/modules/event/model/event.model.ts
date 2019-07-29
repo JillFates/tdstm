@@ -65,6 +65,22 @@ export enum EventRowType {
 	ActualCompletion
 }
 
+export enum CatagoryRowType {
+	Header,
+	PlannedStart,
+	PlannedCompletion,
+	ActualStart,
+	ActualCompletion
+}
+
+export interface CategoryTask {
+	category: string;
+	actStart: string;
+	actFinish: string;
+	estStart: string;
+	estFinish: string;
+}
+
 export class EventPlanStatus {
 	dialIndicator: number;
 	cssClass: string;
@@ -95,4 +111,8 @@ export class TaskSummaryStep {
 	plannedCompletion: string;
 	actualStart: string;
 	actualCompletion: string;
+}
+
+export interface TaskCategoryCell {
+	text: string;
 }
