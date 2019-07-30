@@ -1,7 +1,14 @@
 task-list
+  .button-toolbar
+    padding-top: 5px
+    padding-left: 8px
+
   .top-filters
     .tds-action-button
       margin-right:  10px
+    .event-dropdown
+      .k-input
+        height: inherit
 
   .task-grid
     margin-top:  10px
@@ -15,10 +22,15 @@ task-list
       padding-top: 0px !important
       padding-right: 0px
       padding-bottom: 0px !important
-      span
-        display: block
-        padding-left: 3px
-        //padding: 50px 90vw 50px 3px
+
+    .task-updated-cell
+      display: block
+      padding-left: 3px
+      margin: 0 auto
+      padding-top: 12px
+      padding-bottom: 10px
+      padding-left: 3px
+
     .task-status
       padding-left: 0px
       padding-right: 100%
@@ -69,11 +81,15 @@ task-list
       color:  red
 
     .task-action-buttons-wrapper
-      margin: 10px
+      margin: 2px 1px
       .btn:first-child
         margin-left: 15px
       .btn
-        padding: 2px 15px
+        font-size: 11px
+        padding: 1px 10px
         margin-right: 15px
+        i
+          font-size: inherit
+          padding-right: 5px
       .task-action-buttons
         display: inline

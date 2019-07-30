@@ -369,15 +369,18 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
 	 *  successors and predecessors.
 	 */
-	@HasPermission(Permission.TaskManagerView)
-	def getInfoForActionBar(Long taskId) {
-		Project project = getProjectForWs()
-		AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
-		renderAsJson(
-			apiActionId: task.apiAction?.id,
-			assignedTo: task.assignedTo?.id,
-			predecessorsCount: task.taskDependencies.size(),
-			successorsCount: TaskDependency.countByPredecessor(task)
-		)
-	}
+    @HasPermission(Permission.TaskManagerView)
+    def getInfoForActionBar(Long taskId) {
+        Project project = getProjectForWs()
+        AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
+        renderAsJson(
+                apiActionId: task.apiAction?.id,
+                apiActionInvokedAt: task.apiActionInvokedAt,
+                apiActionCompletedAt: task.apiActionCompletedAt,
+                assignedTo: task.assignedTo?.id,
+                predecessorsCount: task.taskDependencies.size(),
+                successorsCount: TaskDependency.countByPredecessor(task),
+                category: task.category
+        )
+    }
 }
