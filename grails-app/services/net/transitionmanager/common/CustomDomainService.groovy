@@ -591,4 +591,48 @@ class CustomDomainService implements ServiceMethods {
 
         return entity
     }
+
+    /**
+     * Used to clear all (NULL) custom asset values
+     * This function first filters all fields given for those that are CustomFields
+     * @param project
+     * @param fieldSpec
+     * @return
+     */
+    Map <String, JSONArray> clearFieldSpecsData(Project project, Map fieldSpec) {
+        Map <String, JSONArray> clearedFields = [:]
+        FieldSpecProject fieldSpecProject
+
+        fieldSpec.each { assetClassName, fieldNames ->
+            AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+            if (fieldNames) {
+                if (! fieldSpecProject) {
+                    fieldSpecProject = createFieldSpecProject(project)
+                }
+
+                fieldNames = fieldNames.findAll {
+                    fieldSpecProject.isCustomField(assetClassName, it)
+                }
+
+                if (fieldNames) {
+                    String sql = 'update AssetEntity set '
+
+                    sql += fieldNames.collect {
+                        "$it = NULL"
+                    }.join(', ')
+
+                    sql += ' where project=:project and assetClass=:assetClass'
+
+                    AssetEntity.executeUpdate(
+                            sql,
+                            [project: project, assetClass: assetClass]
+                    )
+
+                    clearedFields[assetClassName] = fieldNames
+                }
+            }
+        }
+
+        return clearedFields
+    }
 }

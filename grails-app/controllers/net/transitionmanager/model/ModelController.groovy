@@ -298,6 +298,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 
 				def modelAliases = ModelAlias.findAllByModel(model)
 				def paramsMap = [
+					angularModalDialog : params.angularModalDialog,
 					modelInstance  : model,
 					modelConnectors: modelConnectors,
 					otherConnectors: otherConnectors,

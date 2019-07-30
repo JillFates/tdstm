@@ -29,8 +29,8 @@ declare var jQuery: any;
                         </form>
                     </div>
                     <div class="modal-footer form-group-center">
-                        <button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
-                        <button (click)="cancel()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}</button>
+                        <button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
+                        <button (click)="cancel()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}</button>
                     </div>
                 </div>
             </div>
@@ -48,6 +48,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	tdsUiPrompt: any;
 	resolve: any;
 	reject: any;
+	hideIconButtons: boolean;
 
 	openNotifier: any;
 
@@ -87,6 +88,8 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 			this.confirmLabel = event.confirmLabel || 'Yes';
 			this.cancelLabel = event.cancelLabel || 'No';
 			this.tdsUiPrompt.modal('show');
+			// by default show the icons, unless they are explicitilly set to be hidden
+			this.hideIconButtons = event.hideIconButtons === true;
 		});
 	};
 
@@ -117,7 +120,7 @@ export class UIPromptService {
 	 * @param component ComponentType
 	 * @param params properties to be inject in the component creation
 	 */
-	open(title: string, message: string, confirmLabel: string, cancelLabel: string): Promise<boolean> {
+	open(title: string, message: string, confirmLabel: string, cancelLabel: string, hideIconButtons = false): Promise<boolean> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'prompt.open',
@@ -126,7 +129,8 @@ export class UIPromptService {
 				title: title,
 				message: message,
 				confirmLabel: confirmLabel,
-				cancelLabel: cancelLabel
+				cancelLabel: cancelLabel,
+				hideIconButtons: hideIconButtons
 			});
 		});
 	}

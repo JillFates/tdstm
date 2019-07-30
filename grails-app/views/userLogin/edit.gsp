@@ -165,7 +165,7 @@
 								</g:hasErrors>
 							</td>
 						</tr>
-						<tr class="prop">
+						<tr class="prop passwordsEditFields">
 							<td valign="top" class="name">
 								<label for="passwordExpirationDate"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</label>
 							</td>
@@ -232,49 +232,6 @@
 								</td>
 							</tr>
 						</g:each>
-
-						<%--
-						<tr class="prop">
-							<td valign="top" class="value" colspan="2">
-								<table style="border: none;">
-									<tr>
-										<td valign="top" class="name">
-											<label >Available Roles:</label>
-										</td>
-										<td valign="top" class="name">
-											<label >&nbsp;</label>
-										</td>
-										<td valign="top" class="name">
-											<label >Assigned Roles:</label>
-										</td>
-									</tr>
-									<tr>
-										<td valign="top" class="name">
-											<select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
-												<g:each in="${availableRoles}" var="availableRoles">
-													<option value="${availableRoles.id}">${availableRoles}</option>
-												</g:each>
-											</select>
-										</td>
-										<td valign="middle" style="vertical-align:middle" >
-											<span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-												<asset:image src="images/right-arrow.png" style="float: left; border: none;"/>
-											</a></span><br/><br/><br/><br/>
-											<span style="white-space: nowrap;"> <a href="#" id="remove"><asset:image src="images/left-arrow.png" style="float: left; border: none;"/>
-											</a></span>
-										</td>
-										<td valign="top" class="name">
-											<select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
-												<g:each in="${assignedRoles}" var="assignedRole">
-													<option value="${assignedRole?.id}" selected="selected">${assignedRole}</option>
-												</g:each>
-											</select>
-										</td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-						--%>
 						</tbody>
 					</table>
 				</div>

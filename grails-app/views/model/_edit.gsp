@@ -237,38 +237,6 @@
 </div>
 <div style="float: left;">
 	<div>
-		<div id="cablingPanelEdit" style="height: auto;min-height: 70px " class="cablingPanel">
-			<g:if test="${modelInstance.rearImage}">
-			<!--<img id="rearImage" src="${createLink(controller:'model', action:'retrieveRearImage', id:modelInstance.id)}" style="max-width:375px;display: ${modelInstance.useImage != 1 ? 'none':'block' }"/>-->
-				<script type="text/javascript">
-					$("#cablingPanelEdit").css("background-color","#FFF")
-				</script>
-			</g:if>
-			<g:else>
-				<script type="text/javascript">
-					var usize = "${modelInstance.usize}";
-					usize = (usize=="")?1:usize;
-					$("#cablingPanelEdit").css("height", (usize*30) + 'px');
-				</script>
-			</g:else>
-
-			<g:each in="${modelConnectors}" status="i" var="modelConnector">
-				<div id="connector${modelConnector.connector}" style="float: left; position: relative; margin-right: 20px;">
-					<%--
-					<div style="position: relative;">
-						<img src="${resource(dir:'i/cabling',file: '' + modelConnector.status + '.png')}" style="float: left;"/>
-					</div>
-					--%>
-					<div id="labelPositionDiv${modelConnector.connector}" style="position: relative;">
-						<span id='connectorLabelText${modelConnector.connector}'>${HtmlUtil.escape(modelConnector.label)}</span>
-					</div>
-
-				</div>
-			</g:each>
-			<g:each in="${otherConnectors}" var="count">
-				<div id="connector${count}"></div>
-			</g:each>
-		</div>
 		<div id="optionsPanel">
 			<span style="font-weight: bold;"><a href="javascript:createConnector('missing')">Add Connector</a></span>
 		</div>

@@ -1,17 +1,17 @@
 <div class="asset-explorer-view-show-component content body">
-    <section class="page-asset-explorer-config">
+    <section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
         <div>
             <div class="btn-group"
-                 *ngIf="canShowSaveButton()">
+                 *ngIf="config.canShowSaveButton">
                 <tds-button-save
-                        (click)="save(getSaveButtonId())"
-                        [ngClass]="{'btn-default':!isDirty(),'btn-success':isDirty()}"
-                        [title]="canSave() ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
-                        [attr.id]="getSaveButtonId()">
+                        (click)="save(config.saveButtonId)"
+                        [ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
+                        [title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
+                        [attr.id]="config.saveButtonId">
                 </tds-button-save>
 
                 <button type="button" class="btn dropdown-toggle"
-                        [ngClass]="{'btn': true, 'btn-default': !isDirty(),'btn-success': isDirty(), 'pull-right': true }"
+                        [ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret asset-view-show-caret"></span>
                     <span class="sr-only">Toggle Dropdown</span>
@@ -19,10 +19,10 @@
 
                 <ul class="dropdown-menu">
                     <!-- Save Button -->
-                    <li *ngIf="canSave()">
+                    <li *ngIf="config.canSave">
                         <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
                     </li>
-                    <li *ngIf="canSaveAs()">
+                    <li *ngIf="config.canSaveAs">
                         <a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
                     </li>
                 </ul>
@@ -41,7 +41,7 @@
             <tds-asset-view-selector
                     #select="tdsAssetViewSelector">
             </tds-asset-view-selector>
-            <tds-button-custom *ngIf="isEditAvailable()"
+            <tds-button-custom *ngIf="config.isEditAvailable"
                         isIconButton="true"
                         icon="cog"
                         tooltip="Configure"

@@ -11,7 +11,6 @@ import {TDSAppComponent} from './tds-app.component';
 import {NgxsModule} from '@ngxs/store';
 import {TDSAppState} from './state/tds-app.state';
 import {NgxsReduxDevtoolsPluginModule} from '@ngxs/devtools-plugin';
-import {NgxsStoragePluginModule} from '@ngxs/storage-plugin';
 import {NgxsLoggerPluginModule} from '@ngxs/logger-plugin';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
@@ -25,7 +24,6 @@ import {UserContextState} from '../modules/auth/state/user-context.state';
 	imports: [
 		NgxsModule.forRoot([TDSAppState, UserContextState]),
 		NgxsReduxDevtoolsPluginModule.forRoot(),
-		NgxsStoragePluginModule.forRoot(),
 		NgxsLoggerPluginModule.forRoot(),
 		// Angular Modules
 		BrowserModule,

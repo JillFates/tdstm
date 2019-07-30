@@ -107,6 +107,7 @@ enum AssetClass {
 	}
 
 	/**
+	 * @todo @see getDomainNameForAssetType()
 	 * This method determines the domain for a given Asset Type.
 	 * Presently, the only domains supported are:
 	 *	- Application
@@ -136,6 +137,16 @@ enum AssetClass {
 			}
 		}
 		return domain
+	}
+
+	/**
+	 * Uppercased version of getDomainForAssetType() used as for Constant String Value
+	 * @Todo oluna: there are many places where the original function is used and uppercased sometimes more than once I think that this should be refactor
+	 * @param assetType
+	 * @return
+	 */
+	static String getDomainNameForAssetType(String assetType) {
+		return getDomainForAssetType(assetType)?.toUpperCase()
 	}
 
 	/**
