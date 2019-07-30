@@ -92,7 +92,7 @@ export class EventDashboardComponent implements OnInit {
 	public onSelectedEvent(id: number): void {
 		this.getNewsFromEvent(id);
 
-		this.eventsService.getTaskCategoriesStats(id)
+		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
 			.subscribe((data: any[]) => {
 				this.taskCategories = data;
 			});

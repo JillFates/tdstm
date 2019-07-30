@@ -465,9 +465,9 @@ export class EventsService {
  	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Category status details
 	*/
-	getTaskCategoriesStats(eventId: number): Observable<any> {
+	getTaskCategoriesStats(eventId: number, userTimeZone: string): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
-			.map((response: any) => this.formatTaskCategoryResults(response && response.data || []))
+			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone))
 			.catch((error: any) => error);
 	}
 
@@ -477,41 +477,42 @@ export class EventsService {
  	 * @param {CategoryTask[]} data  Raw task category results
 	 * @returns {any} Array of task category cells
 	*/
-	formatTaskCategoryResults(data: CategoryTask[]): any {
+	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string): any {
 		const results: Array<Array<TaskCategoryCell>> = [];
 
 		const headerRow: TaskCategoryCell[] = [];
 		data.forEach((item: CategoryTask) => {
-			headerRow.push({text: item.category});
+			headerRow.push({text: item.category, classes: 'empty-column'});
 		});
 		results.push(headerRow);
 
 		const columnsLength = headerRow.length;
-		results.push(this.getInitialTaskCategoriesCells(columnsLength));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 
 		data.forEach((item: CategoryTask, index: number) => {
-			results[CatagoryRowType.PlannedStart][index] = {text: item.estStart};
-			results[CatagoryRowType.PlannedCompletion][index] = {text: item.estFinish};
-			results[CatagoryRowType.ActualStart][index] = {text: item.actStart};
-			results[CatagoryRowType.ActualCompletion][index] = {text: item.actFinish};
+			results[CatagoryRowType.PlannedStart][index].text =   DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
 		});
 
 		return {tasks: results, columns: columnsLength};
 	}
 
 	/**
-	 * Get the initial task category cells 
+	 * Get the initial task category cells
  	 * @param {number[]} lenght Number of categories
+ 	 * @param {string} classes Comma separated css classes
 	 * @returns {any} Array of task category cells
 	*/
-	private getInitialTaskCategoriesCells(lenght: number): TaskCategoryCell[] {
+	private getInitialTaskCategoriesCells(lenght: number, classes: string): TaskCategoryCell[] {
 		const items: TaskCategoryCell[] = [];
 
 		for (let i = 0; i < lenght; i++) {
-			items.push({text: ''})
+			items.push({text: '', classes: classes})
 		}
 
 		return items;

@@ -115,4 +115,5 @@ export class TaskSummaryStep {
 
 export interface TaskCategoryCell {
 	text: string;
+	classes: string;
 }
