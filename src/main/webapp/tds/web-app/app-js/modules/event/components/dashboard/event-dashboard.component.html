@@ -27,13 +27,13 @@
                 <div class="col-md-2">
                     <tds-plan-versus-status 
                         #planVersusStatus
-                        [hasBundleSteps]="hasBundleSteps()"
+                        [hasBundleSteps]="hasBundleSteps"
                         (changeProgress)="onChangeStatus($event)"
                         [currentProgress]="eventPlanStatus.dialIndicator">
                     </tds-plan-versus-status>
                 </div>
                 <div class="col-md-4">
-                    <tds-event-resume *ngIf="hasBundleSteps()" [event]="eventPlanStatus"></tds-event-resume>
+                    <tds-event-resume *ngIf="hasBundleSteps" [event]="eventPlanStatus"></tds-event-resume>
                 </div>
                 <div class="col-md-4">
                     <tds-news [news]="newsList" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
@@ -140,8 +140,7 @@
             </div>
             <div class="row task-category-container">
                 <tds-task-category
-                    *ngIf="bundleSteps" 
-                    (changeTab)="onChangeStepsTab($event)"
+                    *ngIf="taskCategories" 
                     [taskCategories]="taskCategories"
                     [bundleSteps]="bundleSteps">
                 </tds-task-category>

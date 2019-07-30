@@ -205,100 +205,9 @@ export class EventsService {
 	}
 
 	/**
-	 * Get the initial array of bundles
- 	 * @param {number} lenght Bundle numbers
- 	 * @param {string} classes Css classes to style the bundles
-	 * @returns {any[]} Array of empty bundles
+	 * Retrive the full event list
+	 * @returns {EventModel[]} list of events
 	*/
-	private getInitialBundleValues(lenght: number, classes: string): any[] {
-		const items = [];
-		for (let i = 0; i < lenght; i++) {
-			items.push({text: '', classes})
-		}
-		return items;
-	}
-
-	/**
-	 * Get the steps of every bundle
- 	 * @param {any} snapshot
- 	 * @param {any} moveBundleSteps
- 	 * @param {string} userTimeZone
- 	 * @param {any} moveBundleList
- 	 * @param {number} selectedBundleId
-	 * @returns {any} Array of empty bundles
-	*/
-	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
-		let steps = [];
-
-		let headerRow = [];
-		moveBundleSteps.forEach((moveBundle: any) => {
-			headerRow.push({ id: moveBundle.id, text: moveBundle.label, classes: '' });
-		});
-
-		steps.push(headerRow);
-		steps.push(this.getInitialBundleValues(headerRow.length, 'empty-column'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-
-		snapshot.steps.forEach((step: any) => {
-			const bundle: any = moveBundleSteps
-				.find((currentBundle: any) => {
-					return currentBundle.moveBundle.id === parseInt(snapshot.moveBundleId, 10) && step.tid === currentBundle.transitionId;
-				});
-
-			if (bundle) {
-				console.log(bundle);
-			}
-			let colIndex = headerRow.findIndex((item: any) => item.id === bundle.id);
-			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
-			steps[EventRowType.Percents][colIndex].text = percent;
-			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
-			steps[EventRowType.PlannedStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planStart);
-			steps[EventRowType.PlannedCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planComp);
-			steps[EventRowType.ActualStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actStart);
-			steps[EventRowType.ActualCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actComp);
-
-			let remainingTasksNumber = 0
-			let totalTasksNumber = 0
-			if (!isNaN(step.tskComp / step.tskTot)) {
-				remainingTasksNumber = step.tskComp
-				totalTasksNumber = step.tskTot
-			}
-
-			let taskManagerUrl =  './../assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
-			let firstUrl = taskManagerUrl + '1&step=' + step.wfTranId
-			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
-			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
-			// set the task value
-			steps[EventRowType.Tasks][colIndex].text = linksHtml;
-		});
-
-		return {
-			categories: this.categories,
-			steps,
-			columnsLength: headerRow.length,
-			moveBundleList: moveBundleList,
-			selectedBundleId: selectedBundleId
-		};
-	}
-
-	/**
-	 * Get and empty bundle object
-	 * @returns {any}
-	*/
-	getEmptyBundleSteps(): any {
-		return {
-			categories: this.categories,
-			columnsLength: 0,
-			moveBundleList: [],
-			selectedBundleId: null,
-			steps: []
-		}
-	}
-
 	getEventsForList(): Observable<EventModel[]> {
 		return this.http.get(`../ws/moveEvent/list`)
 			.map((response: any) => {
@@ -488,8 +397,8 @@ export class EventsService {
 
 		const columnsLength = headerRow.length;
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 
 		data.forEach((item: CategoryTask, index: number) => {
@@ -499,7 +408,11 @@ export class EventsService {
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
 		});
 
-		return {tasks: results, columns: columnsLength};
+		const hasInfo = data.find((item: CategoryTask) => {
+			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
+		})
+
+		return {tasks: results, columns: columnsLength, hasInfo};
 	}
 
 	/**

@@ -1,58 +1,8 @@
-<div class="container task-category-component" *ngIf="taskCategories">
-    <!--
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-1 column-navigation"></div>
-        <div class="col-md-8">
-            <div class="row">
-                <div class="col-md-{{colSize}}">
-                    <kendo-tabstrip (tabSelect)="onChangeTab($event)">
-                        <kendo-tabstrip-tab 
-                            [title]="bundle.name" 
-                            class="tab-item"
-                            [selected]="bundle.id === bundleSteps.selectedBundleId"
-                            *ngFor="let bundle of bundleSteps.moveBundleList">
-                        </kendo-tabstrip-tab>
-                    </kendo-tabstrip>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-1 column-navigation"></div>
-    </div>
-    -->
-
-    <!--
-    <div class="row" *ngFor="let row of bundleSteps.steps; let rowIndex = index;">
-        <div class="col-md-2 category-description">{{bundleSteps.categories[rowIndex]}}</div>
-        <div class="col-md-1 column-navigation">
-                <span *ngIf="rowIndex == 0" 
-                      class="glyphicon glyphicon-chevron-left left-arrow" 
-                      [ngClass]="{'disabled': showFrom === 0}"
-                      (click)="onBack()">
-                </span>
-        </div>
-        <div class="col-md-8">
-            <div class="row">
-                <div *ngFor="let column of getColumns(row);" 
-                        class="col-md-{{colSize}} {{column.classes}}" 
-                        [ngClass]="{'heading': rowIndex === 0}">
-                        <span [innerHtml]="column.text"></span>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-1 column-navigation">
-                <span *ngIf="rowIndex == 0" 
-                      class="glyphicon glyphicon-chevron-right right-arrow" 
-                      [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  bundleSteps.columnsLength}"
-                      (click)="onNext()">
-                </span>            
-        </div>
-    </div>
-    -->
+<div class="container task-category-component" *ngIf="taskCategories.hasInfo">
     <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;">
             <div class="col-md-2 category-description">{{categories[rowIndex]}}</div>
             <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0" 
+                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
                           class="glyphicon glyphicon-chevron-left left-arrow" 
                           [ngClass]="{'disabled': showFrom === 0}"
                           (click)="onBack()">
@@ -68,7 +18,7 @@
                 </div>
             </div>
             <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0" 
+                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
                           class="glyphicon glyphicon-chevron-right right-arrow" 
                           [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  taskCategories.columns}"
                           (click)="onNext()">

@@ -36,8 +36,8 @@ export class EventDashboardComponent implements OnInit {
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
 	public teamTaskMatrix = [];
-	public bundleSteps = null;
 	public taskCategories = null;
+	public hasBundleSteps = false;
 
 	constructor(
 		private eventsService: EventsService,
@@ -94,6 +94,7 @@ export class EventDashboardComponent implements OnInit {
 
 		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
 			.subscribe((data: any[]) => {
+				console.log(data);
 				this.taskCategories = data;
 			});
 
@@ -102,20 +103,14 @@ export class EventDashboardComponent implements OnInit {
 				this.eventDetails = eventDetails;
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
+				this.hasBundleSteps = false;
 				if (bundles.length) {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
-						this.bundleSteps = this.eventsService.getBundleSteps(
-							statusDetails,
-							this.eventDetails.moveBundleSteps,
-							this.userTimeZone,
-							this.eventDetails.moveBundleList,
-							this.selectedEventBundle && this.selectedEventBundle.id
-						);
-
+						this.hasBundleSteps = true;
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
 						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
 						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
@@ -125,7 +120,6 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
 					});
 				} else {
-					this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 					this.eventPlanStatus = new EventPlanStatus();
 				}
 			});
@@ -209,34 +203,9 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	/**
-	 * On changing the bundle steps tab, call the endpoint to refresh the status details
-  	 * @param {number} selectedBundleId Current step bundle tab selected
-	*/
-	public onChangeStepsTab(selectedBundleId: number): void {
-		this.eventsService.getEventStatusDetails(selectedBundleId, this.selectedEvent.id)
-		.subscribe((statusDetails: any) => {
-			this.bundleSteps = this.eventsService.getBundleSteps(
-				statusDetails,
-				this.eventDetails.moveBundleSteps,
-				this.userTimeZone,
-				this.eventDetails.moveBundleList,
-				selectedBundleId
-			);
-		});
-	}
-
-	/**
 	 * On countdown timer timeout, call the on selected method to refresh the report
 	*/
 	public onTimeout(): void {
 		this.onSelectedEvent(this.selectedEvent.id);
 	}
-
-	/**
-	 * Determine if the current event has bundle steps
-	*/
-	public hasBundleSteps(): boolean {
-		return this.bundleSteps && this.bundleSteps.moveBundleList.length > 0;
-	}
-
 }

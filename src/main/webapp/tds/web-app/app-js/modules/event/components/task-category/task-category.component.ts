@@ -8,7 +8,7 @@ import {EventRowType, TaskCategoryCell} from './../../model/event.model';
 })
 export class TaskCategoryComponent {
 	@Input() bundleSteps: any;
-	@Input() taskCategories: Array<Array<TaskCategoryCell>> = [];
+	@Input() taskCategories: any;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 
 	public colSize: number;
@@ -18,9 +18,9 @@ export class TaskCategoryComponent {
 	public categories = [
 		'Category',
 		'Estimated Start',
-		'Estimated Finish',
+		'Estimated Completion',
 		'Actual Start',
-		'Actual Finish',
+		'Actual Completion',
 	];
 
 	constructor() {
@@ -49,7 +49,7 @@ export class TaskCategoryComponent {
 	 * Increase the showFrom indicator one value just if doing this doesn't cause an index overflow
 	*/
 	public onNext(): void {
-		if (this.bundleSteps &&  (this.showFrom + this.elementsToShow + 1) <= this.bundleSteps.columnsLength)  {
+		if (this.hasTasks &&  (this.showFrom + this.elementsToShow + 1) <= this.taskCategories.columns)  {
 			this.showFrom += 1;
 		}
 	}
@@ -61,7 +61,7 @@ export class TaskCategoryComponent {
 	 * @returns {Array<any>} Array containing the columns covered by the interval defined
 	*/
 	public getColumns(row: any): any {
-		if (!this.bundleSteps) {
+		if (!this.hasTasks) {
 			return [];
 		}
 
@@ -76,5 +76,11 @@ export class TaskCategoryComponent {
 	public onChangeTab(selecteEvent: any): void {
 		this.setInitialConfiguration();
 		this.changeTab.emit(this.bundleSteps.moveBundleList[selecteEvent.index].id);
+	}
+	/**
+	 * Return a boolean indicating if there are task present
+	*/
+	private hasTasks(): boolean {
+		return this.taskCategories && this.taskCategories.tasks;
 	}
 }
