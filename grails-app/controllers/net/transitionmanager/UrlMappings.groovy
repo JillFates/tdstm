@@ -203,6 +203,13 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event/updateEventSummary" {
+			controller = "wsEvent"
+			action = [
+			    POST: "updateEventSummary"
+			]
+		}
+
 		"/ws/event" {
 			controller = "event"
 			action = [GET: "index"]
@@ -946,6 +953,13 @@ class UrlMappings {
 			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchProjects"
+			]
+		}
+
+		"/ws/customDomain/fieldSpec/ASSETS/DELETE" {
+			controller = "wsCustomDomain"
+			action = [
+				POST: "clearFieldSpecsData"
 			]
 		}
 

@@ -5,8 +5,8 @@ export class BundleModel {
 	public description: string;
 	public fromId: number;
 	public toId: number;
-	public startTime: string;
-	public completionTime: string;
+	public startTime: Date;
+	public completionTime: Date;
 	public projectManagerId: number;
 	public moveManagerId: number;
 	public moveEventId: number;
@@ -36,13 +36,13 @@ export class BundleColumnModel {
 				label: 'Planning',
 				property: 'planning',
 				type: 'boolean',
-				width: 70
+				width: 80
 			},
 			{
-				label: 'Asset Qty',
+				label: 'Asset Quantity',
 				property: 'assetqty',
 				type: 'number',
-				width: 'auto'
+				width: 225
 			},
 			{
 				label: 'Start Time',

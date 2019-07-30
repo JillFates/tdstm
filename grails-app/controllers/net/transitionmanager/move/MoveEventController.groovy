@@ -128,34 +128,6 @@ class MoveEventController implements ControllerMethods, PaginationMethods {
 		render statusAndNewsList as JSON
 	}
 
-	/*
-	 * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
-	 * @author : Lokanada Reddy
-	 * @param  : moveEventId and moveEvent dialIndicatorValue
-	 */
-	@HasPermission(Permission.EventEdit)
-	def updateEventSumamry() {
-		MoveEvent moveEvent = MoveEvent.get(params.moveEventId)
-		def dialIndicator
-		if (params.checkbox == 'true') {
-			dialIndicator = params.value
-		}
-		if (dialIndicator  || dialIndicator == 0) {
-			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
-				dialIndicator: dialIndicator, type: 'P')
-			saveWithWarnings moveEventSnapshot
-			if (moveEventSnapshot.hasErrors()) {
-				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
-			}
-			else {
-				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
-			}
-
-			saveWithWarnings moveEvent
-			render "success"
-		}
-	}
-
 	/**
 	 * The front-end UI to exporting a Runbook spreadsheet
 	 */

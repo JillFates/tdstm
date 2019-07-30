@@ -17,6 +17,7 @@ import {PasswordChangeModel} from '../../model/password-change.model';
 import {DIALOG_SIZE} from '../../../../model/constants';
 import {PageMetadataModel} from '../../model/page-metadata.model';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
+import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 
 declare var jQuery: any;
 
@@ -89,7 +90,7 @@ export class HeaderComponent {
 	 * Destroy the Storage and redirect the user
 	 */
 	public logOut(): void {
-		localStorage.removeItem('@@STATE');
+		localStorage.removeItem(APP_STATE_KEY);
 		this.store.dispatch(new Logout());
 	}
 }

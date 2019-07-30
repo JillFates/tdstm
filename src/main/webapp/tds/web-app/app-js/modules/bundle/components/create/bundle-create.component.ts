@@ -54,11 +54,24 @@ export class BundleCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.activeDialog.close();
-			}
-		});
+		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+			this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.activeDialog.close();
+				}
+			});
+		}
+	}
+
+	private validateTimes(startTime: Date, completionTime: Date): boolean {
+		if (!startTime || !completionTime) {
+			return true;
+		} else if (startTime > completionTime) {
+			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -67,8 +80,8 @@ export class BundleCreateComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.defaultModel)) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
 				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {

@@ -1,3 +1,4 @@
+<g:set var="angularModalDialog" value="${angularModalDialog}" scope="request"/>
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -6,7 +7,6 @@
 	</head>
 	<body>
 		<div class="body">
-			<h1>Model - Edit</h1>
 			<g:if test="${flash.message}">
 				 <div class="message">${flash.message}</div>
 			</g:if>
