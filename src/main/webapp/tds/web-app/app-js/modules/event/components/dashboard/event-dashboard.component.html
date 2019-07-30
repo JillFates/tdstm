@@ -138,13 +138,13 @@
                     </tds-team-task-percents>
                 </div>
             </div>
-            <div class="row bundle-steps-container">
-                <tds-bundle-steps 
+            <div class="row task-category-container">
+                <tds-task-category
                     *ngIf="bundleSteps" 
                     (changeTab)="onChangeStepsTab($event)"
                     [taskCategories]="taskCategories"
                     [bundleSteps]="bundleSteps">
-                </tds-bundle-steps>
+                </tds-task-category>
             </div>
         </div>
     </div>
