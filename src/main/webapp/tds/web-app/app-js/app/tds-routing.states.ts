@@ -18,6 +18,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},
 	{path: 'planning', loadChildren: '../modules/planning/planning.module#PlanningModule'},
+	{path: 'project', loadChildren: '../modules/project/project.module#ProjectModule'},
 	{path: 'provider', loadChildren: '../modules/provider/provider.module#ProviderModule'},
 	{path: 'credential', loadChildren: '../modules/credential/credential.module#CredentialModule'},
 	{path: 'action', loadChildren: '../modules/apiAction/api-action.module#APIActionModule'},

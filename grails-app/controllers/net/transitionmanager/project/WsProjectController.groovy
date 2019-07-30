@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.SortOrder
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
 
@@ -60,5 +61,32 @@ class WsProjectController implements ControllerMethods {
 			}
 		}
 		renderSuccessJson(projectService.projects( projectStatus ))
+	}
+
+	@HasPermission(Permission.ProjectView)
+	def projectsForProjectList() {
+		renderSuccessJson([activeProjects: projectService.projects( ProjectStatus.ACTIVE ), completedProjects: projectService.projects( ProjectStatus.COMPLETED )] )
+	}
+
+	/*
+	 * Populate and present the create view for a new project
+	 */
+	@HasPermission(Permission.ProjectCreate)
+	def getModelForProjectCreate() {
+		PartyGroup company = securityService.userLoginPerson.company
+		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+		// Copy plan methodology field from the default project
+		Project defaultProject = Project.defaultProject
+		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
+		params.planMethodology = defaultProject.planMethodology
+
+		renderSuccessJson([
+				clients: projectDetails.clients,
+				company: company,
+				managers: projectDetails.managers,
+		 		partners: projectDetails.partners,
+				projectInstance: new Project(params),
+		 		workflowCodes: projectDetails.workflowCodes,
+				planMethodologies:planMethodologies ])
 	}
 }

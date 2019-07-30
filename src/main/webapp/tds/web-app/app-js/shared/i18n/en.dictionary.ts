@@ -232,6 +232,9 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
+	'PROJECTS': {
+		'LIST': 'Project List'
+	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
