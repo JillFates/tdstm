@@ -19,7 +19,7 @@
 						<div class="form-group">
 							<label class="col-sm-4 control-label">Email contact: </label>
 							<div class="col-sm-8">
-								<input type="text" name="inputTitle" id="inputEmailContact" class="form-control" placeholder="Email contact" [(ngModel)]="licenseModel.email" required [disabled]="!editMode">
+								<input type="text" name="email" id="inputEmailContact" class="form-control" placeholder="Email contact" [(ngModel)]="licenseModel.email" required [disabled]="!editMode">
 							</div>
 						</div>
 					</div>
@@ -38,6 +38,24 @@
 							<label class="col-sm-4 control-label">Status: </label>
 							<div class="col-sm-8">
 								<label class="control-label " style="text-transform: capitalize;">{{licenseModel.status | lowercase}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">GUID: </label>
+							<div class="col-sm-9">
+								<label class="control-label ">{{licenseModel.guid | lowercase}}</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-4 control-label">Reporting: </label>
+							<div class="col-sm-8">
+								<input type="checkbox" name="collectMetrics" [(ngModel)]="licenseModel.collectMetrics" [checked]="licenseModel.collectMetrics" [disabled]="!editMode"/>
 							</div>
 						</div>
 					</div>
