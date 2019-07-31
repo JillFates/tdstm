@@ -213,7 +213,12 @@ class CustomDomainService implements ServiceMethods {
     void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
-        Map currentStoredFieldSpecs = allFieldSpecs(project, domain)
+        Map currentStoredFieldSpecs = [:]
+
+        try{
+            currentStoredFieldSpecs = allFieldSpecs(project, domain)
+        } catch(ConfigurationException silentFail) {}
+
 
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
@@ -245,7 +250,8 @@ class CustomDomainService implements ServiceMethods {
                     }
                 }
 
-                List<String> currentCustomFields = (currentStoredFieldSpecs[assetClassType].fields*.field).findAll { it.startsWith('custom') }
+                List<Map> fields = currentStoredFieldSpecs[assetClassType] ?: []
+                List<String> currentCustomFields = (fields*.field).findAll { it.startsWith('custom') }
                 List<String> customFieldsToClear = CollectionUtils.disjunction( currentCustomFields, customFieldsToSave)
                 clearCustomFields(project, assetClassType, customFieldsToClear)
 
