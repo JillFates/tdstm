@@ -252,11 +252,8 @@
                     <li class="menu-child-item menu-parent-tasks-my-tasks">
                         <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
-                        <a href="/tdstm/assetEntity/listTasks?initSession=true">Task Manager</a>
-                    </li>
 										<li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
-											<a [routerLink]="['/taskManager','list']">Task Manager <small>(new)</small></a>
+											<a [routerLink]="['/taskManager','list']">Task Manager</a>
 										</li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-graph">
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>

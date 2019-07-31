@@ -89,13 +89,19 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 																 tooltip="View Timeline"
 																 icon="table">
 							</tds-button-custom>
-							<!--<kendo-dropdownlist-->
-							<!--style="width: 100px"-->
-							<!--name="timerList"-->
-							<!--class="form-control"-->
-							<!--[data]="timerList"-->
-							<!--[(ngModel)]="timerValue">-->
-							<!--</kendo-dropdownlist>-->
+							<div class="refresh-control">
+								<tds-pie-countdown
+									[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+									(timeout)="search()"
+									[hideRefresh]="true"
+									[customOptions]="[{seconds: 0, description: 'Manual'},
+																		{seconds: 60, description: '1 Min'},
+																		{seconds: 120, description: '2 Min'},
+																		{seconds: 180, description: '3 Min'},
+																		{seconds: 240, description: '4 Min'},
+																		{seconds: 300, description: '5 Min'}]">
+								</tds-pie-countdown>
+							</div>
 						</div>
 					</div>
 					<kendo-grid
@@ -282,6 +288,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	private readonly allEventsOption = { id: 0, name: 'All Events' };
+	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	selectedEvent = this.allEventsOption;
 	justRemaining: boolean;
 	justMyTasks = false;
@@ -729,5 +736,9 @@ export class TaskListComponent {
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	onTimeout(): void {
+		console.log('timeout');
 	}
 }
