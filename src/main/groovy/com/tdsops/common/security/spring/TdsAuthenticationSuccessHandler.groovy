@@ -81,6 +81,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					} else {
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
+				} else if (userLogin.forcePasswordChange == 'Y') {
+					redirectUri = "/userLogin/changePassword?userLoginInstance=${userLogin.username}"
 				} else {
 					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
 				}

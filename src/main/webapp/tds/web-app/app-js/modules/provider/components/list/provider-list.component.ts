@@ -1,5 +1,12 @@
 // Angular
-import {Component, ElementRef, Inject, OnInit, Renderer2} from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	Renderer2,
+} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {ProviderService} from '../../service/provider.service';
@@ -19,7 +26,13 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
 // Kendo
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
+import {
+	CellClickEvent,
+	GridDataResult,
+	PageChangeEvent
+} from '@progress/kendo-angular-grid';
+import { ReplaySubject } from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 declare var jQuery: any;
 
@@ -30,7 +43,7 @@ declare var jQuery: any;
         #btnCreateProvider { margin-left: 16px; }
 	`]
 })
-export class ProviderListComponent implements OnInit {
+export class ProviderListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 
 	private state: State = {
@@ -53,6 +66,7 @@ export class ProviderListComponent implements OnInit {
 	public resultSet: ProviderModel[];
 	public selectedRows = [];
 	public dateFormat = '';
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -71,13 +85,13 @@ export class ProviderListComponent implements OnInit {
 
 	ngOnInit() {
 		this.userContext.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.providerColumnModel = new ProviderColumnModel(`{0:${this.dateFormat}}`);
 				this.gridColumns = this.providerColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
-
 	protected filterChange(filter: CompositeFilterDescriptor): void {
 		this.state.filter = filter;
 		this.gridData = process(this.resultSet, this.state);
@@ -120,7 +134,9 @@ export class ProviderListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.providerService.deleteContext(dataItem.id).subscribe((result: any) => {
+		this.providerService.deleteContext(dataItem.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((result: any) => {
 			this.dialogService.extra(ProviderAssociatedComponent,
 				[{provide: ProviderAssociatedModel, useValue: result}],
 				false, false)
@@ -149,7 +165,9 @@ export class ProviderListComponent implements OnInit {
 	}
 
 	protected reloadData(): void {
-		this.providerService.getProviders().subscribe(
+		this.providerService.getProviders()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -212,5 +230,16 @@ export class ProviderListComponent implements OnInit {
 		this.gridData = process(this.resultSet, this.state);
 		// Adjusting the locked column(s) height to prevent cut-off issues.
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

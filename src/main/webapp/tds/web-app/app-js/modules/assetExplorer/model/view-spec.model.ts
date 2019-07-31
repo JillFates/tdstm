@@ -3,7 +3,7 @@ export class QueryColumn {
 	property: string;
 }
 
-export const VIEW_COLUMN_MIN_WIDTH = 140;
+export const VIEW_COLUMN_MIN_WIDTH = 110;
 
 export class ViewColumn extends QueryColumn {
 	width ? = VIEW_COLUMN_MIN_WIDTH;

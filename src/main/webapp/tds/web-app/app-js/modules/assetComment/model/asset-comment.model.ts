@@ -5,7 +5,7 @@ export class AssetCommentModel {
 	public modal: {
 		title:  string;
 		type: ModalType
-	}
+	};
 	public archive: boolean;
 	public comment: string;
 	public category: string;
@@ -30,7 +30,7 @@ export class AssetCommentColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 60,
+				width: 52,
 				locked: true
 			},
 			{

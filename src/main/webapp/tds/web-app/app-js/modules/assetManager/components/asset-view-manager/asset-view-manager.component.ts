@@ -1,8 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ViewGroupModel, ViewModel, ViewType} from '../../../assetExplorer/model/view.model';
-import {Observable} from 'rxjs';
-import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {Observable, ReplaySubject} from 'rxjs';
+import {ActivatedRoute, Router} from '@angular/router';
+import {takeUntil} from "rxjs/operators";
 
+import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {Permission} from '../../../../shared/model/permission.model';
@@ -14,19 +16,20 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {AssetViewManagerColumnsHelper} from './asset-view-manager-columns.helper';
-import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
 	selector: 'tds-asset-view-manager',
 	templateUrl: 'asset-view-manager.component.html',
 })
-export class AssetViewManagerComponent implements OnInit {
+export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	public reportGroupModels = Array<ViewGroupModel>();
 	public searchText: String;
 	private viewType = ViewType;
 	public selectedFolder: ViewGroupModel;
 	public gridColumns: GridColumnModel[];
 	private report;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
@@ -41,9 +44,11 @@ export class AssetViewManagerComponent implements OnInit {
 	ngOnInit() {
 		this.gridColumns = AssetViewManagerColumnsHelper.createColumns();
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
-		this.preferenceService.getPreferences(preferencesCodes).subscribe((preferences) => {
+		this.preferenceService.getPreferences(preferencesCodes)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((preferences) => {
 			this.setupDefaultSettings(preferences);
-		});
+			});
 	}
 
 	private setupDefaultSettings(preferences: any[]) {
@@ -93,15 +98,16 @@ export class AssetViewManagerComponent implements OnInit {
 				.then((res) => {
 					if (res) {
 						this.assetExpService.deleteReport(report.id)
-							.subscribe(
-							result => {
-								this.notifier.broadcast({
-									name: AlertType.SUCCESS,
-									message: result
-								});
-								this.loadData();
-							},
-							error => console.log(error));
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
+						result => {
+							this.notifier.broadcast({
+								name: AlertType.SUCCESS,
+								message: result
+							});
+							this.loadData();
+						},
+						error => console.log(error));
 					}
 				});
 		}
@@ -109,6 +115,7 @@ export class AssetViewManagerComponent implements OnInit {
 
 	protected loadData() {
 		this.assetExpService.getReports()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(result => {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
@@ -121,6 +128,7 @@ export class AssetViewManagerComponent implements OnInit {
 		this.gridColumns = AssetViewManagerColumnsHelper.setColumnAsSorted(propertyName);
 
 		this.preferenceService.setPreference(PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT, propertyName)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
 
 		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
@@ -141,7 +149,6 @@ export class AssetViewManagerComponent implements OnInit {
 			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
 			this.permissionService.hasPermission(Permission.AssetExplorerEdit) ||
 			this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
-		;
 	}
 
 	protected isDeleteAvailable(report: ViewModel): boolean {
@@ -153,10 +160,11 @@ export class AssetViewManagerComponent implements OnInit {
 	protected toggleFavorite(report: ViewModel): void {
 		if (report.isFavorite) {
 			this.assetExpService.deleteFavorite(report.id)
-				.subscribe(d => {
-					report.isFavorite = false;
-					this.loadData();
-				});
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(d => {
+				report.isFavorite = false;
+				this.loadData();
+			});
 		} else {
 			if (this.assetExpService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
 				this.notifier.broadcast({
@@ -165,12 +173,24 @@ export class AssetViewManagerComponent implements OnInit {
 				});
 			} else {
 				this.assetExpService.saveFavorite(report.id)
-					.subscribe(d => {
-						report.isFavorite = true;
-						this.loadData();
-					});
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(d => {
+					report.isFavorite = true;
+					this.loadData();
+				});
 			}
 		}
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 
 }
