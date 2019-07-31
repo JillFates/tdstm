@@ -5,7 +5,7 @@ import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.Person
 
 class Application extends AssetEntity {
-	static final String       UNKNOWN     = "Unknown"
+	static final String PLAN_METHODOLOGY_UNKNOWN = "Unknown"
 	static final List<String> CRITICALITY = [
 		'Mission Critical',
 		'Business Critical',
