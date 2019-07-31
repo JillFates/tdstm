@@ -14,6 +14,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 import { Permission } from '../../../../shared/model/permission.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'field-settings-list',
@@ -43,6 +44,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
+		private translatePipe: TranslatePipe,
 	) {
 		this.domains = this.route.snapshot.data['fields'];
 		if (this.domains.length > 0) {
@@ -169,9 +171,11 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel').then(result => {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			).then(result => {
 					if (result) {
 						this.refresh();
 					} else {

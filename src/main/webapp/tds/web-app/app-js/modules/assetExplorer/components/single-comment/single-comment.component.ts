@@ -9,6 +9,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `single-comment`,
@@ -29,6 +30,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		public taskManagerService: TaskService,
 		public assetExplorerService: AssetExplorerService,
 		public promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private userPreferenceService: PreferenceService) {
 		super('#single-comment-component');
 	}
@@ -109,9 +111,11 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();
