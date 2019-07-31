@@ -112,6 +112,7 @@ export class TaskEditCreateModelHelper {
 			assetClasses: [{id: '', text: ''}],
 			status: this.STATUS.READY,
 			statusList: [],
+			percentageComplete: 0,
 			personList: [],
 			teamList: [],
 			originalPredecessorList: [],
@@ -321,6 +322,7 @@ export class TaskEditCreateModelHelper {
 			resolution: '',
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
+			percentageComplete: percentageComplete,
 			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
 				.concat(this.getTaskEdited(predecessorTasks, originalPredecessorList)),
@@ -335,10 +337,6 @@ export class TaskEditCreateModelHelper {
 			note: note,
 			id: id
 		};
-
-		if (apiActionInvokedAt) {
-			payload['percentageComplete'] = percentageComplete;
-		}
 
 		return payload;
 	}
@@ -367,7 +365,7 @@ export class TaskEditCreateModelHelper {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
 			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
-			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+			priority, assignedTeam, status, assignedTo, durationScale, percentageComplete} = this.model;
 
 		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
@@ -412,6 +410,7 @@ export class TaskEditCreateModelHelper {
 			resolution: '',
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
+			percentageComplete: percentageComplete,
 			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
 				.concat(this.getTaskPrevious(predecessorTasks, originalPredecessorList)),
