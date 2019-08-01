@@ -2,7 +2,7 @@ import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ViewGroupModel, ViewModel, ViewType} from '../../../assetExplorer/model/view.model';
 import {Observable, ReplaySubject} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
-import {takeUntil} from "rxjs/operators";
+import {takeUntil} from 'rxjs/operators';
 
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {PermissionService} from '../../../../shared/services/permission.service';

@@ -6,6 +6,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {EventModel} from '../../model/event.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `event-view-edit-component`,
@@ -29,6 +30,7 @@ export class EventViewEditComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
+		private translatePipe: TranslatePipe,
 		@Inject('id') private id) {
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 		this.eventId = this.id;
@@ -182,9 +184,11 @@ export class EventViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close();
@@ -199,9 +203,11 @@ export class EventViewEditComponent implements OnInit {
 	public cancelEdit(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.editing = false;

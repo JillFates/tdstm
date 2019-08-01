@@ -1,4 +1,14 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject} from '@angular/core';
+import {
+	Component,
+	ViewChild,
+	ViewChildren,
+	HostListener,
+	OnInit,
+	QueryList,
+	ElementRef,
+	Inject,
+	OnDestroy
+} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
@@ -25,10 +35,11 @@ import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, Observable, ReplaySubject} from 'rxjs';
 import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {skip, takeLast, takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -62,7 +73,7 @@ enum NavigationTab {
         }
 	`]
 })
-export class APIActionViewEditComponent implements OnInit {
+export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
 	@ViewChild('scriptForm') scriptForm: NgForm;
@@ -102,6 +113,7 @@ export class APIActionViewEditComponent implements OnInit {
 	public selectedLapsed = {value: 0, interval: ''};
 	public selectedStalled = {value: 0, interval: ''};
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public PLEASE_SELECT = null;
 	public commonFieldSpecs;
 	protected actionTypesList = [];
 	protected  remoteCredentials = [];
@@ -143,11 +155,11 @@ export class APIActionViewEditComponent implements OnInit {
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedDictionaryModel: DictionaryModel = {
+	lastSelectedDictionaryModel: DictionaryModel = {
 		id: 0,
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
-	private lastSelectedAgentMethodModel: AgentMethodModel = {
+	lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: '0',
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
@@ -161,10 +173,11 @@ export class APIActionViewEditComponent implements OnInit {
 	};
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
+	public originalModel: APIActionModel = new APIActionModel();
+	public modalType: ActionType;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
-		public originalModel: APIActionModel,
-		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public permissionService: PermissionService,
 		public activeDialog: UIActiveDialogService,
@@ -195,15 +208,16 @@ export class APIActionViewEditComponent implements OnInit {
 		this.parameterList = [];
 
 		// Fork Join load list api calls.
-		const observables = forkJoin<any>(
-			this.apiActionService.getProviders(),
-			this.apiActionService.getAPIActionEnums(),
-			this.customDomainService.getCommonFieldSpecsWithShared()
-		);
 		/**
 		 * Note!! with this fork joined api calls, now the last api call load list should always be getDataScripts()
 		 */
-		observables.subscribe({
+		forkJoin<any>(
+			this.apiActionService.getProviders(),
+			this.apiActionService.getAPIActionEnums(),
+			this.customDomainService.getCommonFieldSpecsWithShared()
+		)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe({
 			next: result => {
 				this.getProviders(result[0]);
 				this.getAgents(result[1]);
@@ -229,7 +243,9 @@ export class APIActionViewEditComponent implements OnInit {
 			}
 
 			if (this.apiActionForm) {
-				this.apiActionForm.valueChanges.subscribe(val => {
+				this.apiActionForm.valueChanges
+					.pipe(takeUntil(this.unsubscribeOnDestroy$))
+					.subscribe(val => {
 					this.verifyIsValidForm();
 				});
 			}
@@ -300,7 +316,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of Credentials
 	 */
 	getCredentials(): void {
-		this.apiActionService.getCredentials().subscribe(
+		this.apiActionService.getCredentials()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
 					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
@@ -318,17 +336,21 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of DataScript
 	 */
 	getDataScripts(): void {
-		this.apiActionService.getDataScripts().subscribe(
-			(result: any) => {
-				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
+		this.apiActionService.getDataScripts()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
+			(result) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
-				this.datascriptList.push(...result);
-				if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
-					this.onProviderValueChange(this.apiActionModel.provider, true);
+				if (result.length > 0) {
+					result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
+					this.datascriptList.push(...result);
+					if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
+						this.onProviderValueChange(this.apiActionModel.provider, true);
+					}
 				}
 				this.loadingLists = false;
 			},
@@ -339,7 +361,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of existing parameters for the API Action
 	 */
 	getParameters(): void {
-		this.apiActionService.getParameters(this.apiActionModel).subscribe(
+		this.apiActionService.getParameters(this.apiActionModel)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result: any) => {
 				this.parameterList = result;
 				this.parameterList.forEach((parameter) => {
@@ -367,7 +391,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	protected onSaveApiAction(): void {
 		if (this.canSave()) {
-			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
+			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
 				(result: any) => {
 					if (result) {
 						this.savedApiAction = true;
@@ -412,9 +438,11 @@ export class APIActionViewEditComponent implements OnInit {
 		}
 		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
@@ -457,7 +485,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.apiActionService.deleteAPIAction(this.apiActionModel.id).subscribe(
+					this.apiActionService.deleteAPIAction(this.apiActionModel.id)
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
 						(result) => {
 							this.activeDialog.dismiss(result);
 						},
@@ -521,7 +551,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Disables codemirrors on the current tab if not in edit state
 	 */
 	private disableCodeMirrors () {
-		this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
+		this.codeMirrorComponents.changes
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 			comps.forEach((child) => {
 				this.codeMirrorComponent = child;
 				setTimeout(() => {
@@ -530,7 +562,7 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 		});
 	}
-	
+
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
@@ -569,13 +601,13 @@ export class APIActionViewEditComponent implements OnInit {
 
 	/**
 	 * On a new Dictionary selected
-	 * @param value
+	 * @param dictionaryModel
 	 */
-	protected onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
+	onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
 		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
 		this.apiActionModel.dictionary = dictionaryModel;
 
-		if (this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
+		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadDictionaryModel(dictionaryModel, res);
@@ -588,7 +620,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private loadDictionaryModel(dictionaryModel: DictionaryModel, changeAgent: boolean): void {
 		if (changeAgent) {
 			if (dictionaryModel.id !== 0) {
-				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
+				this.apiActionService.getActionMethodById(dictionaryModel.id)
+					.pipe(takeUntil(this.unsubscribeOnDestroy$))
+					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
 						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
@@ -627,8 +661,8 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Listener for the Select when the Value Method Changes.
 	 * @param event
 	 */
-	protected onMethodValueChange(event: any): void {
-		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
+	onMethodValueChange(event: any): void {
+		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentMethodModel(res);
@@ -918,7 +952,9 @@ export class APIActionViewEditComponent implements OnInit {
 					}
 				});
 			}
-			this.apiActionService.validateCode(scripts).subscribe(
+			this.apiActionService.validateCode(scripts)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
 				(result: any) => {
 					this.invalidScriptSyntax = false;
 					result.forEach((eventResult: any) => {
@@ -946,14 +982,18 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param {EventReaction} eventReaction
 	 */
 	verifyCode(eventReaction: EventReaction): void {
-		this.validateAllSyntax(eventReaction).subscribe();
+		this.validateAllSyntax(eventReaction)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
 	}
 
 	/**
 	 * Execute the API to validated every Syntax Value.
 	 */
 	onCheckAllSyntax(): void {
-		this.validateAllSyntax().subscribe();
+		this.validateAllSyntax()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
 	}
 
 	/**
@@ -1063,6 +1103,7 @@ export class APIActionViewEditComponent implements OnInit {
 
 		return cloned;
 	}
+<<<<<<< HEAD
 	/**
 	 * Based on the action type determines if the invocation is remote
 	*/
@@ -1087,5 +1128,17 @@ export class APIActionViewEditComponent implements OnInit {
 		if (evenReaction) {
 			evenReaction.selected = selected;
 		}
+=======
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
+>>>>>>> dev/4.7.1
 	}
 }

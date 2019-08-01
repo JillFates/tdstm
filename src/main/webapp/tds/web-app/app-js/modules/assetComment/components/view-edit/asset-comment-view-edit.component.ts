@@ -6,6 +6,7 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `asset-comment-view-edit`,
@@ -20,7 +21,13 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	public commentCategories: string[];
 	private dataSignature: string;
 
-	constructor(public assetCommentModel: AssetCommentModel, public userPreferenceService: PreferenceService, public taskManagerService: TaskService, public assetExplorerService: AssetExplorerService, public promptService: UIPromptService) {
+	constructor(
+		public assetCommentModel: AssetCommentModel,
+		public userPreferenceService: PreferenceService,
+		public taskManagerService: TaskService,
+		public assetExplorerService: AssetExplorerService,
+		private translatePipe: TranslatePipe,
+		public promptService: UIPromptService) {
 		super('#asset-comment-view-edit-component');
 	}
 
@@ -97,9 +104,11 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();
