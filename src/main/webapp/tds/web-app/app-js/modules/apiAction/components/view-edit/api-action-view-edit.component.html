@@ -89,13 +89,15 @@
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
-                                                                    tabindex="2"
-																	id="apiActionProvider" name="apiActionProvider"
-                                                                    (valueChange)="onProviderValueChange($event, false)"
+                                  tabindex="2"
+																	id="apiActionProvider"
+																	name="apiActionProvider"
+                                  (valueChange)="onProviderValueChange($event, false)"
 																	[data]="providerList"
 																	[textField]="'name'"
-                                                                    [valueField]="'id'"
-                                                                    requiredComplexValue propertyName="id"
+																	[valueField]="'id'"
+																	requiredComplexValue
+																	propertyName="id"
 																	[(ngModel)]="apiActionModel.provider"
 																	required
 																	class="form-control">

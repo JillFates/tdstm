@@ -1,6 +1,7 @@
 let webpackConfig = require('./webpack-prod.config')();
 let webpack = require('webpack'); //to access built-in plugins
 let path = require('path');
+const AngularCompilerPlugin = require('@ngtools/webpack').AngularCompilerPlugin;
 
 module.exports = function (config) {
     var appSrcBase = 'web-app/app-js/';       // app source TS files
@@ -13,14 +14,28 @@ module.exports = function (config) {
 			{pattern: appSrcBase + '**/*.html'},
 			{pattern: appSrcBase + 'main.spec.ts'}
 		],
+		plugins: [
+			'karma-jasmine',
+			'@angular-devkit/build-angular/plugins/karma',
+			'karma-webpack',
+			'karma-junit-reporter',
+			'karma-phantomjs-launcher'
+		],
 		webpack: {
+        	mode: 'production',
 			module: webpackConfig.module,
 			resolve: webpackConfig.resolve,
 			plugins: [
 				new webpack.ContextReplacementPlugin( //https://github.com/angular/angular/issues/11580
 					/angular(\\|\/)core(\\|\/)@angular/,
 					path.resolve(__dirname, "app-js")
-				)
+				),
+				new AngularCompilerPlugin({
+					tsConfigPath: 'tsconfig.json',
+					entryModule: 'web-app/app-js/app/tds-app.module#TDSAppModule',
+					sourceMap: false,
+					skipCodeGeneration: true
+				})
 			]
 		},
 		preprocessors: {
@@ -44,6 +59,9 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
 		browsers: ['PhantomJS'],
-        singleRun: true
+        singleRun: true,
+		jasmineNodeOpts: {
+			defaultTimeoutInterval: 2500000
+		},
     });
 };

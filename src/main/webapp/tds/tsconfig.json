@@ -25,5 +25,6 @@
   "angularCompilerOptions": {
     "annotateForClosureCompiler": false,
     "annotationsAs": "decorators"
-  }
+  },
+  "exclude": ["node_modules"]
 }
