@@ -150,10 +150,11 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	errors: any;
 	dataSignature: string;
 	public modalOptions: DecoratorOptions;
+
 	constructor(
 		public personModel: PersonModel,
 		private personService: PersonService,
-    private translatePipe: TranslatePipe,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
 		super('#add-person-component');
 		this.errors = {};

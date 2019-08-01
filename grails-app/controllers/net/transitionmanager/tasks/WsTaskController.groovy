@@ -3,12 +3,14 @@ package net.transitionmanager.tasks
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
@@ -23,6 +25,7 @@ import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 
 /**

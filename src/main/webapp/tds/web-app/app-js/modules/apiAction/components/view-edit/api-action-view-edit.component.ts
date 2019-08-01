@@ -1,13 +1,22 @@
-import { Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject } from '@angular/core';
+import {
+	Component,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	QueryList,
+	ViewChild,
+	ViewChildren
+} from '@angular/core';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	APIActionType,
+	EVENT_BEFORE_CALL_TEXT,
 	EventReaction,
 	EventReactionType,
-	EVENT_BEFORE_CALL_TEXT,
 	Languages
 } from '../../model/api-action.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
@@ -16,7 +25,7 @@ import { APIActionService } from '../../service/api-action.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { ActionType, COLUMN_MIN_WIDTH } from '../../../../shared/model/data-list-grid.model';
 import { INTERVAL, INTERVALS, KEYSTROKE } from '../../../../shared/model/constants';
-import { DictionaryModel, AgentMethodModel, CredentialModel } from '../../model/agent.model';
+import { AgentMethodModel, CredentialModel, DictionaryModel } from '../../model/agent.model';
 import { DataScriptModel } from '../../../dataScript/model/data-script.model';
 import { NgForm } from '@angular/forms';
 import { CustomDomainService } from '../../../fieldSettings/service/custom-domain.service';
@@ -25,11 +34,11 @@ import { SortUtils } from '../../../../shared/utils/sort.utils';
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {forkJoin, Observable, ReplaySubject} from 'rxjs';
-import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {skip, takeLast, takeUntil} from 'rxjs/operators';
+import { forkJoin, Observable, ReplaySubject } from 'rxjs';
+import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { takeUntil } from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -215,6 +224,17 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
+	}
+
 	private getModalTitle(): void {
 		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Action' : (this.modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail');
 	}
@@ -344,9 +364,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * Get the list of existing parameters for the API Action
 	 */
 	getParameters(): void {
-		this.apiActionService.getParameters(this.apiActionModel)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
+		this.apiActionService.getParameters(this.apiActionModel).subscribe(
 			(result: any) => {
 				this.parameterList = result;
 				this.parameterList.forEach((parameter) => {
@@ -374,9 +392,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	protected onSaveApiAction(): void {
 		if (this.canSave()) {
-			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList)
-				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe(
+			this.apiActionService.saveAPIAction(this.apiActionModel, this.parameterList).subscribe(
 				(result: any) => {
 					if (result) {
 						this.savedApiAction = true;
@@ -421,11 +437,9 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		}
 		if ((this.isDirty() || this.isParameterListDirty()) && this.modalType !== this.actionTypes.VIEW) {
 			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
-			)
+				'Abandon Changes?',
+				'You have unsaved changes. Click Confirm to abandon your changes.',
+				'Confirm', 'Cancel')
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close(this.savedApiAction ? this.apiActionModel : null);
@@ -1066,7 +1080,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 		return cloned;
 	}
-<<<<<<< HEAD
+
 	/**
 	 * Based on the action type determines if the invocation is remote
 	*/
@@ -1091,17 +1105,5 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (evenReaction) {
 			evenReaction.selected = selected;
 		}
-=======
-
-	/**
-	 * unsubscribe from all subscriptions on destroy hook.
-	 * @HostListener decorator ensures the OnDestroy hook is called on events like
-	 * Page refresh, Tab close, Browser close, navigation to another view.
-	 */
-	@HostListener('window:beforeunload')
-	ngOnDestroy(): void {
-		this.unsubscribeOnDestroy$.next();
-		this.unsubscribeOnDestroy$.complete();
->>>>>>> dev/4.7.1
 	}
 }
