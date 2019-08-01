@@ -26,17 +26,17 @@
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
 											<td colspan="3">
-												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
+												<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
 											</td>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
 											<td colspan="3">
-												<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${asset.description}" ngmodel="model.asset.description" />
+												<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="2" value="${asset.description}" ngmodel="model.asset.description" />
 											</td>
 										</tr>
 										<tr>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" tabindex="13" ngmodel="model.asset.dbFormat"/>
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType" tabindex="17" />
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="21" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" tabindex="3" ngmodel="model.asset.dbFormat"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType" tabindex="7" />
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="11" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 										</tr>
 										<tr>
 											<td class="label ${standardFieldSpecs.size.imp?:''}"
@@ -47,10 +47,10 @@
 												</label>
 											</td>
 											<td  data-for="sizeScale" nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp ?: ''}">
-												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${asset.size}" ngmodel="model.asset.size"/>
+												<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="4" value="${asset.size}" ngmodel="model.asset.size"/>
 												<div>
 													<kendo-dropdownlist
-															[tabIndex]="15"
+															[tabIndex]="5"
 															class="tm-input-control"
 															name="modelAssetScaleName"
 															[data]="${SizeScale.getAsJsonList() as JSON}"
@@ -67,7 +67,7 @@
 													[(ngModel)]="model.asset.retireDate"
 													class="tm-input-control"
 													name="modelAssetRetireDate"
-													[tabindex]="18"
+													[tabindex]="8"
                                                     [value]="model.asset.retireDate">
                                                 </tds-date-control>
 											</td>
@@ -75,7 +75,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.dependencyBundle?.value}"/>
 											<td class="${standardFieldSpecs.moveBundle.imp ?: ''}" data-for="moveBundle">
 												<kendo-dropdownlist
-														[tabIndex]="22"
+														[tabIndex]="12"
 														class="tm-input-control"
 														name="modelAssetMoveBundle"
 														[data]="model.moveBundleList"
@@ -88,7 +88,7 @@
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset?.rateOfChange}"/>
 											<td>
-												<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="16" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
+												<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="6" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
 											</td>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset?.maintExpDate}"/>
@@ -97,7 +97,7 @@
 													[(ngModel)]="model.asset.maintExpDate"
 													class="tm-input-control"
 													name="modelAssetMainExpDate"
-													[tabindex]="19"
+													[tabindex]="9"
                                                     [value]="model.asset.maintExpDate">
                                                 </tds-date-control>
 											</td>
@@ -105,7 +105,7 @@
 											<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset?.planStatus}"/>
 											<td class="${standardFieldSpecs.planStatus.imp ?: ''}" data-for="planStatus">
 												<kendo-dropdownlist
-														[tabIndex]="23"
+														[tabIndex]="13"
 														class="tm-input-control"
 														name="modelAssetPlanStatus"
 														[data]="model.planStatusOptions"
@@ -117,12 +117,12 @@
 											<td></td>
 											<td></td>
 
-											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="20"/>
+											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="10"/>
 
 											<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset?.validation}"/>
 											<td class="${standardFieldSpecs.validation.imp ?: ''}" data-for="validation">
 												<kendo-dropdownlist
-														[tabIndex]="24"
+														[tabIndex]="14"
 														class="tm-input-control"
 														name="modelAssetValidation"
 														[data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(asset.class).validation.inList as JSON}"
@@ -153,7 +153,7 @@
 	<div class="modal-footer form-group-center">
 		<tds-button-save
 				tooltip="Update Asset"
-				class="btn-primary pull-left component-action-update" tabindex="501"
+				class="btn-primary pull-left component-action-update" tabindex="500"
 				[disabled]="!isDependenciesValidForm"
 				[permissions]="['${Permission.AssetEdit}']"
 				(click)="submitForm($event)">
@@ -162,7 +162,7 @@
 		<tds:hasPermission permission="${Permission.AssetDelete}">
 			<tds-button-delete
 					tooltip="Delete Asset"
-					class="btn-danger component-action-delete" tabindex="502"
+					class="btn-danger component-action-delete" tabindex="501"
 					[permissions]="['${Permission.AssetDelete}']"
 					(click)="onDeleteAsset()">
 			</tds-button-delete>
@@ -171,7 +171,7 @@
 		<tds-button-cancel
 				tooltip="Cancel Edit"
 				class="pull-right component-action-cancel"
-				tabindex="503"
+				tabindex="502"
 				(click)="onCancelEdit()">
 		</tds-button-cancel>
 	</div>

@@ -10,6 +10,7 @@ import {EventsService} from '../../service/events.service';
 // Model
 import {NewsDetailModel} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-news-create-edit',
@@ -21,6 +22,7 @@ export class NewsCreateEditComponent {
 		public activeDialog: UIActiveDialogService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe,
 		private eventsService: EventsService) {
 	}
 
@@ -30,9 +32,11 @@ export class NewsCreateEditComponent {
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

@@ -10,6 +10,14 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		"/task/$id" {
+			controller = "task"
+			action = [GET:"task"]
+			constraints {
+				id(matches: /[0-9]{1,}/)
+			}
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -173,8 +181,8 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/asset/assetCommentCategories" {
-			controller = "wsAsset"
+		"/ws/task/assetCommentCategories" {
+			controller = "wsTask"
 			action = [
 			    GET : 'assetCommentCategories'
 			]
@@ -481,9 +489,9 @@ class UrlMappings {
 			action = [POST:"invokeLocalAction"]
 		}
 
-		"/ws/task/$id/invokeRemoteAction" {
+		"/ws/task/$id/recordRemoteActionStarted" {
 			controller = "wsTask"
-			action = [POST:"invokeRemoteAction"]
+			action = [POST:"recordRemoteActionStarted"]
 		}
 
 		"/ws/task/$id/resetAction" {
@@ -496,14 +504,9 @@ class UrlMappings {
 			action = [POST:"addNote"]
 		}
 
-		"/ws/task/$id/changeTime" {
-			controller = "wsTask"
-			action = [POST:"changeEstTime"]
-		}
-
-		"/ws/task/$id/updateStatus" {
-			controller = "wsTask"
-			action = [POST:"updateStatus"]
+		"/ws/task/$id/changeTaskState" {
+			controller = "Task"
+			action = [POST:"changeTaskState"]
 		}
 
 		"/ws/progress/$id" {
@@ -759,6 +762,7 @@ class UrlMappings {
 			]
 		}
 
+		//Gets que request Hash  --- OLB 161207 Change Hash to request...
 		"/ws/license/$id/hash" {
 			controller = "wsLicenseAdmin"
 			action = [

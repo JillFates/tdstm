@@ -1,33 +1,28 @@
 package net.transitionmanager.tasks
 
-import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.HtmlUtil
-import com.tdssrc.grails.NumberUtil
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.controller.PaginationMethods
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.task.TaskGenerationCommand
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.integration.ActionRequest
-import net.transitionmanager.security.Permission
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.asset.CommentService
+import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
+import net.transitionmanager.command.task.TaskGenerationCommand
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.controller.PaginationMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
-import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
-import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 
 /**
@@ -156,38 +151,30 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.ActionInvoke)
-	def invokeLocalAction() {
-		AssetComment assetComment = fetchDomain(AssetComment, params)
-		Person whom = securityService.loadCurrentPerson()
-		String status = taskService.invokeAction(assetComment, whom, false)
-		renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
+	def invokeLocalAction(Long id) {
+		AssetComment task = taskService.invokeLocalAction(id, currentPerson())
+
+		Map results = [
+			assetComment: task,
+			task: task.taskToMap(),
+			status: task.status,
+			statusCss: taskService.getCssClassForStatus(task.status)
+		]
+
+		renderAsJson(results)
 	}
 
 	/**
-	 * Fetch an api action execution context and return it for remote invocation
+	 * Fetch an api action execution context and return it for remote invocation. If for what ever reason
+	 * the action can not be invoked then an exception will be thrown with the cause.
 	 * @param id - task id where api action is linked to
-	 * @return
+	 * @param publicKey - the public key to encrypt the pertainent data
+	 * @return JSON object containing an ActionRequest context object
 	 */
-	@HasPermission(Permission.ActionInvoke)
-	def invokeRemoteAction() {
-		Project project = getProjectForWs()
-		AssetComment assetComment = fetchDomain(AssetComment, params)
-		ActionRequest actionRequest = apiActionService.createActionRequest(assetComment.apiAction)
-
-		if (! actionRequest.options.apiAction.isRemote) {
-			throw new InvalidRequestException('Local actions was incorrectly invoke as Remote')
-		}
-		Map<String,?> actionRequestMap = actionRequest.toMap()
-
-		// check if api action has credentials so to include credentials password unencrypted
-		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
-			// Need to create new map because credentials map originally is immutable
-			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
-			credentials.password = credentialService.decryptPassword(assetComment.apiAction.credential)
-			actionRequestMap.options.credentials = credentials
-		}
-
-		renderAsJson([actionRequest: actionRequest.toMap()])
+	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
+	def recordRemoteActionStarted(Long id, RecordRemoteActionStartedCommand commandObject) {
+		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
+		renderAsJson([actionRequest: actionRequest])
 	}
 
 	/**
@@ -196,17 +183,14 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 * @return
 	 */
 	@HasPermission(Permission.ActionReset)
-	def resetAction() {
-		AssetComment assetComment = fetchDomain(AssetComment, params)
-		if (assetComment) {
-			Person whom = securityService.loadCurrentPerson()
-			String status = taskService.resetAction(assetComment, whom)
-			renderAsJson([assetComment: assetComment, status: status, statusCss: taskService.getCssClassForStatus(assetComment.status)])
-		} else {
-			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
-			log.error "resetAction: $errorMsg"
-			renderErrorJson([errorMsg])
-		}
+	def resetAction(Long id) {
+		AssetComment task = taskService.resetAction(id, currentPerson())
+		renderAsJson([
+			assetComment: task,
+			task: task.taskToMap(),
+			status: task.status,
+			statusCss: taskService.getCssClassForStatus(task.status)
+		])
 	}
 
 	/**
@@ -221,7 +205,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		AssetComment assetComment = fetchDomain(AssetComment, params)
 		if (assetComment) {
 			Map requestParams = request.JSON
-			Person whom = securityService.loadCurrentPerson()
+			Person whom = currentPerson()
 			Boolean status = taskService.addNote(assetComment, whom, requestParams.note, 0)
 			if (!status) {
 				def errorMsg = " There was a problem when creating Note for Task whithz id - $params.id "

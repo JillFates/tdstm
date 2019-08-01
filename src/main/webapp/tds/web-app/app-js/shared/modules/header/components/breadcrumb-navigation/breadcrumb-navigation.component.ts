@@ -71,9 +71,12 @@ export class BreadcrumbNavigationComponent {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
 				promptService.open(
-					'Abandon Changes?',
-					'You have unsaved changes. Click Confirm to abandon your changes.',
-					'Confirm', 'Cancel').then(result => {
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+					)
+					.then(result => {
 					if (result) {
 						this.route.snapshot.data['hasPendingChanges'] = false;
 						window.location.assign(e.currentTarget.href);
