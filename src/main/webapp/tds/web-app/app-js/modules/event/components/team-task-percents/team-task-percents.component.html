@@ -1,0 +1,32 @@
+<div class="team-task-percents">
+    <div *ngFor="let team of teamTaskMatrix" 
+        class="teamBreakdown toprightcontent smallTable">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="teamcol" nowrap="">
+                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
+                            style="display:block">
+                            {{team.role.description}}
+                        </a>
+                    </td>
+                    <td class="teamcountcolumn">
+                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
+                            style="display:block">
+                           {{team.teamTaskCount}} 
+                        </a>
+                    </td>
+                    <td class="teambarcolumn" nowrap="">
+                        <div class="team_bar_base_small">
+                            <div class="team_bar_graph_small" 
+                                id="team_{{team.role.id}}" 
+                                [style.width.%]="team.percDone">
+                            </div>
+                        </div>
+                        <span class="small_text"><b>{{team.teamTaskCount}} to go</b></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

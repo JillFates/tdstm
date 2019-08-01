@@ -149,7 +149,7 @@ class ApplicationController implements ControllerMethods, PaginationMethods {
 				// Unescaping the parameter since it can include HTML encoded characters (like \' == &#39; )
 				String planMethodology = StringEscapeUtils.unescapeHtml(params.planMethodology)
 
-				if (planMethodology == Application.UNKNOWN) {
+				if (planMethodology == Application.PLAN_METHODOLOGY_UNKNOWN) {
 					query.append(" (ae.`${customField}` is Null OR ae.`${customField}` = '') ")
 				} else {
 					query.append(" ae.`${customField}` = :planMethodology ")

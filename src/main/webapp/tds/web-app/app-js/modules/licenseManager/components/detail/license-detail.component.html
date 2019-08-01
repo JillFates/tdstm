@@ -19,7 +19,7 @@
 						<div class="form-group">
 							<label class="col-sm-4 control-label">Email contact: </label>
 							<div class="col-sm-8">
-								<input type="text" name="inputTitle" id="inputEmailContact" class="form-control" placeholder="Email contact" [(ngModel)]="licenseModel.email" required [disabled]="!editMode">
+								<input type="text" name="email" id="inputEmailContact" class="form-control" placeholder="Email contact" [(ngModel)]="licenseModel.email" required [disabled]="!editMode">
 							</div>
 						</div>
 					</div>
@@ -38,6 +38,24 @@
 							<label class="col-sm-4 control-label">Status: </label>
 							<div class="col-sm-8">
 								<label class="control-label " style="text-transform: capitalize;">{{licenseModel.status | lowercase}}</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">GUID: </label>
+							<div class="col-sm-9">
+								<label class="control-label ">{{licenseModel.guid | lowercase}}</label>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label class="col-sm-4 control-label">Reporting: </label>
+							<div class="col-sm-8">
+								<input type="checkbox" name="collectMetrics" [(ngModel)]="licenseModel.collectMetrics" [checked]="licenseModel.collectMetrics" [disabled]="!editMode"/>
 							</div>
 						</div>
 					</div>
@@ -104,18 +122,16 @@
 								</div>
 							</div>
 							<div class="form-group">
-                                <kendo-daterange>
-                                    <label class="col-sm-2 control-label">Valid Dates:</label>
-                                    <div class="col-sm-2" style="width: 173px;">
-                                        <kendo-dateinput kendoDateRangeStartInput [(value)]="licenseModel.activationDate" [disabled]="!editMode"></kendo-dateinput>
-                                    </div>
-                                    <div class="col-sm-1" style="width: 10px; padding-top: 9px;">
-                                        <span><i class="fa fa-fw fa-ellipsis-v"></i></span>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <kendo-dateinput kendoDateRangeEndInput [(value)]="licenseModel.expirationDate" [disabled]="!editMode"></kendo-dateinput>
-                                    </div>
-                                </kendo-daterange>
+								<label class="col-sm-2 control-label">Valid Dates:</label>
+								<div class="col-sm-2" style="width: 173px;">
+									<kendo-datepicker [(value)]="licenseModel.activationDate" [disabled]="!editMode"></kendo-datepicker>
+								</div>
+								<div class="col-sm-1" style="width: 10px; padding-top: 9px;">
+									<span><i class="fa fa-fw fa-ellipsis-v"></i></span>
+								</div>
+								<div class="col-sm-2">
+									<kendo-datepicker [(value)]="licenseModel.expirationDate" [disabled]="!editMode"></kendo-datepicker>
+								</div>
 							</div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">Request Date:</label>
@@ -128,7 +144,7 @@
 							</div>
 							<div class="form-group">
 								<div class="col-sm-12">
-									<textarea id="selectSpecialInstructions" name="selectSpecialInstructions" class="form-control" rows="3" placeholder="" [(ngModel)]="licenseModel.requestNote" [disabled]="true"></textarea>
+									<textarea id="selectSpecialInstructions" name="selectSpecialInstructions" class="form-control" rows="3" placeholder="" [(ngModel)]="licenseModel.requestNote" [readonly]="true"></textarea>
 								</div>
 							</div>
 							<div class="form-group">

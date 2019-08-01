@@ -8,7 +8,7 @@
             </div>
 
             <div class="callout pre-login-message" *ngFor="let notice of loginInfo.notices">
-                <div [innerHTML]="notice['htmlText']"></div>
+                <div [innerHTML]="notice['htmlText'] | safeHtml"></div>
             </div>
 
             <h1 class="login-box-msg" [ngClass]="{'message': loginInfo.sessionExpired}">

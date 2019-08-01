@@ -7,7 +7,8 @@ enum RemoteCredentialMethod {
 	OS_KEY('OS Keystore (e.g. PSCredential/SSH Keys)'),
 	PROMPTED('User prompted'),
 	SUPPLIED('Supplied by TransitionManager'),
-	USER_PRIV('User OS privilege')
+	USER_PRIV('User OS privilege'),
+	NO_CREDENTIALS('No Credentials')
 	// AWS_SECRETS('AWS Secrets Manager')
 	// HASHI_VAULT('HashiCorp Vault')
 

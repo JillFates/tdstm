@@ -59,7 +59,7 @@
 								</thead>
 								<tbody *ngIf="selectedFolder">
 									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
-										<td class="asset-explorer-td-actions">
+										<td class="asset-explorer-td-actions k-custom-command-column">
 											<div class="tds-action-button-set">
 												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
 												    tooltip="Edit View"

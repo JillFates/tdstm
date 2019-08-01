@@ -1,5 +1,6 @@
 package net.transitionmanager.common
 
+import com.tdsops.tm.enums.ControlType
 import grails.converters.JSON
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.FieldSpecsCacheService
@@ -218,6 +219,17 @@ class CustomDomainService implements ServiceMethods {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
 
                 for (JSONObject field : customFieldSpec.fields) {
+
+                    if ( field.control == ControlType.LIST.value() && ! field.constraints?.values ) {
+                        List<String> values = distinctValues(project, assetClassType, [fieldSpec: field])
+                        if (values) {
+                            if (! field.constraints) {
+                                field.constraints = [:]
+                            }
+                            field.constraints.values = values
+                        }
+                    }
+
                     if (((String) field.field).startsWith('custom')) {
                         if(field?.constraints?.required){
                             field.bulkChangeActions = CUSTOM_REQUIRED_BULK_ACTIONS as JSONArray
@@ -240,13 +252,13 @@ class CustomDomainService implements ServiceMethods {
      * Retrieve a list of distinct values found for the specified domain and field spec
      * @param project - the project to look up asset distinct values on
      * @param domain - the class name of the domain
-     * @param fieldSpec - the field specification as JSON data
+     * @param fieldSpec - the field specification as Map/Json data
      * @param failOnFirst - flag fail on the first found not in spec (NOT used...)
      * @return a list of the distinct values
      * TODO : distinctValues - this method is Asset specific but the method name give no indication of that
      * TODO : distinctValues - should be changed to require project as param
      */
-    List<String> distinctValues(Project project, String domain, JSONObject fieldSpec, Boolean failOnFirst=false) {
+    List<String> distinctValues(Project project, String domain, Map fieldSpec, Boolean failOnFirst=false) {
         AssetClass assetClass = resolveAssetClassType(domain)
         String fieldName = fieldSpec.fieldSpec?.field
         boolean shared = fieldSpec.fieldSpec?.shared
@@ -578,5 +590,49 @@ class CustomDomainService implements ServiceMethods {
         }
 
         return entity
+    }
+
+    /**
+     * Used to clear all (NULL) custom asset values
+     * This function first filters all fields given for those that are CustomFields
+     * @param project
+     * @param fieldSpec
+     * @return
+     */
+    Map <String, JSONArray> clearFieldSpecsData(Project project, Map fieldSpec) {
+        Map <String, JSONArray> clearedFields = [:]
+        FieldSpecProject fieldSpecProject
+
+        fieldSpec.each { assetClassName, fieldNames ->
+            AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+            if (fieldNames) {
+                if (! fieldSpecProject) {
+                    fieldSpecProject = createFieldSpecProject(project)
+                }
+
+                fieldNames = fieldNames.findAll {
+                    fieldSpecProject.isCustomField(assetClassName, it)
+                }
+
+                if (fieldNames) {
+                    String sql = 'update AssetEntity set '
+
+                    sql += fieldNames.collect {
+                        "$it = NULL"
+                    }.join(', ')
+
+                    sql += ' where project=:project and assetClass=:assetClass'
+
+                    AssetEntity.executeUpdate(
+                            sql,
+                            [project: project, assetClass: assetClass]
+                    )
+
+                    clearedFields[assetClassName] = fieldNames
+                }
+            }
+        }
+
+        return clearedFields
     }
 }

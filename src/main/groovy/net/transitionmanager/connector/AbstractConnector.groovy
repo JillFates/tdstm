@@ -75,21 +75,15 @@ class AbstractConnector {
 	 * @throws InvalidRequestException
 	 */
 	@CompileStatic(TypeCheckingMode.SKIP)	// Due to the dynamic method invocation
-	ApiActionResponse invoke(DictionaryItem dictionaryItem, ActionRequest actionRequest) {
-		if (dictionaryItem) {
-			if (dictionaryItem.method) {
-				log.debug 'invoke({}) about to invoke method {}', dictionaryItem.apiMethod, dictionaryItem.method
-				return "${dictionaryItem.method}"(actionRequest)
+	ApiActionResponse invoke(ApiAction apiAction, ActionRequest actionRequest) {
+			if (apiAction.connectorMethod) {
+				log.debug 'invoke({}) about to invoke method {}', apiAction.connectorMethod
+				return "${apiAction.connectorMethod}"(actionRequest)
 			} else {
 				String msg = "The Action Connector $name is missing method name to invoke"
 				log.error msg
 				throw new InvalidRequestException(msg)
 			}
-		} else {
-			String msg = "The connector $name does not have a dictionary defined"
-			log.error msg
-			throw new InvalidRequestException(msg)
-		}
 	}
 
 

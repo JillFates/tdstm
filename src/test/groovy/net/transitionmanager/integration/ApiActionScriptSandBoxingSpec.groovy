@@ -1,11 +1,9 @@
 package net.transitionmanager.integration
 
-
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.MessageSourceService
-import net.transitionmanager.security.ScriptExpressionChecker
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -144,8 +142,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			}
 
 			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -303,7 +299,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -413,7 +408,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 			ImportCustomizer customizer = new ImportCustomizer()
 
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -521,8 +515,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			}
 
 			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 //			customizer.addStaticStars('java.lang.Math')
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
@@ -561,111 +553,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			request.config.getProperty('proxyAuthHost') == '123.88.23.42'
 			request.config.getProperty('proxyAuthPort') == 8080
 			request.config.getProperty('Exchange.CONTENT_TYPE') == 'application/json'
-	}
-
-	void 'test scripts with prohibited and non prohibited methods for strings and objects'() {
-
-			given:
-				ActionRequest request = new ActionRequest(['format': 'xml'])
-				ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
-					.with(request)
-					.with(new ApiActionResponse())
-					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
-					.with(new ApiActionJob())
-					.build(ReactionScriptCode.PRE)
-
-		and:
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.with {
-				// allow closure creation for the ETL iterate command
-				closuresAllowed = false
-				// disallow method definitions
-				methodDefinitionAllowed = false
-				// Language tokens allowed
-				tokensWhitelist = [
-					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
-				].asImmutable()
-				// Types allowed to be used (Including primitive types)
-				constantTypesClassesWhiteList = [
-					Object, Integer, Float, Long, Double, BigDecimal, String,
-					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
-				].asImmutable()
-				// Classes who are allowed to be receivers of method calls
-				receiversClassesWhiteList = [
-					Math,
-					Object, // TODO: This is too much generic class.
-					Integer, Float, Double, Long, BigDecimal, String
-				].asImmutable()
-			}
-
-			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
-			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
-
-		when: 'A script with a prohibited string method is called'
-			evaluator.evaluate("""
-				'ls /'.execute().text
-			""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			evaluator.evaluate("""
-				'www.google.com'.toURI()
-			""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			evaluator.evaluate("""
-				'ls /'.execute().toURL()
-			""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a prohibited string method is called'
-			evaluator.evaluate("""
-				'5'.asType(Integer)
-			""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
-		when: 'A script with a non-prohibited string method is called'
-			evaluator.evaluate("""
-				'test'.toUpperCase()
-			""".stripIndent(), configuration)
-
-		then: 'no exception is thrown'
-			noExceptionThrown()
-
-		when: 'A script with a non-prohibited object method is called'
-			evaluator.evaluate("""
-				new Object().asBoolean()
-			""".stripIndent(), configuration)
-
-		then: 'no exception is thrown'
-			noExceptionThrown()
-
-		when: 'A script with a non-prohibited string method is called'
-			evaluator.evaluate("""
-				new Object().addShutdownHook({})
-			""".stripIndent(), configuration)
-
-		then: 'a MultipleCompilationErrorsException exception is thrown'
-			thrown MultipleCompilationErrorsException
-
 	}
 }
 

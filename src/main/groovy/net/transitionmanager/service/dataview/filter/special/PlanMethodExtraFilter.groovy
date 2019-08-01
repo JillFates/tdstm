@@ -36,29 +36,27 @@ class PlanMethodExtraFilter extends SpecialExtraFilter {
 
 		String customField = project.planMethodology
 		if (!customField) {
-			throw new InvalidParamException('The Plan Methodology must be configured for project before using the '
-				+ ExtraFilterType.PLAN_METHOD.name
-				+ ' filter.'
-			)
+			return [
+					hqlExpression: " 1=1 ",
+					hqlParams    : [:]
+			]
 		}
 
 		// Unescaping the parameter since it can include HTML encoded characters (like \' == &#39; )
 		String planMethodology = StringEscapeUtils.unescapeHtml(this.filter)
-		if (planMethodology == Application.UNKNOWN) {
+		if (planMethodology == Application.PLAN_METHODOLOGY_UNKNOWN) {
 
 			return [
 				hqlExpression: " COALESCE(AE.${customField}, '') = '' ",
 				hqlParams    : [:]
 			]
 
-		} else {
-
-			return [
-				hqlExpression: " AE.${customField} = :planMethodology ",
-				hqlParams    : [
-					planMethodology: planMethodology
-				]
-			]
 		}
+		return [
+			hqlExpression: " AE.${customField} = :planMethodology ",
+			hqlParams    : [
+				planMethodology: planMethodology
+			]
+		]
 	}
 }

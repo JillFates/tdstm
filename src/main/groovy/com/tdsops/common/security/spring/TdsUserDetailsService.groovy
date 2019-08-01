@@ -56,8 +56,7 @@ class TdsUserDetailsService implements GrailsUserDetailsService {
 			userLogin.password,
 			!userLogin.isDisabled(), // enabled
 			!userLogin.hasExpired(), // accountNonExpired
-			false, // credentialsNonExpired, always false here to avoid an exception, instead
-			       // the UserLogin is set to require a password change
+			!userLogin.hasPasswordExpired(), //credentialsNonExpired
 			!userLogin.isLockedOut(), // accountNonLocked
 			authorities,
 			(long) userLogin.id,

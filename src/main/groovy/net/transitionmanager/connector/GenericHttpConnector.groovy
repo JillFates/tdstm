@@ -30,7 +30,7 @@ class GenericHttpConnector extends AbstractConnector {
 	 * @param actionRequest - the api action request
 	 * @return an api action response
 	 */
-	ApiActionResponse invokeHttpRequest(ActionRequest actionRequest) {
+	ApiActionResponse callEndpoint(ActionRequest actionRequest) {
 		return httpProducerService.executeCall(actionRequest)
 	}
 

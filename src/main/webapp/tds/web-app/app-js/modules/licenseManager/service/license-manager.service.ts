@@ -102,7 +102,9 @@ export class LicenseManagerService {
 			bannerMessage: licenseModel.bannerMessage,
 			gracePeriodDays: licenseModel.gracePeriodDays,
 			websitename: licenseModel.websitename,
-			hostName: licenseModel.hostName
+			hostName: licenseModel.hostName,
+			guid: licenseModel.guid,
+			collectMetrics: licenseModel.collectMetrics
 		};
 		if (licenseModel.method.name !== 'CUSTOM') {
 			licenseModified.method.max = parseInt(licenseModel.method.max, 10);
