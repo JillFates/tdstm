@@ -1,13 +1,11 @@
-import {TestBed, async, fakeAsync, tick, ComponentFixture} from '@angular/core/testing';
-import {DropDownListComponent, DropDownsModule} from '@progress/kendo-angular-dropdowns';
-import {By} from '@angular/platform-browser';
+import {TestBed, async, fakeAsync, tick} from '@angular/core/testing';
+import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {CommonModule} from '@angular/common';
-import {ElementRef, EventEmitter, NO_ERRORS_SCHEMA, Renderer2} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {HttpClientModule} from '@angular/common/http';
 import {NgxsModule} from '@ngxs/store';
-import {of} from 'rxjs';
 
 import {APIActionViewEditComponent} from './api-action-view-edit.component';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -19,12 +17,9 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {en_DICTIONARY} from '../../../../shared/i18n/en.dictionary';
-import {ProviderModel} from '../../../provider/model/provider.model';
 import {DictionaryModel} from '../../model/agent.model';
 import {NumericTextBoxModule} from '@progress/kendo-angular-inputs';
-import {DomainModel} from '../../../fieldSettings/model/domain.model';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {TDSModalPageWrapperComponent} from '../../../../shared/components/modal-page-wrapper/modal-page-wrapper.component';
 
 describe('APIActionViewEditComponent', () => {
 
@@ -73,6 +68,7 @@ describe('APIActionViewEditComponent', () => {
 		}).compileComponents();
 	}));
 
+	// setup function to destructure and use whats needed on each it step
 	function setup() {
 		const fixture = TestBed.createComponent(APIActionViewEditComponent);
 		const comp = fixture.debugElement.componentInstance;
@@ -101,33 +97,43 @@ describe('APIActionViewEditComponent', () => {
 	describe('OnDictionaryValueChange behaviour', () => {
 		it('should prompt the confirmation dialog', fakeAsync(() => {
 
+			// properties needed for this step
 			const { fixture, comp, promptService } = setup();
 
+			// simulate asynchronous time passing and detect any changes
 			tick(500);
 			fixture.detectChanges();
 			tick(500);
 
+			// set modal type to 2 = EDIT so that prompt can be shown
 			comp.modalType = 2;
 			comp.lastSelectedDictionaryModel = dictionaryModel[0];
 
+			// execute onDictionaryValueChange to simulate a new dictionary was selected
 			comp.onDictionaryValueChange(dictionaryModel[0]);
 
+			// prompt should have been called
 			expect(promptService.open).toHaveBeenCalled();
 		}));
 
 		it('should not prompt confirmation dialog', fakeAsync(() => {
 
+			// properties needed for this step
 			const { fixture, comp, promptService } = setup();
 
+			// simulate asynchronous time passing and detect any changes
 			tick(500);
 			fixture.detectChanges();
 			tick(500);
 
+			// set modal type to 0 = CREATE so that prompt cannot be shown
 			comp.modalType = 0;
 			comp.lastSelectedDictionaryModel = dictionaryModel[0];
 
+			// execute onDictionaryValueChange to simulate a new dictionary was selected
 			comp.onDictionaryValueChange(dictionaryModel[0]);
 
+			// prompt shouldn't have been called
 			expect(promptService.open).not.toHaveBeenCalled();
 		}));
 	});
@@ -135,33 +141,43 @@ describe('APIActionViewEditComponent', () => {
 	describe('OnMethodValueChange behaviour', () => {
 		it('should prompt the confirmation dialog', fakeAsync(() => {
 
+			// properties needed for this step
 			const { fixture, comp, promptService } = setup();
 
+			// simulate asynchronous time passing and detect any changes
 			tick(500);
 			fixture.detectChanges();
 			tick(500);
 
+			// set modal type to 2 = EDIT so that prompt cannot be shown
 			comp.modalType = 2;
 			comp.lastSelectedAgentMethodModel = dictionaryModel[0];
 
+			// execute onMethodValueChange to simulate a new dictionary was selected
 			comp.onMethodValueChange(dictionaryModel[0]);
 
+			// prompt should have been called
 			expect(promptService.open).toHaveBeenCalled();
 		}));
 
 		it('should not prompt confirmation dialog', fakeAsync(() => {
 
+			// properties needed for this step
 			const { fixture, comp, promptService } = setup();
 
+			// simulate asynchronous time passing and detect any changes
 			tick(500);
 			fixture.detectChanges();
 			tick(500);
 
+			// set modal type to 0 = CREATE so that prompt cannot be shown
 			comp.modalType = 0;
 			comp.lastSelectedAgentMethodModel = dictionaryModel[0];
 
+			// execute onMethodValueChange to simulate a new dictionary was selected
 			comp.onMethodValueChange(dictionaryModel[0]);
 
+			// prompt shouldn't have been called
 			expect(promptService.open).not.toHaveBeenCalled();
 		}));
 	});
