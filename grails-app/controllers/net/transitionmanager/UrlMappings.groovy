@@ -634,12 +634,12 @@ class UrlMappings {
 			action = [GET: "projects"]
 		}
 
-		"/ws/projectLists" {
+		"/ws/projects/lists" {
 			controller = "wsProject"
 			action = [GET: "projectsForProjectList"]
 		}
 
-		"/ws/createProjectModel" {
+		"/ws/projects/createProjectModel" {
 			controller = "wsProject"
 			action = [GET: "getModelForProjectCreate"]
 		}

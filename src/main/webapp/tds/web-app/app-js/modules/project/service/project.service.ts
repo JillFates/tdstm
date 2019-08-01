@@ -18,7 +18,7 @@ export class ProjectService {
 	}
 
 	getProjects(): Observable<any> {
-		return this.http.get(`../ws/projectLists`)
+		return this.http.get(`../ws/projects/lists`)
 			.map((response: any) => {
 				response.data.activeProjects.forEach((r) => {
 					r.completion = ((r.completion) ? new Date(r.completion) : '');
@@ -43,7 +43,7 @@ export class ProjectService {
 	}
 
 	getModelForProjectCreate() {
-		return this.http.get(`../ws/reports/createProjectModel`)
+		return this.http.get(`../ws/projects/createProjectModel`)
 			.map((response: any) => {
 				return response;
 			})
@@ -60,7 +60,7 @@ export class ProjectService {
 	}
 
 	saveProject(model: ProjectModel, id = ''): Observable<any> {
-		let postRequest = {
+		/*let postRequest = {
 			id: id,
 			name: model.name,
 			description: model.description,
@@ -73,8 +73,8 @@ export class ProjectService {
 			operationalOrder: model.operationalOrder,
 			workflowCode: model.workflowCode,
 			useForPlanning: model.useForPlanning
-		};
-		return this.http.post(`../ws/reports/saveProject/${id}`, JSON.stringify(postRequest))
+		};*/
+		return this.http.post(`../ws/reports/saveProject/${id}`, JSON.stringify(model))
 				.map((response: any) => {
 					return response;
 				})

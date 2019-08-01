@@ -1,18 +1,21 @@
 import {ModalType} from '../../../shared/model/constants';
 
 export class ProjectModel {
-	public name: string;
+	public clientId: number;
+	public projectName: string;
 	public description: string;
-	public fromId: number;
-	public toId: number;
-	public startTime: string;
-	public completionTime: string;
+	public startDate: Date;
+	public completionDate: Date;
+	public partnerIds: number[];
 	public projectManagerId: number;
-	public moveManagerId: number;
-	public moveEventId: number;
-	public operationalOrder: number;
 	public workflowCode: string;
-	public useForPlanning: boolean;
+	public projectCode: string;
+	public projectType: string;
+	public comment: string;
+	public defaultBundle: string;
+	public timeZone: string;
+	public collectReportingMetrics: boolean;
+	public planMethodology: string;
 }
 
 export class ProjectColumnModel {

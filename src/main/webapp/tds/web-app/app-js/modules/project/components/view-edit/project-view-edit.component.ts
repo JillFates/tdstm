@@ -43,17 +43,21 @@ export class ProjectViewEditComponent implements OnInit {
 	ngOnInit() {
 		this.projectModel = new ProjectModel();
 		const defaultProject = {
-			name: '',
+			clientId: 0,
+			projectName: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
-			startTime: '',
-			completionTime: '',
+			startDate: new Date(),
+			completionDate: new Date(),
+			partnerIds: [],
 			projectManagerId: 0,
-			moveManagerId: 0,
-			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
-			useForPlanning: false,
+			projectCode: '',
+			projectType: 'Standard',
+			comment: '',
+			defaultBundle: 'TBD',
+			timeZone: '',
+			collectReportingMetrics: true,
+			planMethodology: 'Migration Method'
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
@@ -106,12 +110,6 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public switchToEdit() {
 		this.editing = true;
-		if (this.projectModel.startTime) {
-			this.startTimePicker.dateValue = this.formatForDateTimePicker(this.projectModel.startTime);
-		}
-		if (this.projectModel.completionTime) {
-			this.completionTimePicker.dateValue = this.formatForDateTimePicker(this.projectModel.completionTime);
-		}
 	}
 
 	private getModel(id) {
@@ -128,9 +126,6 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel = projectModel;
 
 				this.projectModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.projectModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.projectModel.fromId = data.moveProjectInstance.sourceRoom ? data.moveProjectInstance.sourceRoom.id : 0;
-				this.projectModel.toId = data.moveProjectInstance.targetRoom ? data.moveProjectInstance.targetRoom.id : 0;
 
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
@@ -143,22 +138,6 @@ export class ProjectViewEditComponent implements OnInit {
 
 	private updateSavedFields() {
 		this.savedModel = JSON.parse(JSON.stringify(this.projectModel));
-		this.rooms.forEach((room) => {
-			if (room.id === this.savedModel.fromId) {
-				this.sourceRoom = room.roomName;
-			}
-			if (room.id === this.savedModel.toId) {
-				this.targetRoom = room.roomName;
-			}
-		});
-		this.managers.forEach((manager) => {
-			if (manager.staff.id === this.savedModel.projectManagerId) {
-				this.projectManager = manager.name;
-			}
-			if (manager.staff.id === this.savedModel.moveManagerId) {
-				this.moveManager = manager.name;
-			}
-		});
 	}
 
 	public saveForm() {

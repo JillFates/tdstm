@@ -12,7 +12,9 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 export class ProjectCreateComponent implements OnInit {
 	public managers;
 	public workflowCodes;
-	public rooms;
+	public planMethodologies;
+	public clients;
+	public partners;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public projectModel: ProjectModel = null;
 	private defaultModel = null;
@@ -27,17 +29,21 @@ export class ProjectCreateComponent implements OnInit {
 		this.getModel();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
-			name: '',
+			clientId: 0,
+			projectName: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
-			startTime: '',
-			completionTime: '',
+			startDate: new Date(),
+			completionDate: new Date(),
+			partnerIds: [],
 			projectManagerId: 0,
-			moveManagerId: 0,
-			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
-			useForPlanning: false,
+			projectCode: '',
+			projectType: 'Standard',
+			comment: '',
+			defaultBundle: 'TBD',
+			timeZone: '',
+			collectReportingMetrics: true,
+			planMethodology: 'Migration Method'
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
 	}
@@ -45,11 +51,12 @@ export class ProjectCreateComponent implements OnInit {
 	private getModel() {
 		this.projectService.getModelForProjectCreate().subscribe((result: any) => {
 			let data = result.data;
-			this.projectModel.operationalOrder = 1;
 			this.managers = data.managers;
 			this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
 			this.workflowCodes = data.workflowCodes;
-			this.rooms = data.rooms;
+			this.clients = data.clients;
+			this.partners = data.partners;
+			this.planMethodologies = data.planMethodologies;
 		});
 	}
 
