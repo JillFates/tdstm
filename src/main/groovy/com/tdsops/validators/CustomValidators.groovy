@@ -12,6 +12,7 @@ import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.common.CustomDomainService
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.StringUtils
+import org.hibernate.proxy.HibernateProxyHelper
 import org.springframework.validation.Errors
 
 import java.text.NumberFormat
@@ -48,9 +49,12 @@ class CustomValidators {
 			// Get the list of values from the list Closure
 			List<String> validValues = aListClosure.call()
 
+			// Make sure to get the correct class. Under some scenarios, such as dependencies, we get a proxy to the asset.
+			Class domainClass = HibernateProxyHelper.getClassWithoutInitializingProxy(object)
+
 			// Determine if the field supports blank and nullable
-			def blank = GormUtil.getConstraintValue(object.getClass(), fieldName, 'blank')
-			def nullable = GormUtil.getConstraintValue(object.getClass(), fieldName, 'nullable')
+			def blank = GormUtil.getConstraintValue(domainClass, fieldName, 'blank')
+			def nullable = GormUtil.getConstraintValue(domainClass, fieldName, 'nullable')
 
 			if ((value == null && nullable) ||
 			    (value == '' && blank) ||
