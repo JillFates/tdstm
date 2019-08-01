@@ -515,7 +515,7 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 		});
 	}
-	
+
 	/**
 	 * Determine if the tab is enabled
 	 * @param num

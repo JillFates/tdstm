@@ -737,8 +737,4 @@ export class TaskListComponent {
 			}
 		}
 	}
-
-	onTimeout(): void {
-		console.log('timeout');
-	}
 }
