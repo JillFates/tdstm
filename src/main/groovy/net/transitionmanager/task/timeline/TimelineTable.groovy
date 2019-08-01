@@ -1,4 +1,8 @@
 package net.transitionmanager.task.timeline
+
+
+import groovy.time.TimeCategory
+
 /**
  * Calculates following values for vertices in critical path calculation:
  * 1) Earliest start
@@ -9,11 +13,15 @@ package net.transitionmanager.task.timeline
 class TimelineTable {
 
 	Set<TaskVertex> vertices
+	Date windowEndTime
+	Date windowStartTime
 
-	TimelineTable(TaskTimeLineGraph graph, Date startDate) {
+	TimelineTable(TaskTimeLineGraph graph, Date windowStartTime, Date windowEndTime, Date currentTime) {
+		this.windowStartTime = windowStartTime
+		this.windowEndTime = windowEndTime
 		vertices = graph.vertices
 		vertices.each { TaskVertex vertex ->
-			vertex.initialize(startDate)
+			vertex.initialize(currentTime)
 		}
 	}
 
@@ -23,13 +31,18 @@ class TimelineTable {
 	 * @param predecessor
 	 * @return true: any of the times were updated, false otherwise.
 	 */
-	boolean checkAndUpdateEarliestTimes(TaskVertex vertex, TaskVertex successor) {
+	boolean checkAndUpdateEarliestTimes(TaskVertex currentVertex, TaskVertex successor) {
 		boolean timesUpdated = false
 
-		if (successor.earliestStart == 0 || (vertex.earliestFinish > successor.earliestStart)) {
-			successor.earliestStart = vertex.earliestFinish
-			successor.earliestFinish = successor.earliestStart + successor.remainingDuration
-			successor.earliestPredecessor = vertex
+		if (successor.earliestStart == 0 || (currentVertex.earliestFinish > successor.earliestStart)) {
+			successor.earliestStart = currentVertex.earliestFinish
+			successor.earliestFinish = successor.earliestStart + successor.remaining + successor.elapsed
+			successor.criticalPredecessor = currentVertex
+
+			use(TimeCategory) {
+				successor.earliestStartDate = currentVertex.earliestFinishDate
+				successor.earliestFinishDate = successor.earliestStartDate + successor.remaining.minutes + successor.elapsed.minutes
+			}
 
 			timesUpdated = true
 		}
@@ -49,21 +62,16 @@ class TimelineTable {
 
 		if (predecessor.latestFinish > vertex.latestStart) {
 			predecessor.latestFinish = vertex.latestStart
-			predecessor.latestStart = predecessor.latestFinish - predecessor.remainingDuration
-			predecessor.latestPredecessor = predecessor
+			predecessor.latestStart = predecessor.latestFinish - predecessor.remaining - predecessor.elapsed
+
+			use(TimeCategory) {
+				predecessor.latestFinishDate = vertex.latestStartDate
+				predecessor.latestStartDate = predecessor.latestFinishDate - predecessor.remaining.minutes - predecessor.elapsed.minutes
+			}
+
 			timesUpdated = true
 		}
 		return timesUpdated
-	}
-
-
-	/**
-	 * Transform the earliest/latest times into the corresponding duration
-	 */
-	void calculateDatesAndSlacks(Date startDate) {
-		vertices.each { TaskVertex vertex ->
-			vertex.calculateDatesAndSlack(startDate)
-		}
 	}
 
 	/**
@@ -76,7 +84,7 @@ class TimelineTable {
 	void calculateAllPaths(TaskTimeLineGraph taskGraph, TimelineSummary timelineSummary) {
 
 		taskGraph.sinks.each { TaskVertex sink ->
-			List<TaskVertex> earliestPath = getPath(sink, 'earliestPredecessor')
+			List<TaskVertex> earliestPath = getPath(sink)
 
 			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(earliestPath, sink.latestFinish)
 			CriticalPathRoute criticalPathRoute = timelineSummary.criticalPathRoutes.find {
@@ -98,15 +106,14 @@ class TimelineTable {
 	 * to the earliest/latest times.
 	 *
 	 * @param sink
-	 * @param predecessorField
 	 * @return
 	 */
-	private List<TaskVertex> getPath(TaskVertex sink, String predecessorField) {
+	private List<TaskVertex> getPath(TaskVertex sink) {
 		List<TaskVertex> path = []
 		TaskVertex vertex = sink
 		while (vertex != null) {
 			path.add(vertex)
-			vertex = (TaskVertex) vertex[predecessorField]
+			vertex = (TaskVertex) vertex.criticalPredecessor
 		}
 		return path.reverse()
 	}
@@ -115,12 +122,27 @@ class TimelineTable {
 	 * Updates a sink {@code TaskVertex} latest finish
 	 * and latest start before calculate backwards
 	 * critical path algorithm.
+	 *
 	 * @param sink an instance of {@code TaskVertex}
 	 * @see TimeLine#doDijkstraForLatestTimes(net.transitionmanager.task.timeline.TaskVertex, net.transitionmanager.task.timeline.TimeLine.GraphPath)
 	 */
 	void updateSinkLatestTimes(TaskVertex sink) {
+
 		sink.latestFinish = sink.earliestFinish
-		sink.latestStart = sink.latestFinish - sink.remainingDuration
+		sink.latestFinishDate = sink.earliestFinishDate
+
+		Integer windowEndTimeDifference = 0
+		if (!sink.hasStarted() && windowEndTime > sink.latestFinishDate) {
+			use(TimeCategory) {
+				windowEndTimeDifference = (windowEndTime - sink.latestFinishDate).minutes
+			}
+			sink.latestFinishDate = windowEndTime
+		}
+
+		sink.latestStart = sink.latestFinish + windowEndTimeDifference - sink.remaining - sink.elapsed
+		use(TimeCategory) {
+			sink.latestStartDate = sink.latestFinishDate - sink.remaining.minutes - sink.elapsed.minutes
+		}
 
 	}
 

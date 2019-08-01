@@ -15,7 +15,14 @@ class TaskVertex {
 	 * In minutes
 	 */
 	Integer duration
-	Integer remainingDuration
+	/**
+	 *
+	 */
+	Integer remaining
+	/**
+	 *
+	 */
+	Integer elapsed
 
 	String comment
 	String description
@@ -33,17 +40,15 @@ class TaskVertex {
 	List<TaskVertex> successors = []
 	List<TaskVertex> predecessors = []
 
-
 	Integer earliestStart = 0
 	Integer earliestFinish = 0
-	TaskVertex earliestPredecessor
+	TaskVertex criticalPredecessor
 
 	Integer latestStart = 0
 	Integer latestFinish = Integer.MAX_VALUE
-	TaskVertex latestPredecessor
 
 	/* The following fields are only needed if start/finish times must be presented as dates. */
-	Integer slack = 0
+	private Integer slack = 0
 
 	TaskVertex(Integer taskNumber,
 			   String taskComment,
@@ -58,36 +63,23 @@ class TaskVertex {
 		this.duration = duration
 	}
 
-	void initialize(Date startDate) {
+	@CompileStatic(TypeCheckingMode.SKIP)
+	void initialize(Date currentTime) {
 		Integer earliest = 0
 		Integer latest = 0
 		earliestStart = earliest
 		latestStart = latest
-
-		this.remainingDuration = remainingDurationInMinutes(startDate)
+		remaining = remainingDurationInMinutes(currentTime)
+		elapsed = duration - remaining
 
 		if (isStart()) {
 			earliestStart = 0 //startTime
-			earliestFinish = earliestStart + this.remainingDuration
-		}
-	}
+			earliestFinish = earliestStart + remaining + elapsed
 
-	/**
-	 * This method transform the earliest/latest start/finish times into the
-	 * corresponding date values.
-	 * It also calculates the slack for the current task as the difference between
-	 * the latest start time and the earliest start time.
-	 *
-	 * @param startDate
-	 */
-	@CompileStatic(TypeCheckingMode.SKIP)
-	void calculateDatesAndSlack(Date startDate) {
-		slack = latestStart - earliestStart
-		use(TimeCategory) {
-			earliestStartDate = startDate + earliestStart.minutes
-			earliestFinishDate = startDate + earliestFinish.minutes
-			latestStartDate = startDate + latestStart.minutes
-			latestFinishDate = startDate + latestFinish.minutes
+			use(TimeCategory) {
+				earliestStartDate = actualStart ?: currentTime
+				earliestFinishDate = earliestStartDate + remaining.minutes + elapsed.minutes
+			}
 		}
 	}
 
@@ -123,14 +115,14 @@ class TaskVertex {
 	 * @return {@code Integer} value with remaining time
 	 */
 	@CompileStatic(TypeCheckingMode.SKIP)
-	Integer remainingDurationInMinutes(Date pointInTime) {
+	Integer remainingDurationInMinutes(Date currentTime) {
 
-		if (status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]) {
+		if (hasFinished()) {
 			return 0
-		} else if (actualStart != null) {
+		} else if (hasStarted() && actualStart != null) {
 			Integer elapsedTime = 0
 			use(TimeCategory) {
-				elapsedTime = (pointInTime - actualStart).minutes
+				elapsedTime = (currentTime - actualStart).minutes
 			}
 			return this.duration - elapsedTime
 		} else {
@@ -138,6 +130,14 @@ class TaskVertex {
 		}
 	}
 
+	Boolean hasFinished() {
+		return status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]
+	}
+
+
+	Boolean hasStarted() {
+		return status == AssetCommentStatus.STARTED
+	}
 	/**
 	 * A <b>source</b> or <b>start</b> is a vertex with not predecessors
 	 * or incoming edges
@@ -158,6 +158,10 @@ class TaskVertex {
 
 	Boolean isCriticalPath() {
 		return criticalPath
+	}
+
+	Integer getSlack() {
+		return hasStarted() ? 0 : (latestStart - earliestStart)
 	}
 
 	/**

@@ -8,9 +8,9 @@ import net.transitionmanager.project.MoveEvent
  */
 class TimelineSummary {
 
-	Date startDate
-	Date windowStartDate
-	Date windowEndDate
+	Date windowStartTime
+	Date windowEndTime
+	Date currentTime
 
 	MoveEvent moveEvent
 
@@ -20,8 +20,10 @@ class TimelineSummary {
 	List<TaskVertex> longestCriticalPath = []
 	List<CriticalPathRoute> criticalPathRoutes = []
 
-	TimelineSummary(Date startDate) {
-		this.startDate = startDate
+	TimelineSummary(Date windowStartTime, Date windowEndTime, Date currentTime) {
+		this.windowStartTime = windowStartTime
+		this.windowEndTime = windowEndTime
+		this.currentTime = currentTime
 	}
 
 	void addCriticalPathRoute(CriticalPathRoute criticalPathRoute) {

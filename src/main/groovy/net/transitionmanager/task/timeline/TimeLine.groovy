@@ -1,5 +1,6 @@
 package net.transitionmanager.task.timeline
 
+import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -13,15 +14,15 @@ class TimeLine {
 		this.graph = graph
 	}
 
-	TimelineSummary calculate(Date startDate = new Date()) {
+	TimelineSummary calculate(Date windowStartTime, Date windowEndTime, Date currentTime = TimeUtil.nowGMT()) {
 		// Initialize object for results.
-		timelineSummary = new TimelineSummary(startDate)
+		timelineSummary = new TimelineSummary(windowStartTime, windowEndTime, currentTime)
 		// Initialize the table that will contain the information of the graph traversal.
-		timelineTable = new TimelineTable(graph, startDate)
+		timelineTable = new TimelineTable(graph, windowStartTime, windowEndTime, currentTime)
 		// Executes the Critical Path Analysis.
 		executeCriticalPathAnalysis()
 		// Transform the earliest/latest starts into dates and calculate the slack for each task.
-		timelineTable.calculateDatesAndSlacks(startDate)
+		//timelineTable.calculateDatesAndSlacks(startDate)
 		// Build all the paths.
 		timelineTable.calculateAllPaths(graph, timelineSummary)
 
@@ -46,7 +47,6 @@ class TimeLine {
 			timelineTable.updateSinkLatestTimes(sink)
 			doDijkstraForLatestTimes(sink, graphPath)
 		}
-
 	}
 
 	/**
