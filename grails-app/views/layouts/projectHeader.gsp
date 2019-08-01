@@ -143,14 +143,6 @@ int minPasswordLength = tds.minPasswordLength()
 							</tds:hasPermission>
 						</ul>
 					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
-						<ul >
-							<li><g:link class="mmlink" controller="workflow" action="home" onclick="hideMegaMenu('adminMegaMenu')">List Workflows </g:link> </li>
-							<tds:hasPermission permission="${Permission.HelpMenuView}">
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Manufacturers</g:link></li>
