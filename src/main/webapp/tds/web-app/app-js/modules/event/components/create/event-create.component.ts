@@ -3,6 +3,7 @@ import {EventsService} from '../../service/events.service';
 import {EventModel} from '../../model/event.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `event-create`,
@@ -18,6 +19,7 @@ export class EventCreateComponent implements OnInit {
 	constructor(
 		private eventsService: EventsService,
 		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private activeDialog: UIActiveDialogService) {
 	}
 
@@ -79,9 +81,11 @@ export class EventCreateComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.defaultModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close();
