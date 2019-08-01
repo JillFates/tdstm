@@ -336,7 +336,7 @@ export class TaskListComponent {
 		observables.subscribe({
 				next: value => {
 					// Custom Columns, TaskPref value[0]
-					this.builCustomColumns(value[0].customColumns, value[0].assetCommentFields);
+					this.buildCustomColumns(value[0].customColumns, value[0].assetCommentFields);
 					// Current event, value[1]
 					this.loadEventListAndSearch(value[1]);
 					// Task list size, value[2]
@@ -375,7 +375,12 @@ export class TaskListComponent {
 	 * Sets the custom columns headers into the column grid definition
 	 * and builds the available custom columns.
 	 */
-	private builCustomColumns(customColumns: any, assetCommentFields: any): void {
+	private buildCustomColumns(customColumns: any, assetCommentFields: any): void {
+		if (!customColumns && !assetCommentFields) {
+			this.allAvailableCustomColumns = [];
+			this.currentCustomColumns = [];
+			return;
+		}
 		Object.values(customColumns).forEach((custom: string, index: number) => {
 			const column = `userSelectedCol${ index }`;
 			let match = this.columnsModel.find(item => item.property === column);
@@ -414,7 +419,7 @@ export class TaskListComponent {
 		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
 		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
 			.subscribe(result => {
-				this.builCustomColumns(result.customColumns, result.assetCommentFields);
+				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
 				this.search();
 			});
 	}
