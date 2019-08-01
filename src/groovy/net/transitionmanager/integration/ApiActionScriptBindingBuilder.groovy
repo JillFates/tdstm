@@ -4,8 +4,6 @@ import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.i18n.Message
 import net.transitionmanager.service.MessageSourceService
 import net.transitionmanager.task.TaskFacade
-import org.springframework.beans.factory.annotation.Autowired
-
 /**
  * Fluent API for Builder pattern.
  * You must define all the necessary params to build an instance of ApiActionScriptBinding
@@ -86,7 +84,12 @@ class ApiActionScriptBindingBuilder {
 
 		switch (code) {
 			case ReactionScriptCode.PRE:
-				checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
+				if(asset) {
+					checkParams(ReactionScriptCode.PRE, ['request', 'asset', 'task', 'job'])
+				}else{
+					checkParams(ReactionScriptCode.PRE, ['request', 'task', 'job'])
+				}
+
 				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request: request,
@@ -108,7 +111,12 @@ class ApiActionScriptBindingBuilder {
 						])
 				break
 			default:
-				checkParams(ReactionScriptCode.DEFAULT, ['request', 'response', 'asset', 'task', 'job'])
+				if(asset) {
+					checkParams(ReactionScriptCode.DEFAULT, ['request', 'response', 'asset', 'task', 'job'])
+				} else{
+					checkParams(ReactionScriptCode.DEFAULT, ['request', 'response', 'task', 'job'])
+				}
+
 				binding = new ApiActionScriptBinding(messageSourceService,
 						[
 								request : request,
