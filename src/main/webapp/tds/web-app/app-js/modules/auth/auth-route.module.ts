@@ -4,6 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 // Components
 import {LoginComponent} from './components/login/login.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
+import {ChangePasswordComponent} from './components/change-password/change-password.component';
 
 /**
  * Auth Route States
@@ -16,6 +17,9 @@ export class AuthRouteStates {
 	};
 	public static readonly FORGOT_PASSWORD = {
 		url: 'auth/forgot'
+	};
+	public static readonly CHANGE_PASSWORD = {
+		url: 'auth/changePassword'
 	};
 }
 
@@ -40,6 +44,16 @@ export const LoginRoute: Routes = [
 			}
 		},
 		component: ForgotPasswordComponent
+	},
+	{
+		path: AuthRouteStates.CHANGE_PASSWORD.url,
+		data: {
+			page: {
+				hideTopNav: true,
+				title: 'LOGIN.CHANGE_PASSWORD', instruction: '', menu: []
+			}
+		},
+		component: ChangePasswordComponent
 	}
 ];
 
