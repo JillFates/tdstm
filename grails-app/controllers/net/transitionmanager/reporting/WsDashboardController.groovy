@@ -570,7 +570,7 @@ class WsDashboardController implements ControllerMethods {
 
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
-			if(!key) key = Application.UNKNOWN
+			if(!key) key = Application.PLAN_METHODOLOGY_UNKNOWN
 
 			if(!groups[key]) groups[key] = 0
 
@@ -587,7 +587,7 @@ class WsDashboardController implements ControllerMethods {
 		if (customFieldSetting?.constraints?.values) {
 			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 				if ( ! it ) {
-					result[Application.UNKNOWN] = 0
+					result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 				} else if (groupPlanMethodologyCount[it]) {
 					result[it] = 0
 				}

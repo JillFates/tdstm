@@ -145,9 +145,17 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * On save all prevent to the user that underlaying data could be deleted
+	 * just whenever there is a delete action pending to be saved
+	 */
 	protected onSaveAll(): void {
 		this.askForDeleteUnderlayingData()
-			.then((deleteUnderLaying: boolean) => this.notifySaveAll(deleteUnderLaying));
+			.then((deleteUnderLaying: boolean) => {
+				if (deleteUnderLaying) {
+					this.notifySaveAll(deleteUnderLaying)
+				}
+			});
 	}
 
 	/**

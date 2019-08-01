@@ -38,10 +38,12 @@ class ProjectListPage extends Page {
         projectNameFilter           { $("input#gs_projectCode")}
         projectGridPager            { $("div#pg_projectGridIdGridPager")}
         projectNameGridField        {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_projectCode")}
+        projectNameColumn  {$("td", "role": "gridcell", "aria-describedby": "projectGridIdGrid_name")}
         projectDeletedMessage { $("#messageDivId")}
         showActiveBtn { projectView.find("input", type: "button", value: "Show Active Projects")}
         projectsModule { module ProjectsMenuModule}
         commonsModule { module CommonsModule}
+        noRecords (required: false) {$(".ui-paging-info", text:'No records to view')}
     }
 
     def clickOnCreateButton(){
@@ -82,5 +84,22 @@ class ProjectListPage extends Page {
 
     def clickOnActiveProjectsButton(){
         waitFor {showActiveBtn.click()}
+    }
+    /**
+     * Validates the "No Records" message is displayed
+     */
+    def noRecrdsAreDisplayed(){
+        noRecords.displayed
+    }
+
+    def clickOnFirstListedProject(){
+        waitFor {projectNameGridField[0].find("a").click()}
+    }
+
+    def getFirstProjectName(){
+        projectNameColumn[0].text()
+    }
+    def getFirstProjectCode(){
+        projectNameGridField[0].text()
     }
 }
