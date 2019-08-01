@@ -15,6 +15,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
+import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.ObjectUtils
 import org.grails.web.json.JSONArray
@@ -212,11 +213,19 @@ class CustomDomainService implements ServiceMethods {
     void saveFieldSpecs(Project project, String domain, JSONObject fieldSpec) {
         List<String> assetClassTypes = resolveAssetClassTypes(domain)
 
+        Map currentStoredFieldSpecs = [:]
+
+        try{
+            currentStoredFieldSpecs = allFieldSpecs(project, domain)
+        } catch(ConfigurationException silentFail) {}
+
+
         for (String assetClassType : assetClassTypes) {
             JSONObject customFieldSpec = fieldSpec[assetClassType]
 
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
+                List<String> customFieldsToSave = []
 
                 for (JSONObject field : customFieldSpec.fields) {
 
@@ -231,6 +240,8 @@ class CustomDomainService implements ServiceMethods {
                     }
 
                     if (((String) field.field).startsWith('custom')) {
+                        customFieldsToSave << field.field
+
                         if(field?.constraints?.required){
                             field.bulkChangeActions = CUSTOM_REQUIRED_BULK_ACTIONS as JSONArray
                         }else {
@@ -238,6 +249,11 @@ class CustomDomainService implements ServiceMethods {
                         }
                     }
                 }
+
+                List<Map> fields = currentStoredFieldSpecs[assetClassType] ?: []
+                List<String> currentCustomFields = (fields*.field).findAll { it.startsWith('custom') }
+                List<String> customFieldsToClear = CollectionUtils.disjunction( currentCustomFields, customFieldsToSave)
+                clearCustomFields(project, assetClassType, customFieldsToClear)
 
                 settingService.save(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC, assetClassType, customFieldSpec.toString(), customFieldSpecVersion)
             } else {
@@ -604,7 +620,6 @@ class CustomDomainService implements ServiceMethods {
         FieldSpecProject fieldSpecProject
 
         fieldSpec.each { assetClassName, fieldNames ->
-            AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
             if (fieldNames) {
                 if (! fieldSpecProject) {
                     fieldSpecProject = createFieldSpecProject(project)
@@ -615,24 +630,36 @@ class CustomDomainService implements ServiceMethods {
                 }
 
                 if (fieldNames) {
-                    String sql = 'update AssetEntity set '
-
-                    sql += fieldNames.collect {
-                        "$it = NULL"
-                    }.join(', ')
-
-                    sql += ' where project=:project and assetClass=:assetClass'
-
-                    AssetEntity.executeUpdate(
-                            sql,
-                            [project: project, assetClass: assetClass]
-                    )
-
+                    clearCustomFields(project, assetClassName, fieldNames)
                     clearedFields[assetClassName] = fieldNames
                 }
             }
         }
 
         return clearedFields
+    }
+
+    /**
+     * helper method to clear the fieldname values in the assets
+     * @param project
+     * @param assetClassName
+     * @param fieldNames
+     */
+    private void clearCustomFields(Project project, String assetClassName, List<String> fieldNames) {
+        if (fieldNames) {
+            AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+            String sql = 'update AssetEntity set '
+
+            sql += fieldNames.collect {
+                "$it = NULL"
+            }.join(', ')
+
+            sql += ' where project=:project and assetClass=:assetClass'
+
+            AssetEntity.executeUpdate(
+                    sql,
+                    [project: project, assetClass: assetClass]
+            )
+        }
     }
 }

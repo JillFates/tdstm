@@ -54,8 +54,9 @@ export class StringUtils {
 	 */
 	public static removeScapeSequences(value: string): string {
 		return value
+			.replace(new RegExp(/\\{2}/, 'g'), '\\')
 			.replace(new RegExp('\\\\/', 'g'), '/')
 			.replace(new RegExp('\\\\\'', 'g'), '\'')
-			.replace(new RegExp('\\\\\"', 'g'), '\'');
+			.replace(new RegExp('\\\\\"', 'g'), '\"');
 	}
 }
