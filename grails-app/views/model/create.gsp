@@ -26,14 +26,14 @@
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
+			<td class="name"><b>Manufacturer:<span style="color: red">*</span></b></td>
 			<td valign="top" class="name">
 				<g:select id="manufacturerId" name="manufacturer.id" from="${Manufacturer.list([sort:'name',order:'asc'])}" optionKey="id" value="${modelInstance?.manufacturer?.id}" onchange="akaUtil.handleParentPropChange('model')"></g:select>
 				<g:hasErrors bean="${modelInstance}" field="manufacturer">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="manufacturer" /></div>
 				</g:hasErrors>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap"><b>Model Name:<span style="color: red">*</span></b></td>
+			<td class="name" nowrap="nowrap"><b>Model Name:<span style="color: red">*</span></b></td>
 			<td>
 				<input type="text" name="modelName" id="modelNameId" value="${modelInstance?.modelName}" onchange="akaUtil.handleParentPropChange('model')">
 				<g:hasErrors bean="${modelInstance}" field="modelName">
@@ -42,7 +42,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name">AKA:</td>
+			<td class="name">AKA:</td>
 			<td>
 				<table style="border:0px ;margin-left:-8px">
 					<tbody id="addAkaTableId">
@@ -50,14 +50,14 @@
 				</table>
 				<span id="addAkaId" class="addAkaDisabled" onclick="akaUtil.addAka('model')"><b>Add AKA</b></span>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Asset Type:</td>
+			<td class="name" nowrap="nowrap">Asset Type:</td>
 			<td><g:select id="assetTypeId" name="assetType" from="${assetTypes}" value="${modelInstance.assetType}" onchange="showBladeFields(this.value)"></g:select></td>
 		<tr>
-			<td valign="top" class="name">Usize:</td>
+			<td class="name">Usize:</td>
 			<td>
 				<g:select id="usizeId" name="usize" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(modelInstance.class).usize.inList}" value="${modelInstance.usize}"></g:select>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Dimensions(inches):</td>
+			<td class="name" nowrap="nowrap">Dimensions(inches):</td>
 			<td>
 			H:<input type="number" min="0" size="3" name="height" id="heightId" value="" style="width: 44px;"/>
 			W:<input type="number" min="0" size="3" name="width" id="widthId" value="" style="width: 44px;"/>
@@ -65,21 +65,21 @@
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Model Weight:</td>
+			<td class="name" nowrap="nowrap">Model Weight:</td>
 			<td>
 				<input type="number" min="0" max="10000" name="weight" id="weightId" value=""/>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Layout Style:</td>
+			<td class="name" nowrap="nowrap">Layout Style:</td>
 			<td>
 				<input type="text" name="layoutStyle" id="layoutStyle" value=""/>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Product Line:</td>
+			<td class="name" nowrap="nowrap">Product Line:</td>
 			<td>
 				<input type="text" name="productLine" id="productLine" value=""/>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Model Family:</td>
+			<td class="name" nowrap="nowrap">Model Family:</td>
 			<td>
 				<input type="text" name="modelFamily" id="modelFamily" value=""/>
 			</td>
@@ -97,7 +97,7 @@
 					</div>
 				</g:hasErrors>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">End of Life Status:</td>
+			<td class="name" nowrap="nowrap">End of Life Status:</td>
 			<td>
 				<input type="text" name="endOfLifeStatus" id="endOfLifeStatus" value=""/>
 			</td>
@@ -106,7 +106,7 @@
 				<input type = "hidden" id="modelScope" name='modelScope' />
 			</td>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
+			<td class="name" nowrap="nowrap">Power (Max/Design/Avg):</td>
 			<td>
 				<input type="number" size="4" name="powerNameplate" id="powerNameplateCreateId" value="${modelInstance.powerNameplate}"
 					onblur="changePowerValue('Create')" style="width: 50px;"><a id ="namePlateId"  title="Make standard values from nameplate" style="cursor: pointer;vertical-align: top"
@@ -115,17 +115,17 @@
 				<input type="number" size="4" name="powerUse" id="powerUseCreateId" value="${modelInstance.powerUse}" style="width: 50px;">&nbsp;
 				<g:select id="powerTypeId" name='powerType' from="${['Watts','Amps']}" value="${tds.powerType()}" /></td>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">CPU Type :</td>
+			<td class="name" nowrap="nowrap">CPU Type :</td>
 			<td><input type="text" name="cpuType " id="cpuType" value=""/></td>
 		</tr>
 		<!--<tr>
-			<td valign="top" class="name" nowrap="nowrap">Front image:</label></td>
+			<td class="name" nowrap="nowrap">Front image:</label></td>
 			<td><input size="20" type="file" name="frontImage" id="frontImageId" accept="image/*" /></td>
-			<td valign="top" class="name" nowrap="nowrap">Rear image:</td>
+			<td class="name" nowrap="nowrap">Rear image:</td>
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" /></td>
 		</tr>-->
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
-			<td valign="top" class="name">Blade Rows:</td>
+			<td class="name">Blade Rows:</td>
 			<td><input type="text" name="bladeRows" value="${modelInstance.bladeRows}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeRows">
 				<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeRows" /></div>
@@ -133,7 +133,7 @@
 			</td>
 		</tr>
 		<tr id="bladeCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
-			<td valign="top" class="name">Blade Count:</td>
+			<td class="name">Blade Count:</td>
 			<td><input type="text" name="bladeCount" value="${modelInstance.bladeCount}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeCount">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeCount" /></div>
@@ -141,7 +141,7 @@
 			</td>
 		</tr>
 		<tr id="bladeLabelCountId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
-			<td valign="top" class="name">Blade Label Count:</td>
+			<td class="name">Blade Label Count:</td>
 			<td><input type="text" name="bladeLabelCount" value="${modelInstance.bladeLabelCount}" >
 				<g:hasErrors bean="${modelInstance}" field="bladeLabelCount">
 					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="bladeLabelCount" /></div>
@@ -173,25 +173,25 @@
 					<input type="checkbox" name="sourceTDS" id="sourceTDSId"/>
 				</g:else>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">CPU Count:</td>
+			<td class="name" nowrap="nowrap">CPU Count:</td>
 			<td>
 				<input type="number" min="0" max="10000" name="cpuCount" id="cpuCount" value=""/>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name"><label for="useForPlanning">Room Object:</label></td>
+			<td class="name"><label for="useForPlanning">Room Object:</label></td>
 			<td><input type="checkbox" name="roomObject" id="roomObject" ${modelInstance.roomObject ? 'checked="checked"' : ''}/></td>
-			<td valign="top" class="name" nowrap="nowrap">Memory Size:</td>
+			<td class="name" nowrap="nowrap">Memory Size:</td>
 			<td>
 				<input type="number" min="0" max="10000" step="any" name="memorySize" id="memorySize" value=""/>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" class="name" nowrap="nowrap">Validated By:</td>
+			<td class="name" nowrap="nowrap">Validated By:</td>
 			<td>
 				<input type="text" name="validatedBy" id="validatedBy" value="" readonly="readonly"/>
 			</td>
-			<td valign="top" class="name" nowrap="nowrap">Storage Size:</td>
+			<td class="name" nowrap="nowrap">Storage Size:</td>
 			<td>
 				<input type="number" min="0" max="10000" step="any" name="storageSize" id="storageSize" value=""/>
 			</td>
@@ -199,19 +199,19 @@
 		<tr>
 			<td></td>
 			<td></td>
-			<td valign="top" class="name">Notes:</td>
+			<td class="name">Notes:</td>
 			<td><input type="text" name="description" id="descriptionId" value="${modelInstance.description}" ></td>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
-			<td valign="top" class="name" nowrap="nowrap">Source URL :</td>
+			<td class="name" nowrap="nowrap">Source URL :</td>
 			<td><input type="text" name="sourceURL " id="sourceURL " value=""/></td>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
-			<td valign="top" class="name" nowrap="nowrap">Model Status :</td>
+			<td class="name" nowrap="nowrap">Model Status :</td>
 			<td>
 				<g:select id="modelStatus" name='modelStatus' value ='${modelInstance.modelStatus}' from="${['new']}" ></g:select>
 			</td>
