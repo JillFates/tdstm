@@ -1,7 +1,10 @@
 package com.tdssrc.grails
 
+import com.tds.asset.AssetComment
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import grails.transaction.NotTransactional
+import net.transitionmanager.domain.ApiAction
 import org.apache.commons.validator.UrlValidator
 import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
 import org.springframework.web.context.request.RequestContextHolder
@@ -81,6 +84,48 @@ class HtmlUtil {
 			</a>"""
 	}
 
+	/**
+	 * Generate action button in action.
+	 * @param attrs
+	 * Expected attributes:
+	 * apiActionId - api action id
+	 * apiActionInvokedAt - task invoked at
+	 * apiActionCompletedAt - task completed at
+	 * apiActionType - api action type
+	 * id - task id
+	 * status - task status
+	 * onclick - javascript onClick action
+	 *
+	 * @return an HTML ApiAction Invoke button
+	 */
+	@NotTransactional
+	static apiActionButton(Map attrs) {
+		// create a temporary asset comment to be able to use same function as in task manager to generate
+		// invoke api action button
+		AssetComment assetComment = new AssetComment(
+				apiAction: attrs.apiActionId ? new ApiAction(id: attrs.apiActionId, actionType: attrs.apiActionType) : null,
+				apiActionInvokedAt: attrs.apiActionInvokedAt,
+				apiActionCompletedAt: attrs.apiActionCompletedAt,
+				status: attrs.status
+		)
+		Map<String, ?> invokeButtonDetails = assetComment.getInvokeActionButtonDetails()
+		if (invokeButtonDetails) {
+			String name = invokeButtonDetails.label
+			String buttonId = name + "_button_" + attrs.id
+			String labelId = name + "_text_" + attrs.id
+			String tooltip = invokeButtonDetails.tooltipText ? "data-toggle='popover' data-trigger='hover' data-content='${invokeButtonDetails.tooltipText}'" : ''
+			String disabled = invokeButtonDetails.disabled ? 'task_button_disabled' : 'ui-button-text task_button'
+			return """<a 
+					id="${buttonId}" href="javascript:void(0);" 
+					class="task_action ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary task_action btn_${name}"
+					onclick="${invokeButtonDetails.disabled ? 'javascript:void(0);' : attrs.onclick}">
+					<span class="ui-button-icon-primary ui-icon ${invokeButtonDetails.icon} task_icon"></span>
+					<span id="${labelId}" ${tooltip} class="${disabled}">${invokeButtonDetails.label}</span>
+			</a>"""
+		} else {
+			return ''
+		}
+	}
 
 	/**
 	 * Used to determine the CSS class name that should be used when presenting a task, which is based on the task's status
