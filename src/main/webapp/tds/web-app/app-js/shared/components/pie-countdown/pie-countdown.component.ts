@@ -8,7 +8,7 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<span class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="notifyTimeout()"></span>
+				<span *ngIf="!hideRefresh" class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="notifyTimeout()"></span>
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
@@ -24,6 +24,9 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 export class PieCountdownComponent implements OnInit {
 	@Output() timeout: EventEmitter<void> = new EventEmitter<void>();
 	@Input() refreshEverySeconds = 0;
+	@Input() hideRefresh = false;
+	@Input() refreshPreference: string;
+	@Input() customOptions: Array<CountDownItem>;
 	public selectedTimerOption: CountDownItem = null;
 	private interval: any;
 	public timerOptions: Array<CountDownItem> = [
@@ -42,10 +45,17 @@ export class PieCountdownComponent implements OnInit {
 	 * On input changes set the corresponding refresh event parameter
 	 */
 	ngOnInit() {
-		this.preferenceService.getPreferences(PREFERENCES_LIST.EVENTDB_REFRESH)
+		if (this.customOptions) {
+			this.timerOptions = this.customOptions;
+		}
+		let refreshPref = PREFERENCES_LIST.EVENTDB_REFRESH;
+		if (this.refreshPreference) {
+			refreshPref = this.refreshPreference;
+		}
+		this.preferenceService.getPreferences(refreshPref)
 			.subscribe((preferences: any[]) => {
 				this.selectedTimerOption =  {
-					seconds: parseInt(preferences[PREFERENCES_LIST.EVENTDB_REFRESH] || '0', 10),
+					seconds: parseInt(preferences[refreshPref] || '0', 10),
 					description: ''
 				};
 				this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
@@ -70,7 +80,11 @@ export class PieCountdownComponent implements OnInit {
  	 * @param {any} timerOption current timer option selected
 	*/
 	onSelectedTimerOption(timerOption: any): void {
-		this.preferenceService.setPreference(PREFERENCES_LIST.EVENTDB_REFRESH, timerOption.seconds)
+		let refreshPref = PREFERENCES_LIST.EVENTDB_REFRESH;
+		if (this.refreshPreference) {
+			refreshPref = this.refreshPreference;
+		}
+		this.preferenceService.setPreference(refreshPref, timerOption.seconds)
 			.subscribe(() => {
 				this.selectedTimerOption = {seconds : 0, description: ''};
 				setTimeout(() => {

@@ -23,9 +23,9 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
-import {ReplaySubject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from "../../../../shared/constants/common-shrunk-columns";
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'data-script-list',
