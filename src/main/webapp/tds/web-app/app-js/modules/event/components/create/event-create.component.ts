@@ -55,7 +55,7 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime)) {
+		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
@@ -69,6 +69,15 @@ export class EventCreateComponent implements OnInit {
 			return true;
 		} else if (startTime > completionTime) {
 			alert('The completion time must be later than the start time.');
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private validateRequiredFields(model: EventModel): boolean {
+		if (!model.name) {
+			alert('Field "Name" is required.');
 			return false;
 		} else {
 			return true;
