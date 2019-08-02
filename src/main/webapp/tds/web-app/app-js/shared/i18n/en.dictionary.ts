@@ -136,6 +136,9 @@ export const en_DICTIONARY: Object = {
 			}
 		}
 	},
+	'ASSET_EXPORT': {
+		'ASSET_EXPORT': 'Asset Export',
+	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
 		'SUMMARY': 'Summary'
