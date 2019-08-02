@@ -222,7 +222,7 @@ class UrlMappings {
 
 		"/ws/moveEvent/taskCategoriesStats/$moveEventId" {
 			controller = 'wsEvent'
-			action = [GET: 'getTaskCategoriesStats']
+			action = [GET: 'taskCategoriesStats']
 		}
 
 		"/ws/moveEvent/list" {
