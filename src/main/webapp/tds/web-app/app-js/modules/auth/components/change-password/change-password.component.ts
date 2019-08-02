@@ -5,6 +5,8 @@ import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider'
 import {Logout} from '../../action/login.actions';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../model/user-context.model';
+import {RouterUtils} from '../../../../shared/utils/router.utils';
+import {WindowService} from '../../../../shared/services/window.service';
 
 @Component({
 	selector: 'tds-change-password',
@@ -32,7 +34,8 @@ export class ChangePasswordComponent implements OnInit {
 	constructor(
 		private loginService: LoginService,
 		private router: Router,
-		private store: Store) {
+		private store: Store,
+		private windowService: WindowService) {
 	}
 
 	ngOnInit(): void {
@@ -45,9 +48,11 @@ export class ChangePasswordComponent implements OnInit {
 	 * Request Password Recovery by sending email
 	 */
 	public onPasswordChange(): void {
-		this.loginService.forgotPassword(this.email).subscribe((data: any) => {
-			if (!data.success) {
+		this.loginService.updatePassword(this.passwordChangeModel.newPassword, this.passwordChangeModel.confirmPassword).subscribe((res: any) => {
+			if (!res && !res.data.success) {
 				this.error = 'An error occurred, please try again later.';
+			} else {
+				this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute('/project/show');
 			}
 		});
 	}
