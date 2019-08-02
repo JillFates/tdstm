@@ -250,7 +250,7 @@ class CustomDomainService implements ServiceMethods {
                     }
                 }
 
-                List<Map> fields = currentStoredFieldSpecs[assetClassType] ?: []
+                List<Map> fields = (currentStoredFieldSpecs[assetClassType]?.fields) ?: []
                 List<String> currentCustomFields = (fields*.field).findAll { it.startsWith('custom') }
                 List<String> customFieldsToClear = CollectionUtils.disjunction( currentCustomFields, customFieldsToSave)
                 clearCustomFields(project, assetClassType, customFieldsToClear)
