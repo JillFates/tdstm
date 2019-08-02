@@ -523,6 +523,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/user/updatePassword" {
+			controller = 'wsUser'
+			action = [
+				POST: 'updatePassword'
+			]
+		}
+
 		"/auth/loginInfo" {
 			controller = "auth"
 			action = [GET: "getLoginInfo"]
