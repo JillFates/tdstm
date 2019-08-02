@@ -19,6 +19,7 @@ class ProjectDetailsPage extends Page {
         pdProjDetTable { $("table",class:"show-project-table")}
         pdPageMessage (required: false, wait:true) { $("div", class:"message")}  //TODO add ID reference to message div
         // TODO project table have no references to its items
+        pdProjectName {$("#updateShow").find("td.valueNW")[2]}
         pdEditBtn { $("input", type:"submit",class:"edit", name:"_action_Edit")}
         pdDeleteBtn { $("input", type:"submit",class:"delete", name:"_action_Delete")}
         pdFieldSetBtn { $("input", type:"button",class:"show")}
@@ -31,5 +32,9 @@ class ProjectDetailsPage extends Page {
 
     def clickOnDeleteButtonAndConfirm(){
         withConfirm(true){waitFor{pdDeleteBtn.click()}}
+    }
+
+    def clickEdit(){
+        pdEditBtn.click()
     }
 }

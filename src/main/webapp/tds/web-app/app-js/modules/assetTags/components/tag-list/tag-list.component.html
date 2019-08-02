@@ -36,7 +36,7 @@
                     </ng-template>
 
                     <!-- Action -->
-                    <kendo-grid-command-column [width]="85" [locked]="true">
+                    <kendo-grid-command-column  [width]="62" [class]="{'k-custom-command-column': true}" [locked]="true">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="text-center">
                                 <label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>

@@ -1,5 +1,5 @@
 // Angular
-import {Component} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -19,13 +19,15 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TagService} from '../../service/tag.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {takeUntil} from 'rxjs/operators';
+import {ReplaySubject} from 'rxjs';
 
 @Component({
 	selector: 'tag-list',
 	templateUrl: 'tag-list.component.html',
 	providers: [TranslatePipe]
 })
-export class TagListComponent {
+export class TagListComponent implements OnInit, OnDestroy {
 
 	public gridSettings: DataGridOperationsHelper;
 	protected gridColumns: TagListColumnsModel;
@@ -36,6 +38,7 @@ export class TagListComponent {
 	protected dateFormat: string;
 
 	private readonly REMOVE_CONFIRMATION = 'ASSET_TAGS.TAG_LIST.REMOVE_CONFIRMATION';
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private tagService: TagService,
@@ -44,7 +47,11 @@ export class TagListComponent {
 		private promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
 		private userContext: UserContextService) {
+	}
+
+	ngOnInit(): void {
 		this.userContext.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.gridColumns = new TagListColumnsModel(`{0:${this.dateFormat}}`);
@@ -57,7 +64,9 @@ export class TagListComponent {
 	 */
 	private onLoad(): void {
 		this.colorList = this.tagService.getTagColorList();
-		this.tagService.getTags().subscribe( (result: ApiResponseModel) => {
+		this.tagService.getTags()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.gridSettings = new DataGridOperationsHelper(result.data,
 					[{ dir: 'asc', field: 'name'}], // initial sort config.
@@ -95,7 +104,9 @@ export class TagListComponent {
 			this.translatePipe.transform(PROMPT_CONFIRM),
 			this.translatePipe.transform(PROMPT_CANCEL)).then(result => {
 			if (result) {
-				this.tagService.deleteTag(dataItem.id).subscribe( (result: ApiResponseModel) => {
+				this.tagService.deleteTag(dataItem.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (result: ApiResponseModel) => {
 					if (result.status === ApiResponseModel.API_SUCCESS) {
 						this.reloadTagList();
 					} else {
@@ -192,7 +203,9 @@ export class TagListComponent {
 	 * @param rowIndex
 	 */
 	private createTag(tagModel: TagModel, sender, rowIndex): void {
-		this.tagService.createTag(tagModel).subscribe( (result: ApiResponseModel) => {
+		this.tagService.createTag(tagModel)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
@@ -209,7 +222,9 @@ export class TagListComponent {
 	 * @param rowIndex
 	 */
 	private updateTag(tagModel: TagModel, sender, rowIndex): void {
-		this.tagService.updateTag(tagModel).subscribe( (result: ApiResponseModel) => {
+		this.tagService.updateTag(tagModel)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.finishSave(sender, rowIndex);
 				this.reloadTagList();
@@ -235,7 +250,9 @@ export class TagListComponent {
 	 * Reloads the current tag list from grid.
 	 */
 	private reloadTagList(): void {
-		this.tagService.getTags().subscribe((result: ApiResponseModel) => {
+		this.tagService.getTags()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS) {
 				this.gridSettings.reloadData(result.data);
 			} else {
@@ -278,5 +295,16 @@ export class TagListComponent {
 
 	protected canMerge(): boolean {
 		return this.permissionService.hasPermission(Permission.TagMerge);
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

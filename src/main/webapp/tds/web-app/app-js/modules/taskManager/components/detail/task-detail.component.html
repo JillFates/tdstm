@@ -167,7 +167,7 @@
                                                     <td class="valueNW"><span>{{model.durationDelta}}</span></td>
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail && model.apiActionInvokedAt" class="prop">
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label N" nowrap="nowrap">
                                                          <label><span>Completion %:</span></label>
                                                     </td>
@@ -319,6 +319,7 @@
                             (start)="onStartTask()"
                             (done)="onDoneTask()"
                             (invoke)="onInvoke()"
+														(reset)="onReset()"
                             (assignToMe)="onAssignToMe()"
                             (neighborhood)="onNeighborhood()"
                             [options]="getShowTaskActionsOptions()"

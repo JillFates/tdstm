@@ -1,9 +1,27 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild, OnChanges, SimpleChanges, ChangeDetectionStrategy} from '@angular/core';
-import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
+import {
+	Component,
+	EventEmitter,
+	Input,
+	OnInit,
+	Output,
+	ViewChild,
+	OnChanges,
+	SimpleChanges,
+	ChangeDetectionStrategy,
+	OnDestroy, HostListener
+} from '@angular/core';
+import {Observable, ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
-import {DataStateChangeEvent, GridDataResult, RowClassArgs} from '@progress/kendo-angular-grid';
+import {
+	DataStateChangeEvent,
+	GridDataResult,
+	RowClassArgs
+} from '@progress/kendo-angular-grid';
+
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {Observable} from 'rxjs';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
 	DIALOG_SIZE,
@@ -45,7 +63,7 @@ import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/compon
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import {UserContextModel} from '../../../auth/model/user-context.model';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -59,7 +77,7 @@ declare var jQuery: any;
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: 'asset-view-grid.component.html'
 })
-export class AssetViewGridComponent implements OnInit, OnChanges {
+export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() data: any;
 	@Input() model: ViewSpec;
 	@Input() gridState: State;
@@ -114,6 +132,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 	protected SELECT_ALL_COLUMN_WIDTH = SELECT_ALL_COLUMN_WIDTH;
 	private canCreateAssets: boolean;
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private preferenceService: PreferenceService,
@@ -140,7 +161,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetExplorerCreate);
 
 		this.selectedAssetsForBulk = [];
-		this.getPreferences().subscribe((preferences: any) => {
+		this.getPreferences()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((preferences: any) => {
 			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
 
 			this.bulkCheckboxService.setPageSize(this.gridState.take);
@@ -170,14 +193,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		// Listen to any Changes outside the model, like Asset Edit Views
 		this.eventListeners();
 		this.getCurrentUser();
-
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
 		const dataChange = changes['data'];
 
 		if (dataChange && dataChange.currentValue !== dataChange.previousValue) {
-			this.applyData(dataChange.currentValue)
+			this.applyData(dataChange.currentValue);
 		}
 
 	}
@@ -640,7 +662,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 	onChangeJustPlanning(isChecked = false): void {
 		this.justPlanningChange.emit(isChecked);
 
-		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString()).subscribe(() => {
+		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(() => {
 			this.onReload();
 		});
 	}
@@ -666,11 +690,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 			model: this.model,
 			justPlanning: this.justPlanning
 		}, this.getBulkAssetIdsFromView.bind(this))
-		.subscribe((results: any) => {
-			this.bulkItems = [...results.selectedAssetsIds];
-			this.selectedAssetsForBulk = [...results.selectedAssets];
-			this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
-		}, (err) => console.log('Error:', err));
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((results: any) => {
+				this.bulkItems = [...results.selectedAssetsIds];
+				this.selectedAssetsForBulk = [...results.selectedAssets];
+				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+			}, (err) => console.log('Error:', err));
 	}
 
 	hasSelectedItems(): boolean {
@@ -684,6 +709,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 
 	private getCurrentUser() {
 		this.userService.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe( (user: any) => {
 				this.currentUser = user;
 			}, (error: any) => console.log(error));
@@ -721,5 +747,16 @@ export class AssetViewGridComponent implements OnInit, OnChanges {
 		}
 
 		return this.assetExplorerService.query(viewId, payload);
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

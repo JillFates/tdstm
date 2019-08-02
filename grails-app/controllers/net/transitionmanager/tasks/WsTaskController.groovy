@@ -3,6 +3,7 @@ package net.transitionmanager.tasks
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
@@ -10,6 +11,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
@@ -24,6 +26,7 @@ import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 
 /**
@@ -42,6 +45,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	ApiActionService apiActionService
 	CredentialService credentialService
     UserPreferenceService userPreferenceService
+    AssetEntityService assetEntityService
 
 	/**
 	 * Publishes a TaskBatch that has been generated before
@@ -273,7 +277,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
 		Map params = request.JSON
-        println(params)
         if (params.containsKey("justRemaining") && params.justRemaining in [0, 1]) {
             userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
         }
@@ -311,4 +314,62 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
 		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)
 	}
+
+    @HasPermission(Permission.TaskManagerView)
+    def listCustomColumns() {
+        Map taskPref = assetEntityService.getExistingPref(UserPreferenceEnum.Task_Columns)
+        def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
+        Map modelPref = [:]
+        /*String[] modelPref2 = new String[taskPref.keySet().size()]*/
+        taskPref.eachWithIndex { key, value, index -> modelPref[index] = value }
+        /* taskPref.eachWithIndex { key, value, index -> modelPref['userSelectedCol' + index] = assetCommentFields[value] } */
+        renderAsJson(customColumns: modelPref, assetCommentFields: assetCommentFields)
+    }
+
+    /**
+     * used to set the Application custom columns pref as JSON
+     * @param columnValue
+     * @param from
+     * @render true
+     */
+    @HasPermission(Permission.TaskManagerView)
+    def setCustomColumns() {
+        Map requestParams = request.JSON
+        def column = requestParams.columnValue
+        String fromKey = requestParams.from
+        def prefCode = requestParams.type as UserPreferenceEnum
+        println(requestParams)
+        assert prefCode
+        def existingColsMap = assetEntityService.getExistingPref(prefCode)
+        String key = existingColsMap.find { it.value == column }?.key
+        if (key) {
+            existingColsMap[key] = requestParams.previousValue
+        }
+
+        existingColsMap[fromKey] = column
+        userPreferenceService.setPreference(prefCode, existingColsMap as JSON)
+        def assetCommentFields = AssetComment.taskCustomizeFieldAndLabel
+        renderAsJson(customColumns: existingColsMap, assetCommentFields: assetCommentFields)
+    }
+
+	/**
+	 * Retrieve the information required by the front-end for rendering the Action Bar for a given Task.
+	 * @param taskId - the id of the task.
+	 * @return the API Action ID (if any), the ID of the person assigned to the task (if any), the number of
+	 *  successors and predecessors.
+	 */
+    @HasPermission(Permission.TaskManagerView)
+    def getInfoForActionBar(Long taskId) {
+        Project project = getProjectForWs()
+        AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
+        renderAsJson(
+                apiActionId: task.apiAction?.id,
+                apiActionInvokedAt: task.apiActionInvokedAt,
+                apiActionCompletedAt: task.apiActionCompletedAt,
+                assignedTo: task.assignedTo?.id,
+                predecessorsCount: task.taskDependencies.size(),
+                successorsCount: TaskDependency.countByPredecessor(task),
+                category: task.category
+        )
+    }
 }

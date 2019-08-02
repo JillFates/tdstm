@@ -141,8 +141,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					this.metaParam = this.getMetaParam();
 				}
 
-				if (classForAsset) {
+				if (classForAsset && classForAsset.assetClass) {
 					this.model.assetClass = {id: classForAsset.assetClass, text: ''};
+				} else {
+					this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
 				}
 
 				jQuery('[data-toggle="popover"]').popover();

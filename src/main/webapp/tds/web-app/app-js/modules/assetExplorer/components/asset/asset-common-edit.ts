@@ -17,6 +17,7 @@ import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/direc
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -47,7 +48,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		protected notifierService: NotifierService,
 		protected tagService: TagService,
 		protected metadata: any,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
+	) {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 
@@ -171,9 +174,11 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	protected promptSaveChanges(): void {
 		this.promptService.open(
-			'Abandon Changes?',
-			'You have unsaved changes. Click Confirm to abandon your changes.',
-			'Confirm', 'Cancel').then(result => {
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+		).then(result => {
 			if (result) {
 				this.cancelCloseDialog();
 			} else {

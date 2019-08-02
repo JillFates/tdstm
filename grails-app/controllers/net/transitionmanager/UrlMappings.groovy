@@ -431,6 +431,19 @@ class UrlMappings {
 			action = [POST:"listTasks"]
 		}
 
+		"/ws/task/getInfoForActionBar/$taskId" {
+			controller = "wsTask"
+			action = [GET: "getInfoForActionBar"]
+		}
+
+        "/ws/task/customColumns" {
+            controller = "wsTask"
+            action = [
+                    GET:"listCustomColumns",
+                    POST: "setCustomColumns"
+            ]
+        }
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]

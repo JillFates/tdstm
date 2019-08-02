@@ -4,12 +4,12 @@
 
 // Angular
 import {NgModule} from '@angular/core';
-// Services
-import {TaskService} from './service/task.service';
 import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 import {SharedModule} from '../../shared/shared.module';
 import {AssetExplorerModule} from '../assetExplorer/asset-explorer.module';
-import {FormsModule} from '@angular/forms';
+// Services
+import {TaskService} from './service/task.service';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {PopupModule} from '@progress/kendo-angular-popup';
@@ -46,11 +46,10 @@ import {ReportsService} from '../reports/service/reports.service';
 	],
 	providers: [
 		// Resolve
-		TagsResolveService,
 		ModuleResolveService,
-		// Services
-		TaskService,
-		ReportsService
+		TagsResolveService,
+		ReportsService,
+		TaskService
 	],
 })
 

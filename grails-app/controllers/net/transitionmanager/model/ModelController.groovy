@@ -158,6 +158,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			def powerUsed = params.float("powerUse", 0f)
 			def powerType = params.powerType
 			def endOfLifeDate = params.endOfLifeDate
+			def memorySize = params.double("memorySize", 0f)
+			def storageSize = params.double("storageSize", 0f)
 
 			if (endOfLifeDate) {
 				params.endOfLifeDate = TimeUtil.parseDate(endOfLifeDate)
@@ -179,6 +181,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			modelInstance.powerUse = powerUsed
 			modelInstance.powerDesign = powerDesign
 			modelInstance.powerNameplate = powerNameplate
+			modelInstance.memorySize = memorySize
+			modelInstance.storageSize = storageSize
 
 			if (params.modelStatus == 'valid') {
 				modelInstance.validatedBy = securityService.loadCurrentPerson()
@@ -298,6 +302,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 
 				def modelAliases = ModelAlias.findAllByModel(model)
 				def paramsMap = [
+					angularModalDialog : params.angularModalDialog,
 					modelInstance  : model,
 					modelConnectors: modelConnectors,
 					otherConnectors: otherConnectors,
@@ -337,6 +342,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				def powerDesign = params.float("powerDesign", 0f)
 				def powerUsed = params.float("powerUse", 0f)
 				def powerType = params.powerType
+				def memorySize = params.double("memorySize", 0f)
+				def storageSize = params.double("storageSize", 0f)
 
 				if (powerType == "Amps") {
 					powerNameplate = powerNameplate * 120
@@ -349,6 +356,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				params.powerNameplate = powerNameplate
 				params.powerDesign = powerDesign
 				params.powerUse = powerUsed
+				params.memorySize = memorySize
+				params.storageSize = storageSize
 
 				def frontImage = request.getFile("frontImage")
 				if (frontImage && frontImage?.getBytes()?.getSize() > 0) {
@@ -634,23 +643,27 @@ class ModelController implements ControllerMethods, PaginationMethods {
 				WorkbookUtil.addCell(modelSheet, 15, r+1, String.valueOf(models[r].sourceTDSVersion ? models[r].sourceTDSVersion : 1))
 				WorkbookUtil.addCell(modelSheet, 16, r+1, String.valueOf(models[r].useImage == 1 ? "yes" : "no"))
 				WorkbookUtil.addCell(modelSheet, 17, r+1, String.valueOf(models[r].usize ? models[r].usize : ""))
-				WorkbookUtil.addCell(modelSheet, 18, r+1, String.valueOf(models[r].height ? models[r].height : ""))
-				WorkbookUtil.addCell(modelSheet, 19, r+1, String.valueOf(models[r].weight ? models[r].weight : ""))
-				WorkbookUtil.addCell(modelSheet, 20, r+1, String.valueOf(models[r].depth ? models[r].depth : ""))
-				WorkbookUtil.addCell(modelSheet, 21, r+1, String.valueOf(models[r].width ? models[r].width : ""))
-				WorkbookUtil.addCell(modelSheet, 22, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: ""))
-				WorkbookUtil.addCell(modelSheet, 23, r+1, String.valueOf(models[r].productLine ? models[r].productLine :""))
-				WorkbookUtil.addCell(modelSheet, 24, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :""))
-				WorkbookUtil.addCell(modelSheet, 25, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :""))
-				WorkbookUtil.addCell(modelSheet, 26, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :""))
-				WorkbookUtil.addCell(modelSheet, 27, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :""))
-				WorkbookUtil.addCell(modelSheet, 28, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :""))
-				WorkbookUtil.addCell(modelSheet, 29, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : ""))
-				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
-				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
-				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
-				WorkbookUtil.addCell(modelSheet, 33, r+1, TimeUtil.formatDate(models[r].dateCreated))
-				WorkbookUtil.addCell(modelSheet, 34, r+1, TimeUtil.formatDate(models[r].lastModified))
+				WorkbookUtil.addCell(modelSheet, 18, r+1, String.valueOf(models[r].cpuType ? models[r].cpuType : ""))
+				WorkbookUtil.addCell(modelSheet, 19, r+1, String.valueOf(models[r].cpuCount ? models[r].cpuCount : ""))
+				WorkbookUtil.addCell(modelSheet, 20, r+1, String.valueOf(models[r].memorySize ? models[r].memorySize : ""))
+				WorkbookUtil.addCell(modelSheet, 21, r+1, String.valueOf(models[r].storageSize ? models[r].storageSize : ""))
+				WorkbookUtil.addCell(modelSheet, 22, r+1, String.valueOf(models[r].height ? models[r].height : ""))
+				WorkbookUtil.addCell(modelSheet, 23, r+1, String.valueOf(models[r].weight ? models[r].weight : ""))
+				WorkbookUtil.addCell(modelSheet, 24, r+1, String.valueOf(models[r].depth ? models[r].depth : ""))
+				WorkbookUtil.addCell(modelSheet, 25, r+1, String.valueOf(models[r].width ? models[r].width : ""))
+				WorkbookUtil.addCell(modelSheet, 26, r+1, String.valueOf(models[r].layoutStyle ? models[r].layoutStyle: ""))
+				WorkbookUtil.addCell(modelSheet, 27, r+1, String.valueOf(models[r].productLine ? models[r].productLine :""))
+				WorkbookUtil.addCell(modelSheet, 28, r+1, String.valueOf(models[r].modelFamily ? models[r].modelFamily :""))
+				WorkbookUtil.addCell(modelSheet, 29, r+1, String.valueOf(models[r].endOfLifeDate ? models[r].endOfLifeDate :""))
+				WorkbookUtil.addCell(modelSheet, 30, r+1, String.valueOf(models[r].endOfLifeStatus ? models[r].endOfLifeStatus :""))
+				WorkbookUtil.addCell(modelSheet, 31, r+1, String.valueOf(models[r].createdBy ? models[r].createdBy :""))
+				WorkbookUtil.addCell(modelSheet, 32, r+1, String.valueOf(models[r].updatedBy ? models[r].updatedBy :""))
+				WorkbookUtil.addCell(modelSheet, 33, r+1, String.valueOf(models[r].validatedBy ? models[r].validatedBy : ""))
+				WorkbookUtil.addCell(modelSheet, 34, r+1, String.valueOf(models[r].sourceURL ? models[r].sourceURL :""))
+				WorkbookUtil.addCell(modelSheet, 35, r+1, String.valueOf(models[r].modelStatus ? models[r].modelStatus:""))
+				WorkbookUtil.addCell(modelSheet, 36, r+1, String.valueOf(models[r].modelScope ? models[r].modelScope :""))
+				WorkbookUtil.addCell(modelSheet, 37, r+1, TimeUtil.formatDate(models[r].dateCreated))
+				WorkbookUtil.addCell(modelSheet, 38, r+1, TimeUtil.formatDate(models[r].lastModified))
 			}
 
 			def connectorSheet = book.getSheet("connector")
@@ -732,7 +745,12 @@ class ModelController implements ControllerMethods, PaginationMethods {
 						bladeHeight:model.bladeHeight,
 						sourceTDSVersion:model.sourceTDSVersion,
 						powerNameplate: powerNameplate,
-						powerDesign : powerDesign]
+						powerDesign : powerDesign,
+						cpuType : model.cpuType,
+						cpuCount : model.cpuCount,
+						memorySize : model.memorySize,
+						storageSize : model.storageSize
+		]
 		render modelMap as JSON
 	}
 

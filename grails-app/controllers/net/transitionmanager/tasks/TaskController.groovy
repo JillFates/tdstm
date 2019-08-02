@@ -33,7 +33,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
@@ -82,7 +81,6 @@ class TaskController implements ControllerMethods {
 	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService

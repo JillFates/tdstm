@@ -1,6 +1,5 @@
 <div class="modal fade in model-device-show-component" tds-handle-escape (escPressed)="cancelCloseDialog()" id="model-device-show-component" data-backdrop="static"
      tabindex="-1" role="dialog">
-	<form id="editModelForm" action="/tdstm/model/edit" method="post" target="_blank">
 		<div class="modal-dialog modal-sm" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -52,6 +51,30 @@
 							</div>
 							<div class="row">
 								<div class="form-group">
+									<div class="col-md-6">CPU Type:</div>
+									<div class="col-md-6">{{deviceModel.cpuType}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-6">CPU Count:</div>
+									<div class="col-md-6">{{deviceModel.cpuCount}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-6">Memory Size:</div>
+									<div class="col-md-6">{{deviceModel.memorySize}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
+									<div class="col-md-6">Storage Size:</div>
+									<div class="col-md-6">{{deviceModel.storageSize}}</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group">
 									<div class="col-md-6">Source TDS:</div>
 									<div class="col-md-6">
 										<input type="checkbox" name="sourceTDS" disabled="disabled"/>
@@ -69,12 +92,11 @@
 				</div>
 				<div class="modal-footer form-group-center">
 					<input name="id" type="hidden" id="show_modelId" value="{{deviceModel.id}}">
-					<button type="submit" [disabled]="!canEditModel()" class="btn btn-primary pull-left" (click)="onEditModel()">
+					<button type="button" [disabled]="!canEditModel()" (click)="onEditModel()" class="btn btn-primary pull-left">
 						<span class="glyphicon glyphicon-pencil"></span> Edit</button>
 					<button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
 						<span class="glyphicon glyphicon-ban-circle"></span> Close</button>
 				</div>
 			</div>
 		</div>
-	</form>
 </div>
