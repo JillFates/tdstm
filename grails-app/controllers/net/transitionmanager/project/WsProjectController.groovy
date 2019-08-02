@@ -17,8 +17,6 @@ import net.transitionmanager.exception.InvalidParamException
 @Slf4j
 class WsProjectController implements ControllerMethods {
 
-	ProjectService projectService
-
 	/**
 	 * Gets the projects associated to a user
 	 */

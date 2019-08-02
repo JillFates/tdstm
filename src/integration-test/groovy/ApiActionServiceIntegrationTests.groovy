@@ -218,7 +218,7 @@ class ApiActionServiceIntegrationTests extends Specification{
 //			awsConnector.awsService = awsService
 //
 //		when: 'calling the invoke method on the service'
-//			apiActionService.invoke(action, task)
+//			apiActionService.invoke(action, task, whom)
 //		then: 'the awsService.sendSnsNotification should be called with proper params'
 //			1 * awsService.sendSnsMessage(action.asyncQueue, { validateSendSnsMessageMap(it) } )
 //	}
@@ -295,10 +295,8 @@ class ApiActionServiceIntegrationTests extends Specification{
 			apiActionService.validateApiActionName(project1, apiAction1.name, apiAction1.id)
 		and: "True when changing the name for an existing Action with a valid input (an update operation)"
 			apiActionService.validateApiActionName(project1, apiAction2.name, apiAction1.id)
-		and: "User current project when no project is given."
-			apiActionService.validateApiActionName(null, apiAction1.name)
 		and: "False when no name is given."
-			! apiActionService.validateApiActionName(project1, null)
+			!apiActionService.validateApiActionName(project1, null)
 
 	}
 

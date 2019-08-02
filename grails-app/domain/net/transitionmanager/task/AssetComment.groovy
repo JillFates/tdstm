@@ -88,11 +88,8 @@ class AssetComment {
 	// Any settings for the API Action that will override the settings in the apiAction (stored as JSON)
 	String apiActionSettings
 
-	// The percentage of the action duration that has been completed (set by API call)
-	Integer apiActionPercentDone = 0
-
 	// The percentage of the task that has been completed (manually set by users)
-	Integer taskPercentDone = 0
+	Integer percentageComplete = 0
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
@@ -166,8 +163,7 @@ class AssetComment {
 		apiActionCompletedAt nullable: true
 		apiActionSettings nullable: true
 		score nullable: true
-		apiActionPercentDone nullable: true, range: 0..100
-		taskPercentDone nullable: false, range: 0..100
+		percentageComplete nullable: false, range: 0..100
 	}
 
 	static mapping = {
@@ -312,6 +308,14 @@ class AssetComment {
 		return hasAction() && !apiActionInvokedAt && !apiAction.isRemote && status in [READY, STARTED]
 	}
 
+	/**
+	 * Returns true if method can be invoked on server (WebAPI) otherwise false
+	 * @return
+	 */
+	Boolean canInvokeOnServer() {
+		return hasAction() && ActionType.WEB_API.equals(apiAction.actionType)
+	}
+
 	/*
 	 * Used to determine if the task action can be invoked remotely
 	 *
@@ -327,21 +331,11 @@ class AssetComment {
 	}
 
 	/**
-	 * Get invoke api action buttom details (enabled, disabled, alt text, etc)
-	 * @param disabled - whether button should be disabled or not
-	 * @param alt - alt message to show if apply
+	 * Returns true if method can be invoked remotely in TM Desktop (e.g. scripts) otherwise false
 	 * @return
 	 */
-	Map<String, ?> getInvokeButtonDetails(boolean disabled, String alt) {
-		return [
-				label      : 'Invoke',
-				icon       : 'ui-icon-gear',
-				actionType : 'invokeAction',
-				newStatus  : STARTED,
-				redirect   : 'taskManager',
-				disabled   : disabled,
-				tooltipText: alt
-		]
+	Boolean canInvokeRemotely() {
+		return hasAction() && !ActionType.WEB_API.equals(apiAction.actionType)
 	}
 
 	/**
@@ -350,23 +344,35 @@ class AssetComment {
 	 * @return
 	 */
 	Map<String, ?> getInvokeActionButtonDetails() {
-		boolean canInvokeOnServer = (hasAction() && ActionType.WEB_API == apiAction.actionType)
-		boolean canInvokeRemotely = (hasAction() && !ActionType.WEB_API == apiAction.actionType)
+		boolean canInvokeOnServer = canInvokeOnServer()
+		boolean canInvokeRemotely = canInvokeRemotely()
 		if (isAutomatic() || (!canInvokeOnServer && !canInvokeRemotely)) {
 			return null
 		}
 
+		Closure<Map<String, ?>> invokeButtonDetails = { boolean disabled, String alt ->
+			return [
+					label      : 'Invoke',
+					icon       : 'ui-icon-gear',
+					actionType : 'invokeAction',
+					newStatus  : STARTED,
+					redirect   : 'taskManager',
+					disabled   : disabled,
+					tooltipText: alt
+			]
+		}
+
 		if (canInvokeOnServer) {
 			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(false, null)
+				return invokeButtonDetails(false, null)
 			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
 			}
 		} else if (canInvokeRemotely) {
 			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action must be invoked from TM Desktop')
+				return invokeButtonDetails(true, 'Action must be invoked from TM Desktop')
 			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
+				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
 			}
 		}
 
@@ -426,8 +432,14 @@ class AssetComment {
 			actionMap = [
 			    id: apiAction.id,
 				name: apiAction.name,
-				isRemote: false,
-				type: 'Api',
+				isRemote: apiAction.isRemote,
+				actionType: [
+					id: apiAction.actionType.name(),
+					name: apiAction.actionType.toString()
+				],
+				description: apiAction.description,
+				remoteCredentialMethod :
+					(apiAction.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
 				invokedAt: apiActionInvokedAt,
 				completedAt: apiActionCompletedAt
 			]
@@ -450,12 +462,13 @@ class AssetComment {
 				name: assignedTo.toString()
 			]
 		}
+
 		return [
-				id: id,
-				taskNumber: taskNumber,
-				title: comment,
-				status: status,
-				statusUpdated: statusUpdated,
+			id: id,
+			taskNumber: taskNumber,
+			title: comment,
+			status: status,
+			statusUpdated: statusUpdated,
 			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
 			lastUpdated: lastUpdated,
 			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),
@@ -472,8 +485,13 @@ class AssetComment {
 			actFinish: actFinish,
 			team: role ?: '',
 			isPublished: isPublished,
+			percentageComplete: percentageComplete,
+			project: [
+				id: this.project.id,
+				name: this.project.toString()
+			],
 			isActionInvocableLocally: isActionInvocableLocally(),
-			isActionInvocableRemotey: isActionInvocableRemotely(),
+			isActionInvocableRemotely: isActionInvocableRemotely(),
 			isAutomatic: isAutomatic(),
 		]
 
@@ -481,13 +499,14 @@ class AssetComment {
 
 	// task Manager column header names and its labels
 	static final Map<String, String> taskCustomizeFieldAndLabel = [
-		actStart: 'Actual Start', assignedTo: 'Assigned To', category: 'Category', commentType: 'Comment Type',
-		createdBy: 'Created By', dateCreated: 'Date Created', dateResolved: 'Date Resolved', displayOption: 'Display Option',
-		duration: 'Duration', durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', actFinish: 'Actual Finish',
-		hardAssigned: 'Hard Assignment', isPublished: 'Is Published', lastUpdated: 'Last Updated', sendNotification: 'Send Notification',
-		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team',
-		statusUpdated: 'Status Updated', assetName: 'Asset Name', assetType: 'Asset Type', event: 'Move Event',
-		instructionsLink: 'Instructions Link', taskSpec: 'TaskSpec ID', bundle: 'Move Bundle'
+		actFinish: 'Actual Finish', actStart: 'Actual Start', apiAction: 'Action Name',
+		assetName: 'Asset Name', assetType: 'Asset Type', assignedTo: 'Assigned To', category: 'Category',
+		bundle: 'Move Bundle', commentType: 'Comment Type', createdBy: 'Created By', dateCreated: 'Date Created',
+		dateResolved: 'Date Resolved', displayOption: 'Display Option', duration: 'Duration',
+		durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', event: 'Move Event',
+		hardAssigned: 'Hard Assignment', instructionsLink: 'Instructions Link', isPublished: 'Is Published', lastUpdated: 'Last Updated',
+		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team', sendNotification: 'Send Notification',
+		statusUpdated: 'Status Updated', percentageComplete: 'Completion %', taskSpec: 'TaskSpec ID'
 	].asImmutable()
 
 	Map toMap() {

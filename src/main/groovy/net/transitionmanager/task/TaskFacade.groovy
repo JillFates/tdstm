@@ -1,11 +1,11 @@
 package net.transitionmanager.task
 
-import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdssrc.grails.GormUtil
-import net.transitionmanager.person.Person
-import net.transitionmanager.i18n.Message
 import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.person.Person
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -15,10 +15,17 @@ class TaskFacade {
 	TaskService taskService
 	MessageSourceService messageSourceService
 	private AssetComment task
+	private Person whom
 
 	@Autowired
-	TaskFacade(AssetComment task) {
+	/**
+	 * Constructor
+	 * @param task - the actual task that will be wrapped within the fascade
+	 * @param whom - the person whom is interacting with the system that will be associated to the done/started/error methods
+	 */
+	TaskFacade(AssetComment task, Person whom) {
 		this.task = task
+		this.whom = whom
 	}
 
 	/**
@@ -137,9 +144,8 @@ class TaskFacade {
 	}
 
 	private void addTaskCommentNoteAndUpdateStatus(String status, String message) {
-		Person whom = getWhom()
 		taskService.addNote(task, whom, message)
-		updateTaskStatus(status, whom)
+		updateTaskStatus(status)
 	}
 
 	/**
@@ -147,16 +153,8 @@ class TaskFacade {
 	 * @param status
 	 * @param whom
 	 */
-	private void updateTaskStatus(String status, Person whom = null) {
-		whom = whom ?: getWhom()
+	private void updateTaskStatus(String status) {
 		task = taskService.setTaskStatus(task, status, whom)
 	}
 
-	/**
-	 * TODO: per ticket description this is temporary
-	 * TM-8695 - WHOM section
-	 */
-	private Person getWhom() {
-		return taskService.getAutomaticPerson()
-	}
 }
