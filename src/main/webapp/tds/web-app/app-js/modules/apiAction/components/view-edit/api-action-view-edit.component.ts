@@ -172,11 +172,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	};
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
-	public originalModel: APIActionModel = new APIActionModel();
-	public modalType: ActionType;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
+		public originalModel: APIActionModel,
+		public modalType: ActionType,
 		public promptService: UIPromptService,
 		public permissionService: PermissionService,
 		public activeDialog: UIActiveDialogService,
@@ -203,7 +203,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
-
 		// Fork Join load list api calls.
 		/**
 		 * Note!! with this fork joined api calls, now the last api call load list should always be getDataScripts()
@@ -213,8 +212,8 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.apiActionService.getAPIActionEnums(),
 			this.customDomainService.getCommonFieldSpecsWithShared()
 		)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe({
+		.pipe(takeUntil(this.unsubscribeOnDestroy$))
+		.subscribe({
 			next: result => {
 				this.getProviders(result[0]);
 				this.getAgents(result[1]);
@@ -469,6 +468,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
+		console.log(this.modalType);
 		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
@@ -1105,5 +1105,12 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (evenReaction) {
 			evenReaction.selected = selected;
 		}
+	}
+
+	/**
+	 * Extract the datascript name
+	 */
+	getDataScriptName(): string {
+		return (this.apiActionModel && this.apiActionModel.defaultDataScript && this.apiActionModel.defaultDataScript.name) || '';
 	}
 }
