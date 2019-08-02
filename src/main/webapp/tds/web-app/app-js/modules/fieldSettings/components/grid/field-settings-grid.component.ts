@@ -172,7 +172,7 @@ export class FieldSettingsGridComponent implements OnInit {
 				true);
 		}
 
-		return Promise.resolve(false);
+		return Promise.resolve(true);
 	}
 
 	/**

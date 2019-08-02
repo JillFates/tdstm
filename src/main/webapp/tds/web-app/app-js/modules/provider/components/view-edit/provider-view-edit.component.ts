@@ -8,6 +8,7 @@ import {KEYSTROKE} from '../../../../shared/model/constants';
 import {ProviderService} from '../../service/provider.service';
 import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -36,6 +37,7 @@ export class ProviderViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private prompt: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private providerService: ProviderService) {
 
 		this.providerModel = Object.assign({}, this.originalModel);
@@ -97,9 +99,11 @@ export class ProviderViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

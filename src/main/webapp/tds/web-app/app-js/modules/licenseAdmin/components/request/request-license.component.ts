@@ -8,6 +8,7 @@ import {LicenseAdminService} from '../../service/license-admin.service';
 import {RequestLicenseModel} from '../../model/license.model';
 // Other
 import {Observable} from 'rxjs';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-license-create',
@@ -28,6 +29,7 @@ export class RequestLicenseComponent implements OnInit {
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private licenseAdminService: LicenseAdminService) {
 	}
 
@@ -72,9 +74,11 @@ export class RequestLicenseComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

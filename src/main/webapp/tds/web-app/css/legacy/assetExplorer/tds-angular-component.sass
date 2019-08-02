@@ -234,7 +234,10 @@
     td
       padding: 0 6px
       height: 32px
-      span[role=listbox]:focus
+      span[role=listbox]:focus,
+      span.k-picker-wrap.k-state-default.k-state-focused,
+      span.k-dropdown-wrap.k-state-default.k-state-focused,
+      kendo-numerictextbox span.k-state-focused
         box-shadow: 0 0 5px #4D90FE
         border: 1px solid #4D90FE
 

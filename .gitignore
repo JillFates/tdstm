@@ -27,3 +27,4 @@ test/e2e/build
 # ignore local config file!
 tdstm-config.groovy
 **/.gradle/**
+src/main/webapp/tds/karma_html/
