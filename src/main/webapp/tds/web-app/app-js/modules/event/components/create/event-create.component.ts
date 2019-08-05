@@ -55,7 +55,7 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime)) {
+		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
@@ -75,6 +75,15 @@ export class EventCreateComponent implements OnInit {
 		}
 	}
 
+	private validateRequiredFields(model: EventModel): boolean {
+		if (!model.name) {
+			alert('Field "Name" is required.');
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
@@ -83,8 +92,8 @@ export class EventCreateComponent implements OnInit {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {

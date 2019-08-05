@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -61,6 +61,12 @@ export class BundleViewEditComponent implements OnInit {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.bundleModel = Object.assign({}, defaultBundle, this.bundleModel);
 		this.getModel(this.bundleId);
+	}
+
+	// Close dialog if back button is pressed
+	@HostListener('window:popstate', ['$event'])
+	onPopState(event) {
+		this.activeDialog.close()
 	}
 
 	public confirmDeleteBundle() {
@@ -202,8 +208,8 @@ export class BundleViewEditComponent implements OnInit {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {
@@ -221,8 +227,8 @@ export class BundleViewEditComponent implements OnInit {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {
