@@ -319,7 +319,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
 											</div>
 										</div>
 									</div>
@@ -731,7 +731,7 @@
 												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
 											</div>
 										</div>
 									</div>
