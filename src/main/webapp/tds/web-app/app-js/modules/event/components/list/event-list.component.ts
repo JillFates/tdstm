@@ -105,9 +105,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	 * @param {SelectionEvent} event
 	 */
 	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			this.showEvent(event['dataItem'].id);
-		}
+		this.selectRow(event.dataItem.id);
 	}
 
 	protected reloadData(): void {
