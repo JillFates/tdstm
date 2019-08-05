@@ -50,7 +50,6 @@ import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.RecipeException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.imports.TaskBatch
-import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
@@ -80,7 +79,6 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
-
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -482,50 +480,6 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to indicate that a task's remote action has been started. This will update the
-	 * action and task appropriately after which the Action Request object is constructed.
-	 *
-	 * @param taskId The task that the action command it tied to.
-	 * @param currentPerson The currently logged in person.
-	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
-	 */
-	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom, String publicKey) {
-		AssetComment task = fetchTaskById(taskId, whom)
-
-		task = markActionStarted(task.id, whom, false)
-
-		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
-
-		Map<String,?> actionRequestMap = actionRequest.toMap()
-
-		// Store Callback information into the options
-		String url = coreService.getApplicationUrl()
-		Map jwt = securityService.generateJWT()
-		actionRequestMap.options.callback = [
-			siteUrl: url,
-			token: jwt.access_token
-		]
-
-		// check if api action has credentials so to include credentials password unencrypted
-		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
-		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
-			// Need to create new map because credentials map originally is immutable
-			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
-
-			// Encrypt the username and password with the Public Key that the client sent to the server
-			 credentials.username = securityService.encryptWithPublicKey(task.apiAction.credential.username, publicKey)
-			 credentials.password = securityService.encryptWithPublicKey(credentialService.decryptPassword(task.apiAction.credential), publicKey)
-
-			actionRequestMap.options.credentials = credentials
-		}
-
-		// Add the Task object to the returned map
-		actionRequestMap.task = task.taskToMap()
-
-		return actionRequestMap
-	}
-
-	/**
 	 * Try to mark a task as started by locking it before, if lock fails
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
@@ -651,50 +605,6 @@ class TaskService implements ServiceMethods {
 		return task
 	}
 
-	/**
-	 * Reset an action so it can be invoked again
-	 * @param taskId - the ID of the task
-	 * @param whom
-	 * @return
-	 */
-	AssetComment resetAction(Long taskId, Person whom) {
-		AssetComment task = fetchTaskById(taskId, whom)
-
-		if (task.hasAction() && !task.isAutomatic() && task.status in AssetCommentStatus.AllowedStatusesToResetAction) {
-			String errMsg
-			try {
-				// Update the task so it can be invoked again
-				task.apiActionInvokedAt = null
-				task.apiActionCompletedAt = null
-				task.actStart = null
-				task.dateResolved = null
-				task.percentageComplete = 0
-
-				// Log a note that the API Action was reset
-				addNote(task, whom, "Reset action ${task.apiAction.name}")
-
-				// Make sure that the status is READY instead
-				task.status = AssetCommentStatus.READY
-
-			} catch (InvalidRequestException e) {
-				errMsg = e.getMessage()
-			} catch (InvalidConfigurationException e) {
-				errMsg = e.getMessage()
-			} catch (e) {
-				errMsg = 'A runtime error occurred while attempting to process the action'
-				log.error ExceptionUtil.stackTraceToString('resetAction() failed ', e)
-			}
-
-			if (errMsg) {
-				log.info "resetAction() error $errMsg"
-				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
-				task.status = AssetCommentStatus.HOLD
-			}
-		} else {
-			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
-		}
-		return task
-	}
 
 	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
