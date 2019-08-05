@@ -41,7 +41,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
@@ -294,7 +294,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getCategories(): Observable<any[]> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
 			.map((response: any) => {
 				return response && response.data || [];
 
