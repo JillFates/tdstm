@@ -112,8 +112,8 @@
                 <div class="modal-footer form-group-center">
                     <div *ngIf="canEditBundle">
                         <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
-                        <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteBundle()"></tds-button-delete>
-                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger pull-left tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
+                        <tds-button-delete class="btn-danger" (click)="confirmDeleteBundle()"></tds-button-delete>
+                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
                             <div class="tds-action-button-container">
                                 <i class="fa fa-fw fa-trash"></i>Delete Bundle & Assets
                             </div>
