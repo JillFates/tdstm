@@ -88,7 +88,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			showStart: false,
 			showAssignToMe: false,
 			showNeighborhood: false,
-			invoke: false
+			invoke: false,
+			showReset: false
 		};
 
 		if (!this.model) {
@@ -121,6 +122,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				this.modelHelper.STATUS.READY,
 				this.modelHelper.STATUS.STARTED
 			].indexOf(this.model.status) >= 0;
+
+		options.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
 		return options;
 	}
 
@@ -289,6 +292,17 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	onInvoke(): void {
 		this.taskManagerService.invokeAction(this.model.id)
+			.subscribe((result) => {
+				this.hasChanges = true;
+				this.loadTaskDetail();
+			});
+	}
+
+	/**
+	 * Reset the current task action
+	 */
+	onReset(): void {
+		this.taskManagerService.resetTaskAction(this.model.id)
 			.subscribe((result) => {
 				this.hasChanges = true;
 				this.loadTaskDetail();

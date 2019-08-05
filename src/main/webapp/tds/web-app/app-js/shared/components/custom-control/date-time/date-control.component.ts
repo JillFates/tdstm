@@ -27,7 +27,7 @@ import {DateValidationConstraints} from '../../../../shared/model/validation-con
 			[title]="title"
 			[min]="minimum"
 			[max]="maximum"
-			[value]="dateValue"
+		    [value]="getDateValue(dateValue)"
 			(blur)="onBlur()"
 			[format]="displayFormat"
 			[tabindex]="tabindex"
@@ -94,7 +94,7 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 	*/
 	private onBlur(): void  {
 		this.onTouched();
-		this.blur.emit(this.getDateValue());
+		this.blur.emit(this.getDateValue(this.value));
 	}
 
 	/**
@@ -107,18 +107,21 @@ export class TDSDateControlComponent extends TDSCustomControl implements OnChang
 		} else {
 			this.value = null;
 		}
+
+		this.dateValue = this.getDateValue(this.value);
 		this.onTouched();
 	}
 
 	/**
 	 * Format the date value to the fomarmat used by the date control
+	 * @param {value} Date Value to be formated
 	 */
-	private getDateValue(): any {
-		if (!this.value) {
+	public getDateValue(value: any): any {
+		if (!value) {
 			return null;
 		}
 
-		let localDateFormatted = DateUtils.getDateFromGMT(this.value);
+		let localDateFormatted = DateUtils.getDateFromGMT(value);
 		return  DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATE);
 	}
 

@@ -11,7 +11,7 @@ import {
 	OnDestroy, HostListener
 } from '@angular/core';
 import {Observable, ReplaySubject} from 'rxjs';
-import {takeUntil} from "rxjs/operators";
+import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
 import {
 	DataStateChangeEvent,
@@ -63,7 +63,7 @@ import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/compon
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from "../../../../shared/constants/common-shrunk-columns";
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,

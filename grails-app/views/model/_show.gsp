@@ -60,6 +60,18 @@
 			<td>${modelInstance?.endOfLifeStatus}</td>
         </tr>
 		<tr>
+			<td>CPU Type:</td>
+			<td>${modelInstance?.cpuType}</td>
+			<td>Memory Size:</td>
+			<td>${modelInstance?.memorySize}</td>
+		</tr>		
+		<tr>
+			<td>CPU Count:</td>
+			<td>${modelInstance?.cpuCount}</td>
+			<td>Storage Size:</td>
+			<td>${modelInstance?.storageSize}</td>
+		</tr>
+		<tr>
 			<td>Power (max/design/avg) :</td>
 			<td>
 				<span id="namePlatePowerSpanId">${tds.rackPower(power: modelInstance?.powerNameplate)}</span>

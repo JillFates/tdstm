@@ -13,6 +13,7 @@ import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.person.Person
+import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
@@ -31,6 +32,7 @@ class TaskActionService implements ServiceMethods {
 	FileSystemService fileSystemService
 	ApiActionService  apiActionService
 	AssetService      assetService
+	CredentialService credentialService
 	SecurityService   securityService
 
 	/**
@@ -42,12 +44,9 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 */
 	void actionStarted(ActionCommand action, Long taskId, Person currentPerson) {
-		securityService.hasAccessToProject(action.project)
-		AssetComment task = get(AssetComment, taskId, action.project)
+		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
-
 		taskService.addNote(task, currentPerson, "${task?.apiAction?.name ?: ''} started at ${new Date().format(TimeUtil.FORMAT_DATE_ISO8601)}")
-
 	}
 
 	/**
@@ -59,13 +58,10 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 */
 	void actionProgress(ActionCommand action, Long taskId, Person currentPerson) {
-		securityService.hasAccessToProject(action.project)
-		AssetComment task = get(AssetComment, taskId, action.project)
+		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
-
-		task.apiActionPercentDone = action.progress
+		task.percentageComplete = action.progress
 		task.save()
-
 	}
 
 	/**
@@ -77,13 +73,12 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 */
 	void actionDone(ActionCommand action, Long taskId, Person currentPerson) {
-		securityService.hasAccessToProject(action.project)
-		AssetComment task = get(AssetComment, taskId, action.project)
+		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
-
-		invokeReactionScript(ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
+		invokeReactionScript(currentPerson, ReactionScriptCode.SUCCESS, task, action.message, action.stdout, action.stderr, true, action.data, action.datafile)
 		task.apiActionCompletedAt = new Date()
-		task.apiActionPercentDone = 100
+		task.percentageComplete = 100
 		task.save()
 	}
 
@@ -96,11 +91,25 @@ class TaskActionService implements ServiceMethods {
 	 * @param currentPerson The currently logged in person.
 	 */
 	void actionError(ActionCommand action, Long taskId, Person currentPerson) {
-		securityService.hasAccessToProject(action.project)
-		AssetComment task = get(AssetComment, taskId, action.project)
+		AssetComment task = fetchTaskForAction(action, taskId, currentPerson)
 		addMessageToTaskNotes(action.message, task, currentPerson)
+		logForDebug(task, currentPerson,  action.stdout, action.stderr)
+		invokeReactionScript(currentPerson, ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
+	}
 
-		invokeReactionScript(ReactionScriptCode.ERROR, task, action.message, action.stdout, action.stderr, false)
+	/**
+	 * Logs stdOut and stdErr to task notes if the action has debug enabled
+	 *
+	 * @param task The task to log a note for, if its action has debugEnabled = true
+	 * @param currentPerson  The currently logged in person.
+	 * @param stdOut Standard output returned.
+	 * @param stdErr Standard error output returned.
+	 */
+	void logForDebug(AssetComment task, Person currentPerson, String stdOut, String stdErr) {
+		if (task.apiAction.debugEnabled) {
+			addMessageToTaskNotes(stdOut, task, currentPerson)
+			addMessageToTaskNotes(stdErr, task, currentPerson)
+		}
 	}
 
 	/**
@@ -119,6 +128,7 @@ class TaskActionService implements ServiceMethods {
 	/**
 	 * Sets up and invokes the reaction script.
 	 *
+	 * @param whom - the individual that triggered the invocation of the action
 	 * @param code The ReactionScriptCode SUCCESS or ERROR
 	 * @param task The task that relates to the action, that was run.
 	 * @param stdout The standard output of the remote action that was run.
@@ -127,6 +137,7 @@ class TaskActionService implements ServiceMethods {
 	 * @param datafile A list of data files sent back as context of invoking the remote action
 	 */
 	private void invokeReactionScript(
+		Person whom,
 		ReactionScriptCode code,
 		AssetComment task,
 		String message,
@@ -137,15 +148,14 @@ class TaskActionService implements ServiceMethods {
 		List<MultipartFile> datafile = null) {
 
 		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
-		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task)
+		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
-		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, true)
+		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, false)
 
 		List<String> filenames = datafile.collect { MultipartFile file ->
 			fileSystemService.writeFile(file, fileSystemService.TMD_PREFIX)
 		}
-
 		ApiActionResponse apiActionResponse = new ApiActionResponse(
 			originalFilename: datafile ? datafile[0].originalFilename : null,
 			filename: filenames ? filenames[0] : null,
@@ -176,6 +186,20 @@ class TaskActionService implements ServiceMethods {
 			// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 			ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
 		}
+	}
+
+	/**
+	 * Used by these service methods to fetch the Task referenced in the action command object. If the
+	 * person does not have access to the project then an exception will be thrown.
+	 *
+	 * @param action the ActionCommand object
+	 * @see net.transitionmanager.command.task.ActionCommand *
+	 * @param taskId The task that the action command it tied to.
+	 * @param currentPerson The currently logged in person.
+	 */
+	private AssetComment fetchTaskForAction(ActionCommand action, Long taskId, Person currentPerson) {
+		securityService.hasAccessToProject(action.project)
+		return get(AssetComment, taskId, action.project)
 	}
 
 }

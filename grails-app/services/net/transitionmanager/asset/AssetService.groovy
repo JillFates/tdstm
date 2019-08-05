@@ -242,7 +242,11 @@ class AssetService {
      * @return
      */
     AssetFacade getAssetFacade(AssetEntity assetEntity, boolean readonly) {
-        Map<String, ?> fieldSpecs = customDomainService.customFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
-        return new AssetFacade(assetEntity, fieldSpecs, readonly)
+        AssetFacade facade
+        if (assetEntity) {
+            Map<String, ?> fieldSpecs = customDomainService.customFieldSpecs(assetEntity.project, assetEntity.assetClass.toString(), false)
+            facade = new AssetFacade(assetEntity, fieldSpecs, readonly)
+        }
+        return facade
    }
 }

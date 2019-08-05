@@ -19,8 +19,8 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TagService} from '../../service/tag.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {takeUntil} from "rxjs/operators";
-import {ReplaySubject} from "rxjs";
+import {takeUntil} from 'rxjs/operators';
+import {ReplaySubject} from 'rxjs';
 
 @Component({
 	selector: 'tag-list',

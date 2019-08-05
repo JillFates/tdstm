@@ -4,6 +4,7 @@ import {BundleModel} from '../../model/bundle.model';
 import {Router} from '@angular/router';
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `bundle-create`,
@@ -20,6 +21,7 @@ export class BundleCreateComponent implements OnInit {
 	constructor(
 		private bundleService: BundleService,
 		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
 		private activeDialog: UIActiveDialogService) {
 	}
 
@@ -80,9 +82,11 @@ export class BundleCreateComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.defaultModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close();
