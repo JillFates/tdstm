@@ -49,13 +49,14 @@
                                     <kendo-numerictextbox
                                             (valueChange)="onFilter(column)"
                                             [decimals]="0"
+                                            [min]="0"
                                             style="width:100%"
                                             format="\#"
                                             placeholder="Filter {{column.label}}"
                                             name="{{column.property}}"
                                             [(ngModel)]="column.filter" >
                                     </kendo-numerictextbox>
-                                    <span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all;width:100%;top:-2x; text-align:right; padding-right:35px" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+                                    <span *ngIf="column.filter !== undefined && column.filter !== ''" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all; text-align:right; margin-right:35px" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
                                 </div>
                                 <div *ngIf="column.type === 'boolean'">
                                     <kendo-dropdownlist [data]="booleanFilterData" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-dropdownlist>
