@@ -218,7 +218,8 @@ class TaskService implements ServiceMethods {
 			t.instructions_link AS instructionsLink,
 			t.api_action_id AS apiActionId,
 			t.api_action_invoked_at AS apiActionInvokedAt,
-			t.api_action_completed_at AS apiActionCompletedAt
+			t.api_action_completed_at AS apiActionCompletedAt,
+			aa.action_type AS apiActionType
 			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
@@ -286,6 +287,7 @@ class TaskService implements ServiceMethods {
 		sql.append("""FROM asset_comment t
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id
 			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id
+			LEFT OUTER JOIN api_action aa ON t.api_action_id = aa.id
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND t.is_published = true """)
 
 		// filter tasks to those directly assigned to the user and/or assigned to a team that they're assigne and the task is in one of the proper statuses
