@@ -218,7 +218,7 @@ class ArchitectureGraphService implements ServiceMethods {
 
 		Integer opacity = 1
 
-		return dependencyList.withIndex().collect { Map dependency, Integer index ->
+		return dependencyList.withIndex().findResults { Map dependency, Integer index ->
 			boolean notApplicable = (dependency.status == AssetDependencyStatus.NA)
 			boolean validated = (dependency.status == AssetDependencyStatus.VALIDATED)
 			boolean questioned = (dependency.status == AssetDependencyStatus.QUESTIONED)
@@ -245,7 +245,7 @@ class ArchitectureGraphService implements ServiceMethods {
 					unresolved   : unresolved
 				]
 			}
-		}
+		} as List<LinkedHashMap>
 	}
 
 	/**
