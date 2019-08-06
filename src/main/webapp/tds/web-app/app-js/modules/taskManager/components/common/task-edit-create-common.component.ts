@@ -106,7 +106,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 
 		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
-			commonCalls.push(this.taskManagerService.getCategories());
+			commonCalls.push(this.taskManagerService.getAssetCommentCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
 			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
 			commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
