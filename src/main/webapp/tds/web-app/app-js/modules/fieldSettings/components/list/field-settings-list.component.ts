@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import { Observable } from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -13,6 +14,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 import { Permission } from '../../../../shared/model/permission.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'field-settings-list',
@@ -42,6 +44,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
+		private translatePipe: TranslatePipe,
 	) {
 		this.domains = this.route.snapshot.data['fields'];
 		if (this.domains.length > 0) {
@@ -103,7 +106,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback: any): void {
+	protected onSaveAll(savingInfo: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
@@ -129,6 +132,18 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				});
 
 				this.fieldService.saveFieldSettings(this.domains)
+					.pipe(
+						switchMap((res: any) => {
+							if (res.status === 'error') {
+								return res;
+							} else {
+								// delete underlaying data
+								return savingInfo.deleteUnderLaying ?
+									this.fieldService.deleteCustomFields(this.fieldsToDelete) :
+									Observable.of(true);
+							}
+						})
+					)
 					.subscribe((res: any) => {
 						if (res.status === 'error') {
 							let message: string = res.errors.join(',');
@@ -138,8 +153,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 							});
 						}
 						this.refresh();
-						callback();
-
+						savingInfo.callback();
 					});
 			} else {
 				this.selectedTab = invalid[0].domain;
@@ -157,9 +171,11 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			).then(result => {
 					if (result) {
 						this.refresh();
 					} else {

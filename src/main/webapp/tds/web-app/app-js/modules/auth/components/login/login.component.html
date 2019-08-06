@@ -1,0 +1,89 @@
+<div class="login-component" *ngIf="!redirectUser">
+    <div class="login-box" [ngClass]="{'login-notice': loginInfo && loginInfo.notices.length > 0 }">
+        <div class="login-box-body">
+            <div class="login-logo">
+                <a href="http://www.transitionaldata.com/service/transitionmanager" target="new">
+                    <img src="/tdstm/assets/images/TMLoginLogo_v4.7.png" border="0" alt="Learn more about TransitionManager">
+                </a>
+            </div>
+
+            <div class="callout pre-login-message" *ngFor="let notice of loginInfo.notices">
+                <div [innerHTML]="notice['htmlText'] | safeHtml"></div>
+            </div>
+
+            <h1 class="login-box-msg" [ngClass]="{'message': loginInfo.sessionExpired}">
+                <span *ngIf="!loginInfo.sessionExpired">{{'LOGIN.START_YOUR_SESSION' | translate}}</span>
+                <span *ngIf="loginInfo.sessionExpired">{{'LOGIN.SESSION_EXPIRED' | translate}}</span>
+            </h1>
+
+            <form action="signIn" name="loginForm" class="login-form"  #loginForm='ngForm' >
+                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
+                    {{loginInfo.config?.authorityLabel}}
+                    <kendo-dropdownlist
+                            name="authority"
+                            [defaultItem]="defaultAuthorityItem"
+                            [valuePrimitive]="true"
+                            [(ngModel)]="loginModel.authority"
+                            [data]="loginInfo.config.authorityList"
+                            required
+                    >
+                    </kendo-dropdownlist>
+                </div>
+                <div class="form-group has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT">
+                    {{'LOGIN.DOMAIN' | translate}}:
+                    <input type="text"
+                           class="form-control authority"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="authority"
+                           [(ngModel)]="loginModel.authority"
+                           placeholder="Enter {{loginInfo.config?.authorityLabel}}"
+                           title="Enter {{loginInfo.config?.authorityLabel}}"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           required>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control username"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="username"
+                           id="usernameid"
+                           [(ngModel)]="loginModel.username"
+                           placeholder="Enter your username"
+                           title="Enter your username"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           required>
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control"
+                           [ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
+                           name="password"
+                           id="password"
+                           [(ngModel)]="loginModel.password"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           placeholder="Enter your password"
+                           title="Enter your password"
+                           required/>
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="message">{{errMessage}}</div>
+                <div class="row">
+                    <div class="col-xs-8">
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-xs-4">
+                        <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+
+            <div class="login-forgot-password-link">
+                <pre><a [routerLink]="['/auth','forgot']" id="forgot-your-password">{{'LOGIN.FORGOT_PASSWORD' | translate}}?</a></pre>
+            </div>
+            <div class="build-info">{{loginInfo.buildVersion}}</div>
+        </div>
+    </div>
+</div>

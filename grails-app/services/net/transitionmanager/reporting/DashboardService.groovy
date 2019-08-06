@@ -1,8 +1,15 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectLogo
+import net.transitionmanager.security.Permission
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.TaskService
 
@@ -11,9 +18,13 @@ import net.transitionmanager.task.TaskService
  */
 class DashboardService implements ServiceMethods {
 
+	private static final Integer EVENT_DASHBOARD_MAX_TEAM_ROWS = 6
+
 	static transactional = false
 
+	MoveEventService moveEventService
 	TaskService taskService
+	UserPreferenceService userPreferenceService
 
 	/**
 	 * Generates the model used by the Task Summary section of the Event Dashboard
@@ -111,6 +122,37 @@ class DashboardService implements ServiceMethods {
 		}
 		model.teamTaskMatrix = teamTaskResultsMatrix
 
+		return model
+	}
+
+	/**
+	 * Create and return a map with the model for the Event Dashboard.
+	 * @param project - the user's current project.
+	 * @param moveEvent - the event selected by the user.
+	 * @param viewUnpublished - whether or not unpublished tasks should be included in the model.
+	 * @return
+	 */
+	Map getEventDashboardModel(Project project, MoveEvent moveEvent, boolean viewUnpublished) {
+		List<MoveEvent> moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])
+		List<MoveBundle> moveBundleList = MoveBundle.findAll(" FROM MoveBundle mb where moveEvent = :moveEvent ORDER BY mb.startTime ", [moveEvent: moveEvent])
+
+		Map model = [
+			project                       : project,
+			projectLogo                   : ProjectLogo.findByProject(project),
+			moveEvent                     : moveEvent,
+			moveEventsList                : moveEventsList,
+			moveBundleSteps               : moveEventService.getMoveBundleSteps(moveBundleList),
+			moveBundleList                : moveBundleList,
+			timeToUpdate                  : userPreferenceService.getPreference(UserPreferenceEnum.DASHBOARD_REFRESH) ?: 'never',
+			EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),
+			viewUnpublished               : viewUnpublished ? '1' : '0'
+		]
+
+		Map taskSummaryMap = getTaskSummaryModel(moveEvent.id, EVENT_DASHBOARD_MAX_TEAM_ROWS, viewUnpublished)
+
+		if (taskSummaryMap) {
+			model.putAll(taskSummaryMap)
+		}
 		return model
 	}
 }

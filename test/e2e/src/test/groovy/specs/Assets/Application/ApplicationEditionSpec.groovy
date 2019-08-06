@@ -41,7 +41,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
     static isDepName
     static isDepBundle = appBundle
     static isDepType = "Batch"
-    static isDepStatus = "Confirmed"
+    static isDepStatus = "Unknown"
 
     static appDataMap = [
             appName: appNameOld,
@@ -239,7 +239,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
             aeModalIsDepTypeArrow.click()
             waitFor { aeModalSelectorValues.find{it.text()==isDepType}.click() }
             aeModalIsDepStatusArrow.click()
-            waitFor { aeModalSelectorValues.find{it.text()==isDepStatus}.click() }
+            waitFor(30) { aeModalSelectorValues.find{it.text()==isDepStatus}.click() }
 
         then: 'Every value should be accordingly added'
             aeModalIsDepFreqValue.text().trim() == isDepFreq

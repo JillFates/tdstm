@@ -21,6 +21,7 @@ export class UILoaderDirective {
 
 	constructor(private notifierService: NotifierService, private loaderService: UILoaderService) {
 		this.httpRequestHandlerInitial();
+		this.stopLoader();
 		this.httpRequestHandlerCompleted();
 		this.httpRequestHandlerCompletedWithErrors();
 		this.notificationRouteChange();
@@ -53,6 +54,16 @@ export class UILoaderDirective {
 					}
 				}, LOADER_IDLE_PERIOD);
 			}
+		});
+	}
+
+	/**
+	 * Can be invoked to stop the loader at anytime
+	 */
+	stopLoader() {
+		this.notifierService.on('stopLoader', (event) => {
+			this.loaderService.stopProgress();
+			this.loaderService.hide();
 		});
 	}
 

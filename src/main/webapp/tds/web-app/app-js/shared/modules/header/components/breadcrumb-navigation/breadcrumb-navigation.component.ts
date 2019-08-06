@@ -5,13 +5,14 @@ import {Title} from '@angular/platform-browser';
 // Service
 import {NotifierService} from '../../../../services/notifier.service';
 import {TaskService} from '../../../../../modules/taskManager/service/task.service';
-import {UserContextService} from '../../../../../modules/security/services/user-context.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 // Models
 import {ASSET_MENU_CSS_TREE} from '../../model/asset-menu.model';
-import {UserContextModel} from '../../../../../modules/security/model/user-context.model';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 // Other
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
+import {PageMetadataModel} from '../../model/page-metadata.model';
 
 declare var jQuery: any;
 
@@ -19,7 +20,7 @@ declare var jQuery: any;
 	selector: 'tds-breadcrumb-navigation',
 	template: `
         <!-- Content Header (Page header) -->
-        <section class="content-header">
+        <section class="content-header" *ngIf="!pageMetaData.hideTopNav">
             <ng-container *ngIf="pageMetaData">
                 <h1>
                     {{pageMetaData.title | translate}}
@@ -55,13 +56,7 @@ declare var jQuery: any;
 export class BreadcrumbNavigationComponent {
 
 	protected userContext: UserContextModel;
-	public pageMetaData: {
-		id: any,
-		title: string,
-		instruction: string,
-		menu: Array<string>,
-		topMenu: any
-	};
+	public pageMetaData: PageMetadataModel = new PageMetadataModel();
 
 	constructor(
 		private taskService: TaskService,
@@ -76,9 +71,12 @@ export class BreadcrumbNavigationComponent {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
 				promptService.open(
-					'Confirmation Required',
-					'You have changes that have not been saved. Do you want to continue and lose those changes?',
-					'Confirm', 'Cancel').then(result => {
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+						translatePipe.transform('GLOBAL.CONFIRM'),
+						translatePipe.transform('GLOBAL.CANCEL'),
+					)
+					.then(result => {
 					if (result) {
 						this.route.snapshot.data['hasPendingChanges'] = false;
 						window.location.assign(e.currentTarget.href);
@@ -109,6 +107,13 @@ export class BreadcrumbNavigationComponent {
 	 * Includes breadcrumbs, tiles, and other menu changes
 	 */
 	private headerListeners(): void {
+
+		this.notifierService.on('notificationRouteChange', event => {
+			if (event.event.url.indexOf('/auth/') >= 0) {
+				this.pageMetaData.hideTopNav = true;
+			}
+		});
+
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
 				this.pageMetaData = event.route.snapshot.data.page;
@@ -167,6 +172,9 @@ export class BreadcrumbNavigationComponent {
 
 	protected getUserContext(): void {
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			if (!userContext.user) {
+				this.pageMetaData.hideTopNav = true;
+			}
 			this.userContext = userContext;
 		});
 	}

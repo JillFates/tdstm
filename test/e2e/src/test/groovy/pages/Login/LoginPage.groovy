@@ -5,19 +5,24 @@ import geb.Page
 import utils.Login
 import pages.Admin.User.*
 import pages.Login.MenuPage
+import modules.CommonsModule
 
 class LoginPage extends Page {
-    static url = "/tdstm/auth/login"
+    static url = "/tdstm/module/auth/login"
 
     static at = {
         title == "Login"
+        waitFor(8){username.displayed}
+        waitFor(8){password.displayed}
+        waitFor(8){submitButton.displayed}
     }
 
     static content = {
         username { $("#usernameid") }
         password { $("input", name:"password") }
         submitButton { $("#submitButton") }
-        errorMessage { $("#loginForm").find("div", class:"message")}
+        errorMessage { $("div", class:"message")}
+        commonsModule { module CommonsModule }
     }
 
     def getCredentials(userIndex, passIndex){
@@ -52,6 +57,7 @@ class LoginPage extends Page {
             submitButton.click()
             verifyWrongPassError()
             numAttempts--
+            commonsModule.waitForLoader(5)
         }
     }
 
@@ -66,6 +72,7 @@ class LoginPage extends Page {
             submitButton.click()
             verifyWrongUserError()
             numAttempts--
+            commonsModule.waitForLoader(5)
         }
     }
 

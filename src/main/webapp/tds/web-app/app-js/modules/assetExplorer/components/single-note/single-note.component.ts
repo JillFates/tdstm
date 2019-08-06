@@ -3,6 +3,7 @@ import {SingleNoteModel} from './model/single-note.model';
 import {ModalType} from '../../../../shared/model/constants';
 import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: `single-note`,
@@ -55,7 +56,11 @@ export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
 	public modalType = ModalType;
 	private note: string;
 
-	constructor(public singleNoteModel: SingleNoteModel, public promptService: UIPromptService) {
+	constructor(
+		public singleNoteModel: SingleNoteModel,
+		public promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
+	) {
 		super('#single-note-component');
 	}
 
@@ -89,9 +94,11 @@ export class SingleNoteComponent extends UIExtraDialog implements  OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();

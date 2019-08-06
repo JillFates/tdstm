@@ -31,11 +31,10 @@ class AssetFieldSettingsPage extends Page {
         addCustomFieldButton { activeTabPane.find("#btnAddCustom")}
         kendoGridContainer { activeTabPane.find("kendo-grid.field-settings-grid")}
         headers { kendoGridContainer.find(".k-grid-header th")}
-        gridRows { kendoGridContainer.find(".k-grid-container tr[kendogridlogicalrow]")}
-        firstRow { gridRows.first()}
+        gridRows { kendoGridContainer.find(".k-grid-container tbody[kendogridtablebody]").find("tr")}
         minSringControlLenght { $(".modal label[for=minSize]").next().find(".k-numeric-wrap input")}
         maxSringControlLenght { $(".modal label[for=maxSize]").next().find(".k-numeric-wrap input")}
-        deleteButtons { gridRows.find("button span.fa-trash")}
+        firstDeleteButton { gridRows[0].find("td")[0].find("div", class:"tds-action-button-set").find("tds-button-delete")}
     }
 
     def clickOnEditButton(){
@@ -91,7 +90,7 @@ class AssetFieldSettingsPage extends Page {
      * @author Sebastian Bigatton
      */
     def verifyCustomRowStatus(){
-        waitFor{firstRow.find("button span.fa-trash").displayed} // verify remove button displayed
+        waitFor{firstDeleteButton.displayed} // verify remove button displayed
 
         def labelInput = getLabelInput()
         labelInput.singleElement() == js."document.activeElement" // verify label has the focus
@@ -199,19 +198,19 @@ class AssetFieldSettingsPage extends Page {
     }
 
     /**
-     * Deletes fields by given min number of fields to avoid deleting or stay in the system
-     * @author Sebastian Bigatton
+     * Deletes Asset Field Settings until there are only 2
+     * @author Alvaro Navarro
      */
-    def deleteFields(minNumberOfFieldsPresent){
-        def count = 0
-        def cell
-        while (deleteButtons.size() > minNumberOfFieldsPresent){
-            cell = getFieldRowCellByIndexAndColumnName("Action", count)
-            waitFor{cell.find("button span.fa-trash").click()}
-            waitFor{cell.find("button span.fa-undo").displayed}
-            count = count + 1
+    def deleteFields(recordsToDelete){
+        while (recordsToDelete!=0){
+            commonsModule.waitForLoader 5
+            waitFor{editButton.click()}
+            commonsModule.waitForLoader 5
+            waitFor(30){firstDeleteButton.click()}
+            commonsModule.waitForLoader 5
+            waitFor(30){clickOnSaveAllButton()}
+            recordsToDelete = recordsToDelete-1
         }
-        clickOnSaveAllButton()
     }
 
     def getGridRowsSize(){
@@ -220,13 +219,13 @@ class AssetFieldSettingsPage extends Page {
 
     def bulkDelete(minNumberOfFieldsPresent) {
         if(getGridRowsSize() > minNumberOfFieldsPresent) {
-            clickOnEditButton()
-            deleteFields minNumberOfFieldsPresent
+            def recordsToDelete = getGridRowsSize() - minNumberOfFieldsPresent
+            deleteFields(recordsToDelete)
         }
-        true // done, just return true to avoid test fails
+        true // done, just return true to avoid test failures
     }
 
     def verifyRowsCountDisplayedByGivenNumber(fieldsCount){
-        getGridRowsSize() == fieldsCount
+        getGridRowsSize() <= fieldsCount
     }
 }

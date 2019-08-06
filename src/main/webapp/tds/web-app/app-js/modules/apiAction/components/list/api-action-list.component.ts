@@ -1,11 +1,11 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {APIActionService} from '../../service/api-action.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
@@ -23,11 +23,14 @@ import {
 	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
 import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {APIActionType} from '../../model/api-action.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'api-action-list',
@@ -37,7 +40,7 @@ import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 		.action-header { width:100%; text-align:center; }
 	`]
 })
-export class APIActionListComponent implements OnInit {
+export class APIActionListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 	private state: State = {
 		sort: [{
@@ -66,6 +69,9 @@ export class APIActionListComponent implements OnInit {
 	public dateFormat = '';
 	protected createActionText = '';
 	protected hasEarlyAccessTMRPermission: boolean;
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private route: ActivatedRoute,
@@ -85,6 +91,7 @@ export class APIActionListComponent implements OnInit {
 
 	ngOnInit() {
 		this.userContext.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.apiActionColumnModel = new APIActionColumnModel(`{0:${this.dateFormat}}`);
@@ -127,7 +134,9 @@ export class APIActionListComponent implements OnInit {
 	 */
 	protected onEdit(dataItem: any): void {
 		let apiAction: APIActionModel = dataItem as APIActionModel;
-		this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+		this.apiActionService.getAPIAction(apiAction.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((response: APIActionModel) => {
 			this.openAPIActionDialogViewEdit(response, ActionType.EDIT, apiAction);
 		}, error => console.log(error));
 	}
@@ -140,7 +149,9 @@ export class APIActionListComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.apiActionService.deleteAPIAction(dataItem.id).subscribe(
+					this.apiActionService.deleteAPIAction(dataItem.id)
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -157,14 +168,18 @@ export class APIActionListComponent implements OnInit {
 		if (event.columnIndex > 0) {
 			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
 			this.selectRow(apiAction.id);
-			this.apiActionService.getAPIAction(apiAction.id).subscribe((response: APIActionModel) => {
+			this.apiActionService.getAPIAction(apiAction.id)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe((response: APIActionModel) => {
 				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
 			}, error => console.log(error));
 		}
 	}
 
 	protected reloadData(): void {
-		this.apiActionService.getAPIActions().subscribe(
+		this.apiActionService.getAPIActions()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -182,7 +197,9 @@ export class APIActionListComponent implements OnInit {
 	}
 
 	private reloadItem(originalModel: APIActionModel): void {
-		this.apiActionService.getAPIAction(originalModel.id).subscribe((response: APIActionModel) => {
+		this.apiActionService.getAPIAction(originalModel.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((response: APIActionModel) => {
 			Object.assign(originalModel, response);
 		}, error => console.log(error));
 	}
@@ -247,5 +264,16 @@ export class APIActionListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

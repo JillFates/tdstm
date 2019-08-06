@@ -118,9 +118,8 @@ class RecipeHistorySpec extends GebReportingSpec {
         when: 'The User clicks in the Recipe'
             waitFor { getRecipeByName(recipeDataMap.name).click()}
         then: 'Text containing the Recipe Name should be displayed'
-            waitFor { getRecipeNameDisplayedInTaskGenerationTab().contains(recipeDataMap.name)} }
-
-    // History Tab (empty)
+            waitFor { getRecipeNameDisplayedInTaskGenerationTab().contains(recipeDataMap.name)}
+    }
 
     def "2. Verifying the Information in the 'History' tab"() {
         given: 'The User is in the Cookbook Section'

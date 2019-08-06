@@ -1,0 +1,78 @@
+@mixin pie-countdown-timer($time) {
+  animation:
+    spin ($time/2) + s linear infinite,
+    bg $time + s step-end infinite;
+}
+
+$pie-base-color: #3c8dbc;
+$pie-under-color: #eee;
+
+.pie-countdown {
+  // border: 1px solid blue;
+}
+  .pie-countdown-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .pie-countdown .refresh {
+    color: $pie-base-color;
+    cursor: pointer;
+  }
+
+  .pie-countdown-container .k-dropdown {
+    margin: auto 10px;
+    width: 75px;
+  }
+
+      .pie-countdown-timer {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: $pie-under-color;
+        background-image: linear-gradient(to right, transparent 50%, $pie-base-color 0);
+        color: $pie-under-color;
+      }
+      
+      .pie-countdown-timer::before {
+        content: '';
+        display: block;
+        margin-left: 50%;
+        height: 100%;
+        border-radius: 0 100% 100% 0 / 50%;
+        background-color: inherit;
+        transform-origin: left;
+      }
+      
+      
+      @keyframes spin {
+        to { transform: rotate(.5turn); }
+      }
+      
+      @keyframes bg {
+        50% { background: $pie-base-color; }
+      }
+      
+      .timer-30-seconds::before {
+        @include pie-countdown-timer(30);
+      }
+      
+      .timer-60-seconds::before {
+        @include pie-countdown-timer(60);
+      }
+      
+      .timer-120-seconds::before {
+        @include pie-countdown-timer(120);
+      }
+      
+      .timer-300-seconds::before {
+        @include pie-countdown-timer(300);
+      }
+      
+      .timer-600-seconds::before {
+        @include pie-countdown-timer(600);
+      }
+
+

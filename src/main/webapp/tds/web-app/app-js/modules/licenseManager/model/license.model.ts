@@ -119,6 +119,8 @@ export class LicenseModel {
 	expirationDate?: Date;
 	activationDate?: Date;
 	status?: string;
+	guid?: string;
+	collectMetrics?: boolean;
 	bannerMessage?: string;
 	requestNote?: string;
 	environment?: string;

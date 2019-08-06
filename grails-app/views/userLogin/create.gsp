@@ -19,6 +19,23 @@
 
 				$('#username').focus();
 
+				var requiredInput = $('.requiredInput');
+
+				checkIfDisableSave();
+
+				requiredInput.change(function() {
+					checkIfDisableSave();
+				});
+
+				requiredInput.on('input', function() {
+					checkIfDisableSave();
+				});
+
+				$('.passwordField').on('input', function() {
+					checkIfDisableSave();
+				});
+
+				togglePasswordEditFields($("#isLocal"));
 			});
 
 			function selectAllAssigned(){
@@ -29,15 +46,80 @@
 
 			}
 
-			function togglePasswordFields($me) {
+
+			// Placeholder for loacl account input
+			var localAccount = $("#isLocal");
+
+			function checkIfDisableSave() {
+				var empty = false;
+				var isLocal = localAccount.is(":checked");
+				var save = $('.save');
+				$('.requiredInput').each(function () {
+					if ($(this).val().length === 0) {
+						empty = true;
+					}
+				});
+
+				var passwordsMatch = $('#passwordId').val() === $('#confirmPasswordId').val();
+
+				if ((!isLocal && empty) || (isLocal && (empty || !passwordsMatch))) {
+					save.attr('disabled', 'disabled');
+					save.addClass('disableButton');
+				} else {
+					save.removeAttr('disabled');
+					save.removeClass('disableButton');
+				}
+			}
+
+			// If local account input was checked, then clean passwords field if not empty
+			function cleanPasswordFields() {
+				var pwd = $("#passwordId");
+				var pwdConfirm = $("#confirmPasswordId");
+				pwd.val("");
+				pwdConfirm.val("");
+				$(".passwordsEditFields").each(function() {
+					var pwdField = $(this);
+					pwdField.hide();
+				});
+			}
+
+			var form = $("form[name='createUserForm']")[0];
+
+			$(form).submit(function(event){
+				var emailValue = $("#emailInputId").val();
+				var errMsg = "";
+				if(localAccount.is(":checked")){
+					if(emailValue){
+						if(!tdsCommon.isValidEmail(emailValue)){
+							errMsg = "Email address is invalid."
+						}
+					}else{
+						errMsg = "Email address is required!"
+					}
+				} else {
+					cleanPasswordFields();
+				}
+
+				if(errMsg.length > 0){
+					event.preventDefault()
+					alert(errMsg)
+				}
+			});
+
+
+			currentMenuId = "#adminMenu";
+			$('.menu-list-users').addClass('active');
+			$('.menu-parent-admin').addClass('active');
+
+			function togglePasswordEditFields($me) {
 				var isChecked = $me.is(":checked")
 				if (!isChecked) {
-					$me.val(false)
-					$(".passwordsEditFields").hide();
+					$me.val(false);
+					cleanPasswordFields();
 					$("#emailFieldId").hide();
 					$("#emailDisplayId").show();
 				} else {
-					$me.val(true)
+					$me.val(true);
 					$(".passwordsEditFields").show();
 					$("#emailFieldId").show();
 					$("#emailDisplayId").hide();
@@ -166,7 +248,7 @@
 									</g:else>
 								</td>
 							</tr>
-							<tr class="prop">
+							<tr class="prop passwordsEditFields">
 								<td valign="top" class="name">
 									<label for="passwordExpirationDateId"><g:message code="userLogin.passwordExpires.label" default="Password Expires" />:</label>
 								</td>
@@ -226,107 +308,6 @@
 									</td>
 								</tr>
 							</g:each>
-                            <%--<tr class="prop">
-                              <td valign="top" class="value" >
-                              	<table style="border: none;">
-
-
-                              	</table>
-                              </td>
-                            </tr>
-                            --%><%--<tr class="prop">
-                                <td valign="top" class="value" colspan="2">
-
-                                <table style="border: none;">
-
-                                <tr>
-
-                               <td valign="top" class="name">
-
-                                    <label >Available Roles:</label>
-
-                                </td>
-
-                                <td valign="top" class="name">
-
-                                    <label >&nbsp;</label>
-
-                                </td>
-
-                                <td valign="top" class="name">
-
-                                    <label >Assigned Roles:</label>
-
-                                </td>
-
-                                </tr>
-
-                                <tr>
-
-	                                <td valign="top" class="name">
-
-		                                <select name="availableRole" id="availableRoleId" multiple="multiple" size="10" style="width: 250px">
-
-			                                <g:each in="${roleList}" var="availableRoles">
-
-			                                	<option value="${availableRoles.id}">${availableRoles}</option>
-
-			                                </g:each>
-
-		                                </select>
-
-	                                </td>
-
-	                                <td valign="middle" style="vertical-align:middle" >
-
-		                                <span style="white-space: nowrap;height: 100px;" > <a href="#" id="add">
-
-										<asset:image src="images/right-arrow.png" style="float: left; border: none;"/>
-
-										</a></span><br/><br/><br/><br/>
-
-		                                <span style="white-space: nowrap;"> <a href="#" id="remove">
-
-		                                <asset:image src="images/left-arrow.png" style="float: left; border: none;"/>
-
-		                                </a></span>
-
-	                                </td>
-
-	                                <td valign="top" class="name">
-
-		                                <select name="assignedRole" id="assignedRoleId" multiple="multiple" size="10" style="width: 250px">
-
-			                                <g:if test="${assignedRole}">
-
-				                                <g:each in="${assignedRole}" var="assignedRole">
-
-				                                	<option value="${assignedRole}" selected="selected">${RoleType.get(assignedRole)}</option>
-
-				                                </g:each>
-
-			                                </g:if>
-
-			                                <g:else>
-
-			                                	<option value="USER" selected="selected">${RoleType.get('USER')}</option>
-
-			                                </g:else>
-
-		                                </select>
-
-	                                </td>
-
-                                </tr>
-
-                                </table>
-
-                                </td>
-
-
-                            </tr> --%>
-
-
 						</tbody>
 					</table>
 				</div>
@@ -336,83 +317,6 @@
 			</g:form>
 		</div>
 	<script>
-
-        function checkIfDisableSave() {
-            var empty = false;
-            $('.requiredInput').each(function () {
-                if ($(this).val().length == 0) {
-                    empty = true;
-                }
-            });
-
-            var passwordsMatch = $('#passwordId').val() == $('#confirmPasswordId').val();
-
-            if (empty || !passwordsMatch) {
-                $('.save').attr('disabled', 'disabled');
-                $('.save').addClass('disableButton');
-            } else {
-                $('.save').removeAttr('disabled');
-                $('.save').removeClass('disableButton');
-            }
-        }
-
-        $(document).ready(function() {
-            checkIfDisableSave();
-            $('.requiredInput').change(function() {
-                checkIfDisableSave();
-            });
-            $('.requiredInput').on('input', function() {
-                checkIfDisableSave();
-            });
-            $('.passwordField').on('input', function() {
-                checkIfDisableSave();
-            });
-        });
-
-		var form = $("form[name='createUserForm']")[0]
-		$(form).submit(function(event){
-			var emailValue = $("#emailInputId").val()
-			var errMsg = ""
-			if($("#isLocal").is(":checked")){
-				if(emailValue){
-					if(!tdsCommon.isValidEmail(emailValue)){
-						errMsg = "Email address is invalid."
-					}
-				}else{
-					errMsg = "Email address is required!"
-				}
-			}
-
-	    	if(errMsg.length > 0){
-	    		event.preventDefault()
-	    		alert(errMsg)
-	    	}
-		})
-
-
-		currentMenuId = "#adminMenu";
-		$('.menu-list-users').addClass('active');
-		$('.menu-parent-admin').addClass('active');
-
-		function togglePasswordEditFields($me) {
-				var isChecked = $me.is(":checked")
-				if (!isChecked) {
-					$me.val(false)
-					$(".passwordsEditFields").hide();
-					$("#emailFieldId").hide();
-					$("#emailDisplayId").show();
-				} else {
-					$me.val(true)
-					$(".passwordsEditFields").show();
-					$("#emailFieldId").show();
-					$("#emailDisplayId").hide();
-				}
-		}
-
-		$(document).ready(function(){
-			togglePasswordEditFields($("#isLocal"))
-
-		})
 	</script>
 	</body>
 </html>

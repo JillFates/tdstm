@@ -10,6 +10,14 @@ class UrlMappings {
 			action = [GET:"userTask"]
 		}
 
+		"/task/$id" {
+			controller = "task"
+			action = [GET:"task"]
+			constraints {
+				id(matches: /[0-9]{1,}/)
+			}
+		}
+
 		/**
 		 * TM-8842  Dependency Analyzer drill-in from Asset Show Details
 		 */
@@ -173,8 +181,8 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/asset/assetCommentCategories" {
-			controller = "wsAsset"
+		"/ws/task/assetCommentCategories" {
+			controller = "wsTask"
 			action = [
 			    GET : 'assetCommentCategories'
 			]
@@ -203,14 +211,51 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/event/updateEventSummary" {
+			controller = "wsEvent"
+			action = [
+			    POST: "updateEventSummary"
+			]
+		}
+
 		"/ws/event" {
 			controller = "event"
 			action = [GET: "index"]
 		}
 
+		"/ws/moveEvent/dashboardModel" {
+			controller = "wsEvent"
+			action = [GET: "getEventDashboardModel"]
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
+		}
+
+		"/ws/moveEvent/createModel" {
+			controller = "wsEvent"
+			action = [GET:"getModelForCreate"]
+		}
+
+		"/ws/moveEvent/viewEditModel/$id" {
+			controller = "wsEvent"
+			action = [GET:"getModelForViewEdit"]
+		}
+
+		"/ws/moveEvent/saveEvent/$id?" {
+			controller = "wsEvent"
+			action = [POST:"saveEvent"]
+		}
+
+		"/ws/moveEvent/markAssetsMoved/$id" {
+			controller = "wsEvent"
+			action = [PUT:"markEventAssetAsMoved"]
+		}
+
+		"/ws/moveEvent/deleteEvent/$id" {
+			controller = "wsEvent"
+			action = [DELETE:"deleteEvent"]
 		}
 
 		"/ws/moveEventNews/$id?" {
@@ -303,7 +348,6 @@ class UrlMappings {
 			action = [GET:"listBundles"]
 		}
 
-
 		/***************************/
 
 		"/ws/assetImport/invokeFetchAction/$id" {
@@ -387,6 +431,19 @@ class UrlMappings {
 			action = [POST:"listTasks"]
 		}
 
+		"/ws/task/getInfoForActionBar/$taskId" {
+			controller = "wsTask"
+			action = [GET: "getInfoForActionBar"]
+		}
+
+        "/ws/task/customColumns" {
+            controller = "wsTask"
+            action = [
+                    GET:"listCustomColumns",
+                    POST: "setCustomColumns"
+            ]
+        }
+
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
 			action = [POST:"generateTasks"]
@@ -432,9 +489,9 @@ class UrlMappings {
 			action = [POST:"invokeLocalAction"]
 		}
 
-		"/ws/task/$id/invokeRemoteAction" {
+		"/ws/task/$id/recordRemoteActionStarted" {
 			controller = "wsTask"
-			action = [POST:"invokeRemoteAction"]
+			action = [POST:"recordRemoteActionStarted"]
 		}
 
 		"/ws/task/$id/resetAction" {
@@ -447,14 +504,9 @@ class UrlMappings {
 			action = [POST:"addNote"]
 		}
 
-		"/ws/task/$id/changeTime" {
-			controller = "wsTask"
-			action = [POST:"changeEstTime"]
-		}
-
-		"/ws/task/$id/updateStatus" {
-			controller = "wsTask"
-			action = [POST:"updateStatus"]
+		"/ws/task/$id/changeTaskState" {
+			controller = "Task"
+			action = [POST:"changeTaskState"]
 		}
 
 		"/ws/progress/$id" {
@@ -485,6 +537,16 @@ class UrlMappings {
 			action = [
 				GET: 'context'
 			]
+		}
+
+		"/auth/loginInfo" {
+			controller = "auth"
+			action = [GET: "getLoginInfo"]
+		}
+
+		"/auth/sendResetPasswordEmail" {
+			controller = "auth"
+			action = [GET: "sendResetPasswordEmail"]
 		}
 
 		"/ws/user/modelForPreferenceManager" {
@@ -700,6 +762,7 @@ class UrlMappings {
 			]
 		}
 
+		//Gets que request Hash  --- OLB 161207 Change Hash to request...
 		"/ws/license/$id/hash" {
 			controller = "wsLicenseAdmin"
 			action = [
@@ -894,6 +957,13 @@ class UrlMappings {
 			controller = "wsLicenseAdmin"
 			action = [
 					GET: "fetchProjects"
+			]
+		}
+
+		"/ws/customDomain/fieldSpec/ASSETS/DELETE" {
+			controller = "wsCustomDomain"
+			action = [
+				POST: "clearFieldSpecsData"
 			]
 		}
 
@@ -1307,6 +1377,41 @@ class UrlMappings {
             ]
         }
 
+		"/ws/reports/viewEditBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleViewEdit"
+			]
+		}
+
+		"/ws/reports/createBundleModel" {
+			controller = "wsReports"
+			action = [
+					GET: "modelForBundleCreate"
+			]
+		}
+
+		"/ws/reports/saveBundle/$moveBundleId?" {
+			controller = "wsReports"
+			action = [
+					POST: "saveBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundle/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundle"
+			]
+		}
+
+		"/ws/reports/deleteBundleAndAssets/$moveBundleId" {
+			controller = "wsReports"
+			action = [
+					DELETE: "deleteBundleAndAssets"
+			]
+		}
+
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"
 			action = [
@@ -1395,7 +1500,11 @@ class UrlMappings {
 
 		"/api/${controller}"(version: "1.0", namespace: "v1", method: "GET")
 		"/api/${controller}/$id(.$format)?"(version: "1.0", action: "show", namespace:"v1", method: "GET")
-		"/api/${controller}/$id/$action(.$format)?"(version: "1.0", namespace:"v1", method: "GET")
+
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "GET")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "POST")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "PUT")
+		"/api/$controller/$id/$action(.$format)?"(version: "1.0", namespace: "v1", method: "DELETE")
 
 		"/api/${controller}/$id(.$format)?"(action: "delete", version: "1.0", namespace:"v1", method: "DELETE")
 		"/api/${controller}/$id(.$format)?"(action: "update", version: "1.0", namespace:"v1", method: "PUT")

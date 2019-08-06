@@ -38,4 +38,12 @@ class LookupFacade {
 	Boolean asBoolean() {
 		return found
 	}
+
+
+	@Override
+	String toString() {
+		return """LOOKUP {
+			found=${found}
+		}"""
+	}
 }

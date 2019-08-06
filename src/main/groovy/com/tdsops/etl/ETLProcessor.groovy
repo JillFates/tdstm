@@ -40,6 +40,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
+
 /**
  * Class that receives all the ETL initial commands.
  * <pre>
@@ -1142,7 +1143,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return current instance of ETLProcessor
 	 */
 	ETLProcessor log(Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
-		debugConsole.append(level, ETLValueHelper.valueOf(message))
+		debugConsole.append(level, String.valueOf(message))
 		return this
 	}
 

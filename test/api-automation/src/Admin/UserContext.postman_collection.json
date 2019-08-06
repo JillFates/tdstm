@@ -1,0 +1,140 @@
+{
+	"info": {
+		"_postman_id": "2921c4ff-8780-4458-a630-cf1a34d3ab3d",
+		"name": "User Context",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login User Context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2b17bc48-14e9-43d1-bed2-e730da57442f",
+						"exec": [
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Context",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Expected Data is returned\", function () {",
+							"  var response = JSON.parse(responseBody);",
+							"  var userId = response.data.user.id;",
+							"  var person = response.data.person.id;",
+							"",
+							"  pm.expect(userId).to.not.eql(null);",
+							"  pm.expect(person).to.not.eql(null);",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/user/context",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"user",
+						"context"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "06be5f65-1486-421a-8c1c-c81539942073",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "03862798-b1e2-4ce8-a386-7ce56320bec3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "ec2a067f-5952-45da-aea4-9310831e0d29",
+			"key": "secondID",
+			"value": "999999999999999999999",
+			"type": "string"
+		}
+	]
+}

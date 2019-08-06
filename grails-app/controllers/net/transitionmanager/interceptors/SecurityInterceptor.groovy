@@ -5,6 +5,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.AuditService
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.person.UserService
 
@@ -69,8 +70,8 @@ class SecurityInterceptor {
 				// TODO : JPM 12/2016 -- need to figure out the moveEventProjectClientStaff permission check here
 				def moveEventProjectClientStaff = PartyRelationship.find(
 					"from PartyRelationship p where p.partyRelationshipType = 'STAFF' " +
-					"and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = 'ROLE_COMPANY' " +
-					"and p.roleTypeCodeTo = 'ROLE_STAFF' and p.partyIdTo = $securityService.currentPersonId")
+					"and p.partyIdFrom = ${moveObject?.project?.client?.id} and p.roleTypeCodeFrom = '$RoleType.CODE_PARTY_COMPANY' " +
+					"and p.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' and p.partyIdTo = $securityService.currentPersonId")
 				if (!moveEventProjectClientStaff) {
 					// if not ADMIN check whether user is associated to the Party that is associate to
 					// the Project.client of the moveEvent / MoveBundle

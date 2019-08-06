@@ -636,7 +636,7 @@ function createBehaviorHandler () {
 		
 		// if the user wasn't in region selection mode and they clicked in place, deselect all nodes
 		} else if (clicked && !multiselect) {
-			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
+			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE_NO_TOGGLE)
 		}
 	}
 }

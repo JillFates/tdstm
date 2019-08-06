@@ -31,7 +31,7 @@
 							<td class="name"><label>Project Code:</label></td>
 
 							<td class="valueNW ${hasErrors(bean:projectInstance, field:'projectCode','errors')}">
-								<input type="text" id="projectCode" name="projectCode" indextab="110" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
+								<input type="text" id="projectCode" name="projectCode"  maxlength="20" indextab="110" value="${fieldValue(bean:projectInstance, field:'projectCode')}" />
 								<g:hasErrors bean="${projectInstance}" field="projectCode">
 									<div class="errors">
 										<g:renderErrors bean="${projectInstance}" as="list" field="projectCode" />

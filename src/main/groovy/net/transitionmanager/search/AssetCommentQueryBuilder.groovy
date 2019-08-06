@@ -252,7 +252,6 @@ class AssetCommentQueryBuilder {
 	 * Handle cases where the resulting expression is 'field = someValue'
 	 */
 	Closure eqBuilder = { String field, Map fieldMap ->
-		def value = requestParams[field]
 		comparisonBuilder(field, fieldMap, '=')
 	}
 
@@ -328,7 +327,7 @@ class AssetCommentQueryBuilder {
 		Date today = new Date().clearTime()
 		switch (requestParams[field]) {
 			case "dueOpenIssue":
-				whereClauses << "ac.dueDate IN < :filterToday"
+				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 		// 'break' intentionally omitted.
 
@@ -345,7 +344,7 @@ class AssetCommentQueryBuilder {
 				break
 
 			case "generalOverDue" :
-				whereClauses << "ac.dueDate IN < :filterToday"
+				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
 				whereClauses << "ac.category in (:planningCategories)"
 				whereParams['planningCategories'] = AssetComment.planningCategories
@@ -427,6 +426,7 @@ class AssetCommentQueryBuilder {
 	 */
 	Map fieldsInfoMap = [
 		'actStart':             [property: 'ac.actStart', builder: likeBuilder, type: Date],
+		'apiAction':            [property: 'ac.apiAction.name', builder: likeBuilder],
 		'assetName':            [property: 'ac.assetEntity.assetName', builder: likeBuilder],
 		'assetType':            [property: 'ac.assetEntity.assetType', builder: likeBuilder],
 		'assignedTo':           [property: SqlUtil.personFullName('assignedTo','ac'), builder: likeBuilder],
@@ -452,7 +452,7 @@ class AssetCommentQueryBuilder {
 		'isPublished':          [property: 'ac.isPublished', builder: boolEqBuilder],
 		'isResolved':           [property: 'ac.dateResolved', builder: zeroIsNullBuilder ],
 		'hardAssigned':         [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
-		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.actionableStatusList],
+		'justActionable':       [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.ActionableStatusCodes],
 		'justMyTasks':          [builder: justMyTasksBuilder],
 		'justRemaining':        [property: 'ac.status', builder: notEqIfSetBuilder, value:AssetCommentStatus.COMPLETED],
 		'moveEvent':            [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
@@ -463,6 +463,7 @@ class AssetCommentQueryBuilder {
 		'sendNotification':     [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status':               [property: 'ac.status', builder: likeBuilder],
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
+		'percentageComplete':	[property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
 		'viewUnpublished':      [builder: viewUnpublishedBuilder],

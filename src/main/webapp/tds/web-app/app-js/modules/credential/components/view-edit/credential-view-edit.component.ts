@@ -215,9 +215,11 @@ export class CredentialViewEditComponent {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close(null);

@@ -89,9 +89,14 @@
 							</g:if>
 
 							<tds:hasPermission permission="${Permission.ActionInvoke}">
-								<g:if test="${item?.apiActionId != null && item?.apiActionInvokedAt == null && item?.apiActionCompletedAt == null && item?.status in [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.COMPLETED]}">
-									<tds:actionButton label="Invoke" icon="ui-icon-gear" id="${item?.id}" onclick="invokeAction('${item?.id}')"/>
-								</g:if>
+								<tds:invokeActionButton
+										apiActionId="${item?.apiActionId}"
+										apiActionInvokedAt="${item?.apiActionInvokedAt}"
+										apiActionCompletedAt="${item?.apiActionCompletedAt}"
+										apiActionType="${item?.apiActionType}"
+										id="${item?.id}"
+										status="${item?.status}"
+										onclick="invokeAction('${item?.id}')"/>
 							</tds:hasPermission>
 							<tds:hasPermission permission="${Permission.ActionReset}">
 								<g:if test="${item?.apiActionId != null && item?.status in [AssetCommentStatus.HOLD]}">
@@ -155,7 +160,9 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $('[data-toggle="popover"]').popover();
+        $('[data-toggle="popover"]').popover({
+            container: 'body'
+        });
     });
 
 	if('${tab}'=="todo"){

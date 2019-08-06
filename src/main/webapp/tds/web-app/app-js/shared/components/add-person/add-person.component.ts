@@ -5,6 +5,7 @@ import { PersonModel } from './model/person.model';
 import { PersonService } from '../../services/person.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
 import { DecoratorOptions} from '../../model/ui-modal-decorator.model';
+import {TranslatePipe} from '../../pipes/translate.pipe';
 
 @Component({
 	selector: 'add-person',
@@ -149,9 +150,11 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 	errors: any;
 	dataSignature: string;
 	public modalOptions: DecoratorOptions;
+
 	constructor(
 		public personModel: PersonModel,
 		private personService: PersonService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
 		super('#add-person-component');
 		this.errors = {};
@@ -210,9 +213,11 @@ export class AddPersonComponent extends UIExtraDialog  implements  OnInit {
 		if (this.isDirty()) {
 
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();

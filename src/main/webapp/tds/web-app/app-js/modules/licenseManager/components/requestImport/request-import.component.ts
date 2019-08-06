@@ -9,6 +9,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 import {AlertType} from '../../../../shared/model/alert.model';
 // Other
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-request-import-license',
@@ -24,6 +25,7 @@ export class RequestImportComponent {
 		private notifierService: NotifierService,
 		private promptService: UIPromptService,
 		private licenseManagerService: LicenseManagerService,
+		private translatePipe: TranslatePipe,
 		public activeDialog: UIActiveDialogService) {
 		this.modalOptions = {isFullScreen: false, isResizable: false};
 		this.dataSignature = JSON.stringify(this.licenseKey);
@@ -32,9 +34,11 @@ export class RequestImportComponent {
 	public cancelCloseDialog($event): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

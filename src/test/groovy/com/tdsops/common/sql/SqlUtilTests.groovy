@@ -362,4 +362,26 @@ class SqlUtilTests extends Specification {
 			''			| null
 	}
 
+	void 'Test parseParameter with expressions looking for (not) null/empty values'() {
+		expect: 'the expression is resolved correctly'
+			FieldSearchData fsd = new FieldSearchData([
+				domain: Application,
+				column: "id",
+				filter: filter
+			])
+			SqlUtil.parseParameter(fsd)
+			fsd.sqlSearchExpression == expression
+			fsd.sqlSearchParameters == null
+		where:
+			filter      | expression
+			"="         | "trim(coalesce(id,'')) = ''"
+			"=    "     | "trim(coalesce(id,'')) = ''"
+			"!"         | "trim(coalesce(id,'')) <> ''"
+			"!    "     | "trim(coalesce(id,'')) <> ''"
+			"=null"     | "id IS NULL"
+			"=nULl   "  | "id IS NULL"
+			"!null"     | "id IS NOT NULL"
+			"!nULl   "  | "id IS NOT NULL"
+	}
+
 }

@@ -4,6 +4,7 @@ import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.common.security.RSACodec
 import com.tdsops.common.security.SecurityConfigParser
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.common.security.spring.TdsUserDetails
@@ -19,10 +20,15 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.springsecurity.rest.token.AccessToken
+import grails.plugin.springsecurity.rest.token.generation.TokenGenerator
 import grails.web.servlet.mvc.GrailsParameterMap
 import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.exception.ConfigurationException
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -30,16 +36,12 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyRole
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.PasswordHistory
-import net.transitionmanager.security.PasswordReset
-import net.transitionmanager.security.Permission
-import net.transitionmanager.security.Permissions
-import net.transitionmanager.security.RolePermissions
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.jdbc.core.JdbcTemplate
@@ -50,6 +52,8 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
+
+import java.security.PublicKey
 
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
@@ -65,13 +69,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = ROLE_USER.name()
 
-	def auditService
-	def emailDispatchService
-	def partyRelationshipService
-	def personService
-	def springSecurityService
-	def userPreferenceService
-	JdbcTemplate jdbcTemplate
+	AuditService             auditService
+	EmailDispatchService     emailDispatchService
+	PartyRelationshipService partyRelationshipService
+	PersonService            personService
+	SpringSecurityService    springSecurityService
+	UserPreferenceService    userPreferenceService
+	JdbcTemplate             jdbcTemplate
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -82,6 +86,49 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	private long forgotMyPasswordResetTTL = 0
 	private long accountActivationTTL = 0
+
+	TokenGenerator tokenGenerator
+	private RSACodec       rsaCodec = new RSACodec()
+
+	/**
+	 * Generates a Map that contains the JWT token for the current user.
+	 * This is comparable to logging in using the /api url, using spring security rest.
+	 *
+	 * @return A Map that contains the JWT token, refresh token, username, roles, token type, and expiration in seconds.
+	 */
+	@NotTransactional()
+	Map generateJWT (){
+		UserDetails userDetails = springSecurityService.getPrincipal()
+		AccessToken token = tokenGenerator.generateAccessToken(userDetails)
+
+		return [
+			// username       : userDetails.username,
+			// roles          : userDetails.authorities*.toString(),
+			"token_type"   : "Bearer",
+			"access_token" : token.accessToken,
+			"expires_in"   : token.expirationq
+		]
+	}
+
+	/**
+	 * Used to encrypt a String using a public key
+	 * @param text - the text to be encrypted
+	 * @param publicKeyText - the public key to use for performing the encryption
+	 * @return the text encrypted
+	 */
+	@NotTransactional()
+	String encryptWithPublicKey(String text, String publicKeyText) {
+		if (! publicKeyText) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
+
+		try {
+			PublicKey publicKey = rsaCodec.getPublicKey(publicKeyText)
+			return rsaCodec.encrypt(publicKey, text)
+		} catch (java.security.spec.InvalidKeySpecException e) {
+			throwException(InvalidParamException, 'security.encryption.message.invalidPublicKey', 'The public key is not a properly formatted RSA key')
+		}
+	}
 
 	void afterPropertiesSet() {
 
@@ -138,6 +185,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	Map getLoginConfig() {
 		loginConfigMap
+	}
+
+	/**
+	 * Create and return a map with the login config for the login page.
+	 * @return
+	 */
+	Map getConfigForLogin() {
+		return SecurityConfigParser.parseLoginSettings(grailsApplication.config, true)
 	}
 
 	/**
@@ -253,8 +308,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			// Find the projects that the user has been assigned to
 			projectIds = PartyRelationship.where {
 				partyRelationshipType.id == 'PROJ_STAFF'
-				roleTypeCodeFrom.id == 'ROLE_PROJECT'
-				roleTypeCodeTo.id == 'ROLE_STAFF'
+				roleTypeCodeFrom.id == RoleType.CODE_PARTY_PROJECT
+				roleTypeCodeTo.id == RoleType.CODE_PARTY_STAFF
 				partyIdTo.id == person.id
 				if (projectId) {
 					partyIdFrom.id == projectId
@@ -429,7 +484,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @return  the RoleTypes
 	 */
 	List<RoleType> getSecurityRoleTypes() {
-		return RoleType.findAllByType(RoleType.SECURITY, [sort: 'level', order: 'desc'])
+		return RoleType.findAllByType(RoleType.TYPE_SECURITY, [sort: 'level', order: 'desc'])
 	}
 
 	/**
@@ -1218,7 +1273,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		// Remove any Roles that are not in the above list
-		partyRelationshipService.updatePartyRoleByType(RoleType.SECURITY, person, assignedRoles)
+		partyRelationshipService.updatePartyRoleByType(RoleType.TYPE_SECURITY, person, assignedRoles)
 
 		if (setUserRoles(assignedRoles, person.id)) {
 			throw new DomainUpdateException('Unable to update user security roles')
@@ -1259,7 +1314,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	RoleType getSecurityRoleType(String roleCode) {
 		RoleType rt = RoleType.find('from RoleType rt where rt.id=:code and rt.type=:type',
-		                            [code: roleCode, type: RoleType.SECURITY])
+		                            [code: roleCode, type: RoleType.TYPE_SECURITY])
 		if (!rt) {
 			log.warn 'getSecurityRoleType() called with invalid code {}', roleCode
 		}
@@ -1457,9 +1512,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		return RoleType.findAllByTypeAndLevelLessThanEquals(
-				RoleType.SECURITY,
-				maxLevel,
-				[sort: 'level', order: 'desc']
+			RoleType.TYPE_SECURITY,
+			maxLevel,
+			[sort: 'level', order: 'desc']
 		)
 	}
 
@@ -1485,7 +1540,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		String query = """from RoleType r where r.type = :type and r.id in
 			(select pr.roleType.id from PartyRole pr where pr.party=:person group by pr.roleType.id)
 			order by r.level desc"""
-		RoleType.executeQuery(query, [person: person, type: RoleType.SECURITY])
+		RoleType.executeQuery(query, [person: person, type: RoleType.TYPE_SECURITY])
 	}
 
 	/**
@@ -1589,7 +1644,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	PartyRole assignRoleCode(Person person, String roleCode) {
 		RoleType rt = RoleType.get(roleCode)
-		if (!rt || rt.type != RoleType.SECURITY ) {
+		if (!rt || rt.type != RoleType.TYPE_SECURITY ) {
 			throw new InvalidParamException("Invalid role code $roleCode specified")
 		}
 
@@ -1799,7 +1854,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			                 group by roleType.id)
 			  and (type = ? OR type = ?)
 			order by description
-		''', [person, RoleType.TEAM, RoleType.SECURITY])
+		''', [person, RoleType.TYPE_TEAM, RoleType.TYPE_SECURITY])
 	}
 
 	@Transactional

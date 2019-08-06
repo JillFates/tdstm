@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
@@ -12,6 +13,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
 
 import java.util.Map.Entry
@@ -399,10 +401,15 @@ class DomainClassQueryHelper {
 			return otherAlternateKeys[fieldName].join
 		}
 
-		if (GormUtil.isReferenceProperty(clazz, fieldName)) {
-			return "left outer join ${DOMAIN_ALIAS}.${fieldName}".toString()
-		} else {
+		// When the field is fullname for the Person then no join is necessary as this is handled differently
+		if (clazz.isAssignableFrom(Person) && fieldName == Person.FULLNAME_KEY) {
 			return ''
+		} else {
+			if (GormUtil.isReferenceProperty(clazz, fieldName)) {
+				return "left outer join ${DOMAIN_ALIAS}.${fieldName}".toString()
+			} else {
+				return ''
+			}
 		}
 	}
 
@@ -420,6 +427,23 @@ class DomainClassQueryHelper {
 		Map<String, ?> hqlParams = [:]
 
 		String hqlWhere = conditions.collect { FindCondition condition ->
+
+			// eval conditions to see if it has 'fullName' and create specific query to use Person fullName
+			if (clazz.isAssignableFrom(Person) && condition.propertyName == Person.FULLNAME_KEY) {
+				PersonService personService = ApplicationContextHolder.getService('personService')
+				Map personFullNameMap = personService.parseName(condition.value)
+				Map<String, ?> findAllPersonsResult = personService.findAllPersons(personFullNameMap, project)
+
+				if (findAllPersonsResult && findAllPersonsResult.personsList.size() > 0) {
+					List<Person> personsList = findAllPersonsResult.personsList
+					List<Long> personsIds = personsList.collect { it.id }
+					hqlParams['personsIdsHqlParam'] = personsIds
+					return  " ${DOMAIN_ALIAS}.id in ( :personsIdsHqlParam ) "
+				} else {
+					// return this where clause to simulate that person was not found
+					return ' 1 <> 1 '
+				}
+			}
 
 			String property = getPropertyForField(clazz, condition)
 			String namedParameter = getNamedParameterForField(clazz, condition)

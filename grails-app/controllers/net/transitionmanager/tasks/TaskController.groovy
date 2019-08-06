@@ -10,23 +10,22 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import groovy.time.TimeDuration
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
-import net.transitionmanager.command.task.AssignToMeCommand
 import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
 import net.transitionmanager.connector.AbstractConnector
-import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
@@ -34,16 +33,13 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.task.timeline.TaskTimeLineGraph
-import net.transitionmanager.task.timeline.TimeLine
-import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -85,16 +81,41 @@ class TaskController implements ControllerMethods {
 	CustomDomainService customDomainService
 	JdbcTemplate jdbcTemplate
 	PartyRelationshipService partyRelationshipService
-	ProjectService projectService
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
+	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
+
+	/**
+	 * Used to get the task information by ID
+	 * @param id - the ID of the task to retrieve
+	 * @return JSON map of the Task object
+	 */
+	def task(Long id) {
+		AssetComment task = taskService.fetchTaskById(id, currentPerson())
+		renderAsJson(task:task.taskToMap())
+	}
+
+	/**
+	 * Used to change the state of a task between Started, Done and Hold.
+	 * This will take the task ID and check to make sure that the user has access vs using the
+	 * User CurrentProject.
+	 * @param id - the ID of the task
+	 * @param currentStatus - the current status that we are expecting the task to be in
+	 * @param status - the status to set the task to
+	 * @param message - optional message when setting the task on HOLD
+	 * @return The task as an JSON object is updated
+	 */
+	def changeTaskState(Long id) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, request.JSON.currentStatus, request.JSON.status, request.JSON.message)
+		renderAsJson(task:task.taskToMap())
+	}
 
 	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
@@ -126,8 +147,13 @@ class TaskController implements ControllerMethods {
 				flash.message = map.error
 			}
 
-			def redirParams = []
-
+			def redirParams = [view: requestParams.view]
+			if (requestParams.containsKey('tab') && requestParams.tab) {
+				redirParams.tab = requestParams.tab
+			}
+			if (requestParams.containsKey('sort') && requestParams.sort) {
+				redirParams.sort = requestParams.sort
+			}
 			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
@@ -145,13 +171,19 @@ class TaskController implements ControllerMethods {
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
 	@HasPermission(Permission.TaskEdit)
-	def assignToMe(AssignToMeCommand params) {
+	def assignToMe() {
+		Map requestParams
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
 
 		String errorMsg = ''
 		String assignedToName = ''
 
 		try {
-			Person assignedTo = taskService.assignToMe(params.id as Long, params.status)
+			Person assignedTo = taskService.assignToMe(requestParams.id as Long, requestParams.status)
 			assignedToName = assignedTo.toString()
 		} catch (EmptyResultException | ServiceException e) {
 			errorMsg = e.message
@@ -313,15 +345,9 @@ class TaskController implements ControllerMethods {
 			}
 
 			if (securityService.hasPermission(Permission.ActionInvoke)) {
-				if (comment.isActionInvocableLocally() && !comment.isAutomatic() ) {
-					actionBar << [
-						label: 'Invoke',
-						icon: 'ui-icon-gear',
-						actionType: 'invokeAction',
-						newStatus: STARTED,
-						redirect: 'taskManager',
-						disabled: false
-					]
+				Map<String, ?> invokeActionDetails = comment.getInvokeActionButtonDetails()
+				if (invokeActionDetails) {
+					actionBar << invokeActionDetails
 				}
 			}
 
@@ -917,7 +943,7 @@ digraph runbook {
 			AssetComment comment = taskService.changeEstTime(commentId, day)
 			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
 			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
-		} catch (EmptyResultException | ValidationException e) {
+		} catch (EmptyResultException | InvalidParamException e) {
 			retMap['etext'] = e.message
 		}
 		render retMap as JSON
@@ -984,15 +1010,8 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
-
-		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
-			.withVertices(tasks)
-			.withEdges(deps)
-			.build()
-
-		TimelineSummary timelineSummary = new TimeLine(graph).calculate(defaultEstStart)
+		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		def deps = runbookService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1091,16 +1110,19 @@ digraph runbook {
 		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
 			ApiAction apiAction = assetComment.apiAction
 			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
-			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
 
 			List<Map> methodParamsList = apiAction.methodParamsList
 			methodParamsList = taskService.fillLabels(project, methodParamsList)
 
 			Map apiActionPayload = [
-				connector       : connector.name,
-				method      : methodInfo.name,
-				description : methodInfo.description,
-				methodParams: methodParamsList,
+				name              : apiAction.name,
+				script            : taskActionService.renderScript(apiAction.script, assetComment),
+				isRemote          : apiAction.isRemote,
+				type              : apiAction.actionType.type,
+				connector         : connector.name,
+				method            : apiAction.connectorMethod,
+				description       : apiAction?.description,
+				methodParams      : methodParamsList,
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
@@ -1376,8 +1398,8 @@ digraph runbook {
 		}
 		// log.info "listComment() sort=$params.sort, order=$params.order"
 
-		def isCleaner = partyRelationshipService.staffHasFunction(project, person.id, 'ROLE_CLEANER')
-		def isMoveTech = partyRelationshipService.staffHasFunction(project, person.id, 'ROLE_MOVE_TECH')
+		def isCleaner = partyRelationshipService.staffHasFunction(project, person.id, RoleType.CODE_TEAM_CLEANER)
+		def isMoveTech = partyRelationshipService.staffHasFunction(project, person.id, RoleType.CODE_TEAM_MOVE_TECH)
 
 		if (params.event) {
 			userPreferenceService.setPreference(PREF.MYTASKS_MOVE_EVENT_ID,
@@ -1512,7 +1534,7 @@ function goBack() { window.history.back() }
 		// Determine the cart quantity
 		// The quantity only appears on the last label scanned/printed for a particular cart. This is used to notify
 		// the logistics and transport people that the cart is ready to wrap up.
-		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == "ROLE_CLEANER" && assetComment.status != COMPLETED) {
+		if (moveEvent && assetComment.assetEntity?.cart && assetComment.role == RoleType.CODE_TEAM_CLEANER && assetComment.status != COMPLETED) {
 			def cart = taskService.getCartQuantities(moveEvent, assetComment.assetEntity.cart)
 			if (cart && (cart.total - cart.done) == 1) {
 				// Only set the cartQty if we're printing the LAST set of labels for a cart (done is 1 less than total)
@@ -1531,7 +1553,7 @@ function goBack() { window.history.back() }
 			return
 		}
 
-		def isCleaner = partyRelationshipService.staffHasFunction(project, securityService.currentPersonId, 'ROLE_CLEANER')
+		def isCleaner = partyRelationshipService.staffHasFunction(project, securityService.currentPersonId, RoleType.CODE_TEAM_CLEANER)
 		def canPrint = isCleaner
 
 		def noteList = assetComment.notes.sort{it.dateCreated}

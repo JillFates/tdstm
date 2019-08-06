@@ -93,9 +93,11 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 	protected cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translate.transform('GLOBAL.CONFIRM'),
+				this.translate.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();
@@ -291,5 +293,12 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		}
 
 		return '';
+	}
+
+	/**
+	 * On change the notice type unpdate get the typeid
+	*/
+	onChangeNoticeType(value: any) {
+		this.model.typeId = (value && value.typeId);
 	}
 }

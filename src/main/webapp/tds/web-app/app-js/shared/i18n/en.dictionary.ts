@@ -40,6 +40,7 @@ export const en_DICTIONARY: Object = {
 		'REMOVE_FAVORITES': 'Remove from Favorites',
 		'SHARE_WITH_USERS': 'Share with other users',
 		'CLEAR_FILTERS': 'Clear filters',
+		'CLEAR_FILTER': 'Clear filter',
 		'FREEZE': 'Freeze',
 		'CLEAR': 'Clear',
 		'PLEASE_SELECT': 'Please Select..',
@@ -51,8 +52,8 @@ export const en_DICTIONARY: Object = {
 		'FETCH': 'Fetch',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
-			'CONFIRMATION_REQUIRED': 'Confirmation Required',
-			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
@@ -87,7 +88,7 @@ export const en_DICTIONARY: Object = {
 		'API_ACTIONS': 'Actions',
 	},
 	'ASSET_EXPLORER': {
-		'ASSET_EXPLORER': 'View Manager',
+		'ASSET_EXPLORER': 'Manage Views',
 		'CREATE': 'Create View',
 		'EDIT': 'Edit View',
 		'SHOW': 'Show View',
@@ -204,6 +205,15 @@ export const en_DICTIONARY: Object = {
 		'PLURAL_NAME': 'Dependencies',
 		'CONFIRM_DELETE_DEPENDENCY': 'Are you sure you would like to delete the dependency?'
 	},
+	'EVENT': {
+		'EVENT': 'Event',
+		'EVENTS': 'Events',
+		'CREATE_EVENT': 'Create Event',
+		'LIST': 'Event List',
+		'TITLE_DASHBOARD': 'Event Dashboard',
+		'DASHBOARD': 'Dashboard',
+		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
@@ -216,7 +226,11 @@ export const en_DICTIONARY: Object = {
 	},
 	'PLANNING': {
 		'PLANNING': 'Planning',
-		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist'
+		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
+		'BUNDLES': {
+			'BUNDLES': 'Bundles',
+			'LIST': 'Bundle List',
+		}
 	},
 	'FIELD_SETTINGS': {
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
@@ -230,7 +244,8 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH': 'Max Length',
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
-		}
+		},
+		'CLEAR_UNDERLAYING_DATA': 'The underlying data will be deleted when you delete the custom field(s).\nPress Yes continue, No to cancel.',
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',
@@ -285,6 +300,26 @@ export const en_DICTIONARY: Object = {
 			'CLICK_TO_IMMEDIATE_PROCESS' : 'Click to immediate attempt to post selected PENDING records to the the database. Ignored records will not be processed.\n'
 		}
 	},
+	'NEWS': {
+		'EDIT_NEWS': 'News Edit',
+		'CREATE_NEWS': 'News Create'
+	},
+	'LOGIN': {
+		'BACK_TO_LOGIN': 'Back to Login',
+		'CHECK_YOUR_EMAIL': 'Check Your Email',
+		'DOMAIN': 'Domain',
+		'FORGOT_PASSWORD': 'Forgot Password',
+		'LOGIN': 'Login',
+		'PLEASE_SELECT': 'Please select',
+		'SEND': 'Send',
+		'START_YOUR_SESSION': 'Sign in to start your session',
+		'SESSION_EXPIRED': 'Your session has expired. Please log in.',
+		'PASSWORD_ASSISTANT': 'Password Assistant',
+		'THANKS_FOR_REQUEST': 'Thank you for requesting a password reset. If your account is currently active,\n' +
+			'\t\t\tyou will receive an email with a reset link. If you do not receive this email,\n' +
+			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
+		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
+	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',
@@ -298,7 +333,7 @@ export const en_DICTIONARY: Object = {
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
 		'POST_NOTICES': 'Post Notices',
 		'TOOLTIP_TITLE': 'Notice title',
-		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
+		'TOOLTIP_NOTICE_TYPES': `Pre Login: Appear on Login Form
 Post Login: Used for general notices after Login
 Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
 		'TOOLTIP_ACTIVE': 'Notice will only appear when Active as long as it is within the Activation/Expiration date range if set',

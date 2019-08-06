@@ -65,34 +65,47 @@ export class FieldSettingsService {
 	}
 
 	/**
-	 * NOTE This function is added here in the service as it needs to be shared with different components.
-	 *
-	 * Checks if the label parameter string matches other labels in the fields list.
+	 * Delete the underlaying data for the custom fields selected
+	 * @param {string} payload - Contains the list of fields to be remove grouped by domain
+	 * @returns {any}
+	 */
+	deleteCustomFields(payload: any): Observable<any> {
+		return this.http.post(`${this.fieldSettingsUrl}/ASSETS/DELETE`, JSON.stringify(payload))
+			.map((response: any) => response['_body'] ? response : {status: 'Ok'})
+			.catch((error: any) => Observable.throw(error || 'Server error'));
+	}
+
+	/**
+	 * Checks if `label` matches any other labels inside `fields`.
 	 *    This comparison is case-insensitive and it doesn't take into account any trailing,
 	 *    leading or in-between spaces.
 	 *    e.g.  label: "Last Modified or last modified or LastModified".
-	 *        other label: "Last Modified".
-	 *        This comparisons will error.
+	 *        	other label: "Last Modified".
+	 *        	THE ABOVE COMPARISON WILL ERROR.
 	 *
-	 * @param The label string to be compared with the list of existing labels.
-	 * @param The list of fields.
+	 * @param {string} label - The label string to be compared with the other labels in `fields`.
+	 * @param {any} fields - The list of fields.
+	 * @returns {boolean} - `true` if there are conflicts, `false` otherwise.
 	 */
 	conflictsWithAnotherLabel(label: string, fields: any): boolean {
 		// NOTE The comparision at the end is done with "1", because there will always be one positive result in the list
 		// when the label compares to itself.
+		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
 		return fields.filter(
-			item => item.label.replace(/\s/g, '').toLowerCase().trim() === label.replace(/\s/g, '').toLowerCase().trim()
+			item => item.label.replace(/\s/g, '').toLowerCase().trim() === cleanLabel
 			&& item.label.trim() !== '').length > 1;
 	}
 
 	/**
-	 * NOTE This function is added here in the service as it needs to be shared with different components.
+	 * Checks if `label` matches any field names inside `fields`.
+	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing,
+	 * leading or in-between spaces.
+	 *    e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName".
+	 * 	  THE ABOVE COMPARISON WILL ERROR.
 	 *
-	 * Checks if the label String matches any field names in the list of fields.
-	 * NOTE This comparison is case-insensitive and it doesn't take into account any trailing, leading or in-between spaces.
-	 *    e.g. label: "Asset Name" or "asset Name" or "AssetName" or "assetName", and some field name: "assetName". <- This comparisons will error.
-	 * @param  The label string to be compared with the list of existing field names.
-	 * @param The list of fields.
+	 * @param {string} label - The label string to be compared with the list of field names in `fields`.
+	 * @param {any} fields - The list of fields.
+	 * @returns {boolean} - `true` if there are conflicts, `false` otherwise.
 	 */
 	conflictsWithAnotherFieldName(label: string, fields: any): boolean {
 		let cleanLabel = label.replace(/\s/g, '').toLowerCase().trim();
@@ -102,23 +115,23 @@ export class FieldSettingsService {
 	}
 
 	/**
-	 * Check if the label from the field parameter has conflicts with any label or fieldName from another domains.
+	 * Check if the label from the field parameter has conflicts with any label or fieldName from another domain.
 	 *
-	 * @param field  The field from where we are taking the label string we are using to compare
+	 * @param {any} field - The field to compare.
 	 * (It will be used only if the field is shared, otherwise it won't do anything).
-	 * @param domains  The domains with the list of fields we will compare to (the list of fields corresponding to the
-	 * domain where "field" comes from won't be used, just the list of fields of the other domains).
-	 * @param originDomain  The domain to which "fields" belongs to.
+	 * @param {any} domains - The domains with the list of fields we will compare to (the list of fields corresponding to the
+	 * domain where `field` comes from won't be used, just the list of fields of the other domains).
+	 * @param originDomain  The domain to which ``field` belongs to.
 	 * @returns {boolean} True if any conflict is found, false otherwise.
 	 */
 	conflictsWithAnotherDomain(field: any, domains: any, originDomain: any): boolean {
 		let conflicts = [];
 		// We are going to find conflicts in the other domains,
-		// so first remove the origin domain (the domain to which 'field' belongs) from the list of domains
+		// so first remove the origin domain (the domain to which 'field' belongs to) from the list of domains
 		let filteredDomains = domains.filter((d) => d.domain !== originDomain.domain);
 		// The whole logic should only be computed if the field is shared
 		if (field.shared === true) {
-			// Get the label from 'field' (convert to lower case and trim spaces )
+			// get the label from 'field' (convert to lower case and trim spaces )
 			let fieldLabel = field.label.replace(/\s/g, '').toLowerCase().trim();
 			for (let domain of filteredDomains) {
 				// get all fields from this domain
@@ -144,14 +157,14 @@ export class FieldSettingsService {
 
 	/**
 	 * Checks for any conflicts between:
-	 * - labels an other labels,
-	 * - labels and fieldNames,
-	 * - labels and other labels and fieldNames from other domains.
+	 * - between labels,
+	 * - between labels and fieldNames,
+	 * - between labels and the labels and fieldNames from other domains.
 	 *
-	 * @param fields  The list of fields to check from.
-	 * @param domains  The list of all the domains, so conflicts against other domains can be checked as well.
-	 * @param originDomain  The domain to which "fields" belongs to.
-	 * @returns {boolean}  True if any conflict is found, false otherwise.
+	 * @param {any} fields - The list of fields to check from.
+	 * @param {any} domains - The list of all the domains, so conflicts against other domains can be checked as well.
+	 * @param {any} originDomain - The domain to which `fields` belongs to.
+	 * @returns {boolean} - `true` if any conflict is found, `false` otherwise.
 	 */
 	checkLabelsAndNamesConflicts(fields: any, domains: any, originDomain: any): boolean {
 		// Check if there are conflicts among labels

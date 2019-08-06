@@ -7,24 +7,30 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule, NgModuleFactoryLoader, SystemJsNgModuleLoader, APP_INITIALIZER} from '@angular/core';
 import {HttpClientModule} from '@angular/common/http';
 import {TDSAppComponent} from './tds-app.component';
-// Service
-import {AuthGuardService} from '../modules/security/services/auth.guard.service';
-import {UserService} from '../modules/security/services/user.service';
-import {UserContextService} from '../modules/security/services/user-context.service';
+// Ngxs
+import {NgxsModule} from '@ngxs/store';
+import {TDSAppState} from './state/tds-app.state';
+import {NgxsReduxDevtoolsPluginModule} from '@ngxs/devtools-plugin';
+import {NgxsLoggerPluginModule} from '@ngxs/logger-plugin';
 // Root Basic modules
 import {TDSAppRouteModule} from './tds-routing.states';
 import {SharedModule} from '../shared/shared.module';
 // Feature modules
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
-import {UserModule} from '../modules/user/user.module';
+import {AuthModule} from '../modules/auth/auth.module';
+import {UserContextState} from '../modules/auth/state/user-context.state';
 
 @NgModule({
 	imports: [
+		NgxsModule.forRoot([TDSAppState, UserContextState]),
+		NgxsReduxDevtoolsPluginModule.forRoot(),
+		NgxsLoggerPluginModule.forRoot(),
 		// Angular Modules
 		BrowserModule,
 		HttpClientModule,
 		BrowserAnimationsModule,
 		TDSAppRouteModule,
+		AuthModule,
 		TaskManagerModule,
 		SharedModule.forRoot()
 	],
@@ -32,16 +38,7 @@ import {UserModule} from '../modules/user/user.module';
 		TDSAppComponent,
 	],
 	providers: [
-		AuthGuardService,
-		UserService,
-		UserContextService,
-		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader },
-		{
-			provide: APP_INITIALIZER,
-			useFactory: (provider: UserContextService) => () => provider.initializeUserContext(),
-			deps: [UserContextService],
-			multi: true
-		}
+		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
 	],
 	bootstrap: [
 		TDSAppComponent

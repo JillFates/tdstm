@@ -22,7 +22,6 @@ import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.party.PartyRelationshipType
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
@@ -66,17 +65,17 @@ class PersonService implements ServiceMethods {
 
 	// A list of the Domain class properties that perform cross references to prevent deletions
 	private static final Map<String, Map<String, Boolean>> PERSON_DELETE_EXCEPTIONS_MAP = [
-		application: [sme_id: true, sme2_id: true],
-		asset_entity: [app_owner_id: true]
+			application: [sme_id: true, sme2_id: true],
+			asset_entity: [app_owner_id: true]
 	]
 
 	// The Person properties that are updated by the Person Merge functionality
 	private static final List<String> MERGE_PERSON_DOMAIN_PROPERTIES = [
-		'firstName', 'middleName', 'lastName', 'nickName', 'title', 'email',
-		'department', 'location', 'stateProv', 'country',
-		'workPhone', 'mobilePhone',
-		'personImageURL',
-		'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
+			'firstName', 'middleName', 'lastName', 'nickName', 'title', 'email',
+			'department', 'location', 'stateProv', 'country',
+			'workPhone', 'mobilePhone',
+			'personImageURL',
+			'tdsNote', 'tdsLink', 'keyWords', 'travelOK'
 	]
 
 	/* ***************************
@@ -117,8 +116,8 @@ class PersonService implements ServiceMethods {
 		StringBuilder query = new StringBuilder('SELECT party_id_to_id as id FROM party_relationship pr')
 		query.append(' JOIN person p ON p.person_id=pr.party_id_to_id')
 		query.append(' WHERE pr.party_id_from_id=:company')
-		query.append(' AND pr.role_type_code_from_id="ROLE_COMPANY"')
-		query.append(' AND pr.role_type_code_to_id="ROLE_STAFF"')
+		query.append(" AND pr.role_type_code_from_id='$RoleType.CODE_PARTY_COMPANY'")
+		query.append(" AND pr.role_type_code_to_id='$RoleType.CODE_PARTY_STAFF'")
 		// query.append(' ')
 		if (nameMap.first) {
 			queryParams.first = nameMap.first
@@ -163,14 +162,14 @@ class PersonService implements ServiceMethods {
 			throw new InvalidParamException('User has no first name associated with account')
 		}
 
-		String query = '''
+		String query = """
 			select 
 				pr.partyIdTo from PartyRelationship pr
 			where 
 				pr.partyIdFrom = :company
-				and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY'
-				and pr.roleTypeCodeTo = 'ROLE_STAFF'
-		'''
+				and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY'
+				and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF'
+		"""
 		Map queryParams = [company: company]
 
 		query += ' AND ((pr.partyIdTo.firstName = :firstName'
@@ -193,7 +192,6 @@ class PersonService implements ServiceMethods {
 		}
 
 		query +=  ' OR (pr.partyIdTo.firstName = :firstName AND pr.partyIdTo.middleName is null AND pr.partyIdTo.lastName is null))'
-
 		log.debug 'findByCompanyAndName() Query = {}', query
 
 		return PartyRelationship.executeQuery(query, queryParams)
@@ -212,8 +210,8 @@ class PersonService implements ServiceMethods {
 			Map args = [company: company, email: email]
 			persons = PartyRelationship.executeQuery("select pr.partyIdTo from PartyRelationship pr " +
 					"where pr.partyIdFrom = :company " +
-					"and pr.roleTypeCodeFrom.id = 'ROLE_COMPANY' " +
-					"and pr.roleTypeCodeTo = 'ROLE_STAFF' " +
+					"and pr.roleTypeCodeFrom.id = '$RoleType.CODE_PARTY_COMPANY' " +
+					"and pr.roleTypeCodeTo = '$RoleType.CODE_PARTY_STAFF' " +
 					"and pr.partyIdTo.email = :email", args)
 		}
 		return persons
@@ -275,7 +273,7 @@ class PersonService implements ServiceMethods {
 		String mn = 'findPerson()'
 		Map results = [person: null, isAmbiguous: false, partial: false]
 
-		log.debug 'findPersion() attempting to find nameMap={} in project {}', nameMap, project
+		log.debug '{} attempting to find nameMap={} in project {}', mn, nameMap, project
 
 		// Make sure we have a person
 		if (!nameMap || !nameMap.containsKey('first')) {
@@ -283,8 +281,47 @@ class PersonService implements ServiceMethods {
 			return results
 		}
 
+		Map<String, ?> findAllPersonsResult = findAllPersons(nameMap, project, staffList, clientStaffOnly, checkAmbiguity)
+		if (findAllPersonsResult) {
+			List<Person> persons = findAllPersonsResult.personsList
+			int s = persons?.size()
+			if (s > 1) {
+				results.isAmbiguous = true
+			} else if (s == 1) {
+				String lastName = lastNameWithSuffix(nameMap)
+				results.person = persons[0]
+				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
+			}
+			results.partial = findAllPersonsResult.partial
+		}
+
+		log.debug '{} results={}', mn, results
+		return results
+	}
+
+	/**
+	 * Find persons associated with a given project using a parsed name map
+	 * @param nameMap - a Map containing person name elements
+	 * @param project - the project object that the person is associated with
+	 * @param staffList - deprecated argument that is no longer used
+	 * @param clientStaffOnly - a flag to indicate if the search should only look at staff of the client or all persons associated to the project
+	 * @param checkAmbiguity - a flag to indicate if the search should include lastName and middleName if present
+	 * in the nameMap as part of the where clause
+	 * @return A map with a clist of persons found by fullName passed as nameMap and a flag indicating if the
+	 * resulting list of persons found is a partial find or not
+	 */
+	Map<String, ?> findAllPersons(Map nameMap, Project project, List staffList = null, boolean clientStaffOnly = true, boolean checkAmbiguity = false) {
+		boolean partial = false
+		String mn = 'findAllPersons()'
+		log.debug '{} attempting to find nameMap={} in project {}', mn, nameMap, project
+
+		// Make sure we have a person
+		if (!nameMap || !nameMap.containsKey('first')) {
+			return null
+		}
+
 		String hql = "from PartyRelationship PR inner join PR.partyIdTo P where PR.partyRelationshipType.id='STAFF' " +
-			  "and PR.roleTypeCodeFrom.id='ROLE_COMPANY' and PR.roleTypeCodeTo.id='ROLE_STAFF' and PR.partyIdFrom IN (:companies)"
+			"and PR.roleTypeCodeFrom.id='$RoleType.CODE_PARTY_COMPANY' and PR.roleTypeCodeTo.id='$RoleType.CODE_PARTY_STAFF' and PR.partyIdFrom IN (:companies)"
 
 		List companies = [project.client]
 
@@ -313,17 +350,8 @@ class PersonService implements ServiceMethods {
 		}
 		log.debug '{} findPerson() Initial search found {} {}', mn, persons.size(), nameMap
 
-		int s = persons.size()
-		if (s > 1) {
-			persons.each { person -> log.debug '{} person {} {}', mn, person.id, person }
-			// results.person = persons[0]
-			results.isAmbiguous = true
-		} else if (s == 1) {
-			results.person = persons[0]
-		} else {
-
+		if (!persons) {
 			// Try to find match on partial
-
 			// Closure to construct the where and queryParams used below
 			def addQueryParam = { name, value ->
 				if (!StringUtil.isBlank(value)) {
@@ -341,23 +369,14 @@ class PersonService implements ServiceMethods {
 			log.debug '{} partial search using {}', mn, queryParams
 			persons = Person.findAll(hql + where, queryParams)
 			if (persons) {
+				partial = true
 				persons = persons.collect({ it[1] })
 			}
 			log.debug '{} partial search found {}', mn, persons.size()
-
-			s = persons.size()
-			if (s > 1) {
-				results.isAmbiguous = true
-				results.partial = true
-			} else if (s == 1) {
-				results.person = persons[0]
-				results.isAmbiguous = (StringUtil.isBlank(lastName) && !StringUtil.isBlank(results.person.lastName))
-				results.partial = true
-			}
 		}
 
-		log.debug '{} results={}', mn, results
-		return results
+		log.debug '{} results={}', mn, persons
+		return [partial: partial, personsList: persons]
 	}
 
 	/**
@@ -436,11 +455,11 @@ class PersonService implements ServiceMethods {
 	 * @param String The full name of the person
 	 * @return Map - the map of the parsed name that includes first, last, middle, suffix or null if it couldn't be parsed for some odd reason
 	 */
-	Map parseName(String name) {
+	Map<String, String> parseName(String name) {
 		name = StringUtils.strip(name)
-		Map map = [first: '', last: '', middle: '', suffix: '']
-		def firstLast = true
-		def split
+		Map<String, String> map = [first: '', last: '', middle: '', suffix: '']
+		boolean firstLast = true
+		List<String> split
 
 		if (!name) {
 			return null
@@ -450,11 +469,11 @@ class PersonService implements ServiceMethods {
 		if (name.contains(',')) {
 			split = name.split(',').collect { it.trim() }
 			//println "a) split ($split) isa ${split.getClass()}"
-			def size = split.size()
+			int size = split.size()
 
 			if (size == 2) {
 				// Check to see if it is a Suffix vs last, first
-				def s = split[1]
+				String s = split[1]
 				if (SUFFIXES.contains(s.toLowerCase())) {
 					// We got first last, suffix
 					map.suffix = s
@@ -478,7 +497,7 @@ class PersonService implements ServiceMethods {
 			//println "0) split ($split) isa ${split.getClass()}"
 		}
 
-		def size = split.size()
+		int size = split.size()
 
 		if (firstLast) {
 
@@ -502,7 +521,7 @@ class PersonService implements ServiceMethods {
 			// Check to see if we have a middle name or a compound name
 			if (size >= 2) {
 				//println "4) split ($split) isa ${split.getClass()}"
-				def last = split.pop()
+				String last = split.pop()
 				if (COMPOUND_NAMES.contains(split[-1].toLowerCase())) {
 					last = split.pop() + ' ' + last
 				}
@@ -521,7 +540,7 @@ class PersonService implements ServiceMethods {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			def last = split[0].split("\\s+").collect { it.trim() }
+			List<String> last = split[0].split("\\s+").collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -531,7 +550,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			def first = split[1].split("\\s+").collect { it.trim() }
+			List<String> first = split[1].split("\\s+").collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {
@@ -1018,7 +1037,7 @@ class PersonService implements ServiceMethods {
 		addToTeam(person, teamCode)
 
 		if (!isAssignedToProjectTeam(project, person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project '$project.name' on team $teamCode")
 			}
 			else {
@@ -1037,7 +1056,7 @@ class PersonService implements ServiceMethods {
 	 */
 	void addToTeam(Person person, String teamCode) {
 		if (!isAssignedToTeam(person, teamCode)) {
-			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, "ROLE_COMPANY", person, teamCode)) {
+			if (partyRelationshipService.savePartyRelationship("STAFF", person.company, RoleType.CODE_PARTY_COMPANY, person, teamCode)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to team $teamCode")
 			}
 			else {
@@ -1079,7 +1098,7 @@ class PersonService implements ServiceMethods {
 	private void addToProjectSecured(Project project, Person person) {
 		// Add to the project if not assigned already
 		if (!isAssignedToProject(project, person)) {
-			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, "ROLE_PROJECT", person, 'ROLE_STAFF')) {
+			if (partyRelationshipService.savePartyRelationship("PROJ_STAFF", project, RoleType.CODE_PARTY_PROJECT, person, RoleType.CODE_PARTY_STAFF)) {
 				auditService.logMessage("$securityService.currentUsername assigned $person to project $project.name as STAFF")
 			} else {
 				throw new DomainUpdateException("An error occurred while attempting to assign the person to the project")
@@ -1192,7 +1211,7 @@ class PersonService implements ServiceMethods {
 		// Remove the Project Staff relationship for the project
 		List<RoleType> roles = partyRelationshipService.getProjectStaffFunctions(map.project.id, map.person.id)
 		for (RoleType role in roles) {
-			if (role.type == RoleType.TEAM) {
+			if (role.type == RoleType.TYPE_TEAM) {
 				partyRelationshipService.deletePartyRelationship("PROJ_STAFF", map.project, "PROJECT", map.person, role.type)
 				metrics.teamsUnassigned++
 			}
@@ -1343,7 +1362,7 @@ class PersonService implements ServiceMethods {
 	 * @return The PartyRelationshipReference that represents the person's relationship to a project
 	 */
 	PartyRelationship getProjectReference(Project project, Person person) {
-		return getProjectTeamReference(project, person, 'ROLE_STAFF')
+		return getProjectTeamReference(project, person, RoleType.CODE_PARTY_STAFF)
 	}
 
 	/**
@@ -1360,7 +1379,7 @@ class PersonService implements ServiceMethods {
 		def teamRef = PartyRelationship.createCriteria().get {
 			and {
 				eq('partyRelationshipType.id', 'PROJ_STAFF')
-				eq('roleTypeCodeFrom.id', 'ROLE_PROJECT')
+				eq('roleTypeCodeFrom.id', RoleType.CODE_PARTY_PROJECT)
 				eq("roleTypeCodeTo${teamCode instanceof RoleType ? '' : '.id'}", teamCode)
 				eq('partyIdFrom', project)
 				eq('partyIdTo', person)
@@ -1418,9 +1437,9 @@ class PersonService implements ServiceMethods {
 		assert person != null
 
 		PartyRelationship.createCriteria().list {
-			eq('partyRelationshipType', PartyRelationshipType.load('ROLE_PROJ_STAFF'))
+			eq('partyRelationshipType', PartyRelationshipType.load('PROJ_STAFF'))
 			and {
-				eq('roleTypeCodeFrom', RoleType.load('ROLE_PROJECT'))
+				eq('roleTypeCodeFrom', RoleType.load(RoleType.CODE_PARTY_PROJECT))
 				eq('partyIdTo', person)
 				if (project) {
 					eq('partyIdFrom', project)
@@ -1718,10 +1737,10 @@ class PersonService implements ServiceMethods {
 			person = personList.find {
 				// Find person using case-insensitive search
 				StringUtils.equalsIgnoreCase(it.firstName, personCommand.firstName) &&
-					((StringUtils.isEmpty(personCommand.lastName) && StringUtils.isEmpty(it.lastName)) ||
-					  StringUtils.equalsIgnoreCase(it.lastName, personCommand.lastName)) &&
-					((StringUtils.isEmpty(personCommand.middleName) && StringUtils.isEmpty(it.middleName)) ||
-					  StringUtils.equalsIgnoreCase(it.middleName, personCommand.middleName))
+						((StringUtils.isEmpty(personCommand.lastName) && StringUtils.isEmpty(it.lastName)) ||
+								StringUtils.equalsIgnoreCase(it.lastName, personCommand.lastName)) &&
+						((StringUtils.isEmpty(personCommand.middleName) && StringUtils.isEmpty(it.middleName)) ||
+								StringUtils.equalsIgnoreCase(it.middleName, personCommand.middleName))
 			}
 
 			if (person != null) {
@@ -1801,6 +1820,6 @@ class PersonService implements ServiceMethods {
 	 */
 	Person findByUsername(String username) {
 		Person.executeQuery('select u.person from UserLogin u where u.username=:username',
-			[username: username])[0]
+				[username: username])[0]
 	}
 }

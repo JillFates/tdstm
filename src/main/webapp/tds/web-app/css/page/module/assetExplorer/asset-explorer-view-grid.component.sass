@@ -5,10 +5,13 @@
       font-size: $grid-font-icon-size
 
   .k-grid-header
+    .k-filter-row
+      td
+        vertical-align: top
     .k-icon
       font-size: $grid-font-icon-size
     tr
-      height: unset!important
+      //height: unset!important
       td
         .asset-tag-selector-component
           .k-multiselect
@@ -18,10 +21,15 @@
               min-height: unset
         .has-feedback
           input.form-control
-            padding: 2px 27px 2px 12px 
-            height: unset
+            padding: 2px 27px 2px 12px
           span.form-control-feedback
             line-height: 28px
+        div
+          .asset-grid-margin
+            margin-bottom: 0px
+            margin-top: 3px
+      input.form-control[name="common.assetName"]
+        width: 98%
 
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important

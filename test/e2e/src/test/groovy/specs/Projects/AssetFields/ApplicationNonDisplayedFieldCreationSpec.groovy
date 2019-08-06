@@ -10,7 +10,7 @@ import spock.lang.Shared
 
 /**
  * This spec verify some required fields and validations, then creates a custom Application field
- * which wont be displayed and finally verifies it was properly saved.
+ * which won't be displayed and finally verifies it was properly saved.
  * @author Sebastian Bigatton
  */
 
@@ -53,7 +53,7 @@ class ApplicationNonDisplayedFieldCreationSpec extends GebReportingSpec{
     }
 
     def "1. The user verifies default tab displayed"() {
-        when: 'The User is in Assets Fields Settings page'
+        when: 'The User is in Asset Fields Settings page'
             at AssetFieldSettingsPage
         then: 'Application tab is active and displayed'
             verifyActiveTabByName "Application"
@@ -90,11 +90,11 @@ class ApplicationNonDisplayedFieldCreationSpec extends GebReportingSpec{
     }
 
     def "4. The user creates a Non-Displayed Custom Application field"(){
-        when: 'The user fill field information'
-            fieldInfo.fieldName = getLabelInputId() // store field name to verify after create
+        when: 'The user fills field information'
+            fieldInfo.fieldName = getLabelInputId() // store field name to verify after creation
             setLabelName fieldInfo.label
-            fieldInfo.highlighting = selectRandomHighlighting() // selects and returns selected to verify after create
-            clickOnDisplayCheckbox() // to disable it
+            fieldInfo.highlighting = selectRandomHighlighting() // selects a random option on the Highlighting field
+            clickOnDisplayCheckbox() // Disables display of the Asset Field
             setDefaultValue fieldInfo.defaultValue
             getSelectedControlValueInEdit() == fieldInfo.control
             clickOnControlWheelIcon()

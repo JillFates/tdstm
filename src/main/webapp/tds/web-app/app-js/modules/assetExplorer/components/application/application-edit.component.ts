@@ -16,8 +16,9 @@ import { AddPersonComponent } from '../../../../shared/components/add-person/add
 import { PersonModel } from '../../../../shared/components/add-person/model/person.model';
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -47,9 +48,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe,
 			) {
-				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {

@@ -108,7 +108,6 @@ class ApiCatalogTestHelper {
         "description": "List of all Applications",
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
-        "method": "fetchAssetList",
         "httpMethod": "GET",
         "producesData": 1,
         "params": [
@@ -125,7 +124,6 @@ class ApiCatalogTestHelper {
         "description": "List of databases",
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
-        "method": "fetchAssetList",
         "httpMethod": "GET",
         "producesData": 1,
         "params": [
@@ -139,7 +137,6 @@ class ApiCatalogTestHelper {
         "description": "Call endpoint",
         "endpointUrl": "https://{HOSTNAME}.about.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
-        "method": "fetchAssetList",
         "httpMethod": "GET",
         "producesData": 1,
         "params": [
@@ -197,7 +194,6 @@ class ApiCatalogTestHelper {
                 "description": "Performs a call to an HTTP endpoint",
                 "endpointUrl": "https://SOME-DOMAIN/SOME/PATH",
                 "docUrl": "http://about.com/docs#appList",
-                "method": "invokeHttpRequest",
                 "httpMethod": "GET",
                 "producesData": 0,
                 "params": [

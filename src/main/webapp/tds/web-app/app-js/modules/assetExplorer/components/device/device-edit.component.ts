@@ -14,8 +14,9 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {TagService} from '../../../assetTags/service/tag.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DeviceCommonComponent} from './model-device/device-common.component';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export function DeviceEditComponent(template, editModel, metadata: any) {
 
@@ -35,9 +36,11 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService) {
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe
+		) {
 
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {

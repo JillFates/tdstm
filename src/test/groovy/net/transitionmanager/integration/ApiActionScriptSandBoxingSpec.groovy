@@ -1,11 +1,12 @@
 package net.transitionmanager.integration
 
-
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.person.Person
 import net.transitionmanager.security.ScriptExpressionChecker
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -58,7 +59,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -69,18 +70,18 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			evaluator.evaluate("""
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-				
+
 				// Set the socket and connect to 5 seconds
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				// Set up a proxy for the call
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
-				
+
 				// Set the charset for the exchange
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
-				
+
 				// Set the content-type to JSON
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
 			""".stripIndent())
@@ -109,7 +110,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -144,7 +145,6 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			}
 
 			ImportCustomizer customizer = new ImportCustomizer()
-
 			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
@@ -153,18 +153,18 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			evaluator.evaluate("""
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
-				
+
 				// Set the socket and connect to 5 seconds
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				// Set up a proxy for the call
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
-				
+
 				// Set the charset for the exchange
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
-				
+
 				// Set the content-type to JSON
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
 			""".stripIndent(),
@@ -194,7 +194,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -211,7 +211,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				 */
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
@@ -242,7 +242,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -269,7 +269,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -304,6 +304,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			ImportCustomizer customizer = new ImportCustomizer()
 
 			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
+
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
 
@@ -316,10 +317,10 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				request.headers.add('header1', 'value1')
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
-				
+
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', contentType('json'))
 			""".stripIndent(),
@@ -350,7 +351,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -360,8 +361,8 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 		when: 'The PRE script is evaluated'
 			evaluator.evaluate("""
 				request.params.format = 'json'
-				def greeting(String name){ 
-					"Hello, \$name" 
+				def greeting(String name){
+					"Hello, \$name"
 				}
 				assert greeting('Diego') == 'Hello, Diego!'
 			""".stripIndent())
@@ -379,7 +380,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -421,17 +422,17 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 
 		when: 'The PRE script with a closure is evaluated'
 			evaluator.evaluate("""
-				def contentType(String type){ 
-					return "application/\$type" 
+				def contentType(String type){
+					return "application/\$type"
 				}
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', 8080)
-				
+
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', contentType('json'))
 			""".stripIndent(),
@@ -462,7 +463,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -472,7 +473,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 		when: 'The PRE script is evaluated'
 			evaluator.evaluate("""
 				import java.lang.Math
-				
+
 				request.params.format = 'json'
 				Math.max 10, 100
 			""".stripIndent())
@@ -490,7 +491,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 				.with(request)
 				.with(new ApiActionResponse())
 				.with(new AssetFacade(null, [:], true))
-				.with(new TaskFacade())
+				.with(new TaskFacade(new AssetComment(), new Person()))
 				.with(new ApiActionJob())
 				.build(ReactionScriptCode.PRE)
 
@@ -523,6 +524,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 			ImportCustomizer customizer = new ImportCustomizer()
 
 			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
+
 //			customizer.addStaticStars('java.lang.Math')
 			CompilerConfiguration configuration = new CompilerConfiguration()
 			configuration.addCompilationCustomizers customizer, secureASTCustomizer
@@ -532,15 +534,15 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 		when: 'The PRE script with a closure is evaluated'
 			evaluator.evaluate("""
 				import java.lang.Math
-				
+
 				request.params.format = 'json'
 				request.headers.add('header1', 'value1')
 				request.config.setProperty('httpClient.socketTimeout', 5000)
 				request.config.setProperty('httpClient.connectionTimeout', 5000)
-				
+
 				request.config.setProperty('proxyAuthHost', '123.88.23.42')
 				request.config.setProperty('proxyAuthPort', Math.max(80, 8080))
-				
+
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
 			""".stripIndent(),
@@ -571,7 +573,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 					.with(request)
 					.with(new ApiActionResponse())
 					.with(new AssetFacade(null, [:], true))
-					.with(new TaskFacade())
+					.with(new TaskFacade(new AssetComment(), new Person()))
 					.with(new ApiActionJob())
 					.build(ReactionScriptCode.PRE)
 

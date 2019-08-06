@@ -1,0 +1,396 @@
+{
+	"info": {
+		"_postman_id": "3f4b0fb2-4749-43bb-bb89-922ae04e1eb8",
+		"name": "Cookbook-Recipe Automation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Cookbook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Recipes List",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "38a384a8-1600-460c-b193-7a6fa560e0fb",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var recipeID = jsonObject.data.list[0].recipeId;",
+							"",
+							"",
+							"var versionNumber = jsonObject.data.list[0].versionNumber;",
+							"if(versionNumber === \"\")",
+							"    versionNumber = 0 ; //If the version number is empty then it means it's the version number 0",
+							"",
+							"",
+							"pm.environment.set(\"recipeID\", recipeID);",
+							"pm.environment.set(\"versionNumber\", versionNumber);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get 1 Recipe JSON",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50810268-fdb2-4eb4-8d75-a1ad44fda9d2",
+						"exec": [
+							"/*",
+							"* The objective of this test is to use the ?format=json endpoint and check that it returns data properly",
+							"*/",
+							"",
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Recipe ID matches\", function () {",
+							"    var jsonObject = JSON.parse(responseBody);",
+							"    pm.expect(jsonObject.data.recipeId).to.eql(pm.variables.get(\"recipeID\"));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{recipeID}}/{{versionNumber}}?format=json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{recipeID}}",
+						"{{versionNumber}}"
+					],
+					"query": [
+						{
+							"key": "format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Empty Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "08247937-cfd7-4c4b-98d9-2d4e5b0e347c",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var newRecipeID = jsonObject.data.recipeId;",
+							"",
+							"",
+							"pm.environment.set(\"newRecipeID\", newRecipeID);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "QAE2E Recipe {{$randomInt}}{{$randomInt}}",
+							"type": "text"
+						},
+						{
+							"key": "description",
+							"value": "Created via API Script",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe?rand=",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe"
+					],
+					"query": [
+						{
+							"key": "rand",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get created Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50810268-fdb2-4eb4-8d75-a1ad44fda9d2",
+						"exec": [
+							"/*",
+							"* The objective of this test is to use the ?format=json endpoint and check that it returns data properly",
+							"*/",
+							"",
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var recipeName = jsonObject.data.name;",
+							"console.log(recipeName);",
+							"pm.environment.set(\"recipeName\", recipeName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{newRecipeID}}/?format=json",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{newRecipeID}}",
+						""
+					],
+					"query": [
+						{
+							"key": "format",
+							"value": "json"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Recipe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50810268-fdb2-4eb4-8d75-a1ad44fda9d2",
+						"exec": [
+							"pm.test(\"Success\", function () {",
+							"pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.unset(\"versionNumber\");",
+							"pm.environment.unset(\"recipeID\");",
+							"pm.environment.unset(\"recipeName\");",
+							"pm.environment.unset(\"newRecipeID\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "recipeId",
+							"value": "{{newRecipeID}}",
+							"type": "text"
+						},
+						{
+							"key": "sourceCode",
+							"value": "groups: [\n  [\n    name: 'QAE2E',\n    description: 'QAE2E list',\n    filter : [\n      class: 'application',\n      asset: [\n        planStatus: 'Confirmed'\n      ]\n    ]\n  ]\n],\ntasks: [\n  [\n    id: 1100,\n    description: 'Startup ALL applications',\n    title: 'Startup app ${it.assetName}',\n    workflow: 'AppStartup',\n    team: 'APP_COORD',\n    category: 'startup',\n    duration: 10,\n    filter : [\n      group: 'QAE2E'\n    ]\n  ]\n]",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{recipeName}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/cookbook/recipe/{{newRecipeID}}?rand=",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"cookbook",
+						"recipe",
+						"{{newRecipeID}}"
+					],
+					"query": [
+						{
+							"key": "rand",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "5ca4f469-ce1e-4471-8d61-cba0c715c233",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "de26352d-5f06-406c-af4b-4d0f7acbcd64",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

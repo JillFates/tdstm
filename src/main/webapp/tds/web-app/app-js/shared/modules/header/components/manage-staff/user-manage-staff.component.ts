@@ -6,6 +6,7 @@ import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {UIActiveDialogService, UIExtraDialog} from '../../../../services/ui-dialog.service';
 import {DecoratorOptions} from '../../../../model/ui-modal-decorator.model';
 import {PermissionService} from '../../../../services/permission.service';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 @Component({
 	selector: 'user-manage-staff',
@@ -30,6 +31,7 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		private permissionService: PermissionService,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
+		private translatePipe: TranslatePipe,
 		@Inject('id') private id) {
 		super('#user-manage-staff-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
@@ -45,9 +47,11 @@ export class UserManageStaffComponent extends UIExtraDialog {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM')	,
+				this.translatePipe.transform('GLOBAL.CANCEL')	,
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();
@@ -64,9 +68,11 @@ export class UserManageStaffComponent extends UIExtraDialog {
 		if (this.editing) {
 			if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 				this.promptService.open(
-					'Confirmation Required',
-					'You have changes that have not been saved. Do you want to continue and lose those changes?',
-					'Confirm', 'Cancel')
+					this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+					this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+					this.translatePipe.transform('GLOBAL.CONFIRM'),
+					this.translatePipe.transform('GLOBAL.CANCEL'),
+				)
 					.then(confirm => {
 						if (confirm) {
 							this.personModel = Object.assign({}, this.savedPersonModel);

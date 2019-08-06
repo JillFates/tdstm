@@ -16,6 +16,7 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
 import {AlertType} from '../../../../shared/model/alert.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -87,6 +88,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
 		private dialogService: UIDialogService,
+		private translate: TranslatePipe,
 		private fieldSettingsService: FieldSettingsService) {
 	}
 
@@ -143,11 +145,47 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * On save all prevent to the user that underlaying data could be deleted
+	 * just whenever there is a delete action pending to be saved
+	 */
 	protected onSaveAll(): void {
-		this.saveEmitter.emit(() => {
-			this.reset();
-		});
+		this.askForDeleteUnderlayingData()
+			.then((deleteUnderLaying: boolean) => {
+				if (deleteUnderLaying) {
+					this.notifySaveAll(deleteUnderLaying)
+				}
+			});
+	}
 
+	/**
+	 * If there is records to be deleted, show the confirmation propmpt dialog asking
+	 * if those fields should be deleted in the back end as well
+	 */
+	private askForDeleteUnderlayingData(): Promise<boolean> {
+		if (this.fieldsToDelete.length) {
+			return this.prompt.open(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
+				this.translate.transform('GLOBAL.YES'),
+				this.translate.transform('GLOBAL.NO'),
+				true);
+		}
+
+		return Promise.resolve(true);
+	}
+
+	/**
+	 * Notify to the host component about a save all action
+	 * Send the flag to inform about deleting the underlaying data
+	 * @param {boolean} deleteUnderLaying True to delete the underlaying data in the backend
+	 */
+	private notifySaveAll(deleteUnderLaying: boolean): void {
+		const savingInfo = {
+			deleteUnderLaying,
+			callback: () => this.reset()
+		}
+		this.saveEmitter.emit(savingInfo);
 	}
 
 	/**
@@ -410,26 +448,11 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * On blur input field controls, it applies the validation rules to the label and name of the field control
-	 * @param {FieldSettingsModel} dataItem Contains the model of the asset field control which launched the event
-	 * @param {any} event Context event from the input that launched the change
+	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
+	 * @param {any} event - Context event from the input that launched the change
 	 */
 	protected onLabelBlur(dataItem: FieldSettingsModel, event: any) {
-		dataItem.errorMessage = '';
-		const fields = this.getFieldsExcludingDeleted();
-		const message = 'The label must be different from all other field names and labels';
-
-		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
-			dataItem.errorMessage = message;
-		} else {
-			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
-				dataItem.errorMessage = message;
-			} else {
-				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
-					dataItem.errorMessage = message;
-				}
-			}
-		}
-
+		// if the data item has an error, mark the whole form as having an error
 		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 
 		if (dataItem.errorMessage)  {
@@ -530,13 +553,35 @@ export class FieldSettingsGridComponent implements OnInit {
 	}
 
 	/**
-	 * On esc key pressed open confirmation dialog
+	 * This code runs each time a key is pressed.
+	 *
+	 * @param {FieldSettingsModel} dataItem - The model of the asset field control which launched the event
+	 * @param {KeyboardEvent} event - Context event from the input that launched the change
 	 */
-	protected onKeyPressed(event: KeyboardEvent): void {
+	protected onKeyPressed(dataItem: FieldSettingsModel, event: KeyboardEvent): void {
+		// Mark form as dirty
 		this.setIsDirty(true);
+		// On esc key pressed, open confirmation dialog
 		if (event.code === 'Escape') {
 			this.onCancel(event);
 		}
+		// Validate conflicts between label names and field names
+		dataItem.errorMessage = '';
+		const fields = this.getFieldsExcludingDeleted();
+		const message = 'The label must be different from all other field names and labels';
+
+		if (this.fieldSettingsService.conflictsWithAnotherLabel(dataItem.label, fields)) {
+			dataItem.errorMessage = message;
+		} else {
+			if (this.fieldSettingsService.conflictsWithAnotherFieldName(dataItem.label, fields)) {
+				dataItem.errorMessage = message;
+			} else {
+				if (this.fieldSettingsService.conflictsWithAnotherDomain(dataItem, this.domains, this.domains[0])) {
+					dataItem.errorMessage = message;
+				}
+			}
+		}
+		this.formHasError =  Boolean(dataItem.errorMessage || this.atLeastOneInvalidField());
 	}
 
 	/**

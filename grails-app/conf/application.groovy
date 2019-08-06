@@ -364,6 +364,7 @@ grails {
 			// http://alvarosanchez.github.io/grails-spring-security-rest/1.5.4/docs/guide/single.html#tokenValidation
 			filterChain.chainMap = [
 				[pattern: '/api/projects/heartbeat', filters: 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor'],
+				[pattern: '/api/appVersion', filters: 'anonymousAuthenticationFilter,restTokenValidationFilter,restExceptionTranslationFilter,filterInvocationInterceptor'],
 				[pattern: '/api/**', filters: 'JOINED_FILTERS,-anonymousAuthenticationFilter,-exceptionTranslationFilter,-authenticationProcessingFilter,-securityContextPersistenceFilter,-rememberMeAuthenticationFilter'],  // Stateless chain
 				[pattern: '/**', filters: 'JOINED_FILTERS,-restTokenValidationFilter,-restExceptionTranslationFilter'] // Traditional chain
 			]
@@ -382,7 +383,7 @@ grails {
 				postOnly = true
 			}
 			auth {
-				loginFormUrl = '/auth/login'
+				loginFormUrl = '/module/auth/login'
 				useForward = false
 				ajaxLoginFormUrl = loginFormUrl // Overrides default redirect Login URL for AJAX requests.
 			}
@@ -390,7 +391,7 @@ grails {
 				hideUserNotFoundExceptions = false
 			}
 
-			failureHandler.defaultFailureUrl = '/auth/login'
+			failureHandler.defaultFailureUrl = '/module/auth/login'
 
 			// See https://grails-plugins.github.io/grails-spring-security-core/v2/guide/requestMappings.html for details
 			// Note that when the two property values are reversed that Forbidden is thrown for unknown controllers while
@@ -409,6 +410,11 @@ grails {
 				token {
 					validation {
 						enableAnonymousAccess = true
+					}
+					storage {
+						jwt {
+							expiration = 14400 // default expiration to 4 hours
+						}
 					}
 				}
 			}

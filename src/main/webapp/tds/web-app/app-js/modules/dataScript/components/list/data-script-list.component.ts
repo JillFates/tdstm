@@ -1,8 +1,8 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {DataScriptService} from '../../service/data-script.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -19,10 +19,13 @@ import {
 	ActionType
 } from '../../model/data-script.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'data-script-list',
@@ -32,7 +35,7 @@ import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-g
 		.action-header { width:100%; text-align:center; }
 	`]
 })
-export class DataScriptListComponent implements OnInit {
+export class DataScriptListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 
 	private state: State = {
@@ -57,6 +60,9 @@ export class DataScriptListComponent implements OnInit {
 	public selectedRows = [];
 	public isRowSelected = (e: RowArgs) => this.selectedRows.indexOf(e.dataItem.id) >= 0;
 	public dateFormat = '';
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private route: ActivatedRoute,
@@ -85,6 +91,7 @@ export class DataScriptListComponent implements OnInit {
 
 	ngOnInit() {
 		this.userContext.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.dataScriptColumnModel = new DataScriptColumnModel(`{0:${this.dateFormat}}`);
@@ -136,7 +143,9 @@ export class DataScriptListComponent implements OnInit {
 	 * @param dataItem
 	 */
 	protected onDeleteDataScript(dataItem: any): void {
-		this.dataIngestionService.validateDeleteScript(dataItem.id).subscribe(
+		this.dataIngestionService.validateDeleteScript(dataItem.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result) => {
 				if (result && result['canDelete']) {
 					this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
@@ -161,7 +170,9 @@ export class DataScriptListComponent implements OnInit {
 	 * Execute the Service to delete the DataScript
 	 */
 	private deleteDataScript(dataItem: any): void {
-		this.dataIngestionService.deleteDataScript(dataItem.id).subscribe(
+		this.dataIngestionService.deleteDataScript(dataItem.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result) => {
 				this.reloadDataScripts();
 			},
@@ -180,7 +191,9 @@ export class DataScriptListComponent implements OnInit {
 	}
 
 	protected reloadDataScripts(): void {
-		this.dataIngestionService.getDataScripts().subscribe(
+		this.dataIngestionService.getDataScripts()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result: DataScriptModel[]) => { this.setDataGrid(result); },
 			(err) => console.log(err));
 	}
@@ -228,5 +241,16 @@ export class DataScriptListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

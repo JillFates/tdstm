@@ -66,7 +66,9 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToAssetFieldSettings(){
+        waitFor(30){projectsItem}
         selectMenu(projectsItem)
+        waitFor(30){projectsFieldsSetItem}
         selectItem(projectsFieldsSetItem)
     }
 
@@ -83,9 +85,7 @@ class ProjectsMenuModule extends Module {
     }
 
     def goToETLScripts(){
-        waitFor (30) {projectsItem}
         selectMenu(projectsItem)
-        waitFor (30) {projectsETLScripts}
         selectItem(projectsETLScripts)
     }
 

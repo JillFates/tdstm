@@ -219,9 +219,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}
 		if (this.isScriptDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			).then(result => {
 					if (result) {
 						this.dismiss();
 					}
@@ -254,7 +256,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	}
 
 	public isScriptDirty(): boolean {
-		return (this.dataScriptModel && (this.dataScriptModel.etlSourceCode !== this.script));
+		return (this.dataScriptModel.etlSourceCode) ? this.dataScriptModel.etlSourceCode !== this.script : this.script.length > 0;
 	}
 
 	private onScriptChange(event: { newValue: string, oldValue: string }) {

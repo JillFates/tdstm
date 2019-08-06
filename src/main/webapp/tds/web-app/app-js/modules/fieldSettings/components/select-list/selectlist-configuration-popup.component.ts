@@ -7,6 +7,7 @@ import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 /**
  *
@@ -41,6 +42,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
 		private activeDialog: UIActiveDialogService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
 	}
 
@@ -212,9 +214,11 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty() || this.newItem.length > 0) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.items = [];

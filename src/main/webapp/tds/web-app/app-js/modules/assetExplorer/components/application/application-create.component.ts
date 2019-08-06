@@ -16,8 +16,9 @@ import { PersonModel } from '../../../../shared/components/add-person/model/pers
 import {PersonService} from '../../../../shared/services/person.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
-import {UserContextService} from '../../../security/services/user-context.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 const pleaseSelectMessage = 'Please Select';
 
@@ -50,9 +51,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe
 			) {
-				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {

@@ -14,9 +14,10 @@ import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
-import {UserContextService} from '../../../security/services/user-context.service';
-import {UserContextModel} from '../../../security/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -47,7 +48,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		protected notifierService: NotifierService,
 		protected tagService: TagService,
 		protected metadata: any,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private translatePipe: TranslatePipe,
+	) {
 			this.assetTagsModel = {tags: metadata.assetTags};
 			this.tagList = metadata.tagList;
 
@@ -171,9 +174,11 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	protected promptSaveChanges(): void {
 		this.promptService.open(
-			'Confirmation Required',
-			'You have changes that have not been saved. Do you want to continue and lose those changes?',
-			'Confirm', 'Cancel').then(result => {
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'),
+		).then(result => {
 			if (result) {
 				this.cancelCloseDialog();
 			} else {
