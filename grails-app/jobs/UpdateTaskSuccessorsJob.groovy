@@ -32,7 +32,7 @@ class UpdateTaskSuccessorsJob {
 			boolean isPM = dataMap.getBoolean('isPM')
 			int tries = dataMap.getIntValue('tries') + 1
 
-			log.info "updateTaskSuccessors Job started for task id $taskId (attempt #$tries)"
+			log.info "updateTaskSuccessors Job started for task id $taskId (attempt #$tries) whomId ${whomId}"
 
 			// Invoke the service method
 			def result = taskNonTranService.updateTaskSuccessors(taskId, status, whomId, isPM, tries)
