@@ -9,23 +9,22 @@ import groovy.transform.TypeCheckingMode
 class TaskVertex {
 
 	Integer taskNumber
+	/**
+	 * Task comment name
+	 */
 	String taskComment
 	/**
-	 * Time to complete a Task {@code AssetComment}
-	 * In minutes
+	 * Duration time, in minutes, to complete current {@code TaskVertex}
 	 */
 	Integer duration
 	/**
-	 *
+	 * Remaining time, in minutes, to complete current {@code TaskVertex}
 	 */
 	Integer remaining
 	/**
-	 *
+	 * Elapsed time, in minutes, for completion of the current {@code TaskVertex}
 	 */
 	Integer elapsed
-
-	String comment
-	String description
 
 	Date actualStart
 	/**
@@ -60,11 +59,13 @@ class TaskVertex {
 			   String taskComment,
 			   int duration = 0,
 			   String status = AssetCommentStatus.PLANNED,
-			   Date actualStart = null) {
+			   Date actualStart = null,
+			   Date statusUpdated = null) {
 
 		this.taskNumber = taskNumber
 		this.taskComment = taskComment
 		this.status = status
+		this.statusUpdated = statusUpdated
 		this.actualStart = actualStart
 		this.duration = duration
 	}
@@ -125,13 +126,13 @@ class TaskVertex {
 
 		if (hasFinished()) {
 			return 0
-		} else if (hasStarted() && actualStart != null) {
+		} else if (isStarted() && actualStart != null) {
 			Integer elapsedTime = 0
 			use(TimeCategory) {
 				elapsedTime = (currentTime - actualStart).minutes
 			}
 			return this.duration - elapsedTime
-		} else if (isOnHold() && actualStart != null) {
+		} else if (isOnHold() && statusUpdated != null) {
 			// We assume the time that the status was updated to ON_HOLD
 			// minus start time it is the amount of work done.
 			Integer elapsedTime = 0
@@ -144,28 +145,69 @@ class TaskVertex {
 			return this.duration
 		}
 	}
-
+	/**
+	 * It calculates if a {@code TaskVertex} has already finished.
+	 * It is defined by {@code AssetCommentStatus#COMPLETED} and
+	 * {@code AssetCommentStatus#TERMINATED}
+	 * @return true if {@code TaskVertex#status} is in
+	 * 		[{@code AssetCommentStatus#COMPLETED}, {@code AssetCommentStatus#TERMINATED}]
+	 */
 	Boolean hasFinished() {
 		return status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]
 	}
-
+	/**
+	 * It calculates if a {@code TaskVertex} has not started yet.
+	 * It is defined by {@code AssetCommentStatus#PLANNED} and
+	 * {@code AssetCommentStatus#PENDING}
+	 * @return true if {@code TaskVertex#status} is in
+	 * 		[{@code AssetCommentStatus#PLANNED}, {@code AssetCommentStatus#PENDING}]
+	 */
 	Boolean hasNotStarted() {
 		return status in [
 			AssetCommentStatus.PLANNED,
 			AssetCommentStatus.PENDING
 		]
 	}
-
+	/**
+	 * Checks if current {@code TaskVertex} is a start node
+	 * for critical analysis.
+	 * @return true if {@code TaskVertex#predecessors} is empty.
+	 */
 	Boolean isStart() {
 		return predecessors.isEmpty()
 	}
-
+	/**
+	 * It calculates if a {@code TaskVertex} has already started.
+	 * It is defined by {@code AssetCommentStatus#STARTED} and
+	 * {@code AssetCommentStatus#HOLD}
+	 * @return true if {@code TaskVertex#status} is in
+	 * 		[{@code AssetCommentStatus#STARTED}, {@code AssetCommentStatus#HOLD}]
+	 */
 	Boolean hasStarted() {
 		return status in [AssetCommentStatus.STARTED, AssetCommentStatus.HOLD]
 	}
+
 	/**
-	 * A <b>source</b> or <b>start</b> is a vertex with not predecessors
-	 * or incoming edges
+	 * Check if {@code TaskVertex} is in status
+	 * {@code AssetCommentStatus#STARTED}
+	 * @return
+	 */
+	Boolean isStarted() {
+		return status in [AssetCommentStatus.STARTED]
+	}
+
+	/**
+	 * Check if {@code TaskVertex} is in status
+	 * {@code AssetCommentStatus#TERMINATED}
+	 * @return
+	 */
+	Boolean isTerminated() {
+		return status in [AssetCommentStatus.TERMINATED]
+	}
+
+	/**
+	 * Check if {@code TaskVertex} is in status
+	 * {@code AssetCommentStatus#HOLD}
 	 * @return
 	 */
 	Boolean isOnHold() {
@@ -173,9 +215,9 @@ class TaskVertex {
 	}
 
 	/**
-	 * A <b>sink</b> is a vertex without successors
-	 * or outgoing edges
-	 * @return
+	 * Checks if current {@code TaskVertex} is a sink node
+	 * for critical analysis.
+	 * @return true if {@code TaskVertex#successors} is empty.
 	 */
 	Boolean isSink() {
 		return successors.isEmpty()

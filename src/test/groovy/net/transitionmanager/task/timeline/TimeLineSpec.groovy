@@ -11,6 +11,7 @@ import spock.lang.Unroll
 
 import java.text.SimpleDateFormat
 
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
@@ -70,7 +71,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
  	*/
 
 	@Unroll
-	void 'test can calculate critical path for a graph with only one TaskVertex with status#status and window end time at=#endTime'() {
+	void 'test can calculate critical path for a graph with only one TaskVertex with status=#status, actual start=#actStart, status updated=#statusUpdated and window end time=#endTime'() {
 
 		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
 			Date windowStartDate = hourInDay('06:00')
@@ -78,7 +79,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay(now)
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: hourInDay('06:00'), status: status)
+				actStart: hourInDay(actStart), status: status, statusUpdated: hourInDay(statusUpdated))
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(taskA)
@@ -101,12 +102,16 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 
 		where:
-			endTime | now     | status     || dur | rem | elap | sla | es      | ef      | ls      | lf
-			'06:30' | '06:00' | PLANNED    || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'07:00' | '06:00' | PLANNED    || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
-			'06:30' | '06:10' | STARTED    || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'07:00' | '06:10' | STARTED    || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'06:30' | '06:30' | TERMINATED || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			endTime | now     | actStart | status     | statusUpdated || dur | rem | elap | sla | es      | ef      | ls      | lf
+			'06:30' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'07:00' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
+			'06:30' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:30' | '06:20' | '06:00'  | STARTED    | '06:00'       || 30  | 10  | 20   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:30' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'07:00' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'07:00' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:30' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:70' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex and a larger window end time'() {

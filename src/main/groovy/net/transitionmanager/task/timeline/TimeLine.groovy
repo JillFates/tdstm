@@ -21,14 +21,14 @@ class TimeLine {
 	}
 
 	/**
-	 * <p>Calculates Critical Path analisys using an instance of {@code TaskTimeLineGraph} set in constructor.</p>
+	 * <p>Calculates Critical Path analysis using an instance of {@code TaskTimeLineGraph} set in constructor.</p>
 	 * <p>It uses 3 variables for calculate slack, earliest start and finish, remaining and elapsed time,
 	 * and latest start and finish. </p>
 	 * <p>Window start time and window end time define a window time range to detect if critical path
 	 * could be inside that range or not. It also add slack time in critical path calculation.</p>
 	 * <p>It returns an instance of {@TimelineSummary} that contains all the results after critical path calculation</p>
 	 * <p> Internally it executes critical path doing a Dijkstra-like algorithm, Deep First Search.
-	 * It makes it doing first walking upwards {@code TimeLine#doDijkstraForEarliestTimes}
+	 * It makes it doing first walking forward {@code TimeLine#doDijkstraForEarliestTimes}
 	 * from sources to sinks and then backwards {@code TimeLine#doDijkstraForLatestTimes}
 	 * from sinks to sources</p>
 	 * <p></p>
@@ -58,7 +58,7 @@ class TimeLine {
 
 	/**
 	 * Executes the Critical Path Analysis on the graph.
-	 * It makes it doing first walking upwards {@code TimeLine#doDijkstraForEarliestTimes}
+	 * First walking forward {@code TimeLine#doDijkstraForEarliestTimes}
 	 * from sources to sinks and then backwards {@code TimeLine#doDijkstraForLatestTimes}
 	 * from sinks to sources
 	 */

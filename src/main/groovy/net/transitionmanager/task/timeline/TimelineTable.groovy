@@ -13,12 +13,27 @@ import groovy.time.TimeCategory
 class TimelineTable {
 
 	/**
-	 * {@code Set} of {@code TaskVertex}
+	 * {@code Set} of {@code TaskVertex} used in fields calculations.
 	 */
 	Set<TaskVertex> vertices
-	Date windowEndTime
+	/**
+	 * Window start time range used in critical path calculation
+	 */
 	Date windowStartTime
+	/**
+	 * Window end time range used in critical path calculation
+	 */
+	Date windowEndTime
 
+	/**
+	 * Class constructor. It builds new a instance of {@code TimelineTable}.
+	 * It initializes {@code TaskTimeLineGraph#vertices} using currentTime parameter.
+	 *
+	 * @param graph an instance of {@code TaskTimeLineGraph}
+	 * @param windowStartTime Window start time range used in critical path calculation
+	 * @param windowEndTime Window end time range used in critical path calculation
+	 * @param currentTime Time when the calculation of the critical path is executed
+	 */
 	TimelineTable(TaskTimeLineGraph graph, Date windowStartTime, Date windowEndTime, Date currentTime) {
 		this.windowStartTime = windowStartTime
 		this.windowEndTime = windowEndTime
@@ -29,13 +44,15 @@ class TimelineTable {
 	}
 
 	/**
-	 *
+	 * During critical path analysis on the graph, walking forward {@code TimeLine#doDijkstraForEarliestTimes}
+	 * from sources to sinks, it calculates earliest start time and
+	 * earliest start finish using
 	 * @param successor
 	 * @param predecessor
 	 * @return true: any of the times were updated, false otherwise.
 	 */
 	boolean checkAndUpdateEarliestTimes(TaskVertex currentVertex, TaskVertex successor) {
-		boolean timesUpdated = false
+
 
 		if (successor.earliestStart == 0 || (currentVertex.earliestFinish > successor.earliestStart)) {
 			successor.earliestStart = currentVertex.earliestFinish
@@ -47,10 +64,10 @@ class TimelineTable {
 				successor.earliestFinishDate = successor.earliestStartDate + successor.remaining.minutes + successor.elapsed.minutes
 			}
 
-			timesUpdated = true
+			return true
+		} else {
+			return false
 		}
-
-		return timesUpdated
 	}
 
 	/**
@@ -79,37 +96,48 @@ class TimelineTable {
 
 	/**
 	 * For each sink, calculate the earliest path and the latest path. Additionally, determine which is
-	 * the critical path.
-	 *
-	 * @param taskGraph
-	 * @param timelineSummary
+	 * the correct critical path.
+	 * Each critical path calculated in saved in an instance of {@code CriticalPathRoute}.
+	 * For more details about that see {@see TimelineTable#getPath}
+	 * Then there is 2 new scenarios:
+	 * <ul>
+	 * <li> 1) It's a new {@code CriticalPathRoute} from a different sub-graph.
+	 * 		So it's going to be added immediately in
+	 * {@code TimelineSummary#criticalPathRoutes}
+	 * <li> 2) It has an intersection with other {@code CriticalPathRoute}
+	 * 		previously calculated and it is necessary to determine if
+	 * 		this is bigger than the intersected in order to be replaced.
+	 * </ul>
+	 * @param taskGraph an instance of {@code TaskTimeLineGraph}
+	 * @param timelineSummary an instance of {@code timelineSummary}
 	 */
 	void calculateAllPaths(TaskTimeLineGraph taskGraph, TimelineSummary timelineSummary) {
 
 		taskGraph.sinks.each { TaskVertex sink ->
-			List<TaskVertex> earliestPath = getPath(sink)
 
-			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(earliestPath, sink.latestFinish)
+			CriticalPathRoute newCriticalPathRoute = new CriticalPathRoute(getPath(sink), sink.latestFinish)
 			CriticalPathRoute criticalPathRoute = timelineSummary.criticalPathRoutes.find {
 				it.intersectsPath(newCriticalPathRoute)
 			}
 
 			if (!criticalPathRoute) {
-				// new critical path for a different sub-graph
+				// new critical path from a different sub-graph
 				timelineSummary.addCriticalPathRoute(newCriticalPathRoute)
-			} else if (newCriticalPathRoute.isGreatherEqualsThan(criticalPathRoute)) {
+			} else if (newCriticalPathRoute.isLargerEqualsThan(criticalPathRoute)) {
+				//it is larger that an existing one and it need to be replaced
 				timelineSummary.replaceCriticalPathRouteBy(criticalPathRoute, newCriticalPathRoute)
 			}
 		}
 	}
 
-
 	/**
 	 * Starting from a sink, traverse the timeline table building the path corresponding
-	 * to the earliest/latest times.
+	 * to the earliest/latest times using {@code TaskVertex#criticalPredecessor} field.
 	 *
-	 * @param sink
-	 * @return
+	 * @param sink an instance of {@code TaskVertex}
+	 * @return a{@code List} of {@code TaskVertex} instances
+	 * 		than belongs to a path from one {@code TaskVertex} source
+	 * 		to the sink {@code TaskVertex} parameter
 	 */
 	private List<TaskVertex> getPath(TaskVertex sink) {
 		List<TaskVertex> path = []

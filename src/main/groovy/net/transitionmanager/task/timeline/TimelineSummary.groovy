@@ -60,9 +60,16 @@ class TimelineSummary {
 		addCriticalPathRoute(newCriticalPathRoute)
 	}
 }
-
+/**
+ * Route for a critical path results.
+ * It contains a {@code List} of {@code TaskVertex}
+ * and It also defines the latest finish used comparing {@code CriticalPathRoute} instances.
+ */
 class CriticalPathRoute {
 
+	/**
+	 * {@code List} of {@code TaskVertex} that belongs to a critical path result
+	 */
 	final List<TaskVertex> vertices
 	final Integer latestFinish
 
@@ -71,11 +78,25 @@ class CriticalPathRoute {
 		this.latestFinish = latestFinish
 	}
 
+	/**
+	 * Checks intersections of both {@code CriticalPathRoute#vertices}.
+	 *
+	 * @param other an instance of {@code CriticalPathRoute}.
+	 * @return true if there is an intersection between both {@code CriticalPathRoute#vertices}.
+	 */
 	Boolean intersectsPath(CriticalPathRoute other) {
 		return !vertices.intersect(other.vertices)?.isEmpty()
 	}
 
-	boolean isGreatherEqualsThan(CriticalPathRoute other) {
+	/**
+	 * Checks if an instance of {@code CriticalPathRoute} is larger than the current
+	 * using  {@code CriticalPathRoute#latestFinish} field
+	 *
+	 * @param other an instance of {@code CriticalPathRoute}.
+	 * @return true if {@code CriticalPathRoute#latestFinish}
+	 * 		is bigger than the cu
+	 */
+	boolean isLargerEqualsThan(CriticalPathRoute other) {
 		return latestFinish >= other.latestFinish
 	}
 }

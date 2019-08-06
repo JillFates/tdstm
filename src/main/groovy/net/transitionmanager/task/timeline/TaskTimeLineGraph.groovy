@@ -131,7 +131,8 @@ class TaskTimeLineGraph {
 				task.comment,
 				task.duration,
 				task.status,
-				task.actStart
+				task.actStart,
+				task.statusUpdated
 			)
 			return this
 		}
