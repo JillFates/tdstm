@@ -12,6 +12,9 @@ import groovy.time.TimeCategory
  */
 class TimelineTable {
 
+	/**
+	 * {@code Set} of {@code TaskVertex}
+	 */
 	Set<TaskVertex> vertices
 	Date windowEndTime
 	Date windowStartTime
@@ -132,7 +135,7 @@ class TimelineTable {
 		sink.latestFinishDate = sink.earliestFinishDate
 
 		Integer windowEndTimeDifference = 0
-		if (!sink.hasStarted() && windowEndTime > sink.latestFinishDate) {
+		if (!sink.hasStarted() && !sink.hasFinished() && windowEndTime > sink.latestFinishDate) {
 			use(TimeCategory) {
 				windowEndTimeDifference = (windowEndTime - sink.latestFinishDate).minutes
 			}

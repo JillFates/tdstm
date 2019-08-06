@@ -28,6 +28,12 @@ class TaskVertex {
 	String description
 
 	Date actualStart
+	/**
+	 * @see {@code AssetComment#statusUpdated}
+	 */
+	// Updated when the status changes so we can compute the elapsed time that a task is in a status
+	Date statusUpdated
+
 	String status
 
 	Boolean criticalPath = false
@@ -125,6 +131,15 @@ class TaskVertex {
 				elapsedTime = (currentTime - actualStart).minutes
 			}
 			return this.duration - elapsedTime
+		} else if (isOnHold() && actualStart != null) {
+			// We assume the time that the status was updated to ON_HOLD
+			// minus start time it is the amount of work done.
+			Integer elapsedTime = 0
+			use(TimeCategory) {
+				// statusUpdated
+				elapsedTime = (statusUpdated - actualStart).minutes
+			}
+			return this.duration - elapsedTime
 		} else {
 			return this.duration
 		}
@@ -134,17 +149,27 @@ class TaskVertex {
 		return status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]
 	}
 
+	Boolean hasNotStarted() {
+		return status in [
+			AssetCommentStatus.PLANNED,
+			AssetCommentStatus.PENDING
+		]
+	}
+
+	Boolean isStart() {
+		return predecessors.isEmpty()
+	}
 
 	Boolean hasStarted() {
-		return status == AssetCommentStatus.STARTED
+		return status in [AssetCommentStatus.STARTED, AssetCommentStatus.HOLD]
 	}
 	/**
 	 * A <b>source</b> or <b>start</b> is a vertex with not predecessors
 	 * or incoming edges
 	 * @return
 	 */
-	Boolean isStart() {
-		return predecessors.isEmpty()
+	Boolean isOnHold() {
+		return status in [AssetCommentStatus.HOLD]
 	}
 
 	/**
@@ -161,7 +186,7 @@ class TaskVertex {
 	}
 
 	Integer getSlack() {
-		return hasStarted() ? 0 : (latestStart - earliestStart)
+		return (hasStarted() || hasFinished()) ? 0 : (latestStart - earliestStart)
 	}
 
 	/**

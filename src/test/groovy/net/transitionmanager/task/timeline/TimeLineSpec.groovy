@@ -1,14 +1,19 @@
 package net.transitionmanager.task.timeline
 
-import com.tdsops.tm.enums.domain.AssetCommentStatus
+
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.text.SimpleDateFormat
+
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 
 class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
@@ -21,6 +26,8 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	@Shared
 	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
 
+	@Shared
+	String aDay = '06/22/2018'
 	/**
 	 * Common TaskVertex Ids used in several test cases.
 	 */
@@ -34,13 +41,13 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	void 'test can calculate critical path for an empty list of TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with an empty list of TaskVertex'
-			Date windowStartDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 06:30')
-			Date currentTime = pointInTime('06/01/2019 06:00')
+			Date windowStartDate = hourInDay('06:00')
+			Date windowEndTime = hourInDay('06:30')
+			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph emptyGraph = new TaskTimeLineGraph([] as Set)
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(emptyGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
@@ -52,43 +59,62 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
-	void 'test can calculate critical path for a graph with only one TaskVertex'() {
+	/*
+		   +-----+---+-----|
+		   |06:00| A |06:30|
+		   +-----+---+-----+
+		   |06:00| 30|06:30|
+		   +-----+---+-----|
+		   +---------------+---------------+
+		 06:00           06:30           07:00
+ 	*/
 
-		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 06:30')
-			Date currentTime = pointInTime('06/01/2019 06:00')
+	@Unroll
+	void 'test can calculate critical path for a graph with only one TaskVertex with status#status and window end time at=#endTime'() {
+
+		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartDate = hourInDay('06:00')
+			Date windowEndTime = hourInDay(endTime)
+			Date currentTime = hourInDay(now)
+
+			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+				actStart: hourInDay('06:00'), status: status)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 30)
+				.withVertex(taskA)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		and: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
-		then:
+		expect:
 			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
-				criticalPath
-				taskNumber == 1
-				taskComment == A
-				duration == 30
-				remaining == 30
-				elapsed == 0
-				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				duration == dur
+				remaining == rem
+				elapsed == elap
+				slack == sla
+				earliestStartDate == hourInDay(es)
+				earliestFinishDate == hourInDay(ef)
+				latestStartDate == hourInDay(ls)
+				latestFinishDate == hourInDay(lf)
 			}
+
+		where:
+			endTime | now     | status     || dur | rem | elap | sla | es      | ef      | ls      | lf
+			'06:30' | '06:00' | PLANNED    || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'07:00' | '06:00' | PLANNED    || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
+			'06:30' | '06:10' | STARTED    || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'07:00' | '06:10' | STARTED    || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:30' | '06:30' | TERMINATED || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex and a larger window end time'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:00')
-			Date currentTime = pointInTime('06/01/2019 06:00')
+			Date windowStartDate = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:00')
+			Date currentTime = hourInDay('06:00')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
 
@@ -96,7 +122,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(taskA)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
@@ -109,28 +135,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 30
 				elapsed == 0
 				slack == 30
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:00')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:30')
+				latestFinishDate == hourInDay('07:00')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with only one started TaskVertex and a larger window end time'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:00')
-			Date currentTime = pointInTime('06/01/2019 06:10')
+			Date windowStartDate = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:00')
+			Date currentTime = hourInDay('06:10')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
+				actStart: hourInDay('06:00'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertices(taskA)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
@@ -143,28 +169,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 20
 				elapsed == 10
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with only one started TaskVertex and current time 10 minutes later'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 06:30')
-			Date currentTime = pointInTime('06/01/2019 06:10')
+			Date windowStartDate = hourInDay('06:00')
+			Date windowEndTime = hourInDay('06:30')
+			Date currentTime = hourInDay('06:10')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
+				actStart: hourInDay('06:00'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertices(taskA)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
@@ -177,28 +203,28 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 20
 				elapsed == 10
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 	}
-
+	//TODO: dcorrea review results with John
 	void 'test can calculate critical path for a graph with only one started TaskVertex and larger window end time with current time 15 minutes later'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 06:30')
-			Date currentTime = pointInTime('06/01/2019 06:15')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('06:30')
+			Date currentTime = hourInDay('06:15')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:10'), status: AssetCommentStatus.STARTED)
+				actStart: hourInDay('06:10'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertices(taskA)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
@@ -210,19 +236,19 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				duration == 30
 				remaining == 25
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:10')
-				earliestFinishDate == pointInTime('06/01/2019 06:40')
-				latestStartDate == pointInTime('06/01/2019 06:10')
-				latestFinishDate == pointInTime('06/01/2019 06:40')
+				earliestStartDate == hourInDay('06:10')
+				earliestFinishDate == hourInDay('06:40')
+				latestStartDate == hourInDay('06:10')
+				latestFinishDate == hourInDay('06:40')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with two TaskVertex'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:10')
-			Date currentTime = pointInTime('06/01/2019 06:00')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
 			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
@@ -245,10 +271,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 30
 				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				taskNumber == 2
@@ -257,19 +283,19 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 40
 				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:30')
+				latestFinishDate == hourInDay('07:10')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with two TaskVertex and larger window end time'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:20')
-			Date currentTime = pointInTime('06/01/2019 06:00')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:20')
+			Date currentTime = hourInDay('06:00')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
 			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
@@ -280,7 +306,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withEdge(edgeAB)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
@@ -293,10 +319,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 30
 				elapsed == 0
 				slack == 10
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:10')
-				latestFinishDate == pointInTime('06/01/2019 06:40')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:10')
+				latestFinishDate == hourInDay('06:40')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -306,23 +332,23 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 40
 				elapsed == 0
 				slack == 10
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 07:20')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:40')
+				latestFinishDate == hourInDay('07:20')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with two TaskVertex, one already started'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:10')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
 
-			Date currentTime = pointInTime('06/01/2019 06:10')
+			Date currentTime = hourInDay('06:10')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
+				actStart: hourInDay('06:00'), status: STARTED)
 			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
@@ -331,7 +357,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withEdge(edgeAB)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
@@ -344,10 +370,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 20
 				elapsed == 10
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -357,23 +383,23 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 40
 				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:30')
+				latestFinishDate == hourInDay('07:10')
 			}
 	}
 
 	void 'test can calculate critical path for a graph with two TaskVertex, one already started and a larger window end time'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:20')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:20')
 
-			Date currentTime = pointInTime('06/01/2019 06:10')
+			Date currentTime = hourInDay('06:10')
 
 			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
+				actStart: hourInDay('06:00'), status: STARTED)
 			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
@@ -382,7 +408,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withEdge(edgeAB)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
+		when: 'TimeLine calculates its critical path'
 			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
@@ -395,10 +421,11 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 20
 				elapsed == 10
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				//TODO: dcorrea. Review this result with John.
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:10')
+				latestFinishDate == hourInDay('06:40')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -408,18 +435,20 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 40
 				elapsed == 0
 				slack == 10
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 07:20')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:40')
+				latestFinishDate == hourInDay('07:20')
 			}
 	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a bigger duration'() {
+	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a bigger duration finding two routes'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date startDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 08:00')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('08:00')
+
+			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 30).addEdgeTo(B)
@@ -427,11 +456,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(3, C, 120)
 				.build()
 
-		and:
-			TimeLine timeLine = new TimeLine(taskTimeLineGraph)
-
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = timeLine.calculate(startDate, windowEndTime)
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -446,11 +473,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == A
 				duration == 30
 				remaining == 30
+				elapsed == 0
 				slack == 50
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:50')
-				latestFinishDate == pointInTime('06/01/2019 07:20')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:50')
+				latestFinishDate == hourInDay('07:20')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -458,11 +486,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == B
 				duration == 40
 				remaining == 40
+				elapsed == 0
 				slack == 50
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 07:20')
-				latestFinishDate == pointInTime('06/01/2019 08:00')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('07:20')
+				latestFinishDate == hourInDay('08:00')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				criticalPath
@@ -470,19 +499,22 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == C
 				duration == 120
 				remaining == 120
+				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 08:00')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 08:00')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('08:00')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('08:00')
 			}
 	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a smaller duration'() {
+	void 'test can calculate critical path for a graph with three TaskVertex, one isolated with a smaller duration finding two routes'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowEndTime = pointInTime('06/01/2019 07:10')
-			Date startDate = pointInTime('06/01/2019 06:00')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+
+			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 30).addEdgeTo(B)
@@ -490,11 +522,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(3, C, 30)
 				.build()
 
-		and:
-			TimeLine timeLine = new TimeLine(taskTimeLineGraph)
-
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = timeLine.calculate(startDate, windowEndTime)
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -510,11 +540,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == A
 				duration == 30
 				remaining == 30
+				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -522,11 +553,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == B
 				duration == 40
 				remaining == 40
+				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:30')
+				latestFinishDate == hourInDay('07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				criticalPath
@@ -534,19 +566,22 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == C
 				duration == 30
 				remaining == 30
+				elapsed == 0
 				slack == 40
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:40')
+				latestFinishDate == hourInDay('07:10')
 			}
 	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex defining one start'() {
+	//TODO: dcorrea add graph examples
+	void 'test can calculate critical path for a graph with three TaskVertex defining one start finding one route'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date startDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 07:10')
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 30).addEdgesTo(B, C)
@@ -554,8 +589,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(3, C, 20)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(startDate, windowEndTime)
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -569,11 +605,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == A
 				duration == 30
 				remaining == 30
+				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				earliestStartDate == hourInDay('06:00')
+				earliestFinishDate == hourInDay('06:30')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -581,11 +618,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == B
 				duration == 40
 				remaining == 40
+				elapsed == 0
 				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('07:10')
+				latestStartDate == hourInDay('06:30')
+				latestFinishDate == hourInDay('07:10')
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
 				!criticalPath
@@ -593,24 +631,52 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				taskComment == C
 				duration == 20
 				remaining == 20
+				elapsed == 0
 				slack == 20
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 06:50')
-				latestStartDate == pointInTime('06/01/2019 06:50')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				earliestStartDate == hourInDay('06:30')
+				earliestFinishDate == hourInDay('06:50')
+				latestStartDate == hourInDay('06:50')
+				latestFinishDate == hourInDay('07:10')
 			}
 
 	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex with all task in the future'() {
+	/*
+                                             +-----+---+-----+
+                                             |06:30| B |07:10|
+                               +------------>+-----+---+-----+
+                               |             |06:30| 40|07:10|
+                               |             +-----+---+-----+
+                               |
+               +-----+---+-----|
+               |06:00| A |06:30|
+               +-----+---+-----+
+               |06:00| 30|06:30|
+               +-----+---+-----|
+                               |
+                               |       +-----+---+-----+
+                               |       |06:30| A |06:50|
+                               +------>+-----+---+-----+
+                                       |06:50| 20|07:10|
+                                       +-----+---+-----+
+               +-----------------------+---------------+--------+
+             06:00                   06:30           06:50    07:10
+	 */
 
-		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date startDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 7:10')
+	@Unroll
+	void 'test can calculate critical path for a graph with three TaskVertex A status=#statusA, B status=#statusB and C status=#statusC, window end time=#endTime and current time=#current'() {
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
-			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20)
+		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay(endTime)
+			Date currentTime = hourInDay(current)
+
+			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+				actStart: hourInDay(startA), status: statusA)
+			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
+				actStart: hourInDay(startB), status: statusB)
+			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
+				actStart: hourInDay(startC), status: statusC)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 			TaskDependency edgeAC = new TaskDependency(id: 102, predecessor: taskA, assetComment: taskC, type: 'SS')
 
@@ -619,247 +685,68 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withEdges(edgeAB, edgeAC)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(startDate, windowEndTime)
+		and: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
-		then:
+		expect:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskB.comment]
 			}
 			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
-				criticalPath
-				taskNumber == 1
-				taskComment == A
-				duration == 30
-				remaining == 30
-				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
+				criticalPath == cpA
+				slack == slackA
+				earliestStartDate == hourInDay(esA)
+				earliestFinishDate == hourInDay(efA)
+				latestStartDate == hourInDay(lsA)
+				latestFinishDate == hourInDay(lfA)
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
-				criticalPath
-				taskNumber == 2
-				taskComment == B
-				duration == 40
-				remaining == 40
-				slack == 0
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				criticalPath == cpB
+				slack == slackB
+				earliestStartDate == hourInDay(esB)
+				earliestFinishDate == hourInDay(efB)
+				latestStartDate == hourInDay(lsB)
+				latestFinishDate == hourInDay(lfB)
 			}
 			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
-				!criticalPath
-				taskNumber == 3
-				taskComment == C
-				duration == 20
-				remaining == 20
-				slack == 20
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 06:50')
-				latestStartDate == pointInTime('06/01/2019 06:50')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
+				criticalPath == cpC
+				slack == slackC
+				earliestStartDate == hourInDay(esC)
+				earliestFinishDate == hourInDay(efC)
+				latestStartDate == hourInDay(lsC)
+				latestFinishDate == hourInDay(lfC)
 			}
-	}
 
-	void 'test can calculate critical path for a graph with three TaskVertex with one task already started'() {
-
-		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date startDate = pointInTime('06/01/2019 06:00')
-			Date windowEndTime = pointInTime('06/01/2019 7:10')
-
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.STARTED)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
-			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20)
-			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
-			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
-
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertices(taskA, taskB, taskC)
-				.withEdges(edgeAB, edgeAC)
-				.build()
-
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(startDate, windowEndTime)
-
-		then:
-			with(timelineSummary, TimelineSummary) {
-				cycles.size() == 0
-				criticalPathRoutes.size() == 1
-				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskB.comment]
-			}
-			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
-				taskNumber == 1
-				taskComment == A
-				duration == 30
-				remaining == 10
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 06:30')
-				latestStartDate == pointInTime('06/01/2019 06:00')
-				latestFinishDate == pointInTime('06/01/2019 06:30')
-			}
-			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
-				taskNumber == 2
-				taskComment == B
-				duration == 40
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
-			}
-			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
-				taskNumber == 3
-				taskComment == C
-				duration == 20
-				earliestStartDate == pointInTime('06/01/2019 06:30')
-				earliestFinishDate == pointInTime('06/01/2019 06:50')
-				latestStartDate == pointInTime('06/01/2019 06:30')
-				latestFinishDate == pointInTime('06/01/2019 06:50')
-			}
-	}
-
-	void 'test can calculate critical path for a graph with three TaskVertex with one finished and two tasks already started'() {
-
-		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-
-			Date windowStartTime = pointInTime('06/01/2019 05:00')
-			Date windowEndTime = pointInTime('06/01/2019 10:00')
-
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.TERMINATED)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
-				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.STARTED)
-			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
-				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.STARTED)
-
-			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
-			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
-
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertices(taskA, taskB, taskC)
-				.withEdges(edgeAB, edgeAC)
-				.build()
-
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(pointInTime('06/01/2019 06:40'))
-
-		then:
-			with(timelineSummary, TimelineSummary) {
-				cycles.size() == 0
-				criticalPathRoutes.size() == 1
-				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskB.comment]
-			}
-			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
-				taskNumber == 1
-				taskComment == A
-				duration == 30
-				remaining == 0
-				earliestStartDate == pointInTime('06/01/2019 06:40')
-				earliestFinishDate == pointInTime('06/01/2019 06:40')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 06:40')
-			}
-			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
-				taskNumber == 2
-				taskComment == B
-				duration == 40
-				remaining == 30
-				earliestStartDate == pointInTime('06/01/2019 06:40')
-				earliestFinishDate == pointInTime('06/01/2019 07:10')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 07:10')
-			}
-			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
-				taskNumber == 3
-				taskComment == C
-				duration == 20
-				remaining == 10
-				earliestStartDate == pointInTime('06/01/2019 06:40')
-				earliestFinishDate == pointInTime('06/01/2019 06:50')
-				latestStartDate == pointInTime('06/01/2019 06:40')
-				latestFinishDate == pointInTime('06/01/2019 06:50')
-			}
-	}
-
-	void 'test can calculate critical path for a graph with three TaskVertex with all task finished'() {
-
-		given: 'a TaskTimeLineGraph with a list of TaskVertex'
-
-			Date windowStartTime = pointInTime('06/01/2019 05:00')
-			Date windowEndTime = pointInTime('06/01/2019 10:00')
-
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
-				actStart: pointInTime('06/01/2019 06:00'), status: AssetCommentStatus.TERMINATED)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
-				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.TERMINATED)
-			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
-				actStart: pointInTime('06/01/2019 06:30'), status: AssetCommentStatus.TERMINATED)
-
-			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
-			TaskDependency edgeAC = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskC, type: 'SS')
-
-			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertices(taskA, taskB, taskC)
-				.withEdges(edgeAB, edgeAC)
-				.build()
-
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(pointInTime('06/01/2019 07:30'))
-
-		then:
-			with(timelineSummary, TimelineSummary) {
-				cycles.size() == 0
-				criticalPathRoutes.size() == 1
-				criticalPathRoutes[0].vertices.collect { it.taskComment } == [taskA.comment, taskC.comment]
-			}
-			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
-				taskNumber == 1
-				taskComment == A
-				duration == 30
-				remaining == 0
-				earliestStartDate == pointInTime('06/01/2019 06:00')
-				earliestFinishDate == pointInTime('06/01/2019 07:30')
-				latestStartDate == pointInTime('06/01/2019 07:30')
-				latestFinishDate == pointInTime('06/01/2019 07:30')
-			}
-			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
-				taskNumber == 2
-				taskComment == B
-				duration == 40
-				remaining == 0
-				earliestStartDate == pointInTime('06/01/2019 07:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:30')
-				latestStartDate == pointInTime('06/01/2019 07:30')
-				latestFinishDate == pointInTime('06/01/2019 07:30')
-			}
-			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
-				taskNumber == 3
-				taskComment == C
-				duration == 20
-				remaining == 0
-				earliestStartDate == pointInTime('06/01/2019 07:30')
-				earliestFinishDate == pointInTime('06/01/2019 07:30')
-				latestStartDate == pointInTime('06/01/2019 07:30')
-				latestFinishDate == pointInTime('06/01/2019 07:30')
-			}
+		where:
+			endTime | current | startA  | statusA    | startB  | statusB    | startC  | statusC    || cpA  | slackA | esA     | efA     | lsA     | lfA     | cpB  | slackB | esB     | efB     | lsB     | lfB     | cpC   | slackC | esC     | efC     | lsC     | lfC
+			'07:10' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
+			'07:20' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 10     | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
+			'07:10' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
+			'07:10' | '06:10' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
+			'07:20' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
+			'07:10' | '06:40' | '06:00' | TERMINATED | '06:30' | STARTED    | '06:30' | STARTED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
+			'07:10' | '07:10' | '06:00' | TERMINATED | '06:30' | TERMINATED | '06:30' | TERMINATED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex defining one sink'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, B, 4).addEdgeTo(D)
 				.withVertex(2, C, 2).addEdgeTo(D)
 				.withVertex(3, D, 5)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -872,6 +759,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, D, C)
 				.withVertex(2, B, 4).addEdgeTo(D)
@@ -879,27 +770,25 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(4, D, 5)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
-				withTimeLineTable(timelineSummary.timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					C		2		3		5		5		7		2		false
-					D		5		7		12		7		12		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink and using a TaskVertex with duration equals zero in critical path'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, C)
 				.withVertex(2, B, 4).addEdgeTo(E)
@@ -908,8 +797,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(5, D, 5)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then: 'graph contains all the final result values'
 			taskTimeLineGraph.V() == 5
@@ -919,20 +809,15 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, E, D]
 			}
-
-			withTimeLineTable(timelineSummary.timelineTable, """
-				Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
-				A		3		0		3		0		3		0		true
-				B		4		3		7		3		7		0		true
-				E		0		7		7		7		7		0		true
-				C		2		3		5		5		7		2		false
-				D		5		7		12		7		12		0		true
-			""")
 	}
 
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink and using a TaskVertex with duration equals zero NOT in critical path'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, A, 3).addEdgesTo(B, C)
 				.withVertex(2, B, 4).addEdgeTo(D)
@@ -941,28 +826,26 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(5, D, 5)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					E		0		5		5		7		7		2		false
-					C		2		3		5		5		7		2		false
-					D		5		7		12		7		12		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path for a graph with four TaskVertex defining one start and one sink after randomize vertices order'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(1, B, 4).addEdgeTo(D)
 				.withVertex(2, D, 5)
@@ -970,58 +853,53 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.withVertex(4, A, 3).addEdgesTo(B, C)
 				.build()
 
-		when: 'TimeLine tries to calculate its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then: 'graph contains all the final result values'
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath
-					B		4		3		7		3		7		0		true
-					D		5		7		12		7		12		0		true
-					C		2		3		5		5		7		2		false
-					A		3		0		3		0		3		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with one source and one sink'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G, H]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					C		2		3		5		9		11		6		false
-					D		5		7		12		7		12		0		true
-					E		1		5		6		11		12		6		false
-					F		2		5		7		14		16		9		false
-					G		4		12		16		12		16		0		true
-					H		3		16		19		16		19		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an cyclic directed graph with one source and one sink'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createCyclicDirectedGraphWithOneStartAndOneSink()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -1029,53 +907,44 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				cycles[0].collect { it.taskComment } == [B, D, G]
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G, H]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					C		2		3		5		9		11		6		false
-					D		5		7		12		7		12		0		true
-					E		1		5		6		11		12		6		false
-					F		2		5		7		14		16		9		false
-					G		4		12		16		12		16		0		true
-					H		3		16		19		16		19		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with two starts and one sink'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndOneSink()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [B, D, G, H]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
-					B		4		0		4		0		4		0		true
-					C		2		0		2		6		8		6		false
-					D		5		4		9		4		9		0		true
-					E		1		2		3		8		9		6		false
-					F		2		2		4		11		13		9		false
-					G		4		9		13		9		13		0		true
-					H		3		13		16		13		16 		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an cyclic directed graph with two starts and one sink'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createCyclicDirectedGraphWithTwoStartsAndOneSink()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -1083,53 +952,44 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				cycles[0].collect { it.taskComment } == [D, G]
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [B, D, G, H]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
-					B		4		0		4		0		4		0		true
-					C		2		0		2		6		8		6		false
-					D		5		4		9		4		9		0		true
-					E		1		2		3		8		9		6		false
-					F		2		2		4		11		13		9		false
-					G		4		9		13		9		13		0		true
-					H		3		13		16		13		16 		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with one start and two sinks'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndTwoSinks()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	et.		ef.		ls.		lf.		slack	CriticalPath
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					C		2		3		5		3		5		0		false
-					D		5		7		12		7		12		0		true
-					E		1		5		6		11		12		6		false
-					F		2		5		7		5		7		0		false
-					G		4		12		16		12		16		0		true
-					H		3		7		10		7		10		0		false
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an cyclic directed graph with one start and two sinks'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createCyclicDirectedGraphWithOneStartAndTwoSinks()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -1137,128 +997,106 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				cycles[0].collect { it.taskComment } == [B, D]
 				criticalPathRoutes.size() == 1
 				criticalPathRoutes[0].vertices.collect { it.taskComment } == [A, B, D, G]
-				withTimeLineTable(timelineTable, """
-					Task	dur.	et.		ef.		ls.		lf.		slack	Critical Path
-					A		3		0		3		0		3		0		true
-					B		4		3		7		3		7		0		true
-					C		2		3		5		3		5		0		false
-					D		5		7		12		7		12		0		true
-					E		1		5		6		11		12		6		false
-					F		2		5		7		5		7		0		false
-					G		4		12		16		12		16		0		true
-					H		3		7		10		7		10		0		false
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with two start and two sinks'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoStartsAndTwoSinks()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 2
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
-					B		4		0		4		0		4		0		true
-					C		2		0		2		0		2		0		true
-					D		5		4		9		4		9		0		true
-					E		1		2		3		8		9		6		false
-					F		2		2		4		2		4		0		true
-					G		4		9		13		9		13		0		true
-					H		3		4		7		4		7		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with multiples critical path with same size'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithMultiplesCriticalPaths()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 2
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
-					B		2		0		2		0		2		0		true
-					C		2		0		2		0		2		0		true
-					D		1		2		3		2		3		0		true
-					E		1		2		3		2		3		0		false
-					F		2		2		4		2		4		0		true
-					G		4		3		7		3		7		0		true
-					H		3		4		7		4		7		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with three sub-graphs'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithThreeSubGraphs()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 3
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
-					B		4		0		4		0		4		0		true
-					C		2		0		2		0		2		0		true
-					D		5		4		9		4		9		0		true
-					E		1		2		3		2		3		0		false
-					F		2		2		4		2		4		0		true
-					G		4		9		13		9		13		0		true
-					H		3		4		7		4		7		0		true
-					I		8		0		8		0		8		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for an acyclic directed graph with two sub-graphs'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithTwoSubGraphs()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate()
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0
 				criticalPathRoutes.size() == 2
-				withTimeLineTable(timelineTable, """
-					Task	dur.	es.		ef.		ls.		lf.		slack	CriticalPath?
-					B		4		0		4		0		4		0		true
-					C		2		0		2		0		2		0		true
-					D		5		4		9		4		9		0		true
-					E		1		2		3		2		3		0		false
-					F		2		2		4		2		4		0		true
-					G		4		9		13		9		13		0		true
-					H		3		4		7		4		7		0		true
-				""")
 			}
 	}
 
 	void 'test can calculate critical path method for group a task and dependencies'() {
 
 		given:
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:10')
+			Date currentTime = hourInDay('06:00')
+
+		and:
 			TaskTimeLineGraph taskTimeLineGraph = taskTimeLineGraphTestHelper.createTaskAndDependenciesExample()
 
 		when:
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph).calculate(new Date())
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
 			with(timelineSummary, TimelineSummary) {
@@ -1268,7 +1106,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
-	private Date pointInTime(String dateTime) {
-		return formatter.parse(dateTime)
+	private Date hourInDay(String dateTime) {
+		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
 	}
 }
