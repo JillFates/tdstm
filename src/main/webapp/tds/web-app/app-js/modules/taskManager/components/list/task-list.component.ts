@@ -1,6 +1,8 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import { Observable } from 'rxjs/Observable';
 import {
 	CellClickEvent,
 	DetailCollapseEvent,
@@ -23,7 +25,7 @@ import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone } from 'ramda';
+import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskCreateComponent } from '../create/task-create.component';
@@ -288,6 +290,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	private readonly allEventsOption = { id: 0, name: 'All Events' };
+	private urlParams = {};
 	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	selectedEvent = this.allEventsOption;
 	justRemaining: boolean;
@@ -313,39 +316,52 @@ export class TaskListComponent {
 		private userPreferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
-		private translate: TranslatePipe) {
+		private translate: TranslatePipe,
+		private activatedRoute: ActivatedRoute) {
 		this.onLoad();
+	}
+
+	private getUrlParamOrUserPreference(paramName: string, preferenceKey: string): Observable<any> {
+		return  hasIn(paramName, this.urlParams) ?
+			Observable.of(this.urlParams[paramName]) :
+			this.userPreferenceService.getSinglePreference(preferenceKey);
 	}
 
 	/**
 	 * Load all the user preferences to populate the task manager grid.
 	 */
 	private onLoad(): void {
+		this.activatedRoute.queryParams
+			.subscribe(params => {
+				this.urlParams = params;
+			});
+
 		this.loading = true;
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
+
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
+			this.getUrlParamOrUserPreference('moveEvent', PREFERENCES_LIST.CURRENT_EVENT_ID),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.VIEW_UNPUBLISHED),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.JUST_REMAINING)
+			this.getUrlParamOrUserPreference('justRemaining', PREFERENCES_LIST.JUST_REMAINING),
 		);
 		observables.subscribe({
 				next: value => {
-					// Custom Columns, TaskPref value[0]
-					this.buildCustomColumns(value[0].customColumns, value[0].assetCommentFields);
-					// Current event, value[1]
-					this.loadEventListAndSearch(value[1]);
-					// Task list size, value[2]
-					this.pageSize = value[2] ? parseInt(value[2], 0) : GRID_DEFAULT_PAGE_SIZE;
-					// Task Refresh Timer, value[3]
-					// Task View Unpublished, value[4]
-					this.viewUnpublished = value[4] ? value[4] === 'true' : false;
-					// Just Remaining, value [5]
-					this.justRemaining = value[5] ? value[5] === '1' : false;
+					const [custom, currentEventId, listSize, unpublished, justRemaining] = value;
+
+					// Custom Columns, TaskPref
+					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
+					// Current event
+					this.loadEventListAndSearch(currentEventId);
+					// Task list size
+					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					// Task View Unpublished
+					this.viewUnpublished = unpublished ? unpublished === 'true' : false;
+					// Just Remaining
+					this.justRemaining = justRemaining ? justRemaining === '1' : false;
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -399,13 +415,27 @@ export class TaskListComponent {
 	 */
 	private search(taskId ?: number): void {
 		this.loading = true;
-		this.taskService.getTaskList(this.selectedEvent.id, this.justRemaining, this.justMyTasks, this.viewUnpublished).subscribe(result => {
-			this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
-			this.rowsExpandedMap = {};
-			this.rowsExpanded = false;
-			this.loading = false;
-			setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
-		});
+
+		// Set the default filter values
+		const defaultFilters = {
+			moveEvent: this.selectedEvent.id,
+			justRemaining: this.justRemaining ? 1 : 0,
+			justMyTasks: this.justMyTasks ? 1 : 0,
+			viewUnpublished: this.viewUnpublished ? 1 : 0,
+			sord: 'asc',
+		};
+
+		// Append url filters, in case they were not present in the default filters
+		const filters = Object.assign({}, this.urlParams, defaultFilters);
+
+		this.taskService.getTaskList(filters)
+			.subscribe(result => {
+				this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
+				this.rowsExpandedMap = {};
+				this.rowsExpanded = false;
+				this.loading = false;
+				setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
+			});
 	}
 
 	/**

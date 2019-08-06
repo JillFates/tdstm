@@ -50,10 +50,13 @@
             </table>
             <h4>Open Tasks</h4>
             <div>
-                <a href="/tdstm/assetEntity/listTasks?filter=openIssue&moveEvent=0&justRemaining=1">{{planningDashboardModel.discovery.activeTasks}} Active {{planningDashboardModel.discovery.activeTasks > 1 ? 'Tasks' : 'Task'}}</a>
+                <a [routerLink]="['/taskManager', 'list']"
+                   [queryParams]="{filter: 'openIssue', moveEvent:0,  justRemaining:1}">
+                    {{planningDashboardModel.discovery.activeTasks}} Active {{planningDashboardModel.discovery.activeTasks > 1 ? 'AATasks' : 'AATask'}}
+                </a>
             </div>
             <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0" class="planning-dashboard-overdue-tasks">
-                <a href="/tdstm/assetEntity/listTasks?filter=dueOpenIssue&moveEvent=0&justRemaining=1"><span>{{planningDashboardModel.discovery.overdueTasks}}</span> Overdue Tasks</a>
+                <a href="/tdstm/module/taskManger/list?filter=dueOpenIssue&moveEvent=0&justRemaining=1"><span>{{planningDashboardModel.discovery.overdueTasks}}</span> Overdue Tasks</a>
             </div>
         </div>
         <div class="dashboard-div analysis-phase">
@@ -111,12 +114,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><a href="/tdstm/assetEntity/listTasks?filter=analysisIssue&moveEvent=0&justRemaining=0">{{planningDashboardModel.analysis.activeTasks}}</a></td>
-                        <td><a href="/tdstm/assetEntity/listTasks?filter=analysisIssue&moveEvent=0&justRemaining=0">Active Tasks</a></td>
+                        <td><a href="/tdstm/module/taskManager/list?filter=analysisIssue&moveEvent=0&justRemaining=0">{{planningDashboardModel.analysis.activeTasks}}</a></td>
+                        <td><a href="/tdstm/module/taskManager/list?filter=analysisIssue&moveEvent=0&justRemaining=0">Active Tasks</a></td>
                     </tr>
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
-                        <td><a href="/tdstm/assetEntity/listTasks?filter=generalOverDue&moveEvent=0&justRemaining=1">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
-                        <td><a href="/tdstm/assetEntity/listTasks?filter=generalOverDue&moveEvent=0&justRemaining=1">Overdue Tasks</a></td>
+                        <td><a href="/tdstm/module/taskManager/list?filter=generalOverDue&moveEvent=0&justRemaining=1">{{planningDashboardModel.analysis.overdueTasks}}</a></td>
+                        <td><a href="/tdstm/module/taskManager/list?filter=generalOverDue&moveEvent=0&justRemaining=1">Overdue Tasks</a></td>
                     </tr>
                 </table>
             </div>
@@ -313,7 +316,7 @@
                                 <td></td>
                                     <td *ngFor="let task of planningDashboardModel.execution.openTasks" class="execution-data-column">
                                         <span *ngIf="task.count==0" class='colorGrey'>0</span>
-                                        <a *ngIf="task.count!=0"  href="/tdstm/assetEntity/listTasks?moveEvent={{task.moveEvent}}&justRemaining=1">
+                                        <a *ngIf="task.count!=0"  href="/tdstm/module/taskManager/list?moveEvent={{task.moveEvent}}&justRemaining=1">
                                             {{task.count}}
                                         </a>
                                     </td>
