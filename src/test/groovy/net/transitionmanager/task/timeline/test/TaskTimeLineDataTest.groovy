@@ -1,4 +1,7 @@
-package net.transitionmanager.task.timeline
+package net.transitionmanager.task.timeline.test
+
+import net.transitionmanager.task.timeline.TaskVertex
+import net.transitionmanager.task.timeline.TimelineTable
 
 trait TaskTimeLineDataTest {
 

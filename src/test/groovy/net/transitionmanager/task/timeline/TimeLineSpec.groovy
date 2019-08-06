@@ -5,6 +5,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
+import net.transitionmanager.task.timeline.test.TaskTimeLineDataTest
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

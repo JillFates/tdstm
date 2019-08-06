@@ -265,7 +265,6 @@ class TaskVertex {
 		return "TaskVertex { " +
 			"taskNumber='" + taskNumber + '\'' +
 			"taskComment='" + taskComment + '\'' +
-			", description='" + (description ?: '') + '\'' +
 			", duration=" + duration +
 			' }';
 	}
