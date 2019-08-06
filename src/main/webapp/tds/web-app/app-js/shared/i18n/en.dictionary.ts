@@ -138,6 +138,9 @@ export const en_DICTIONARY: Object = {
 	},
 	'ASSET_EXPORT': {
 		'ASSET_EXPORT': 'Asset Export',
+		'SELECT_BUNDLE': 'Select one or more bundle(s):',
+		'CHOOSE_ITEM': 'Choose Item(s) to Export:',
+		'EXPORT_BUTTON': 'Export Excel'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',

@@ -1,4 +1,66 @@
 <!-- Main content -->
 <div class="content body tds-kendo-grid api-action-list-component">
-	<h3>Hola mundo</h3>
+	<!-- Main content -->
+	<section>
+		<div>
+			<div class="box-body">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+<!--						<h3 class="box-title">Export</h3>-->
+					</div><!-- /.box-header -->
+				<form id="exportForm" action="export" method="post" name="exportForm" role="form">
+					<div class="box-body">
+
+						<div class="form-group col-lg-3 col-md-4">
+							<label for="bundleId">Select one or more bundle(s):</label>
+							<select id="bundleId" name="bundle" multiple="multiple" class="form-control medium-height">
+								<option value="All">All Bundles</option>
+								<option value="planning-bundle" selected="selected">Planning Bundles</option>
+								<option value="" disabled>──────────</option>
+								<option value="1">name</option>
+							</select>
+						</div>
+						<div class="form-group col-lg-3 col-md-4">
+							<label for="checkboxGroup">Choose Items to Export:</label>
+							<div class="row checkboxGroup" id="checkboxGroup">
+								<div class="col-sm-6">
+									<ul class="list-group sub-set">
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="applicationId">
+													<input type="checkbox" id="applicationId" name="application" value="application"/>Application</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="applicationId">
+													<input type="checkbox" id="applicationId" name="application" value="application"/>Application</label>
+											</div>
+										</li>
+									</ul>
+								</div>
+								<div class="col-sm-6">
+									<ul class="list-group sub-set">
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="rackId">
+													<input type="checkbox" id="rackId" name="rack" value="rack"/>Rack</label>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<input type="hidden" id="exportFormat" name="exportFormat" value="xlsx" />
+						</div>
+						<div class="">
+							<button type="submit" id="exportButton" class="btn btn-primary">Export Excel&nbsp;&nbsp;<span class="exportIcon glyphicon glyphicon-download" aria-hidden="true"></span></button>
+						</div>
+					</div>
+				</form>
+				</div>
+			</div>
+		</div>
+	</section>
 </div>
