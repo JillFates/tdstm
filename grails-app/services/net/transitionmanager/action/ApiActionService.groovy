@@ -559,15 +559,17 @@ class ApiActionService implements ServiceMethods {
 			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(
-				ApiActionScriptBindingBuilder.class)
-			.with(request)
-			.with(response)
-			.with(asset)
-			.with(task)
-			.with(job)
-			.build(code)
+		ApiActionScriptBindingBuilder scriptBuilder = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder.class)
+					.with(request)
+					.with(response)
+					.with(task)
+					.with(job)
 
+		if (asset) {
+			scriptBuilder = scriptBuilder.with(asset)
+		}
+
+		ApiActionScriptBinding scriptBinding = scriptBuilder.build(code)
 		def result = new ApiActionScriptEvaluator(scriptBinding).evaluate(script)
 
 		checkEvaluationScriptResult(code, result)
@@ -600,14 +602,17 @@ class ApiActionService implements ServiceMethods {
 			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
-				.with(request)
-				.with(response)
-				.with(asset)
-				.with(task)
-				.with(job)
-				.build(code)
+		ApiActionScriptBindingBuilder scriptBuilder = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder.class)
+					.with(request)
+					.with(response)
+					.with(task)
+					.with(job)
 
+		if (asset) {
+			scriptBuilder = scriptBuilder.with(asset)
+		}
+
+		ApiActionScriptBinding scriptBinding = scriptBuilder.build(code)
 		List errors = new ApiActionScriptEvaluator(scriptBinding).checkSyntax(script)
 
 		return [
