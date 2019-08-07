@@ -601,8 +601,10 @@ class DataviewService implements ServiceMethods {
 					}
 					// Determine if the field is a custom field based on the field's spec.
 					Boolean isCustom = column.fieldSpec?.isUserDefinedField
-					// A field should be populated if it's a common field or if it's a custom field that belongs to the asset's domain.
-					Boolean shouldBePopulated = !isCustom || (isCustom && column.domain == assetDomain)
+					// Determine if the (custom) field is shared or it belongs to the same domain.
+					Boolean displayIfCustom = isCustom && (column.domain == assetDomain || column.fieldSpec.shared)
+					// A field should be populated if it isn't user defined or it's a displayable custom field.
+					Boolean shouldBePopulated = !isCustom || displayIfCustom
 					if (column && shouldBePopulated) {
 						row["${column.domain}${DataviewApiFilterParam.FIELD_NAME_SEPARATOR_CHARACTER}${column.property}"] = cell
 					}
