@@ -20,7 +20,6 @@ import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.common.ControllerService
@@ -43,7 +42,6 @@ class WsAssetController implements ControllerMethods {
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
-	MoveBundleService moveBundleService
 	PageRenderer groovyPageRenderer
 	StorageService storageService
 	UserPreferenceService userPreferenceService
@@ -565,12 +563,5 @@ class WsAssetController implements ControllerMethods {
 		String justPlanningPref = userPreferenceService.getPreference(null, UserPreferenceEnum.ASSET_JUST_PLANNING, "false")
 		Boolean justPlanning = StringUtil.toBoolean(justPlanningPref)
 		renderSuccessJson(assetEntityService.getAssetSummary(project, justPlanning))
-	}
-
-	@HasPermission(Permission.AssetExport)
-	def bundlesAndPreferencesForAssetExport() {
-		Project project = getProjectForWs()
-		renderSuccessJson([bundles:moveBundleService.lookupList(project),
-		                   userPreferences: userPreferenceService.getExportPreferences()])
 	}
 }
