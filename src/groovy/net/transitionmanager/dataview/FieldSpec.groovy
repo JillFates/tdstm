@@ -1,5 +1,6 @@
 package net.transitionmanager.dataview
 
+import com.tdssrc.grails.StringUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.hibernate.type.DateType
@@ -57,6 +58,7 @@ class FieldSpec {
 	Boolean separator
 	Boolean allowNegative
 	Integer required
+	Boolean shared
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	FieldSpec(Map fieldSpecMap) {
@@ -71,6 +73,7 @@ class FieldSpec {
 		this.separator = fieldSpecMap.constraints.separator
 		this.allowNegative = fieldSpecMap.constraints.allowNegative
 		this.required = fieldSpecMap.constraints.required
+		this.shared = StringUtil.toBoolean(fieldSpecMap.shared)
 	}
 
 	/**
