@@ -195,11 +195,9 @@
                 <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
             </div>
             <div *ngIf="!editing" class="modal-footer form-group-center">
-                <div *ngIf="canEditEvent">
-                    <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
-                    <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteEvent()"></tds-button-delete>
-                    <button class="btn btn-primary pull-left" (click)="confirmMarkAssetsMoved()">Mark Assets Moved</button>
-                </div>
+                <tds-button-edit *ngIf="canEditEvent" class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
+                <tds-button-delete *ngIf="canEditEvent" class="btn-danger" (click)="confirmDeleteEvent()"></tds-button-delete>
+                <button *ngIf="canEditEvent" class="btn btn-primary" (click)="confirmMarkAssetsMoved()">Mark Assets Moved</button>
                 <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
             </div>
         </div>
