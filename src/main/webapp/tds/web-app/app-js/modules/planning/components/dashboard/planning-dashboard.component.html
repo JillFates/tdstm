@@ -56,7 +56,11 @@
                 </a>
             </div>
             <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0" class="planning-dashboard-overdue-tasks">
-                <a href="/tdstm/module/taskManger/list?filter=dueOpenIssue&moveEvent=0&justRemaining=1"><span>{{planningDashboardModel.discovery.overdueTasks}}</span> Overdue Tasks</a>
+                <a [routerLink]="['/taskManager', 'list']"
+                   [queryParams]="{filter: 'dueOpenIssue', moveEvent:0,  justRemaining:1}">
+                    <span>{{planningDashboardModel.discovery.overdueTasks}}</span>
+                    Overdue Tasks
+                </a>
             </div>
         </div>
         <div class="dashboard-div analysis-phase">
