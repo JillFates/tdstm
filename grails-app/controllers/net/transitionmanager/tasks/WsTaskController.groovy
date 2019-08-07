@@ -1,6 +1,7 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
@@ -371,5 +372,13 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
                 successorsCount: TaskDependency.countByPredecessor(task),
                 category: task.category
         )
+    }
+
+    /**
+     * Return a list with all the AssetCommentCategory values.
+     */
+    @HasPermission(Permission.TaskBatchView)
+    def assetCommentCategories() {
+        renderSuccessJson(AssetCommentCategory.list)
     }
 }

@@ -47,7 +47,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	 * Load All Comment Categories
 	 */
 	private loadCommentCategories(): void {
-		this.taskManagerService.getCommentCategories().subscribe((res) => {
+		this.taskManagerService.getAssetCommentCategories().subscribe((res) => {
 			this.commentCategories = res;
 			if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
 				this.singleCommentModel.category = this.commentCategories[0];

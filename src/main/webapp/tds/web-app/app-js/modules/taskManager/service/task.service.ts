@@ -37,18 +37,6 @@ export class TaskService {
 	}
 
 	/**
-	 * Get the Comment Categories
-	 * @returns {Observable<any>}
-	 */
-	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
-			.map((response: any) => {
-				return response && response.status === 'success' && response.data;
-			})
-			.catch((error: any) => error);
-	}
-
-	/**
 	 * Get the Task Details
 	 * @returns {Observable<any>}
 	 */
@@ -290,10 +278,10 @@ export class TaskService {
 
 	/**
 	 *
-	 * Get categories
+	 * Get Asset Comment Categories
 	 * @returns {Observable<any>}
 	 */
-	getCategories(): Observable<any[]> {
+	getAssetCommentCategories(): Observable<any[]> {
 		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
 			.map((response: any) => {
 				return response && response.data || [];

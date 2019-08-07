@@ -40,7 +40,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 * Load All Comment Categories
 	 */
 	private loadCommentCategories(): void {
-		this.taskManagerService.getCommentCategories().subscribe((res) => {
+		this.taskManagerService.getAssetCommentCategories().subscribe((res) => {
 			this.commentCategories = res;
 			if (!this.assetCommentModel.category || this.assetCommentModel.category === null) {
 				this.assetCommentModel.category = this.commentCategories[0];
