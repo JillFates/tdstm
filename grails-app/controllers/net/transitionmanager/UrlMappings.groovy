@@ -60,6 +60,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/bundlesAndPreferencesForAssetExport" {
+			controller = 'wsAsset'
+			action = [
+			    GET: 'bundlesAndPreferencesForAssetExport'
+			]
+		}
+
 		"/ws/asset/clone" {
 			controller = "wsAsset"
 			action = [
