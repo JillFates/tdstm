@@ -1,14 +1,11 @@
 package net.transitionmanager.license
 
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.exception.InvalidLicenseException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
-import grails.plugins.mail.MailService
 import grails.gorm.transactions.Transactional
+import grails.plugins.mail.MailService
 import groovy.util.logging.Slf4j
-
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
 import net.nicholaswilliams.java.licensing.LicenseManagerProperties
@@ -17,22 +14,22 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidLicenseException
 import net.transitionmanager.license.License as DomainLicense
 import net.transitionmanager.license.prefs.FilePrivateKeyDataProvider
 import net.transitionmanager.license.prefs.FilePublicKeyDataProvider
 import net.transitionmanager.license.prefs.MyLicenseProvider
 import net.transitionmanager.license.prefs.TDSLicenseValidator
 import net.transitionmanager.license.prefs.TDSPasswordProvider
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.party.PartyGroup
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
-import org.grails.web.json.JSONElement
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
-
 
 @Slf4j
 class LicenseAdminService extends LicenseCommonService implements InitializingBean {
