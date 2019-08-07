@@ -484,15 +484,6 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
 	}
 
-
-	/**
-	 * Return a list with all the AssetCommentCategory values.
-	 */
-	@HasPermission(Permission.TaskBatchView)
-	def assetCommentCategories() {
-		renderSuccessJson(AssetCommentCategory.list)
-	}
-
 	/**
 	 * Delete a comment given its id.
 	 */
