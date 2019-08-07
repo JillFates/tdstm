@@ -403,6 +403,7 @@ export class TaskService {
 
 	/**
 	 * POST - Get the List of Task presented on Task Management list.
+	 * @param {any} filters  Object containing the filters to apply for
 	 */
 	getTaskList(filters: any): Observable<any> {
 
