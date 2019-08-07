@@ -321,6 +321,12 @@ export class TaskListComponent {
 		this.onLoad();
 	}
 
+	/**
+	 * Verifies the presence of the filter passed in the url,
+	 * if it exists returns the url filter value, otherwise returns the user preference value
+	 * @param {string} paramName  Name of the parameter received in the url
+	 * @param {string} preferenceKey  Name of user preference key
+	*/
 	private getUrlParamOrUserPreference(paramName: string, preferenceKey: string): Observable<any> {
 		return  hasIn(paramName, this.urlParams) ?
 			Observable.of(this.urlParams[paramName]) :
@@ -331,6 +337,7 @@ export class TaskListComponent {
 	 * Load all the user preferences to populate the task manager grid.
 	 */
 	private onLoad(): void {
+		/* ge the parameters passed by the url */
 		this.activatedRoute.queryParams
 			.subscribe(params => {
 				this.urlParams = params;
