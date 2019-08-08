@@ -228,6 +228,11 @@ class UrlMappings {
 			action = [GET: "getEventDashboardModel"]
 		}
 
+		"/ws/moveEvent/taskCategoriesStats/$moveEventId" {
+			controller = 'wsEvent'
+			action = [GET: 'taskCategoriesStats']
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
