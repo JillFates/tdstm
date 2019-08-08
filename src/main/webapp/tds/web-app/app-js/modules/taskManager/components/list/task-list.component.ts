@@ -433,7 +433,7 @@ export class TaskListComponent {
 		};
 
 		// Append url filters, in case they were not present in the default filters
-		const filters = Object.assign({}, this.urlParams, defaultFilters);
+		const filters = Object.assign({}, defaultFilters, this.urlParams);
 
 		this.taskService.getTaskList(filters)
 			.subscribe(result => {

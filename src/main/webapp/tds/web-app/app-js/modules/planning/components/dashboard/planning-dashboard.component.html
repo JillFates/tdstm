@@ -51,13 +51,13 @@
             <h4>Open Tasks</h4>
             <div>
                 <a [routerLink]="['/taskManager', 'list']"
-                   [queryParams]="{filter: 'openIssue', moveEvent:0,  justRemaining:1}">
+                   [queryParams]="{filter: 'openIssue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
                     {{planningDashboardModel.discovery.activeTasks}} Active {{planningDashboardModel.discovery.activeTasks > 1 ? 'Tasks' : 'Task'}}
                 </a>
             </div>
             <div *ngIf="planningDashboardModel.discovery.overdueTasks > 0" class="planning-dashboard-overdue-tasks">
                 <a [routerLink]="['/taskManager', 'list']"
-                   [queryParams]="{filter: 'dueOpenIssue', moveEvent:0,  justRemaining:1}">
+                   [queryParams]="{filter: 'dueOpenIssue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
                     <span>{{planningDashboardModel.discovery.overdueTasks}}</span>
                     Overdue Tasks
                 </a>
@@ -120,13 +120,13 @@
                     <tr>
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0}">
+                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0, viewUnpublished: 0}">
                                 {{planningDashboardModel.analysis.activeTasks}}
                             </a>
                         </td>
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0}">
+                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0, viewUnpublished: 0}">
                                 Active Tasks
                             </a>
                         </td>
@@ -134,13 +134,13 @@
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1}">
+                               [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
                                 {{planningDashboardModel.analysis.overdueTasks}}
                             </a>
                         </td>
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1}">
+                               [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
                                 Overdue Tasks
                             </a>
                         </td>
@@ -342,7 +342,7 @@
                                         <span *ngIf="task.count==0" class='colorGrey'>0</span>
                                         <a *ngIf="task.count!=0"
                                            [routerLink]="['/taskManager', 'list']"
-                                           [queryParams]="{moveEvent: task.moveEvent, justRemaining:1}">
+                                           [queryParams]="{moveEvent: task.moveEvent, justRemaining:1, viewUnpublished: 0}">
                                             {{task.count}}
                                         </a>
                                     </td>
