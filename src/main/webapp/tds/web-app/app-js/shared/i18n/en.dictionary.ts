@@ -309,6 +309,8 @@ export const en_DICTIONARY: Object = {
 		'CHECK_YOUR_EMAIL': 'Check Your Email',
 		'DOMAIN': 'Domain',
 		'FORGOT_PASSWORD': 'Forgot Password',
+		'CHANGE_PASSWORD': 'Change Password',
+		'SAVE_PASSWORD': 'Save Password',
 		'LOGIN': 'Login',
 		'PLEASE_SELECT': 'Please select',
 		'SEND': 'Send',

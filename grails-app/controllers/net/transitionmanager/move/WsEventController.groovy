@@ -306,4 +306,13 @@ class WsEventController implements ControllerMethods {
 		}
 		renderSuccessJson("success")
 	}
+
+
+	/**
+	 * Find and return various task-related stats per category for the given event.
+	 */
+	def taskCategoriesStats(Long moveEventId) {
+		Project project = getProjectForWs()
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId))
+	}
 }

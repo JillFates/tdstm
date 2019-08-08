@@ -542,4 +542,44 @@ class MoveEventService implements ServiceMethods {
 
 		return moveBundleSteps
 	}
+
+
+	/**
+	 * Find different stats for the given event, grouped by category.
+	 * @param project
+	 * @param moveEventId
+	 * @return a list with the cor
+	 */
+	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
+		// Fetch the corresponding MoveEvent and throw an exception if not found.
+		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
+		// Query the database for the min/max dates for tasks in the event grouped by category.
+		List taskCategoriesStatsList = AssetComment.createCriteria().list {
+			eq('moveEvent', moveEvent)
+			projections {
+				groupProperty('category')
+				min('actStart')
+				max('dateResolved')
+				min('estStart')
+				max('estFinish')
+			}
+		}
+
+		List<Map> stats = []
+		taskCategoriesStatsList.each { categoryStats ->
+			// Only add to the results if any of the dates has values
+			if (categoryStats[1] || categoryStats[2] || categoryStats[3] || categoryStats[4]) {
+				stats << [
+					"category": categoryStats[0],
+					"actStart": categoryStats[1],
+					"actFinish": categoryStats[2],
+					"estStart": categoryStats[3],
+					"estFinish": categoryStats[4],
+				]
+			}
+		}
+
+		return stats
+	}
+
 }

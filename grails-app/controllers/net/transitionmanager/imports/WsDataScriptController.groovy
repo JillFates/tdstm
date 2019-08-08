@@ -179,7 +179,7 @@ class WsDataScriptController implements ControllerMethods, PaginationMethods {
 
         String rootNode = params.rootNode ?: ''
 
-        Long maxRows = paginationMaxRowValue() ?: 25
+        Long maxRows = 2500000
         Map jsonMap = dataScriptService.parseDataFromFile(id, originalFileName, filename, rootNode, maxRows)
         renderSuccessJson(jsonMap)
     }

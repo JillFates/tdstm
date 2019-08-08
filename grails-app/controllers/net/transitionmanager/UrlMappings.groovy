@@ -228,6 +228,11 @@ class UrlMappings {
 			action = [GET: "getEventDashboardModel"]
 		}
 
+		"/ws/moveEvent/taskCategoriesStats/$moveEventId" {
+			controller = 'wsEvent'
+			action = [GET: 'taskCategoriesStats']
+		}
+
 		"/ws/moveEvent/list" {
 			controller = "wsEvent"
 			action = [GET: "listEvents"]
@@ -509,6 +514,11 @@ class UrlMappings {
 			action = [POST:"changeTaskState"]
 		}
 
+        "/ws/task/$id/updateStatus" {
+            controller = "wsTask"
+            action = [POST:"updateStatus"]
+        }
+
 		"/ws/progress/$id" {
 			controller = "wsProgress"
 			action = [
@@ -536,6 +546,13 @@ class UrlMappings {
 			controller = 'user'
 			action = [
 				GET: 'context'
+			]
+		}
+
+		"/ws/user/updatePassword" {
+			controller = 'wsUser'
+			action = [
+				POST: 'updatePassword'
 			]
 		}
 
