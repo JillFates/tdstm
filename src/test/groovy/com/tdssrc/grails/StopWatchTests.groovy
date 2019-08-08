@@ -1,7 +1,6 @@
 package com.tdssrc.grails
 
 import groovy.time.TimeDuration
-import org.junit.Ignore
 import spock.lang.Specification
 
 class StopWatchTests extends Specification {
