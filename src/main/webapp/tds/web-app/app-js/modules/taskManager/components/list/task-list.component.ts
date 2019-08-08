@@ -352,7 +352,7 @@ export class TaskListComponent {
 			this.taskService.getCustomColumns(),
 			this.getUrlParamOrUserPreference('moveEvent', PREFERENCES_LIST.CURRENT_EVENT_ID),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.VIEW_UNPUBLISHED),
+			this.getUrlParamOrUserPreference('viewUnpublished', PREFERENCES_LIST.VIEW_UNPUBLISHED),
 			this.getUrlParamOrUserPreference('justRemaining', PREFERENCES_LIST.JUST_REMAINING),
 		);
 		observables.subscribe({
@@ -366,9 +366,14 @@ export class TaskListComponent {
 					// Task list size
 					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
 					// Task View Unpublished
-					this.viewUnpublished = unpublished ? unpublished === 'true' : false;
+					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
 					// Just Remaining
 					this.justRemaining = justRemaining ? justRemaining === '1' : false;
+
+					// params were transferred to local properties,
+					// we can remove them from the parameters object
+					// and leave only the parameters which are not handled by local properties
+					this.urlParams = this.excludeSetParameters(this.urlParams);
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -434,6 +439,8 @@ export class TaskListComponent {
 
 		// Append url filters, in case they were not present in the default filters
 		const filters = Object.assign({}, defaultFilters, this.urlParams);
+		console.log('Filters are:');
+		console.log(filters);
 
 		this.taskService.getTaskList(filters)
 			.subscribe(result => {
@@ -778,5 +785,25 @@ export class TaskListComponent {
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	/**
+	 * Once parameters are set to the properties of the component
+	 * we need to remove them
+	 * @param {any} params Parameters coming from the route
+	 */
+	excludeSetParameters(params: any): any {
+		const resultingParams = {};
+		const numberParams = ['moveEvent', 'justRemaining', 'viewUnpublished'];
+
+		for (let property in params) {
+			if (params.hasOwnProperty(property)) {
+				if (numberParams.indexOf(property) === -1) {
+					resultingParams[property] = params[property];
+				}
+			}
+		}
+
+		return resultingParams;
 	}
 }
