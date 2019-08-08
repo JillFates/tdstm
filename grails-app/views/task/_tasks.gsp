@@ -94,6 +94,8 @@
 										apiActionInvokedAt="${item?.apiActionInvokedAt}"
 										apiActionCompletedAt="${item?.apiActionCompletedAt}"
 										apiActionType="${item?.apiActionType}"
+										apiActionName="${item?.apiActionName}"
+										apiActionDescription="${item?.apiActionDescription}"
 										id="${item?.id}"
 										status="${item?.status}"
 										onclick="invokeAction('${item?.id}')"/>
