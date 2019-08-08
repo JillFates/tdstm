@@ -19,11 +19,6 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { TaskEditComponent } from '../edit/task-edit.component';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskCreateComponent } from '../create/task-create.component';
@@ -37,7 +32,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 			<section>
 				<div class="box-body box-with-empty-header">
 					<div class="row top-filters">
-						<div class="col-sm-6">
+						<div class="col-sm-7">
 							<label class="control-label" for="fetch">Event</label>
 							<kendo-dropdownlist
 								style="width: 200px; padding-right: 20px"
@@ -76,7 +71,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								View Unpublished
 							</label>
 						</div>
-						<div class="col-sm-6 text-right">
+						<div class="col-sm-5 text-right">
 							<tds-button-custom class="btn-primary"
 																 (click)="onViewTaskGraphHandler()"
 																 title="View Task Graph"
@@ -216,17 +211,17 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								<span style="margin-right:16px">Delay for:</span>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 1)">
+									(click)="changeTimeEst(dataItem, 1)">
 									<i class="fa fa-forward"></i>1 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 2)">
+									(click)="changeTimeEst(dataItem, 2)">
 									<i class="fa fa-forward"></i>2 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 7)">
+									(click)="changeTimeEst(dataItem, 7)">
 									<i class="fa fa-forward"></i>7 day
 								</button>
 							</div>
@@ -312,8 +307,7 @@ export class TaskListComponent {
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
 		private dialogService: UIDialogService,
-		private userContextService: UserContextService,
-		private translate: TranslatePipe) {
+		private userContextService: UserContextService) {
 		this.onLoad();
 	}
 
@@ -447,46 +441,6 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * On Edit Task Button Handler open the task edit modal.
-	 * @param taskRow: any
-	 */
-	onEditTaskHandler(taskRow: any): void {
-		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
-		this.taskService.getTaskDetails(taskRow.id)
-			.subscribe((res) => {
-				let modelHelper = new TaskEditCreateModelHelper(
-					this.userContext.timezone,
-					this.userContext.dateFormat,
-					this.taskService,
-					this.dialogService,
-					this.translate);
-				taskDetailModel.detail = res;
-				taskDetailModel.modal = {
-					title: 'Task Edit',
-					type: ModalType.EDIT
-				};
-				let model = modelHelper.getModelForDetails(taskDetailModel);
-				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
-				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
-				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.search()
-							} else {
-								this.search(taskRow.id)
-							}
-						}
-					}).catch(result => {
-						console.log(result);
-				});
-			});
-	}
-
-	/**
 	 * On Create Task button handler open the Create task modal.
 	 */
 	onCreateTaskHandler(): void {
@@ -525,15 +479,20 @@ export class TaskListComponent {
 			id: taskRow.id,
 			modal: {
 				title: 'Task Detail'
-			},
-			detail: {
-				currentUserId: this.userContext.user.id
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then(() => {
-			// do nothing.
+		]).then((result) => {
+			if (result) {
+				if (result.isDeleted) {
+					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+						this.search();
+					});
+				} else {
+					this.search();
+				}
+			}
 		}).catch(result => {
 			if (result) {
 				this.search();
@@ -542,14 +501,14 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Changes the time estimation of a task.
-	 * @param id: string
+	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
+	 * @param taskRow: any
 	 * @param days: string
 	 */
-	changeTimeEst(id: string, days: string) {
-		this.taskService.changeTimeEst(id, days)
+	changeTimeEst(taskRow: any, days: string) {
+		this.taskService.changeTimeEst(taskRow.id, days)
 			.subscribe(() => {
-				this.search(parseInt(id, 0));
+				taskRow.updatedTime = '0s';
 			});
 	}
 
@@ -666,6 +625,7 @@ export class TaskListComponent {
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;
+				this.search(taskRow.id);
 			});
 	}
 

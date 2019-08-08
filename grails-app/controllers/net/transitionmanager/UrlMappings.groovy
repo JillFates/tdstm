@@ -514,6 +514,11 @@ class UrlMappings {
 			action = [POST:"changeTaskState"]
 		}
 
+        "/ws/task/$id/changeTime" {
+            controller = "wsTask"
+            action = [POST:"changeEstTime"]
+        }
+
         "/ws/task/$id/updateStatus" {
             controller = "wsTask"
             action = [POST:"updateStatus"]
