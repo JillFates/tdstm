@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import groovy.time.TimeDuration
+import org.junit.Ignore
 import spock.lang.Specification
 
 class StopWatchTests extends Specification {
@@ -84,6 +85,7 @@ class StopWatchTests extends Specification {
 		stopWatch.lastLap.seconds == 2
 	}
 
+	@Ignore // This was known to fail from time to time, see TM-15701
 	void 'Test Multiple Time Lap'() {
 		setup:
 		int max = 5
