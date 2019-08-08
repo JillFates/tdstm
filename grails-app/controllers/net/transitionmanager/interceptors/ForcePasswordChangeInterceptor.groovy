@@ -28,7 +28,7 @@ class ForcePasswordChangeInterceptor {
 			}
 
 			flash.message = "Your password has expired and must be changed"
-			redirect(controller: 'userLogin', action: 'changePassword', params: [userLoginInstance: userLogin])
+			redirect(uri: '/module/auth/changePassword')
 			return false
 		}
 
