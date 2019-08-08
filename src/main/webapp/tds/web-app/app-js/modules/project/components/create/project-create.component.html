@@ -7,32 +7,54 @@
     </div>
     <div class="modal-body">
         <div class="modal-body-container">
-            <form action="save" method="post" name="projectCreateForm">
-                <div class="dialog">
-                    <table>
-                        <tbody>
+            <div class="dialog">
+                <table>
+                    <tbody>
                         <tr>
                             <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
                         </tr>
                         <tr class="prop">
-                            <td valign="top" class="name"><b>Client:&nbsp;<span style="color: red">*</span></b></td>
+                            <td valign="top" class="name"><b>Client:</b></td>
                             <td valign="top" class="value">
-                                <kendo-dropdownlist type="text" [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" id="client" name="client"></kendo-dropdownlist>
+                                <kendo-dropdownlist type="text" [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" [valuePrimitive]="true" id="client" name="client"></kendo-dropdownlist>
                             </td>
                         </tr>
 
                         <tr class="prop">
-                            <td valign="top" class="name">Project Name:</td>
+                            <td valign="top" class="name">Project Code:&nbsp;<span style="color: red">*</span></td>
+                            <td valign="top" class="value">
+                                <input id="projectCode" name="projectCode" [(ngModel)]="projectModel.projectCode"/>
+                            </td>
+                        </tr>
+
+                        <tr class="prop">
+                            <td valign="top" class="name">Project Name:&nbsp;<span style="color: red">*</span></td>
                             <td valign="top" class="value">
                                 <input type="text" [(ngModel)]="projectModel.projectName"  id="projectName" name="projectName"/>
                             </td>
                         </tr>
+
+                        <tr class="prop">
+                            <td valign="top" class="name">Project Type:</td>
+                            <td valign="top" class="value">
+                                <kendo-dropdownlist id="projectType" name="projectType" [data]="projectTypes" [(ngModel)]="projectModel.projectType" ></kendo-dropdownlist>
+                            </td>
+                        </tr>
+
                         <tr class="prop">
                             <td valign="top" class="name">Description:</td>
                             <td valign="top" class="value">
                                 <textarea type="text" [(ngModel)]="projectModel.description"  id="description" name="description"></textarea>
                             </td>
                         </tr>
+
+                        <tr>
+                            <td valign="top" class="name"><b>Comment:</b></td>
+                            <td valign="top" class="value">
+                                <textarea id="comment" name="comment" [(ngModel)]="projectModel.comment"></textarea>
+                            </td>
+                        </tr>
+
                         <tr class="prop">
                             <td valign="top" class="name">Start Date:</td>
                             <td valign="top" class="value">
@@ -41,7 +63,7 @@
                         </tr>
 
                         <tr class="prop">
-                            <td valign="top" class="name">Completion Date:</td>
+                            <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
                             <td valign="top" class="value">
                                 <kendo-datepicker [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
                             </td>
@@ -55,50 +77,46 @@
                             </td>
                         </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="projectManagerId" name="projectManager" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-
-                        <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                        <td valign="top" class="value">
-                            <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="projectModel.workflowCode" [data]="workflowCodes"></kendo-dropdownlist>
-                        </td>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Code:</td>
-                            <td valign="top" class="value">
-                                <input id="projectCode" name="projectCode" [(ngModel)]="projectModel.projectCode"/>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Type:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="projectType" name="projectType" [(ngModel)]="projectModel.projectType" ></kendo-dropdownlist>
-                            </td>
-                        </tr>
                         <tr>
-                            <td valign="top" class="name"><b>Comment:&nbsp;<span style="color: red">*</span></b></td>
+                            <td valign="top" class="name"><b>Project Logo:</b></td>
                             <td valign="top" class="value">
-                                <textarea id="comment" name="comment" [(ngModel)]="projectModel.comment"></textarea>
+                                <kendo-upload
+                                    #kendoUploadInstance="kendoUpload"
+                                    [restrictions]="file.uploadRestrictions"
+                                    [autoUpload]="file.autoUpload"
+                                    [saveUrl]="file.uploadSaveUrl"
+                                    [removeUrl]="file.uploadDeleteUrl"
+                                    [saveField]="file.saveField"
+                                    [removeField]="file.removeField"
+                                    [multiple]="file.multiple"
+                                    [disabled]="false"
+                                    (select)="onSelectFile($event)"
+                                    (upload)="onUploadFile($event)"
+                                    (remove)="onRemoveFile($event)"
+                                    (success)="completeEventHandler($event)">
+                                <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
+                            </kendo-upload><!---->
                             </td>
                         </tr>
 
                         <tr>
-                            <td valign="top" class="name"><b>Default Bundle:&nbsp;<span style="color: red">*</span></b></td>
+                            <td valign="top" class="name"><b>Default Bundle:</b></td>
                             <td valign="top" class="value">
                                 <input id="defaultBundle" name="defaultBundle" [(ngModel)]="projectModel.defaultBundle"/>
                             </td>
                         </tr>
 
-                        <tr>
-                            <td valign="top" class="name"><b>Time Zone:&nbsp;<span style="color: red">*</span></b></td>
+                        <tr class="prop">
+                            <td valign="top" class="name">Project Manager:</td>
                             <td valign="top" class="value">
-                                <input id="timeZone" name="timeZone" [(ngModel)]="projectModel.timeZone"/>
+                                <kendo-dropdownlist id="projectManagerId" name="projectManager" [data]="managers" [textField]="'name'" [valueField]="'id'" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" class="name"><b>Time Zone:</b></td>
+                            <td valign="top" class="value">
+                                <input id="timeZone" name="timeZone" [(ngModel)]="projectModel.timeZone"/> <button class="btn btn-secondary" (click)="openTimezoneModal()">Change</button>
                             </td>
                         </tr>
 
@@ -106,17 +124,21 @@
                             <td valign="top" class="name">Collect Reporting Metrics:</td>
                             <td> <input type="checkbox" name="collectReportingMetrics" id="collectReportingMetrics" value="true" checked="checked" [(ngModel)]="projectModel.collectReportingMetrics"/></td>
                         </tr>
-                        </tbody>
+
+                        <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="projectModel.workflowCode" [data]="workflowCodes" [valuePrimitive]="true"></kendo-dropdownlist>
+                        </td>
 
                         <tr>
-                            <td valign="top" class="name"><b>Plan Methodology:&nbsp;<span style="color: red">*</span></b></td>
+                            <td valign="top" class="name"><b>Plan Methodology:</b></td>
                             <td valign="top" class="value">
-                                <kendo-dropdownlist id="planMethodology" name="planMethodology" [(ngModel)]="projectModel.planMethodology" [data]="planMethodologies" [valueField]="'label'" [textField]="'label'"></kendo-dropdownlist>
+                                <kendo-dropdownlist id="planMethodology" name="planMethodology" [(ngModel)]="projectModel.planMethodology" [data]="planMethodologies" [valuePrimitive]="true"></kendo-dropdownlist>
                             </td>
                         </tr>
-                    </table>
-                </div>
-            </form>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="buttons modal-footer">

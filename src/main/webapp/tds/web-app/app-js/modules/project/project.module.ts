@@ -18,6 +18,7 @@ import {ProjectResolveService} from './resolve/project-resolve.service';
 import {ProjectRouteModule} from './project-routing.states';
 import {ProjectCreateComponent} from './components/create/project-create.component';
 import {ProjectViewEditComponent} from './components/view-edit/project-view-edit.component';
+import {UploadModule} from '@progress/kendo-angular-upload';
 
 @NgModule({
 	imports: [
@@ -27,6 +28,7 @@ import {ProjectViewEditComponent} from './components/view-edit/project-view-edit
 		FormsModule,
 		// Kendo
 		DropDownsModule,
+		UploadModule,
 		GridModule,
 		PopupModule,
 		InputsModule,

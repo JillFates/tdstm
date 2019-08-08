@@ -2,8 +2,13 @@ import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {ProjectModel} from '../../model/project.model';
 import {Router} from '@angular/router';
-import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
+import {ASSET_IMPORT_FILE_UPLOAD_TYPE, DIALOG_SIZE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
+import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
+import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 
 @Component({
 	selector: `project-create`,
@@ -15,14 +20,24 @@ export class ProjectCreateComponent implements OnInit {
 	public planMethodologies;
 	public clients;
 	public partners;
+	public projectTypes;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public projectModel: ProjectModel = null;
 	private defaultModel = null;
+	public file = new KendoFileUploadBasicConfig();
+	public fetchFileContent: any;
+	public transformFileContent: any;
+	public fetchResult: any;
+	public fetchInProcess = false;
+	public fetchInputUsed: 'action' | 'file' = 'action';
+	public transformResult: ApiResponseModel;
+	public transformInProcess = false;
 
 	constructor(
 		private projectService: ProjectService,
 		private promptService: UIPromptService,
-		private activeDialog: UIActiveDialogService) {
+		private activeDialog: UIActiveDialogService,
+		private dialogService: UIDialogService) {
 	}
 
 	ngOnInit() {
@@ -35,6 +50,7 @@ export class ProjectCreateComponent implements OnInit {
 			startDate: new Date(),
 			completionDate: new Date(),
 			partnerIds: [],
+			projectLogo: '',
 			projectManagerId: 0,
 			workflowCode: 'STD_PROCESS',
 			projectCode: '',
@@ -56,11 +72,77 @@ export class ProjectCreateComponent implements OnInit {
 			this.workflowCodes = data.workflowCodes;
 			this.clients = data.clients;
 			this.partners = data.partners;
+			this.projectTypes = data.projectTypes;
 			this.planMethodologies = data.planMethodologies;
 		});
 	}
 
+	openTimezoneModal() {
+		this.dialogService.extra(UserDateTimezoneComponent, [{
+			provide: Boolean,
+			useValue: true
+		}]).then(result => {
+			this.projectModel.timeZone = result.timezone;
+		}).catch(result => {
+			console.log('Dismissed Dialog');
+		});
+	}
+	public onSelectFile(e?: any): void {
+		this.file.fileUID = e.files[0].uid;
+	}
+
+	public onRemoveFile(e: RemoveEvent): void {
+		if (!this.fetchResult || !this.fetchResult.filename) {
+			return;
+		}
+		// delete temporary server uploaded file
+		const tempServerFilesToDelete = [ this.fetchResult.filename ];
+
+		// delete temporary transformed file
+		if (this.transformResult) {
+			tempServerFilesToDelete.push(this.transformResult.data.filename)
+		}
+
+		// get the coma separated file names to delete
+		e.data = { filename: tempServerFilesToDelete.join(',') };
+
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+		this.transformResult = null;
+		this.transformFileContent = null;
+	}
+
+	public onUploadFile(e: UploadEvent): void {
+		e.data = {};
+		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
+		this.clearFilename();
+	}
+
+	public completeEventHandler(e: SuccessEvent) {
+		let response = e.response.body.data;
+		if (response.operation === 'delete') { // file deleted successfully
+			// console.log(response.data);
+			this.clearFilename();
+			this.file.fileUID = null;
+		} else if (response.filename) { // file uploaded successfully
+			let filename = response.filename;
+			this.fetchResult = { status: 'success', filename: filename };
+			this.fetchInputUsed = 'file';
+		} else {
+			this.clearFilename();
+			this.fetchResult = { status: 'error' };
+		}
+	}
+
+	private clearFilename(e?: any) {
+		this.fetchResult = null;
+		this.fetchFileContent = null;
+	}
+
 	public saveForm() {
+		if (this.fetchResult && this.fetchResult.status === 'success') {
+			this.projectModel.projectLogo = this.fetchResult.filename;
+		}
 		this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
 			if (result.status === 'success') {
 				this.activeDialog.close();

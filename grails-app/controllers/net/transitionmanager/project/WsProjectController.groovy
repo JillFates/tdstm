@@ -4,12 +4,23 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
+import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyGroupService
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.security.RoleType
+
+import javax.persistence.CascadeType
+import javax.persistence.OneToOne
 
 /**
  * Handles WS calls of the ProjectsService
@@ -18,7 +29,10 @@ import net.transitionmanager.exception.InvalidParamException
 @Slf4j
 class WsProjectController implements ControllerMethods {
 
+	PartyGroupService partyGroupService
+	PersonService personService
 	ProjectService projectService
+	ControllerService controllerService
 
 	/**
 	 * Gets the projects associated to a user
@@ -77,16 +91,133 @@ class WsProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		// Copy plan methodology field from the default project
 		Project defaultProject = Project.defaultProject
+		List<Map> managers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
+		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		params.planMethodology = defaultProject.planMethodology
 
 		renderSuccessJson([
 				clients: projectDetails.clients,
 				company: company,
-				managers: projectDetails.managers,
+				managers: managers,
 		 		partners: projectDetails.partners,
 				projectInstance: new Project(params),
 		 		workflowCodes: projectDetails.workflowCodes,
+				projectTypes: projectTypes,
 				planMethodologies:planMethodologies ])
+	}
+
+	private def retrievetimeZone(timezoneValue) {
+		def result
+		if (StringUtil.isBlank(timezoneValue)) {
+			result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+		} else {
+			def tz = Timezone.findByCode(timezoneValue)
+			if (tz) {
+				result = tz
+			} else {
+				result = Timezone.findByCode(TimeUtil.defaultTimeZone)
+			}
+		}
+		return result
+	}
+
+	@HasPermission(Permission.ProjectEdit)
+	def saveProject(String projectId) {
+		Project.withTransaction { status ->
+			def requestParams = request.JSON
+			PartyGroup company = securityService.userLoginPerson.company
+
+			//
+			// Properly set some of the parameters that before injecting into the Project domain
+			//
+			def startDate = requestParams.startDate
+			def completionDate = requestParams.completionDate
+			if (startDate) {
+				requestParams.startDate = TimeUtil.parseISO8601Date(startDate)
+			}
+			if (completionDate) {
+				requestParams.completionDate = TimeUtil.parseISO8601Date(completionDate)
+			}
+			requestParams.runbookOn =  1	// Default to ON
+			requestParams.timeZone = retrievetimeZone(requestParams.timeZone)
+			requestParams.collectReportingMetrics = requestParams.collectMetrics == "1" ? 1: 0
+
+			Project project = new Project(
+					[
+							client:  PartyGroup.findById(requestParams.clientId),
+							name: requestParams.projectName,
+					        projectCode: requestParams.projectCode,
+							description: requestParams.description,
+							startDate: requestParams.startDate,
+							completionDate: requestParams.completionDate,
+							workflowCode: requestParams.workflowCode,
+							projectType: requestParams.projectType,
+							runbookOn: requestParams.runbookOn,
+							timezone: requestParams.timeZone
+					]
+			)
+
+			def partnersIds = requestParams.projectPartners
+			params.projectLogo = requestParams.projectLogo
+
+			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
+
+			project.guid = StringUtil.generateGuid()
+
+			if (logoFile instanceof String || project.hasErrors() || !project.save(flush:true)) {
+				if (logoFile instanceof String) {
+					flash.message = logoFile
+				}
+				else {
+					flash.message = 'Some properties were not properly defined'
+				}
+
+				project.discard()
+
+				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+
+				List<Map> planMethodologies = projectService.getPlanMethodologiesValues(Project.defaultProject)
+
+				renderErrorJson([
+						company: company, projectInstance: project, clients: projectDetails.clients,
+						partners: projectDetails.partners, managers: projectDetails.managers,
+						workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies, prevParam: requestParams
+				] )
+				return
+			}
+
+			projectService.setOwner(project,company)
+
+			// Save the partners to be related to the project
+			projectService.updateProjectPartners(project, partnersIds)
+
+			// Clone any settings from the Default Project
+			projectService.cloneDefaultSettings(project)
+
+			// Deal with the Project Manager if one is supplied
+			Long projectManagerId = NumberUtil.toPositiveLong(requestParams.projectManagerId, -1)
+			if (projectManagerId > 0) {
+				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), RoleType.CODE_TEAM_PROJ_MGR)
+			}
+
+			// Deal with the adding the project logo if one was supplied
+			ProjectLogo projectLogo
+
+			if (logoFile) {
+				projectLogo = projectService.createOrUpdate(project, logoFile)
+			}
+
+			userPreferenceService.setCurrentProjectId(project.id)
+
+			/* Create and assign the default Bundle for this project. Although the bundle
+			* is assigned in ProjectService::getDefaultBundle, it's done here too for visibility. */
+			project.defaultBundle = projectService.getDefaultBundle(project, (String)requestParams.defaultBundleName)
+			project.save()
+
+			flash.message = "Project $project was created"
+			renderSuccessJson()
+
+		} // Project.withTransaction
 	}
 }

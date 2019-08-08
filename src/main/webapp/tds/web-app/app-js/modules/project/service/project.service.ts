@@ -60,21 +60,7 @@ export class ProjectService {
 	}
 
 	saveProject(model: ProjectModel, id = ''): Observable<any> {
-		/*let postRequest = {
-			id: id,
-			name: model.name,
-			description: model.description,
-			sourceRoom: model.fromId,
-			targetRoom: model.toId,
-			startTime: model.startTime,
-			completionTime: model.completionTime,
-			projectManager: model.projectManagerId,
-			moveManager: model.moveManagerId,
-			operationalOrder: model.operationalOrder,
-			workflowCode: model.workflowCode,
-			useForPlanning: model.useForPlanning
-		};*/
-		return this.http.post(`../ws/reports/saveProject/${id}`, JSON.stringify(model))
+		return this.http.post(`../ws/project/saveProject/${id}`, JSON.stringify(model))
 				.map((response: any) => {
 					return response;
 				})

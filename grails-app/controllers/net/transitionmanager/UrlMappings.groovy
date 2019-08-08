@@ -649,6 +649,13 @@ class UrlMappings {
 			action = [GET:"userProjects"]
 		}
 
+		"/ws/project/saveProject/$projectId?" {
+			controller = "wsProject"
+			action = [
+					POST: "saveProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]
