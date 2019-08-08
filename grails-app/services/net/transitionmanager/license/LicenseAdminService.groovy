@@ -1,14 +1,11 @@
 package net.transitionmanager.license
 
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.exception.InvalidLicenseException
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import grails.converters.JSON
-import grails.plugins.mail.MailService
 import grails.gorm.transactions.Transactional
+import grails.plugins.mail.MailService
 import groovy.util.logging.Slf4j
-
 import net.nicholaswilliams.java.licensing.License
 import net.nicholaswilliams.java.licensing.LicenseManager
 import net.nicholaswilliams.java.licensing.LicenseManagerProperties
@@ -17,21 +14,22 @@ import net.nicholaswilliams.java.licensing.licensor.LicenseCreatorProperties
 import net.sf.ehcache.Cache
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
+import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidLicenseException
 import net.transitionmanager.license.License as DomainLicense
 import net.transitionmanager.license.prefs.FilePrivateKeyDataProvider
 import net.transitionmanager.license.prefs.FilePublicKeyDataProvider
 import net.transitionmanager.license.prefs.MyLicenseProvider
 import net.transitionmanager.license.prefs.TDSLicenseValidator
 import net.transitionmanager.license.prefs.TDSPasswordProvider
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
-import net.transitionmanager.party.PartyGroup
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.core.io.Resource
-
 
 @Slf4j
 class LicenseAdminService extends LicenseCommonService implements InitializingBean {
@@ -256,22 +254,12 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 			log.debug("LOAD LICENSE FROM STORE")
 			licState = [:]
 			cache.put(new Element(projectId, licState))
-			List<DomainLicense> licenses = DomainLicense.findAllByProjectAndStatus(projectId, DomainLicense.Status.ACTIVE) //dateCreated?
+			List<DomainLicense> licenses = DomainLicense.where {
+				(status == DomainLicense.Status.ACTIVE) && (hash != null) &&
+						  (project == projectId) || (project == 'all')
+			}.list()
 
-			//TODO: iterate over the licenses to find the one that fits
-			DomainLicense license = licenses.find { it.hash }
-
-			//If no active license for this project, check ALL for a multi-project one
-			if(!license) {
-				license = DomainLicense.findByProjectAndStatus("all", DomainLicense.Status.ACTIVE)
-			}
-
-			//Validate that the license in the DB has not been compromised
-			//LicenseManager manager = LicenseManager.getInstance()
-			//License licObj = manager.getLicense(license.id)
-
-			if (!license || !license.hash) {
-				// UNLICENSED
+			if ( ! licenses ) { // UNLICENSED
 				licState.state = State.UNLICENSED
 				licState.message = "A license is required in order to enable all features of the application."
 				licState.valid = false
@@ -280,15 +268,108 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.goodAfterDate = null
 				licState.goodBeforeDate = null
 				licState.type = null
-			}else {
-				License licObj = getLicenseObj(license)
-				int max = licObj?.numberOfLicenses ?: 0
-				licState.numberOfLicenses = max
-				licState.goodAfterDate = licObj.goodAfterDate ? new Date(licObj.goodAfterDate) : null
-				licState.goodBeforeDate = licObj.goodBeforeDate ? new Date(licObj.goodBeforeDate) : null
-				licState.type = license.type
 
-				if(licObj == null){
+			}else {
+				Date now = new Date()
+				long nowTime = now.getTime()
+
+				String currentHost = getHostName()
+				String fqdn = getFQDN()
+				String errorMessage = ''
+				int gracePeriodDays = 0
+
+				List<License> licenseObjs = licenses.collect { DomainLicense lic -> getLicenseObj(lic) }
+
+				licenseObjs = licenseObjs.findAll { License lic ->
+					Map jsonData = JSON.parse(lic.subject)
+					gracePeriodDays    = Math.max( gracePeriodDays, jsonData.gracePeriodDays ?: 0)
+					String hostName 	 = jsonData.hostName
+					String websitename = jsonData.websitename
+					String projectName = JSON.parse(jsonData.project)?.name
+
+					if ( DomainLicense.WILDCARD != hostName &&
+							  ! StringUtils.equalsIgnoreCase(currentHost, hostName) ) {
+
+						if ( ! errorMessage ) {
+							errorMessage = """
+								|Error loading license:<br/> 
+								|current host:<br/><strong>${currentHost}</strong><br/>
+								|licensed host:<br/><strong>${hostName}</strong>
+							""".stripMargin()
+						}
+
+						return false
+					}
+
+					if ( DomainLicense.WILDCARD != websitename &&
+							  ! StringUtils.equalsIgnoreCase(fqdn, websitename)
+					){
+						if ( ! errorMessage ) {
+							errorMessage = """
+								|Error loading license:<br/> 
+								|current website:<br/><strong>${fqdn}</strong><br/>
+								|licensed website:<br/><strong>${websitename}</strong>
+							""".stripMargin()
+						}
+
+						return false
+					}
+
+					//The Name still the same? and is not a Multiproject one
+					if( projectName != project.name && projectName != "all" ){
+						if ( ! errorMessage ) {
+							errorMessage = "The name of the project was changed but must be <strong>'${projectName}'</strong> for license compliance"
+						}
+
+						return false
+					}
+
+					return (nowTime >= lic.goodAfterDate && nowTime <= lic.goodBeforeDate)
+
+				}
+
+
+				if (! licenseObjs ) {
+					licState.state = State.EXPIRED
+
+					String message = "The license has expired. A new license is required in order to enable all features of the application."
+					if (errorMessage) {
+						message += '<hr/>' + errorMessage
+					}
+
+					licState.message = message
+					licState.valid = false
+					return licState
+				}
+
+
+				Map stackedlicense = licenseObjs.inject([
+						  numberOfLicenses: 0,
+						  goodAfterDate:    null,
+						  goodBeforeDate:   null,
+						  subject: null,
+						  productKey: null,
+				]) { Map stackLic, License lic ->
+					[
+							  numberOfLicenses: stackLic.numberOfLicenses + lic.numberOfLicenses,
+							  goodAfterDate: (! stackLic.goodAfterDate ) ? lic.goodAfterDate :
+									            Math.max(stackLic.goodAfterDate, lic.goodAfterDate),
+							  goodBeforeDate: (! stackLic.goodBeforeDate ) ? lic.goodBeforeDate :
+									            Math.min(stackLic.goodBeforeDate, lic.goodBeforeDate),
+							  subject: (! stackLic.subject) ?: lic.subject,
+							  productKey: (! stackLic.productKey) ?: lic.productKey,
+					]
+				}
+
+				DomainLicense firstLicense = licenses.first()
+
+				licState.numberOfLicenses = stackedlicense.numberOfLicenses
+				licState.goodAfterDate = stackedlicense.goodAfterDate ? new Date(stackedlicense.goodAfterDate) : null
+				licState.goodBeforeDate = stackedlicense.goodBeforeDate ? new Date(stackedlicense.goodBeforeDate) : null
+				licState.type = firstLicense.type
+				licState.banner = firstLicense.bannerMessage
+
+				if( licState?.numberOfLicenses == 0 ){
 					licState.state = State.UNLICENSED
 					licState.message = "A license is required in order to enable all features of the application."
 					licState.valid = false
@@ -296,89 +377,26 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					return licState
 				}
 
-				def jsonData = JSON.parse(licObj.subject)
-				int gracePeriodDays = jsonData.gracePeriodDays
-				String hostName 	= jsonData.hostName
-				String websitename 	= jsonData.websitename
-
-				String projectName	   = JSON.parse(jsonData.project)?.name
-				log.debug("Lic: {}", licObj.productKey)
-				log.debug("jsonData: {}", jsonData)
-				log.debug("projectName : {}", projectName)
-				log.debug("project.name : {}", project.name)
-
-				licState.banner = license.bannerMessage
-
-				String currentHost = getHostName()
-				if (
-					DomainLicense.WILDCARD != hostName &&
-					! StringUtils.equalsIgnoreCase(currentHost, hostName)
-				){
-					licState.message = """
-						|Error loading license:<br/> 
-						|current host:<br/><strong>${currentHost}</strong><br/>
-						|licensed host:<br/><strong>${hostName}</strong>
-					""".stripMargin()
-					licState.valid = false
-					return licState
-				}
-
-				String fqdn = getFQDN()
-				if (
-					DomainLicense.WILDCARD != websitename &&
-					! StringUtils.equalsIgnoreCase(fqdn, websitename)
-				){
-					licState.message = """
-						|Error loading license:<br/> 
-						|current website:<br/><strong>${fqdn}</strong><br/>
-						|licensed website:<br/><strong>${websitename}</strong>
-					""".stripMargin()
-					licState.valid = false
-					return licState
-				}
-
-				//The Name still the same? and is not a Multiproject one
-				if(projectName != project.name && projectName != "all"){
-					licState.message = "The name of the project was changed but must be <strong>'${projectName}'</strong> for license compliance"
-					licState.valid = false
-					return licState
-				}
-
-
-				Date now = new Date()
-				long nowTime = now.getTime()
-
-				if (nowTime >= licObj.goodAfterDate && nowTime <= licObj.goodBeforeDate) {
-					long numServers = assetEntityService.countServers(project)
-					log.debug("NumServers: {}", numServers)
-					if (numServers <= max) {
-						licState.state = State.VALID
-						licState.message = ""
-						licState.lastCompliantDate = now
+				long numServers = assetEntityService.countServers(project)
+				log.debug("NumServers: {}", numServers)
+				if (numServers <= licState.numberOfLicenses) {
+					licState.state = State.VALID
+					licState.message = ""
+					licState.lastCompliantDate = now
+					licState.valid = true
+				} else {
+					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
+					if(gracePeriod > 0) {
+						licState.state = State.NONCOMPLIANT
+						licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
 						licState.valid = true
 					} else {
-						int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
-						if(gracePeriod > 0) {
-							licState.state = State.NONCOMPLIANT
-							licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-							licState.valid = true
-						} else {
-							licState.state = State.INBREACH
-							licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${license.max} to re-enable all application features."
-							licState.valid = false
-						}
+						licState.state = State.INBREACH
+						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${license.max} to re-enable all application features."
+						licState.valid = false
 					}
-				} else {
-					licState.state = State.EXPIRED
-					license.status = DomainLicense.Status.EXPIRED
-
-					licState.message = "The license has expired. A new license is required in order to enable all features of the application."
-					licState.valid = false
 				}
 
-				if(license.isDirty()){
-					license.save()
-				}
 			}
 		} else {
 			log.debug("LICENSE LOADED FROM CACHE")
