@@ -9,7 +9,7 @@ export class BundleModel {
 	public completionTime: Date;
 	public projectManagerId: number;
 	public moveManagerId: number;
-	public moveEventId: number;
+	public moveEvent: any;
 	public operationalOrder: number;
 	public workflowCode: string;
 	public useForPlanning: boolean;

@@ -78,7 +78,7 @@
                             <td valign="top" class="name">Event:</td>
 
                             <td valign="top" class="value">
-                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEventid}">{{savedModel?.moveEventId}}</a>
+                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEvent.id}">{{savedModel?.moveEvent.name}}</a>
                             </td>
 
                         </tr>
@@ -180,6 +180,13 @@
                             <td valign="top" class="name">Event Manager:</td>
                             <td valign="top" class="value">
                                 <kendo-dropdownlist id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId"  [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'" [data]="managers"></kendo-dropdownlist>
+                            </td>
+                        </tr>
+
+                        <tr class="prop">
+                            <td valign="top" class="name">Event:</td>
+                            <td valign="top" class="value">
+                                <kendo-dropdownlist id="moveEventId" name="moveEvent" [(ngModel)]="bundleModel.moveEvent" [textField]="'name'" [valueField]="'id'" [data]="moveEvents"></kendo-dropdownlist>
                             </td>
                         </tr>
 
