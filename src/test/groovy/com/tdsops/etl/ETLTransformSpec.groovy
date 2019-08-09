@@ -19,7 +19,6 @@ import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.project.Project
-import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
@@ -1827,6 +1826,68 @@ class ETLTransformSpec extends ETLBaseSpec {
 						}
 						assertWith(fields.license, FieldResult) {
 							value == 1
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-12079')
+	void 'test can use Math and and StringUtils transformations in transform command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,app version,url
+				12134556,Apple Inc.,1.0.0,www.apple
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'application id' transform with min(9999999) load 'Name' 
+					load 'appTech' transform with random()
+					extract 'vendor name' transform with floor() load 'Vendor'
+					extract 'app version' transform with prependIfMissing('V.') load 'appVersion'
+					extract 'url' transform with appendIfMissing('.com') load 'license'
+				}
+			""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					assertWith(data[0], RowResult) {
+						errorCount == 0
+						assertWith(fields.assetName, FieldResult) {
+							value == 12134556
+						}
+						assertWith(fields.appTech, FieldResult) {
+							value == 6
+						}
+						assertWith(fields.appVendor, FieldResult) {
+							value == 'Apple Inc.'
+						}
+						assertWith(fields.appVersion, FieldResult) {
+							value == 'V.1.0.0'
+						}
+						assertWith(fields.license, FieldResult) {
+							value == 'www.apple.com'
 						}
 					}
 				}
