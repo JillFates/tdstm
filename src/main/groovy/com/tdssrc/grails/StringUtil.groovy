@@ -418,7 +418,7 @@ class StringUtil {
 		while (m.find()) {
 			String paramName = m.group(1).trim()
 			if (params.containsKey(paramName)) {
-				m.appendReplacement(sb, params[paramName])
+				m.appendReplacement(sb, params[paramName] ?: '[Null]')
 			} else {
 				missing << paramName
 			}

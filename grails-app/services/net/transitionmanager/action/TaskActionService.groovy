@@ -12,6 +12,7 @@ import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidConfigurationException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -21,6 +22,7 @@ import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
@@ -28,6 +30,7 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.grails.web.json.JSONObject
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.multipart.MultipartFile
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
@@ -319,6 +322,52 @@ class TaskActionService implements ServiceMethods {
 			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
 		}
 		return task
+	}
+
+	/**
+	 * This looks up the details of an api action, including parameters, and script, if applicable.
+	 *
+	 * @param taskId The task to look up and API action for.
+	 * @param project The project to use to look up the API action.
+	 *
+	 * @return A map of API action details including:
+	 *    name,
+	 *    script,
+	 *    isRemote,
+	 *    type,
+	 *    connector(name),
+	 *    method,
+	 *    description,
+	 *    methodParams,
+	 *    methodParamsValues
+	 */
+	Map actionLookup(Long taskId, Project project) {
+		AssetComment assetComment = AssetComment.findByIdAndProject(taskId, project)
+		if (!assetComment) {
+			throw new EmptyResultException("Task $taskId not found.")
+		}
+
+		if (assetComment.apiAction) {
+			ApiAction apiAction = assetComment.apiAction
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
+
+			List<Map> methodParamsList = apiAction.methodParamsList
+			methodParamsList = taskService.fillLabels(project, methodParamsList)
+
+			return [
+				name              : apiAction.name,
+				script            : renderScript(apiAction.script, assetComment),
+				isRemote          : apiAction.isRemote,
+				type              : apiAction.actionType.type,
+				connector         : connector?.name,  //adding the ? so that I can unit test this.
+				method            : apiAction.connectorMethod,
+				description       : apiAction?.description,
+				methodParams      : methodParamsList,
+				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
+			]
+		} else {
+			throw new AccessDeniedException("Action doesn't exist for users project.")
+		}
 	}
 
 }
