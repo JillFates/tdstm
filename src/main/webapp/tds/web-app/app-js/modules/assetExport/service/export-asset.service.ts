@@ -14,7 +14,7 @@ import 'rxjs/add/operator/catch';
 export class ExportAssetService {
 
 	// private instance variable to hold base url
-	private export_asset_url = '../assets/export';
+	private export_asset_url = '/tdstm/ws/asset/';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -27,7 +27,7 @@ export class ExportAssetService {
 	 * @returns {Observable<R>}
 	 */
 	public getExportAssetsData(): Observable<any[]> {
-		return this.http.get(this.export_asset_url + 'loginInfo')
+		return this.http.get(this.export_asset_url + 'bundlesAndPreferencesForAssetExport')
 			.map((response: any) => {
 				return response && response.data;
 			})

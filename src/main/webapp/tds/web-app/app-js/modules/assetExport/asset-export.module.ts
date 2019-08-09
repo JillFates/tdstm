@@ -9,7 +9,7 @@ import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 // Route Module
 import {AssetExportRouteModule} from './asset-export-route.module';
 // Services
-
+import {ExportAssetService} from './service/export-asset.service'
 // Components
 import {ExportComponent} from './components/export/export.component';
 
@@ -24,7 +24,7 @@ import {ExportComponent} from './components/export/export.component';
 		// Route
 		AssetExportRouteModule
 	],
-	providers: [],
+	providers: [ExportAssetService],
 	declarations: [
 		ExportComponent,
 	]

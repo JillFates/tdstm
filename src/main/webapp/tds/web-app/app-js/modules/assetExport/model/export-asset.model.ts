@@ -1,16 +1,9 @@
 export class ExportAssetModel {
-	notices: [];
-	buildVersion: string;
-	sessionExpired: boolean;
-	config: any = {};
+	bundles: [];
+	userPreferences: {};
 
 	constructor() {
-		this.notices = [];
-		this.buildVersion = '';
-		this.sessionExpired = false;
-		this.config = {
-			authorityList: [],
-			authorityName: ''
-		};
+		this.bundles = [];
+		this.userPreferences = {};
 	}
 }

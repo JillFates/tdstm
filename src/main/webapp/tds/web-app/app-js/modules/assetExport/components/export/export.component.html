@@ -17,24 +17,93 @@
 								<option value="All">All Bundles</option>
 								<option value="planning-bundle" selected="selected">Planning Bundles</option>
 								<option value="" disabled>──────────</option>
-								<option value="1">name</option>
+								<option *ngFor="let bundle of exportAssetsData.bundles" value="{{bundle.id}}">{{bundle.name}}</option>
 							</select>
 						</div>
-						<div class="form-group col-lg-3 col-md-4">
+						<div class="form-group col-lg-3 col-md-4" *ngIf="userPreferences.length > 0">
 							<label for="checkboxGroup">Choose Items to Export:</label>
 							<div class="row checkboxGroup" id="checkboxGroup">
 								<div class="col-sm-6">
 									<ul class="list-group sub-set">
 										<li class="list-group-item">
 											<div class="checkbox">
-												<label for="applicationId">
-													<input type="checkbox" id="applicationId" name="application" value="application"/>Application</label>
+												<label for="allItems">
+													<input
+														type="checkbox"
+														id="allItems"
+														name="All"
+														value="all"
+														(change)="selectAll()"
+														[checked]="selectedAll"/>
+													All Items
+												</label>
 											</div>
 										</li>
 										<li class="list-group-item">
 											<div class="checkbox">
 												<label for="applicationId">
-													<input type="checkbox" id="applicationId" name="application" value="application"/>Application</label>
+													<input
+														type="checkbox"
+														id="applicationId"
+														name="application"
+														value="{{userPreferences[0]['preference']}}"
+														[(ngModel)]="userPreferences[0].selected"
+														(change)="checkIfAllSelected()"
+													/>
+<!--														[checked]="userPreferences[0]['selected']-->
+														<!--[checked]="exportAssetsData.userPreferences['ImportApplication'] === 'true'"/>-->
+													Application
+												</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="assetId">
+													<input
+														type="checkbox"
+														id="assetId"
+														name="asset"
+														value="{{userPreferences[1]['preference']}}"
+														[(ngModel)]="userPreferences[1].selected"
+														(change)="checkIfAllSelected()"
+													/>
+<!--														value="asset"-->
+<!--														(change)="checkIfAllSelected()"-->
+<!--														[checked]="exportAssetsData.userPreferences['ImportServer'] === 'true'"/>-->
+														Devices
+												</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="databaseId"><input
+													type="checkbox"
+													id="databaseId"
+													name="database"
+													value="{{userPreferences[2]['preference']}}"
+													[(ngModel)]="userPreferences[2].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="database"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--													[checked]="exportAssetsData.userPreferences['ImportDatabase'] === 'true'"/>-->
+													Database</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="filesId"><input
+													type="checkbox"
+													id="filesId"
+													name="files"
+													value="{{userPreferences[3]['preference']}}"
+													[(ngModel)]="userPreferences[3].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="files"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--													[checked]="exportAssetsData.userPreferences['ImportStorage'] === 'true'"/>-->
+													Storage</label>
 											</div>
 										</li>
 									</ul>
@@ -43,8 +112,82 @@
 									<ul class="list-group sub-set">
 										<li class="list-group-item">
 											<div class="checkbox">
-												<label for="rackId">
-													<input type="checkbox" id="rackId" name="rack" value="rack"/>Rack</label>
+												<label for="roomId"><input
+													type="checkbox"
+													id="roomId"
+													name="room"
+													value="{{userPreferences[4]['preference']}}"
+													[(ngModel)]="userPreferences[4].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="room"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--													[checked]="exportAssetsData.userPreferences['ImportRoom'] === 'true'"/>-->
+													Room</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="rackId"><input
+													type="checkbox"
+													id="rackId"
+													name="rack"
+													value="{{userPreferences[5]['preference']}}"
+													[(ngModel)]="userPreferences[5].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="rack"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--											   		[checked]="exportAssetsData.userPreferences['ImportRack'] === 'true'"/>-->
+													Rack</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="dependencyId"><input
+													type="checkbox"
+													id="dependencyId"
+													name="dependency"
+													value="{{userPreferences[6]['preference']}}"
+													[(ngModel)]="userPreferences[6].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="dependency"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--													[checked]="exportAssetsData.userPreferences['ImportDependency'] === 'true'"/>-->
+													Dependency</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="cablingId"><input
+													type="checkbox"
+													id="cablingId"
+													name="cabling"
+													value="{{userPreferences[7]['preference']}}"
+													[(ngModel)]="userPreferences[7].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="cable"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--												  	[checked]="exportAssetsData.userPreferences['ImportCabling'] === 'true'"/>-->
+													Cabling</label>
+											</div>
+										</li>
+										<li class="list-group-item">
+											<div class="checkbox">
+												<label for="commentId"><input
+													type="checkbox"
+													id="commentId"
+													name="comment"
+													value="{{userPreferences[8]['preference']}}"
+													[(ngModel)]="userPreferences[8].selected"
+													(change)="checkIfAllSelected()"
+												/>
+<!--													value="comment"-->
+<!--													(change)="checkIfAllSelected()"-->
+<!--												  	[checked]="exportAssetsData.userPreferences['ImportComment'] === 'true'"/>-->
+													Comment</label>
 											</div>
 										</li>
 									</ul>

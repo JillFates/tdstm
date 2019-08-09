@@ -1,12 +1,14 @@
 // Angular
 import {
 	Component,
-	ElementRef,
 	HostListener,
 	OnDestroy,
 	OnInit,
-	Renderer2,
 } from '@angular/core';
+// Services
+import {ExportAssetService} from '../../service/export-asset.service';
+// Models
+import {ExportAssetModel} from '../../model/export-asset.model';
 
 declare var jQuery: any;
 
@@ -17,12 +19,54 @@ declare var jQuery: any;
 })
 export class ExportComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
-	constructor() {
+	public selectedAll = false;
+
+	private userPreferences  = [];
+
+	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
+
+	constructor(private exportService: ExportAssetService) {
 		// comment
 	}
 
 	ngOnInit() {
-		// comment
+		this.exportService.getExportAssetsData().subscribe( (res: any) => {
+			console.log('res', res);
+			this.exportAssetsData = res;
+			this.updateUserPreferencesModel();
+		});
+	}
+
+	updateUserPreferencesModel() {
+		this.userPreferences = [
+			{preference: 'ImportApplication', selected: this.exportAssetsData.userPreferences['ImportApplication'] === 'true'},
+			{preference: 'ImportServer', selected: this.exportAssetsData.userPreferences['ImportServer'] === 'true'},
+			{preference: 'ImportDatabase', selected: this.exportAssetsData.userPreferences['ImportDatabase'] === 'true'},
+			{preference: 'ImportStorage', selected: this.exportAssetsData.userPreferences['ImportStorage'] === 'true'},
+			{preference: 'ImportRoom', selected: this.exportAssetsData.userPreferences['ImportRoom'] === 'true'},
+			{preference: 'ImportRack', selected: this.exportAssetsData.userPreferences['ImportRack'] === 'true'},
+			{preference: 'ImportDependency', selected: this.exportAssetsData.userPreferences['ImportDependency'] === 'true'},
+			{preference: 'ImportCabling', selected: this.exportAssetsData.userPreferences['ImportCabling'] === 'true'},
+			{preference: 'ImportComment', selected: this.exportAssetsData.userPreferences['ImportComment'] === 'true'}
+		];
+	}
+
+	selectAll() {
+		this.selectedAll = !this.selectedAll;
+		for (let i = 0; i < this.userPreferences.length; i++) {
+			this.userPreferences[i].selected = this.selectedAll;
+		}
+	}
+
+	checkIfAllSelected() {
+		let totalSelected =  0;
+		for (let i = 0; i < this.userPreferences.length; i++) {
+			if (this.userPreferences[i].selected) {
+				totalSelected++;
+			}
+		}
+		this.selectedAll = totalSelected === this.userPreferences.length;
+		return true;
 	}
 
 	/**
