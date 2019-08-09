@@ -132,7 +132,7 @@ class NumberUtilTests extends Specification {
 			NumberUtil.isFloat('-12321.35')
 			!NumberUtil.isFloat('abc')
 			!NumberUtil.isFloat(new Date())
-			!NumberUtil.isFloat('123.12')
+			NumberUtil.isFloat('123.12')
 			!NumberUtil.isFloat(null)
 	}
 
