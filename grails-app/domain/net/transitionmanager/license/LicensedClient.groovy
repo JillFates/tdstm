@@ -60,7 +60,11 @@ class LicensedClient {
 	static constraints = {
 		method         nullable: true
 		activationDate nullable: true
-		expirationDate nullable: true
+		expirationDate nullable: true, validator: { Date val, LicensedClient obj ->
+			if (obj.activationDate && val < obj.activationDate)
+				return false
+			return true
+		}
 		requestNote    nullable: true
 		hash           nullable: true
 		bannerMessage  nullable: true
