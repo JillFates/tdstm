@@ -363,10 +363,12 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     def getInfoForActionBar(Long taskId) {
         Project project = getProjectForWs()
         AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
+        Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
         renderAsJson(
                 apiActionId: task.apiAction?.id,
                 apiActionInvokedAt: task.apiActionInvokedAt,
                 apiActionCompletedAt: task.apiActionCompletedAt,
+                invokeActionDetails: invokeActionDetails,
                 assignedTo: task.assignedTo?.id,
                 predecessorsCount: task.taskDependencies.size(),
                 successorsCount: TaskDependency.countByPredecessor(task),
