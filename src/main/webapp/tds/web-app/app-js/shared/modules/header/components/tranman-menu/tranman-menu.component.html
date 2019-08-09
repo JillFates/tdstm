@@ -219,7 +219,7 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Events</li>
                     <li class="menu-child-item menu-parent-planning-event-list">
-                        <a href="/tdstm/module/event/list">List Events</a>
+                        <a [routerLink]="['/event','list']" >List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
                         <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
@@ -236,7 +236,7 @@
                     <li class="divider"></li>
                     <li class="menu-parent-item">Bundles</li>
                     <li class="menu-child-item menu-parent-planning-list-bundles">
-                        <a href="/tdstm/module/bundle/list">List Bundles</a>
+                            <a [routerLink]="['/bundle','list']">List Bundles</a>
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
                         <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
@@ -285,7 +285,7 @@
                         <a [routerLink]="['/planning','dashboard']">Planning Dashboard</a>
                     </li>
                     <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                        <a href="/tdstm/module/event/dashboard">Event Dashboard</a>
+                        <a [routerLink]="['/event','dashboard']">Event Dashboard</a>
                     </li>
                 </ul>
             </li>

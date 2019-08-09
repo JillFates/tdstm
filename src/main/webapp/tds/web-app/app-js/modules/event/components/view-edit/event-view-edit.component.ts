@@ -31,7 +31,7 @@ export class EventViewEditComponent implements OnInit {
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
 		private translatePipe: TranslatePipe,
-		@Inject('id') private id) {
+		@Inject('id') private id: any) {
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 		this.eventId = this.id;
 	}

@@ -24,6 +24,8 @@ import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.modul
 import { TaskCreateComponent } from '../create/task-create.component';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
+import {Store} from '@ngxs/store';
+import {SetEvent} from '../../../event/action/event.actions';
 
 @Component({
 	selector: 'task-list',
@@ -42,7 +44,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								[textField]="'name'"
 								[valueField]="'id'"
 								[(ngModel)]="selectedEvent"
-								(valueChange)="onFiltersChange()">
+								(valueChange)="onEventSelect()">
 							</kendo-dropdownlist>
 							<label for="one">
 								<input
@@ -306,6 +308,7 @@ export class TaskListComponent {
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
+		private store: Store,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService) {
 		this.onLoad();
@@ -315,10 +318,11 @@ export class TaskListComponent {
 	 * Load all the user preferences to populate the task manager grid.
 	 */
 	private onLoad(): void {
-		this.loading = true;
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
+			this.selectedEvent = userContext.event;
 		});
+		this.loading = true;
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
@@ -420,6 +424,14 @@ export class TaskListComponent {
 
 	/**
 	 * On Event select change.
+	 */
+	onEventSelect(): void {
+		this.store.dispatch(new SetEvent({id: this.selectedEvent.id, name: this.selectedEvent.name}));
+		this.onFiltersChange();
+	}
+
+	/**
+	 * On Any other change.
 	 * @param selection: Array<any>
 	 */
 	onFiltersChange($event ?: any) {
