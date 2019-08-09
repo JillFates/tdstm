@@ -1,6 +1,6 @@
 /*
 	This is the Geb configuration file.
-	
+
 	See: http://www.gebish.org/manual/current/#configuration
 */
 
@@ -42,11 +42,14 @@ environments {
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.addArguments("--whitelisted-ips");
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
                 //capabilities.setVersion("45.4.0esr")
                 //capabilities.setPlatform(Platform.LINUX)
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
+                capabilities.merge(chromeOptions);
                 new RemoteWebDriver( new URL(browserLocation), capabilities )
 		    }
         }
@@ -97,4 +100,3 @@ baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa11.transitionma
 println "geb.build.baseUrl: Testing qa environment ${baseUrl}"
 
 //reportsDir = "target/geb-reports"
-
