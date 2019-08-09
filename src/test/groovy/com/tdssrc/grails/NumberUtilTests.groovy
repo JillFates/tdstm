@@ -128,6 +128,8 @@ class NumberUtilTests extends Specification {
 			NumberUtil.isFloat('5')
 			NumberUtil.isFloat('12391023')
 			NumberUtil.isFloat('-1232135')
+			NumberUtil.isFloat('12391.023')
+			NumberUtil.isFloat('-12321.35')
 			!NumberUtil.isFloat('abc')
 			!NumberUtil.isFloat(new Date())
 			!NumberUtil.isFloat('123.12')

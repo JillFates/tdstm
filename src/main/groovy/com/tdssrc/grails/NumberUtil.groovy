@@ -34,7 +34,7 @@ class NumberUtil {
 			true
 		}
 		else if (value instanceof CharSequence) {
-			value.isLong()
+			value.isFloat()
 		}
 		else {
 			false
