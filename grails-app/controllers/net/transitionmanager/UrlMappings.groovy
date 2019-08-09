@@ -67,7 +67,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/assets/exportAssets" {
+		"/ws/asset/exportAssets" {
 			controller = 'wsAsset'
 			action = [
 			    POST: 'exportAssets'
