@@ -17,6 +17,7 @@ export class LoginService {
 
 	// private instance variable to hold base url
 	private authUrl = '../auth/';
+	private internalPath = '../ws/';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -47,6 +48,21 @@ export class LoginService {
 		return this.http.get(`${this.authUrl}sendResetPasswordEmail?email=${userEmail}`)
 			.map((response: any) => {
 				return response && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Request to Update Password
+	 * @returns {Observable<R>}
+	 */
+	public updatePassword(password: string, confirmPassword: string): Observable<any> {
+		return this.http.post(`${this.internalPath}user/updatePassword`, JSON.stringify({
+			password: password,
+			confirmPassword: confirmPassword
+		}))
+			.map((response: any) => {
+				return response;
 			})
 			.catch((error: any) => error);
 	}

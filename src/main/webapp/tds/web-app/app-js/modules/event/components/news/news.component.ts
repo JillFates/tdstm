@@ -11,16 +11,16 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+						<div class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 				<kendo-tabstrip-tab [title]="'Archive'">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+						<div class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
@@ -59,10 +59,10 @@ export class NewsComponent implements OnChanges {
 	/**
 	 * Selecting a news throw the event to notify to the host component
 	 * to open the news details
- 	 * @param {number} id  News id
+ 	 * @param {any} id  News selected
 	*/
-	public onSelectedNews(id: number): void {
-		this.selected.emit(id);
+	public onSelectedNews(news: any): void {
+		this.selected.emit(news);
 	}
 
 	/**

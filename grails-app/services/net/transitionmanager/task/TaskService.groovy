@@ -528,9 +528,12 @@ class TaskService implements ServiceMethods {
 			}
 
 			// Make sure the use has permission to invoke the action
-			if ( !securityService.hasPermission(whom, Permission.ActionInvoke) ||
-				( ! invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) ) {
-				throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+			// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+			if (!whom.isSystemUser()) {
+				if (!securityService.hasPermission(whom, Permission.ActionInvoke) ||
+						(!invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false))) {
+					throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+				}
 			}
 
 			// Prevent action from occuring if the reaction scripts are invalid
@@ -600,7 +603,10 @@ class TaskService implements ServiceMethods {
 			throw new EmptyResultException('Task was not found')
 		}
 		// Validate that the user has access to the project associated with the task
-		securityService.hasAccessToProject(task.project, currentPerson.userLogin)
+		// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+		if (currentPerson && !currentPerson.isSystemUser()) {
+			securityService.hasAccessToProject(task.project, currentPerson.userLogin)
+		}
 
 		return task
 	}
@@ -660,7 +666,7 @@ class TaskService implements ServiceMethods {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
-				task = invokeLocalAction(task, whom)
+				task = invokeLocalAction(task.id, whom)
 				status = task.status
 			}
 		}

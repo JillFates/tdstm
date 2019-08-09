@@ -4,6 +4,7 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WebUtil
 import net.transitionmanager.asset.Application
+import net.transitionmanager.command.UserUpdatePasswordCommand
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
@@ -364,4 +365,15 @@ class WsUserController implements ControllerMethods {
 
 		renderSuccessJson(timezone: timezone.getID(), datetimeFormat: datetimeFormat)
 	}
+
+	/**
+	 * Endpoint that allows the user to reset their own password -- should they have the right permission.
+	 */
+	@HasPermission(Permission.UserResetOwnPassword)
+	def updatePassword() {
+		UserUpdatePasswordCommand command = populateCommandObject(UserUpdatePasswordCommand)
+		securityService.updatePassword(securityService.userLogin, command)
+		renderSuccessJson("Your password has been updated successfully.")
+	}
+
 }
