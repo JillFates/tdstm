@@ -25,6 +25,56 @@ class NumberUtil {
 	}
 
 	/**
+	 * Nifty little test to validate that a value is a {@code Float}
+	 * @param a string representing a long value
+	 * @return true if the value is a Long
+	 */
+	static boolean isFloat(Object value) {
+		if (value instanceof Float) {
+			true
+		}
+		else if (value instanceof CharSequence) {
+			value.isLong()
+		}
+		else {
+			false
+		}
+	}
+
+	/**
+	 * Nifty little test to validate that a value is a {@code Double}
+	 * @param a string representing a long value
+	 * @return true if the value is a Long
+	 */
+	static boolean isDouble(Object value) {
+		if (value instanceof Double) {
+			true
+		}
+		else if (value instanceof CharSequence) {
+			value.isDouble()
+		}
+		else {
+			false
+		}
+	}
+
+	/**
+	 * Nifty little test to validate that a value is a {@code Integer}
+	 * @param a string representing a long value
+	 * @return true if the value is a Long
+	 */
+	static boolean isInteger(Object value) {
+		if (value instanceof Integer) {
+			true
+		}
+		else if (value instanceof CharSequence) {
+			value.isInteger()
+		}
+		else {
+			false
+		}
+	}
+	/**
 	 * Nifty little test to validate that a value is a Long and Postive
 	 * @param value  a number in string format
 	 * @return true if the value is a Long and >= 0

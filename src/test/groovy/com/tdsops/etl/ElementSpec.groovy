@@ -1,10 +1,11 @@
 package com.tdsops.etl
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class ElementSpec extends Specification {
 
-	void 'test Element String functions' () {
+	void 'test Element String functions'() {
 		given:
 			String strValue = "Test String"
 			String trimableStr = """
@@ -32,25 +33,25 @@ class ElementSpec extends Specification {
 			new Element(value: strBlankDate).toDate('yyyy-MM-dd').value == ''
 			new Element(value: strDateValue).toDate('yyyy-MM-dd').value == 'Date Value'
 			new Element(value: strDateYYYYMMDD).toDate('yyyy-MM-dd').value == new Date(2018 - 1900, 6 - 1, 25)
-			new Element(value: strDateMMDDYYYY).toDate('yyyy-MM-dd','MM-dd-yyyy').value == new Date(2018 - 1900, 6 - 1, 25)
+			new Element(value: strDateMMDDYYYY).toDate('yyyy-MM-dd', 'MM-dd-yyyy').value == new Date(2018 - 1900, 6 - 1, 25)
 			new Element(value: strAbcDate).toDate('yyyy-MM-dd').value == 'abc-123'
 	}
 
-	void 'test Element String functions with null values' () {
+	void 'test Element String functions with null values'() {
 		expect:
 			new Element(value: null).left(4).value == ''
 			new Element(value: null).lowercase().value == ''
-			new Element(value: null).middle(3,5).value == ''
-			new Element(value: null).replaceAll('x','y').value == ''
-			new Element(value: null).replaceFirst('x','y').value == ''
-			new Element(value: null).replaceLast('x','y').value == ''
+			new Element(value: null).middle(3, 5).value == ''
+			new Element(value: null).replaceAll('x', 'y').value == ''
+			new Element(value: null).replaceFirst('x', 'y').value == ''
+			new Element(value: null).replaceLast('x', 'y').value == ''
 			new Element(value: null).sanitize().value == ''
 			new Element(value: null).trim().value == ''
 			new Element(value: null).uppercase().value == ''
 			new Element(value: null).toDate('yyyy-MM-dd').value == null
 	}
 
-	void 'test Element methodMissing function, delegate to wrapped value' () {
+	void 'test Element methodMissing function, delegate to wrapped value'() {
 		given:
 			String strValue = "Test String"
 			int intValue = 1974
@@ -62,12 +63,12 @@ class ElementSpec extends Specification {
 			new Element(value: strValue).substring(1, 4) == 'est'
 
 			new Element(value: intValue).power(2) == new Element(value: intValue.power(2))
-			new Element(value: intValue) - intValue2 == new Element(value: (intValue - intValue2) )
+			new Element(value: intValue) - intValue2 == new Element(value: (intValue - intValue2))
 
 			new Element(value: dateValue).getTime() == new Element(value: dateValue.getTime())
 	}
 
-	void 'test Exception if String function applied to Non String Element' () {
+	void 'test Exception if String function applied to Non String Element'() {
 		given:
 			int value = 100
 			Element element = new Element(value: value)
@@ -80,5 +81,217 @@ class ElementSpec extends Specification {
 			e.message == "left function only supported for String values (${value} : ${value.class})"
 	}
 
+	@Unroll
+	void 'test can use java.lang.Math.round transformation on Element.value=#value'() {
 
+		expect:
+			new Element(value: value).round().value == transformedValue
+
+		where:
+			value     || transformedValue
+			1234      || 1234
+			4321.56d  || 4322
+			1111.56f  || 1112
+			'2222.56' || 2223
+			'FOO BAR' || 'FOO BAR'
+			null      || null
+	}
+
+	@Unroll
+	void 'test can use java.lang.Math.abs transformation on Element.value=#value'() {
+
+		expect:
+			new Element(value: value).abs().value == transformedValue
+
+		where:
+			value     || transformedValue
+			1         || 1
+			-1        || 1
+			2l        || 2
+			-2l       || 2
+			3d        || 3
+			-3d       || 3
+			4f        || 4
+			-4f       || 4
+			'5'       || 5
+			'-5'      || 5
+			'FOO BAR' || 'FOO BAR'
+			null      || null
+	}
+
+	@Unroll
+	void 'test can use java.lang.Math.ceil transformation on Element.value=#value'() {
+
+		expect:
+			new Element(value: value).ceil().value == transformedValue
+
+		where:
+			value     || transformedValue
+			10.5d     || 11
+			10.1d     || 11.0d
+			-20.18d   || -20
+			-20.68d   || -20.0d
+			'10.5d'   || 11
+			'10.3d'   || 11.0d
+			'-20.98d' || -20.0d
+			4.5f      || 4.5f
+			-4.9f     || -4.9f
+			'5.4321'  || 6
+			'-5.4321' || -5
+			'FOO BAR' || 'FOO BAR'
+			null      || null
+	}
+
+	@Unroll
+	void 'test can use java.lang.Math.floor transformation on Element.value=#value'() {
+
+		expect:
+			new Element(value: value).floor().value == transformedValue
+
+		where:
+			value     || transformedValue
+			10.5d     || 10
+			10.1d     || 10
+			-20.18d   || -21
+			-20.68d   || -21
+			'10.5d'   || 10
+			'10.3d'   || 10
+			'-20.98d' || -21
+			4.5f      || 4f
+			-4.9f     || -5.0f
+			'5.4321'  || 5.0d
+			'-5.4321' || -6
+			'FOO BAR' || 'FOO BAR'
+			null      || null
+	}
+
+	@Unroll
+	void 'test can use java.lang.Math.min transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).min(otherValue).value == transformedValue
+
+		where:
+			value     | otherValue || transformedValue
+			10        | 20         || 10
+			'10'      | 20         || 10
+			20        | 10         || 10
+			'20'      | 10         || 10
+			-10       | -20        || -20
+			-20       | -10        || -20
+			10        | 20.20d     || 10
+			20.20d    | 10         || 20.20d
+			10.45f    | 20.20f     || 10.45f
+			20.20f    | 10.54f     || 10.54f
+			'FOO BAR' | 20         || 'FOO BAR'
+	}
+
+	@Unroll
+	void 'test can use java.lang.Math.max transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).max(otherValue).value == transformedValue
+
+		where:
+			value     | otherValue || transformedValue
+			10        | 20         || 20
+			20        | 10         || 20
+			10.1d     | 20.10d     || 20.10d
+			20.10d    | 10.10d     || 20.10d
+			10.1f     | 20.10f     || 20.10f
+			20.10f    | 10.10f     || 20.10f
+			-10       | -20        || -10
+			-20       | -10        || -10
+			'FOO BAR' | 20         || 'FOO BAR'
+	}
+
+	void 'test can use java.lang.Math.random transformation'() {
+
+		expect:
+			new Element(value: null).random().value == null
+
+			with(new Element(value: 123).random(), Element) {
+				value != null
+				value instanceof Double
+			}
+			with(new Element(value: 123.01d).random(), Element) {
+				value != null
+				value instanceof Double
+			}
+			with(new Element(value: 123.01f).random(), Element) {
+				value != null
+				value instanceof Double
+			}
+
+			with(new Element(value: 123.01f).random(), Element) {
+				value != null
+				value instanceof Double
+			}
+
+			with(new Element(value: 'FOO BAR').random(), Element) {
+				value != null
+				value instanceof Double
+			}
+	}
+
+	@Unroll
+	void 'test can org.apache.commons.lang3.StringUtils.appendIfMissing transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).appendIfMissing(otherValue).value == transformedValue
+
+		where:
+			value        | otherValue || transformedValue
+			'grails.com' | '.com'     || 'grails.com'
+			'grails.COM' | '.com'     || 'grails.COM.com'
+			'grails'     | '.com'     || 'grails.com'
+			'grails'     | null       || 'grails'
+			null         | '.com'     || null
+	}
+
+	@Unroll
+	void 'test can org.apache.commons.lang3.StringUtils.appendIfMissingIgnoreCase transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).appendIfMissingIgnoreCase(otherValue).value == transformedValue
+
+		where:
+			value        | otherValue || transformedValue
+			'grails.com' | '.com'     || 'grails.com'
+			3            | '.com'     || 3
+			'grails.COM' | '.com'     || 'grails.COM'
+			'grails'     | '.com'     || 'grails.com'
+			'grails'     | null       || 'grails'
+			null         | '.com'     || null
+	}
+
+	@Unroll
+	void 'test can org.apache.commons.lang3.StringUtils.prependIfMissing transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).prependIfMissing(otherValue).value == transformedValue
+
+		where:
+			value            | otherValue || transformedValue
+			'grails.com'     | 'www.'     || 'www.grails.com'
+			3                | 'www.'     || 3
+			'www.grails.com' | 'WWW.'     || 'WWW.www.grails.com'
+			'grails.com'     | null       || 'grails.com'
+			null             | 'www'      || null
+	}
+
+	@Unroll
+	void 'test can org.apache.commons.lang3.StringUtils.prependIfMissingIgnoreCase transformation on Element.value=#value and other value=#otherValue'() {
+
+		expect:
+			new Element(value: value).prependIfMissingIgnoreCase(otherValue).value == transformedValue
+
+		where:
+			value            | otherValue || transformedValue
+			'grails.com'     | 'www.'     || 'www.grails.com'
+			3                | 'www.'     || 3
+			'www.grails.com' | 'WWW.'     || 'www.grails.com'
+			'grails.com'     | null       || 'grails.com'
+			null             | 'www'      || null
+	}
 }

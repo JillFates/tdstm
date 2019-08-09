@@ -104,6 +104,36 @@ class NumberUtilTests extends Specification {
 		!NumberUtil.isLong(null)
 	}
 
+	void testIsDouble() {
+		expect:
+			!NumberUtil.isDouble(50)
+			NumberUtil.isDouble(50d)
+			!NumberUtil.isDouble(100L)
+			!NumberUtil.isDouble(10.01)
+			NumberUtil.isDouble('5')
+			NumberUtil.isDouble('12391023')
+			NumberUtil.isDouble('-1232135')
+			!NumberUtil.isDouble('abc')
+			!NumberUtil.isDouble(new Date())
+			NumberUtil.isDouble('123.12')
+			!NumberUtil.isDouble(null)
+	}
+
+	void testIsFloat() {
+		expect:
+			!NumberUtil.isFloat(50)
+			NumberUtil.isFloat(50f)
+			!NumberUtil.isFloat(100L)
+			!NumberUtil.isFloat(10.01)
+			NumberUtil.isFloat('5')
+			NumberUtil.isFloat('12391023')
+			NumberUtil.isFloat('-1232135')
+			!NumberUtil.isFloat('abc')
+			!NumberUtil.isFloat(new Date())
+			!NumberUtil.isFloat('123.12')
+			!NumberUtil.isFloat(null)
+	}
+
 	void testIsPostiveLong() {
 		expect:
 		NumberUtil.isPositiveLong('5')
