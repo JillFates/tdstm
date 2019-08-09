@@ -92,6 +92,8 @@ class HtmlUtil {
 	 * apiActionInvokedAt - task invoked at
 	 * apiActionCompletedAt - task completed at
 	 * apiActionType - api action type
+	 * apiActionName - api action name
+	 * apiActionDescription - api action description
 	 * id - task id
 	 * status - task status
 	 * onclick - javascript onClick action
@@ -103,7 +105,8 @@ class HtmlUtil {
 		// create a temporary asset comment to be able to use same function as in task manager to generate
 		// invoke api action button
 		AssetComment assetComment = new AssetComment(
-				apiAction: attrs.apiActionId ? new ApiAction(id: attrs.apiActionId, actionType: attrs.apiActionType) : null,
+				apiAction: attrs.apiActionId ? new ApiAction(
+						id: attrs.apiActionId, actionType: attrs.apiActionType, name: attrs.apiActionName, description: attrs.apiActionDescription) : null,
 				apiActionInvokedAt: attrs.apiActionInvokedAt,
 				apiActionCompletedAt: attrs.apiActionCompletedAt,
 				status: attrs.status
