@@ -7,7 +7,7 @@
                             <div class="event-selector">
                                 <span class="event-title">{{'EVENT.EVENT' | translate}}:</span>
                                 <kendo-dropdownlist [data]="eventList" [(ngModel)]="selectedEvent"
-                                    (ngModelChange)="onSelectedEvent($event.id)" textField="name" valueField="id">
+                                    (ngModelChange)="onSelectedEvent($event.id, $event.name)" textField="name" valueField="id">
                                 </kendo-dropdownlist>
                                 <label for="agreement" class="aligned-label dontshow-again">
                                     <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
