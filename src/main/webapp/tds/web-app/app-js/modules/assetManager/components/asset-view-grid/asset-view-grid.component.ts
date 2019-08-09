@@ -20,7 +20,7 @@ import {
 } from '@progress/kendo-angular-grid';
 
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
+import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -107,6 +107,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public currentFields = [];
 	public justPlanning = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
+	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
 	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	public showMessage = true;
 	public typingTimeout: any;
