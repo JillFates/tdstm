@@ -11,6 +11,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class RecipeEditionSpec extends GebReportingSpec {
     def testKey
@@ -25,6 +27,8 @@ class RecipeEditionSpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()
@@ -245,5 +249,3 @@ class RecipeEditionSpec extends GebReportingSpec {
             waitFor {SyntErrTabDetails.text() == ""}
     }
 }
-
-

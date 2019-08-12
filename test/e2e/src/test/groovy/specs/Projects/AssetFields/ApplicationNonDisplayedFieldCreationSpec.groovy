@@ -8,6 +8,8 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import spock.lang.Shared
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This spec verify some required fields and validations, then creates a custom Application field
  * which won't be displayed and finally verifies it was properly saved.
@@ -36,6 +38,8 @@ class ApplicationNonDisplayedFieldCreationSpec extends GebReportingSpec{
     ]
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

@@ -30,7 +30,7 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
 
     def setupSpec() {
         CachingDriverFactory.clearCacheAndQuitDriver()
-        
+
         testCount = 0
         to LoginPage
         login()
