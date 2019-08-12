@@ -747,6 +747,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
+				task.percentageComplete = 100
 				addNote(task, whom, "Task was Completed")
 				break
 
