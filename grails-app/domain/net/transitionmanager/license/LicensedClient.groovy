@@ -130,8 +130,9 @@ class LicensedClient {
 	}
 	
 	static isExpirationValid (Date expirationDate, LicensedClient licensedClient) {
-		if (licensedClient.activationDate && expirationDate < licensedClient.activationDate)
+		if (licensedClient.activationDate && expirationDate < licensedClient.activationDate) {
 			return false
+		}
 		return true
 	}
 	
