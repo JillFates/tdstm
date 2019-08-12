@@ -9,6 +9,7 @@ import {
 import {ExportAssetService} from '../../service/export-asset.service';
 // Models
 import {ExportAssetModel} from '../../model/export-asset.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -21,11 +22,14 @@ export class ExportComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 	public selectedAll = false;
 
-	private userPreferences  = [];
-
+	private userPreferences = [];
+	private selectedBundles = [];
+	private errorMessage = '';
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
 
-	constructor(private exportService: ExportAssetService) {
+	constructor(
+		private exportService: ExportAssetService,
+		private translatePipe: TranslatePipe) {
 		// comment
 	}
 
@@ -69,6 +73,38 @@ export class ExportComponent implements OnInit, OnDestroy {
 		return true;
 	}
 
+	exportData() {
+		if (this.selectedBundles.length === 0) {
+			this.errorMessage = this.translatePipe.transform('ASSET_EXPORT.BUNDLE_ERROR');
+		} else {
+			// get user preferences
+			let data = {
+				projectIdExport: 2445,
+				dataTransferSet: 1,
+				application: 'application',
+				asset: 'asset',
+				exportFormat: 'xlsx'
+			};
+			let result = this.userPreferences.reduce(function(map, obj) {
+				map[obj.preference] = obj.selected;
+				data[obj.preference] = obj.selected;
+				return map;
+			}, {});
+
+			if (this.selectedBundles.find(el => {return el === 'all'})) {
+				data['bundle'] = 'all';
+			} else if (this.selectedBundles.find(el => {return el === 'planning-bundle'})) {
+				data['bundle'] = 'planning-bundle';
+			} else {
+				data['bundle'] = this.selectedBundles;
+			}
+			console.log('data', data);
+		}
+	}
+
+	updateError() {
+		this.errorMessage = '';
+	}
 	/**
 	 * unsubscribe from all subscriptions on destroy hook.
 	 * @HostListener decorator ensures the OnDestroy hook is called on events like

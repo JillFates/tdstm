@@ -38,8 +38,8 @@ export class ExportAssetService {
 	 * Gets a export assets file based on what the user selected.
 	 * @returns {Observable<R>}
 	 */
-	public downloadBundleFile(userEmail: string): Observable<any[]> {
-		return this.http.get(`${this.export_asset_url }sendResetPasswordEmail?email=${userEmail}`)
+	public downloadBundleFile(exportData: any): Observable<any[]> {
+		return this.http.post(`${this.export_asset_url }exportAssets`, exportData )
 			.map((response: any) => {
 				return response && response.data;
 			})

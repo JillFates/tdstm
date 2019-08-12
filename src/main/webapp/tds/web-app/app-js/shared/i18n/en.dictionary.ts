@@ -140,7 +140,16 @@ export const en_DICTIONARY: Object = {
 		'ASSET_EXPORT': 'Asset Export',
 		'SELECT_BUNDLE': 'Select one or more bundle(s):',
 		'CHOOSE_ITEM': 'Choose Item(s) to Export:',
-		'EXPORT_BUTTON': 'Export Excel'
+		'EXPORT_BUTTON': 'Export Excel',
+		'BUNDLE_ERROR': '* Select at least one bundle',
+		'ALL_ITEMS': 'All Items',
+		'DATABASE': 'Database',
+		'STORAGE': 'Storage',
+		'ROOM': 'Room',
+		'RACK': 'Rack',
+		'DEPENDENCY': 'Dependency',
+		'CABLING': 'Cabling',
+		'COMMENT': 'Comment'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
