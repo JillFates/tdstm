@@ -15,6 +15,9 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.SystemClock
 
 import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
 
 
 waiting {
