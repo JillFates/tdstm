@@ -260,6 +260,7 @@ export const en_DICTIONARY: Object = {
 		'REQUEST_NEW_LICENSE': 'Request New License',
 		'LICENSE_REQUEST_COMPLETED': 'License Request Completed',
 		'LICENSE_DETAIL': 'License Detail',
+		'LICENSE_EDIT': 'License Edit',
 		'TRAINING': 'Training',
 		'PRODUCTION': 'Production',
 	},

@@ -175,24 +175,13 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
 					this.editing = false;
 				}
 			});
-		}
-	}
-
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
 		}
 	}
 
