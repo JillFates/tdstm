@@ -15,7 +15,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.SystemClock
 
 waiting {
-	timeout = 20
+	timeout = 30
 }
 
 environments {
@@ -29,7 +29,7 @@ environments {
 	// run via “./gradlew chromeTest”
 	// See: http://code.google.com/p/selenium/wiki/ChromeDriver
 	chrome {
-		atCheckWaiting = 10
+		atCheckWaiting = 30
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local chrome browser : ${browserLocation}"
