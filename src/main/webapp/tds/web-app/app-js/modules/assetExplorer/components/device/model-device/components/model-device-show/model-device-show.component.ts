@@ -4,8 +4,8 @@ import {DeviceModel} from '../../model/device-model.model';
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
-import {TDSModalPageWrapperComponent} from '../../../../../../../shared/components/modal-page-wrapper/modal-page-wrapper.component';
 import {ModelService} from '../../../../../service/model.service';
+import {ModelDeviceEditComponent} from '../model-device-edit/model-device-edit.component';
 
 @Component({
 	selector: 'model-device-show',
@@ -57,20 +57,10 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 			return;
 		}
 
-		this.dialogService.extra(TDSModalPageWrapperComponent,
-				[
-					{provide: 'title', useValue: 'Edit Model'},
-					{provide: 'url', useValue: this.getEditModelUrl()}
-				], true, false)
+		this.dialogService.extra(ModelDeviceEditComponent,
+				[], true, false)
 			.then((result) => {
 				console.log(result);
 			}).catch((error) => console.log(error));
-	}
-
-	/**
-	 * get the url for the model edit view
-	*/
-	private getEditModelUrl(): string {
-		return `/tdstm/model/edit?id=${this.deviceModel.id}&angularModalDialog=true`;
 	}
 }

@@ -39,6 +39,7 @@ import {TaskCreateComponent} from '../taskManager/components/create/task-create.
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
 import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
+import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
 
 @NgModule({
 	imports: [
@@ -66,6 +67,7 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		ModelDeviceShowComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
+		ModelDeviceEditComponent,
 		AssetCloneComponent,
 		PopupAssetMessageComponent,
 		TaskCommentDialogComponent,
@@ -111,6 +113,7 @@ import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.
 		SingleNoteComponent,
 		ManufacturerShowComponent,
 		ManufacturerEditComponent,
+		ModelDeviceEditComponent,
 		ModelDeviceShowComponent,
 		AssetCloneComponent
 	],
