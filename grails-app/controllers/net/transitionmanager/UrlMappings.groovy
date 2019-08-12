@@ -644,6 +644,11 @@ class UrlMappings {
 			action = [GET: "getModelForProjectCreate"]
 		}
 
+		"/ws/projects/viewEditProject/$projectId" {
+			controller = "wsProject"
+			action = [GET: "getModelForProjectViewEdit"]
+		}
+
 		"/ws/project/userProjects" {
 			controller = "wsProject"
 			action = [GET:"userProjects"]

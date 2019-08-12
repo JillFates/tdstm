@@ -11,99 +11,89 @@
                 <div class="steps_table">
                     <table>
                         <tbody>
+                            <tr class="prop">
+                                <td valign="top" class="name">Name:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Name:</td>
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectName}}
+                                </td>
 
-                            <td valign="top" class="value">
-                                {{savedModel?.projectName}}
-                            </td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Description:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
+                                <td valign="top" class="value">{{savedModel?.description}}</td>
 
-                            <td valign="top" class="value">{{savedModel?.description}}</td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Comment:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">From:</td>
+                                <td valign="top" class="value">{{savedModel?.comment}}</td>
 
-                            <td valign="top" class="value"><span *ngIf="sourceRoom != 'null'">{{sourceRoom}}</span></td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Start Date:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">To:</td>
+                                <td valign="top" class="value">{{savedModel?.startDate}}</td>
 
-                            <td valign="top" class="value"><span *ngIf="targetRoom != 'null'">{{targetRoom}}</span></td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Completion Date:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Time:</td>
+                                <td valign="top" class="value">{{savedModel?.completionDate}}</td>
 
-                            <td valign="top" class="value">{{savedModel?.startTime | tdsDateTime: userTimeZone}}</td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Associated Partners:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Time:</td>
+                                <td valign="top" class="value"><span *ngFor="let partner of savedModel?.partnerIds">{{availablePartners[partner]}}</span></td>
 
-                            <td valign="top" class="value">{{savedModel?.completionTime | tdsDateTime: userTimeZone}}</td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Default Bundle:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
+                                <td valign="top" class="value">{{savedModel?.defaultBundle}}</td>
 
-                            <td valign="top" class="value">
-                                <span *ngIf="projectManager">{{projectManager}}</span>
-                            </td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Manager:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Event Manager:</td>
+                                <td valign="top" class="value">NAME</td>
 
-                            <td valign="top" class="value">
-                                <span *ngIf="moveManager">{{moveManager}}</span>
-                            </td>
+                            </tr>
 
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">Event:</td>
+                            <tr class="prop">
+                                <td valign="top" class="name">Timezone:</td>
 
-                            <td valign="top" class="value">
-                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEventid}">{{savedModel?.moveEventId}}</a>
-                            </td>
+                                <td valign="top" class="value">{{savedModel?.timeZone}}</td>
 
-                        </tr>
+                            </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Order:</td>
+                            <tr class="prop">
+                                <td valign="top" class="name">Collect Reporting Metrics:</td>
+                                <td> <input type="checkbox" [disabled]="true" [ngModel]="savedModel?.collectReportingMetrics"/></td>
+                            </tr>
 
-                            <td valign="top" class="value">{{savedModel?.operationalOrder}}</td>
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Workflow Code:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">WorkFlow Code</td>
+                                <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
 
-                            <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
+                            </tr>
 
-                        </tr>
+                            <tr class="prop">
+                                <td valign="top" class="name">Plan Methodology:</td>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Use For Planning:</td>
+                                <td valign="top" class="value">{{savedModel?.planMethodology}}</td>
 
-                            <td valign="top" class="value">
-                                <input *ngIf="savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" checked="checked"
-                                       disabled="disabled"/>
-                                <input *ngIf="!savedModel?.useForPlanning" type="checkbox" id="useForPlanning" name="useForPlanning" disabled="disabled"/>
-                            </td>
-                        </tr>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -121,109 +111,142 @@
                     </div>
                 </div>
             </div>
-            <form [hidden]="!editing" action="save" method="post" name="projectEditForm">
-                <div class="dialog steps_table">
-                    <table style="border:0">
-                        <tbody>
-                        <tr>
-                            <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name"><b>Name:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="projectModel.name" style="width:180px" id="name" name="name"/>
-                            </td>
-                        </tr>
+            <div *ngIf="editing">
+                <table style="border:0">
+                    <tbody>
+                    <tr>
+                        <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name"><b>Client:</b></td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist type="text" [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" [valuePrimitive]="true" id="client" name="client"></kendo-dropdownlist>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="projectModel.description"  style="width:98%" id="description" name="description"/>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">From:</td>
-                            <td valign="top" class="value">
-                                <select id="sourceRoomId" name="sourceRoom" [(ngModel)]="projectModel.fromId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">To:</td>
-                            <td valign="top" class="value">
-                                <select id="targetRoomId" name="targetRoom" [(ngModel)]="projectModel.toId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let room of rooms" [value]="room.id">{{room.roomName}}</option>
-                                </select>
-                            </td>
-                        </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Code:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <input id="projectCode" name="projectCode" [(ngModel)]="projectModel.projectCode"/>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control #startTimePicker name="startTime" [(ngModel)]="projectModel.startTime"></tds-datetime-control>
-                            </td>
-                        </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Name:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <input type="text" [(ngModel)]="projectModel.projectName"  id="projectName" name="projectName"/>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control #completionTimePicker name="completionTime" [(ngModel)]="projectModel.completionTime"></tds-datetime-control>
-                            </td>
-                        </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Type:</td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="projectType" name="projectType" [data]="projectTypes" [(ngModel)]="projectModel.projectType" ></kendo-dropdownlist>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
-                            <td valign="top" class="value">
-                                <select id="projectManagerId" name="projectManager" [(ngModel)]="projectModel.projectManagerId" >
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                                </select>
-                            </td>
-                        </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Description:</td>
+                        <td valign="top" class="value">
+                            <textarea type="text" [(ngModel)]="projectModel.description"  id="description" name="description"></textarea>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Event Manager:</td>
-                            <td valign="top" class="value">
-                                <select id="moveManagerId" name="moveManager" [(ngModel)]="projectModel.moveManagerId">
-                                    <option value="0" selected="selected">Please Select</option>
-                                    <option *ngFor="let manager of managers" [value]="manager.staff.id">{{manager.name}}</option>
-                                </select>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td valign="top" class="name"><b>Comment:</b></td>
+                        <td valign="top" class="value">
+                            <textarea id="comment" name="comment" [(ngModel)]="projectModel.comment"></textarea>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Order:</td>
-                            <td valign="top" class="value">
-                                <select id="operationalOrderId" name="operationalOrder" [(ngModel)]="projectModel.operationalOrder" >
-                                    <option *ngFor="let order of orderNums" [value]="order">{{order}}</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <select id="workflowCodeId" name="workflowCode" [(ngModel)]="projectModel.workflowCode">
-                                    <option value="" selected="selected">Please Select</option>
-                                    <option *ngFor="let code of workflowCodes" [value]="code">{{code}}</option>
-                                </select>
-                            </td>
-                        </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name">Start Date:</td>
+                        <td valign="top" class="value">
+                            <kendo-datepicker [(ngModel)]="projectModel.startDate"></kendo-datepicker>
+                        </td>
+                    </tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Use for Planning:</td>
-                            <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" [(ngModel)]="projectModel.useForPlanning"/></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <tr class="prop">
+                        <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <kendo-datepicker [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Associated Partners:</td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist style="display: block" *ngFor="let partnerId of projectModel.partnerIds" [data]="partners" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
+                            <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Project Logo:</b></td>
+                        <td valign="top" class="value">
+                            <kendo-upload
+                                    #kendoUploadInstance="kendoUpload"
+                                    [restrictions]="file.uploadRestrictions"
+                                    [autoUpload]="file.autoUpload"
+                                    [saveUrl]="file.uploadSaveUrl"
+                                    [removeUrl]="file.uploadDeleteUrl"
+                                    [saveField]="file.saveField"
+                                    [removeField]="file.removeField"
+                                    [multiple]="file.multiple"
+                                    [disabled]="false"
+                                    (select)="onSelectFile($event)"
+                                    (upload)="onUploadFile($event)"
+                                    (remove)="onRemoveFile($event)"
+                                    (success)="completeEventHandler($event)">
+                                <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
+                            </kendo-upload><!---->
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Default Bundle:</b></td>
+                        <td valign="top" class="value">
+                            <input id="defaultBundle" name="defaultBundle" [(ngModel)]="projectModel.defaultBundle"/>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Manager:</td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="projectManagerId" name="projectManager" [data]="managers" [textField]="'name'" [valueField]="'id'" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Time Zone:</b></td>
+                        <td valign="top" class="value">
+                            <input id="timeZone" name="timeZone" [(ngModel)]="projectModel.timeZone"/> <button class="btn btn-secondary" (click)="openTimezoneModal()">Change</button>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Collect Reporting Metrics:</td>
+                        <td> <input type="checkbox" name="collectReportingMetrics" id="collectReportingMetrics" value="true" checked="checked" [(ngModel)]="projectModel.collectReportingMetrics"/></td>
+                    </tr>
+
+                    <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
+                    <td valign="top" class="value">
+                        <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="projectModel.workflowCode" [data]="workflowCodes" [valuePrimitive]="true"></kendo-dropdownlist>
+                    </td>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Plan Methodology:</b></td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="planMethodology" name="planMethodology" [(ngModel)]="projectModel.planMethodology" [data]="planMethodologies" [valuePrimitive]="true"></kendo-dropdownlist>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 <div class="modal-footer form-group-center">
                     <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                     <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>

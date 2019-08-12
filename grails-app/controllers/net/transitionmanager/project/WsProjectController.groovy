@@ -1,26 +1,27 @@
 package net.transitionmanager.project
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.Timezone
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyGroupService
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.security.RoleType
-
-import javax.persistence.CascadeType
-import javax.persistence.OneToOne
 
 /**
  * Handles WS calls of the ProjectsService
@@ -29,7 +30,8 @@ import javax.persistence.OneToOne
 @Slf4j
 class WsProjectController implements ControllerMethods {
 
-	PartyGroupService partyGroupService
+	PartyRelationshipService partyRelationshipService
+	CustomDomainService customDomainService
 	PersonService personService
 	ProjectService projectService
 	ControllerService controllerService
@@ -105,6 +107,57 @@ class WsProjectController implements ControllerMethods {
 		 		workflowCodes: projectDetails.workflowCodes,
 				projectTypes: projectTypes,
 				planMethodologies:planMethodologies ])
+	}
+
+	@HasPermission(Permission.ProjectView)
+	def getModelForProjectViewEdit(String projectId) {
+		Project project = Project.get(projectId)
+		if (!project) return
+
+		PartyGroup company = securityService.userLoginPerson.company
+		String companyId = company.id
+		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+
+		// Save and load various user preferences
+		userPreferenceService.setCurrentProjectId(project.id)
+		userPreferenceService.setPreference(UserPreferenceEnum.PARTY_GROUP, companyId)
+
+		if (!userPreferenceService.getPreference(UserPreferenceEnum.CURR_POWER_TYPE)) {
+			userPreferenceService.setPreference(UserPreferenceEnum.CURR_POWER_TYPE, "Watts")
+		}
+
+		def imageId
+		def projectLogo = ProjectLogo.findByProject(project)
+		if (projectLogo) {
+			imageId = projectLogo.id
+		}
+		session.setAttribute('setImage', imageId)
+		boolean isDeleteable = securityService.hasPermission(Permission.ProjectDelete) && !project.isDefaultProject()
+
+		Map planMethodology = [:]
+		if (project.planMethodology) {
+			planMethodology= customDomainService.findCustomField(project, AssetClass.APPLICATION.toString()) {
+				it.field == project.planMethodology
+			}
+		}
+
+		// Log a warning if the planMethodology field spec was not found but one is defined
+		if (!planMethodology && project.planMethodology) {
+			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
+		}
+
+		renderSuccessJson([
+				projectInstance      : project,
+				timezone             : project.timezone?.label ?: '',
+				client               : project.client,
+				defaultBundle        : project.defaultBundle,
+				possiblePartners	 : projectDetails.partners,
+				projectPartners      : partyRelationshipService.getProjectPartners(project),
+				projectManagers      : projectService.getProjectManagers(project),
+				projectLogoForProject: projectLogo,
+				isDeleteable         : isDeleteable,
+				planMethodology      : planMethodology
+		])
 	}
 
 	private def retrievetimeZone(timezoneValue) {

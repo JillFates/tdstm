@@ -6,6 +6,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {ProjectModel} from '../../model/project.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -14,15 +15,10 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 export class ProjectViewEditComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
-	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public managers;
-	public rooms;
+	public file = new KendoFileUploadBasicConfig();
 	public workflowCodes;
-	public isDefaultProject;
-	public sourceRoom;
-	public targetRoom;
-	public projectManager;
-	public moveManager;
+	public availablePartners = {};
 	public projectId;
 	public canEditProject;
 	public editing = false;
@@ -42,13 +38,14 @@ export class ProjectViewEditComponent implements OnInit {
 
 	ngOnInit() {
 		this.projectModel = new ProjectModel();
-		const defaultProject = {
+		let defaultProject = {
 			clientId: 0,
 			projectName: '',
 			description: '',
 			startDate: new Date(),
 			completionDate: new Date(),
 			partnerIds: [],
+			projectLogo: '',
 			projectManagerId: 0,
 			workflowCode: 'STD_PROCESS',
 			projectCode: '',
@@ -118,19 +115,28 @@ export class ProjectViewEditComponent implements OnInit {
 				let data = result.data;
 				let projectModel = this.projectModel;
 				// Fill the model based on the current person.
-				Object.keys(data.moveProjectInstance).forEach((key) => {
-					if (key in projectModel && data.moveProjectInstance[key]) {
-						projectModel[key] = data.moveProjectInstance[key];
+				Object.keys(data.projectInstance).forEach((key) => {
+					if (key in projectModel && data.projectInstance[key]) {
+						projectModel[key] = data.projectInstance[key];
 					}
 				});
 				this.projectModel = projectModel;
+				data.possiblePartners.forEach((partner) => {
+					this.availablePartners[partner.id] = partner.name;
+				});
+
+				data.projectPartners.forEach((partner) => {
+					this.projectModel.partnerIds.push(partner.id);
+				});
 
 				this.projectModel.projectManagerId = data.projectManager ? data.projectManager : 0;
 
-				this.managers = data.managers;
-				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				this.workflowCodes = data.workflowCodes;
-				this.rooms = data.rooms;
+				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle.name : '';
+				this.projectModel.projectName = data.projectInstance.name;
+				this.projectModel.timeZone = data.timezone;
+				//this.managers = data.managers;
+				//this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
+				//this.workflowCodes = data.workflowCodes;
 
 				this.updateSavedFields();
 			});

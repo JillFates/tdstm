@@ -35,7 +35,7 @@ export class ProjectService {
 	}
 
 	getModelForProjectViewEdit(id) {
-		return this.http.get(`../ws/reports/viewEditProject/${id}`)
+		return this.http.get(`../ws/projects/viewEditProject/${id}`)
 			.map((response: any) => {
 				return response;
 			})
