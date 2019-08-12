@@ -438,9 +438,9 @@ export class TaskListComponent {
 		};
 
 		// Append url filters, in case they were not present in the default filters
-		const filters = Object.assign({}, defaultFilters, this.urlParams);
-		console.log('Filters are:');
-		console.log(filters);
+		const filters: any = Object.assign({}, defaultFilters, this.urlParams);
+		// moveEvent should be string for all events
+		filters['moveEvent'] = filters.moveEvent === 0 ? '0' : filters.moveEvent;
 
 		this.taskService.getTaskList(filters)
 			.subscribe(result => {
