@@ -5,6 +5,7 @@ import grails.converters.JSON
 import grails.util.Environment
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.TailRecursive
 import net.transitionmanager.model.Model
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.lang.StringEscapeUtils
@@ -75,9 +76,12 @@ class ArchitectureGraphService implements ServiceMethods {
 	 * @param level The number of levels deep to produce the graph.
 	 * @param assetsList The list of assets for the graph, which grows with every level added.
 	 * @param dependencyList The list of dependencies, which grows with every level added.
+	 *
+	 * return True just to satisfy @TailRecursive, because it doesn't work with void
 	 */
+	@TailRecursive
 	@CompileDynamic
-	void buildArchitectureGraph(List<Long> assetIds, Integer level, Set<Map> assetsList, Set<Map> dependencyList) {
+	boolean buildArchitectureGraph(List<Long> assetIds, Integer level, Set<Map> assetsList, Set<Map> dependencyList) {
 
 		List<Map> assets = AssetEntity.createCriteria().list {
 			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -116,7 +120,7 @@ class ArchitectureGraphService implements ServiceMethods {
 			assetsForNextLevel.addAll(dependencies*.dependentId)
 
 			if (!assetsForNextLevel) {
-				return
+				return true
 			}
 
 			buildArchitectureGraph(assetsForNextLevel, level - 1, assetsList, dependencyList)
