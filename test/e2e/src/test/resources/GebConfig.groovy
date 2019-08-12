@@ -14,12 +14,6 @@ import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.SystemClock
 
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-
-
 waiting {
 	timeout = 20
 }
@@ -53,11 +47,6 @@ environments {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
                 //capabilities.setVersion("45.4.0esr")
                 //capabilities.setPlatform(Platform.LINUX)
-
-                LoggingPreferences loggingprefs = new LoggingPreferences();
-                loggingprefs.enable(LogType.BROWSER, Level.ALL);
-                capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingprefs);
-
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
                 // capabilities.merge(chromeOptions);
