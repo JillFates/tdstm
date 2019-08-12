@@ -9,6 +9,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.waiting.WaitTimeoutException
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class StaffListCleanUpSpec extends GebReportingSpec {
     def testKey
@@ -19,6 +21,8 @@ class StaffListCleanUpSpec extends GebReportingSpec {
     static usersToBeDeleted = []
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()
