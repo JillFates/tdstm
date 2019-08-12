@@ -15,7 +15,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.SystemClock
 
 waiting {
-	timeout = 30
+	timeout = 60
 }
 
 environments {
