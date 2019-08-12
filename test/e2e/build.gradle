@@ -30,7 +30,7 @@ ext {
         groovyVersion = '2.4.12'
         gebVersion = '1.1.1'
         //seleniumVersion = '3.4.0'
-        seleniumVersion = '3.5.3'
+        seleniumVersion = '3.14.0'
         chromeDriverVersion = '2.37'
         geckoDriverVersion = '0.18.0'
     }
