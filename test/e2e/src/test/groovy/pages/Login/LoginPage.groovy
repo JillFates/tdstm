@@ -12,9 +12,9 @@ class LoginPage extends Page {
 
     static at = {
         title == "Login"
-        waitFor(10){username.displayed}
-        waitFor(10){password.displayed}
-        waitFor(10){submitButton.displayed}
+        waitFor(8){username.displayed}
+        waitFor(8){password.displayed}
+        waitFor(8){submitButton.displayed}
     }
 
     static content = {

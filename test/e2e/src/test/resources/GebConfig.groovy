@@ -4,7 +4,6 @@
 	See: http://www.gebish.org/manual/current/#configuration
 */
 
-
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxDriver
@@ -15,7 +14,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.support.ui.SystemClock
 
 waiting {
-	timeout = 10
+	timeout = 20
 }
 
 environments {
@@ -29,7 +28,7 @@ environments {
 	// run via “./gradlew chromeTest”
 	// See: http://code.google.com/p/selenium/wiki/ChromeDriver
 	chrome {
-		atCheckWaiting = 30
+		atCheckWaiting = 10
 
         if (browserLocation == 'local') {  // use local browser (not grid)
             println "browser.location: Using local chrome browser : ${browserLocation}"
@@ -42,19 +41,15 @@ environments {
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
-                // ChromeOptions chromeOptions = new ChromeOptions();
-                // chromeOptions.addArguments("--whitelisted-ips");
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
                 //capabilities.setVersion("45.4.0esr")
                 //capabilities.setPlatform(Platform.LINUX)
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
-                // capabilities.merge(chromeOptions);
                 new RemoteWebDriver( new URL(browserLocation), capabilities )
 		    }
         }
 	}
-
 
 	// run via “./gradlew firefoxTest”
 	// See: http://code.google.com/p/selenium/wiki/FirefoxDriver
