@@ -64,6 +64,8 @@ class ApiActionResponse {
 		immutable.data = this.data
 		immutable.elapsed = this.elapsed
 		immutable.error = this.error
+		immutable.stdout = this.stdout
+		immutable.stderr = this.stderr
 		immutable.headers = this.headers
 		immutable.files = this.files
 		immutable.filename = this.filename

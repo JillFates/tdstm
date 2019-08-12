@@ -142,8 +142,21 @@ class TaskFacade {
 		addTaskCommentNoteAndUpdateStatus(AssetCommentStatus.COMPLETED, messageSourceService.i18nMessage(Message.ApiActionTaskMessageByPassed))
 	}
 
+	/**
+	 * Add a task comment given by user or default error message when null.
+	 * Also set task status
+	 *
+	 * @param status - new task status
+	 * @param message - note message
+	 */
 	private void addTaskCommentNoteAndUpdateStatus(String status, String message) {
-		taskService.addNote(task, whom, message)
+		if (message) {
+			taskService.addNote(task, whom, message)
+		} else {
+			taskService.addNote(task,
+					whom,
+					messageSourceService.i18nMessage(Message.ApiActionTaskMessageDefaultError))
+		}
 		updateTaskStatus(status)
 	}
 

@@ -136,6 +136,7 @@ class HttpProducerService {
             }
             ApiActionResponse errorApiActionResponse = new ApiActionResponse()
             errorApiActionResponse.error = errorMessage
+            errorApiActionResponse.stderr = errorMessage
             errorApiActionResponse.successful = false
             return errorApiActionResponse.asImmutable()
         }
@@ -194,6 +195,7 @@ class HttpProducerService {
 
         if (!apiActionResponse.successful) {
             apiActionResponse.error = getHttpResponseError(apiActionResponse.status)
+            apiActionResponse.stderr = getHttpResponseError(apiActionResponse.status)
             apiActionResponse.data = null
         } else {
             InputStream is = httpResponse?.entity?.content
