@@ -17,7 +17,15 @@
                         <div class="box-body">
                             <div class="form-group">
                                 <div class="col-md-3">Manufacturer:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <tds-combobox
+                                            [(model)]="manufacturerSelectValue"
+                                            [serviceRequest]="searchManufacturers"
+                                            [searchOnScroll]="false"
+                                            [reloadOnOpen]="true"
+                                            (valueChange)="onManufacturerValueChange($event)" >
+                                    </tds-combobox>
+                                </div>
                                 <div class="col-md-3">Model Name:</div>
                                 <div class="col-md-3">---</div>
                             </div>

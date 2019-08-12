@@ -25,4 +25,18 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		this.cancelCloseDialog();
 	}
 
+	/**
+	 * On Manufacturers combobox change.
+	 * @param value
+	 */
+	protected onManufacturerValueChange(value: any): void {
+		if (!value) {
+			value = {id: null};
+		}
+
+		console.log('On Manufacturer value change:', value);
+		// this.model.asset.manufacturerSelectValue = value;
+		// this.model.asset.modelSelectValue = {id: null};
+	}
+
 }
