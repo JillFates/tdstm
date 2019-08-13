@@ -24,6 +24,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
@@ -377,7 +378,7 @@ export class TaskListComponent {
 					// params were transferred to local properties,
 					// we can remove them from the parameters object
 					// and leave only the parameters which are not handled by local properties
-					this.urlParams = this.excludeSetParameters(this.urlParams);
+					this.urlParams = ObjectUtils.excludeProperties(this.urlParams, ['moveEvent', 'justRemaining', 'viewUnpublished']);
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -763,25 +764,5 @@ export class TaskListComponent {
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
-	}
-
-	/**
-	 * Once parameters are set to the properties of the component
-	 * we need to remove them
-	 * @param {any} params Parameters coming from the route
-	 */
-	excludeSetParameters(params: any): any {
-		const resultingParams = {};
-		const numberParams = ['moveEvent', 'justRemaining', 'viewUnpublished'];
-
-		for (let property in params) {
-			if (params.hasOwnProperty(property)) {
-				if (numberParams.indexOf(property) === -1) {
-					resultingParams[property] = params[property];
-				}
-			}
-		}
-
-		return resultingParams;
 	}
 }
