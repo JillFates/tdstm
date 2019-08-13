@@ -24,7 +24,7 @@ class TagsDeletionSpec extends GebReportingSpec {
     static maxNumberOfBulkTagsToBeDeleted = 3 // custom E2E tags to remove in workaround test
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

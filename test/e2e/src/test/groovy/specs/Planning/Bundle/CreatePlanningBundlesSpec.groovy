@@ -27,7 +27,7 @@ class CreatePlanningBundlesSpec extends GebReportingSpec {
                          "STD_PROCESS","on"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

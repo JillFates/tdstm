@@ -18,7 +18,7 @@ class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
     static rowData= []
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

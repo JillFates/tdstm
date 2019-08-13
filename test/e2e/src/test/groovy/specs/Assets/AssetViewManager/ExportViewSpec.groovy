@@ -22,7 +22,7 @@ class ExportViewSpec extends GebReportingSpec {
     static fileName = "QAE2E " + randStr  + " ExportSystemAllAssets"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

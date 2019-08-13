@@ -34,7 +34,7 @@ class ProjectCreationDefaultTagsSpec extends GebReportingSpec {
     static SOX_Tag = ["name": "SOX", "description": "Sarbanes–Oxley Act Compliance", "color": "#eaf2d9"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

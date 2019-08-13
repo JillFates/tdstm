@@ -32,7 +32,7 @@ class BundleDeleteSpec extends GebReportingSpec {
     static maxNumberOfBundles = 2
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

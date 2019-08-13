@@ -25,7 +25,7 @@ class ProjectsLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

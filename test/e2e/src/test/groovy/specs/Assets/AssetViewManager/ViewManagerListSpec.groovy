@@ -24,7 +24,7 @@ class ViewManagerListSpec extends GebReportingSpec {
     def listValidation=true
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

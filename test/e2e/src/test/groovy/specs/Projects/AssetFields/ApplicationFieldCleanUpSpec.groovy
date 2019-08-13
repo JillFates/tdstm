@@ -25,7 +25,7 @@ class ApplicationFieldCleanUpSpec extends GebReportingSpec{
     static minNumberOfFieldsPresent = 2
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

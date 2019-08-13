@@ -20,7 +20,7 @@ class CompanyDeletionSpec extends GebReportingSpec {
     static baseName = "QAE2E"
     static companyName =""
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

@@ -27,7 +27,7 @@ class ProjectCreationSpec extends GebReportingSpec {
     static licensedProjectName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

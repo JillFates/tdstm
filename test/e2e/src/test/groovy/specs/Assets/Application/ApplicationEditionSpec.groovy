@@ -53,7 +53,7 @@ class ApplicationEditionSpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

@@ -24,7 +24,7 @@ class AssetsLandingPageSpec extends GebReportingSpec {
     static assetPagesLinks = 18
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

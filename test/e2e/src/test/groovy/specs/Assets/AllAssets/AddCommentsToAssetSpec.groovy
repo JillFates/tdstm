@@ -32,7 +32,7 @@ class AddCommentsToAssetSpec extends GebReportingSpec {
     def beforeCommentsCount
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage

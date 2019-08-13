@@ -17,7 +17,7 @@ class RecipeCreationSpec extends GebReportingSpec {
     static recipeText
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

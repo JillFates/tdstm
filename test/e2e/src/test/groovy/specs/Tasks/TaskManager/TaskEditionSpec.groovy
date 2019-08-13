@@ -33,7 +33,7 @@ class TaskEditionSpec extends GebReportingSpec {
     static taskNote = "This is a Note for "+ baseName +" "+ randStr + " Task For E2E Edited"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

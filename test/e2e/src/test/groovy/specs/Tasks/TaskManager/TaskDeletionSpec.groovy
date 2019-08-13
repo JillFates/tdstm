@@ -23,7 +23,7 @@ class TaskDeletionSpec extends GebReportingSpec {
     static taskEvent = "Buildout"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

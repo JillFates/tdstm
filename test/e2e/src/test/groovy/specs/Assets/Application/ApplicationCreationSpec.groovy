@@ -29,7 +29,7 @@ class ApplicationCreationSpec extends GebReportingSpec {
     static appStatus = "Assigned"
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

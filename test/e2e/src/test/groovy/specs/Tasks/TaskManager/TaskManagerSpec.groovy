@@ -16,7 +16,7 @@ class TaskManagerSpec extends GebReportingSpec {
     //Define the names of the tasks you will Create and Edit
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
         
         testCount = 0
         to LoginPage

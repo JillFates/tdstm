@@ -34,7 +34,7 @@ class ApplicationCloneSpec extends GebReportingSpec {
     static appCountBefore
 
     def setupSpec() {
-        CachingDriverFactory.clearCacheAndQuitDriver()
+        CachingDriverFactory.clearCache()
 
         testCount = 0
         to LoginPage
