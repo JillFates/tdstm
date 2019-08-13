@@ -163,10 +163,12 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * if those fields should be deleted in the back end as well
 	 */
 	private askForDeleteUnderlayingData(): Promise<boolean> {
-		if (this.fieldsToDelete.length) {
+		const countFieldsToDelete = this.fieldsToDelete.length;
+
+		if (countFieldsToDelete) {
 			return this.prompt.open(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
+				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA', [countFieldsToDelete > 1 ? 'fields' : 'field'] ),
 				this.translate.transform('GLOBAL.YES'),
 				this.translate.transform('GLOBAL.NO'),
 				true);
