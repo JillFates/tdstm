@@ -17,9 +17,16 @@ export class ProjectViewEditComponent implements OnInit {
 	public savedModel: ProjectModel = null;
 	public managers;
 	public file = new KendoFileUploadBasicConfig();
+	public client;
+	public clients;
 	public workflowCodes;
+	public projectManagers;
 	public availablePartners = {};
 	public projectId;
+	public projectLogoId;
+	public projectGUID;
+	public dateCreated;
+	public lastUpdated;
 	public canEditProject;
 	public editing = false;
 	protected userTimeZone: string;
@@ -129,9 +136,16 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectModel.partnerIds.push(partner.id);
 				});
 
-				this.projectModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-
+				this.projectManagers = data.projectManagers ? data.projectManagers : [];
+				this.clients = data.clients ? data.clients : [];
+				this.client = data.client;
+				this.projectLogoId = data.projectLogoForProject.id;
+				this.projectModel.clientId = data.client.id;
+				this.projectGUID = data.projectInstance.guid;
+				this.dateCreated = data.projectInstance.dateCreated;
+				this.lastUpdated = data.projectInstance.lastUpdated;
 				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle.name : '';
+				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance.name;
 				this.projectModel.timeZone = data.timezone;
 				//this.managers = data.managers;
@@ -144,6 +158,12 @@ export class ProjectViewEditComponent implements OnInit {
 
 	private updateSavedFields() {
 		this.savedModel = JSON.parse(JSON.stringify(this.projectModel));
+
+		this.clients.forEach((client) => {
+			if (client.id === this.savedModel.clientId) {
+				this.client = client.clientName;
+			}
+		});
 	}
 
 	public saveForm() {

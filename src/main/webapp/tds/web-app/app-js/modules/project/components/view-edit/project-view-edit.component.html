@@ -12,12 +12,35 @@
                     <table>
                         <tbody>
                             <tr class="prop">
-                                <td valign="top" class="name">Name:</td>
+                                <td valign="top" class="name">Client:</td>
+
+                                <td valign="top" class="value">
+                                    {{client?.name}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Code:</td>
+
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectCode}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Name:</td>
 
                                 <td valign="top" class="value">
                                     {{savedModel?.projectName}}
                                 </td>
+                            </tr>
 
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Type:</td>
+
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectType}}
+                                </td>
                             </tr>
 
                             <tr class="prop">
@@ -52,7 +75,14 @@
                                 <td valign="top" class="name">Associated Partners:</td>
 
                                 <td valign="top" class="value"><span *ngFor="let partner of savedModel?.partnerIds">{{availablePartners[partner]}}</span></td>
+                            </tr>
 
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Logo:</td>
+
+                                <td valign="top" class="value">
+                                    <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId"/>
+                                </td>
                             </tr>
 
                             <tr class="prop">
@@ -63,9 +93,13 @@
                             </tr>
 
                             <tr class="prop">
-                                <td valign="top" class="name">Project Manager:</td>
+                                <td valign="top" class="name">Project Managers:</td>
 
-                                <td valign="top" class="value">NAME</td>
+                                <td valign="top" class="value">
+                                    <ul>
+                                        <li *ngFor="let manager of projectManagers">{{manager}}</li>
+                                    </ul>
+                                </td>
 
                             </tr>
 
@@ -82,10 +116,34 @@
                             </tr>
 
                             <tr class="prop">
+                                <td valign="top" class="name">Date Created:</td>
+
+                                <td valign="top" class="value">
+                                    {{dateCreated}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Last Updated:</td>
+
+                                <td valign="top" class="value">
+                                    {{lastUpdated}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
                                 <td valign="top" class="name">Workflow Code:</td>
 
                                 <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
 
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">GUID:</td>
+
+                                <td valign="top" class="value">
+                                    {{projectGUID}}
+                                </td>
                             </tr>
 
                             <tr class="prop">

@@ -147,13 +147,14 @@ class WsProjectController implements ControllerMethods {
 		}
 
 		renderSuccessJson([
+				clients				 : projectDetails.clients,
 				projectInstance      : project,
 				timezone             : project.timezone?.label ?: '',
 				client               : project.client,
 				defaultBundle        : project.defaultBundle,
 				possiblePartners	 : projectDetails.partners,
 				projectPartners      : partyRelationshipService.getProjectPartners(project),
-				projectManagers      : projectService.getProjectManagers(project),
+				projectManagers      : projectService.getProjectManagers(project).collect{ it -> it.toString()},
 				projectLogoForProject: projectLogo,
 				isDeleteable         : isDeleteable,
 				planMethodology      : planMethodology
