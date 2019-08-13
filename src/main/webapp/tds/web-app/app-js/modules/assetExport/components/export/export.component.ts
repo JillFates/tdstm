@@ -9,7 +9,11 @@ import {
 import {ExportAssetService} from '../../service/export-asset.service';
 // Models
 import {ExportAssetModel} from '../../model/export-asset.model';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+// Pipes
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+// Others
+import {Store} from '@ngxs/store';
 
 declare var jQuery: any;
 
@@ -25,11 +29,13 @@ export class ExportComponent implements OnInit, OnDestroy {
 	private userPreferences = [];
 	private selectedBundles = [];
 	private errorMessage = '';
+	private userContext: UserContextModel;
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
 
 	constructor(
 		private exportService: ExportAssetService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private store: Store) {
 		// comment
 	}
 
@@ -38,6 +44,10 @@ export class ExportComponent implements OnInit, OnDestroy {
 			console.log('res', res);
 			this.exportAssetsData = res;
 			this.updateUserPreferencesModel();
+		});
+
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
 		});
 	}
 
@@ -79,7 +89,7 @@ export class ExportComponent implements OnInit, OnDestroy {
 		} else {
 			// get user preferences
 			let data = {
-				projectIdExport: 2445,
+				projectIdExport: this.userContext.project.id,
 				dataTransferSet: 1,
 				application: 'application',
 				asset: 'asset',
@@ -99,6 +109,10 @@ export class ExportComponent implements OnInit, OnDestroy {
 				data['bundle'] = this.selectedBundles;
 			}
 			console.log('data', data);
+
+			this.exportService.downloadBundleFile(data).subscribe( res => {
+				console.log('data', res);
+			})
 		}
 	}
 

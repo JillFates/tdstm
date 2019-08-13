@@ -30,6 +30,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.utils.Profiler
+import org.quartz.Scheduler
 import org.apache.commons.lang3.BooleanUtils
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -51,6 +52,7 @@ class WsAssetController implements ControllerMethods {
 	DeviceService deviceService
 	MoveBundleService moveBundleService
 	PageRenderer groovyPageRenderer
+	Scheduler quartzScheduler
 	ProgressService progressService
 	StorageService storageService
 	UserPreferenceService userPreferenceService
