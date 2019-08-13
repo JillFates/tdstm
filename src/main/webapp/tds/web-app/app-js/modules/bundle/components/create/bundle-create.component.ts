@@ -1,11 +1,11 @@
 import {Component, ElementRef, HostListener, OnInit, Renderer2} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {BundleModel} from '../../model/bundle.model';
-import {Router} from '@angular/router';
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `bundle-create`,
@@ -67,23 +67,12 @@ export class BundleCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
 				}
 			});
-		}
-	}
-
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
 		}
 	}
 

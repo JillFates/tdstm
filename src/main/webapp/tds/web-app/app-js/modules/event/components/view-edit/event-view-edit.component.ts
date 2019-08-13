@@ -139,24 +139,13 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
+		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
 					this.editing = false;
 				}
 			});
-		}
-	}
-
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
 		}
 	}
 

@@ -357,4 +357,22 @@ export class DateUtils {
 	public static stringDateToDate(date: any): any {
 		return (date && date.toDateString) ? date : DateUtils.toDateUsingFormat(date, DateUtils.SERVER_FORMAT_DATE)
 	}
+
+	/**
+	 * Checks if a provided date range is valid and sends an alert if the dates are reversed
+	 * @param startTime (Date): Starting date of the range
+	 * @param endTime (Date): Ending date of the range
+	 * @param reverseMessage (String): Message to alert if the date is reversed
+	 * @returns {Boolean}
+	 */
+	public static validateDateRange (startTime: Date, endTime: Date, reverseMessage = 'The completion time must be later than the start time.'): boolean {
+		if (!startTime || !endTime) {
+			return true;
+		} else if (startTime > endTime) {
+			alert(reverseMessage);
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
