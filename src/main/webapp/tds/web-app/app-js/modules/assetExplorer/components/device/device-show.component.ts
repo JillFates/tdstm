@@ -51,8 +51,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			return this.manufacturerName;
 		}
 
-		showModel(id: string): void {
-			this.modelService.getModelAsJSON(id)
+		showModel(modelId: string, manufacturerId: string): void {
+			this.modelService.getModelAsJSON(modelId)
 				.subscribe((deviceModel: DeviceModel) => {
 					this.dialogService.extra(ModelDeviceShowComponent,
 						[UIDialogService,

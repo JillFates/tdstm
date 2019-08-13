@@ -32,4 +32,20 @@ export class ModelService {
 		}), {headers, responseType: 'text'})
 		.map((response: any) => response)
 	}
+
+	isValidAlias(alias: string, id: number, parentName: string): Observable<boolean> {
+		const url = `/tdstm/manufacturer/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
+
+		return this.http.get(url)
+		.map((res: any) => res === 'valid')
+	}
+
+	getDeviceManufacturer(id: string): Observable<any> {
+		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
+		return this.http.post(url, '')
+		.map((res: Response) => res.json())
+		.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
+		.catch((error: any) => error.json());
+	}
+
 }
