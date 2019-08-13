@@ -6,6 +6,7 @@ import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {EventModel} from '../../../event/model/event.model';
 
 @Component({
 	selector: `bundle-create`,
@@ -18,6 +19,7 @@ export class BundleCreateComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
 	private defaultModel = null;
+	private requiredFields = ['name', 'workflowCode'];
 
 	constructor(
 		private bundleService: BundleService,
@@ -64,6 +66,24 @@ export class BundleCreateComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: BundleModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**
