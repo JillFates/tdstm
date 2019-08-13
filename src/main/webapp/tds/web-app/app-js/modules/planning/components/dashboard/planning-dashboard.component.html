@@ -51,7 +51,7 @@
             <h4>Open Tasks</h4>
             <div>
                 <a [routerLink]="['/taskManager', 'list']"
-                   [queryParams]="{filter: 'openIssue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
+                   [queryParams]="{filter: 'openIssue', moveEvent:0,  justRemaining:1}">
                     {{planningDashboardModel.discovery.activeTasks}} Active {{planningDashboardModel.discovery.activeTasks > 1 ? 'Tasks' : 'Task'}}
                 </a>
             </div>
@@ -120,13 +120,13 @@
                     <tr>
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0, viewUnpublished: 0}">
+                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0}">
                                 {{planningDashboardModel.analysis.activeTasks}}
                             </a>
                         </td>
                         <td>
                             <a [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0, viewUnpublished: 0}">
+                               [queryParams]="{filter: 'analysisIssue', moveEvent:0,  justRemaining:0}">
                                 Active Tasks
                             </a>
                         </td>

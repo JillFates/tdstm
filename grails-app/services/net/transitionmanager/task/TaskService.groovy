@@ -217,7 +217,9 @@ class TaskService implements ServiceMethods {
 			t.api_action_id AS apiActionId,
 			t.api_action_invoked_at AS apiActionInvokedAt,
 			t.api_action_completed_at AS apiActionCompletedAt,
-			aa.action_type AS apiActionType
+			aa.action_type AS apiActionType,
+			aa.name as apiActionName, 
+			aa.description as apiActionDescription
 			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list

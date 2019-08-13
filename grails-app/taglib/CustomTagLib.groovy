@@ -141,6 +141,8 @@ class CustomTagLib implements InitializingBean {
 	 * apiActionInvokedAt - task invoked at
 	 * apiActionCompletedAt - task completed at
 	 * apiActionType - api action type
+	 * apiActionName - api action name
+	 * apiActionDescription - api action description
 	 * id - task id
 	 * status - task status
 	 * onclick - javascript onClick action

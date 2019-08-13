@@ -95,10 +95,12 @@ export class LicenseDetailComponent implements OnInit {
 	 * Save the current status of the License
 	 */
 	protected saveLicense(): void {
-		this.licenseManagerService.saveLicense(this.licenseModel).subscribe((license: any) => {
-			this.editMode = false;
-			this.prepareControlActionButtons();
-		});
+		if (DateUtils.validateDateRange(this.licenseModel.activationDate, this.licenseModel.expirationDate, 'The expiration date must be later than the activation date.')) {
+			this.licenseManagerService.saveLicense(this.licenseModel).subscribe((license: any) => {
+				this.editMode = false;
+				this.prepareControlActionButtons();
+			});
+		}
 	}
 
 	/**

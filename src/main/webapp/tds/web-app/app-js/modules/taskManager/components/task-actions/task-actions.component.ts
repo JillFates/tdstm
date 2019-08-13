@@ -55,7 +55,7 @@ export class TaskActionsComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		console.log('Init');
+		// Silence is golden.
 	}
 
 	/**

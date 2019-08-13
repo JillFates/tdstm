@@ -368,18 +368,16 @@ class AssetComment {
 			return null
 		}
 
-		if (canInvokeOnServer) {
-			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(false, null)
-			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
-			}
-		} else if (canInvokeRemotely) {
-			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action must be invoked from TM Desktop')
-			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return getInvokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
-			}
+		if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${ apiAction.name } started at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
+		} else if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${ apiAction.name } completed at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
+		} else if (!canInvokeRemotely && canInvokeOnServer && status == READY && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
+		} else if (!canInvokeRemotely && canInvokeOnServer && status == STARTED && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
+		} else if (canInvokeRemotely && !canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${apiAction.name}, must be invoked from TM Desktop")
 		}
 
 		return null

@@ -4,6 +4,7 @@ import {EventModel} from '../../model/event.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `event-create`,
@@ -55,23 +56,12 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
+		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
 				}
 			});
-		}
-	}
-
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
 		}
 	}
 

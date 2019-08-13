@@ -91,4 +91,24 @@ export class ObjectUtils {
 	public static isEmpty(obj: any) {
 		return Object.keys(obj).length === 0 && obj.constructor === Object;
 	}
+
+	/**
+	 * Return an object containing just the properties that are not present in the blacklist
+	 * @param {any} properties Object containing the properties to work on
+	 * @param {any} blackList If some property exists in the blacklist  remove it
+	 * @returns {any} Object containing just the properties not present in the black list
+	 */
+	public static excludeProperties(properties: any, blackList: string[]): any {
+		const result = {};
+
+		for (let property in properties) {
+			if (properties.hasOwnProperty(property)) {
+				if (blackList.indexOf(property) === -1) {
+					result[property] = properties[property];
+				}
+			}
+		}
+
+		return result;
+	}
 }

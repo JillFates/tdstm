@@ -60,7 +60,7 @@ class LicensedClient {
 	static constraints = {
 		method         nullable: true
 		activationDate nullable: true
-		expirationDate nullable: true
+		expirationDate nullable: true, validator: LicensedClient.&isExpirationValid
 		requestNote    nullable: true
 		hash           nullable: true
 		bannerMessage  nullable: true
@@ -128,7 +128,14 @@ class LicensedClient {
 		}
 		errors
 	}
-
+	
+	static isExpirationValid (Date expirationDate, LicensedClient licensedClient) {
+		if (licensedClient.activationDate && expirationDate < licensedClient.activationDate) {
+			return false
+		}
+		return true
+	}
+	
 	static LicensedClient fetch(JSONElement json, createIfNotFound = false){
 		Closure dateParser = {String strDate ->
 			if(strDate){
