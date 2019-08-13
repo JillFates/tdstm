@@ -16,6 +16,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleModel: BundleModel = null;
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
+	public moveEvents;
 	public managers;
 	public rooms;
 	public workflowCodes;
@@ -53,6 +54,7 @@ export class BundleViewEditComponent implements OnInit {
 			startTime: '',
 			completionTime: '',
 			projectManagerId: 0,
+			moveEvent: {},
 			moveManagerId: 0,
 			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
@@ -140,7 +142,9 @@ export class BundleViewEditComponent implements OnInit {
 				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
 				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
 				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
 
+				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
 				this.workflowCodes = data.workflowCodes;
@@ -171,24 +175,13 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
 					this.editing = false;
 				}
 			});
-		}
-	}
-
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
 		}
 	}
 

@@ -3,7 +3,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
 import { pathOr } from 'ramda';
 import * as R from  'ramda';
-
+// Store
+import {Store} from '@ngxs/store';
+// Action
+import {SetEvent} from '../../action/event.actions';
 // Services
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
@@ -12,11 +15,9 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { EventsService } from './../../service/events.service';
 import { NewsModel, NewsDetailModel } from './../../model/news.model';
 import { EventModel, EventPlanStatus } from './../../model/event.model';
-
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
 import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
-
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
 
@@ -44,6 +45,7 @@ export class EventDashboardComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
+		private store: Store,
 		private userContextService: UserContextService) {
 	}
 
@@ -71,7 +73,7 @@ export class EventDashboardComponent implements OnInit {
 				this.eventList = eventList;
 				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
 				if (this.selectedEvent) {
-					this.onSelectedEvent(this.selectedEvent.id);
+					this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 				}
 			});
 	}
@@ -89,7 +91,8 @@ export class EventDashboardComponent implements OnInit {
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
 	*/
-	public onSelectedEvent(id: number): void {
+	public onSelectedEvent(id: number, name: string): void {
+		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
 
 		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
@@ -206,6 +209,6 @@ export class EventDashboardComponent implements OnInit {
 	 * On countdown timer timeout, call the on selected method to refresh the report
 	*/
 	public onTimeout(): void {
-		this.onSelectedEvent(this.selectedEvent.id);
+		this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 	}
 }

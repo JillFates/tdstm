@@ -1,6 +1,10 @@
 // Angular
 import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+// Store
+import {Store} from '@ngxs/store';
+// Actions
+import {SetEvent} from '../../action/event.actions';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -57,6 +61,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
+		private store: Store,
 		private preferenceService: PreferenceService) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
@@ -76,7 +81,12 @@ export class EventListComponent implements OnInit, AfterContentInit {
 
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
-			this.showEvent(this.route.snapshot.queryParams['show']);
+			let {id, name} = this.resultSet.find((bundle: any) => {
+				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0);
+			});
+			setTimeout(() => {
+				this.showEvent(id, name);
+			});
 		}
 	}
 
@@ -152,7 +162,13 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		}
 	}
 
-	protected showEvent(id): void {
+	/**
+	 * Open and show the selected Event
+	 * Also it set into the local the new value
+	 * @param id
+	 */
+	protected showEvent(id, name): void {
+		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.dialogService.open(EventViewEditComponent,
 			[{provide: 'id', useValue: id}]).then(result => {
 			this.reloadData();

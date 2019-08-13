@@ -31,6 +31,8 @@ import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.modul
 import { TaskCreateComponent } from '../create/task-create.component';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
+import {Store} from '@ngxs/store';
+import {SetEvent} from '../../../event/action/event.actions';
 
 @Component({
 	selector: 'task-list',
@@ -39,7 +41,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 			<section>
 				<div class="box-body box-with-empty-header">
 					<div class="row top-filters">
-						<div class="col-sm-6">
+						<div class="col-sm-7">
 							<label class="control-label" for="fetch">Event</label>
 							<kendo-dropdownlist
 								style="width: 200px; padding-right: 20px"
@@ -49,7 +51,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								[textField]="'name'"
 								[valueField]="'id'"
 								[(ngModel)]="selectedEvent"
-								(valueChange)="onFiltersChange()">
+								(valueChange)="onEventSelect()">
 							</kendo-dropdownlist>
 							<label for="one">
 								<input
@@ -78,7 +80,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								View Unpublished
 							</label>
 						</div>
-						<div class="col-sm-6 text-right">
+						<div class="col-sm-5 text-right">
 							<tds-button-custom class="btn-primary"
 																 (click)="onViewTaskGraphHandler()"
 																 title="View Task Graph"
@@ -218,17 +220,17 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								<span style="margin-right:16px">Delay for:</span>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 1)">
+									(click)="changeTimeEst(dataItem, 1)">
 									<i class="fa fa-forward"></i>1 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 2)">
+									(click)="changeTimeEst(dataItem, 2)">
 									<i class="fa fa-forward"></i>2 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 7)">
+									(click)="changeTimeEst(dataItem, 7)">
 									<i class="fa fa-forward"></i>7 day
 								</button>
 							</div>
@@ -314,6 +316,7 @@ export class TaskListComponent {
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
+		private store: Store,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
@@ -343,10 +346,11 @@ export class TaskListComponent {
 				this.urlParams = params;
 			});
 
-		this.loading = true;
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
+			this.selectedEvent = userContext.event;
 		});
+		this.loading = true;
 
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
@@ -470,6 +474,14 @@ export class TaskListComponent {
 
 	/**
 	 * On Event select change.
+	 */
+	onEventSelect(): void {
+		this.store.dispatch(new SetEvent({id: this.selectedEvent.id, name: this.selectedEvent.name}));
+		this.onFiltersChange();
+	}
+
+	/**
+	 * On Any other change.
 	 * @param selection: Array<any>
 	 */
 	onFiltersChange($event ?: any) {
@@ -488,46 +500,6 @@ export class TaskListComponent {
 				this.gridComponent.collapseRow(index);
 			}
 		});
-	}
-
-	/**
-	 * On Edit Task Button Handler open the task edit modal.
-	 * @param taskRow: any
-	 */
-	onEditTaskHandler(taskRow: any): void {
-		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
-		this.taskService.getTaskDetails(taskRow.id)
-			.subscribe((res) => {
-				let modelHelper = new TaskEditCreateModelHelper(
-					this.userContext.timezone,
-					this.userContext.dateFormat,
-					this.taskService,
-					this.dialogService,
-					this.translate);
-				taskDetailModel.detail = res;
-				taskDetailModel.modal = {
-					title: 'Task Edit',
-					type: ModalType.EDIT
-				};
-				let model = modelHelper.getModelForDetails(taskDetailModel);
-				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
-				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
-				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.search()
-							} else {
-								this.search(taskRow.id)
-							}
-						}
-					}).catch(result => {
-						console.log(result);
-				});
-			});
 	}
 
 	/**
@@ -569,15 +541,20 @@ export class TaskListComponent {
 			id: taskRow.id,
 			modal: {
 				title: 'Task Detail'
-			},
-			detail: {
-				currentUserId: this.userContext.user.id
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then(() => {
-			// do nothing.
+		]).then((result) => {
+			if (result) {
+				if (result.isDeleted) {
+					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+						this.search();
+					});
+				} else {
+					this.search();
+				}
+			}
 		}).catch(result => {
 			if (result) {
 				this.search();
@@ -586,14 +563,14 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Changes the time estimation of a task.
-	 * @param id: string
+	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
+	 * @param taskRow: any
 	 * @param days: string
 	 */
-	changeTimeEst(id: string, days: string) {
-		this.taskService.changeTimeEst(id, days)
+	changeTimeEst(taskRow: any, days: string) {
+		this.taskService.changeTimeEst(taskRow.id, days)
 			.subscribe(() => {
-				this.search(parseInt(id, 0));
+				taskRow.updatedTime = '0s';
 			});
 	}
 
@@ -710,6 +687,7 @@ export class TaskListComponent {
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;
+				this.search(taskRow.id);
 			});
 	}
 
