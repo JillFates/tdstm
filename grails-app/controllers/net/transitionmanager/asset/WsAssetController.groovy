@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
@@ -31,7 +31,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.utils.Profiler
 import org.quartz.Scheduler
-import org.apache.commons.lang3.BooleanUtils
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 
@@ -52,8 +51,8 @@ class WsAssetController implements ControllerMethods {
 	DeviceService deviceService
 	MoveBundleService moveBundleService
 	PageRenderer groovyPageRenderer
-	Scheduler quartzScheduler
 	ProgressService progressService
+	Scheduler quartzScheduler
 	StorageService storageService
 	UserPreferenceService userPreferenceService
 
@@ -591,6 +590,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetExport)
 	def exportAssets() {
 		Map paramsMap = request.JSON
+		paramsMap.bundle = CollectionUtils.asList(paramsMap.bundle)
 		UserLogin currentUser = securityService.userLogin
 		userPreferenceService.getExportPreferences().each { String preferenceName, String preferenceValue ->
 			if (!paramsMap.containsKey(preferenceName)) {
@@ -609,9 +609,7 @@ class WsAssetController implements ControllerMethods {
 
 		// Delay 2 seconds to allow this current transaction to commit before firing off the job
 		Trigger trigger = new SimpleTriggerImpl("TM-" + key, null, new Date(System.currentTimeMillis() + 2000))
-		trigger.jobDataMap.putAll(params)
-
-		trigger.jobDataMap.bundle = request.getParameterValues("bundle")
+		trigger.jobDataMap.putAll(paramsMap)
 		trigger.jobDataMap.key = key
 		trigger.jobDataMap.username = securityService.currentUsername
 		trigger.jobDataMap.projectId = securityService.userCurrentProjectId
