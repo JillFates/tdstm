@@ -245,7 +245,7 @@ export const en_DICTIONARY: Object = {
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		},
-		'CLEAR_UNDERLAYING_DATA': 'The underlying data will be deleted when you delete the custom field(s).\nPress Yes continue, No to cancel.',
+		'CLEAR_UNDERLAYING_DATA': 'The underlying data will be deleted when you delete the custom {param1}.\nPress Yes to continue, No to cancel.',
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',
@@ -322,6 +322,11 @@ export const en_DICTIONARY: Object = {
 			'\t\t\tyou will receive an email with a reset link. If you do not receive this email,\n' +
 			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
 		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
+	},
+	'COMMENT': {
+		'SHOW_COMMENT': 'Comment Detail',
+		'CREATE_COMMENT': 'Comment Create',
+		'EDIT_COMMENT': 'Comment Edit',
 	},
 	'NOTICE': {
 		'ADMIN': 'Admin',

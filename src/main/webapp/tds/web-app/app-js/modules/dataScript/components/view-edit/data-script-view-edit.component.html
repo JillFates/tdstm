@@ -95,7 +95,7 @@
 		</tds-button-save>
 
 		<tds-button-edit *ngIf="modalType === actionTypes.VIEW" 
-			(click)="changeToEditDataScript()" class="btn-primary pull-left">
+			(click)="changeToEditDataScript()" [disabled]="!isUpdateAvailable()" class="btn-primary pull-left">
 		</tds-button-edit>
 
 		<tds-button-custom *ngIf="modalType === actionTypes.VIEW" [icon]="'eye'"
@@ -103,7 +103,7 @@
 		</tds-button-custom>
 
 		<tds-button-delete *ngIf="modalType !== actionTypes.CREATE" 
-			(click)="onDeleteDataScript()" class="btn-danger">
+			(click)="onDeleteDataScript()" [disabled]="!isDeleteAvailable()" class="btn-danger">
 		</tds-button-delete>
 
 		<tds-button-close *ngIf="modalType === actionTypes.VIEW"

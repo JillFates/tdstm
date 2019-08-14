@@ -7,6 +7,7 @@ import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/
 import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `bundle-view-edit-component`,
@@ -70,6 +71,16 @@ export class BundleViewEditComponent implements OnInit {
 	@HostListener('window:popstate', ['$event'])
 	onPopState(event) {
 		this.activeDialog.close()
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	public confirmDeleteBundle() {

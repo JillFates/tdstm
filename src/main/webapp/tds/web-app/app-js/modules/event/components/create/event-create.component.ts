@@ -1,10 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {EventsService} from '../../service/events.service';
 import {EventModel} from '../../model/event.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
@@ -43,6 +44,16 @@ export class EventCreateComponent implements OnInit {
 			apiActionBypass: false
 		};
 		this.eventModel = Object.assign({}, this.defaultModel, this.eventModel);
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	private getModel() {

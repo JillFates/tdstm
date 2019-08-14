@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {EventsService} from '../../service/events.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -7,6 +7,7 @@ import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/
 import {EventModel} from '../../model/event.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `event-view-edit-component`,
@@ -55,6 +56,16 @@ export class EventViewEditComponent implements OnInit {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.eventModel = Object.assign({}, defaultEvent, this.eventModel);
 		this.getModel(this.eventId);
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	public confirmDeleteEvent() {

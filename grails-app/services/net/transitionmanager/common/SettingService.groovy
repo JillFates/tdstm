@@ -105,6 +105,7 @@ class SettingService implements ServiceMethods {
                 if (setting.key == AssetClass.APPLICATION.name()) {
                     settingMap.put(PLAN_METHODOLOGY_KEY, setting.project.planMethodology)
                 }
+                fixEmptyConstraints(settingMap)
                 return settingMap
             } catch (Exception e) {
                 log.error(e.message, e)
@@ -206,6 +207,25 @@ class SettingService implements ServiceMethods {
         if (jsonObject.containsKey(FIELDS_KEY)) {
             jsonObject.get(FIELDS_KEY).each { Map<String, ?> field ->
                 field.put(LABEL_KEY, StringUtils.trim(field[LABEL_KEY] as String))
+            }
+        }
+    }
+
+    /**
+     * This method fixes the field.constraints.values from having repeated values
+     * @param settingMap
+     * @return
+     */
+    private void fixEmptyConstraints(Map<String, ?> settingMap) {
+        println settingMap.size()
+        settingMap?.fields?.each { Map<String, Map<String, List<String>>> field ->
+            List<String> values = field.constraints?.values
+            if ( values ) {
+                Set newValues = new HashSet()
+                for (v in values) {
+                    newValues << StringUtils.trim(v)
+                }
+                field.constraints.values = newValues.toList()
             }
         }
     }

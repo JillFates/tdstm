@@ -56,6 +56,7 @@ class FieldSpec {
 	Boolean separator
 	Boolean allowNegative
 	Integer required
+	Boolean shared
 
 	@CompileStatic(TypeCheckingMode.SKIP)
 	FieldSpec(Map fieldSpecMap) {
@@ -70,6 +71,7 @@ class FieldSpec {
 		this.separator = fieldSpecMap.constraints.separator
 		this.allowNegative = fieldSpecMap.constraints.allowNegative
 		this.required = fieldSpecMap.constraints.required
+		this.shared = StringUtil.toBoolean(fieldSpecMap.shared)
 	}
 
 	/**
