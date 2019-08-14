@@ -1,10 +1,10 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, Renderer2} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {BundleModel} from '../../model/bundle.model';
-import {Router} from '@angular/router';
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
@@ -43,6 +43,16 @@ export class BundleCreateComponent implements OnInit {
 			useForPlanning: false,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	private getModel() {
