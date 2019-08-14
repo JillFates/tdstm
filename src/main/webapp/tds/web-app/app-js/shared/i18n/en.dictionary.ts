@@ -323,6 +323,11 @@ export const en_DICTIONARY: Object = {
 			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
 		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
 	},
+	'COMMENT': {
+		'SHOW_COMMENT': 'Comment Detail',
+		'CREATE_COMMENT': 'Comment Create',
+		'EDIT_COMMENT': 'Comment Edit',
+	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',
