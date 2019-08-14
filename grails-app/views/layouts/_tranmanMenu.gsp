@@ -97,9 +97,11 @@
                                     <g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-projects-field-settings">
-                                <g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link>
-                            </li>
+                            <tds:hasPermission permission="${Permission.UserSendActivations}">
+                                <li class="menu-child-item menu-projects-field-settings">
+                                    <g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <li class="menu-child-item menu-projects-tags">
                                 <g:link class="mmlink" controller="module" action="tag" id="list">
                                     Tags
