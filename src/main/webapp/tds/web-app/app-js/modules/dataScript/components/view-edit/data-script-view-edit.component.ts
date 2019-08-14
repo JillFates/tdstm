@@ -242,5 +242,5 @@ export class DataScriptViewEditComponent implements OnInit {
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
-	} 
+	}
 }

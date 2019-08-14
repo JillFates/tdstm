@@ -436,9 +436,9 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 
 	protected canLoadSampleData(): boolean {
 		return this.permissionService.hasPermission(Permission.ETLScriptLoadSampleData);
-	} 
+	}
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
-	} 
+	}
 }

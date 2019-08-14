@@ -254,5 +254,5 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
-	} 
+	}
 }
