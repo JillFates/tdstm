@@ -94,13 +94,13 @@
                     <li class="menu-child-item ">
                         <a [routerLink]="['/provider','list']">Providers</a>
                     </li>
-                    <li class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.CredentialView)" class="menu-child-item ">
                         <a [routerLink]="['/credential','list']">Credentials</a>
                     </li>
                     <li class="menu-child-item ">
                         <a [routerLink]="['/datascript','list']">ETL Scripts</a>
                     </li>
-                    <li class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.ActionEdit)" class="menu-child-item ">
                         <a [routerLink]="['/action','list']">Actions</a>
                     </li>
                 </ul>

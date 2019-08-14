@@ -72,6 +72,7 @@ interface Permission {
 			ETLScriptDelete               = "ETLScriptDelete",
 			ETLScriptUpdate               = "ETLScriptUpdate",
 			ETLScriptView                 = "ETLScriptView",
+			ETLScriptLoadSampleData       = "ETLScriptLoadSampleData",
 			EventChangeStatus             = 'EventChangeStatus',
 			EventCreate                   = 'EventCreate',
 			EventDashboardDialOverride    = 'EventDashboardDialOverride',

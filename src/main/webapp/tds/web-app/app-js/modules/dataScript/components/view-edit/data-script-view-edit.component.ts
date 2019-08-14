@@ -8,12 +8,14 @@ import 'rxjs/add/operator/mergeMap';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService, UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import { DataScriptModel, ActionType, DataScriptMode } from '../../model/data-script.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
 import { DataScriptService } from '../../service/data-script.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-builder.component';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {Permission} from '../../../../shared/model/permission.model';
 
 const DEBOUNCE_MILLISECONDS = 800;
 @Component({
@@ -49,7 +51,8 @@ export class DataScriptViewEditComponent implements OnInit {
 		private prompt: UIPromptService,
 		private dataIngestionService: DataScriptService,
 		private dialogService: UIDialogService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private permissionService: PermissionService) {
 
 		this.dataScriptModel = Object.assign({}, this.originalModel);
 		this.getProviders();
@@ -231,5 +234,13 @@ export class DataScriptViewEditComponent implements OnInit {
 				}
 			})
 			.catch(error => console.log('Cancel datascript designer'));
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderDelete);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderUpdate);
 	}
 }
