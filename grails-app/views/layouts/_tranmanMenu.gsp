@@ -116,21 +116,25 @@
                                 Providers
                             </g:link>
                         </li>
-                        <li class="menu-child-item ">
-                            <g:link class="mmlink" controller="module" action="credential" id="list">
-                                Credentials
-                            </g:link>
-                        </li>
+                         <tds:hasPermission permission="${Permission.CredentialView}">
+                            <li class="menu-child-item ">
+                                <g:link class="mmlink" controller="module" action="credential" id="list">
+                                    Credentials
+                                </g:link>
+                            </li>
+                        </tds:hasPermission>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="datascript" id="list">
                                 ETL Scripts
                             </g:link>
                         </li>
-                        <li class="menu-child-item ">
-                            <g:link class="mmlink" controller="module" action="action" id="list">
-                                Actions
-                            </g:link>
-                        </li>
+                        <tds:hasPermission permission="${Permission.ActionEdit}">
+                            <li class="menu-child-item ">
+                                <g:link class="mmlink" controller="module" action="action" id="list">
+                                    Actions
+                                </g:link>
+                            </li>
+                        </tds:hasPermission>
                     </ul>
                 </li>
                 <li class="dropdown menu-parent-data-centers">
