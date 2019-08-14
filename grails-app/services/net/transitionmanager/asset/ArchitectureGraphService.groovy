@@ -81,7 +81,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 */
 	@TailRecursive
 	@CompileDynamic
-	boolean buildArchitectureGraph(List<Long> assetIds, Integer level, Set<Map> assetsList, Set<Map> dependencyList) {
+	boolean buildArchitectureGraph(List<Long> assetIds, Integer level, Set<Map> assetsList, Set<Map> dependencyList, boolean levelsDown = true) {
 
 		List<Map> assets = AssetEntity.createCriteria().list {
 			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
@@ -101,8 +101,9 @@ class ArchitectureGraphService implements ServiceMethods {
 			List<Map> dependencies = AssetDependency.createCriteria().list {
 				resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 
-				or {
+				if(levelsDown) {
 					'in'('asset.id', assetIds)
+				}else {
 					'in'('dependent.id', assetIds)
 				}
 
@@ -123,7 +124,7 @@ class ArchitectureGraphService implements ServiceMethods {
 				return true
 			}
 
-			buildArchitectureGraph(assetsForNextLevel, level - 1, assetsList, dependencyList)
+			buildArchitectureGraph(assetsForNextLevel, level - 1, assetsList, dependencyList, levelsDown)
 		}
 	}
 
