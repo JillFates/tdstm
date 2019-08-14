@@ -139,18 +139,15 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
 				this.client = data.client;
-				this.projectLogoId = data.projectLogoForProject.id;
-				this.projectModel.clientId = data.client.id;
-				this.projectGUID = data.projectInstance.guid;
-				this.dateCreated = data.projectInstance.dateCreated;
-				this.lastUpdated = data.projectInstance.lastUpdated;
+				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
+				this.projectModel.clientId = data.client ? data.client.id : 0;
+				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
+				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
+				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
 				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle.name : '';
 				this.projectModel.projectLogo = data.projectLogoForProject;
-				this.projectModel.projectName = data.projectInstance.name;
+				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
-				//this.managers = data.managers;
-				//this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				//this.workflowCodes = data.workflowCodes;
 
 				this.updateSavedFields();
 			});

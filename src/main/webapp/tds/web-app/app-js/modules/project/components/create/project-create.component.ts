@@ -62,6 +62,10 @@ export class ProjectCreateComponent implements OnInit {
 			planMethodology: 'Migration Method'
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
+		this.file.uploadRestrictions = {
+			allowedExtensions: ['.jpg', '.png', '.gif'],
+			maxFileSize: 5000000
+		};
 	}
 
 	private getModel() {
@@ -120,12 +124,12 @@ export class ProjectCreateComponent implements OnInit {
 
 	public completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
-		if (response.operation === 'delete') { // file deleted successfully
+		if (response && response.operation === 'delete') { // file deleted successfully
 			// console.log(response.data);
 			this.clearFilename();
 			this.file.fileUID = null;
-		} else if (response.filename) { // file uploaded successfully
-			let filename = response.filename;
+		} else if (e.files[0]) { // file uploaded successfully
+			let filename = e.files[0].name;
 			this.fetchResult = { status: 'success', filename: filename };
 			this.fetchInputUsed = 'file';
 		} else {

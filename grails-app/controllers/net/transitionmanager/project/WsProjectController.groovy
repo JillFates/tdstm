@@ -203,6 +203,7 @@ class WsProjectController implements ControllerMethods {
 							name: requestParams.projectName,
 					        projectCode: requestParams.projectCode,
 							description: requestParams.description,
+							comment: requestParams.comment,
 							startDate: requestParams.startDate,
 							completionDate: requestParams.completionDate,
 							workflowCode: requestParams.workflowCode,
@@ -212,7 +213,7 @@ class WsProjectController implements ControllerMethods {
 					]
 			)
 
-			def partnersIds = requestParams.projectPartners
+			def partnersIds = requestParams.partnerIds
 			params.projectLogo = requestParams.projectLogo
 
 			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
