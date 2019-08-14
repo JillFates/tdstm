@@ -7,6 +7,7 @@ import {DataScriptService} from '../../service/data-script.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+
 // Components
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {DataScriptViewEditComponent} from '../view-edit/data-script-view-edit.component';
@@ -20,6 +21,7 @@ import {
 } from '../../model/data-script.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {UserContextModel} from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-grid';
@@ -253,4 +255,16 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
 	}
+
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ETLScriptCreate);
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderDelete);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	} 
 }
