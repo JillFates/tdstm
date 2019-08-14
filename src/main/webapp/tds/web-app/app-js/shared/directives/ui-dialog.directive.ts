@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 
 import { NotifierService } from '../services/notifier.service';
-import { UIActiveDialogService } from '../services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../services/ui-dialog.service';
 import { ComponentCreatorService } from '../services/component-creator.service';
 
 declare var jQuery: any;
@@ -48,7 +48,11 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	replaceNotifier: any;
 	extraNotifier: any;
 
-	constructor(private notifierService: NotifierService, private activeDialog: UIActiveDialogService, private compCreator: ComponentCreatorService) {
+	constructor(
+		private notifierService: NotifierService,
+		private activeDialog: UIActiveDialogService,
+		private compCreator: ComponentCreatorService,
+		private dialogService: UIDialogService) {
 		this.registerListeners();
 	}
 
@@ -166,6 +170,14 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 
 				this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 				this.activeDialog.componentInstance = this.cmpRef;
+			} else {
+				// This should not happens, but it is a safe guard, will be replaced the return function by the storage
+				this.dialogService.open(event.component, event.params,
+					event.size).then(x => {
+					// -
+				}).catch(x => {
+					// -
+				});
 			}
 		});
 
