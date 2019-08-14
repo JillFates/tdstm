@@ -125,15 +125,29 @@ export class APIActionParameterColumnModel {
 	}
 }
 
+export const EVENT_DEFAULT_TEXT_SCRIPT = `// Put the task on hold and add a comment with the cause of the error
+ task.error( response.stderr )
+`;
+export const EVENT_DEFAULT_TEXT_WEB_API = `// Put the task on hold and add a comment with the cause of the error
+ task.error( response.error )
+//If you are using TMD to run the web API use this reaction script instead, of the default above.
+//task.error( response.stderr )
+`;
+export const EVENT_DEFAULT_ERROR_SCRIPT = `// Put the task on hold and add a comment with the cause of the error
+ task.error( response.stderr )`;
+export const EVENT_DEFAULT_ERROR_WEB_API = `// Put the task on hold and add a comment with the cause of the error
+ task.error( response.error )
+//If you are using TMD to run the web API use this reaction script instead, of the default above.
+//task.error( response.stderr )
+`;
+
 export const EVENT_STATUS_TEXT = '// Check the HTTP response code for a 200 OK \n if (response.status == SC.OK) { \n \t return SUCCESS \n } else { \n \t return ERROR \n}';
 export const EVENT_SUCCESS_TEXT = '// Update the task status that the task completed\n task.done()';
-export const EVENT_DEFAULT_TEXT = '// Put the task on hold and add a comment with the cause of the error\n task.error( response.stderr )';
 export const EVENT_BEFORE_CALL_TEXT  = `// Setting Content Type, default 'application/json'
 // request.config.setProperty('Content-Type', 'text/csv')
 
 // Setting content type Accepted, default 'application/json'
 // request.config.setProperty('Accept', 'application/xml;q=0.9')`;
-export const EVENT_DEFAULT_ERROR = '// Put the task on hold and add a comment with the cause of the error\n task.error( response.stderr )';
 export enum APIActionType {
 	HTTP_API = 1,
 	SCRIPT
@@ -227,12 +241,17 @@ export class APIActionModel {
 		APIActionModel.createBasicReactions(this);
 	}
 
-	public static createBasicReactions(apiActionModel: APIActionModel): void {
+	/**
+	 * Base upon the action type creates the corresponding basic reactions
+	 * @param {APIActionModel} apiActionModel
+	 * @param {boolean} isWebAPI
+	 */
+	public static createBasicReactions(apiActionModel: APIActionModel, isWebAPI = false): void {
 		apiActionModel.eventReactions = [];
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, EVENT_STATUS_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, EVENT_SUCCESS_TEXT));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, EVENT_DEFAULT_TEXT));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, EVENT_DEFAULT_ERROR));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, isWebAPI ? EVENT_DEFAULT_TEXT_WEB_API : EVENT_DEFAULT_TEXT_SCRIPT));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, isWebAPI ? EVENT_DEFAULT_ERROR_WEB_API : EVENT_DEFAULT_ERROR_SCRIPT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
