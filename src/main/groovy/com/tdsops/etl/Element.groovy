@@ -940,9 +940,16 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of {@code Element}
 	 */
 	Element ceil() {
-		if (NumberUtil.isDouble(this.value)) {
-			this.value = Math.ceil(this.value as Double)
+
+		if (!this.value) {
+			return this
 		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+		}
+
+		this.value = Math.ceil(this.value as Double)
 		checkLoadedElement()
 		return this
 	}
@@ -1029,9 +1036,16 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of {@code Element}
 	 */
 	Element floor() {
-		if (NumberUtil.isDouble(this.value) || NumberUtil.isFloat(this.value)) {
-			this.value = Math.floor(this.value as Double)
+
+		if (!this.value) {
+			return this
 		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+		}
+
+		this.value = Math.floor(this.value as Double)
 		checkLoadedElement()
 		return this
 	}
@@ -1045,64 +1059,26 @@ class Element implements RangeChecker, ETLCommand {
 	 * @param otherValue
 	 * @return current instance of {@code Element}
 	 */
-	Element min(int otherValue) {
-		if (NumberUtil.isInteger(this.value)) {
-			this.value = Math.min(this.value as Integer, otherValue)
+	Element min(Number otherValue) {
+
+		if (!this.value || !otherValue) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+		}
+
+		Double a = this.value as Double
+		Double b = otherValue as Double
+		Double min = Math.min(a, b)
+		if (min == b) {
+			this.value = otherValue
 		}
 		checkLoadedElement()
 		return this
 	}
 
-	/**
-	 * Perform {@code Math#min} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10l) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Long} value
-	 * @return current instance of {@code Element}
-	 */
-	Element min(long otherValue) {
-		if (NumberUtil.isLong(this.value)) {
-			this.value = Math.min(this.value as Long, otherValue)
-		}
-		checkLoadedElement()
-		return this
-	}
-
-	/**
-	 * Perform {@code Math#min} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10d) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Double} value
-	 * @return current instance of {@code Element}
-	 */
-	Element min(double otherValue) {
-		if (NumberUtil.isDouble(this.value)) {
-			this.value = Math.min(this.value as Double, otherValue)
-		}
-		checkLoadedElement()
-		return this
-	}
-
-	/**
-	 * Perform {@code Math#min} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10.10f) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Float} value
-	 * @return current instance of {@code Element}
-	 */
-	Element min(float otherValue) {
-		if (NumberUtil.isFloat(this.value)) {
-			this.value = Math.min(this.value as Float, otherValue)
-		}
-		checkLoadedElement()
-		return this
-	}
 	/**
 	 * Perform {@code Math#max} over {@code Element#value}
 	 * <code>
@@ -1112,60 +1088,21 @@ class Element implements RangeChecker, ETLCommand {
 	 * @param otherValue
 	 * @return current instance of {@code Element}
 	 */
-	Element max(int otherValue) {
-		if (NumberUtil.isInteger(this.value)) {
-			this.value = Math.max(this.value as Integer, otherValue)
-		}
-		checkLoadedElement()
-		return this
-	}
+	Element max(Number otherValue) {
 
-	/**
-	 * Perform {@code Math#max} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10l) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Long} value
-	 * @return current instance of {@code Element}
-	 */
-	Element max(long otherValue) {
-		if (NumberUtil.isLong(this.value)) {
-			this.value = Math.max(this.value as Long, otherValue)
+		if (!this.value || !otherValue) {
+			return this
 		}
-		checkLoadedElement()
-		return this
-	}
 
-	/**
-	 * Perform {@code Math#max} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10d) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Double} value
-	 * @return current instance of {@code Element}
-	 */
-	Element max(double otherValue) {
-		if (NumberUtil.isDouble(this.value)) {
-			this.value = Math.max(this.value as Double, otherValue)
+		if (!Number.isAssignableFrom(this.value.class)) {
+			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
 		}
-		checkLoadedElement()
-		return this
-	}
 
-	/**
-	 * Perform {@code Math#max} over {@code Element#value}
-	 * <code>
-	 * extract 'CPU Utilization' transform with min(10.10f) load 'CPU Load'
-	 * </code>
-	 *
-	 * @param otherValue a {@code Float} value
-	 * @return current instance of {@code Element}
-	 */
-	Element max(float otherValue) {
-		if (NumberUtil.isFloat(this.value)) {
-			this.value = Math.max(this.value as Float, otherValue)
+		Double a = this.value as Double
+		Double b = otherValue as Double
+		Double max = Math.max(a, b)
+		if (max == b) {
+			this.value = otherValue
 		}
 		checkLoadedElement()
 		return this

@@ -126,20 +126,20 @@ class ElementSpec extends Specification {
 			new Element(value: value).ceil().value == transformedValue
 
 		where:
-			value     || transformedValue
-			10.5d     || 11
-			10.1d     || 11.0d
-			-20.18d   || -20
-			-20.68d   || -20.0d
-			'10.5d'   || 11
-			'10.3d'   || 11.0d
-			'-20.98d' || -20.0d
-			4.5f      || 4.5f
-			-4.9f     || -4.9f
-			'5.4321'  || 6
-			'-5.4321' || -5
-			'FOO BAR' || 'FOO BAR'
-			null      || null
+			value   || transformedValue
+			10      || 10
+			10d     || 10d
+			10f     || 10f
+			10.5    || 11
+			10.6d   || 11
+			10.7f   || 11
+			10.5d   || 11
+			10.1d   || 11.0d
+			-20.18d || -20
+			-20.68d || -20.0d
+			-21.69f || -21.0f
+			-4.9f   || -4f
+			null    || null
 	}
 
 	@Unroll
@@ -149,20 +149,16 @@ class ElementSpec extends Specification {
 			new Element(value: value).floor().value == transformedValue
 
 		where:
-			value     || transformedValue
-			10.5d     || 10
-			10.1d     || 10
-			-20.18d   || -21
-			-20.68d   || -21
-			'10.5d'   || 10
-			'10.3d'   || 10
-			'-20.98d' || -21
-			4.5f      || 4f
-			-4.9f     || -5.0f
-			'5.4321'  || 5.0d
-			'-5.4321' || -6
-			'FOO BAR' || 'FOO BAR'
-			null      || null
+			value   || transformedValue
+			10.5d   || 10
+			10.1d   || 10
+			10.1f   || 10
+			10.1    || 10
+			-20.18d || -21
+			-20.68d || -21
+			4.5f    || 4f
+			-4.9f   || -5.0f
+			null    || null
 	}
 
 	@Unroll
@@ -172,18 +168,21 @@ class ElementSpec extends Specification {
 			new Element(value: value).min(otherValue).value == transformedValue
 
 		where:
-			value     | otherValue || transformedValue
-			10        | 20         || 10
-			'10'      | 20         || 10
-			20        | 10         || 10
-			'20'      | 10         || 10
-			-10       | -20        || -20
-			-20       | -10        || -20
-			10        | 20.20d     || 10
-			20.20d    | 10         || 20.20d
-			10.45f    | 20.20f     || 10.45f
-			20.20f    | 10.54f     || 10.54f
-			'FOO BAR' | 20         || 'FOO BAR'
+			value  | otherValue || transformedValue
+			10     | 20         || 10
+			10.11  | 20.11      || 10.11
+			20     | 10         || 10
+			20.12  | 10.12      || 10.12
+			20.13f | 10.12      || 10.12
+			20.14d | 10.12d     || 10.12d
+			20.13f | 10.12f     || 10.12f
+			20.14d | 10.12      || 10.12
+			20l    | 10         || 10l
+			-10l   | -20l       || -20l
+			-20    | -10        || -20
+			10     | 20.20d     || 10
+			null   | 20.44      || null
+			20.44  | null       || 20.44
 	}
 
 	@Unroll
@@ -193,16 +192,20 @@ class ElementSpec extends Specification {
 			new Element(value: value).max(otherValue).value == transformedValue
 
 		where:
-			value     | otherValue || transformedValue
-			10        | 20         || 20
-			20        | 10         || 20
-			10.1d     | 20.10d     || 20.10d
-			20.10d    | 10.10d     || 20.10d
-			10.1f     | 20.10f     || 20.10f
-			20.10f    | 10.10f     || 20.10f
-			-10       | -20        || -10
-			-20       | -10        || -10
-			'FOO BAR' | 20         || 'FOO BAR'
+			value  | otherValue || transformedValue
+			10     | 20.1       || 20.1
+			10     | 20.2f      || 20.2f
+			10     | 20.3d      || 20.3d
+			10     | 20l        || 20l
+			21     | 10         || 21
+			10.1d  | 20.10d     || 20.10d
+			20.10d | 10.10d     || 20.10d
+			10.1f  | 20.10f     || 20.10f
+			20.10f | 10.10f     || 20.10f
+			-10    | -20        || -10
+			-20    | -10        || -10
+			15.34  | null       || 15.34
+			null   | 15.34      || null
 	}
 
 	void 'test can use java.lang.Math.random transformation'() {
