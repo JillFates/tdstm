@@ -7,6 +7,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class TagsDeletionSpec extends GebReportingSpec {
     static testCount
@@ -22,6 +24,8 @@ class TagsDeletionSpec extends GebReportingSpec {
     static maxNumberOfBulkTagsToBeDeleted = 3 // custom E2E tags to remove in workaround test
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

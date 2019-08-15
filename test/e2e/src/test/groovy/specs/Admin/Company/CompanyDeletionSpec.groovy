@@ -7,6 +7,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * @author ingrid
  */
@@ -18,6 +20,8 @@ class CompanyDeletionSpec extends GebReportingSpec {
     static baseName = "QAE2E"
     static companyName =""
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()
