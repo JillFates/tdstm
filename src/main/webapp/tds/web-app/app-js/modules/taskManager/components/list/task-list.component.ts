@@ -1,6 +1,8 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import { Observable } from 'rxjs/Observable';
 import {
 	CellClickEvent,
 	DetailCollapseEvent,
@@ -22,13 +24,16 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
-import { clone } from 'ramda';
+import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskCreateComponent } from '../create/task-create.component';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
+import {Store} from '@ngxs/store';
+import {SetEvent} from '../../../event/action/event.actions';
 
 @Component({
 	selector: 'task-list',
@@ -37,7 +42,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 			<section>
 				<div class="box-body box-with-empty-header">
 					<div class="row top-filters">
-						<div class="col-sm-6">
+						<div class="col-sm-7">
 							<label class="control-label" for="fetch">Event</label>
 							<kendo-dropdownlist
 								style="width: 200px; padding-right: 20px"
@@ -47,7 +52,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								[textField]="'name'"
 								[valueField]="'id'"
 								[(ngModel)]="selectedEvent"
-								(valueChange)="onFiltersChange()">
+								(valueChange)="onEventSelect()">
 							</kendo-dropdownlist>
 							<label for="one">
 								<input
@@ -76,7 +81,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								View Unpublished
 							</label>
 						</div>
-						<div class="col-sm-6 text-right">
+						<div class="col-sm-5 text-right">
 							<tds-button-custom class="btn-primary"
 																 (click)="onViewTaskGraphHandler()"
 																 title="View Task Graph"
@@ -216,17 +221,17 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 								<span style="margin-right:16px">Delay for:</span>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 1)">
+									(click)="changeTimeEst(dataItem, 1)">
 									<i class="fa fa-forward"></i>1 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 2)">
+									(click)="changeTimeEst(dataItem, 2)">
 									<i class="fa fa-forward"></i>2 day
 								</button>
 								<button
 									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem.id, 7)">
+									(click)="changeTimeEst(dataItem, 7)">
 									<i class="fa fa-forward"></i>7 day
 								</button>
 							</div>
@@ -288,6 +293,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	private readonly allEventsOption = { id: 0, name: 'All Events' };
+	private urlParams = {};
 	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	selectedEvent = this.allEventsOption;
 	justRemaining: boolean;
@@ -311,41 +317,68 @@ export class TaskListComponent {
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
+		private store: Store,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
-		private translate: TranslatePipe) {
+		private translate: TranslatePipe,
+		private activatedRoute: ActivatedRoute) {
 		this.onLoad();
+	}
+
+	/**
+	 * Verifies the presence of the filter passed in the url,
+	 * if it exists returns the url filter value, otherwise returns the user preference value
+	 * @param {string} paramName  Name of the parameter received in the url
+	 * @param {string} preferenceKey  Name of user preference key
+	*/
+	private getUrlParamOrUserPreference(paramName: string, preferenceKey: string): Observable<any> {
+		return  hasIn(paramName, this.urlParams) ?
+			Observable.of(this.urlParams[paramName]) :
+			this.userPreferenceService.getSinglePreference(preferenceKey);
 	}
 
 	/**
 	 * Load all the user preferences to populate the task manager grid.
 	 */
 	private onLoad(): void {
-		this.loading = true;
+		/* ge the parameters passed by the url */
+		this.activatedRoute.queryParams
+			.subscribe(params => {
+				this.urlParams = params;
+			});
+
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
+			this.selectedEvent = userContext.event;
 		});
+		this.loading = true;
+
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
+			this.getUrlParamOrUserPreference('moveEvent', PREFERENCES_LIST.CURRENT_EVENT_ID),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.VIEW_UNPUBLISHED),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.JUST_REMAINING)
+			this.getUrlParamOrUserPreference('viewUnpublished', PREFERENCES_LIST.VIEW_UNPUBLISHED),
+			this.getUrlParamOrUserPreference('justRemaining', PREFERENCES_LIST.JUST_REMAINING),
 		);
 		observables.subscribe({
 				next: value => {
-					// Custom Columns, TaskPref value[0]
-					this.buildCustomColumns(value[0].customColumns, value[0].assetCommentFields);
-					// Current event, value[1]
-					this.loadEventListAndSearch(value[1]);
-					// Task list size, value[2]
-					this.pageSize = value[2] ? parseInt(value[2], 0) : GRID_DEFAULT_PAGE_SIZE;
-					// Task Refresh Timer, value[3]
-					// Task View Unpublished, value[4]
-					this.viewUnpublished = value[4] ? value[4] === 'true' : false;
-					// Just Remaining, value [5]
-					this.justRemaining = value[5] ? value[5] === '1' : false;
+					const [custom, currentEventId, listSize, unpublished, justRemaining] = value;
+
+					// Custom Columns, TaskPref
+					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
+					// Current event
+					this.loadEventListAndSearch(currentEventId);
+					// Task list size
+					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					// Task View Unpublished
+					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
+					// Just Remaining
+					this.justRemaining = justRemaining ? justRemaining === '1' : false;
+
+					// params were transferred to local properties,
+					// we can remove them from the parameters object
+					// and leave only the parameters which are not handled by local properties
+					this.urlParams = ObjectUtils.excludeProperties(this.urlParams, ['moveEvent', 'justRemaining', 'viewUnpublished']);
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -399,13 +432,29 @@ export class TaskListComponent {
 	 */
 	private search(taskId ?: number): void {
 		this.loading = true;
-		this.taskService.getTaskList(this.selectedEvent.id, this.justRemaining, this.justMyTasks, this.viewUnpublished).subscribe(result => {
-			this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
-			this.rowsExpandedMap = {};
-			this.rowsExpanded = false;
-			this.loading = false;
-			setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
-		});
+
+		// Set the default filter values
+		const defaultFilters = {
+			moveEvent: this.selectedEvent.id,
+			justRemaining: this.justRemaining ? 1 : 0,
+			justMyTasks: this.justMyTasks ? 1 : 0,
+			viewUnpublished: this.viewUnpublished ? 1 : 0,
+			sord: 'asc',
+		};
+
+		// Append url filters, in case they were not present in the default filters
+		const filters: any = Object.assign({}, defaultFilters, this.urlParams);
+		// moveEvent should be string for all events
+		filters['moveEvent'] = filters.moveEvent === 0 ? '0' : filters.moveEvent;
+
+		this.taskService.getTaskList(filters)
+			.subscribe(result => {
+				this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
+				this.rowsExpandedMap = {};
+				this.rowsExpanded = false;
+				this.loading = false;
+				setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
+			});
 	}
 
 	/**
@@ -426,6 +475,14 @@ export class TaskListComponent {
 
 	/**
 	 * On Event select change.
+	 */
+	onEventSelect(): void {
+		this.store.dispatch(new SetEvent({id: this.selectedEvent.id, name: this.selectedEvent.name}));
+		this.onFiltersChange();
+	}
+
+	/**
+	 * On Any other change.
 	 * @param selection: Array<any>
 	 */
 	onFiltersChange($event ?: any) {
@@ -444,46 +501,6 @@ export class TaskListComponent {
 				this.gridComponent.collapseRow(index);
 			}
 		});
-	}
-
-	/**
-	 * On Edit Task Button Handler open the task edit modal.
-	 * @param taskRow: any
-	 */
-	onEditTaskHandler(taskRow: any): void {
-		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
-		this.taskService.getTaskDetails(taskRow.id)
-			.subscribe((res) => {
-				let modelHelper = new TaskEditCreateModelHelper(
-					this.userContext.timezone,
-					this.userContext.dateFormat,
-					this.taskService,
-					this.dialogService,
-					this.translate);
-				taskDetailModel.detail = res;
-				taskDetailModel.modal = {
-					title: 'Task Edit',
-					type: ModalType.EDIT
-				};
-				let model = modelHelper.getModelForDetails(taskDetailModel);
-				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
-				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
-				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
-					{ provide: TaskDetailModel, useValue: clone(model) }
-				], false, false)
-					.then(result => {
-						if (result) {
-							if (result.isDeleted) {
-								this.search()
-							} else {
-								this.search(taskRow.id)
-							}
-						}
-					}).catch(result => {
-						console.log(result);
-				});
-			});
 	}
 
 	/**
@@ -525,15 +542,20 @@ export class TaskListComponent {
 			id: taskRow.id,
 			modal: {
 				title: 'Task Detail'
-			},
-			detail: {
-				currentUserId: this.userContext.user.id
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then(() => {
-			// do nothing.
+		]).then((result) => {
+			if (result) {
+				if (result.isDeleted) {
+					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+						this.search();
+					});
+				} else {
+					this.search();
+				}
+			}
 		}).catch(result => {
 			if (result) {
 				this.search();
@@ -542,14 +564,14 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Changes the time estimation of a task.
-	 * @param id: string
+	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
+	 * @param taskRow: any
 	 * @param days: string
 	 */
-	changeTimeEst(id: string, days: string) {
-		this.taskService.changeTimeEst(id, days)
+	changeTimeEst(taskRow: any, days: string) {
+		this.taskService.changeTimeEst(taskRow.id, days)
 			.subscribe(() => {
-				this.search(parseInt(id, 0));
+				taskRow.updatedTime = '0s';
 			});
 	}
 
@@ -666,6 +688,7 @@ export class TaskListComponent {
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;
+				this.search(taskRow.id);
 			});
 	}
 

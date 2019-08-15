@@ -6,6 +6,8 @@ import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This script deletes excess number of ETL Scripts
  * @ingrid
@@ -22,6 +24,8 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
     static success=true
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

@@ -1,4 +1,4 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="bundle-create-component modal-content" id="bundle-create-component">
+<div tds-autofocus class="bundle-create-component modal-content" id="bundle-create-component">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -92,7 +92,7 @@
         </div>
     </div>
     <div class="buttons modal-footer">
-        <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+        <tds-button-save [disabled]="!validateRequiredFields(bundleModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
         <tds-button-close class="pull-right" (click)="cancelCloseDialog()"></tds-button-close>
     </div>
 </div>

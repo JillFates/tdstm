@@ -6,9 +6,10 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {EventsService} from '../../service/events.service';
+import {DisplayOptionGeneric, DisplayOptionUser} from '../../model/news.model';
 
 // Model
-import {NewsDetailModel} from '../../model/news.model';
+import {NewsDetailModel, CommentType, DisplayOptions} from '../../model/news.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -17,6 +18,10 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 	templateUrl: 'news-create-edit.component.html'
 })
 export class NewsCreateEditComponent {
+	public commentType: string;
+	public optionGeneric = DisplayOptionGeneric;
+	public optionUser = DisplayOptionUser;
+
 	constructor(
 		public model: NewsDetailModel,
 		public activeDialog: UIActiveDialogService,
@@ -24,6 +29,7 @@ export class NewsCreateEditComponent {
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private eventsService: EventsService) {
+			this.commentType = CommentType[model.commentType];
 	}
 
 	/**
@@ -34,8 +40,8 @@ export class NewsCreateEditComponent {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {
@@ -73,6 +79,10 @@ export class NewsCreateEditComponent {
 			isArchived: this.model.commentObject.isArchived ? 1 : 0,
 			resolution: this.model.commentObject.resolution
 		};
+
+		if (this.model.commentObject.displayOption) {
+			payload['displayOption'] = this.model.commentObject.displayOption;
+		}
 
 		if (this.isCreate()) {
 			payload['moveEventId'] = this.model.commentObject.moveEvent.id;

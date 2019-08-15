@@ -1,5 +1,9 @@
 import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
+// Store
+import {Store} from '@ngxs/store';
+// Actions
+import {SetBundle} from '../../action/bundle.actions';
 import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
 import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {GridDataResult} from '@progress/kendo-angular-grid';
@@ -52,6 +56,7 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
+		private store: Store,
 		private renderer: Renderer2) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
@@ -70,7 +75,12 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
-			this.showBundle(this.route.snapshot.queryParams['show']);
+			let {id, name} = this.resultSet.find((bundle: any) => {
+				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0);
+			});
+			setTimeout(() => {
+				this.showBundle(id, name);
+			});
 		}
 	}
 
@@ -94,7 +104,8 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		this.filterChange(this.state.filter);
 	}
 
-	protected showBundle(id): void {
+	protected showBundle(id, name): void {
+		this.store.dispatch(new SetBundle({id: id, name: name}));
 		this.dialogService.open(BundleViewEditComponent,
 			[{provide: 'id', useValue: id}]).then(result => {
 			this.reloadData();

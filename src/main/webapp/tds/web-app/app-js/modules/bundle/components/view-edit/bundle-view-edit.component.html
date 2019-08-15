@@ -1,4 +1,4 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content bundle-view-edit-component" id="bundle-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
+<div tds-autofocus class="modal-content bundle-view-edit-component" id="bundle-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
      <div class="modal-header">
          <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
              <span aria-hidden="true">×</span>
@@ -78,7 +78,7 @@
                             <td valign="top" class="name">Event:</td>
 
                             <td valign="top" class="value">
-                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEventid}">{{savedModel?.moveEventId}}</a>
+                                <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEvent.id}">{{savedModel?.moveEvent.name}}</a>
                             </td>
 
                         </tr>
@@ -112,8 +112,8 @@
                 <div class="modal-footer form-group-center">
                     <div *ngIf="canEditBundle">
                         <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
-                        <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteBundle()"></tds-button-delete>
-                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger pull-left tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
+                        <tds-button-delete class="btn-danger" (click)="confirmDeleteBundle()"></tds-button-delete>
+                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger tds-generic-button" (click)="confirmDeleteBundleAndAssets()">
                             <div class="tds-action-button-container">
                                 <i class="fa fa-fw fa-trash"></i>Delete Bundle & Assets
                             </div>
@@ -184,6 +184,13 @@
                         </tr>
 
                         <tr class="prop">
+                            <td valign="top" class="name">Event:</td>
+                            <td valign="top" class="value">
+                                <kendo-dropdownlist id="moveEventId" name="moveEvent" [(ngModel)]="bundleModel.moveEvent" [textField]="'name'" [valueField]="'id'" [data]="moveEvents"></kendo-dropdownlist>
+                            </td>
+                        </tr>
+
+                        <tr class="prop">
                             <td valign="top" class="name">Order:</td>
                             <td valign="top" class="value">
                                 <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
@@ -204,7 +211,7 @@
                     </table>
                 </div>
                 <div class="modal-footer form-group-center">
-                    <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                    <tds-button-save [disabled]="!validateRequiredFields(bundleModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                     <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
                 </div>
             </form>

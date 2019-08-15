@@ -1,24 +1,24 @@
-import net.transitionmanager.asset.Application
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
+import net.transitionmanager.asset.Application
 import net.transitionmanager.command.PersonCommand
-import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.security.Permission
-import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -756,6 +756,53 @@ class PersonServiceIntegrationTests extends Specification {
 		def test = personService.processMergePersonRequest(toUser, new PersonCommand(), params)
 		then: 'the From UserLogin should be switched to the To Person'
         test == "John Jeffrey Doe was merged to Jane Mary Doe"
+	}
+
+	def '19. Test finding persons by fullName'() {
+		when:
+			Person person1 = personHelper.createPerson(adminPerson,
+				project.client,
+				project,
+				[
+					firstName : 'Diego',
+					middleName: 'Martin',
+					lastName  : 'Correa'
+				]
+			)
+			Person person2 = personHelper.createPerson(adminPerson,
+				project.client,
+				project,
+				[
+					firstName: 'Diego',
+					lastName : 'Correa'
+				]
+			)
+
+			Map personFullNameMap = personService.parseName('Diego Correa')
+			Map<String, ?> findAllPersonsResult = personService.findAllPersons(personFullNameMap, project)
+
+			List<Person> personsList = findAllPersonsResult.personsList
+
+		then:
+			personsList.size() == 2
+			personsList.collect { it.id } == [person1.id, person2.id]
+
+		when:
+			personFullNameMap = personService.parseName('Diego Martin Correa')
+			findAllPersonsResult = personService.findAllPersons(personFullNameMap, project)
+			personsList = findAllPersonsResult.personsList
+
+		then:
+			personsList.size() == 1
+			personsList.collect { it.id } == [person1.id]
+
+		when:
+			personFullNameMap = personService.parseName('Diego M. Correa')
+			findAllPersonsResult = personService.findAllPersons(personFullNameMap, project)
+			personsList = findAllPersonsResult.personsList
+
+		then:
+			personsList.size() == 0
 	}
 
 	// Used to convert a person object into a map used by the PersonService

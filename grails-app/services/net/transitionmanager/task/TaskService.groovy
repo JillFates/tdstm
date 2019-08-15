@@ -50,7 +50,6 @@ import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.RecipeException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.imports.TaskBatch
-import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
@@ -80,7 +79,6 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
-
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -218,7 +216,10 @@ class TaskService implements ServiceMethods {
 			t.instructions_link AS instructionsLink,
 			t.api_action_id AS apiActionId,
 			t.api_action_invoked_at AS apiActionInvokedAt,
-			t.api_action_completed_at AS apiActionCompletedAt
+			t.api_action_completed_at AS apiActionCompletedAt,
+			aa.action_type AS apiActionType,
+			aa.name as apiActionName, 
+			aa.description as apiActionDescription
 			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
@@ -286,6 +287,7 @@ class TaskService implements ServiceMethods {
 		sql.append("""FROM asset_comment t
 			LEFT OUTER JOIN asset_entity a ON a.asset_entity_id = t.asset_entity_id
 			LEFT OUTER JOIN person p ON p.person_id = t.assigned_to_id
+			LEFT OUTER JOIN api_action aa ON t.api_action_id = aa.id
 			WHERE t.project_id=:projectId AND t.comment_type=:type AND t.is_published = true """)
 
 		// filter tasks to those directly assigned to the user and/or assigned to a team that they're assigne and the task is in one of the proper statuses
@@ -480,50 +482,6 @@ class TaskService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to indicate that a task's remote action has been started. This will update the
-	 * action and task appropriately after which the Action Request object is constructed.
-	 *
-	 * @param taskId The task that the action command it tied to.
-	 * @param currentPerson The currently logged in person.
-	 * @return Map that represents the ActionRequest object with additional attributes stuffed in for good measure
-	 */
-	Map<String,?> recordRemoteActionStarted(Long taskId, Person whom, String publicKey) {
-		AssetComment task = fetchTaskById(taskId, whom)
-
-		task = markActionStarted(task.id, whom, false)
-
-		ActionRequest actionRequest = apiActionService.createActionRequest(task.apiAction, task)
-
-		Map<String,?> actionRequestMap = actionRequest.toMap()
-
-		// Store Callback information into the options
-		String url = coreService.getApplicationUrl()
-		Map jwt = securityService.generateJWT()
-		actionRequestMap.options.callback = [
-			siteUrl: url,
-			token: jwt.access_token
-		]
-
-		// check if api action has credentials so to include credentials password unencrypted
-		// TODO : JM 6/19 : The credential type needs to be determined (server supplied)
-		if (actionRequest.options.hasProperty('credentials') && actionRequestMap.options.credentials) {
-			// Need to create new map because credentials map originally is immutable
-			Map<String, ?> credentials = new HashMap<>(actionRequestMap.options.credentials)
-
-			// Encrypt the username and password with the Public Key that the client sent to the server
-			 credentials.username = securityService.encryptWithPublicKey(task.apiAction.credential.username, publicKey)
-			 credentials.password = securityService.encryptWithPublicKey(credentialService.decryptPassword(task.apiAction.credential), publicKey)
-
-			actionRequestMap.options.credentials = credentials
-		}
-
-		// Add the Task object to the returned map
-		actionRequestMap.task = task.taskToMap()
-
-		return actionRequestMap
-	}
-
-	/**
 	 * Try to mark a task as started by locking it before, if lock fails
 	 * or if the task was already started by another user, thows an exception
 	 * indicating it so
@@ -568,13 +526,16 @@ class TaskService implements ServiceMethods {
 
 			// Attempting to invoke a local action remotely?
 			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
-				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attepted to invoke a local action as remote, which is not allowed')
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attempted to invoke a local action as remote, which is not allowed')
 			}
 
 			// Make sure the use has permission to invoke the action
-			if ( !securityService.hasPermission(whom, Permission.ActionInvoke) ||
-				( ! invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) ) {
-				throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+			// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+			if (!whom.isSystemUser()) {
+				if (!securityService.hasPermission(whom, Permission.ActionInvoke) ||
+						(!invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false))) {
+					throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+				}
 			}
 
 			// Prevent action from occuring if the reaction scripts are invalid
@@ -644,55 +605,14 @@ class TaskService implements ServiceMethods {
 			throw new EmptyResultException('Task was not found')
 		}
 		// Validate that the user has access to the project associated with the task
-		securityService.hasAccessToProject(task.project, currentPerson.userLogin)
-
-		return task
-	}
-
-	/**
-	 * Reset an action so it can be invoked again
-	 * @param taskId - the ID of the task
-	 * @param whom
-	 * @return
-	 */
-	AssetComment resetAction(Long taskId, Person whom) {
-		AssetComment task = fetchTaskById(taskId, whom)
-
-		if (task.hasAction() && !task.isAutomatic() && task.status in AssetCommentStatus.AllowedStatusesToResetAction) {
-			String errMsg
-			try {
-				// Update the task so it can be invoked again
-				task.apiActionInvokedAt = null
-				task.apiActionCompletedAt = null
-				task.actStart = null
-				task.dateResolved = null
-				task.percentageComplete = 0
-
-				// Log a note that the API Action was reset
-				addNote(task, whom, "Reset action ${task.apiAction.name}")
-
-				// Make sure that the status is READY instead
-				task.status = AssetCommentStatus.READY
-
-			} catch (InvalidRequestException e) {
-				errMsg = e.getMessage()
-			} catch (InvalidConfigurationException e) {
-				errMsg = e.getMessage()
-			} catch (e) {
-				errMsg = 'A runtime error occurred while attempting to process the action'
-				log.error ExceptionUtil.stackTraceToString('resetAction() failed ', e)
-			}
-
-			if (errMsg) {
-				log.info "resetAction() error $errMsg"
-				addNote(task, whom, "Reset action ${task.apiAction.name} failed : $errMsg")
-				task.status = AssetCommentStatus.HOLD
-			}
-		} else {
-			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
+		// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+		if (currentPerson && !currentPerson.isSystemUser()) {
+			securityService.hasAccessToProject(task.project, currentPerson.userLogin)
 		}
+
 		return task
 	}
+
 
 	/**
 	 * Overloaded version of the setTaskStatus that has passes the logged in user's person object to the main method
@@ -748,7 +668,7 @@ class TaskService implements ServiceMethods {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
-				task = invokeLocalAction(task, whom)
+				task = invokeLocalAction(task.id, whom)
 				status = task.status
 			}
 		}
@@ -827,6 +747,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
+				task.percentageComplete = 100
 				addNote(task, whom, "Task was Completed")
 				break
 

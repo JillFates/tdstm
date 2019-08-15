@@ -14,6 +14,8 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class AddTagsToAssetSpec extends GebReportingSpec {
 
@@ -26,6 +28,8 @@ class AddTagsToAssetSpec extends GebReportingSpec {
 
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+
         testCount = 0
         to LoginPage
         login()

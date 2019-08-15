@@ -1,0 +1,36 @@
+<div class="container task-category-component" *ngIf="taskCategories.hasInfo">
+    <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;">
+            <div class="col-md-2 category-description">{{categories[rowIndex]}}</div>
+            <div class="col-md-1 column-navigation">
+                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
+                          class="glyphicon glyphicon-chevron-left left-arrow" 
+                          [ngClass]="{'disabled': showFrom === 0}"
+                          (click)="onBack()">
+                    </span>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div *ngFor="let column of getColumns(row);" 
+                            class="col-md-{{colSize}} {{column.classes}}" 
+                            [ngClass]="{'heading': rowIndex === 0}">
+                            <a *ngIf="rowIndex === 0; else categoryValue"
+                               [routerLink]="['/taskManager', 'list']"
+                               [queryParams]="{category: column.text}">
+                                <span [innerHtml]="column.text"></span>
+                            </a>
+
+                            <ng-template #categoryValue>
+                                <span [innerHtml]="column.text"></span>
+                            </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1 column-navigation">
+                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
+                          class="glyphicon glyphicon-chevron-right right-arrow" 
+                          [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  taskCategories.columns}"
+                          (click)="onNext()">
+                    </span>            
+            </div>
+    </div>
+</div>

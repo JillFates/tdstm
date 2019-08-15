@@ -73,8 +73,8 @@ export class BreadcrumbNavigationComponent {
 				promptService.open(
 						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+						translatePipe.transform('GLOBAL.CONFIRM'),
+						translatePipe.transform('GLOBAL.CANCEL'),
 					)
 					.then(result => {
 					if (result) {

@@ -95,8 +95,8 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 			this.promptService.open(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translate.transform('GLOBAL.CONFIRM'),
+				this.translate.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {

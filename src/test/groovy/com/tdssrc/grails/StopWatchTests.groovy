@@ -84,6 +84,8 @@ class StopWatchTests extends Specification {
 		stopWatch.lastLap.seconds == 2
 	}
 
+	/*
+	@Ignore // This was known to fail from time to time, see TM-15701
 	void 'Test Multiple Time Lap'() {
 		setup:
 		int max = 5
@@ -110,4 +112,5 @@ class StopWatchTests extends Specification {
 		and: "the duration of the Stopwatch is the same that the time consumed for the test"
 		stopWatch.sinceStart.seconds == (stopT - startT).intdiv(1000).intValue()
 	}
+	*/
 }

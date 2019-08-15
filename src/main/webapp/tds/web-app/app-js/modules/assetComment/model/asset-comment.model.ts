@@ -3,7 +3,7 @@ import {ModalType} from '../../../shared/model/constants';
 export class AssetCommentModel {
 	public id?: string;
 	public modal: {
-		title:  string;
+		title?:  string;
 		type: ModalType
 	};
 	public archive: boolean;

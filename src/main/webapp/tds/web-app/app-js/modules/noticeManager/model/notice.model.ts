@@ -4,12 +4,6 @@ export class NoticeColumnModel {
 	constructor(dateFormat: string) {
 		this.columns = [
 			{
-				label: 'Action',
-				property: 'action',
-				type: 'action',
-				width: 108,
-				locked: true
-			}, {
 				label: 'Title',
 				property: 'title',
 				type: 'text',
@@ -30,14 +24,14 @@ export class NoticeColumnModel {
 				property: 'activationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 130
+				width: 140
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 130
+				width: 140
 			},
 			{
 				label: 'Sequence',
