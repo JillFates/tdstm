@@ -8,16 +8,16 @@
 					<div class="box-header with-border">
 <!--						<h3 class="box-title">Export</h3>-->
 					</div><!-- /.box-header -->
-				<form id="exportForm" action="export" method="post" name="exportForm" role="form">
+				<form id="exportForm" name="exportForm" role="form">
 					<div class="box-body">
 
 						<div class="form-group col-lg-3 col-md-4">
 							<label for="bundleId">{{translatePipe.transform('ASSET_EXPORT.SELECT_BUNDLE')}}</label>
 							<select [(ngModel)]="selectedBundles" id="bundleId" (change)="updateError()" name="bundle" multiple="multiple" class="form-control medium-height">
-								<option value="all">All Bundles</option>
-								<option value="planning-bundle" selected="selected">Planning Bundles</option>
+								<option value="All">All Bundles</option>
+								<option value="useForPlanning">Planning Bundles</option>
 								<option value="" disabled>──────────</option>
-								<option *ngFor="let bundle of exportAssetsData.bundles" [ngValue]="bundle.id">{{bundle.name}}</option>
+								<option *ngFor="let bundle of exportAssetsData.bundles" [ngValue]="bundle['id']">{{bundle['name']}}</option>
 							</select>
 						</div>
 						<div class="form-group col-lg-3 col-md-4" *ngIf="userPreferences.length > 0">
@@ -164,9 +164,6 @@
 							<div class="form-group error-bundle" *ngIf="this.errorMessage">
 								{{this.errorMessage}}
 							</div>
-							<div class="form-group error-bundle" *ngIf="this.userPreferencesError">
-								{{this.userPreferencesError}}
-							</div>
 						</div>
 					</div>
 				</form>
@@ -174,4 +171,5 @@
 			</div>
 		</div>
 	</section>
+	<tds-progress-bar [opened]="opened" [title]="title" [value]="progress_value"></tds-progress-bar>
 </div>

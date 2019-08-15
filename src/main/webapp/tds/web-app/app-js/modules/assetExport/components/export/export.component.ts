@@ -1,10 +1,5 @@
 // Angular
-import {
-	Component,
-	HostListener,
-	OnDestroy,
-	OnInit,
-} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 // Services
 import {ExportAssetService} from '../../service/export-asset.service';
 // Models
@@ -14,34 +9,39 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Others
 import {Store} from '@ngxs/store';
-
-declare var jQuery: any;
+import {saveAs} from 'file-saver';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'tds-asset-export',
 	templateUrl: 'export.component.html',
 	styles: []
 })
-export class ExportComponent implements OnInit, OnDestroy {
+export class ExportComponent implements OnInit {
 	protected gridColumns: any[];
 	public selectedAll = false;
-
 	private userPreferences = [];
-	private selectedBundles = [];
+	private selectedBundles = ['useForPlanning'];
 	private errorMessage = '';
+	private opened = false;
+	private title = '';
+	private progress_value = 0;
 	private userContext: UserContextModel;
 	public exportAssetsData: ExportAssetModel = new ExportAssetModel();
 
 	constructor(
 		private exportService: ExportAssetService,
 		private translatePipe: TranslatePipe,
-		private store: Store) {
-		// comment
+		private store: Store,
+		protected dialogService: UIDialogService) {
 	}
 
+	/**
+	 * onInit retrieve the information for displaying all the bundles and filling up
+	 * the users preference to item to export
+	 */
 	ngOnInit() {
 		this.exportService.getExportAssetsData().subscribe( (res: any) => {
-			console.log('res', res);
 			this.exportAssetsData = res;
 			this.updateUserPreferencesModel();
 		});
@@ -51,7 +51,10 @@ export class ExportComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	updateUserPreferencesModel() {
+	/**
+	 * Set the user preferences for the selected items on the Items to Export list
+	 */
+	updateUserPreferencesModel(): void {
 		this.userPreferences = [
 			{preference: 'ImportApplication', selected: this.exportAssetsData.userPreferences['ImportApplication'] === 'true'},
 			{preference: 'ImportServer', selected: this.exportAssetsData.userPreferences['ImportServer'] === 'true'},
@@ -65,29 +68,39 @@ export class ExportComponent implements OnInit, OnDestroy {
 		];
 	}
 
-	selectAll() {
+	/**
+	 * Used for select/deselect all items on checkbox list
+	*/
+	selectAll(): void {
 		this.selectedAll = !this.selectedAll;
-		for (let i = 0; i < this.userPreferences.length; i++) {
-			this.userPreferences[i].selected = this.selectedAll;
-		}
+		this.userPreferences.forEach((el, index) => {
+			this.userPreferences[index].selected = this.selectedAll;
+		});
 	}
 
-	checkIfAllSelected() {
+	/**
+	 * If the user selects all checkboxes this function checks if all
+	 * are marked to activate All Items checkbox
+	*/
+	checkIfAllSelected(): boolean {
 		let totalSelected =  0;
-		for (let i = 0; i < this.userPreferences.length; i++) {
-			if (this.userPreferences[i].selected) {
+		this.userPreferences.forEach((el, index) => {
+			if (this.userPreferences[index].selected) {
 				totalSelected++;
 			}
-		}
+		});
 		this.selectedAll = totalSelected === this.userPreferences.length;
 		return true;
 	}
 
-	exportData() {
+	/**
+	 * Setup the data we will send to the backend to export the selected assets
+	 * Added validation to make sure at least one bundle is selected
+	 */
+	exportData(): void {
 		if (this.selectedBundles.length === 0) {
 			this.errorMessage = this.translatePipe.transform('ASSET_EXPORT.BUNDLE_ERROR');
 		} else {
-			// get user preferences
 			let data = {
 				projectIdExport: this.userContext.project.id,
 				dataTransferSet: 1,
@@ -95,37 +108,51 @@ export class ExportComponent implements OnInit, OnDestroy {
 				asset: 'asset',
 				exportFormat: 'xlsx'
 			};
-			let result = this.userPreferences.reduce(function(map, obj) {
-				map[obj.preference] = obj.selected;
+			this.userPreferences.reduce((map, obj) => {
 				data[obj.preference] = obj.selected;
 				return map;
 			}, {});
 
-			if (this.selectedBundles.find(el => {return el === 'all'})) {
-				data['bundle'] = 'all';
-			} else if (this.selectedBundles.find(el => {return el === 'planning-bundle'})) {
-				data['bundle'] = 'planning-bundle';
+			if (this.selectedBundles.find(el => {return el === 'All'})) {
+				data['bundle'] = 'All';
+			} else if (this.selectedBundles.find(el => {return el === 'useForPlanning'})) {
+				data['bundle'] = 'useForPlanning';
 			} else {
 				data['bundle'] = this.selectedBundles;
 			}
-			console.log('data', data);
-
 			this.exportService.downloadBundleFile(data).subscribe( res => {
-				console.log('data', res);
-			})
+				this.opened = true;
+				if (res['key']) {
+					this.pollUntilTaskFinished(res['key']);
+				}
+			});
 		}
 	}
 
-	updateError() {
-		this.errorMessage = '';
-	}
 	/**
-	 * unsubscribe from all subscriptions on destroy hook.
-	 * @HostListener decorator ensures the OnDestroy hook is called on events like
-	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 * Recursive function to monitor progress of file exporting in backend
+	 * Calls to backend to retrieve progress every second while progress hasn't reached
+	 * to 100 % ready
 	 */
-	@HostListener('window:beforeunload')
-	ngOnDestroy(): void {
-		// comment
+	async pollUntilTaskFinished(taskId) {
+		this.exportService.getProgress(taskId).subscribe(( progress) => {
+			this.progress_value = progress['percentComp'];
+			this.title = progress['status'];
+			if ( this.progress_value < 100) {
+				setTimeout(() => this.pollUntilTaskFinished(taskId), 1000);
+			} else {
+				saveAs(this.exportService.getBundleFile(taskId), progress['data'].header.split('=')[1]);
+				this.opened = false;
+			}
+		}, error => {
+			console.log(error);
+		});
+	}
+
+	/**
+	 * Set the error to empty when a bundle is selected
+	 * */
+	updateError(): void {
+		this.errorMessage = '';
 	}
 }

@@ -15,6 +15,8 @@ export class ExportAssetService {
 
 	// private instance variable to hold base url
 	private export_asset_url = '/tdstm/ws/asset/';
+	private progress_export_asset_url = '/tdstm/ws/progress/';
+	private bundle_file_url = '/tdstm/assetEntity/downloadExport';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -35,7 +37,7 @@ export class ExportAssetService {
 	}
 
 	/**
-	 * Gets a export assets file based on what the user selected.
+	 * Gets a export assets key for a file based on what the user selected.
 	 * @returns {Observable<R>}
 	 */
 	public downloadBundleFile(exportData: any): Observable<any[]> {
@@ -44,5 +46,23 @@ export class ExportAssetService {
 				return response && response.data;
 			})
 			.catch((error: any) => error);
+	}
+
+	/** Gets the actual file
+	 * @returns info for file
+	 * */
+	public getProgress(key: string): Observable<any[]> {
+		return this.http.get(`${this.progress_export_asset_url + key}`).map(
+			(response: any) => {
+				return response && response.data
+			})
+			.catch( (error: any) => error );
+	}
+
+	/** Gets the actual file
+	 * @returns info for file
+	 * */
+	public getBundleFile(key: string) {
+		return `${this.bundle_file_url}?key=${key}`;
 	}
 }
