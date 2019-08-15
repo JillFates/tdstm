@@ -151,7 +151,6 @@ class TaskFacade {
 	 * @param message - note message
 	 */
 	private void addTaskCommentNoteAndUpdateStatus(String status, String message) {
-		taskService.addNote(task, whom, message)
 		if (message) {
 			taskService.addNote(task, whom, message)
 		} else {
