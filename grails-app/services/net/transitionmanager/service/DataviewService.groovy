@@ -675,6 +675,7 @@ class DataviewService implements ServiceMethods {
 						type: typeFor(column),
 						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
+						domainAlias: domainAliasFor(column)
 				])
 
 				String property = propertyFor(column)
@@ -857,6 +858,15 @@ class DataviewService implements ServiceMethods {
 		return transformations[column.property].manyToManyParameterName
 	}
 
+	/**
+	 * Return the domain alias for the domain of the given field. This will be useful for handling special cases,
+	 * such as custom fields, where additional columns need to be queried.
+	 * @param column
+	 * @return
+	 */
+	private static domainAliasFor(Map column) {
+		return transformations[column.property].domainAlias
+	}
 
 	/**
 	 * Return the closure for fetching additional elements for this
@@ -1103,7 +1113,7 @@ class DataviewService implements ServiceMethods {
 		],
 
     ].withDefault {
-        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where"]
+        String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where", domainAlias: "AE"]
     }
 
 	/**
