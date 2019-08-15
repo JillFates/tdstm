@@ -6,6 +6,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
 	selector: `event-create`,
@@ -17,6 +18,7 @@ export class EventCreateComponent implements OnInit {
 	public assetTags: any[] = [];
 	public eventModel: EventModel = null;
 	private defaultModel = null;
+	private requiredFields = ['name'];
 
 	constructor(
 		private eventsService: EventsService,
@@ -76,13 +78,22 @@ export class EventCreateComponent implements OnInit {
 		}
 	}
 
-	private validateRequiredFields(model: EventModel): boolean {
-		if (!model.name) {
-			alert('Field "Name" is required.');
-			return false;
-		} else {
-			return true;
-		}
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: EventModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**

@@ -191,7 +191,7 @@
                 </table>
             </div>
             <div *ngIf="editing" class="modal-footer form-group-center">
-                <tds-button-save [disabled]="!eventModel.name" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                <tds-button-save [disabled]="!validateRequiredFields(eventModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                 <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
             </div>
             <div *ngIf="!editing" class="modal-footer form-group-center">
