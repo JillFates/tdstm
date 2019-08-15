@@ -256,7 +256,7 @@ export class APIActionService {
 			'STATUS': model.eventReactions[0].value,
 			'SUCCESS': model.eventReactions[1].value,
 			'DEFAULT': model.eventReactions[2].value,
-			'ERROR': model.eventReactions[3].value,
+			'ERROR': model.eventReactions[3].selected ?  model.eventReactions[3].value : '',
 			'FAILED': model.eventReactions[4].value,
 			'LAPSED': model.eventReactions[5].value,
 			'STALLED': model.eventReactions[6].value,
