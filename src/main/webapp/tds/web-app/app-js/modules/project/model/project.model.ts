@@ -8,7 +8,7 @@ export class ProjectModel {
 	public startDate: Date;
 	public completionDate: Date;
 	public partnerIds: number[];
-	public projectLogo: string;
+	public projectLogo: File;
 	public projectManagerId: number;
 	public workflowCode: string;
 	public projectCode: string;

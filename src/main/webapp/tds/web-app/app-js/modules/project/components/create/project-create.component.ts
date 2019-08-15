@@ -21,15 +21,10 @@ export class ProjectCreateComponent implements OnInit {
 	public clients;
 	public partners;
 	public projectTypes;
-	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public projectModel: ProjectModel = null;
 	private defaultModel = null;
 	public file = new KendoFileUploadBasicConfig();
-	public fetchFileContent: any;
-	public transformFileContent: any;
 	public fetchResult: any;
-	public fetchInProcess = false;
-	public fetchInputUsed: 'action' | 'file' = 'action';
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
 
@@ -111,9 +106,7 @@ export class ProjectCreateComponent implements OnInit {
 		e.data = { filename: tempServerFilesToDelete.join(',') };
 
 		this.fetchResult = null;
-		this.fetchFileContent = null;
 		this.transformResult = null;
-		this.transformFileContent = null;
 	}
 
 	public onUploadFile(e: UploadEvent): void {
@@ -125,13 +118,12 @@ export class ProjectCreateComponent implements OnInit {
 	public completeEventHandler(e: SuccessEvent) {
 		let response = e.response.body.data;
 		if (response && response.operation === 'delete') { // file deleted successfully
-			// console.log(response.data);
 			this.clearFilename();
 			this.file.fileUID = null;
 		} else if (e.files[0]) { // file uploaded successfully
 			let filename = e.files[0].name;
 			this.fetchResult = { status: 'success', filename: filename };
-			this.fetchInputUsed = 'file';
+			this.projectModel.projectLogo = e.files[0].rawFile;
 		} else {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
@@ -140,12 +132,11 @@ export class ProjectCreateComponent implements OnInit {
 
 	private clearFilename(e?: any) {
 		this.fetchResult = null;
-		this.fetchFileContent = null;
 	}
 
 	public saveForm() {
 		if (this.fetchResult && this.fetchResult.status === 'success') {
-			this.projectModel.projectLogo = this.fetchResult.filename;
+			//this.projectModel.projectLogo = this.fetchResult.filename;
 		}
 		this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
 			if (result.status === 'success') {
