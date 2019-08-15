@@ -20,6 +20,7 @@ import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.co
 import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'event-dashboard',
@@ -41,6 +42,7 @@ export class EventDashboardComponent implements OnInit {
 	public hasBundleSteps = false;
 
 	constructor(
+		private route: ActivatedRoute,
 		private eventsService: EventsService,
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
@@ -71,10 +73,13 @@ export class EventDashboardComponent implements OnInit {
 			.subscribe((results: any[]) => {
 				const [eventList, preference] = results;
 				this.eventList = eventList;
-				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
+
+				let eventId = this.route.snapshot.queryParams['moveEvent'];
+				this.selectedEvent = this.getDefaultEvent(eventId ? eventId : (preference && preference[PREFERENCES_LIST.MOVE_EVENT] || ''));
 				if (this.selectedEvent) {
 					this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 				}
+
 			});
 	}
 
