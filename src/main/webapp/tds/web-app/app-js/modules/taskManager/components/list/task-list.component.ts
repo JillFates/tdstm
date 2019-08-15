@@ -175,10 +175,10 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 									<i class="fa fa-check"></i>Done
 								</button>
 								<button
-									*ngIf="canShowInvokeButton(dataItem)"
+									*ngIf="dataItem.invokeButton !== null"
 									class="btn btn-primary btn-xs"
-									[title]="dataItem.invokeButton.tooltip || ''"
-									[disabled]="dataItem.invokeButton.disabled"
+									[title]="dataItem.invokeButton.tooltipText || ''"
+									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
 									(click)="invokeActionHandler(dataItem)">
 									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
 								</button>
@@ -575,17 +575,6 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Verify is invoke button can be shown or not.
-	 * @param taskRow
-	 */
-	canShowInvokeButton(taskRow: any): boolean {
-		return taskRow.apiActionId !== null
-			&& taskRow.apiActionInvokedAt === null
-			&& taskRow.apiActionCompletedAt === null
-			&& (taskRow.status === 'Ready' || taskRow.status === 'Started' || taskRow.status === 'Completed');
-	}
-
-	/**
 	 * On Invoke button click.
 	 * @param taskRow: any
 	 */
@@ -613,13 +602,8 @@ export class TaskListComponent {
 				taskRow.apiActionCompletedAt = result.apiActionCompletedAt;
 				taskRow.apiActionInvokedAt = result.apiActionInvokedAt;
 				taskRow.category = result.category;
-				taskRow.invokeButton = {disabled: false};
 				if (result.invokeActionDetails) {
-					taskRow.invokeButton = {
-						label: result.invokeActionDetails.label || 'Invoke',
-						tooltip: result.invokeActionDetails.tooltipText || '',
-						disabled: result.disabled
-					}
+					taskRow.invokeButton = {...result.invokeActionDetails};
 				}
 			});
 		}
