@@ -514,6 +514,13 @@ class UrlMappings {
 			action = [POST:"changeTaskState"]
 		}
 
+		"/ws/task/$taskId/actionLookUp" {
+			controller = 'wsTask'
+			action = [
+				GET: 'actionLookUp'
+			]
+		}
+
         "/ws/task/$id/changeTime" {
             controller = "wsTask"
             action = [POST:"changeEstTime"]
@@ -1508,6 +1515,8 @@ class UrlMappings {
 			controller = 'singleApp'
 			action = 'index'
 		}
+
+
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")

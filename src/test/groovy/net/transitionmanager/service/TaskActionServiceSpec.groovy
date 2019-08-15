@@ -22,6 +22,7 @@ import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
+import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.integration.ActionRequest
@@ -405,5 +406,49 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			String renderedScript = service.renderScript('echo {param1} \necho {username} \necho {password}',assetComment)
 		then: 'The script is rendered to a string'
 			renderedScript == 'echo xk324-kj1i2-23ks-9sdl \necho {username} \necho {password}'
+	}
+
+	@ConfineMetaClassChanges([TaskActionService])
+	void "Test ActionLookUp"(){
+		setup: 'Given mocks for external services'
+			service.apiActionService = [
+				connectorInstanceForAction: { ApiAction action ->
+					[
+						buildMethodParamsWithContext: { ApiAction action2, AssetComment task ->
+							[param1: 'test param']
+						}
+					] as AbstractConnector
+				}
+			] as ApiActionService
+
+			service.metaClass.renderScript = {String script,  AssetComment task-> script}
+
+			service.taskService  = [
+				fillLabels: {Project project, List<Map> methodParams-> methodParams}
+			] as TaskService
+		when: 'calling actionLookUp'
+			Map action = service.actionLookup(action.id, project)
+		then: 'a map of API action details is returned'
+
+			action == [
+				name              : 'testAction',
+				script            : null,
+				isRemote          : true,
+				type              : 'WebAPI',
+				connector         : null,
+				method            : 'invokeHttpRequest',
+				description       : 'This is an action for testing',
+				methodParams      : [
+					[
+						paramName: 'param1',
+						context  : 'USER_DEF',
+						value    : 'xk324-kj1i2-23ks-9sdl'
+					]
+				],
+				methodParamsValues: [
+					param1: 'test param'
+				]
+			]
+
 	}
 }

@@ -1,0 +1,5 @@
+model {
+    Map apiAction
+}
+
+json g.render(apiAction)
