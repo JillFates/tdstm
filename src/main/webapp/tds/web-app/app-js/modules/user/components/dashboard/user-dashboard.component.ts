@@ -51,6 +51,7 @@ export class UserDashboardComponent implements OnInit {
 	public items: any[] = [{
 		text: 'Sample Box'
 	}];
+	public userContext: UserContextModel;
 	@ViewChild('taskGrid') taskGrid: GridComponent;
 
 	constructor(
@@ -59,12 +60,17 @@ export class UserDashboardComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
 		private store: Store) {
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 
 	ngOnInit() {
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.notifierService.broadcast( {name: 'notificationHeaderTitleChange', title: 'User Dashboard for ' + userContext.person.fullName});
+		this.notifierService.broadcast({
+			name: 'notificationHeaderTitleChange',
+			title: 'User Dashboard for ' + this.userContext.person.fullName
 		});
+
 		this.populateData();
 	}
 
