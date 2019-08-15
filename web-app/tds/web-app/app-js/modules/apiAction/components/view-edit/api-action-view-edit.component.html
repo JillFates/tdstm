@@ -988,7 +988,7 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="modalType === actionTypes.VIEW"> Error
+														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0 || modalType === actionTypes.VIEW"> Error
 													</label>
 												</div>
 											</div>
