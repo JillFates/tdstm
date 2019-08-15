@@ -721,7 +721,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	private populateReactionScripts(): void {
 		const methodScripts = this.apiActionModel.agentMethod.script;
-		APIActionModel.createBasicReactions(this.apiActionModel);
+		APIActionModel.createBasicReactions(this.apiActionModel, this.apiActionModel.actionType && this.apiActionModel.actionType.id === this.WEB_API);
 		for (let reactionType in methodScripts) {
 			if (methodScripts[reactionType]) {
 				let match = this.apiActionModel.eventReactions.find(item => item.type === reactionType);
@@ -1088,9 +1088,12 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.apiActionModel.isRemote = this.isRemote();
 
 		// on create api action, set the default value for is remote action
-		if (this.modalType === ActionType.CREATE && this.apiActionModel.isRemote) {
-			this.setSelectEventReaction('SUCCESS', true);
-			this.setSelectEventReaction('ERROR', true);
+		if (this.modalType === ActionType.CREATE ) {
+			APIActionModel.createBasicReactions(this.apiActionModel, type.id === this.WEB_API);
+			if (this.apiActionModel.isRemote) {
+				this.setSelectEventReaction('ERROR', true);
+				this.setSelectEventReaction('SUCCESS', true);
+			}
 		}
 	}
 
