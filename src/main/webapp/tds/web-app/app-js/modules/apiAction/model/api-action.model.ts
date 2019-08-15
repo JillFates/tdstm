@@ -250,7 +250,7 @@ export class APIActionModel {
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STATUS, true, EVENT_STATUS_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.SUCCESS, true, EVENT_SUCCESS_TEXT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.DEFAULT, true, isWebAPI ? EVENT_DEFAULT_TEXT_WEB_API : EVENT_DEFAULT_TEXT_SCRIPT));
-		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, false, isWebAPI ? EVENT_DEFAULT_ERROR_WEB_API : EVENT_DEFAULT_ERROR_SCRIPT));
+		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.ERROR, true, isWebAPI ? EVENT_DEFAULT_ERROR_WEB_API : EVENT_DEFAULT_ERROR_SCRIPT));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.FAILED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.LAPSED, false, ''));
 		apiActionModel.eventReactions.push(new EventReaction(EventReactionType.STALLED, false, ''));
