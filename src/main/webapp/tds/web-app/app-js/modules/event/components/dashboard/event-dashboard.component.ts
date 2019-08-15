@@ -47,8 +47,7 @@ export class EventDashboardComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private store: Store,
-		private userContextService: UserContextService) {
+		private store: Store) {
 	}
 
 	ngOnInit() {
@@ -59,10 +58,9 @@ export class EventDashboardComponent implements OnInit {
 	 * Call the endpoints required to populate the initial data
 	*/
 	private populateData(): void {
-		this.userContextService.getUserContext()
-		.subscribe((userContext: UserContextModel) => {
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.userTimeZone = userContext.timezone;
-		})
+		});
 
 		const services = [
 			this.eventsService.getEvents(),

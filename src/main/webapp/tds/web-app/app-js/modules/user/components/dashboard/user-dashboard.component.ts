@@ -22,7 +22,7 @@ import {COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
 import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GridComponent} from '@progress/kendo-angular-grid';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {ContextMenuComponent} from '@progress/kendo-angular-menu';
+import {Store} from '@ngxs/store';
 
 @Component({
 	selector: 'user-dashboard',
@@ -51,19 +51,18 @@ export class UserDashboardComponent implements OnInit {
 	public items: any[] = [{
 		text: 'Sample Box'
 	}];
-	@ViewChild('taskGrid')
-	taskGrid: GridComponent;
+	@ViewChild('taskGrid') taskGrid: GridComponent;
 
 	constructor(
 		private userService: UserService,
 		private taskService: TaskService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private userContextService: UserContextService) {
+		private store: Store) {
 	}
 
 	ngOnInit() {
-		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.notifierService.broadcast( {name: 'notificationHeaderTitleChange', title: 'User Dashboard for ' + userContext.person.fullName});
 		});
 		this.populateData();
