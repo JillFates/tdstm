@@ -38,7 +38,9 @@
 			<ng-template kendoGridHeaderTemplate>
 				<div class="row text-center">
                     <tds-checkbox name="assetsSelector"
-                                  [hasThirdState]="true"
+								  [hasThirdState]="true"
+								  [style]="{'cursor': isBulkSelectAvailable() ? 'pointer' : 'text' }"
+								  [disabled]="!isBulkSelectAvailable()"
                                   (changeState)="bulkCheckboxService.changeState(($event))"
                                   id="assetSelector"
                                   [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
@@ -48,9 +50,11 @@
 			<ng-template kendoGridCellTemplate let-dataItem>
 				<div class="check-row">
 					<input type="checkbox" id="checkbox_{{dataItem.id}}"
-					       [checked]="bulkCheckboxService.getValueBulkItem(dataItem.id)"
-					       (change)="bulkCheckboxService.checkItem(dataItem.id, $event.target.checked)"
-					       name="checkbox_{{dataItem.id}}">
+					[ngStyle]="{'cursor': isBulkSelectAvailable() ? 'pointer' : 'text' }"
+					[disabled]="!isBulkSelectAvailable()"
+					[checked]="bulkCheckboxService.getValueBulkItem(dataItem.id)"
+					(change)="bulkCheckboxService.checkItem(dataItem.id, $event.target.checked)"
+					name="checkbox_{{dataItem.id}}">
 				</div>
 			</ng-template>
 		</kendo-grid-column>

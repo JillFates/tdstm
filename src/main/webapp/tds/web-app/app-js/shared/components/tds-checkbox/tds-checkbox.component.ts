@@ -9,12 +9,14 @@ const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 	selector: 'tds-checkbox',
 	template: `
         <div class="tds-checkbox-component">
-            <input class="component-action-change" type="checkbox" #tdsCheckbox (change)="onChange()" style="cursor: pointer" />
+            <input class="component-action-change" [disabled]="disabled" type="checkbox" #tdsCheckbox (change)="onChange()" [attr.style]=" style ? style : 'cursor: pointer'" />
         </div>
 	`
 })
 export class TDSCheckboxComponent implements OnInit {
 	@Input() hasThirdState: boolean;
+	@Input() disabled = false;
+	@Input() style = String;
 	@Input() setStateSubject: Subject<CheckboxState>;
 	@Output() changeState: EventEmitter<CheckboxState> = new EventEmitter();
 	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
