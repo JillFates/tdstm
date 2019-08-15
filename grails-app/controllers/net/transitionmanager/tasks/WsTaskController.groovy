@@ -1,6 +1,7 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
@@ -10,6 +11,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
@@ -27,7 +29,6 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-
 /**
  * Handles WS calls of the TaskService.
  *
@@ -40,6 +41,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	CommentService commentService
 	QzSignService qzSignService
 	TaskService taskService
+	TaskActionService taskActionService
 	ApiActionService apiActionService
 	CredentialService credentialService
     UserPreferenceService userPreferenceService
@@ -176,7 +178,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission( [ Permission.ActionInvoke, Permission.ActionRemoteAllowed ])
 	def recordRemoteActionStarted(Long id, RecordRemoteActionStartedCommand commandObject) {
-		Map actionRequest = taskService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
+		Map actionRequest = taskActionService.recordRemoteActionStarted(id,  currentPerson(), commandObject.publicKey)
 		renderAsJson([actionRequest: actionRequest])
 	}
 
@@ -187,7 +189,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.ActionReset)
 	def resetAction(Long id) {
-		AssetComment task = taskService.resetAction(id, currentPerson())
+		AssetComment task = taskActionService.resetAction(id, currentPerson())
 		renderAsJson([
 			assetComment: task,
 			task: task.taskToMap(),
@@ -370,4 +372,36 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
                 category: task.category
         )
     }
+
+
+    /**
+     * Return a list with all the AssetCommentCategory values.
+     */
+    @HasPermission(Permission.TaskBatchView)
+    def assetCommentCategories() {
+        renderSuccessJson(AssetCommentCategory.list)
+    }
+
+	/**
+	 * Looks up the API action and provides it's details as a JSON map.
+	 *
+	 * @param taskId The id of the task to use to look up the API action details.
+	 *
+	 * @return A JSON map containing the API action details:
+	 *    name,
+	 *    script,
+	 *    isRemote,
+	 *    type,
+	 *    connector(name),
+	 *    method,
+	 *    description,
+	 *    methodParams,
+	 *    methodParamsValues
+	 */
+	@HasPermission(Permission.TaskView)
+	def actionLookUp(Long taskId) {
+		Project project = securityService.userCurrentProject
+		render view: 'actionLookUp', model: [apiAction: taskActionService.actionLookup(taskId, project)]
+	}
+
 }

@@ -14,6 +14,7 @@ import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-m
 import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
 import {Observable} from 'rxjs';
+import {BundleModel} from '../../../bundle/model/bundle.model';
 
 declare var jQuery: any;
 
@@ -77,6 +78,8 @@ export class CredentialViewEditComponent {
 		valid: true,
 		error: ''
 	};
+	private requiredFields = ['name', 'provider', 'username', 'password', 'authenticationUrl', 'httpMethod', 'validationExpression'];
+
 	constructor(
 		public originalModel: CredentialModel,
 		public modalType: ActionType,
@@ -154,6 +157,24 @@ export class CredentialViewEditComponent {
 	}
 
 	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: CredentialModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
+	}
+
+	/**
 	 * Set the possible Status for the Credential
 	 */
 	private getAuthMethods(): void {
@@ -217,8 +238,8 @@ export class CredentialViewEditComponent {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {

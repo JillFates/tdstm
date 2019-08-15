@@ -135,6 +135,23 @@ class CustomTagLib implements InitializingBean {
 	}
 
 	/**
+	 * Used to generate an HTML ApiAction Invoke Button
+	 * Expected attributes:
+	 * apiActionId - api action id
+	 * apiActionInvokedAt - task invoked at
+	 * apiActionCompletedAt - task completed at
+	 * apiActionType - api action type
+	 * apiActionName - api action name
+	 * apiActionDescription - api action description
+	 * id - task id
+	 * status - task status
+	 * onclick - javascript onClick action
+	 */
+	def invokeActionButton = { Map attrs ->
+		out << HtmlUtil.apiActionButton(attrs)
+	}
+
+	/**
 	 * Used to output text as URL if it matches or straight text otherwise
 	 * @param text - text or URL to be displayed, for URL if there is a pipe (|) character the pattern will be (label | url) (required)
 	 * @param target - set the A 'target' tag appropriately (optional)

@@ -310,14 +310,16 @@ class StringUtil {
 	 * -- CLOSE --
 	 */
 	static openEnvelop(String openTag, String closeTag, String message){
-		def idxB = message.indexOf(openTag)
+		message = message ?: ''
+		int idxB = message.indexOf(openTag)
 		if(idxB >= 0){
-			def idxE = message.indexOf(closeTag)
+			int idxE = message.indexOf(closeTag)
 			if(idxE < 0){
-				throw new RuntimeException("Malformed Message", "Missing ${closeTag} tag for request")
+				throw new RuntimeException("Malformed Message, Missing ${closeTag} tag for request")
 			}
 			message = message.substring(idxB + openTag.length(), idxE)
 		}
+
 		message.trim()
 	}
 
@@ -418,7 +420,7 @@ class StringUtil {
 		while (m.find()) {
 			String paramName = m.group(1).trim()
 			if (params.containsKey(paramName)) {
-				m.appendReplacement(sb, params[paramName])
+				m.appendReplacement(sb, params[paramName] ?: '[Null]')
 			} else {
 				missing << paramName
 			}

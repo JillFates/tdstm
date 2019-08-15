@@ -339,6 +339,24 @@ class AssetComment {
 	}
 
 	/**
+	 * Get invoke api action buttom details (enabled, disabled, alt text, etc)
+	 * @param disabled - whether button should be disabled or not
+	 * @param alt - alt message to show if apply
+	 * @return
+	 */
+	Map<String, ?> getInvokeButtonDetails(boolean disabled, String alt) {
+		return [
+				label      : 'Invoke',
+				icon       : 'ui-icon-gear',
+				actionType : 'invokeAction',
+				newStatus  : STARTED,
+				redirect   : 'taskManager',
+				disabled   : disabled,
+				tooltipText: alt
+		]
+	}
+
+	/**
 	 * Return a map with Api Action Invoke button details to correctly
 	 * show button in Task Manager
 	 * @return
@@ -350,30 +368,16 @@ class AssetComment {
 			return null
 		}
 
-		Closure<Map<String, ?>> invokeButtonDetails = { boolean disabled, String alt ->
-			return [
-					label      : 'Invoke',
-					icon       : 'ui-icon-gear',
-					actionType : 'invokeAction',
-					newStatus  : STARTED,
-					redirect   : 'taskManager',
-					disabled   : disabled,
-					tooltipText: alt
-			]
-		}
-
-		if (canInvokeOnServer) {
-			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return invokeButtonDetails(false, null)
-			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
-			}
-		} else if (canInvokeRemotely) {
-			if (!apiActionInvokedAt && status in [READY, STARTED]) {
-				return invokeButtonDetails(true, 'Action must be invoked from TM Desktop')
-			} else if (apiActionInvokedAt && status in [READY, STARTED]) {
-				return invokeButtonDetails(true, 'Action started ' + TimeUtil.ago(TimeUtil.elapsed(apiActionInvokedAt)) + ' ago.')
-			}
+		if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${ apiAction.name } started at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
+		} else if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${ apiAction.name } completed at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
+		} else if (!canInvokeRemotely && canInvokeOnServer && status == READY && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
+		} else if (!canInvokeRemotely && canInvokeOnServer && status == STARTED && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
+		} else if (canInvokeRemotely && !canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
+			return getInvokeButtonDetails(true, "Action ${apiAction.name}, must be invoked from TM Desktop")
 		}
 
 		return null

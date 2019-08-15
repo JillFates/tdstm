@@ -122,5 +122,3 @@ class LoginSpec extends GebReportingSpec {
             at MenuPage
     }
 }
-
-

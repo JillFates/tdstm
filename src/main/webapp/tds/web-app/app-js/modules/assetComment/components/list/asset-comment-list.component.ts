@@ -138,7 +138,6 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		let commentModel: AssetCommentModel = {
 			id: comment.id,
 			modal: {
-				title: 'Comment Detail',
 				type: type
 			},
 			archive: comment.dateResolved !== null,

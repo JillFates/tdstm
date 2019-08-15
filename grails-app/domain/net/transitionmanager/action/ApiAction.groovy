@@ -421,4 +421,16 @@ class ApiAction {
 
 		return true
 	}
+
+	/**
+	 * Return action name joined with description if description is not null
+	 * @return
+	 */
+	String joinNameAndDescription() {
+		if (!description) {
+			return name
+		} else {
+			return name + ' : ' + description
+		}
+	}
 }

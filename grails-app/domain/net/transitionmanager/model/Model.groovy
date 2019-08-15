@@ -41,6 +41,10 @@ class Model {
 	Date endOfLifeDate
 	String endOfLifeStatus
 	String sourceURL        // URL of where model data was derived from
+	String cpuType
+	Integer cpuCount
+	Double memorySize
+	Double storageSize
 
 	// Room Associated properties (should be tinyint 0/1)
 	Boolean roomObject
@@ -91,6 +95,10 @@ class Model {
 		validatedBy nullable: true
 		weight nullable: true
 		width nullable: true
+		cpuType nullable: true, size: 0..255
+		cpuCount nullable: true
+		memorySize nullable: true
+		storageSize nullable: true
 
 		// TODO - DELETE THIS
 		dateCreated nullable: true

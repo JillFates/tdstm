@@ -37,18 +37,6 @@ export class TaskService {
 	}
 
 	/**
-	 * Get the Comment Categories
-	 * @returns {Observable<any>}
-	 */
-	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
-			.map((response: any) => {
-				return response && response.status === 'success' && response.data;
-			})
-			.catch((error: any) => error);
-	}
-
-	/**
 	 * Get the Task Details
 	 * @returns {Observable<any>}
 	 */
@@ -290,11 +278,11 @@ export class TaskService {
 
 	/**
 	 *
-	 * Get categories
+	 * Get Asset Comment Categories
 	 * @returns {Observable<any>}
 	 */
-	getCategories(): Observable<any[]> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
+	getAssetCommentCategories(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
 			.map((response: any) => {
 				return response && response.data || [];
 
@@ -403,16 +391,11 @@ export class TaskService {
 
 	/**
 	 * POST - Get the List of Task presented on Task Management list.
+	 * @param {any} filters  Object containing the filters to apply for
 	 */
-	getTaskList(eventId: number, justRemaining: boolean, justMyTasks: boolean, viewUnpublished: boolean): Observable<any> {
-		const request = {
-			moveEvent: eventId,
-			justRemaining: justRemaining ? 1 : 0,
-			justMyTasks: justMyTasks ? 1 : 0,
-			viewUnpublished: viewUnpublished ? 1 : 0,
-			sord: 'asc',
-		}
-		return this.http.post(this.TASK_LIST_URL, request).pipe(
+	getTaskList(filters: any): Observable<any> {
+
+		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
 				if (response.rows) {
 					response.rows = response.rows.map( item => {

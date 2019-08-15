@@ -1,9 +1,8 @@
 /*
 	This is the Geb configuration file.
-	
+
 	See: http://www.gebish.org/manual/current/#configuration
 */
-
 
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -52,7 +51,6 @@ environments {
         }
 	}
 
-
 	// run via “./gradlew firefoxTest”
 	// See: http://code.google.com/p/selenium/wiki/FirefoxDriver
 	firefox {
@@ -93,8 +91,7 @@ environments {
 // To run the tests with chrome and firefox browsers just run “./gradlew test”
 
 // Set or get the baseUrl of the system to be tested
-baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa12.transitionmanager.net'
+baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa11.transitionmanager.net'
 println "geb.build.baseUrl: Testing qa environment ${baseUrl}"
 
 //reportsDir = "target/geb-reports"
-

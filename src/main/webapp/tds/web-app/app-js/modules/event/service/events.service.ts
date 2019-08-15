@@ -7,7 +7,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {catchError, map} from 'rxjs/operators';
 
-import {EventModel, EventRowType} from '../model/event.model';
+import {EventModel, EventRowType, CatagoryRowType, CategoryTask, TaskCategoryCell} from '../model/event.model';
 import {NewsModel, NewsDetailModel} from '../model/news.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
@@ -32,6 +32,7 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
+	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/moveEvent/taskCategoriesStats`;
 	private readonly categories = [
 		'Step',
 		'',
@@ -77,8 +78,8 @@ export class EventsService {
  	 * @param {number} newsid News Id
 	 * @returns {Observable<NewsDetailModel>}
 	 */
-	getNewsDetail(newsId: number): Observable<NewsDetailModel> {
-		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=N`)
+	getNewsDetail(newsId: number, commentType: string): Observable<NewsDetailModel> {
+		return this.http.get(`${this.APP_EVENT_NEWS_DETAIL}/?id=${newsId}&commentType=${commentType}`)
 			.map((response: any) => {
 				return response && response.shift() || null;
 			})
@@ -204,100 +205,9 @@ export class EventsService {
 	}
 
 	/**
-	 * Get the initial array of bundles
- 	 * @param {number} lenght Bundle numbers
- 	 * @param {string} classes Css classes to style the bundles
-	 * @returns {any[]} Array of empty bundles
+	 * Retrive the full event list
+	 * @returns {EventModel[]} list of events
 	*/
-	private getInitialBundleValues(lenght: number, classes: string): any[] {
-		const items = [];
-		for (let i = 0; i < lenght; i++) {
-			items.push({text: '', classes})
-		}
-		return items;
-	}
-
-	/**
-	 * Get the steps of every bundle
- 	 * @param {any} snapshot
- 	 * @param {any} moveBundleSteps
- 	 * @param {string} userTimeZone
- 	 * @param {any} moveBundleList
- 	 * @param {number} selectedBundleId
-	 * @returns {any} Array of empty bundles
-	*/
-	getBundleSteps(snapshot: any, moveBundleSteps: [], userTimeZone: string, moveBundleList: any, selectedBundleId: number): any {
-		let steps = [];
-
-		let headerRow = [];
-		moveBundleSteps.forEach((moveBundle: any) => {
-			headerRow.push({ id: moveBundle.id, text: moveBundle.label, classes: '' });
-		});
-
-		steps.push(headerRow);
-		steps.push(this.getInitialBundleValues(headerRow.length, 'empty-column'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'secondary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-		steps.push(this.getInitialBundleValues(headerRow.length, 'primary'));
-
-		snapshot.steps.forEach((step: any) => {
-			const bundle: any = moveBundleSteps
-				.find((currentBundle: any) => {
-					return currentBundle.moveBundle.id === parseInt(snapshot.moveBundleId, 10) && step.tid === currentBundle.transitionId;
-				});
-
-			if (bundle) {
-				console.log(bundle);
-			}
-			let colIndex = headerRow.findIndex((item: any) => item.id === bundle.id);
-			const percent = isNaN(step.tskComp / step.tskTot) ? 0 + '%' : parseInt(((step.tskComp / step.tskTot) * 100).toString(), 10) + '%';
-			steps[EventRowType.Percents][colIndex].text = percent;
-			steps[EventRowType.Percents][colIndex].classes = step.percentageStyle;
-			steps[EventRowType.PlannedStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planStart);
-			steps[EventRowType.PlannedCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.planComp);
-			steps[EventRowType.ActualStart][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actStart);
-			steps[EventRowType.ActualCompletion][colIndex].text = DateUtils.formatUserDateTime(userTimeZone, step.actComp);
-
-			let remainingTasksNumber = 0
-			let totalTasksNumber = 0
-			if (!isNaN(step.tskComp / step.tskTot)) {
-				remainingTasksNumber = step.tskComp
-				totalTasksNumber = step.tskTot
-			}
-
-			let taskManagerUrl =  './../assetEntity/listTasks?bundle=' + 10 + '&justRemaining=';
-			let firstUrl = taskManagerUrl + '1&step=' + step.wfTranId
-			let secondUrl = taskManagerUrl + '0&step=' + step.wfTranId
-			let linksHtml = '<a href=\'' + firstUrl + '\'>' + remainingTasksNumber + '</a> (of <a href=\'' + secondUrl + '\'>' + totalTasksNumber + '</a>)';
-			// set the task value
-			steps[EventRowType.Tasks][colIndex].text = linksHtml;
-		});
-
-		return {
-			categories: this.categories,
-			steps,
-			columnsLength: headerRow.length,
-			moveBundleList: moveBundleList,
-			selectedBundleId: selectedBundleId
-		};
-	}
-
-	/**
-	 * Get and empty bundle object
-	 * @returns {any}
-	*/
-	getEmptyBundleSteps(): any {
-		return {
-			categories: this.categories,
-			columnsLength: 0,
-			moveBundleList: [],
-			selectedBundleId: null,
-			steps: []
-		}
-	}
-
 	getEventsForList(): Observable<EventModel[]> {
 		return this.http.get(`../ws/moveEvent/list`)
 			.map((response: any) => {
@@ -348,8 +258,7 @@ export class EventsService {
 	deleteEvent(id): Observable<any> {
 		return this.http.delete(`../ws/moveEvent/deleteEvent/${id}`)
 			.map((response: any) => {
-				let eventModels = response && response.status === 'success' && response.data;
-				return eventModels;
+				return response;
 			})
 			.catch((error: any) => error);
 	}
@@ -457,5 +366,67 @@ export class EventsService {
 		return this.http.get(`${this.jobProgressUrl}/${progressKey}`)
 			.map((response: any) => response)
 			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get the relationship among categories and tasks
+ 	 * @param {number} eventId Event id
+	 * @returns {Observable<any>} Category status details
+	*/
+	getTaskCategoriesStats(eventId: number, userTimeZone: string): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
+			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone))
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Take the raws category results and produce the structure that contains
+	 * the relationship task category
+ 	 * @param {CategoryTask[]} data  Raw task category results
+	 * @returns {any} Array of task category cells
+	*/
+	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string): any {
+		const results: Array<Array<TaskCategoryCell>> = [];
+
+		const headerRow: TaskCategoryCell[] = [];
+		data.forEach((item: CategoryTask) => {
+			headerRow.push({text: item.category, classes: 'empty-column'});
+		});
+		results.push(headerRow);
+
+		const columnsLength = headerRow.length;
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
+
+		data.forEach((item: CategoryTask, index: number) => {
+			results[CatagoryRowType.PlannedStart][index].text =   DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
+		});
+
+		const hasInfo = data.find((item: CategoryTask) => {
+			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
+		})
+
+		return {tasks: results, columns: columnsLength, hasInfo};
+	}
+
+	/**
+	 * Get the initial task category cells
+ 	 * @param {number[]} lenght Number of categories
+ 	 * @param {string} classes Comma separated css classes
+	 * @returns {any} Array of task category cells
+	*/
+	private getInitialTaskCategoriesCells(lenght: number, classes: string): TaskCategoryCell[] {
+		const items: TaskCategoryCell[] = [];
+
+		for (let i = 0; i < lenght; i++) {
+			items.push({text: '', classes: classes})
+		}
+
+		return items;
 	}
 }

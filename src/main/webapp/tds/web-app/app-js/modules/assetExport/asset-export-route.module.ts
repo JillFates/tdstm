@@ -1,8 +1,11 @@
 // Angular
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
+// Resolves
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Components
 import {ExportComponent} from './components/export/export.component';
+import {AuthGuardService} from '../auth/service/auth.guard.service';
 
 /**
  * Auth Route States
@@ -24,7 +27,8 @@ export const AssetExportRoute: Routes = [
 				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: []
 			}
 		},
-		component: ExportComponent
+		component: ExportComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
 	},
 ];
 

@@ -13,6 +13,7 @@ import {AssetExportRouteModule} from './asset-export-route.module';
 import {ExportAssetService} from './service/export-asset.service'
 // Components
 import {ExportComponent} from './components/export/export.component';
+import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 
 @NgModule({
 	imports: [
@@ -26,7 +27,11 @@ import {ExportComponent} from './components/export/export.component';
 		// Route
 		AssetExportRouteModule
 	],
-	providers: [ExportAssetService],
+	providers: [
+		// Resolve
+		ModuleResolveService,
+		ExportAssetService
+	],
 	declarations: [
 		ExportComponent,
 	]

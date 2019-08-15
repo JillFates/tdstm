@@ -121,7 +121,8 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [locked]="true"
+								   *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -148,7 +149,7 @@
 				*ngFor="let column of model.columns; let i = index"
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
-				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
+				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH_SHRINK"
 				[width]="commonShrunkColumns.includes(column.label)? commonShrunkColumnWidth : column.width"
 				[class]="column.domain"
 		>

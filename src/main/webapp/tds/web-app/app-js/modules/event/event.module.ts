@@ -24,7 +24,7 @@ import {NewsCreateEditComponent} from './components/news-create-edit/news-create
 import {PlanVersusStatusComponent} from './components/plan-versus-status/plan-versus-status.component';
 import {EventResumeComponent} from './components/event-resume/event-resume.component';
 import {TeamTaskPercentsComponent} from './components/team-task-percents/team-task-percents.component';
-import {BundleStepsComponent} from './components/bundle-steps/bundle-steps.component';
+import {TaskCategoryComponent} from './components/task-category/task-category.component';
 import {EventListComponent} from './components/list/event-list.component';
 import {EventCreateComponent} from './components/create/event-create.component';
 import {EventViewEditComponent} from './components/view-edit/event-view-edit.component';
@@ -67,7 +67,7 @@ import {EventsResolveService} from './resolve/events-resolve.service';
 		PlanVersusStatusComponent,
 		EventResumeComponent,
 		TeamTaskPercentsComponent,
-		BundleStepsComponent
+		TaskCategoryComponent
 	],
 	providers: [
 		// Resolve
@@ -91,7 +91,7 @@ import {EventsResolveService} from './resolve/events-resolve.service';
 		PlanVersusStatusComponent,
 		EventResumeComponent,
 		TeamTaskPercentsComponent,
-		BundleStepsComponent
+		TaskCategoryComponent
 	]
 })
 

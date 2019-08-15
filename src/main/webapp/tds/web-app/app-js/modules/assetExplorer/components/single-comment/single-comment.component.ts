@@ -47,7 +47,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	 * Load All Comment Categories
 	 */
 	private loadCommentCategories(): void {
-		this.taskManagerService.getCommentCategories().subscribe((res) => {
+		this.taskManagerService.getAssetCommentCategories().subscribe((res) => {
 			this.commentCategories = res;
 			if (!this.singleCommentModel.category || this.singleCommentModel.category === null) {
 				this.singleCommentModel.category = this.commentCategories[0];
@@ -113,8 +113,8 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CANCEL'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {

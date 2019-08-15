@@ -106,7 +106,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			// roles          : userDetails.authorities*.toString(),
 			"token_type"   : "Bearer",
 			"access_token" : token.accessToken,
-			"expires_in"   : token.expirationq
+			"expires_in"   : token.expiration
 		]
 	}
 
