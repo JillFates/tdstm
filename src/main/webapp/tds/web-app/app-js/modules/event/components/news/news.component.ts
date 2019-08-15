@@ -2,6 +2,8 @@ import {Component, OnChanges, Input, Output, EventEmitter, SimpleChanges} from '
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {NewsModel} from './../../model/news.model';
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'tds-news',
@@ -11,21 +13,21 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
+						<div  [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div  [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 				<kendo-tabstrip-tab [title]="'Archive'">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
+						<div [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 			</kendo-tabstrip>
-			<tds-button-create (click)="onCreateNews()" class="btn-primary" title="Add News"></tds-button-create>
+			<tds-button-create (click)="onCreateNews()" [disabled]="!isCreateAvailable()" class="btn-primary" title="Add News"></tds-button-create>
 		</div>
 	`
 })
@@ -37,7 +39,10 @@ export class NewsComponent implements OnChanges {
 	public eventNews: Array<NewsModel> = [];
 	public userTimeZone: string;
 
-	constructor(private userContextService: UserContextService) {
+	constructor(
+		private userContextService: UserContextService,
+		private permissionService: PermissionService) {
+
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				this.userTimeZone = userContext.timezone;
@@ -62,7 +67,9 @@ export class NewsComponent implements OnChanges {
  	 * @param {any} id  News selected
 	*/
 	public onSelectedNews(news: any): void {
-		this.selected.emit(news);
+		if (this.isEditAvailable()) {
+			this.selected.emit(news);
+		}
 	}
 
 	/**
@@ -72,5 +79,13 @@ export class NewsComponent implements OnChanges {
 	*/
 	public onCreateNews(): void {
 		this.create.emit();
+	}
+
+	public isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.NewsCreate);
+	}
+
+	public isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.NewsEdit);
 	}
 }
