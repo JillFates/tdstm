@@ -130,8 +130,10 @@ export const EVENT_DEFAULT_TEXT_SCRIPT = `// Put the task on hold and add a comm
 `;
 export const EVENT_DEFAULT_TEXT_WEB_API = `// Put the task on hold and add a comment with the cause of the error
  task.error( response.error )
-//If you are using TMD to run the web API use this reaction script instead, of the default above.
-//task.error( response.stderr )
+
+//If you are using TMD to run the Web API check the Error Event above,
+//and use the commented out:
+//task.error(response.stderr)
 `;
 export const EVENT_DEFAULT_ERROR_SCRIPT = `// Put the task on hold and add a comment with the cause of the error
  task.error( response.stderr )`;
