@@ -26,7 +26,7 @@ class TaskVertexSpec extends Specification {
 	}
 
 	@Unroll
-	void 'test can calculate remaining time duration in minutes based on duration = #duration, durationScale = #durationScale, actual start = #actualStart and status = #status'() {
+	void 'test can calculate remaining time duration in minutes based on duration = #duration, actual start = #actualStart and status = #status'() {
 
 		setup:
 			Date pointInTime = TimeUtil.nowGMT()
