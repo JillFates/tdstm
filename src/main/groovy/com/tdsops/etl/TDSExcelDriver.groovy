@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.monitorjbl.xlsx.StreamingReader
 import com.tdssrc.grails.WorkbookUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -8,8 +9,11 @@ import getl.exception.ExceptionGETL
 import getl.utils.BoolUtils
 import getl.utils.FileUtils
 import getl.utils.ListUtils
-import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.poifs.filesystem.NPOIFSFileSystem
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 
 /**
@@ -32,8 +36,7 @@ import org.apache.poi.ss.usermodel.Workbook
  * </pre>
  * It is implemented TDSExcelDriver#fields
  *
- * @see ExcelDriver
- * @see TDSExcelDriver#fields(getl.data.Dataset)
+ * @see ExcelDriver* @see TDSExcelDriver#fields(getl.data.Dataset)
  * @see TDSExcelDriver#hasSheet(getl.data.Dataset, int)
  * @see TDSExcelDriver#hasSheet(getl.data.Dataset, String)
  */
@@ -43,6 +46,15 @@ class TDSExcelDriver extends ExcelDriver {
 	 * Workbook instance. It's open once using TDSExcelDriver#readWorkbookAndSheets
 	 */
 	Workbook workbook
+	/**
+	 * Current {@code Sheet} used in iterations
+	 */
+	Sheet currentSheet
+	/**
+	 * Current Row used for iteration on {@code TDSExcelDriver#currentSheet}
+	 */
+	Row currentRow
+
 	/**
 	 * Map of sheet names as a map with name and ordinal position as a key
 	 * <pre>
@@ -75,31 +87,31 @@ class TDSExcelDriver extends ExcelDriver {
 	@Override
 	long eachRow(Dataset dataset, Map params, Closure prepareCode, Closure code) {
 
-		if(!workbook) {
+		if (!workbook) {
 			this.readWorkbookAndSheets(dataset)
 		}
-		Sheet sheet = this.sheetsMap[dataset.params.listName]
+		currentSheet = this.sheetsMap[dataset.params.listName]
 
 		dataset.field = fields(dataset)
 		if (dataset.field.isEmpty()) throw new ExceptionGETL("Required fields description with dataset")
 
 		Map datasetParams = dataset.params
 		def header = BoolUtils.IsValue([params.header, datasetParams.header], false)
-		Number offsetRows = dataset.params.currentRowIndex?:0
+		Number offsetRows = dataset.params.currentRowIndex ?: 0
 		Number offsetCells = 0
 		long countRec = 0
 		if (prepareCode != null) prepareCode([])
 
-		def limit = ListUtils.NotNullValue([params.limit, datasetParams.limit, sheet.lastRowNum])
+		def limit = ListUtils.NotNullValue([params.limit, datasetParams.limit, currentSheet.lastRowNum])
 
-		Iterator rows = sheet.rowIterator()
+		Iterator rows = currentSheet.rowIterator()
 
 		if (offsetRows != 0) (1..offsetRows).each {
 			rows.next()
 		}
-		int additionalRows = limit + offsetRows + (header?(1 as int):(0 as int))
+		int additionalRows = limit + offsetRows + (header ? (1 as int) : (0 as int))
 
-		rows.each { org.apache.poi.ss.usermodel.Row row ->
+		rows.each { Row row ->
 			if (row.rowNum >= additionalRows) return
 			Iterator cells = row.cellIterator()
 			LinkedHashMap<String, Object> updater = [:]
@@ -122,18 +134,25 @@ class TDSExcelDriver extends ExcelDriver {
 	@Override
 	List<Field> fields(Dataset dataset) {
 
-		dataset.params.listName = dataset.params.listName?:0
-		if(!fieldsMap.containsKey(dataset.params.listName)){
+		dataset.params.listName = dataset.params.listName ?: 0
+		if (!fieldsMap.containsKey(dataset.params.listName)) {
 
-			if(!workbook) {
+			if (!workbook) {
 				this.readWorkbookAndSheets(dataset)
 			}
-			Sheet sheet = this.sheetsMap[dataset.params.listName]
-			Integer currentRowIndex = dataset.params.currentRowIndex ?:0
+			currentSheet = this.sheetsMap[dataset.params.listName]
+			Integer currentRowIndex = dataset.params.currentRowIndex ?: 0
 
-			List<Cell> cells = WorkbookUtil.getCellsForSheet(currentRowIndex, sheet)
-			List<Field> fields = cells.collect { Cell cell ->
-				new Field(name: cellValue(cell), type: cellType(cell))
+			Iterator rows = currentSheet.rowIterator()
+			if (currentRowIndex != 0) (1..currentRowIndex).each {
+				rows.next()
+			}
+
+			Row row = rows.next()
+			Iterator cells = row.cellIterator()
+			List<Field> fields = []
+			cells.each { Cell cell ->
+				fields.add(new Field(name: cellValue(cell), type: cellType(cell)))
 			}
 			fieldsMap[dataset.params.listName] = fields
 		}
@@ -150,7 +169,7 @@ class TDSExcelDriver extends ExcelDriver {
 	 */
 	@Override
 	private static getCellValue(final Cell cell, final Dataset dataset, final int columnIndex) {
-		cell.setCellType(Cell.CELL_TYPE_STRING)
+		//cell.setCellType(Cell.CELL_TYPE_STRING)
 		return cell.stringCellValue
 	}
 
@@ -159,9 +178,9 @@ class TDSExcelDriver extends ExcelDriver {
 	 * @param cell
 	 * @return
 	 */
-	private String cellValue(Cell cell){
+	private String cellValue(Cell cell) {
 		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
-		return cell.toString().trim()
+		return cell.stringCellValue
 	}
 
 	/**
@@ -169,7 +188,7 @@ class TDSExcelDriver extends ExcelDriver {
 	 * @param cell
 	 * @return
 	 */
-	private Field.Type cellType(Cell cell){
+	private Field.Type cellType(Cell cell) {
 		// TODO: DMC: Complete this conversion
 		return Field.Type.STRING
 	}
@@ -177,13 +196,15 @@ class TDSExcelDriver extends ExcelDriver {
 	/**
 	 * Initialization for TDSExcelDriver#workbook field
 	 * and TDSExcelDriver#sheetsMap
+	 *
 	 * @param dataset the dataset used in getl.excel.ExcelConnection
+	 *
 	 * @return an instance with the Workbook created from dataset content
 	 * @see getl.excel.ExcelConnection
 	 */
-	protected Workbook readWorkbookAndSheets(Dataset dataset){
+	protected Workbook readWorkbookAndSheets(Dataset dataset) {
 
-		if(!workbook){
+		if (!workbook) {
 			String path = dataset.connection.params.path
 			String fileName = dataset.connection.params.fileName
 			String fullPath = FileUtils.ConvertToDefaultOSPath(path + File.separator + fileName)
@@ -200,52 +221,75 @@ class TDSExcelDriver extends ExcelDriver {
 	}
 
 	/**
+	 * Creates an instance of {@code Workbook} from a filename parameter.
+	 * It can prepare 2 different types of {@code Workbook}.
+	 * For 'xls' files, It is created using {@code HSSFWorkbook}
+	 * <pre>
+	 * 		new HSSFWorkbook(new NPOIFSFileSystem(new File(fileName)))
+	 * </pre>
+	 * For 'xlsx' files, It is created using {@code StreamingReader#builder}
+	 * <pre>
+	 *  	InputStream is = new FileInputStream(new File(fileName))
+	 * 		StreamingReader.builder()
+	 * 			.rowCacheSize(100)
+	 * 			.bufferSize(4096)
+	 * 			.open(is);
+	 * </pre>
+	 *
+	 * @param fileName excel file name
+	 * @return an instance of {@code Workbook}
+	 */
+	private static getWorkbookType(final String fileName) {
+		def ext = FileUtils.FileExtension(fileName)
+		if (!(new File(fileName).exists())) throw new ExceptionGETL("File '$fileName' doesn't exists")
+		if (!(ext in ['xls', 'xlsx'])) throw new ExceptionGETL("'$ext' is not available. Please, use 'xls' or 'xlsx'.")
+
+		switch (ext) {
+			case { fileName.endsWith(ext) && ext == 'xlsx' }:
+				// For 'xlsx' files, Apache POI it is not very memory efficient.
+				// We are using a library for reading Excel files using streaming logic.
+				InputStream is = new FileInputStream(new File(fileName))
+				StreamingReader.builder()
+					.rowCacheSize(100)    // number of rows to keep in memory (defaults to 10)
+					.bufferSize(4096)     // buffer size to use when reading InputStream to file (defaults to 1024)
+					.open(is);
+				break
+			case { fileName.endsWith(ext) && ext == 'xls' }:
+				new HSSFWorkbook(new NPOIFSFileSystem(new File(fileName)))
+				break
+			default:
+				throw new ExceptionGETL("Something went wrong")
+		}
+	}
+	/**
 	 * Check if a Workbook instance has a Sheet based on a sheet name
-	 * @param dataset
+	 *
+	 * @param dataset an instance of {@code Dataset}
 	 * @param listName
-	 * @return
+	 *
+	 * @return true if {@code TDSExcelDriver#sheetsMap}
+	 * 		contains a Sheet for listName parameter
 	 */
 	boolean hasSheet(Dataset dataset, String listName) {
-		if(!sheetsMap){
+		if (!sheetsMap) {
 			readWorkbookAndSheets(dataset)
 		}
-		return  sheetsMap.containsKey(listName)
+		return sheetsMap.containsKey(listName)
 	}
 
 	/**
 	 * Check if a Workbook instance has a Sheet based on an ordinal sheet number
-	 * @param dataset
+	 *
+	 * @param dataset an instance of {@code Dataset}
 	 * @param listName
-	 * @return
+	 *
+	 * @return true if {@code TDSExcelDriver#sheetsMap}
+	 * 		contains a Sheet for sheetNumber parameter
 	 */
 	boolean hasSheet(Dataset dataset, int sheetNumber) {
-		if(!sheetsMap){
+		if (!sheetsMap) {
 			readWorkbookAndSheets(dataset)
 		}
-		return  sheetsMap.containsKey(sheetNumber)
-	}
-
-	/**
-	 * Lookups a Sheet instance based on a listName
-	 * @param dataSet
-	 * @param workbook
-	 * @param listName
-	 * @return
-	 */
-	private Sheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, String listName) {
-		return WorkbookUtil.getSheetFromWorkbook(workbook, listName)
-	}
-
-	/**
-	 * Lookups a Sheet instance based on a sheetNumber
-	 * @param dataSet
-	 * @param workbook
-	 * @param listName
-	 * @return
-	 */
-	private Sheet getSheetFromWorkbook(Dataset dataset, Workbook workbook, int sheetNumer) {
-		Sheet sheet = WorkbookUtil.getSheetFromWorkbookAt(workbook, sheetNumer)
-		dataset.params.listName = WorkbookUtil.getSheetName(workbook, sheetNumer)
-		return sheet
+		return sheetsMap.containsKey(sheetNumber)
 	}
 }
