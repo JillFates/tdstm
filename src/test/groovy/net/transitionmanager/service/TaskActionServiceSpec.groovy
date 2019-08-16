@@ -87,7 +87,8 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetComment
 
 		service.taskService = [
-					addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+					addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+						notes << note
 						return true
 					}
 				] as TaskService
@@ -163,7 +164,8 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		assetComment.save(failOnError: true, flush: true)
 
 		service.taskService = [
-			addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+			addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+				notes << note
 				return true
 			}
 		] as TaskService
@@ -308,10 +310,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			when: 'updating the action status'
 				service.actionError(action, assetComment.id, whom)
 			then: 'Task notes are added'
-				notes.size() == 4
+				notes.size() == 3
 				notes.contains('some message')
 				notes[1] == 'ERROR script failure: api invocation exception'
-				notes[3] == "Placed task on HOLD, previous state was 'Ready'"
+				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
 		}
 
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript'() {
@@ -345,10 +347,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			when: 'updating the action status'
 				service.actionDone(action, assetComment.id, whom)
 			then: 'Task notes are added'
-				notes.size() == 4
+				notes.size() == 3
 				notes.contains('some message')
 				notes[1] == 'SUCCESS script failure: api invocation exception'
-				notes[3] == "Placed task on HOLD, previous state was 'Ready'"
+				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
 		}
 
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript for success but not error reaction scripts'() {
