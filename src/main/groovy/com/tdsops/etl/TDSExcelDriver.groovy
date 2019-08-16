@@ -1,6 +1,7 @@
 package com.tdsops.etl
 
 import com.monitorjbl.xlsx.StreamingReader
+import com.monitorjbl.xlsx.impl.StreamingCell
 import com.tdssrc.grails.WorkbookUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -162,6 +163,10 @@ class TDSExcelDriver extends ExcelDriver {
 
 	/**
 	 * Calculates String value of a Cell
+	 * If {@code Cell} is an instance of {@code StreamingCell},
+	 * it means we are iterating using Streaming API.
+	 * It does not have correct support for {@Cell#toString} method.
+
 	 * @param cell
 	 * @param dataset
 	 * @param columnIndex
@@ -169,18 +174,27 @@ class TDSExcelDriver extends ExcelDriver {
 	 */
 	@Override
 	private static getCellValue(final Cell cell, final Dataset dataset, final int columnIndex) {
-		//cell.setCellType(Cell.CELL_TYPE_STRING)
-		return cell.stringCellValue
+		if (cell instanceof StreamingCell) {
+			return cell.stringCellValue
+		} else {
+			return cell.toString()
+		}
 	}
 
 	/**
 	 * Calculates String value of a Cell
+	 * If {@code Cell} is an instance of {@code StreamingCell},
+	 * it means we are iterating using Streaming API.
+	 * It does not have correct support for {@Cell#toString} method.
 	 * @param cell
 	 * @return
 	 */
 	private String cellValue(Cell cell) {
-		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
-		return cell.stringCellValue
+		if (cell instanceof StreamingCell) {
+			return cell.stringCellValue
+		} else {
+			return cell.toString()
+		}
 	}
 
 	/**
