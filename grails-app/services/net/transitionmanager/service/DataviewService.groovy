@@ -4,6 +4,7 @@
 package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
@@ -556,6 +557,8 @@ class DataviewService implements ServiceMethods {
      * @return a Map with data and pagination defined as [data: [.. ..], pagination: [ max: ..., offset: ..., total: ... ]]
      */
     private Map previewQueryResults(List assets, Long total, DataviewSpec dataviewSpec) {
+	    Map<String, List> fieldSpecsByDomain = [:]
+	    Project project = securityService.userCurrentProject
 	    // Find the position of the AssetClass field.
 	    int indexOfAssetClassField = dataviewSpec.columns.findIndexOf {it.property == 'assetClass'}
         [
@@ -573,17 +576,33 @@ class DataviewService implements ServiceMethods {
 						cell = handleTags(cell)
 					}
 
-					/*
+
+					if (!fieldSpecsByDomain.containsKey(assetDomain)) {
+						Map fieldSpec = customDomainService.allFieldSpecs(project, assetDomain)
+						fieldSpecsByDomain[assetDomain] = fieldSpec[assetDomain.toUpperCase()]['fields']
+					}
+
+					/*s
 			            TM-14497: Merging the fix provided for 4.6.x into 4.5.x is not simple, as it relies on functionality not
 			            available on this branch (several changes to DataviewSpec and the addition of the FieldSpecProject class).
 			            Instead of reimplementing all this -- which would mean executing additional queries just to run a simple
-			            check, we can use the field's name which, in 4.5.x, always start with 'custom'.
+			            check, we're pulling the spec for the custom fields and checking conditions against them.
 			         */
-					Boolean isCustom = column.property.startsWith('custom')
-					// A field should be populated if it's a common field or if it's a custom field that belongs to the asset's domain.
-					Boolean shouldBePopulated = !isCustom || (isCustom && column.domain == assetDomain)
-					if (column && shouldBePopulated) {
-						row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+
+					if (column) {
+						Map fieldSpecForColumn = fieldSpecsByDomain[assetDomain].find {it.field == column.property}
+						if (fieldSpecForColumn) {
+							// Is it a custom?
+							Boolean isCustom = StringUtil.toBoolean(fieldSpecForColumn['udf'])
+							// Has the 'show' flag set?
+							Boolean isShowable = StringUtil.toBoolean(fieldSpecForColumn['show'])
+							// Do the column and the field belong to the same domain or is the field shared?
+							Boolean isRightDomain = StringUtil.toBoolean(fieldSpecForColumn['shared']) || column.domain == assetDomain
+							// Populate if it's a common or if it's a custom field, marked to show that belongs to the same domain (or it's shared).
+							if (!isCustom || (isCustom && isShowable && isRightDomain)) {
+								row["${dataviewSpec.columns[index].domain}_${dataviewSpec.columns[index].property}"] = cell
+							}
+						}
 					}
 				}
 
@@ -1178,4 +1197,13 @@ class DataviewService implements ServiceMethods {
 		}
 		return isUnique
 	}
+
+	/**
+	 * This service can't be just autowired.
+	 * @return
+	 */
+	private CustomDomainService getCustomDomainService() {
+		return (CustomDomainService) ApplicationContextHolder.getBean('customDomainService', CustomDomainService)
+	}
+
 }
