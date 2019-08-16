@@ -18,6 +18,8 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -37,6 +39,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
 			userContextService: UserContextService,
+			private permissionService: PermissionService,
 			windowService: WindowService) {
 				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
 				this.mainAsset = modelId;
@@ -91,6 +94,14 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
 				DIALOG_SIZE.LG);
+		}
+
+		protected isManufacturerLinkAvailable(): boolean {
+			return this.permissionService.hasPermission(Permission.ManufacturerView);
+		}
+
+		protected isModelLinkAvailable(): boolean {
+			return this.permissionService.hasPermission(Permission.ModelView);
 		}
 
 		/**
