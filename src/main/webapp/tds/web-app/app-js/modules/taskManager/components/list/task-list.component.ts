@@ -185,10 +185,12 @@ import {SetEvent} from '../../../event/action/event.actions';
 									<i class="fa fa-check"></i>Done
 								</button>
 								<button
-									*ngIf="dataItem.apiActionId !== null && dataItem.apiActionInvokedAt === null && dataItem.apiActionCompletedAt === null && (dataItem.status === 'Ready' || dataItem.status === 'Started' || dataItem.status === 'Completed')"
+									*ngIf="dataItem.invokeButton !== null"
 									class="btn btn-primary btn-xs"
+									[title]="dataItem.invokeButton.tooltipText || ''"
+									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
 									(click)="invokeActionHandler(dataItem)">
-									<i class="fa fa-gear"></i>Invoke
+									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
 								</button>
 								<button class="btn btn-primary btn-xs"
 												*ngIf="dataItem.apiActionId && dataItem.status === 'Hold'"
@@ -663,6 +665,9 @@ export class TaskListComponent {
 				taskRow.apiActionCompletedAt = result.apiActionCompletedAt;
 				taskRow.apiActionInvokedAt = result.apiActionInvokedAt;
 				taskRow.category = result.category;
+				if (result.invokeActionDetails) {
+					taskRow.invokeButton = {...result.invokeActionDetails};
+				}
 			});
 		}
 		this.rowsExpandedMap[$event.index] = true;
