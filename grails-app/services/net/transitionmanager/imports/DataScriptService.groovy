@@ -481,7 +481,7 @@ class DataScriptService implements ServiceMethods{
 	 * @param targetProject  The project to which the new data scripts will be associated.
 	 */
 	void cloneProjectDataScripts(Project sourceProject, Project targetProject) {
-		List<DataScript> dataScripts = DataScript.where
+		List<DataScript> dataScripts = DataScript.where {
 			project == sourceProject
 		}.list()
 
