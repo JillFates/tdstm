@@ -217,7 +217,6 @@ class SettingService implements ServiceMethods {
      * @return
      */
     private void fixEmptyConstraints(Map<String, ?> settingMap) {
-        println settingMap.size()
         settingMap?.fields?.each { Map<String, Map<String, List<String>>> field ->
             List<String> values = field.constraints?.values
             if ( values ) {
