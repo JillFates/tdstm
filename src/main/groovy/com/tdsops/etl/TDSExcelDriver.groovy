@@ -2,6 +2,7 @@ package com.tdsops.etl
 
 import com.monitorjbl.xlsx.StreamingReader
 import com.monitorjbl.xlsx.impl.StreamingCell
+import com.monitorjbl.xlsx.impl.StreamingWorkbook
 import com.tdssrc.grails.WorkbookUtil
 import getl.data.Dataset
 import getl.data.Field
@@ -55,6 +56,10 @@ class TDSExcelDriver extends ExcelDriver {
 	 * Current Row used for iteration on {@code TDSExcelDriver#currentSheet}
 	 */
 	Row currentRow
+	/**
+	 * Total amount of row processed for {@code TDSExcelDriver#currentSheet}
+	 */
+	Integer rowsProcessed = 0
 
 	/**
 	 * Map of sheet names as a map with name and ordinal position as a key
@@ -99,6 +104,13 @@ class TDSExcelDriver extends ExcelDriver {
 		Map datasetParams = dataset.params
 		def header = BoolUtils.IsValue([params.header, datasetParams.header], false)
 		Number offsetRows = dataset.params.currentRowIndex ?: 0
+
+		if (workbook instanceof StreamingWorkbook) {
+			// Stremaing processing is moving iterator when fields are calculated,
+			// at this point we need to move only the skip rows defined by user
+			offsetRows = offsetRows - rowsProcessed
+		}
+
 		Number offsetCells = 0
 		long countRec = 0
 		if (prepareCode != null) prepareCode([])
@@ -107,8 +119,12 @@ class TDSExcelDriver extends ExcelDriver {
 
 		Iterator rows = currentSheet.rowIterator()
 
-		if (offsetRows != 0) (1..offsetRows).each {
-			rows.next()
+		if (offsetRows > 0) {
+			(1..(offsetRows)).each {
+				if (rows.hasNext()) {
+					rows.next()
+				}
+			}
 		}
 		int additionalRows = limit + offsetRows + (header ? (1 as int) : (0 as int))
 
@@ -142,14 +158,17 @@ class TDSExcelDriver extends ExcelDriver {
 				this.readWorkbookAndSheets(dataset)
 			}
 			currentSheet = this.sheetsMap[dataset.params.listName]
+			rowsProcessed = 0
 			Integer currentRowIndex = dataset.params.currentRowIndex ?: 0
 
 			Iterator rows = currentSheet.rowIterator()
 			if (currentRowIndex != 0) (1..currentRowIndex).each {
 				rows.next()
+				rowsProcessed += 1
 			}
 
 			Row row = rows.next()
+			rowsProcessed += 1
 			Iterator cells = row.cellIterator()
 			List<Field> fields = []
 			cells.each { Cell cell ->
@@ -165,8 +184,7 @@ class TDSExcelDriver extends ExcelDriver {
 	 * Calculates String value of a Cell
 	 * If {@code Cell} is an instance of {@code StreamingCell},
 	 * it means we are iterating using Streaming API.
-	 * It does not have correct support for {@Cell#toString} method.
-
+	 * It does not have correct support for {@code Cell#toString} method.
 	 * @param cell
 	 * @param dataset
 	 * @param columnIndex
@@ -185,7 +203,7 @@ class TDSExcelDriver extends ExcelDriver {
 	 * Calculates String value of a Cell
 	 * If {@code Cell} is an instance of {@code StreamingCell},
 	 * it means we are iterating using Streaming API.
-	 * It does not have correct support for {@Cell#toString} method.
+	 * It does not have correct support for {@code Cell#toString} method.
 	 * @param cell
 	 * @return
 	 */
