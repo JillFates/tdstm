@@ -123,15 +123,15 @@ class AssetExportService {
 			def exportedEntity = ""
 
 			// Flags to indicate which tabs to export based on which checkboxes selected in the UI
-			boolean doDevice = params.asset=='asset'
-			boolean doApp = params.application=='application'
-			boolean doDB = params.database=='database'
-			boolean doStorage = params.files=='files'
-			boolean doDependency = params.dependency=='dependency'
-			boolean doRoom = params.room=='room'
-			boolean doRack = params.rack=='rack'
-			boolean doCabling = params.cabling=='cable'
-			boolean doComment = params.comment=='comment'
+			boolean doDevice = StringUtil.toBoolean(params.ImportServer)
+			boolean doApp = StringUtil.toBoolean(params.ImportApplication)
+			boolean doDB = StringUtil.toBoolean(params.ImportDatabase)
+			boolean doStorage = StringUtil.toBoolean(params.ImportStorage)
+			boolean doDependency = StringUtil.toBoolean(params.ImportDependency)
+			boolean doRoom = StringUtil.toBoolean(params.ImportRooms)
+			boolean doRack = StringUtil.toBoolean(params.ImportRacks)
+			boolean doCabling = StringUtil.toBoolean(params.ImportCabling)
+			boolean doComment = StringUtil.toBoolean(params.ImportComment)
 
 			// Queries for main assets
 			String deviceQuery = null
