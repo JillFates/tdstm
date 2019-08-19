@@ -297,4 +297,87 @@ class ElementSpec extends Specification {
 			'grails.com'     | null       || 'grails.com'
 			null             | 'www'      || null
 	}
+
+	@Unroll
+	void 'test can apply toBoolean transformation on Element.value=#value with default value=#defaultValue'() {
+
+		setup:
+			Element element = new Element(value: value)
+		expect:
+			element.toBoolean(defaultValue).value == transformedValue
+			element.errors == errors
+
+		where:
+			value   | defaultValue || transformedValue | errors
+			true    | null         || true             | null
+			true    | false        || true             | null
+			true    | true         || true             | null
+			null    | false        || false            | null
+			null    | null         || null             | null
+			'true'  | null         || true             | null
+			'true'  | false        || true             | null
+			'true'  | true         || true             | null
+			'false' | null         || false            | null
+			'false' | false        || false            | null
+			'false' | true         || false            | null
+			'Yes'   | null         || true             | null
+			'Yes'   | false        || true             | null
+			'Yes'   | true         || true             | null
+			'No'    | null         || false            | null
+			'No'    | false        || false            | null
+			'No'    | true         || false            | null
+			'1'     | null         || true             | null
+			'1'     | false        || true             | null
+			'1'     | true         || true             | null
+			'0'     | null         || false            | null
+			'0'     | false        || false            | null
+			'0'     | true         || false            | null
+			'FOO'   | true         || 'FOO'            | ['Unable to transform value to Boolean']
+	}
+
+	@Unroll
+	void 'test can apply toNumber transformation on Element.value=#value with default value=#defaultValue'() {
+
+		setup:
+			Element element = new Element(value: value)
+		expect:
+			element.toNumber(defaultValue).value == transformedValue
+			element.errors == errors
+
+		where:
+			value | defaultValue || transformedValue | errors
+			1     | null         || 1l               | null
+			null  | 2            || 2l               | null
+			3.0d  | null         || 3l               | ['Unable to transform value to Number']
+			5.0f  | null         || 5l               | ['Unable to transform value to Number']
+			6l    | null         || 6l               | null
+			'FOO' | null         || 'FOO'            | ['Unable to transform value to Number']
+			'FOO' | 23           || 'FOO'            | ['Unable to transform value to Number']
+
+	}
+
+	@Unroll
+	void 'test can apply toDecimal transformation on Element.value=#value with default value=#defaultValue'() {
+
+		setup:
+			Element element = new Element(value: value)
+		expect:
+			element.toDecimal(presicion, defaultValue).value == transformedValue
+			element.errors == errors
+
+		where:
+			value    | presicion | defaultValue || transformedValue | errors
+			1        | 2         | null         || 1.00d            | null
+			2.02     | 2         | null         || 2.02d            | null
+			null     | 2         | 3.0d         || 3.00d            | null
+			null     | 2         | 4.0f         || 4.00d            | null
+			null     | 2         | 5.55         || 5.55d            | null
+			6.1234d  | 3         | null         || 6.123d           | null
+			null     | 3         | 7.1234d      || 7.123d           | null
+			8l       | 3         | null         || 8.000d           | null
+			9.999d   | 3         | null         || 9.999d           | null
+			10.1111d | 3         | null         || 10.111d          | null
+			'FOO'    | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
+			'Yes'    | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
+	}
 }

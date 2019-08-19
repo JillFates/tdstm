@@ -259,7 +259,7 @@ class Element implements RangeChecker, ETLCommand {
 			}
 		}
 
-		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
+		processor?.debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
 	}
 
@@ -431,6 +431,84 @@ class Element implements RangeChecker, ETLCommand {
 		return this
 	}
 
+	/**
+	 * Transform {@code Element#value} from a String to a Long, and set the default value if value is null or blank.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toNumber()
+	 *      load ... transformation with toNumber(120)
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toNumber(Long defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			value = defaultValue
+		} else {
+			Long newValue = NumberUtil.toLong(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Number')
+			}
+		}
+		return this
+	}
+
+	/**
+	 * Transform {@code Element#value} from a string to a Float and automatically rounds to the precision specified.
+	 * If defaultValue provide and value is null or blank then it will be assigned and rounded accordingly.
+	 * If the value was already a decimal then it should be rounded.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toDecimal(2)
+	 *      load ... transformation with toDecimal(2, 12.34)
+	 * <code>
+	 * @see NumberUtil#toDoubleNumber(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toDecimal(Integer precision, Double defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			value = defaultValue.round(precision)
+		} else {
+			Double newValue = NumberUtil.toDoubleNumber(value)
+			if (newValue != null) {
+				value = newValue.round(precision)
+			} else {
+				addToErrors('Unable to transform value to Decimal')
+			}
+		}
+		return this
+	}
+
+	/**
+	 * Transform {@code Element#value} from a String to a Boolean, and set the default value if value is null or blank.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toBoolean()
+	 *      load ... transformation with toBoolean(true)
+	 *      load ... transformation with toBoolean(0)
+	 *      load ... transformation with toBoolean('YES')
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toBoolean(Boolean defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			value = defaultValue
+		} else {
+			Boolean newValue = StringUtil.toBoolean(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Boolean')
+			}
+		}
+		return this
+	}
 	/**
 	 * Transform current value in this Element instance to a Date by attempting to use
 	 * the formats 'yyyy-mm-dd' and 'yyyy/mm/dd'.
