@@ -20,7 +20,7 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 @Integration
 @Rollback
-class ApiDocumentationArtistSpec extends GebSpec {
+class AppVersionControllerSpec extends GebSpec {
 
 	static final String APP_VERSION_ENDPOINT = '/tdstm/api/appVersion'
 
@@ -50,7 +50,6 @@ class ApiDocumentationArtistSpec extends GebSpec {
 					   .contentType(MediaType.APPLICATION_JSON_VALUE)
 					   .when()
 					   .port(this.port)
-
 					   .get(APP_VERSION_ENDPOINT)
 					   .then().assertThat().statusCode(HttpStatus.OK.value())
 
