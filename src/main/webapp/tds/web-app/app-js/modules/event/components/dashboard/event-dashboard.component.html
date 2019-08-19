@@ -72,24 +72,39 @@
                             </div>
                             <div class="fixed-tasks">
                                 <div class="task-done fixed-status">
-                                    <div>Done</div>
-                                    <div>{{eventDetails.countDone}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Completed'}">
+                                          <div>Done</div>
+                                          <div>{{eventDetails.countDone}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-started fixed-status">
-                                    <div>Started</div>
-                                    <div>{{eventDetails.countStarted}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Started'}">
+                                        <div>Started</div>
+                                        <div>{{eventDetails.countStarted}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-ready fixed-status">
-                                    <div>Ready</div>
-                                    <div>{{eventDetails.countReady}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Ready'}">
+                                        <div>Ready</div>
+                                        <div>{{eventDetails.countReady}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-hold fixed-status">
-                                    <div>Hold</div>
-                                    <div>{{eventDetails.countHold}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Hold'}">
+                                        <div>Hold</div>
+                                        <div>{{eventDetails.countHold}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-pending fixed-status">
-                                    <div>Pending</div>
-                                    <div>{{eventDetails.countPending}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Pending'}">
+                                        <div>Pending</div>
+                                        <div>{{eventDetails.countPending}}</div>
+                                    </a>
                                 </div>
                             </div>
                         </div>

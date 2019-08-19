@@ -526,7 +526,7 @@ class TaskService implements ServiceMethods {
 
 			// Attempting to invoke a local action remotely?
 			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
-				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attepted to invoke a local action as remote, which is not allowed')
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attempted to invoke a local action as remote, which is not allowed')
 			}
 
 			// Make sure the use has permission to invoke the action
@@ -747,6 +747,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
+				task.percentageComplete = 100
 				addNote(task, whom, "Task was Completed")
 				break
 

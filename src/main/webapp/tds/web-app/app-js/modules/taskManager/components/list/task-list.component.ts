@@ -1,6 +1,8 @@
+import { ActivatedRoute } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import { Observable } from 'rxjs/Observable';
 import {
 	CellClickEvent,
 	DetailCollapseEvent,
@@ -19,6 +21,12 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { TaskEditComponent } from '../edit/task-edit.component';
+import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
+import { DateUtils } from '../../../../shared/utils/date.utils';
+import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskCreateComponent } from '../create/task-create.component';
@@ -177,10 +185,12 @@ import {SetEvent} from '../../../event/action/event.actions';
 									<i class="fa fa-check"></i>Done
 								</button>
 								<button
-									*ngIf="dataItem.apiActionId !== null && dataItem.apiActionInvokedAt === null && dataItem.apiActionCompletedAt === null && (dataItem.status === 'Ready' || dataItem.status === 'Started' || dataItem.status === 'Completed')"
+									*ngIf="dataItem.invokeButton !== null"
 									class="btn btn-primary btn-xs"
+									[title]="dataItem.invokeButton.tooltipText || ''"
+									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
 									(click)="invokeActionHandler(dataItem)">
-									<i class="fa fa-gear"></i>Invoke
+									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
 								</button>
 								<button class="btn btn-primary btn-xs"
 												*ngIf="dataItem.apiActionId && dataItem.status === 'Hold'"
@@ -285,6 +295,7 @@ import {SetEvent} from '../../../event/action/event.actions';
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	private readonly allEventsOption = { id: 0, name: 'All Events' };
+	private urlParams = {};
 	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	selectedEvent = this.allEventsOption;
 	justRemaining: boolean;
@@ -310,40 +321,66 @@ export class TaskListComponent {
 		private userPreferenceService: PreferenceService,
 		private store: Store,
 		private dialogService: UIDialogService,
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private translate: TranslatePipe,
+		private activatedRoute: ActivatedRoute) {
 		this.onLoad();
+	}
+
+	/**
+	 * Verifies the presence of the filter passed in the url,
+	 * if it exists returns the url filter value, otherwise returns the user preference value
+	 * @param {string} paramName  Name of the parameter received in the url
+	 * @param {string} preferenceKey  Name of user preference key
+	*/
+	private getUrlParamOrUserPreference(paramName: string, preferenceKey: string): Observable<any> {
+		return  hasIn(paramName, this.urlParams) ?
+			Observable.of(this.urlParams[paramName]) :
+			this.userPreferenceService.getSinglePreference(preferenceKey);
 	}
 
 	/**
 	 * Load all the user preferences to populate the task manager grid.
 	 */
 	private onLoad(): void {
+		/* ge the parameters passed by the url */
+		this.activatedRoute.queryParams
+			.subscribe(params => {
+				this.urlParams = params;
+			});
+
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
 		});
 		this.loading = true;
+
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.CURRENT_EVENT_ID),
+			this.getUrlParamOrUserPreference('moveEvent', PREFERENCES_LIST.CURRENT_EVENT_ID),
 			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.VIEW_UNPUBLISHED),
-			this.userPreferenceService.getSinglePreference(PREFERENCES_LIST.JUST_REMAINING)
+			this.getUrlParamOrUserPreference('viewUnpublished', PREFERENCES_LIST.VIEW_UNPUBLISHED),
+			this.getUrlParamOrUserPreference('justRemaining', PREFERENCES_LIST.JUST_REMAINING),
 		);
 		observables.subscribe({
 				next: value => {
-					// Custom Columns, TaskPref value[0]
-					this.buildCustomColumns(value[0].customColumns, value[0].assetCommentFields);
-					// Current event, value[1]
-					this.loadEventListAndSearch(value[1]);
-					// Task list size, value[2]
-					this.pageSize = value[2] ? parseInt(value[2], 0) : GRID_DEFAULT_PAGE_SIZE;
-					// Task Refresh Timer, value[3]
-					// Task View Unpublished, value[4]
-					this.viewUnpublished = value[4] ? value[4] === 'true' : false;
-					// Just Remaining, value [5]
-					this.justRemaining = value[5] ? value[5] === '1' : false;
+					const [custom, currentEventId, listSize, unpublished, justRemaining] = value;
+
+					// Custom Columns, TaskPref
+					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
+					// Current event
+					this.loadEventListAndSearch(currentEventId);
+					// Task list size
+					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					// Task View Unpublished
+					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
+					// Just Remaining
+					this.justRemaining = justRemaining ? justRemaining === '1' : false;
+
+					// params were transferred to local properties,
+					// we can remove them from the parameters object
+					// and leave only the parameters which are not handled by local properties
+					this.urlParams = ObjectUtils.excludeProperties(this.urlParams, ['moveEvent', 'justRemaining', 'viewUnpublished']);
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -397,13 +434,29 @@ export class TaskListComponent {
 	 */
 	private search(taskId ?: number): void {
 		this.loading = true;
-		this.taskService.getTaskList(this.selectedEvent.id, this.justRemaining, this.justMyTasks, this.viewUnpublished).subscribe(result => {
-			this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
-			this.rowsExpandedMap = {};
-			this.rowsExpanded = false;
-			this.loading = false;
-			setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
-		});
+
+		// Set the default filter values
+		const defaultFilters = {
+			moveEvent: this.selectedEvent.id,
+			justRemaining: this.justRemaining ? 1 : 0,
+			justMyTasks: this.justMyTasks ? 1 : 0,
+			viewUnpublished: this.viewUnpublished ? 1 : 0,
+			sord: 'asc',
+		};
+
+		// Append url filters, in case they were not present in the default filters
+		const filters: any = Object.assign({}, defaultFilters, this.urlParams);
+		// moveEvent should be string for all events
+		filters['moveEvent'] = filters.moveEvent === 0 ? '0' : filters.moveEvent;
+
+		this.taskService.getTaskList(filters)
+			.subscribe(result => {
+				this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
+				this.rowsExpandedMap = {};
+				this.rowsExpanded = false;
+				this.loading = false;
+				setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
+			});
 	}
 
 	/**
@@ -612,6 +665,9 @@ export class TaskListComponent {
 				taskRow.apiActionCompletedAt = result.apiActionCompletedAt;
 				taskRow.apiActionInvokedAt = result.apiActionInvokedAt;
 				taskRow.category = result.category;
+				if (result.invokeActionDetails) {
+					taskRow.invokeButton = {...result.invokeActionDetails};
+				}
 			});
 		}
 		this.rowsExpandedMap[$event.index] = true;

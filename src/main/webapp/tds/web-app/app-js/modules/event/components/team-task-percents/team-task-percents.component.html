@@ -5,13 +5,15 @@
             <tbody>
                 <tr>
                     <td class="teamcol" nowrap="">
-                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
-                            style="display:block">
-                            {{team.role.description}}
+                        <a [routerLink]="['/taskManager', 'list']"
+                           [queryParams]="{role: team.role.id, viewUnpublished: 1 }"
+                           style="display:block">
+                           {{team.role.description}}
                         </a>
                     </td>
                     <td class="teamcountcolumn">
-                        <a href="/tdstm/assetEntity/listTasks?role={{team.role.id}}" 
+                        <a [routerLink]="['/taskManager', 'list']"
+                           [queryParams]="{role: team.role.id, viewUnpublished: 1 }"
                             style="display:block">
                            {{team.teamTaskCount}} 
                         </a>

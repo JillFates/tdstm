@@ -20,6 +20,7 @@ import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.co
 import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'event-dashboard',
@@ -41,12 +42,17 @@ export class EventDashboardComponent implements OnInit {
 	public hasBundleSteps = false;
 
 	constructor(
+		private route: ActivatedRoute,
 		private eventsService: EventsService,
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private store: Store,
-		private userContextService: UserContextService) {
+		private store: Store) {
+
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userTimeZone = userContext.timezone;
+		});
+
 	}
 
 	ngOnInit() {
@@ -57,11 +63,6 @@ export class EventDashboardComponent implements OnInit {
 	 * Call the endpoints required to populate the initial data
 	*/
 	private populateData(): void {
-		this.userContextService.getUserContext()
-		.subscribe((userContext: UserContextModel) => {
-			this.userTimeZone = userContext.timezone;
-		})
-
 		const services = [
 			this.eventsService.getEvents(),
 			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
@@ -71,10 +72,13 @@ export class EventDashboardComponent implements OnInit {
 			.subscribe((results: any[]) => {
 				const [eventList, preference] = results;
 				this.eventList = eventList;
-				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
+
+				let eventId = this.route.snapshot.queryParams['moveEvent'];
+				this.selectedEvent = this.getDefaultEvent(eventId ? eventId : (preference && preference[PREFERENCES_LIST.MOVE_EVENT] || ''));
 				if (this.selectedEvent) {
 					this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 				}
+
 			});
 	}
 

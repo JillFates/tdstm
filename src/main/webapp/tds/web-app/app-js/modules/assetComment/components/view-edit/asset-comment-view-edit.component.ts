@@ -22,6 +22,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	private dataSignature: string;
 
 	constructor(
+		private translate: TranslatePipe,
 		public assetCommentModel: AssetCommentModel,
 		public userPreferenceService: PreferenceService,
 		public taskManagerService: TaskService,
@@ -61,7 +62,6 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
-		this.assetCommentModel.modal.title = 'Edit Comment';
 		this.assetCommentModel.modal.type = ModalType.EDIT;
 	}
 
@@ -118,5 +118,26 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		} else {
 			this.dismiss();
 		}
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ModalType} modalType
+	 * @returns {string}
+	 */
+	getModalTitle(modalType: ModalType): string {
+		if (modalType === ModalType.EDIT) {
+			return this.translate.transform('COMMENT.EDIT_COMMENT');
+		}
+
+		if (modalType === ModalType.CREATE) {
+			return this.translate.transform('COMMENT.CREATE_COMMENT');
+		}
+
+		if (modalType === ModalType.VIEW) {
+			return this.translate.transform('COMMENT.SHOW_COMMENT');
+		}
+
+		return '';
 	}
 }

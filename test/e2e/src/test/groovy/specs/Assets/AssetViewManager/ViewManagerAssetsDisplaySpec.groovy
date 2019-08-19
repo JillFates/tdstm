@@ -8,6 +8,8 @@ import pages.Assets.AssetViewManager.AssetViewsPage
 import pages.Assets.AssetViews.AssetDetailsPage
 import pages.Assets.AssetViews.ViewPage
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
 
@@ -16,6 +18,8 @@ class ViewManagerAssetsDisplaySpec extends GebReportingSpec {
     static rowData= []
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

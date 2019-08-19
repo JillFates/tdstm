@@ -1,4 +1,4 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal-content event-view-edit-component" id="event-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
+<div tds-autofocus class="modal-content event-view-edit-component" id="event-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -191,7 +191,7 @@
                 </table>
             </div>
             <div *ngIf="editing" class="modal-footer form-group-center">
-                <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                <tds-button-save [disabled]="!validateRequiredFields(eventModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                 <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
             </div>
             <div *ngIf="!editing" class="modal-footer form-group-center">

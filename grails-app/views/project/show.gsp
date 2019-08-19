@@ -134,7 +134,9 @@
 						</g:if>
 					</tds:hasPermission>
 					<span class="button">
+					<tds:hasPermission permission="${Permission.ProjectFieldSettingsView}">
 						<input class="show" type="button" value="Field Settings" onclick="window.location='${createLink(controller:'module', action: 'fieldsettings')}/list';" />
+					</tds:hasPermission>
 					</span>
 				</g:form>
 			</div>

@@ -13,7 +13,15 @@
                     <div *ngFor="let column of getColumns(row);" 
                             class="col-md-{{colSize}} {{column.classes}}" 
                             [ngClass]="{'heading': rowIndex === 0}">
-                            <span [innerHtml]="column.text"></span>
+                            <a *ngIf="rowIndex === 0; else categoryValue"
+                               [routerLink]="['/taskManager', 'list']"
+                               [queryParams]="{category: column.text}">
+                                <span [innerHtml]="column.text"></span>
+                            </a>
+
+                            <ng-template #categoryValue>
+                                <span [innerHtml]="column.text"></span>
+                            </ng-template>
                     </div>
                 </div>
             </div>

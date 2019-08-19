@@ -24,6 +24,7 @@ import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+import {Permission} from '../../../../shared/model/permission.model';
 // Kendo
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {
@@ -241,5 +242,17 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderCreate);
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderDelete);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderUpdate);
 	}
 }
