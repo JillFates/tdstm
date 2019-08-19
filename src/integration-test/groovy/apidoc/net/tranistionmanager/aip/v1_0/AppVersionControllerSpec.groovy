@@ -67,7 +67,7 @@ class AppVersionControllerSpec extends GebSpec {
 							)
 					)
 				)
-		when: "GET request is made to end-point for the Apolication Version"
+		when: "GET request is made to end-point for the Application Version"
 			def response = requestSpecification
 				.when()
 				.port(this.port)
