@@ -222,38 +222,6 @@ class WsEventController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
-	@HasPermission(Permission.AssetEdit)
-	def markEventAssetAsMoved(String id) {
-		def moveEvent = MoveEvent.get(id.toLong())
-		if (!moveEvent) {
-			log.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
-
-			renderErrorJson('An unexpected condition with the event occurred that is preventing an update.')
-			return
-		}
-
-		if (!securityService.isCurrentProjectId(moveEvent.project.id)) {
-			log.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
-			renderErrorJson('An unexpected condition with the event occurred that is preventing an update')
-			return
-		}
-
-		int assetAffected = 0
-
-		if (moveEvent.moveBundles) {
-			assetAffected = jdbcTemplate.update("update asset_entity  \
-			set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
-				rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
-				source_chassis_id = target_chassis_id, source_blade_position = target_blade_position, \
-				target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
-				target_chassis_id = null, target_blade_position = null\
-			where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
-				and plan_status != 'Moved' ")
-		}
-
-		renderSuccessJson(assetAffected)
-	}
-
 	@HasPermission(Permission.DashboardMenuView)
 	def getEventDashboardModel() {
 		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('moveEvent', UserPreferenceEnum.MOVE_EVENT))
