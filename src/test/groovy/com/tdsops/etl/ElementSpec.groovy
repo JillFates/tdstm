@@ -84,128 +84,163 @@ class ElementSpec extends Specification {
 	@Unroll
 	void 'test can use java.lang.Math.round transformation on Element.value=#value'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).round().value == transformedValue
+			element.round().value == transformedValue
+			element.errors == errors
 
 		where:
-			value     || transformedValue
-			1234      || 1234
-			4321.56d  || 4322
-			1111.56f  || 1112
-			'2222.56' || 2223
-			'FOO BAR' || 'FOO BAR'
-			null      || null
+			value     || transformedValue | errors
+			1234      || 1234d            | null
+			4321.56d  || 4322d            | null
+			1111.56f  || 1112d            | null
+			77.777    || 78d              | null
+			'2222.56' || '2222.56'        | ['Unable to apply round transformation on non numeric value']
+			'FOO BAR' || 'FOO BAR'        | ['Unable to apply round transformation on non numeric value']
+			null      || null             | null
 	}
 
 	@Unroll
 	void 'test can use java.lang.Math.abs transformation on Element.value=#value'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).abs().value == transformedValue
+			element.abs().value == transformedValue
+			element.errors == errors
 
 		where:
-			value     || transformedValue
-			1         || 1
-			-1        || 1
-			2l        || 2
-			-2l       || 2
-			3d        || 3
-			-3d       || 3
-			4f        || 4
-			-4f       || 4
-			'5'       || 5
-			'-5'      || 5
-			'FOO BAR' || 'FOO BAR'
-			null      || null
+			value     || transformedValue | errors
+			1         || 1                | null
+			-1        || 1                | null
+			2l        || 2                | null
+			-2l       || 2                | null
+			3d        || 3                | null
+			-3d       || 3                | null
+			4f        || 4                | null
+			-4f       || 4                | null
+			'5'       || '5'              | ['Unable to apply abs transformation on non numeric value']
+			'-5'      || '-5'             | ['Unable to apply abs transformation on non numeric value']
+			'FOO BAR' || 'FOO BAR'        | ['Unable to apply abs transformation on non numeric value']
+			null      || null             | null
 	}
 
 	@Unroll
 	void 'test can use java.lang.Math.ceil transformation on Element.value=#value'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).ceil().value == transformedValue
+			element.ceil().value == transformedValue
+			element.errors == errors
 
 		where:
-			value   || transformedValue
-			10      || 10
-			10d     || 10d
-			10f     || 10f
-			10.5    || 11
-			10.6d   || 11
-			10.7f   || 11
-			10.5d   || 11
-			10.1d   || 11.0d
-			-20.18d || -20
-			-20.68d || -20.0d
-			-21.69f || -21.0f
-			-4.9f   || -4f
-			null    || null
+			value     || transformedValue | errors
+			10        || 10               | null
+			10d       || 10d              | null
+			10f       || 10f              | null
+			10.5      || 11               | null
+			10.6d     || 11               | null
+			10.7f     || 11               | null
+			10.5d     || 11               | null
+			10.1d     || 11.0d            | null
+			-20.18d   || -20              | null
+			-20.68d   || -20.0d           | null
+			-21.69f   || -21.0f           | null
+			-4.9f     || -4f              | null
+			null      || null             | null
+			'7.9'     || '7.9'            | ['Unable to apply ceil transformation on non numeric value']
+			'FOO BAR' || 'FOO BAR'        | ['Unable to apply ceil transformation on non numeric value']
 	}
 
 	@Unroll
 	void 'test can use java.lang.Math.floor transformation on Element.value=#value'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).floor().value == transformedValue
+			element.floor().value == transformedValue
+			element.errors == errors
 
 		where:
-			value   || transformedValue
-			10.5d   || 10
-			10.1d   || 10
-			10.1f   || 10
-			10.1    || 10
-			-20.18d || -21
-			-20.68d || -21
-			4.5f    || 4f
-			-4.9f   || -5.0f
-			null    || null
+			value   || transformedValue | errors
+			10.5d   || 10               | null
+			10.1d   || 10               | null
+			10.1f   || 10               | null
+			10.1    || 10               | null
+			-20.18d || -21              | null
+			-20.68d || -21              | null
+			4.5f    || 4f               | null
+			-4.9f   || -5.0f            | null
+			null    || null             | null
+			'8.0'   || '8.0'            | ['Unable to apply floor transformation on non numeric value']
+			'FOO'   || 'FOO'            | ['Unable to apply floor transformation on non numeric value']
 	}
 
 	@Unroll
 	void 'test can use java.lang.Math.min transformation on Element.value=#value and other value=#otherValue'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).min(otherValue).value == transformedValue
+			element.min(otherValue).value == transformedValue
+			element.errors == errors
 
 		where:
-			value  | otherValue || transformedValue
-			10     | 20         || 10
-			10.11  | 20.11      || 10.11
-			20     | 10         || 10
-			20.12  | 10.12      || 10.12
-			20.13f | 10.12      || 10.12
-			20.14d | 10.12d     || 10.12d
-			20.13f | 10.12f     || 10.12f
-			20.14d | 10.12      || 10.12
-			20l    | 10         || 10l
-			-10l   | -20l       || -20l
-			-20    | -10        || -20
-			10     | 20.20d     || 10
-			null   | 20.44      || null
-			20.44  | null       || 20.44
+			value   | otherValue || transformedValue | errors
+			10      | 20         || 10               | null
+			10.11   | 20.11      || 10.11            | null
+			20      | 10         || 10               | null
+			20.12   | 10.12      || 10.12            | null
+			20.13f  | 10.12      || 10.12            | null
+			20.14d  | 10.12d     || 10.12d           | null
+			20.13f  | 10.12f     || 10.12f           | null
+			20.14d  | 10.12      || 10.12            | null
+			20l     | 10         || 10l              | null
+			-10l    | -20l       || -20l             | null
+			-20     | -10        || -20              | null
+			10      | 20.20d     || 10               | null
+			null    | 20.44      || null             | null
+			20.44   | null       || 20.44            | null
+			'25.44' | null       || '25.44'          | null
+			'FOO'   | null       || 'FOO'            | null
+			'25.44' | 22         || '25.44'          | ['Unable to apply min transformation on non numeric value']
+			'FOO'   | 44         || 'FOO'            | ['Unable to apply min transformation on non numeric value']
 	}
 
 	@Unroll
 	void 'test can use java.lang.Math.max transformation on Element.value=#value and other value=#otherValue'() {
 
+		setup:
+			Element element = new Element(value: value)
+
 		expect:
-			new Element(value: value).max(otherValue).value == transformedValue
+			element.max(otherValue).value == transformedValue
+			element.errors == errors
 
 		where:
-			value  | otherValue || transformedValue
-			10     | 20.1       || 20.1
-			10     | 20.2f      || 20.2f
-			10     | 20.3d      || 20.3d
-			10     | 20l        || 20l
-			21     | 10         || 21
-			10.1d  | 20.10d     || 20.10d
-			20.10d | 10.10d     || 20.10d
-			10.1f  | 20.10f     || 20.10f
-			20.10f | 10.10f     || 20.10f
-			-10    | -20        || -10
-			-20    | -10        || -10
-			15.34  | null       || 15.34
-			null   | 15.34      || null
+			value   | otherValue || transformedValue | errors
+			10      | 20.1       || 20.1             | null
+			10      | 20.2f      || 20.2f            | null
+			10      | 20.3d      || 20.3d            | null
+			10      | 20l        || 20l              | null
+			21      | 10         || 21               | null
+			10.1d   | 20.10d     || 20.10d           | null
+			20.10d  | 10.10d     || 20.10d           | null
+			10.1f   | 20.10f     || 20.10f           | null
+			20.10f  | 10.10f     || 20.10f           | null
+			-10     | -20        || -10              | null
+			-20     | -10        || -10              | null
+			15.34   | null       || 15.34            | null
+			null    | 15.34      || null             | null
+			'25.44' | 22         || '25.44'          | ['Unable to apply min transformation on non numeric value']
+			'FOO'   | 44         || 'FOO'            | ['Unable to apply min transformation on non numeric value']
 	}
 
 	void 'test can use java.lang.Math.random transformation'() {
@@ -366,18 +401,19 @@ class ElementSpec extends Specification {
 			element.errors == errors
 
 		where:
-			value    | presicion | defaultValue || transformedValue | errors
-			1        | 2         | null         || 1.00d            | null
-			2.02     | 2         | null         || 2.02d            | null
-			null     | 2         | 3.0d         || 3.00d            | null
-			null     | 2         | 4.0f         || 4.00d            | null
-			null     | 2         | 5.55         || 5.55d            | null
-			6.1234d  | 3         | null         || 6.123d           | null
-			null     | 3         | 7.1234d      || 7.123d           | null
-			8l       | 3         | null         || 8.000d           | null
-			9.999d   | 3         | null         || 9.999d           | null
-			10.1111d | 3         | null         || 10.111d          | null
-			'FOO'    | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
-			'Yes'    | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
+			value     | presicion | defaultValue || transformedValue | errors
+			1         | 2         | null         || 1.00d            | null
+			2.02      | 2         | null         || 2.02d            | null
+			null      | 2         | 3.0d         || 3.00d            | null
+			null      | 2         | 4.0f         || 4.00d            | null
+			null      | 2         | 5.55         || 5.55d            | null
+			6.1234d   | 3         | null         || 6.123d           | null
+			null      | 3         | 7.1234d      || 7.123d           | null
+			8l        | 3         | null         || 8.000d           | null
+			9.999d    | 3         | null         || 9.999d           | null
+			10.1111d  | 3         | null         || 10.111d          | null
+			'10.1111' | 3         | null         || 10.111d          | null
+			'FOO'     | 3         | null         || 'FOO'            | ['Unable to transform value to Decimal']
+			'Yes'     | 3         | null         || 'Yes'            | ['Unable to transform value to Decimal']
 	}
 }

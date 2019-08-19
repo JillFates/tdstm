@@ -132,7 +132,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 load aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
 	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
@@ -212,7 +213,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 init aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
 	Element init(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
@@ -225,7 +227,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 initialize aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
 	Element initialize(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
@@ -978,11 +981,17 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of {@code Element}
 	 */
 	Element round() {
-		if (NumberUtil.isDouble(this.value)) {
-			this.value = Math.round(this.value as Double)
-		} else if (NumberUtil.isFloat(this.value)) {
-			this.value = Math.round(this.value as Float)
+
+		if (!this.value) {
+			return this
 		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply round transformation on non numeric value')
+		} else {
+			this.value = Math.round(this.value)
+		}
+
 		checkLoadedElement()
 		return this
 	}
@@ -996,15 +1005,17 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of {@code Element}
 	 */
 	Element abs() {
-		if (NumberUtil.isLong(this.value)) {
-			this.value = Math.abs(this.value as Long)
-		} else if (NumberUtil.isInteger(this.value)) {
-			this.value = Math.abs(this.value as Integer)
-		} else if (NumberUtil.isDouble(this.value)) {
-			this.value = Math.abs(this.value as Double)
-		} else if (NumberUtil.isFloat(this.value)) {
-			this.value = Math.abs(this.value as Float)
+
+		if (!this.value) {
+			return this
 		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply abs transformation on non numeric value')
+		} else {
+			this.value = Math.abs(this.value as Double)
+		}
+
 		checkLoadedElement()
 		return this
 	}
@@ -1024,10 +1035,11 @@ class Element implements RangeChecker, ETLCommand {
 		}
 
 		if (!Number.isAssignableFrom(this.value.class)) {
-			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+			addToErrors('Unable to apply ceil transformation on non numeric value')
+		} else {
+			this.value = Math.ceil(this.value)
 		}
 
-		this.value = Math.ceil(this.value as Double)
 		checkLoadedElement()
 		return this
 	}
@@ -1120,10 +1132,11 @@ class Element implements RangeChecker, ETLCommand {
 		}
 
 		if (!Number.isAssignableFrom(this.value.class)) {
-			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+			addToErrors('Unable to apply floor transformation on non numeric value')
+		} else {
+			this.value = Math.floor(this.value as Double)
 		}
 
-		this.value = Math.floor(this.value as Double)
 		checkLoadedElement()
 		return this
 	}
@@ -1144,15 +1157,16 @@ class Element implements RangeChecker, ETLCommand {
 		}
 
 		if (!Number.isAssignableFrom(this.value.class)) {
-			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+			addToErrors('Unable to apply min transformation on non numeric value')
+		} else {
+			Double a = this.value as Double
+			Double b = otherValue as Double
+			Double min = Math.min(a, b)
+			if (min == b) {
+				this.value = otherValue
+			}
 		}
 
-		Double a = this.value as Double
-		Double b = otherValue as Double
-		Double min = Math.min(a, b)
-		if (min == b) {
-			this.value = otherValue
-		}
 		checkLoadedElement()
 		return this
 	}
@@ -1173,15 +1187,16 @@ class Element implements RangeChecker, ETLCommand {
 		}
 
 		if (!Number.isAssignableFrom(this.value.class)) {
-			throw ETLProcessorException.invalidTransformationOnNotNumericValue(this.value)
+			addToErrors('Unable to apply min transformation on non numeric value')
+		} else {
+			Double a = this.value as Double
+			Double b = otherValue as Double
+			Double max = Math.max(a, b)
+			if (max == b) {
+				this.value = otherValue
+			}
 		}
 
-		Double a = this.value as Double
-		Double b = otherValue as Double
-		Double max = Math.max(a, b)
-		if (max == b) {
-			this.value = otherValue
-		}
 		checkLoadedElement()
 		return this
 	}
