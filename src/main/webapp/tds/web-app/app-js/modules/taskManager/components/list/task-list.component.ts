@@ -302,8 +302,6 @@ export class TaskListComponent {
 	justMyTasks = false;
 	viewUnpublished: boolean;
 	eventList: any;
-	timerList = ['Manual', '1 Min', '2 Min', '3 Min', '4 Min', '5 Min'];
-	timerValue = 'Manual';
 	grid: DataGridOperationsHelper = new DataGridOperationsHelper([]);
 	columnsModel: Array<GridColumnModel> = taskListColumnsModel;
 	loading = true;
