@@ -2,7 +2,7 @@
     <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;">
             <div class="col-md-2 category-description">{{categories[rowIndex]}}</div>
             <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
+                    <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
                           class="glyphicon glyphicon-chevron-left left-arrow" 
                           [ngClass]="{'disabled': showFrom === 0}"
                           (click)="onBack()">
@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0 && taskCategories.tasks.length > elementsToShow" 
+                    <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
                           class="glyphicon glyphicon-chevron-right right-arrow" 
                           [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  taskCategories.columns}"
                           (click)="onNext()">
