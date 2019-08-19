@@ -41,21 +41,11 @@ class FieldSearchData {
                     type: type,
                     whereProperty: whereProperty,
 	                manyToManyQueries: manyToManyQueries,
-                    domainAlias: domainAlias
+                    domainAlias: domainAlias,
+                    shared: shared
             ]
         }
 
-    }
-
-    /**
-     *
-     * @param domain
-     * @param column
-     * @param filter
-     * @param columnAlias
-     */
-    FieldSearchData(Class domain, String column, String filter, String columnAlias = null) {
-        this([ domain: domain, filter: filter, column: column, columnAlias: columnAlias])
     }
 
     /**
@@ -131,7 +121,7 @@ class FieldSearchData {
            the corresponding AssetClass needs to be included to keep the search consistent and avoid
            matches for this custom field in other domains.
         */
-        if (isCustomField() && parsedInfo.parameters) {
+        if (isCustomField() && !isShared() && parsedInfo.parameters) {
             /* Generate a name for the AssetClass parameter that will be unique for each domain.
                This is so when the user mixes custom fields from different domains, nothing is returned. */
             AssetClass assetClass = AssetClass.lookup(domain)
@@ -195,5 +185,9 @@ class FieldSearchData {
 
     String getDomainAlias() {
         return searchInfo.domainAlias
+    }
+
+    Boolean isShared() {
+        return searchInfo.shared
     }
 }
