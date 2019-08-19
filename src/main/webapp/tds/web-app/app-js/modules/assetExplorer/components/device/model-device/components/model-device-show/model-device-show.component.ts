@@ -6,6 +6,7 @@ import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
 import {ModelService} from '../../../../../service/model.service';
 import {ModelDeviceEditComponent} from '../model-device-edit/model-device-edit.component';
+import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
 
 @Component({
 	selector: 'model-device-show',
@@ -15,6 +16,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	constructor(
 		private dialogService: UIDialogService,
 		public deviceModel: DeviceModel,
+		public deviceManufacturer: DeviceManufacturer,
 		private assetExplorerService: AssetExplorerService,
 		private permissionService: PermissionService,
 		private modelService: ModelService) {

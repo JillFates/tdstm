@@ -18,6 +18,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import { forkJoin, Observable, ReplaySubject } from 'rxjs';
 
 export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -52,8 +53,37 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		}
 
 		showModel(modelId: string, manufacturerId: string): void {
-			this.modelService.getModelAsJSON(modelId)
-				.subscribe((deviceModel: DeviceModel) => {
+			forkJoin(
+				this.modelService.getModelAsJSON(modelId),
+				this.manufacturerService.getDeviceManufacturer(manufacturerId)
+			).subscribe((results: any) => {
+				const [deviceModel, deviceManufacturer] = results;
+				console.log(deviceModel);
+				console.log(deviceManufacturer);
+				this.dialogService.extra(ModelDeviceShowComponent,
+					[UIDialogService,
+						{
+							provide: DeviceModel,
+							useValue: deviceModel
+						},
+						{
+							provide: DeviceManufacturer,
+							useValue: deviceManufacturer
+						}
+					], false, false)
+				.then((result) => {
+					console.log(result);
+				}).catch((error) => console.log(error));
+			});
+
+			/*
+			this.manufacturerService.getDeviceManufacturer(manufacturerId)
+			.pipe(
+				switchMap((manufacturer: any) => {
+					console.log()
+					return this.modelService.getModelAsJSON(modelId)
+				})
+			).subscribe((deviceModel: DeviceModel) => {
 					this.dialogService.extra(ModelDeviceShowComponent,
 						[UIDialogService,
 							{
@@ -65,6 +95,8 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 							console.log(result);
 						}).catch((error) => console.log(error));
 				});
+			*/
+
 		}
 
 		showManufacturer(id: string): void {
