@@ -79,10 +79,10 @@ dependencies {
 	compile 'org.apache.commons:commons-lang3:3.8.1'
 	compile 'com.google.guava:guava:19.0'
 	compile 'net.sf.jasperreports:jasperreports:4.5.1'
-	compile 'org.apache.poi:poi-ooxml:3.14'
-	compile 'org.apache.poi:ooxml-schemas:1.1'
+	compile 'org.apache.poi:poi-ooxml:3.17'
+	compile 'org.apache.poi:poi-ooxml-schemas:3.17'
 	compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
-	compile 'org.apache.poi:poi:3.14'
+	compile 'org.apache.poi:poi:3.17'
 	compile 'xml-apis:xml-apis:1.4.01'
 
 	// LIB JARS
@@ -149,7 +149,8 @@ dependencies {
 	//TODO broken in Grails 3.3, asked the author to relase a new version.
 	//compile 'org.grails.plugins:xss-sanitizer:1.0.0'
 
-
+	// https://github.com/monitorjbl/excel-streaming-reader
+	compile 'com.monitorjbl:xlsx-streamer:2.1.0'
 
 	console "org.grails:grails-console"
 
