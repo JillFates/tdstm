@@ -147,7 +147,7 @@ export class FieldSettingsService {
 					// validate conflicts between field, and labels and field names in the domain
 					return itemLabel === fieldLabel || this.conflictsWithAnotherFieldName(field.label, fields);
 				});
-				if (conflicts.length > 0) {
+				if (conflicts.length > 1) {
 					return true;
 				}
 			}
