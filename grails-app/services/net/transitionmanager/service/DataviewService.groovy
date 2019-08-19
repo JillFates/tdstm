@@ -694,7 +694,8 @@ class DataviewService implements ServiceMethods {
 						type: typeFor(column),
 						whereProperty: wherePropertyFor(column),
 						manyToManyQueries: manyToManyQueriesFor(column),
-						domainAlias: domainAliasFor(column)
+						domainAlias: domainAliasFor(column),
+						shared: column.domain == "common"
 				])
 
 				String property = propertyFor(column)
