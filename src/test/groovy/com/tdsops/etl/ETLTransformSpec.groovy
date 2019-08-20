@@ -1842,8 +1842,8 @@ class ETLTransformSpec extends ETLBaseSpec {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,vendor name,app version,url
-				12134556,Apple Inc.,1.0.0,www.apple
+				application id,vendor name,app version,url,reference id
+				12134556,Apple Inc.,1.0.0,www.apple,
 			""".stripIndent())
 
 		and:
@@ -1858,9 +1858,9 @@ class ETLTransformSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
-					extract 'application id' transform with min(9999999) load 'Name' 
-					load 'appTech' transform with random()
-					extract 'vendor name' transform with floor() load 'Vendor'
+					extract 'application id' transform with toNumber() min(9999999) load 'Name' 
+					extract 'reference id' transform with random() load 'externalRefId' 
+					extract 'vendor name' transform with appendIfMissing('Vendor: ') load 'Vendor'
 					extract 'app version' transform with prependIfMissing('V.') load 'appVersion'
 					extract 'url' transform with appendIfMissing('.com') load 'license'
 				}
@@ -1875,13 +1875,13 @@ class ETLTransformSpec extends ETLBaseSpec {
 					assertWith(data[0], RowResult) {
 						errorCount == 0
 						assertWith(fields.assetName, FieldResult) {
-							value == 12134556
+							value == 12134556l
 						}
-						assertWith(fields.appTech, FieldResult) {
-							value == 6
+						assertWith(fields.externalRefId, FieldResult) {
+							value != null
 						}
 						assertWith(fields.appVendor, FieldResult) {
-							value == 'Apple Inc.'
+							value == 'Vendor: Apple Inc.'
 						}
 						assertWith(fields.appVersion, FieldResult) {
 							value == 'V.1.0.0'
