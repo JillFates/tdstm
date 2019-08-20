@@ -66,4 +66,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_0/20190716-fix-unasigned-people-created-during-import-process.groovy'
 	include file: 'version/v4_7_1/20190725-add-four-model-fields.groovy'
 	include file: 'version/v4_7_1/20190814-add-permission-ETLScriptLoadSampleData.groovy'
+	include file: 'version/v4_7_1/20190819-add-role-user-to-the-comment-view-permission.groovy'
 }
