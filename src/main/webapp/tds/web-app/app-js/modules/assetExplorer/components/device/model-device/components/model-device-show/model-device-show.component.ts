@@ -7,6 +7,7 @@ import {PermissionService} from '../../../../../../../shared/services/permission
 import {ModelService} from '../../../../../service/model.service';
 import {ModelDeviceEditComponent} from '../model-device-edit/model-device-edit.component';
 import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
+import {UIPromptService} from '../../../../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: 'model-device-show',
@@ -60,7 +61,17 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 		}
 
 		this.dialogService.extra(ModelDeviceEditComponent,
-				[], true, false)
+				[
+					UIPromptService,
+					{
+						provide: DeviceModel,
+						useValue: this.deviceModel
+					},
+					{
+						provide: DeviceManufacturer,
+						useValue: this.deviceManufacturer
+					}
+				], true, false)
 			.then((result) => {
 				console.log(result);
 			}).catch((error) => console.log(error));

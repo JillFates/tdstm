@@ -5,14 +5,27 @@ import {ComboBoxSearchModel} from '../../../../../../../shared/components/combo-
 import {Observable} from 'rxjs/index';
 import {ComboBoxSearchResultModel} from '../../../../../../../shared/components/combo-box/model/combobox-search-result.model';
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
+import {DeviceModel} from '../../model/device-model.model';
+import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
 
 @Component({
 	selector: 'model-device-edit',
 	templateUrl: 'model-device-edit.component.html'
 })
 export class ModelDeviceEditComponent extends UIExtraDialog {
-	constructor(private prompt: UIPromptService) {
+	private manufacturer = null;
+	constructor(
+		private assetExplorerService: AssetExplorerService,
+		private prompt: UIPromptService,
+		private deviceModel: DeviceModel,
+		private deviceManufacturer: DeviceManufacturer) {
 		super('#model-device-edit-component');
+		console.log(deviceModel);
+		this.manufacturer = {
+			id: this.deviceManufacturer.id,
+			text: this.deviceManufacturer.name
+		}
+
 	}
 
 	/***
@@ -49,8 +62,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 * @returns {Observable<ComboBoxSearchResultModel>}
 	 */
 	protected searchManufacturers = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel> => {
-		// searchModel.query = `assetType=${this.model.asset.assetTypeSelectValue.id ? this.model.asset.assetTypeSelectValue.id : ''}`;
-		// return this.assetExplorerService.getManufacturersForComboBox(searchModel);
-		return null;
+		searchModel.query = `assetType=${this.deviceModel.assetType || ''}`;
+		return this.assetExplorerService.getManufacturersForComboBox(searchModel);
 	}
 }

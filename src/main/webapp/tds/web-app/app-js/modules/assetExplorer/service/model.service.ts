@@ -47,5 +47,4 @@ export class ModelService {
 		.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
 		.catch((error: any) => error.json());
 	}
-
 }
