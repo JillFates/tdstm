@@ -146,6 +146,8 @@ class WsProjectController implements ControllerMethods {
 			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
+		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
+
 		renderSuccessJson([
 				clients				 : projectDetails.clients,
 				projectInstance      : project,
@@ -153,6 +155,7 @@ class WsProjectController implements ControllerMethods {
 				client               : project.client,
 				defaultBundle        : project.defaultBundle,
 				possiblePartners	 : projectDetails.partners,
+				possibleManagers	 : possibleManagers,
 				projectPartners      : partyRelationshipService.getProjectPartners(project),
 				projectManagers      : projectService.getProjectManagers(project).collect{ it -> it.toString()},
 				projectLogoForProject: projectLogo,

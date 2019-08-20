@@ -159,12 +159,12 @@
                 <div class="modal-footer form-group-center">
                     <div *ngIf="canEditProject">
                         <tds-button-edit class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
-                        <tds-button-delete class="btn-danger pull-left" (click)="confirmDeleteProject()"></tds-button-delete>
-                        <button class="btn btn-action tds-action-button tds-button-delete btn-danger pull-left tds-generic-button" (click)="confirmDeleteProjectAndAssets()">
-                            <div class="tds-action-button-container">
-                                <i class="fa fa-fw fa-trash"></i>Delete Project & Assets
-                            </div>
-                        </button>
+                        <tds-button-delete class="btn-danger" (click)="confirmDeleteProject()"></tds-button-delete>
+                        <a routerLink="/fieldsettings/list">
+                            <button class="btn btn-action tds-action-button btn-secondary tds-generic-button" (click)="cancelCloseDialog()">
+                                Field Settings
+                            </button>
+                        </a>
                         <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                     <tr class="prop">
                         <td valign="top" class="name">Associated Partners:</td>
                         <td valign="top" class="value">
-                            <kendo-dropdownlist style="display: block" *ngFor="let partnerId of projectModel.partnerIds" [data]="partners" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
+                            <kendo-dropdownlist style="display: block" *ngFor="let partnerId of projectModel.partnerIds; let i = index" [data]="possiblePartners" [(ngModel)]="projectModel.partnerIds[i]" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
                             <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
                         </td>
                     </tr>
@@ -271,7 +271,7 @@
                     <tr class="prop">
                         <td valign="top" class="name">Project Manager:</td>
                         <td valign="top" class="value">
-                            <kendo-dropdownlist id="projectManagerId" name="projectManager" [data]="managers" [textField]="'name'" [valueField]="'id'" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
+                            <kendo-dropdownlist id="projectManagerId" name="projectManager" [data]="possibleManagers" [textField]="'name'" [valueField]="'id'" [valuePrimitive]="true" [(ngModel)]="projectModel.projectManagerId" ></kendo-dropdownlist>
                         </td>
                     </tr>
 
