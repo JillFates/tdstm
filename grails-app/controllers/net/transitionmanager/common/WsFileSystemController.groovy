@@ -5,6 +5,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadImageFileCommand
 import net.transitionmanager.command.UploadTextCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.i18n.Message
@@ -61,6 +62,16 @@ class WsFileSystemController implements ControllerMethods{
     def uploadFile(UploadFileCommand fileUploadCommand) {
 	    doFileUpload(fileUploadCommand)
     }
+
+	/**
+	 * Endpoint for uploading specifically an image file to the server.
+	 * @param imageFileUploadCommand
+	 * @return
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadImageFile(UploadImageFileCommand imageFileUploadCommand) {
+		doFileUpload(imageFileUploadCommand)
+	}
 
     /**
      * Endpoint for uploading a file from the ETLDesigner to the server.

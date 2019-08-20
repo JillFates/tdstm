@@ -62,7 +62,7 @@ export class ProjectService {
 	saveProject(model: ProjectModel, id = ''): Observable<any> {
 		let formData = new FormData();
 		formData.append('file', model.projectLogo);
-		return this.http.post(`../ws/project/saveProject/${id}`, formData)
+		return this.http.post(`../ws/fileSystem/uploadImageFile/${id}`, formData)
 				.map((response: any) => {
 					return response;
 				})

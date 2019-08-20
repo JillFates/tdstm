@@ -800,6 +800,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/fileSystem/uploadImageFile" {
+			controller = "wsFileSystem"
+			action = [
+					POST: "uploadImageFile"
+			]
+		}
+
 		"/ws/fileSystem/uploadTextETLDesigner" {
 			controller = "wsFileSystem"
 			action = [

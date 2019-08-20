@@ -46,6 +46,11 @@ class FileSystemService implements ServiceMethods {
      */
 	public static final List<String> ALLOWED_FILE_EXTENSIONS_FOR_ETL_UPLOADS = ['csv', 'json', 'xls', 'xlsx', 'xml']
 
+	/*
+     * These are the accepted file extensions when uploading image files
+     */
+	public static final List<String> ALLOWED_FILE_EXTENSIONS_FOR_IMAGE_UPLOADS = ['png','jpg','jpeg','gif']
+
     // The maximum number of tries to get a unique filename so that the getUniqueFilename doesn't get into infinite loop
     static final int maxUniqueTries=100
 
