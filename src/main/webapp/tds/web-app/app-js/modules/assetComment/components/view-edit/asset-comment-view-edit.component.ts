@@ -37,10 +37,10 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 
 	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-		// ModalType.VIEW doesn't need the categories, 
+		// ModalType.VIEW doesn't need the categories,
 		// in fact we need not to load them in that case for permission issues
 		if (this.assetCommentModel.modal.type !== ModalType.VIEW) {
-			this.loadCommentCategories(); 
+			this.loadCommentCategories();
 		}
 	}
 
@@ -70,7 +70,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 */
 	protected onEdit(): void {
 		this.assetCommentModel.modal.type = ModalType.EDIT;
-		this.loadCommentCategories(); 
+		this.loadCommentCategories();
 	}
 
 	protected onSave(): void {
