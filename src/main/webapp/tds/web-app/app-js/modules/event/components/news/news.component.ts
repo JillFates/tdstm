@@ -8,21 +8,21 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 @Component({
 	selector: 'tds-news',
 	template: `
-		<div class="event-news-component">
+		<div class="event-news-component" *ngIf="getDynamicConfiguration(); let config">
 			<kendo-tabstrip>
 				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div  [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div  [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
+						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 				<kendo-tabstrip-tab [title]="'Archive'">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
-						<div [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div [ngStyle]="{'cursor':isEditAvailable() ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
+						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
@@ -87,5 +87,16 @@ export class NewsComponent implements OnChanges {
 
 	public isEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.NewsEdit);
+	}
+
+	/**
+	 * Group all the dynamic informaction required by the view in just one function
+	 * @return {any} Object with the values required dynamically by the view
+	 */
+	public getDynamicConfiguration(): any {
+		return {
+			isEditAvailable: this.isEditAvailable() ,
+			isCreateAvailable: this.isCreateAvailable()
+		}
 	}
 }
