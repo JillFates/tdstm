@@ -14,11 +14,11 @@ import {IntlModule} from '@progress/kendo-angular-intl';
 import {NGXS_PLUGINS, Store} from '@ngxs/store';
 // Shared Services
 import {HeaderService} from './modules/header/services/header.service';
-import {PreferenceService} from '../shared/services/preference.service';
-import {NotifierService} from '../shared/services/notifier.service';
-import {ComponentCreatorService} from '../shared/services/component-creator.service';
-import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
-import {UILoaderService} from '../shared/services/ui-loader.service';
+import {PreferenceService} from './services/preference.service';
+import {NotifierService} from './services/notifier.service';
+import {ComponentCreatorService} from './services/component-creator.service';
+import {UIDialogService, UIActiveDialogService} from './services/ui-dialog.service';
+import {UILoaderService} from './services/ui-loader.service';
 import {PersonService} from './services/person.service';
 import {WindowService} from './services/window.service';
 import {BulkChangeService} from './services/bulk-change.service';
