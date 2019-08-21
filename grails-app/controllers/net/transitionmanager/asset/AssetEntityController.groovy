@@ -2291,7 +2291,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def moveEventId=NumberUtil.toLong(params.moveEvent)
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
-		def filterDesc=params['filter[filters][0][value]']
+		def filterDesc=params['query']
 
 		if (params.commentId) {
 			task = AssetComment.findByIdAndProject(params.commentId, project)

@@ -208,7 +208,7 @@ export class TaskService {
 			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
-			{name: 'filter[filters][0][value]', value: query}
+			{name: 'query', value: query}
 		];
 
 		if (metaParam.eventId) {
