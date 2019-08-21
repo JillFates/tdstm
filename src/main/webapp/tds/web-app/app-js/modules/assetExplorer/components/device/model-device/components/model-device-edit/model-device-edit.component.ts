@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { clone } from 'ramda';
+
 import { UIExtraDialog } from '../../../../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../../../../shared/directives/ui-prompt.directive';
 import {ComboBoxSearchModel} from '../../../../../../../shared/components/combo-box/model/combobox-search-param.model';
@@ -13,7 +15,8 @@ import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacture
 	templateUrl: 'model-device-edit.component.html'
 })
 export class ModelDeviceEditComponent extends UIExtraDialog {
-	private manufacturer = null;
+	public model: any;
+	public manufacturer = null;
 	constructor(
 		private assetExplorerService: AssetExplorerService,
 		private prompt: UIPromptService,
@@ -21,6 +24,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		private deviceManufacturer: DeviceManufacturer) {
 		super('#model-device-edit-component');
 		console.log(deviceModel);
+		this.model = clone(deviceModel);
+
 		this.manufacturer = {
 			id: this.deviceManufacturer.id,
 			text: this.deviceManufacturer.name

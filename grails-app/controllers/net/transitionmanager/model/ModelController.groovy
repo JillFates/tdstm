@@ -759,7 +759,14 @@ class ModelController implements ControllerMethods, PaginationMethods {
 						cpuType : model.cpuType,
 						cpuCount : model.cpuCount,
 						memorySize : model.memorySize,
-						storageSize : model.storageSize
+						storageSize : model.storageSize,
+						importedBy: entry.userLogin?.person ? entry.userLogin.person.firstName + ' ' + entry.userLogin.person.lastName : '',
+						createdBy: model.createdBy,
+						updatedBy: model.updatedBy,
+						validatedBy: model.validatedBy,
+						roomObject: model.roomObject,
+						sourceTDS: model.sourceTDS,
+						modelStatus: model.modelStatus,
 		]
 		render modelMap as JSON
 	}

@@ -1,8 +1,8 @@
-<div class="modal fade in manufacturer-edit-component"
-	 tds-handle-escape (escPressed)="cancelCloseDialog()"
-	 id="model-device-edit-component"
-	 data-backdrop="static"
-	 tabindex="-1" role="dialog">
+<div class="modal fade in"
+     tds-handle-escape (escPressed)="cancelCloseDialog()"
+     id="model-device-edit-component"
+     data-backdrop="static"
+     tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,7 +12,7 @@
                 <h4 class="modal-title">Edit Model</h4>
             </div>
             <div class="modal-body">
-                <form name="form" role="form" class="form-horizontal left-alignment" #form="ngForm">
+                <form name="editModelForm" role="form" class="form-horizontal left-alignment" #form="ngForm">
                     <div class="modal-body-container">
                         <div class="box-body">
                             <div class="form-group">
@@ -27,7 +27,9 @@
                                     </tds-combobox>
                                 </div>
                                 <div class="col-md-3">Model Name:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="modelName" [(ngModel)]="model.modelName">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">AKA:</div>
@@ -43,21 +45,33 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Weight (pounds):</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="modelName" [(ngModel)]="model.modelWeight">
+                                </div>
                                 <div class="col-md-3">Layout Style:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="layoutStyle" [(ngModel)]="model.layoutStyle">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Product Line:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="productLine" [(ngModel)]="model.productLine">
+                                </div>
                                 <div class="col-md-3">Model Family:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="modelFamily" [(ngModel)]="model.modelFamily">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">End of Life Date:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="endOfLifeDate" [(ngModel)]="model.endOfLifeDate">
+                                 </div>
                                 <div class="col-md-3">End of Life Status:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="endOfLifeStatus" [(ngModel)]="model.endOfLifeStatus">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-3">Power (Max/Design/Avg):</div>
@@ -81,9 +95,11 @@
                                 <div class="col-md-3">Updated by:</div>
                                 <div class="col-md-3">---</div>
                                 <div class="col-md-3">Source URL:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <input type="text" name="sourceURL" [(ngModel)]="model.sourceURL">
+                                </div>
                             </div>
-                             <div class="form-group">
+                            <div class="form-group">
                                 <div class="col-md-3">Validated by:</div>
                                 <div class="col-md-3">---</div>
                                 <div class="col-md-3">Model Status:</div>
