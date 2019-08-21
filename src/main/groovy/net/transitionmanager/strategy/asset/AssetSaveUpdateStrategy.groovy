@@ -1,5 +1,6 @@
 package net.transitionmanager.strategy.asset
 
+import grails.validation.ValidationException
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
@@ -17,6 +18,8 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.security.SecurityService
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.Errors
 
 import java.text.DateFormat
 
@@ -248,7 +251,14 @@ abstract class AssetSaveUpdateStrategy {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
 		dependency.updatedBy = currentPerson
-		dependency.save()
+		try {
+			dependency.save()
+		} catch ( ValidationException valEx ) {
+			List<String> errorList = GormUtil.validateErrorsI18n(valEx, LocaleContextHolder.locale)
+			String errorMessage = errorList.join(', ')
+
+			throw new Exception("Dependency Asset [${dependency.dependent.assetName}] contains errors: " + errorMessage)
+		}
 	}
 
 	/**
