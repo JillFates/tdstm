@@ -41,8 +41,17 @@ environments {
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
-                //capabilities.setVersion("45.4.0esr")
-                //capabilities.setPlatform(Platform.LINUX)
+								ChromeOptions options = new ChromeOptions();
+
+								options.addArguments("start-maximized"); // https://stackoverflow.com/a/26283818/1689770
+				        options.addArguments("enable-automation"); // https://stackoverflow.com/a/43840128/1689770
+				        options.addArguments("--no-sandbox"); //https://stackoverflow.com/a/50725918/1689770
+				        options.addArguments("--disable-infobars"); //https://stackoverflow.com/a/43840128/1689770
+				        options.addArguments("--disable-dev-shm-usage"); //https://stackoverflow.com/a/50725918/1689770
+				        options.addArguments("--disable-browser-side-navigation"); //https://stackoverflow.com/a/49123152/1689770
+				        options.addArguments("--disable-gpu");
+								capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+								
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
                 new RemoteWebDriver( new URL(browserLocation), capabilities )
