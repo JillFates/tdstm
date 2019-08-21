@@ -168,27 +168,6 @@ export class EventViewEditComponent implements OnInit {
 		return returnVal;
 	}
 
-	public confirmMarkAssetsMoved() {
-		this.promptService.open(
-			'Confirmation Required',
-			'Change asset locations to targets? (No undo, please backup prior)',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					this.markAssetsMoved();
-				}
-			})
-			.catch((error) => console.log(error));
-	}
-
-	public markAssetsMoved() {
-		this.eventsService.markAssetsMoved(this.eventId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				alert('Assets successfully marked as moved.');
-			}
-		});
-	}
-
 	/**
 	 *  Put date in format to be accepted in a dateTimePicker
 	 */
