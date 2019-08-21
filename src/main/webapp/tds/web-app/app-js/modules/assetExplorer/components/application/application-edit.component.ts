@@ -19,6 +19,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import * as focusTrap from 'focus-trap';
 
 export function ApplicationEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -29,6 +30,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		]
 	})
 	class ApplicationShowComponent extends AssetCommonEdit implements OnInit {
+		private focusTrapElement;
 		defaultItem = {fullName: 'Please Select', personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		yesNoList = ['Y', 'N'];
@@ -57,6 +59,10 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.focusTrapElement = focusTrap.default(<HTMLElement>document.getElementsByClassName('tds-angular-component-content')[0], {
+				initialFocus: '.tds-angular-component-content'
+			});
+			this.focusTrapElement.activate();
 		}
 
 		/**
