@@ -39,7 +39,6 @@
 				<div class="row text-center">
                     <tds-checkbox name="assetsSelector"
 								  [hasThirdState]="true"
-								  [style]="{'cursor': isBulkSelectAvailable() ? 'pointer' : 'text' }"
 								  [disabled]="!isBulkSelectAvailable()"
                                   (changeState)="bulkCheckboxService.changeState(($event))"
                                   id="assetSelector"
