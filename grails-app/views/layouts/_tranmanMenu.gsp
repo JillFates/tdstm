@@ -238,7 +238,8 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
-                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
+                                    <a href="/tdstm/module/assetExport/export">Export Assets</a>
+%{--                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>--}%
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">

@@ -185,7 +185,7 @@ import {SetEvent} from '../../../event/action/event.actions';
 									<i class="fa fa-check"></i>Done
 								</button>
 								<button
-									*ngIf="dataItem.invokeButton !== null"
+									*ngIf="dataItem.invokeButton !== null && dataItem.invokeButton"
 									class="btn btn-primary btn-xs"
 									[title]="dataItem.invokeButton.tooltipText || ''"
 									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
@@ -302,8 +302,6 @@ export class TaskListComponent {
 	justMyTasks = false;
 	viewUnpublished: boolean;
 	eventList: any;
-	timerList = ['Manual', '1 Min', '2 Min', '3 Min', '4 Min', '5 Min'];
-	timerValue = 'Manual';
 	grid: DataGridOperationsHelper = new DataGridOperationsHelper([]);
 	columnsModel: Array<GridColumnModel> = taskListColumnsModel;
 	loading = true;

@@ -92,10 +92,17 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	 */
 	private initialiseComponent(): void {
 		this.dataSignature = JSON.stringify(this.domains);
+		this.isEditable = this.isEditAvailable();
+		this.initialiseFieldsToDelete();
+	}
+
+	/**
+	 * Set the initial empty structure to hold the fields to delete
+	 */
+	private initialiseFieldsToDelete(): void {
 		for (let domain of this.domains) {
 			this.fieldsToDelete[domain.domain] = [];
 		}
-		this.isEditable = this.isEditAvailable();
 	}
 
 	protected onTabChange(domain: string): void {
@@ -145,6 +152,10 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 						})
 					)
 					.subscribe((res: any) => {
+						if (savingInfo.deleteUnderLaying) {
+							this.initialiseFieldsToDelete();
+						}
+
 						if (res.status === 'error') {
 							let message: string = res.errors.join(',');
 							this.notifier.broadcast({
@@ -284,12 +295,27 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 *
 	 * Whenever the user clicks Delete button for a field on the grid, this event is called and
-	 * #this.fieldsToDelete gets updated.
-	 * @param {{domain: string; fieldsToDelete: string[]}} value
+	 * fieldsToDelete gets updated, if the field it is shared it is added to the array, otherwise new value replace old one
+	 * @param {{domain: string; fieldsToDelete: string[]; isSharedField: boolean; addToDeleteCollection: boolean}} value
 	 */
-	protected onDelete(value: { domain: string, fieldsToDelete: string[] }): void {
-		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+	protected onDelete(value: { domain: string, fieldsToDelete: string[], isSharedField: boolean, addToDeleteCollection: boolean }): void {
+		let fieldsToDelete = this.fieldsToDelete[value.domain] || [];
+
+		if (value.addToDeleteCollection) {
+			if (value.isSharedField) {
+				this.fieldsToDelete[value.domain] = fieldsToDelete.concat(value.fieldsToDelete);
+			} else {
+				this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+			}
+		} else {
+			if (value.isSharedField) {
+				this.fieldsToDelete[value.domain] = fieldsToDelete.filter((field) => value.fieldsToDelete.indexOf(field) === -1);
+			} else {
+				this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+			}
+		}
 	}
 
 	protected onFilter(): void {
