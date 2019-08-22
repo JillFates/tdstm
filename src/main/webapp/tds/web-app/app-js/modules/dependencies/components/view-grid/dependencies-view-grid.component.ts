@@ -53,6 +53,8 @@ import {DependencyResults} from '../../model/dependencies.model';
 import {GridColumnModel, SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {DependecyService} from '../../../assetExplorer/service/dependecy.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -94,7 +96,8 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		private dependenciesService: DependenciesService,
 		private openAssetDependenciesService: OpenAssetDependenciesService,
 		private translatePipe: TranslatePipe,
-		protected assetService: DependecyService) {
+		protected assetService: DependecyService,
+		private permissionService: PermissionService) {
 	}
 
 	ngOnInit() {
@@ -446,5 +449,9 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 					this.changeState();
 				}
 			);
+	}
+
+	protected isBulkSelectAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetDependenciesBulkSelect);
 	}
 }
