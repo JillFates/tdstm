@@ -69,6 +69,10 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
 			});
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+		let showId = this.route.snapshot.queryParams['show'];
+		if(showId) {
+			this.showProject(showId);
+		}
 	}
 
 	ngAfterContentInit() {
