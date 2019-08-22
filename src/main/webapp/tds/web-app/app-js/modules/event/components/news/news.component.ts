@@ -10,7 +10,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 	template: `
 		<div class="event-news-component" *ngIf="getDynamicConfiguration(); let config">
 			<kendo-tabstrip>
-				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
+				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
 						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
@@ -18,7 +18,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
-				<kendo-tabstrip-tab [title]="'Archive'">
+				<kendo-tabstrip-tab [title]="'Archive'" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
 						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
@@ -27,12 +27,13 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 				</ng-template>
 				</kendo-tabstrip-tab>
 			</kendo-tabstrip>
-			<tds-button-create (click)="onCreateNews()" [disabled]="!isCreateAvailable()" class="btn-primary" title="Add News"></tds-button-create>
+			<tds-button-create (click)="onCreateNews()" [disabled]="!isCreateAvailable() || isDisabled" class="btn-primary" title="Add News"></tds-button-create>
 		</div>
 	`
 })
 export class NewsComponent implements OnChanges {
 	@Input() news: Array<NewsModel> = [];
+	@Input() isDisabled: Boolean = false;
 	@Output() selected: EventEmitter<number> = new EventEmitter<number>();
 	@Output() create: EventEmitter<void> = new EventEmitter<void>();
 	public archivedNews: Array<NewsModel> = [];
