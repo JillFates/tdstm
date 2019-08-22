@@ -223,17 +223,14 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		return this._newItem;
 	}
 
-
-
 	/**
 	 * Check if the _newItem value is not Blank and is not already in the list of existing values
 	 */
 	private checkNewItemValid(): void {
 		const trimValue = this._newItem.trim();
 		this.newItemValid = (trimValue.length >= 0) &&
-			( this.items.filter((i) => i.value === trimValue).length === 0 );
+			(this.items.filter((i) => i.value === trimValue).length === 0);
 	}
-
 
 	/**
 	 * Close the Dialog but first it verify is not Dirty

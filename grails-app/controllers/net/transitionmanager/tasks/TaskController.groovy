@@ -11,7 +11,6 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
-import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
@@ -22,7 +21,6 @@ import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
-import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -1098,37 +1096,10 @@ digraph runbook {
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
-    // TODO: <SL> Need @HasPermission annotation
+	@HasPermission(Permission.TaskView)
 	def actionLookUp(Long apiActionId, Long commentId) {
 		Project project = securityService.userCurrentProject
-		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
-		if (!assetComment) {
-			sendNotFound()
-			return
-		}
-
-		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
-			ApiAction apiAction = assetComment.apiAction
-			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
-
-			List<Map> methodParamsList = apiAction.methodParamsList
-			methodParamsList = taskService.fillLabels(project, methodParamsList)
-
-			Map apiActionPayload = [
-				name              : apiAction.name,
-				script            : taskActionService.renderScript(apiAction.script, assetComment),
-				isRemote          : apiAction.isRemote,
-				type              : apiAction.actionType.type,
-				connector         : connector.name,
-				method            : apiAction.connectorMethod,
-				description       : apiAction?.description,
-				methodParams      : methodParamsList,
-				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
-			]
-			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
-		} else {
-			sendForbidden()
-		}
+		render(view: "_actionLookUp", model: [apiAction: taskActionService.actionLookup(commentId, project)])
 	}
 
 	@HasPermission(Permission.TaskView)

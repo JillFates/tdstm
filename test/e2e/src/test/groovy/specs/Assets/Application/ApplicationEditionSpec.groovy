@@ -11,6 +11,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ApplicationEditionSpec extends GebReportingSpec {
 
@@ -31,11 +33,11 @@ class ApplicationEditionSpec extends GebReportingSpec {
     static appStatusOld = "Assigned"
     static appStatus = "Confirmed"
     static suppFreq = "constant"
-	static suppClass = "Applications"
+  	static suppClass = "Applications"
     static suppName
-	static suppBundle = appBundle
+  	static suppBundle = appBundle
     static suppType = "Backup"
-	static suppStatus = "Validated"
+  	static suppStatus = "Validated"
     static isDepFreq = "daily"
     static isDepClass = "Databases"
     static isDepName
@@ -51,6 +53,8 @@ class ApplicationEditionSpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+
         testCount = 0
         to LoginPage
         login()

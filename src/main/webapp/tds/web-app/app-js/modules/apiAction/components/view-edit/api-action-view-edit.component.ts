@@ -106,6 +106,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private dataParameterListSignature: string;
+	private requiredFields = ['name', 'provider', 'actionType'];
 	private intervals = INTERVALS;
 	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
@@ -409,6 +410,24 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: APIActionModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
+	}
+
+	/**
 	 * Verify the Object has not changed
 	 * @returns {boolean}
 	 */
@@ -702,7 +721,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	private populateReactionScripts(): void {
 		const methodScripts = this.apiActionModel.agentMethod.script;
-		APIActionModel.createBasicReactions(this.apiActionModel);
+		APIActionModel.createBasicReactions(this.apiActionModel, this.apiActionModel.actionType && this.apiActionModel.actionType.id === this.WEB_API);
 		for (let reactionType in methodScripts) {
 			if (methodScripts[reactionType]) {
 				let match = this.apiActionModel.eventReactions.find(item => item.type === reactionType);
@@ -1048,17 +1067,17 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
 				(this.httpAPIForm && this.httpAPIForm.valid) &&
-				this.validParametersForm
+				this.validParametersForm && this.validateRequiredFields(this.apiActionModel)
 			);
 		}
 		if (this.hasEarlyAccessTMRPermission && actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
 				(this.scriptForm && this.scriptForm.valid) &&
-				this.validParametersForm
+				this.validParametersForm && this.validateRequiredFields(this.apiActionModel)
 			);
 		}
-		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm);
+		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm && this.validateRequiredFields(this.apiActionModel));
 	}
 
 	onChangeType(type: any): void {
@@ -1069,9 +1088,12 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.apiActionModel.isRemote = this.isRemote();
 
 		// on create api action, set the default value for is remote action
-		if (this.modalType === ActionType.CREATE && this.apiActionModel.isRemote) {
-			this.setSelectEventReaction('SUCCESS', true);
-			this.setSelectEventReaction('ERROR', true);
+		if (this.modalType === ActionType.CREATE ) {
+			APIActionModel.createBasicReactions(this.apiActionModel, type.id === this.WEB_API);
+			if (this.apiActionModel.isRemote) {
+				this.setSelectEventReaction('ERROR', true);
+				this.setSelectEventReaction('SUCCESS', true);
+			}
 		}
 	}
 

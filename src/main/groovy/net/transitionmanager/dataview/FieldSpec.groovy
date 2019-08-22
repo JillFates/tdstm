@@ -1,5 +1,6 @@
 package net.transitionmanager.dataview
 
+import com.tdssrc.grails.StringUtil
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.hibernate.type.DateType

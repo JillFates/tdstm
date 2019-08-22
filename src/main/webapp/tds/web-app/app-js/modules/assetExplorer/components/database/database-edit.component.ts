@@ -16,6 +16,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import * as focusTrap from 'focus-trap';
 
 export function DatabaseEditComponent(template, editModel, metadata: any) {
 
@@ -26,6 +27,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			{ provide: 'model', useValue: editModel }
 		]
 	}) class DatabaseShowComponent extends AssetCommonEdit implements OnInit {
+		private focusTrapElement;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -38,7 +40,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 		) {
-
 			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
@@ -51,6 +52,10 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
+			this.focusTrapElement = focusTrap.default(<HTMLElement>document.getElementsByClassName('tds-angular-component-content')[0], {
+				initialFocus: '.tds-angular-component-content'
+			});
+			this.focusTrapElement.activate();
 		}
 
 		/**

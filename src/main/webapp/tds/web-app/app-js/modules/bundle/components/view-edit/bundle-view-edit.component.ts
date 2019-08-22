@@ -31,6 +31,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleId;
 	public editing = false;
 	protected userTimeZone: string;
+	private requiredFields = ['name', 'workflowCode'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
@@ -194,6 +195,24 @@ export class BundleViewEditComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: BundleModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**

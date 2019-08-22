@@ -208,7 +208,7 @@ export class TaskService {
 			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
-			{name: 'filter[filters][0][value]', value: query}
+			{name: 'query', value: query}
 		];
 
 		if (metaParam.eventId) {
@@ -391,16 +391,11 @@ export class TaskService {
 
 	/**
 	 * POST - Get the List of Task presented on Task Management list.
+	 * @param {any} filters  Object containing the filters to apply for
 	 */
-	getTaskList(eventId: number, justRemaining: boolean, justMyTasks: boolean, viewUnpublished: boolean): Observable<any> {
-		const request = {
-			moveEvent: eventId,
-			justRemaining: justRemaining ? 1 : 0,
-			justMyTasks: justMyTasks ? 1 : 0,
-			viewUnpublished: viewUnpublished ? 1 : 0,
-			sord: 'asc',
-		}
-		return this.http.post(this.TASK_LIST_URL, request).pipe(
+	getTaskList(filters: any): Observable<any> {
+
+		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
 				if (response.rows) {
 					response.rows = response.rows.map( item => {

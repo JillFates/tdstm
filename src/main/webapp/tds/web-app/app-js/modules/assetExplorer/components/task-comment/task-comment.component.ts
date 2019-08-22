@@ -9,6 +9,7 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-columns.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
@@ -20,6 +21,7 @@ import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: `task-comment`,
@@ -60,7 +62,8 @@ export class TaskCommentComponent implements OnInit {
 		public taskManagerService: TaskService,
 		private userContextService: UserContextService,
 		private preferenceService: PreferenceService,
-		private translate: TranslatePipe) {
+		private translate: TranslatePipe,
+		private permissionService: PermissionService) {
 		this.getPreferences();
 	}
 
@@ -369,4 +372,13 @@ export class TaskCommentComponent implements OnInit {
 			}, err => reject(false));
 		});
 	}
+
+	protected isTaskCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskCreate);
+	}
+
+	protected isCommentCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentCreate);
+	}
+
 }

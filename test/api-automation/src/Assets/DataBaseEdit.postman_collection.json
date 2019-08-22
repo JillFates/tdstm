@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f8274274-815e-4477-b29d-6931bb514593",
+		"_postman_id": "65e39e15-244e-475a-b47a-486d044d8c69",
 		"name": "DataBaseEdit UPDATE",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -120,7 +120,7 @@
 						"exec": [
 							"pm.test(\"Save bundle id\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
-							"    var bundleId = jsonObject[0].bundleId;",
+							"    var bundleId = jsonObject.data[0].id;",
 							"    pm.environment.set(\"bundleId\", bundleId);",
 							"});",
 							"",
@@ -136,14 +136,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
+					"raw": "{{host}}/tdstm/ws/reports/moveBundles",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"moveBundle",
-						"retrieveBundleList"
+						"ws",
+						"reports",
+						"moveBundles"
 					]
 				}
 			},

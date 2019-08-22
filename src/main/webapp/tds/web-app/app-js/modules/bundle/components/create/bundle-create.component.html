@@ -92,7 +92,7 @@
         </div>
     </div>
     <div class="buttons modal-footer">
-        <tds-button-save [disabled]="!bundleModel.name || !bundleModel.workflowCode" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+        <tds-button-save [disabled]="!validateRequiredFields(bundleModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
         <tds-button-close class="pull-right" (click)="cancelCloseDialog()"></tds-button-close>
     </div>
 </div>

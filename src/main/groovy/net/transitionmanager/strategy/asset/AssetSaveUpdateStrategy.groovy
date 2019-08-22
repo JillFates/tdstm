@@ -1,5 +1,6 @@
 package net.transitionmanager.strategy.asset
 
+import grails.validation.ValidationException
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
@@ -17,6 +18,8 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.security.SecurityService
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.Errors
 
 import java.text.DateFormat
 
@@ -194,7 +197,11 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateSupportingAssets(AssetEntity assetEntity) {
-		createOrUpdateDependencies(assetEntity, true)
+		try {
+			createOrUpdateDependencies(assetEntity, true)
+		} catch ( RuntimeException valEx ) {
+			throw new RuntimeException('Supported ' + valEx.getMessage())
+		}
 	}
 
 	/**
@@ -202,7 +209,11 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateDependentAssets(AssetEntity assetEntity) {
-		createOrUpdateDependencies(assetEntity, false)
+		try {
+			createOrUpdateDependencies(assetEntity, false)
+		} catch ( RuntimeException valEx ) {
+			throw new RuntimeException('Dependent on ' + valEx.getMessage())
+		}
 	}
 
 	/**
@@ -224,7 +235,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param isDependent
 	 */
 	@Transactional
-	private void createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
+	private void  createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
 		AssetDependency dependency = null
 		if (depMap.id) {
 			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id, true)
@@ -248,7 +259,14 @@ abstract class AssetSaveUpdateStrategy {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
 		dependency.updatedBy = currentPerson
-		dependency.save()
+		try {
+			dependency.save()
+		} catch ( ValidationException valEx ) {
+			List<String> errorList = GormUtil.validateErrorsI18n(valEx, LocaleContextHolder.locale)
+			String errorMessage = errorList.join(', ')
+
+			throw new RuntimeException("Asset [${dependency.dependent.assetName}] contains errors: " + errorMessage)
+		}
 	}
 
 	/**

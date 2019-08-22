@@ -23,6 +23,7 @@ export class EventViewEditComponent implements OnInit {
 	public eventId;
 	public editing = false;
 	protected userTimeZone: string;
+	private requiredFields = ['name'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
@@ -149,34 +150,22 @@ export class EventViewEditComponent implements OnInit {
 		}
 	}
 
-	private validateRequiredFields(model: EventModel): boolean {
-		if (!model.name) {
-			alert('Field "Name" is required.');
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	public confirmMarkAssetsMoved() {
-		this.promptService.open(
-			'Confirmation Required',
-			'Change asset locations to targets? (No undo, please backup prior)',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					this.markAssetsMoved();
-				}
-			})
-			.catch((error) => console.log(error));
-	}
-
-	public markAssetsMoved() {
-		this.eventsService.markAssetsMoved(this.eventId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				alert('Assets successfully marked as moved.');
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: EventModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
 			}
 		});
+		return returnVal;
 	}
 
 	/**

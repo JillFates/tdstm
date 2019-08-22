@@ -211,7 +211,7 @@
                     </table>
                 </div>
                 <div class="modal-footer form-group-center">
-                    <tds-button-save [disabled]="!bundleModel.name || !bundleModel.workflowCode" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                    <tds-button-save [disabled]="!validateRequiredFields(bundleModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                     <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
                 </div>
             </form>

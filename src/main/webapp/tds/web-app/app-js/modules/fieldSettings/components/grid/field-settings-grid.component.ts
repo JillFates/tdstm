@@ -213,6 +213,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * Delete button action, adds field to the pending to delete queue.
+	 * if field is shared delete for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -224,24 +225,51 @@ export class FieldSettingsGridComponent implements OnInit {
 		dataItem.toBeDeleted = true;
 		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: true
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete,
+				isSharedField: false,
+				addToDeleteCollection: true
+			});
+		}
 	}
 
 	/**
 	 * Undo Delete button action, removes field from pending to delete queue.
+	 * if field is shared undo for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
 		dataItem.toBeDeleted = false;
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: false
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete
+			});
+		}
+
 	}
 
 	/**

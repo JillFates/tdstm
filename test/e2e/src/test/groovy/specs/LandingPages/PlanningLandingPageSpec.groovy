@@ -8,6 +8,8 @@ import pages.Planning.*
 import pages.Planning.Events.*
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This class sweeps over the Planning Menu.
  * It checks every single landing page.
@@ -20,6 +22,8 @@ class PlanningLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

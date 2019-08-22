@@ -31,7 +31,7 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-                            <span *ngIf="column.property=='name'"><a [href]="'/tdstm/dashboard/index?moveEvent=' + dataItem.eventId">{{dataItem[column.property]}}</a></span>
+                            <span *ngIf="column.property=='name'"><a [routerLink]="'/event/dashboard'" [queryParams]="{'moveEvent' : dataItem.eventId}">{{dataItem[column.property]}}</a></span>
                             <span *ngIf="column.property!='name'">{{dataItem[column.property]}}</span>
                         </ng-template>
                     </kendo-grid-column>

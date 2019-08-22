@@ -10,6 +10,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This script was created as requested on TM-15572
  * @author: Ingrid
@@ -31,6 +33,8 @@ class ProjectEditionSpec extends GebReportingSpec {
     static licensedProjectName = "TM-Demo"
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login(4,5) // test needs to be done by e2e_projects_user

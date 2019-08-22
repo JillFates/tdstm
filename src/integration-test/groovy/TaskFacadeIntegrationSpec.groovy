@@ -94,6 +94,21 @@ class TaskFacadeIntegrationSpec extends Specification {
 			taskFacade.isStarted()
 	}
 
+	void 'test task error using TaskFacade should put the task on hold when adding null note comment a default message should be added.'() {
+		setup: 'giving a task facade with an asset comment'
+			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
+		when: 'marking the task as in error'
+			taskFacade.error(null)
+		then: 'the task status should be updated accordingly'
+			AssetCommentStatus.HOLD == taskFacade.status
+		and: 'task notes should contain the error message passed as the error reason'
+			taskFacade.notes.contains(getExpectedI18NMessage(Message.ApiActionTaskMessageDefaultError))
+		and: 'task isOnHold flag should reflect true'
+			taskFacade.isOnHold()
+	}
+
 	void 'test task done using TaskFacade should complete the task and update status'() {
 		setup: 'giving a task facade with an asset comment'
 			assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)

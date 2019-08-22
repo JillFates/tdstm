@@ -97,9 +97,11 @@
                                     <g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-projects-field-settings">
-                                <g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link>
-                            </li>
+                            <tds:hasPermission permission="${Permission.ProjectFieldSettingsView}">
+                                <li class="menu-child-item menu-projects-field-settings">
+                                    <g:link class="mmlink" controller="module" action="fieldsettings" id="list" onclick="hideMegaMenu('projectMegaMenu')">Asset Field Settings</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <li class="menu-child-item menu-projects-tags">
                                 <g:link class="mmlink" controller="module" action="tag" id="list">
                                     Tags
@@ -236,7 +238,8 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
-                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>
+                                    <a href="/tdstm/module/assetExport/export">Export Assets</a>
+%{--                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>--}%
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
