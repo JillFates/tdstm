@@ -766,6 +766,8 @@ class ModelController implements ControllerMethods, PaginationMethods {
 						roomObject: model.roomObject,
 						sourceTDS: model.sourceTDS,
 						modelStatus: model.modelStatus,
+						powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)
+
 		]
 		render modelMap as JSON
 	}

@@ -9,6 +9,7 @@ import {ComboBoxSearchResultModel} from '../../../../../../../shared/components/
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {DeviceModel} from '../../model/device-model.model';
 import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
+import {PowerModel, PowerUnits} from '../../../../../../../shared/components/power/model/power.model';
 
 @Component({
 	selector: 'model-device-edit',
@@ -19,7 +20,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	public manufacturer = null;
 	public assetType = null;
 	public usize: number[] = [];
-	public powerUnit: string[] = [];
+	public powerUnits = PowerUnits;
+	public powerModel: PowerModel;
 	constructor(
 		private assetExplorerService: AssetExplorerService,
 		private prompt: UIPromptService,
@@ -37,9 +39,14 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			id: this.deviceModel.assetType,
 			text: this.deviceModel.assetType
 		};
+		this.powerModel = {
+			namePlate: this.model.powerNameplate,
+			design: this.model.powerDesign,
+			use: this.model.powerUse,
+			unit: this.model.powerType
+		};
 
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
-		this.powerUnit = ['Watts', 'Amps'];
 	}
 
 	/***

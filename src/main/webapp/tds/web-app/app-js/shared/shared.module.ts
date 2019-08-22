@@ -97,6 +97,7 @@ import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-edit
 import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
 import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/modal-page-wrapper.component';
+import {PowerComponent} from './components/power/power.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -176,7 +177,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		RichTextEditorComponent,
 		PieCountdownComponent,
 		TDSFilterInputComponent,
-		TDSModalPageWrapperComponent
+		TDSModalPageWrapperComponent,
+		PowerComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -239,7 +241,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
-		TDSModalPageWrapperComponent
+		TDSModalPageWrapperComponent,
+		PowerComponent
 	],
 	entryComponents: [
 		DynamicComponent,
