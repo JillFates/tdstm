@@ -7,7 +7,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
-import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -42,7 +42,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 	MoveEvent    moveEvent
 
 	@Shared
-	AssetComment assetComment
+	Task task
 
 	@Shared
 	Person       whom
@@ -59,7 +59,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 		PartyGroup owner = projectService.getOwner(project)
 		whom = personHelper.createStaff(owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
-		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
+		task = assetCommentTestHelper.createAssetComment(project, moveEvent)
 
 	}
 
@@ -96,7 +96,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	void 'test task done using TaskFacade should complete the task and update status'() {
 		setup: 'giving a task facade with an asset comment'
-			assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
+			task = assetCommentTestHelper.createAssetComment(project, moveEvent)
 			TaskFacade taskFacade = getTaskFacadeBean()
 		expect:
 			!taskFacade.isDone()
@@ -180,7 +180,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 	 * @return
 	 */
 	private TaskFacade getTaskFacadeBean() {
-		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment, whom)
+		return grailsApplication.getMainContext().getBean(TaskFacade.class, task, whom)
 	}
 
 	/**

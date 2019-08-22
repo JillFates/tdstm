@@ -2,7 +2,7 @@ package net.transitionmanager.task.timeline
 
 
 import net.transitionmanager.project.Project
-import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import net.transitionmanager.task.timeline.test.TaskTimeLineDataTest
@@ -79,7 +79,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay(endTime)
 			Date currentTime = hourInDay(now)
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay(actStart), status: status, statusUpdated: hourInDay(statusUpdated))
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -122,7 +122,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('07:00')
 			Date currentTime = hourInDay('06:00')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
 				.withVertex(taskA)
@@ -155,7 +155,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('07:00')
 			Date currentTime = hourInDay('06:10')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay('06:00'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -189,7 +189,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('06:30')
 			Date currentTime = hourInDay('06:10')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay('06:00'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -223,7 +223,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('06:30')
 			Date currentTime = hourInDay('06:15')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay('06:10'), status: STARTED)
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -256,8 +256,8 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('07:10')
 			Date currentTime = hourInDay('06:00')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -303,8 +303,8 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay('07:20')
 			Date currentTime = hourInDay('06:00')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -353,9 +353,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 			Date currentTime = hourInDay('06:10')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay('06:00'), status: STARTED)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -404,9 +404,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 			Date currentTime = hourInDay('06:10')
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay('06:00'), status: STARTED)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
@@ -677,11 +677,11 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date windowEndTime = hourInDay(endTime)
 			Date currentTime = hourInDay(current)
 
-			AssetComment taskA = new AssetComment(project: project, taskNumber: 1, comment: A, duration: 30,
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay(startA), status: statusA)
-			AssetComment taskB = new AssetComment(project: project, taskNumber: 2, comment: B, duration: 40,
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40,
 				actStart: hourInDay(startB), status: statusB)
-			AssetComment taskC = new AssetComment(project: project, taskNumber: 3, comment: C, duration: 20,
+			Task taskC = new Task(project: project, taskNumber: 3, comment: C, duration: 20,
 				actStart: hourInDay(startC), status: statusC)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 			TaskDependency edgeAC = new TaskDependency(id: 102, predecessor: taskA, assetComment: taskC, type: 'SS')
