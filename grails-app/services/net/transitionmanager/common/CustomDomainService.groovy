@@ -226,20 +226,31 @@ class CustomDomainService implements ServiceMethods {
             if (customFieldSpec) {
                 Integer customFieldSpecVersion = customFieldSpec[SettingService.VERSION_KEY] as Integer
                 List<String> customFieldsToSave = []
+                List<Map> fields = (currentStoredFieldSpecs[assetClassType]?.fields) ?: []
+                List<String> currentCustomFields = (fields*.field).findAll { it.startsWith('custom') }
+
+                Map fieldsLookUp = fields.collectEntries{ Map field ->
+                    [(field.field): field]
+                }
 
                 for (JSONObject field : customFieldSpec.fields) {
 
                     if ( field.control == ControlType.LIST.value() && ! field.constraints?.values ) {
                         List<String> values = distinctValues(project, assetClassType, [fieldSpec: field])
+
                         if (values) {
-                            if (! field.constraints) {
+
+                            if (!field.constraints) {
                                 field.constraints = [:]
                             }
+
                             field.constraints.values = values
                         }
                     }
 
                     if (((String) field.field).startsWith('custom')) {
+
+                        updateFieldData(fieldsLookUp[(String)field.field],field, assetClassType, project)
                         customFieldsToSave << field.field
 
                         if(field?.constraints?.required){
@@ -250,8 +261,6 @@ class CustomDomainService implements ServiceMethods {
                     }
                 }
 
-                List<Map> fields = (currentStoredFieldSpecs[assetClassType]?.fields) ?: []
-                List<String> currentCustomFields = (fields*.field).findAll { it.startsWith('custom') }
                 List<String> customFieldsToClear = CollectionUtils.disjunction( currentCustomFields, customFieldsToSave)
                 clearCustomFields(project, assetClassType, customFieldsToClear)
 
@@ -262,6 +271,58 @@ class CustomDomainService implements ServiceMethods {
         }
 
         fieldSpecsCacheService.removeFieldSpecs(project, domain)
+    }
+
+    /**
+     * Updates data stored in custom fields based on how the control has changed, from an old spec to a new one.
+     *
+     * @param oldFieldSpec The old specification used for the field name, and to determine what the old control was.
+     * @param newFieldSpec The new Specification, what the field was updated to, used to determine what the new control is.
+     * @param assetClassType The assetClassType to update the custom data for.
+     * @param project The project to update the custom data for.
+     */
+    void updateFieldData(Map oldFieldSpec, Map newFieldSpec, String assetClassType, Project project){
+        if(!oldFieldSpec || oldFieldSpec.control == newFieldSpec.control){
+            return
+        }
+
+        String key = "${oldFieldSpec.control}-${newFieldSpec.control}"
+
+
+        switch (key) {
+            case "$ControlType.DATE.value-$ControlType.DATETIME.value":
+                dataDateToDateTime(project, assetClassType, oldFieldSpec.field)
+                return
+
+            case "$ControlType.DATETIME.value-$ControlType.DATE.value":
+                dataDateTimeToDate(project, assetClassType, oldFieldSpec.field)
+                return
+
+            case "$ControlType.STRING.value-$ControlType.YES_NO.value":
+            case "$ControlType.LIST.value-$ControlType.YES_NO.value":
+                dataToYesNo(project, assetClassType, oldFieldSpec.field)
+                return
+
+            case "$ControlType.NUMBER.value-$ControlType.LIST.value":
+            case "$ControlType.STRING.value-$ControlType.LIST.value":
+            case "$ControlType.YES_NO.value-$ControlType.LIST.value":
+            case "$ControlType.DATETIME.value-$ControlType.LIST.value":
+            case "$ControlType.DATE.value-$ControlType.LIST.value":
+                //The list conversion doesn't require any data conversion
+                return
+
+            case "$ControlType.NUMBER.value-$ControlType.STRING.value":
+            case "$ControlType.YES_NO.value-$ControlType.STRING.value":
+            case "$ControlType.DATE.value-$ControlType.STRING.value":
+            case "$ControlType.DATETIME.value-$ControlType.STRING.value":
+            case "$ControlType.LIST.value-$ControlType.STRING.value":
+                dataToString(project, assetClassType, oldFieldSpec.field, newFieldSpec?.constraints?.maxSize ?: 255)
+                return
+
+            default:
+                clearCustomFields(project, assetClassType, [oldFieldSpec.field])
+        }
+
     }
 
     /**
@@ -640,10 +701,11 @@ class CustomDomainService implements ServiceMethods {
     }
 
     /**
-     * helper method to clear the fieldname values in the assets
-     * @param project
-     * @param assetClassName
-     * @param fieldNames
+     * Clears data stored in custom fields
+     *
+     * @param project The project to clear the data for.
+     * @param assetClassName The assetClass to clear the data for.
+     * @param fieldNames The fieldNames/columns to clear the data for.
      */
     private void clearCustomFields(Project project, String assetClassName, List<String> fieldNames) {
         if (fieldNames) {
@@ -661,5 +723,97 @@ class CustomDomainService implements ServiceMethods {
                     [project: project, assetClass: assetClass]
             )
         }
+    }
+
+    /**
+     * Converts data stored in a custom field from a date to a date time, adding the time 00:00:00.
+     *
+     * @param project The project to update the data for.
+     * @param assetClassName The assetClass to update the data for.
+     * @param fieldName The fieldName/column to update the data for.
+     */
+    private void dataDateToDateTime(Project project, String assetClassName, String fieldName) {
+
+        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+        String sql = 'update AssetEntity set '
+
+        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%d %H.%i.%s')
+                  where project=:project and assetClass=:assetClass
+               """
+
+        AssetEntity.executeUpdate(
+            sql,
+            [project: project, assetClass: assetClass]
+        )
+    }
+
+    /**
+     * Converts data stored in a custom field from a date time to a date, striping off the time.
+     *
+     * @param project The project to update the data for.
+     * @param assetClassName The assetClass to update the data for.
+     * @param fieldName The fieldName/column to update the data for.
+     */
+    private void dataDateTimeToDate(Project project, String assetClassName, String fieldName) {
+
+        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+        String sql = 'update AssetEntity set '
+
+        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%d')
+                  where project=:project and assetClass=:assetClass
+               """
+
+        AssetEntity.executeUpdate(
+            sql,
+            [project: project, assetClass: assetClass]
+        )
+    }
+
+    /**
+     * Converts data stored in a custom field to yes/no data.
+     *
+     * @param project The project to update the data for.
+     * @param assetClassName The assetClass to update the data for.
+     * @param fieldName The fieldName/column to update the data for.
+     */
+    private void dataToYesNo(Project project, String assetClassName, String fieldName) {
+
+        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+        String sql = 'update AssetEntity set '
+
+        sql += """$fieldName = case when (lower($fieldName) = 'yes') then 'Yes'
+                                    when (lower($fieldName) = 'no') then 'No'
+                                    else NULL
+                               end
+                  where project=:project and assetClass=:assetClass
+               """
+
+        AssetEntity.executeUpdate(
+            sql,
+            [project: project, assetClass: assetClass]
+        )
+    }
+
+    /**
+     * Converts data stored in a custom field to a string, truncating to the maxLength size for the new field.
+     *
+     * @param project The project to update the data for.
+     * @param assetClassName The assetClass to update the data for.
+     * @param fieldName The fieldName/column to update the data for.
+     * @param maxLength The max length to truncate the string to.
+     */
+    private void dataToString(Project project, String assetClassName, String fieldName, Integer maxLength) {
+
+        AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
+        String sql = 'update AssetEntity set '
+
+        sql += """$fieldName = substring($fieldName,1, $maxLength)
+                  where project=:project and assetClass=:assetClass
+               """
+
+        AssetEntity.executeUpdate(
+            sql,
+            [project: project, assetClass: assetClass]
+        )
     }
 }
