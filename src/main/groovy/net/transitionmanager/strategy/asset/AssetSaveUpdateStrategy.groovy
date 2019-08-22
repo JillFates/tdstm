@@ -197,11 +197,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateSupportingAssets(AssetEntity assetEntity) {
-		try {
-			createOrUpdateDependencies(assetEntity, true)
-		} catch ( RuntimeException valEx ) {
-			throw new RuntimeException('Supported ' + valEx.getMessage())
-		}
+		createOrUpdateDependencies(assetEntity, true)
 	}
 
 	/**
@@ -209,11 +205,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateDependentAssets(AssetEntity assetEntity) {
-		try {
-			createOrUpdateDependencies(assetEntity, false)
-		} catch ( RuntimeException valEx ) {
-			throw new RuntimeException('Dependent on ' + valEx.getMessage())
-		}
+		createOrUpdateDependencies(assetEntity, false)
 	}
 
 	/**
@@ -245,13 +237,7 @@ abstract class AssetSaveUpdateStrategy {
 		}
 
 		AssetEntity targetAsset = GormUtil.findInProject(project, AssetEntity, depMap.targetAsset.id, true)
-/*
-		dependecy.saveData([
-				  dependent : isDependent? assetEntity : targetAsset,
-				  ...
-				  updatedBy = currentPerson
-		])
-*/
+
 		dependency.dependent = isDependent? assetEntity : targetAsset
 		dependency.asset = isDependent ? targetAsset : assetEntity
 		dependency.dataFlowFreq = depMap.dataFlowFreq
@@ -265,20 +251,10 @@ abstract class AssetSaveUpdateStrategy {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
 
-		// save only if the dependency has been updated
-		if ( dependency.isDirty() ) {
+		// save only if the dependency has been updated or created
+		if ( dependency.isDirty() || ! dependency.id ) {
 			dependency.updatedBy = currentPerson
-			// try {
-				dependency.save(deepValidate: false)
-
-				/*
-			} catch (ValidationException valEx) {
-				List<String> errorList = GormUtil.validateErrorsI18n(valEx, LocaleContextHolder.locale)
-				String errorMessage = errorList.join(', ')
-
-				throw new RuntimeException("Asset [${dependency.dependent.assetName}] contains errors: " + errorMessage)
-			}
-			*/
+			dependency.save(deepValidate: false)
 		}
 	}
 
