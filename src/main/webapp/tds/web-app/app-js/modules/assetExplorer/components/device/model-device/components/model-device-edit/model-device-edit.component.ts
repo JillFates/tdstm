@@ -17,6 +17,9 @@ import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacture
 export class ModelDeviceEditComponent extends UIExtraDialog {
 	public model: any;
 	public manufacturer = null;
+	public assetType = null;
+	public usize: number[] = [];
+	public powerUnit: string[] = [];
 	constructor(
 		private assetExplorerService: AssetExplorerService,
 		private prompt: UIPromptService,
@@ -29,8 +32,14 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		this.manufacturer = {
 			id: this.deviceManufacturer.id,
 			text: this.deviceManufacturer.name
-		}
+		};
+		this.assetType = {
+			id: this.deviceModel.assetType,
+			text: this.deviceModel.assetType
+		};
 
+		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
+		this.powerUnit = ['Watts', 'Amps'];
 	}
 
 	/***
@@ -70,4 +79,23 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		searchModel.query = `assetType=${this.deviceModel.assetType || ''}`;
 		return this.assetExplorerService.getManufacturersForComboBox(searchModel);
 	}
+
+	/**
+	 * Function that handles the request of the Asset Types tds-combobox
+	 * @param {ComboBoxSearchModel} searchModel
+	 * @returns {Observable<ComboBoxSearchResultModel>}
+	 */
+	searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
+		searchModel.query = `manufacturerId=${this.manufacturer.id}`;
+		return this.assetExplorerService.getAssetTypesForComboBox(searchModel);
+	};
+
+	/**
+	 * On Asset Types combobox change.
+	 * @param value
+	 */
+	onAssetTypeValueChange(value: any): void {
+		console.log('on asset type value change');
+	};
+
 }

@@ -57,11 +57,26 @@
                                 <div class="col-md-3">AKA:</div>
                                 <div class="col-md-3">---</div>
                                 <div class="col-md-3">Asset Type:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">
+                                    <tds-combobox
+                                            [(model)]="assetType"
+                                            [serviceRequest]="searchAssetTypes"
+                                            [searchOnScroll]="false"
+                                            [reloadOnOpen]="true"
+                                            (valueChange)="onAssetTypeValueChange($event)">
+                                    </tds-combobox>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-md-3">Usize:</div>
-                                <div class="col-md-3">---</div>
+                                <div class="col-md-3">USize:</div>
+                                <div class="col-md-3">
+                                    <kendo-dropdownlist
+                                            class="select"
+                                            name="usize"
+                                            [data]="usize"
+                                            [(ngModel)]="model.usize">
+                                    </kendo-dropdownlist>
+                                </div>
                                 <div class="col-md-3">Dimensions (inches):</div>
                                 <div class="col-md-3">---</div>
                             </div>
