@@ -460,16 +460,17 @@ class TaskController implements ControllerMethods {
 
 			def dotText = new StringBuilder()
 
-			dotText << """#
-# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
-# Exported on $now
-# This is  .DOT file format of the project tasks
-#
-digraph runbook {
-	graph [rankdir=LR, margin=0.001]
-	node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
-
-"""
+			dotText << """
+				#
+				# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
+				# Exported on $now
+				# This is  .DOT file format of the project tasks
+				#
+				digraph runbook {
+					graph [rankdir=LR, margin=0.001]
+					node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
+				
+			""".stripIndent()
 
 			def style = ''
 			def fontcolor = ''
@@ -569,18 +570,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-//				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString())
-//
-//				// convert the URI to a web safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:taskList]
-//				render data as JSON
-//
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("neighborhood-${taskId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:taskList, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
