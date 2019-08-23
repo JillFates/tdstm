@@ -160,6 +160,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				}
 
 				jQuery('[data-toggle="popover"]').popover();
+				this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
 			});
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
