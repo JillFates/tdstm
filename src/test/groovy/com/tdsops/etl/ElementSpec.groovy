@@ -397,14 +397,16 @@ class ElementSpec extends Specification {
 		setup:
 			Element element = new Element(value: value)
 		expect:
-			element.toDecimal(presicion, defaultValue).value == transformedValue
+			element.toDecimal(precision, defaultValue).value == transformedValue
 			element.errors == errors
 
 		where:
-			value     | presicion | defaultValue || transformedValue | errors
+			value     | precision | defaultValue || transformedValue | errors
 			1         | 2         | null         || 1.00d            | null
 			2.02      | 2         | null         || 2.02d            | null
 			null      | 2         | 3.0d         || 3.00d            | null
+			null      | 2         | null         || null             | null
+			''        | 2         | null         || ''               | null
 			null      | 2         | 4.0f         || 4.00d            | null
 			null      | 2         | 5.55         || 5.55d            | null
 			6.1234d   | 3         | null         || 6.123d           | null

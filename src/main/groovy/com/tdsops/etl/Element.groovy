@@ -474,7 +474,10 @@ class Element implements RangeChecker, ETLCommand {
 	Element toDecimal(Integer precision, Double defaultValue = null) {
 		if (!value) {
 			// set the default value if value is null or blank
-			value = defaultValue.round(precision)
+			if (defaultValue) {
+				value = defaultValue.round(precision)
+			}
+
 		} else {
 			Double newValue = NumberUtil.toDoubleNumber(value)
 			if (newValue != null) {
