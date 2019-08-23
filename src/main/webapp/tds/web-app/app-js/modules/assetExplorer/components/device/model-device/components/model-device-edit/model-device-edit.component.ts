@@ -10,6 +10,12 @@ import {AssetExplorerService} from '../../../../../../assetManager/service/asset
 import {DeviceModel} from '../../model/device-model.model';
 import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
 import {PowerModel, PowerUnits} from '../../../../../../../shared/components/power/model/power.model';
+import {PreferenceService} from '../../../../../../../shared/services/preference.service';
+import {UserContextService} from '../../../../../../auth/service/user-context.service';
+import {takeUntil} from 'rxjs/operators';
+import {CredentialColumnModel} from '../../../../../../credential/model/credential.model';
+import {UserContextModel} from '../../../../../../auth/model/user-context.model';
+import {DateUtils} from '../../../../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'model-device-edit',
@@ -18,14 +24,17 @@ import {PowerModel, PowerUnits} from '../../../../../../../shared/components/pow
 export class ModelDeviceEditComponent extends UIExtraDialog {
 	public model: any;
 	public manufacturer = null;
+	public dateFormat = '';
 	public assetType = null;
 	public usize: number[] = [];
 	public powerUnits = PowerUnits;
 	public powerModel: PowerModel;
 	constructor(
 		private assetExplorerService: AssetExplorerService,
+		// private preferenceService: PreferenceService,
 		private prompt: UIPromptService,
 		private deviceModel: DeviceModel,
+		// private userContext: UserContextService,
 		private deviceManufacturer: DeviceManufacturer) {
 		super('#model-device-edit-component');
 		console.log(deviceModel);
@@ -45,6 +54,15 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			use: this.model.powerUse,
 			unit: this.model.powerType
 		};
+
+		/*
+		this.model.endOfLifeDate = this.model.endOfLifeDate ? new Date(this.model.endOfLifeDate) : null;
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe((format) => {
+				console.log(format);
+				this.dateFormat = format;
+			});
+		*/
 
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
 	}

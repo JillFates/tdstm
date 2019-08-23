@@ -112,7 +112,11 @@
                             <div class="form-group">
                                 <div class="col-md-3">End of Life Date:</div>
                                 <div class="col-md-3">
-                                    <input type="text" name="endOfLifeDate" [(ngModel)]="model.endOfLifeDate">
+                                    <tds-date-control
+                                            [(ngModel)]="model.endOfLifeDate"
+                                            name="endOfLifeDate"
+                                            [value]="model.endOfLifeDate">
+                                    </tds-date-control>
                                  </div>
                                 <div class="col-md-3">End of Life Status:</div>
                                 <div class="col-md-3">
