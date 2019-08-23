@@ -6,6 +6,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.command.task.ActionCommand
@@ -162,7 +163,9 @@ class TaskActionService implements ServiceMethods {
 		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
-		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, false)
+
+		AssetEntity asset = task.assetEntity
+		AssetFacade assetFacade = assetService.getAssetFacade(asset, false)
 
 		List<String> filenames = datafile.collect { MultipartFile file ->
 			fileSystemService.writeFile(file, fileSystemService.TMD_PREFIX)
@@ -179,19 +182,31 @@ class TaskActionService implements ServiceMethods {
 
 		try {
 			apiActionService.invokeReactionScript(code, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
+			// if asset facade is not null and task as an asset entity
+			// let's perform asset validation errors to inform the user about
+			// potential hidden errors during reaction scripts invokation
+			if (assetFacade && asset) {
+				if (!asset.validate()) {
+					asset.errors.allErrors.each {
+						log.info('Task {}-{} has asset entity field validation errors. {}', task.taskNumber, task.comment, it)
+						// add task note with asset entity validation error
+						taskService.addNote(task, whom, i18nMessage(it))
+					}
+					throw new InvalidParamException("Asset: ${asset.assetType}-${asset.assetName} have validation errors.")
+				}
+			}
 		} catch (Exception e) {
-
+			log.info('Reaction script invoke error. ', e)
+			taskService.addNote(task, whom, e.message)
 			if (code == ReactionScriptCode.ERROR) {
 				taskFacade.error("$code script failure: ${e.message}")
 			} else {
-
 				try {
 					script = reactionScripts[ReactionScriptCode.ERROR.name()]
 					apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
 				} catch (Exception ex) {
 					taskFacade.error("$code script failure: ${ex.message}")
 				}
-
 			}
 		} finally {
 			// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
