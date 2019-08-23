@@ -728,6 +728,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			powerUsed = powerUsed ? powerUsed.toDouble().round(1) : ''
 		}
 		def modelMap = [id:model.id,
+						akaCollection: model.getAliases(),
 						manufacturer:model.manufacturer?.name,
 						manufacturerId: model.manufacturer?.id,
 						modelName:model.modelName,
