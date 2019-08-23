@@ -67,7 +67,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 				if (this.field.constraints.required && indexOfBlank !== ValidationUtils.NOT_FOUND) { // If REQUIRED remove blank(empty) option
 					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === ValidationUtils.NOT_FOUND) { // If NOT REQUIRED and distinctValues have no empty option register it.
-					distinctValues.push('');
 					if (this.field.constraints.values && this.field.constraints.values.indexOf('') === ValidationUtils.NOT_FOUND) { // If it's not yet on current field values add it to items list (not deletable)
 						this.items.splice(0, 0, {deletable: false, value: ''} );
 					}
