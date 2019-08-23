@@ -163,7 +163,15 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		 * @type {() => void}
 		 */
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
+			let componentExist = false;
+			// Before to replace a dialog, we need to ensure it exist on the UI
 			if (this.cmpRef) {
+				if (this.cmpRef.location && this.cmpRef.location.nativeElement.localName) {
+					componentExist = jQuery(this.cmpRef.location.nativeElement.localName).length > 0;
+				}
+			}
+
+			if (componentExist) {
 				this.cmpRef.destroy();
 				// Pass params to override the current opened dialog behavior
 				this.size = event.size;
@@ -171,12 +179,12 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 				this.activeDialog.componentInstance = this.cmpRef;
 			} else {
-				// This should not happens, but it is a safe guard, will be replaced the return function by the storage
-				this.dialogService.open(event.component, event.params,
-					event.size).then(x => {
-					// -
-				}).catch(x => {
-					// -
+				this.dialogService.open(event.component, event.params, event.size).finally(() => {
+					// We destroy completely the instance and restore to the original layout
+					this.cmpRef = undefined;
+					setTimeout(() => {
+						jQuery('.layout-top-nav').css('padding-right', 0);
+					}, 400);
 				});
 			}
 		});
