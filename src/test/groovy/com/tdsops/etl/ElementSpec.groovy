@@ -107,21 +107,23 @@ class ElementSpec extends Specification {
 
 		setup:
 			Element element = new Element(value: value)
+			Object result = element.abs().value
 
 		expect:
-			element.abs().value == transformedValue
+			result == transformedValue
+			result?.class == value?.class
 			element.errors == errors
 
 		where:
 			value     || transformedValue | errors
 			1         || 1                | null
 			-1        || 1                | null
-			2l        || 2                | null
-			-2l       || 2                | null
-			3d        || 3                | null
-			-3d       || 3                | null
-			4f        || 4                | null
-			-4f       || 4                | null
+			2l        || 2l               | null
+			-2l       || 2l               | null
+			3d        || 3d               | null
+			-3d       || 3d               | null
+			4f        || 4f               | null
+			-4f       || 4f               | null
 			'5'       || '5'              | ['Unable to apply abs transformation on non numeric value']
 			'-5'      || '-5'             | ['Unable to apply abs transformation on non numeric value']
 			'FOO BAR' || 'FOO BAR'        | ['Unable to apply abs transformation on non numeric value']
@@ -396,6 +398,7 @@ class ElementSpec extends Specification {
 
 		setup:
 			Element element = new Element(value: value)
+
 		expect:
 			element.toDecimal(precision, defaultValue).value == transformedValue
 			element.errors == errors

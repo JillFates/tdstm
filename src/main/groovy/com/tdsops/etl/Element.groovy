@@ -1016,7 +1016,7 @@ class Element implements RangeChecker, ETLCommand {
 		if (!Number.isAssignableFrom(this.value.class)) {
 			addToErrors('Unable to apply abs transformation on non numeric value')
 		} else {
-			this.value = Math.abs(this.value as Double)
+			this.value = Math.abs(this.value)
 		}
 
 		checkLoadedElement()
@@ -1137,7 +1137,7 @@ class Element implements RangeChecker, ETLCommand {
 		if (!Number.isAssignableFrom(this.value.class)) {
 			addToErrors('Unable to apply floor transformation on non numeric value')
 		} else {
-			this.value = Math.floor(this.value as Double)
+			this.value = Math.floor(this.value)
 		}
 
 		checkLoadedElement()
