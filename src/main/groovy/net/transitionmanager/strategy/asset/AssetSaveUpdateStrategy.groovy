@@ -197,11 +197,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateSupportingAssets(AssetEntity assetEntity) {
-		try {
-			createOrUpdateDependencies(assetEntity, true)
-		} catch ( RuntimeException valEx ) {
-			throw new RuntimeException('Supported ' + valEx.getMessage())
-		}
+		createOrUpdateDependencies(assetEntity, true)
 	}
 
 	/**
@@ -209,11 +205,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param assetEntity
 	 */
 	private void createOrUpdateDependentAssets(AssetEntity assetEntity) {
-		try {
-			createOrUpdateDependencies(assetEntity, false)
-		} catch ( RuntimeException valEx ) {
-			throw new RuntimeException('Dependent on ' + valEx.getMessage())
-		}
+		createOrUpdateDependencies(assetEntity, false)
 	}
 
 	/**
@@ -258,14 +250,11 @@ abstract class AssetSaveUpdateStrategy {
 		if (targetAsset.moveBundle.id != moveBundle.id) {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
-		dependency.updatedBy = currentPerson
-		try {
-			dependency.save()
-		} catch ( ValidationException valEx ) {
-			List<String> errorList = GormUtil.validateErrorsI18n(valEx, LocaleContextHolder.locale)
-			String errorMessage = errorList.join(', ')
 
-			throw new RuntimeException("Asset [${dependency.dependent.assetName}] contains errors: " + errorMessage)
+		// save only if the dependency has been updated or created
+		if ( dependency.isDirty() || ! dependency.id ) {
+			dependency.updatedBy = currentPerson
+			dependency.save(deepValidate: false)
 		}
 	}
 
