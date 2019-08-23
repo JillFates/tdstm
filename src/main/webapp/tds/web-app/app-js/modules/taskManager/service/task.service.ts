@@ -446,8 +446,8 @@ export class TaskService {
 		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
 			.pipe(map((response: any) => {
 					let result: TaskActionInfoModel = {
-						predecessors: response.predecessorsCount,
-						successors: response.successorsCount,
+						predecessors: response.predecessorsCount || 0,
+						successors: response.successorsCount || 0,
 						assignedTo: response.assignedTo,
 						apiActionId: response.apiActionId,
 						apiActionCompletedAt: response.apiActionCompletedAt,

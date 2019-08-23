@@ -16,7 +16,6 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -25,7 +24,6 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: `task-detail`,
@@ -54,8 +52,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
-	private taskActionOptions: TaskActionsOptions;
-	private taskActionInfoModel: any;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -88,39 +84,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-	}
-
-	/**
-	 * Builds task action rules for the task options to show.
-	 */
-	buildTaskActionOptions(): void {
-		this.taskActionOptions = {
-			showDone: false,
-			showStart: false,
-			showAssignToMe: false,
-			showNeighborhood: false,
-			invokeButton: null,
-			showReset: false
-		};
-
-		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
-		const predecessorList = this.model && this.model.predecessorList || [];
-		const successorList = this.model && this.model.successorList || [];
-
-		this.taskActionOptions.showDone = this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
-
-		this.taskActionOptions.showStart = this.model.status &&
-			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
-
-		this.taskActionOptions.showAssignToMe = this.userContext.person.id !== assignedTo &&
-			this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
-				.indexOf(this.model.status) >= 0;
-
-		this.taskActionOptions.showNeighborhood = predecessorList.concat(successorList).length > 0;
-
-		this.taskActionOptions.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
 	}
 
 	/**
@@ -162,13 +125,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 								this.model.assetClass = assetClass;
 							}
 						}
-					});
-				this.buildTaskActionOptions();
-				this.taskActionInfoModel = {};
-				this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
-					.subscribe((result: TaskActionInfoModel) => {
-						this.taskActionInfoModel = result;
-						this.taskActionOptions.invokeButton = this.taskActionInfoModel.invokeButton;
 					});
 			});
 	}
