@@ -11,6 +11,7 @@ import {
 import { NotifierService } from '../services/notifier.service';
 import { UIActiveDialogService } from '../services/ui-dialog.service';
 import { ComponentCreatorService } from '../services/component-creator.service';
+import {ModalType} from '../model/constants';
 
 declare var jQuery: any;
 
@@ -95,6 +96,11 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.reject = event.reject;
 			this.resolve = event.resolve;
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
+			if (event.modalType === ModalType.EDIT) {
+				this.cmpRef['_component'].editMode = true;
+			} else {
+				this.cmpRef['_component'].editMode = false;
+			}
 			this.keyboard = event.escape;
 			this.activeDialog.componentInstance = this.cmpRef;
 			this.tdsUiDialog.data('bs.modal').options.keyboard = this.keyboard;
