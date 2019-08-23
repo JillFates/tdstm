@@ -21,9 +21,6 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { TaskEditComponent } from '../edit/task-edit.component';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone, hasIn } from 'ramda';
@@ -34,6 +31,7 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: 'task-list',
@@ -185,10 +183,10 @@ import {SetEvent} from '../../../event/action/event.actions';
 									<i class="fa fa-check"></i>Done
 								</button>
 								<button
-									*ngIf="dataItem.invokeButton !== null && dataItem.invokeButton"
+									*ngIf="dataItem.invokeButton && dataItem.invokeButton !== null"
 									class="btn btn-primary btn-xs"
 									[title]="dataItem.invokeButton.tooltipText || ''"
-									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
+									[disabled]="dataItem.invokeButton.disabled"
 									(click)="invokeActionHandler(dataItem)">
 									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
 								</button>
@@ -654,18 +652,9 @@ export class TaskListComponent {
 	onRowDetailExpandHandler($event: DetailExpandEvent): void {
 		const taskRow = $event.dataItem;
 		if (!taskRow.loadedActions) {
-			this.taskService.getTaskActionInfo(taskRow.id).subscribe(result => {
+			this.taskService.getTaskActionInfo(taskRow.id).subscribe((result: TaskActionInfoModel) => {
+				Object.assign(taskRow, result);
 				taskRow.loadedActions = true;
-				taskRow.predecessors = result.predecessorsCount;
-				taskRow.sucessors = result.successorsCount;
-				taskRow.assignedTo = result.assignedTo;
-				taskRow.apiActionId = result.apiActionId;
-				taskRow.apiActionCompletedAt = result.apiActionCompletedAt;
-				taskRow.apiActionInvokedAt = result.apiActionInvokedAt;
-				taskRow.category = result.category;
-				if (result.invokeActionDetails) {
-					taskRow.invokeButton = {...result.invokeActionDetails};
-				}
 			});
 		}
 		this.rowsExpandedMap[$event.index] = true;

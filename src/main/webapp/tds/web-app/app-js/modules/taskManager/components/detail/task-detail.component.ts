@@ -25,6 +25,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: `task-detail`,
@@ -53,6 +54,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
+	private taskActionOptions: TaskActionsOptions;
+	private taskActionInfoModel: any;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -81,7 +84,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		} else {
 			this.currentUserId = this.userContext.user.id;
 		}
-
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
@@ -89,51 +91,36 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	/**
-	 * Based upon current task status determines which options to show
+	 * Builds task action rules for the task options to show.
 	 */
-	getShowTaskActionsOptions(): TaskActionsOptions {
-		const options = {
+	buildTaskActionOptions(): void {
+		this.taskActionOptions = {
 			showDone: false,
 			showStart: false,
 			showAssignToMe: false,
 			showNeighborhood: false,
-			invoke: false,
+			invokeButton: null,
 			showReset: false
 		};
-
-		if (!this.model) {
-			return options;
-		}
 
 		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
 		const predecessorList = this.model && this.model.predecessorList || [];
 		const successorList = this.model && this.model.successorList || [];
 
-		options.showDone = this.model.status &&
+		this.taskActionOptions.showDone = this.model.status &&
 			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
 
-		options.showStart = this.model.status &&
+		this.taskActionOptions.showStart = this.model.status &&
 			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
 
-		options.showAssignToMe = this.userContext.person.id !== assignedTo &&
+		this.taskActionOptions.showAssignToMe = this.userContext.person.id !== assignedTo &&
 			this.model.status &&
 			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
 				.indexOf(this.model.status) >= 0;
 
-		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
+		this.taskActionOptions.showNeighborhood = predecessorList.concat(successorList).length > 0;
 
-		options.invoke =
-			this.model.apiAction &&
-			this.model.apiAction.id &&
-			!this.model.apiActionInvokedAt &&
-			this.model.status &&
-			[
-				this.modelHelper.STATUS.READY,
-				this.modelHelper.STATUS.STARTED
-			].indexOf(this.model.status) >= 0;
-
-		options.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
-		return options;
+		this.taskActionOptions.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
 	}
 
 	/**
@@ -175,7 +162,14 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 								this.model.assetClass = assetClass;
 							}
 						}
-					})
+					});
+				this.buildTaskActionOptions();
+				this.taskActionInfoModel = {};
+				this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
+					.subscribe((result: TaskActionInfoModel) => {
+						this.taskActionInfoModel = result;
+						this.taskActionOptions.invokeButton = this.taskActionInfoModel.invokeButton;
+					});
 			});
 	}
 

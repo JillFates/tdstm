@@ -10,7 +10,8 @@ export interface TaskActionsOptions {
 	showStart: boolean;
 	showAssignToMe: boolean;
 	showNeighborhood: boolean;
-	invoke: boolean;
+	invokeButton: any;
+	showReset: boolean;
 }
 
 @Component({
@@ -33,14 +34,19 @@ export interface TaskActionsOptions {
             <button  *ngIf="options && options.showNeighborhood" (click)="onNeighborhood()" class="btn btn-default" type="button" title="Neighborhood">
                 <i class="fa fa-med fa-align-left"></i> <span>Neighborhood</span>
             </button>
-            <button  *ngIf="options && options.invoke" [disabled]="!hasInvokePermission"
-                     (click)="onInvoke()" class="btn btn-default" type="button" title="Invoke">
-                <i class="fa fa-med fa-cogs"></i> <span>Invoke</span>
+            <button
+							class="btn btn-default"
+							*ngIf="options && options.invokeButton && optons.invokeButton !== null"
+							[disabled]="!hasInvokePermission || options.invoke.disable"
+							[title]="dataItem.invokeButton.tooltipText || ''"
+							(click)="onInvoke()">
+                <i class="fa fa-med fa-cog"></i> <span>{{options.invokeButton.label || 'Invoke'}}</span>
             </button>
         </div>
      `,
 })
 export class TaskActionsComponent implements OnInit {
+	// @Input() task:
 	@Input() options: TaskActionsOptions;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
 	@Output() done: EventEmitter<void> = new EventEmitter<void>();
