@@ -31,7 +31,7 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
-import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import { TaskStatus } from '../../model/task-edit-create.model';
 
 @Component({
 	selector: 'task-list',
@@ -170,71 +170,30 @@ import { TaskActionInfoModel } from '../../model/task-action-info.model';
 						<!-- Row Detail Template -->
 						<div *kendoGridDetailTemplate="let dataItem, let rowIndex = rowIndex" class="task-action-buttons-wrapper">
 							<div class="task-action-buttons">
-								<button
-									*ngIf="dataItem.status!='Started' && dataItem.status!='Completed'"
-									class="btn btn-primary btn-xs"
-									(click)="updateTaskStatus(dataItem.id,'Started')">
-									<i class="fa fa-play"></i>Start
-								</button>
-								<button
-									*ngIf="dataItem.status!='Completed'"
-									class="btn btn-primary btn-xs"
-									(click)="updateTaskStatus(dataItem.id,'Completed')">
-									<i class="fa fa-check"></i>Done
-								</button>
-								<button
-									*ngIf="dataItem.invokeButton && dataItem.invokeButton !== null"
-									class="btn btn-primary btn-xs"
-									[title]="dataItem.invokeButton.tooltipText || ''"
-									[disabled]="dataItem.invokeButton.disabled"
-									(click)="invokeActionHandler(dataItem)">
-									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
-								</button>
-								<button class="btn btn-primary btn-xs"
-												*ngIf="dataItem.apiActionId && dataItem.status === 'Hold'"
-												(click)="onResetTaskHandler(dataItem)">
-									<i class="fa fa-power-off"></i>Reset Action
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="onOpenTaskDetailHandler(dataItem)">
-									<i class="glyphicon glyphicon-zoom-in"></i>Details
-								</button>
+								<tds-task-actions
+									*ngIf="dataItem.id && dataItem.status"
+									[task]="dataItem"
+									[showDelayActions]="true"
+									[buttonClass]="'btn-primary'"
+									(start)="updateTaskStatus(dataItem.id, TaskStatus.STARTED)"
+									(done)="updateTaskStatus(dataItem.id, TaskStatus.COMPLETED)"
+									(invoke)="invokeActionHandler(dataItem)"
+									(reset)="onResetTaskHandler(dataItem)"
+									(assignToMe)="onAssignToMeHandler(dataItem)"
+									(neighborhood)="onViewTaskNeighborHandler(dataItem)"
+									(delay)="changeTimeEst(dataItem, $event)">
+								</tds-task-actions>
 							</div>
-							<button *ngIf="dataItem.loadedActions && userContext.person.id !== dataItem.assignedTo
-							&& (dataItem.status === 'Pending' || dataItem.status === 'Ready' || dataItem.status === 'Started')"
-											(click)="onAssignToMeHandler(dataItem)"
-											class="btn btn-primary btn-xs">
-								<i class="fa fa-user"></i>Assign To Me
-							</button>
-							<button *ngIf="dataItem.successors > 0 || dataItem.predecessors > 0"
-											(click)="onViewTaskNeighborHandler(dataItem)"
-											class="btn btn-primary btn-xs">
-								<i class="fa fa-sitemap"></i>Neighborhood
+							<button
+								class="btn btn-primary btn-xs"
+								(click)="onOpenTaskDetailHandler(dataItem)">
+								<i class="glyphicon glyphicon-zoom-in"></i>Details
 							</button>
 							<button *ngIf="dataItem.parsedInstructions"
 											class="btn btn-primary btn-xs"
 											(click)="openLinkInNewTab(dataItem.parsedInstructions[1])">
 								{{dataItem.parsedInstructions[0]}}
 							</button>
-							<div *ngIf="dataItem.category && dataItem.category !== 'moveday' && dataItem.status ==='Ready'" class="task-action-buttons">
-								<span style="margin-right:16px">Delay for:</span>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 1)">
-									<i class="fa fa-forward"></i>1 day
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 2)">
-									<i class="fa fa-forward"></i>2 day
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 7)">
-									<i class="fa fa-forward"></i>7 day
-								</button>
-							</div>
 						</div>
 						<kendo-grid-column *ngFor="let column of columnsModel"
 															 field="{{column.property}}"
@@ -292,24 +251,26 @@ import { TaskActionInfoModel } from '../../model/task-action-info.model';
 })
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
-	private readonly allEventsOption = { id: 0, name: 'All Events' };
-	private urlParams = {};
-	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
-	selectedEvent = this.allEventsOption;
+	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
+	TaskStatus: any = TaskStatus;
+	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	justRemaining: boolean;
-	justMyTasks = false;
+	justMyTasks: boolean;
 	viewUnpublished: boolean;
 	eventList: any;
-	grid: DataGridOperationsHelper = new DataGridOperationsHelper([]);
-	columnsModel: Array<GridColumnModel> = taskListColumnsModel;
-	loading = true;
-	hideGrid = true;
+	grid: DataGridOperationsHelper;
+	columnsModel: Array<GridColumnModel>;
+	loading: boolean;
+	hideGrid: boolean;
+	selectedCustomColumn: any;
+	selectedEvent: any;
+	private urlParams: any;
 	private pageSize: number;
-	private currentCustomColumns: any = {};
+	private currentCustomColumns: any;
 	private allAvailableCustomColumns: Array<any>;
-	selectedCustomColumn = {};
 	private userContext: UserContextModel;
-	private rowsExpanded = false;
+	private rowsExpanded: boolean;
+	private rowsExpandedMap: any;
 
 	constructor(
 		private taskService: TaskService,
@@ -320,6 +281,18 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
+		this.justMyTasks = false;
+		this.loading = true;
+		this.hideGrid = true;
+		this.rowsExpanded = false;
+		this.grid = new DataGridOperationsHelper([]);
+		this.columnsModel = taskListColumnsModel;
+		this.selectedCustomColumn = {};
+		this.selectedEvent = this.allEventsOption;
+		this.urlParams = {};
+		this.currentCustomColumns = {};
+		this.rowsExpanded = false;
+		this.rowsExpandedMap = {};
 		this.onLoad();
 	}
 
@@ -483,7 +456,7 @@ export class TaskListComponent {
 	 * On Any other change.
 	 * @param selection: Array<any>
 	 */
-	onFiltersChange($event ?: any) {
+	onFiltersChange($event ?: any): void {
 		this.search();
 	}
 
@@ -491,7 +464,7 @@ export class TaskListComponent {
 	 * Search for a task on the current grid data and expands it. The rest of the rows gets collapsed.
 	 * @param taskId: number
 	 */
-	searchTaskAndExpandRow(taskId: number) {
+	searchTaskAndExpandRow(taskId: number): void {
 		(this.gridComponent.data as GridDataResult).data.forEach((item, index) => {
 			if (item.id === taskId) {
 				this.gridComponent.expandRow(index);
@@ -526,7 +499,7 @@ export class TaskListComponent {
 			}
 		}).catch(result => {
 			if (result) {
-				console.log(result);
+				// console.log(result);
 			}
 		});
 	}
@@ -566,7 +539,7 @@ export class TaskListComponent {
 	 * @param taskRow: any
 	 * @param days: string
 	 */
-	changeTimeEst(taskRow: any, days: string) {
+	changeTimeEst(taskRow: any, days: string): void {
 		this.taskService.changeTimeEst(taskRow.id, days)
 			.subscribe(() => {
 				taskRow.updatedTime = '0s';
@@ -583,7 +556,7 @@ export class TaskListComponent {
 	/**
 	 * On View Neighborhood button handler.
 	 */
-	onViewTaskNeighborHandler(dataItem): void {
+	onViewTaskNeighborHandler(dataItem: any): void {
 		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
 	}
 
@@ -599,7 +572,7 @@ export class TaskListComponent {
 	 * Opens a link in a new browser tab
 	 * @param url
 	 */
-	openLinkInNewTab(url): void {
+	openLinkInNewTab(url: string): void {
 		window.open(url, '_blank');
 	}
 
@@ -608,16 +581,16 @@ export class TaskListComponent {
 	 * @param assetId: number
 	 * @param assetClass: string
 	 */
-	onOpenAssetDetailHandler(taskRow: any) {
+	onOpenAssetDetailHandler(taskRow: any): void {
 		this.dialogService.open(AssetShowComponent,
 			[UIDialogService,
 				{ provide: 'ID', useValue: taskRow.assetEntityId },
 				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
 				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
 			], DIALOG_SIZE.LG).then(result => {
-			console.log('success: ' + result);
+			// console.log('success: ' + result);
 		}).catch(result => {
-			console.log('rejected: ' + result);
+			console.error('rejected: ' + result);
 		});
 	}
 
@@ -639,24 +612,16 @@ export class TaskListComponent {
 	 */
 	invokeActionHandler(taskRow: any): void {
 		this.taskService.invokeAction(taskRow.id)
-			.subscribe(() => {
+			.subscribe(result => {
 				this.search(parseInt(taskRow.id, 0));
-			})
+			});
 	}
 
-	private rowsExpandedMap: any = {};
 	/**
 	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		const taskRow = $event.dataItem;
-		if (!taskRow.loadedActions) {
-			this.taskService.getTaskActionInfo(taskRow.id).subscribe((result: TaskActionInfoModel) => {
-				Object.assign(taskRow, result);
-				taskRow.loadedActions = true;
-			});
-		}
 		this.rowsExpandedMap[$event.index] = true;
 	}
 

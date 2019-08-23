@@ -334,10 +334,7 @@ export class TaskService {
 	 */
 	invokeAction(taskId: string): Observable<any> {
 		return this.http.post(`${ this.baseURL }/ws/task/${ taskId }/invokeLocalAction`, '')
-			.map((res: Response) => {
-				let result = res.json();
-				return result;
-			})
+			.map((response: any) => response)
 			.catch((error: any) => error.json());
 	}
 
