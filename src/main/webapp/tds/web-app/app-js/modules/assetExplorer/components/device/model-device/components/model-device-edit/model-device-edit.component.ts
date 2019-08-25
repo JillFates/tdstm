@@ -26,6 +26,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	public manufacturer = null;
 	public dateFormat = '';
 	public assetType = null;
+	public bladeHeight = ['Half', 'Full'];
 	public usize: number[] = [];
 	public powerUnits = PowerUnits;
 	public powerModel: PowerModel;
@@ -54,6 +55,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			use: this.model.powerUse,
 			unit: this.model.powerType
 		};
+
+		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
 
 		/*
 		this.model.endOfLifeDate = this.model.endOfLifeDate ? new Date(this.model.endOfLifeDate) : null;

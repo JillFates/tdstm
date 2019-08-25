@@ -115,6 +115,7 @@
                                 <div class="col-md-2">End of Life Date:</div>
                                 <div class="col-md-4">
                                     <tds-date-control
+                                            class="tm-input-control"
                                             [(ngModel)]="model.endOfLifeDate"
                                             name="endOfLifeDate"
                                             [value]="model.endOfLifeDate">
@@ -144,6 +145,51 @@
                                 <div class="col-md-2"></div>
                                 <div class="col-md-4"></div>
                             </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Blade Height:</div>
+                                <div class="col-md-4">
+                                     <kendo-dropdownlist
+                                            class="select"
+                                            name="bladeHeight"
+                                            [valuePrimitive]="true"
+                                            [data]="bladeHeight"
+                                            [(ngModel)]="model.bladeHeight">
+                                    </kendo-dropdownlist>
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-2">Blade Rows:</div>
+                                <div class="col-md-4">
+                                    <input type="text" name="bladeRows" [(ngModel)]="model.bladeRows">
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-2">Blade Count:</div>
+                                <div class="col-md-4">
+                                    <input type="text" name="bladeCount" [(ngModel)]="model.bladeCount">
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-2">Blade Label Count:</div>
+                                <div class="col-md-4">
+                                    <input type="text" name="bladeLabelCount" [(ngModel)]="model.bladeLabelCount">
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <div class="col-md-2">Created by:</div>
                                 <div class="col-md-4">{{model.createdBy}}</div>
