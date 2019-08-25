@@ -6,6 +6,7 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
 	selector: 'tds-aka',
 	template: `
         <div class="aka-component">
+            <button (click)="onAdd('')" [disabled]="hasError" id="btnAdAka">Add AKA</button>
             <div class="aka-items">
                 <div class="aka-item" *ngFor="let aka of akas;let index = index;trackBy:trackByIndex;">
                     <input type="text" [(ngModel)]="akas[index]" (change)="onAkaChange($event, index)" [disabled]="hasError && indexError !== index">
@@ -15,7 +16,6 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
                     <label *ngIf="hasError" style="color: red">{{errorMessage}}</label>
                 </div>
             </div>
-            <button (click)="onAdd('')" [disabled]="hasError" id="btnAdAka">Add AKA</button>
         </div>
 	`
 })

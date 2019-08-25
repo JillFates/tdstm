@@ -729,6 +729,7 @@ class ModelController implements ControllerMethods, PaginationMethods {
 		}
 		def modelMap = [id:model.id,
 						akaCollection: model.getAliases(),
+						connectorsCollection: ModelConnector.findAllByModel(model, [sort: "id"]),
 						manufacturer:model.manufacturer?.name,
 						manufacturerId: model.manufacturer?.id,
 						modelName:model.modelName,
