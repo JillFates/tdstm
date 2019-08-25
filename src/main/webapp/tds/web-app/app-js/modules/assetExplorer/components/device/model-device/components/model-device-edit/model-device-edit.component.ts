@@ -57,16 +57,6 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		};
 
 		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
-
-		/*
-		this.model.endOfLifeDate = this.model.endOfLifeDate ? new Date(this.model.endOfLifeDate) : null;
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((format) => {
-				console.log(format);
-				this.dateFormat = format;
-			});
-		*/
-
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
 	}
 
@@ -114,7 +104,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 * @returns {Observable<ComboBoxSearchResultModel>}
 	 */
 	searchAssetTypes = (searchModel: ComboBoxSearchModel): Observable<ComboBoxSearchResultModel>  => {
-		searchModel.query = `manufacturerId=${this.manufacturer.id}`;
+		// searchModel.query = `manufacturerId=${this.manufacturer.id}`;
+		searchModel.query = `manufacturerId=`;
 		return this.assetExplorerService.getAssetTypesForComboBox(searchModel);
 	};
 
@@ -123,6 +114,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 * @param value
 	 */
 	onAssetTypeValueChange(value: any): void {
+		this.assetType = value;
 		console.log('on asset type value change');
 	};
 
