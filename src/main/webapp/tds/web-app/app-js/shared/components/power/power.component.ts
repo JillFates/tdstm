@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 
 import {PowerModel, PowerUnits} from './model/power.model';
+import {ModelService} from '../../../modules/assetExplorer/service/model.service';
 import {convert} from './units-converter.helper';
 
 @Component({
@@ -10,23 +11,30 @@ import {convert} from './units-converter.helper';
 export class PowerComponent implements  OnInit {
 	readonly units =   PowerUnits;
 	@Input() model: PowerModel;
-	constructor() {
+	constructor(
+		private modelService: ModelService
+	) {
 		console.log('Constructor');
 	}
 
 	ngOnInit() {
 		console.log('On init');
-		/*
-		Request URL: http://localhost:8080/tdstm/project/setPower
-		Request Method: POST
-		Type: Watts/Amps
-		 */
+	}
+
+	setStandardPower() {
+		this.model.design = parseInt(this.model.namePlate.toString(), 10) * 0.5;
+		this.model.use = parseInt(this.model.namePlate.toString(), 10) * 0.33;
 	}
 
 	onUnitsChange(unit: string): void {
-		const x = convert(unit, this.model);
-		console.log('converted:');
-		console.log(x);
+		this.modelService.setPower(unit)
+			.subscribe(() => {
+				const converted = convert(unit, this.model);
+
+				this.model.namePlate = converted.namePlate;
+				this.model.design = converted.design;
+				this.model.use = converted.use;
+			});
 	}
 
 }

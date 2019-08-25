@@ -37,7 +37,7 @@
 
 <div class="power-component">
     <div class="max">
-        <input type="number" name="namePlate" [(ngModel)]="model.namePlate">
+        <input type="number" name="namePlate" [(ngModel)]="model.namePlate" (blur)="setStandardPower()">
     </div>
     <div class="arrows">
         <p (click)="setStandardPower()">>></p>

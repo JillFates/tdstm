@@ -21,6 +21,14 @@ export class ModelService {
 			.catch((error: any) => error);
 	}
 
+	setPower(unit: string): Observable<any> {
+		const url = `${this.modelUrl}/../project/setPower?p=${unit}`;
+
+		return this.http.post(url, '', {responseType: 'text'})
+		.map((response: any) => response)
+		.catch((error: any) => error);
+	}
+
 	editModel(id: string): Observable<String> {
 		// 'redirect'To': 'modelDialog'
 		const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
