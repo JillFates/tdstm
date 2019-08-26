@@ -56,7 +56,11 @@
                             <div class="form-group">
                                 <div class="col-md-2">AKA:</div>
                                 <div class="col-md-4">
-                                    <tds-aka [aka]="model.akaCollection"></tds-aka>
+                                    <tds-aka [aka]="model.akaCollection || []"
+                                             [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.text}"
+                                             (validationErrors)="onAkaValidationErrors($event)"
+                                             (modelChange)="onAkaChange($event)"
+                                    ></tds-aka>
                                 </div>
                                 <div class="col-md-2">Asset Type:</div>
                                 <div class="col-md-4">
@@ -115,6 +119,7 @@
                                 <div class="col-md-2">End of Life Date:</div>
                                 <div class="col-md-4">
                                     <tds-date-control
+                                            [tabindex]="24"
                                             class="tm-input-control"
                                             [(ngModel)]="model.endOfLifeDate"
                                             name="endOfLifeDate"
@@ -132,7 +137,9 @@
                                     <tds-power [model]="powerModel"></tds-power>
                                  </div>
                                 <div class="col-md-2">Notes:</div>
-                                <div class="col-md-4">---</div>
+                                <div class="col-md-4">
+                                    <input type="text" name="notes" [(ngModel)]="model.description">
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Room Object:</div>
@@ -212,7 +219,15 @@
                                 <div class="col-md-2">Validated by:</div>
                                 <div class="col-md-4">{{model.validatedBy}}</div>
                                 <div class="col-md-2">Model Status:</div>
-                                <div class="col-md-4">---</div>
+                                <div class="col-md-4">
+                                    <kendo-dropdownlist
+                                            class="select"
+                                            name="modelStatus"
+                                            [valuePrimitive]="true"
+                                            [data]="modelStatus"
+                                            [(ngModel)]="model.modelStatus">
+                                    </kendo-dropdownlist>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Connectors:</div>
@@ -223,7 +238,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary pull-left"><span
+                <button (click)="onSave()" type="button" class="btn btn-primary pull-left"><span
                         class="fa fa-fw fa-floppy-o"></span> Save
                 </button>
                 <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">

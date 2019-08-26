@@ -80,7 +80,6 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	onDelete(index: number): void {
-		console.log('on delete');
 		this.connectors.splice(index, 1);
 	}
 }

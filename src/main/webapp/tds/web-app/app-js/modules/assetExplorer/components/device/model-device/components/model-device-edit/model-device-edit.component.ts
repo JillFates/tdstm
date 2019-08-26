@@ -16,17 +16,20 @@ import {takeUntil} from 'rxjs/operators';
 import {CredentialColumnModel} from '../../../../../../credential/model/credential.model';
 import {UserContextModel} from '../../../../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../../../../shared/utils/date.utils';
+import {AkaChanges} from '../../../../../../../shared/components/aka/model/aka.model';
 
 @Component({
 	selector: 'model-device-edit',
 	templateUrl: 'model-device-edit.component.html'
 })
 export class ModelDeviceEditComponent extends UIExtraDialog {
+	private hasAkaValidationErrors = false;
 	public model: any;
 	public manufacturer = null;
 	public dateFormat = '';
 	public assetType = null;
 	public bladeHeight = ['Half', 'Full'];
+	public modelStatus = ['new', 'full', 'valid'];
 	public usize: number[] = [];
 	public powerUnits = PowerUnits;
 	public powerModel: PowerModel;
@@ -56,7 +59,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			unit: this.model.powerType
 		};
 
-		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
+		// this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
 	}
 
@@ -82,10 +85,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		if (!value) {
 			value = {id: null};
 		}
-
-		console.log('On Manufacturer value change:', value);
-		// this.model.asset.manufacturerSelectValue = value;
-		// this.model.asset.modelSelectValue = {id: null};
+		this.model.manufacturerId = value.id;
 	}
 
 	/**
@@ -115,7 +115,61 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 */
 	onAssetTypeValueChange(value: any): void {
 		this.assetType = value;
-		console.log('on asset type value change');
+		this.model.assetType = this.assetType && this.assetType.id || null;
 	};
+
+	/**
+	 * validate input errors
+	 */
+	onAkaValidationErrors(hasAkaValidationErrors: boolean): void {
+		this.hasAkaValidationErrors = hasAkaValidationErrors;
+	}
+
+	/**
+	 * On changes on aka collection
+	 */
+	public onAkaChange(akaChanges: AkaChanges): void {
+		this.model.akaChanges = akaChanges;
+	}
+
+	onSave() {
+		const payload = {
+			id: this.model.id,
+			modelName: this.model.Name,
+			assetType: this.model.assetType,
+			usize: this.model.usize,
+			modelHeight: this.model.modelHeight,
+			modelWidth: this.model.modelWidth,
+			modelDepth: this.model.modelDepth,
+			modelWeight: this.model.modelWeight,
+			layoutStyle: this.model.layoutStyle,
+			productLine: this.model.productLine,
+			modelFamily: this.model.modelFamily,
+			endOfLifeStatus: this.model.endOfLifeStatus,
+			powerNameplate: this.model.powerNamePlate,
+			powerDesign: this.model.powerDesign,
+			powerUse: this.model.powerUse,
+			powerType: this.model.powerType,
+			cpuType: this.model.cpuType,
+			cpuCount: this.model.cpuCount,
+			bladeRows: this.model.bladeRows || '',
+			bladeCount: this.model.bladeCount || '',
+			bladeLabelCount: this.model.bladeLabelCount || '',
+			bladeHeight: this.model.bladeHeight,
+			memorySize: this.model.memorySize,
+			storageSize: this.model.storageSize,
+			description: this.model.description,
+			sourceURL: this.model.sourceURL,
+			modelStatus: this.model.modelStatus,
+			manufacturerId: this.model.manufacturerId,  // ---------------
+			endOfLifeDate: this.model.endOfLifeDate,
+			sourceTDS: this.model.sourceTDS ? 1 : 0,
+			roomObject: this.model.roomObject ? 1 : 0,
+			akaChanges: this.model.akaChanges || [],
+		};
+
+		console.log(payload);
+
+	}
 
 }
