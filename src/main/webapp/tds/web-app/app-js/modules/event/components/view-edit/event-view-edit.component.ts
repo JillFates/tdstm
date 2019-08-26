@@ -150,6 +150,10 @@ export class EventViewEditComponent implements OnInit {
 		}
 	}
 
+	public isDirty() {
+		return JSON.stringify(this.savedModel) !== JSON.stringify(this.eventModel);
+	}
+
 	/**
 	 * Validate required fields before saving model
 	 * @param model - The model to be saved
