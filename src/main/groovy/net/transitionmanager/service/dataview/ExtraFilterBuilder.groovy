@@ -14,7 +14,7 @@ import net.transitionmanager.service.dataview.filter.special.PlanMethodExtraFilt
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 
 /**
- * Builder class logic for building an instance of Extra Filters.
+ * SimpleBuilder class logic for building an instance of Extra Filters.
  * It can resolve if extra filter is:
  * 1) A special extra filter:
  * <pre>
@@ -37,9 +37,9 @@ class ExtraFilterBuilder {
 	String filter
 
 	/**
-	 * Builder implementation for {@code ExtraFilter} instances.
+	 * SimpleBuilder implementation for {@code ExtraFilter} instances.
 	 * After configuring {@code ExtraFilterBuilder#property} and {@code ExtraFilterBuilder#filter},
-	 * this Builder implementation creates new instances of {@code SpecialExtraFilter}
+	 * this SimpleBuilder implementation creates new instances of {@code SpecialExtraFilter}
 	 * and {@code FieldNameExtraFilter}
 	 *  1) Special filters:
 	 *  <pre>

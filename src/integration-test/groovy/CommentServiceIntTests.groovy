@@ -4,6 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
+import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Specification
 import test.helper.AssetCommentTestHelper
@@ -58,10 +59,10 @@ class CommentServiceIntTests extends Specification {
             MoveEvent event1 = moveEventTestHelper.createMoveEvent(project)
             MoveEvent event2 = moveEventTestHelper.createMoveEvent(project)
             MoveEvent event3 = moveEventTestHelper.createMoveEvent(project)
-            AssetComment task1 = assetCommentTestHelper.createAssetComment(project, event1, false)
-            AssetComment task2 = assetCommentTestHelper.createAssetComment(project, event1)
-            AssetComment task3 = assetCommentTestHelper.createAssetComment(project, event1)
-            AssetComment task4 = assetCommentTestHelper.createAssetComment(project, event2)
+            Task task1 = assetCommentTestHelper.createAssetComment(project, event1, false)
+            Task task2 = assetCommentTestHelper.createAssetComment(project, event1)
+            Task task3 = assetCommentTestHelper.createAssetComment(project, event1)
+            Task task4 = assetCommentTestHelper.createAssetComment(project, event2)
         when: 'requesting published and unpublished tasks for the first event sorted by their comment.'
             Map params = ['event': event1.name, 'viewUnpublished': true]
             Map result = commentService.filterTasks(project, params, 'comment', 'desc', 10, 0)

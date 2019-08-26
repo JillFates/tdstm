@@ -24,6 +24,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
@@ -143,10 +144,9 @@ class TaskServiceIntTests extends Specification{
 
             AssetEntity assetEntity = assetTestHelper.createDevice(project, 'Server', [name: RandomStringUtils.randomAlphabetic(10), description: 'Red'])
 
-            AssetComment task = new AssetComment(
+            Task task = new Task(
                     project: project,
                     comment: "Sample for " + assetEntity.toString(),
-                    commentType: AssetCommentType.TASK,
                     assetEntity: assetEntity
             ).save()
 
@@ -190,10 +190,9 @@ class TaskServiceIntTests extends Specification{
                 endpointUrl: 'http://www.yahoo.com', endpointPath: '/', isRemote:false)
             .save(failOnError: true)
         and: 'a test setup to automatically execute'
-            AssetComment task = new AssetComment(
+            Task task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
                     status: AssetCommentStatus.READY
             ).save(failOnError: true)
@@ -271,10 +270,9 @@ class TaskServiceIntTests extends Specification{
                     getCurrentUsername: { return 'someone' }
             ] as SecurityService
 
-            AssetComment task = new AssetComment(
+            Task task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
@@ -291,10 +289,9 @@ class TaskServiceIntTests extends Specification{
             task.assignedTo == personAssignedTo
 
         when: 'assign to me is call but task status is not the expected'
-            task = new AssetComment(
+            task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING,
@@ -322,10 +319,9 @@ class TaskServiceIntTests extends Specification{
             Date expectedStart2 = TimeUtil.nowGMT().plus(2)
             Date expectedFinish2 = expectedStart2.plus(1)
 
-            AssetComment task = new AssetComment(
+            Task task = new Task (
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
@@ -341,10 +337,9 @@ class TaskServiceIntTests extends Specification{
             TimeUtil.formatDate(assetComment.estFinish) == TimeUtil.formatDate(expectedFinish)
 
         when: 'having a task without duration and duration scale and change estimation time is called with 2 days'
-            task = new AssetComment(
+            task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     status: AssetCommentStatus.PENDING
             ).save()
             final assetCommentId2 = task.id
