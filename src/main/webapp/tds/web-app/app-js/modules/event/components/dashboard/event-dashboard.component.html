@@ -29,14 +29,15 @@
                         #planVersusStatus
                         [hasBundleSteps]="hasBundleSteps"
                         (changeProgress)="onChangeStatus($event)"
-                        [currentProgress]="eventPlanStatus.dialIndicator">
+                        [currentProgress]="eventPlanStatus.dialIndicator"
+                        [isDisabled]="!isEventSelected()">
                     </tds-plan-versus-status>
                 </div>
                 <div class="col-md-4">
                     <tds-event-resume *ngIf="hasBundleSteps" [event]="eventPlanStatus"></tds-event-resume>
                 </div>
                 <div class="col-md-4">
-                    <tds-news [news]="newsList" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
+                    <tds-news [news]="newsList" [isDisabled]="!isEventSelected()" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
                 </div>
                 <div class="col-md-2"></div>
             </div>

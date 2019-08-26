@@ -10,6 +10,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	@ViewChild('form') form: NgForm ;
 	@Input() currentProgress = 0;
 	@Input() hasBundleSteps: boolean;
+	@Input() isDisabled: Boolean = false;
 	@Output() changeProgress: EventEmitter<number> = new EventEmitter<number>();
 	public progress = 0;
 	public showEditControl = false;
@@ -44,7 +45,9 @@ export class PlanVersusStatusComponent implements OnChanges {
 	 * On click chart, toggle the edit controls
 	*/
 	public onClickChart() {
-		this.showEditControl = !this.showEditControl;
+		if (!this.isDisabled) {
+			this.showEditControl = !this.showEditControl;
+		}
 	}
 
 	/**
