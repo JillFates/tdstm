@@ -6,7 +6,7 @@ import net.transitionmanager.task.timeline.TimelineTable
 trait TaskTimeLineDataTest {
 
 	/*
-		TaskVertex Structure definition, compound with TaskNode
+		TaskVertex Structure definition
 		-----------------------------------------------------------------------
 
 											+-----+----------+-----+    	est: earliest start time
