@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
 import { Connector } from './model/connector.model';
 
 @Component({
@@ -53,6 +53,7 @@ import { Connector } from './model/connector.model';
 })
 export class ConnectorComponent implements OnInit {
 	@Input('connectors') originalConnectors: Connector[];
+	@Output('modelChange') modelChange = new EventEmitter<Connector[]>();
 	positions: string[];
 	types: string[];
 	modelTypeSelected: string;
@@ -65,7 +66,6 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		console.log(this.connectors);
 		this.connectors = [...this.originalConnectors];
 	}
 
@@ -73,6 +73,7 @@ export class ConnectorComponent implements OnInit {
 		const count = this.connectors.length;
 		const connector: Connector = { type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', xPosition: 0, yPosition: 0  };
 		this.connectors.push(connector);
+		this.modelChange.emit(this.connectors);
 	}
 
 	trackByIndex(index: number, obj: any): any {
@@ -81,5 +82,7 @@ export class ConnectorComponent implements OnInit {
 
 	onDelete(index: number): void {
 		this.connectors.splice(index, 1);
+		this.modelChange.emit(this.connectors);
 	}
+
 }

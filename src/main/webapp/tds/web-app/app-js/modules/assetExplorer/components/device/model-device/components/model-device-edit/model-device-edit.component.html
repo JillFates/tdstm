@@ -231,7 +231,12 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Connectors:</div>
-                                <div class="col-md-10"><tds-connector [connectors]="model.connectorsCollection"></tds-connector></div>
+                                <div class="col-md-10">
+                                    <tds-connector
+                                            [connectors]="model.connectorsCollection"
+                                            (modelChange)="onConnectorsChange($event)"
+                                    ></tds-connector>
+                                </div>
                             </div>
                         </div>
                     </div>
