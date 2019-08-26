@@ -27,7 +27,7 @@ class TaskTimeLineGraphSpec extends Specification {
 			TaskTimeLineGraph graph = taskTimeLineGraphTestHelper.createAcyclicDirectedGraphWithOneStartAndOneSink()
 
 		then: 'vertices can be calculated'
-			graph.V() == 8
+			graph.verticesSize() == 8
 	}
 
 	void 'can calculate sources for a TaskTimeLineGraph with one start and one sink'() {

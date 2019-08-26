@@ -808,7 +808,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then: 'graph contains all the final result values'
-			taskTimeLineGraph.V() == 5
+			taskTimeLineGraph.verticesSize() == 5
 
 			with(timelineSummary, TimelineSummary) {
 				cycles.size() == 0

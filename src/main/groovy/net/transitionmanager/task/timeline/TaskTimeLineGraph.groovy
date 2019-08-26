@@ -41,7 +41,7 @@ class TaskTimeLineGraph {
 	 *
 	 * @return
 	 */
-	int V() {
+	int verticesSize() {
 		return vertices.size()
 	}
 
