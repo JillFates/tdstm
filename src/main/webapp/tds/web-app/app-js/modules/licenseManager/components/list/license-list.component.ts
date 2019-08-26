@@ -11,18 +11,24 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 // Model
-import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE, DIALOG_SIZE} from '../../../../shared/model/constants';
+import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
+import {
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	ModalType
+} from '../../../../shared/model/constants';
 import {
 	LicenseColumnModel,
-	LicenseType,
-	LicenseStatus,
 	LicenseEnvironment,
-	LicenseModel
+	LicenseModel,
+	LicenseStatus,
+	LicenseType
 } from '../../model/license.model';
 // Kendo
-import {State, process, CompositeFilterDescriptor} from '@progress/kendo-data-query';
+import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+
 declare var jQuery: any;
 
 @Component({
@@ -165,10 +171,14 @@ export class LicenseListComponent implements OnInit {
 	 * Opens the selected License View
 	 * @param licenseModel
 	 */
-	private openLicenseViewEdit(licenseModel: LicenseModel): void {
+	private openLicenseViewEdit(licenseModel: LicenseModel, openEdit = false): void {
+		let modelType = ModalType.VIEW;
+		if (openEdit) {
+			modelType = ModalType.EDIT;
+		}
 		this.dialogService.open(LicenseDetailComponent, [
 			{provide: LicenseModel, useValue: licenseModel}
-		], DIALOG_SIZE.LG, false).then((result: LicenseModel) => {
+		], DIALOG_SIZE.LG, false, modelType).then((result: LicenseModel) => {
 			this.reloadData();
 		}).catch(result => {
 			this.reloadData();
