@@ -145,6 +145,7 @@ class TaskVertex {
 			return this.duration
 		}
 	}
+
 	/**
 	 * It calculates if a {@code TaskVertex} has already finished.
 	 * It is defined by {@code AssetCommentStatus#COMPLETED} and
@@ -155,6 +156,7 @@ class TaskVertex {
 	Boolean hasFinished() {
 		return status in [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED]
 	}
+
 	/**
 	 * It calculates if a {@code TaskVertex} has not started yet.
 	 * It is defined by {@code AssetCommentStatus#PLANNED} and
@@ -168,6 +170,7 @@ class TaskVertex {
 			AssetCommentStatus.PENDING
 		]
 	}
+
 	/**
 	 * Checks if current {@code TaskVertex} is a start node
 	 * for critical analysis.
@@ -176,6 +179,7 @@ class TaskVertex {
 	Boolean isStart() {
 		return predecessors.isEmpty()
 	}
+
 	/**
 	 * It calculates if a {@code TaskVertex} has already started.
 	 * It is defined by {@code AssetCommentStatus#STARTED} and

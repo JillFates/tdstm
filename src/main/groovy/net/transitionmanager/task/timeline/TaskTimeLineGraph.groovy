@@ -41,7 +41,7 @@ class TaskTimeLineGraph {
 	 *
 	 * @return
 	 */
-	int V() {
+	int verticesSize() {
 		return vertices.size()
 	}
 
@@ -62,6 +62,7 @@ class TaskTimeLineGraph {
 	TaskVertex getVertex(TaskVertex taskVertex) {
 		return this.getVertex(taskVertex.taskNumber)
 	}
+
 	/**
 	 * Adds a new edge with successor and predecessor
 	 * @param from an instance of {@code TaskVertex}
@@ -100,6 +101,7 @@ class TaskTimeLineGraph {
 				taskVertexMapByTaskComment[currentVertex.taskComment] = currentVertex
 			}
 		}
+
 		/**
 		 * Adds a new vertex with parameters: taskComment, description and duration
 		 * @param taskComment * @param description
@@ -116,6 +118,7 @@ class TaskTimeLineGraph {
 			)
 			return this
 		}
+
 		/**
 		 * Adds a new {@code AssetComment} task in
 		 * {@code TaskTimeLineGraph} builder creation.
@@ -146,6 +149,7 @@ class TaskTimeLineGraph {
 			tasks.each { AssetComment task -> withVertex(task) }
 			return this
 		}
+
 		/**
 		 * Add a {@code List} of {@code}
 		 * @param tasks
@@ -155,6 +159,7 @@ class TaskTimeLineGraph {
 			tasks.each { AssetComment task -> withVertex(task) }
 			return this
 		}
+
 		/**
 		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
 		 * It used {@code TaskDependency#predecessor} and
@@ -167,6 +172,7 @@ class TaskTimeLineGraph {
 			edgesByTaskNumber.add(new Tuple2<>(taskDependency.predecessor.taskNumber, taskDependency.successor.taskNumber))
 			return this
 		}
+
 		/**
 		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
 		 * It used {@code TaskDependency#predecessor} and
@@ -179,6 +185,7 @@ class TaskTimeLineGraph {
 			taskDependencies.each { TaskDependency taskDependency -> withEdge(taskDependency) }
 			return this
 		}
+
 		/**
 		 * Adds {@code TaskDependency} as edge in {@code TaskTimeLineGraph}.
 		 * It used {@code TaskDependency#predecessor} and
@@ -191,6 +198,7 @@ class TaskTimeLineGraph {
 			taskDependencies.each { TaskDependency taskDependency -> withEdge(taskDependency) }
 			return this
 		}
+
 		/**
 		 * Adds a new vertex with parameters: taskComment and duration
 		 * @param taskComment
@@ -200,6 +208,7 @@ class TaskTimeLineGraph {
 		Builder withVertex(Integer taskNumber, String taskComment, Integer duration) {
 			withVertex(taskNumber, taskComment, '', duration)
 		}
+
 		/**
 		 * Add Edges to a {@code TaskTimeLineGraph} using
 		 * {@code TaskTimeLineGraph#Builder#currentVertex}
@@ -220,6 +229,7 @@ class TaskTimeLineGraph {
 			edgesByTaskComment.add(new Tuple2<>(currentVertex.taskComment, taskComment))
 			return this
 		}
+
 		/**
 		 * Add Edges to a {@code TaskTimeLineGraph} using
 		 * {@code TaskTimeLineGraph#Builder#currentVertex}
@@ -241,6 +251,7 @@ class TaskTimeLineGraph {
 			taskComments.each { String taskComment -> addEdgeTo(taskComment) }
 			return this
 		}
+
 		/**
 		 * Add Edges to a {@code TaskTimeLineGraph} using
 		 * {@code TaskTimeLineGraph#Builder#currentVertex}
@@ -261,6 +272,7 @@ class TaskTimeLineGraph {
 			edgesByTaskNumber.add(new Tuple2<>(currentVertex.taskNumber, taskNumber))
 			return this
 		}
+
 		/**
 		 * Add Edges to a {@code TaskTimeLineGraph} using
 		 * {@code TaskTimeLineGraph#Builder#currentVertex}
