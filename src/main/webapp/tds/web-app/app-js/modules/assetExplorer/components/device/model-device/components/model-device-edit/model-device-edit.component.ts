@@ -135,7 +135,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	/**
 	 * On change connectors
 	 */
-	public onConnectorsChange(connectors: any[]): void {
+	public onConnectorsChange(connectors: any): void {
 		this.model.connectors = connectors;
 	}
 
@@ -172,11 +172,10 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			endOfLifeDate: this.model.endOfLifeDate,
 			sourceTDS: this.model.sourceTDS ? 1 : 0,
 			roomObject: this.model.roomObject ? 1 : 0,
-			akaChanges: this.model.akaChanges || [],
+			aka: this.model.akaChanges || [],
 			connectors: this.model.connectors || [],
 			connectorsCount: 0,
 		};
-		payload.connectorsCount = this.model.connectors.length;
 
 		console.log(payload);
 

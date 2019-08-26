@@ -23,28 +23,35 @@ import { Connector } from './model/connector.model';
                         <kendo-dropdownlist
                                 class="select"
                                 name="modelType"
+                                (selectionChange)="reportChanges()"
                                 [data]="types"
                                 [(ngModel)]="connectors[index].type">
                         </kendo-dropdownlist>
                     </div>
                     <div class="component-label">
                         <input type="text"
+							   (blur)="reportChanges()"
                                [(ngModel)]="connectors[index].label"
                                name="labelValue">
                     </div>
                     <div class="component-label-position">
                         <kendo-dropdownlist
                                 class="select"
+								(selectionChange)="reportChanges()"
                                 name="modelPosition"
                                 [data]="positions"
                                 [(ngModel)]="connectors[index].labelPosition">
                         </kendo-dropdownlist>
                     </div>
                     <div class="component-position-x">
-                        <input type="number" [(ngModel)]="connectors[index].xPosition" name="xPosition">
+                        <input type="number"
+                               (blur)="reportChanges()"
+							   [(ngModel)]="connectors[index].xPosition" name="xPosition">
                     </div>
                     <div class="component-position-y">
-                        <input type="number" [(ngModel)]="connectors[index].yPosition" name="yPosition">
+                        <input type="number"
+                               (blur)="reportChanges()"
+							   [(ngModel)]="connectors[index].yPosition" name="yPosition">
                     </div>
                 </div>
             </div>
@@ -53,7 +60,7 @@ import { Connector } from './model/connector.model';
 })
 export class ConnectorComponent implements OnInit {
 	@Input('connectors') originalConnectors: Connector[];
-	@Output('modelChange') modelChange = new EventEmitter<Connector[]>();
+	@Output('modelChange') modelChange = new EventEmitter<any>();
 	positions: string[];
 	types: string[];
 	modelTypeSelected: string;
@@ -71,9 +78,9 @@ export class ConnectorComponent implements OnInit {
 
 	onAdd(): void {
 		const count = this.connectors.length;
-		const connector: Connector = { type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', xPosition: 0, yPosition: 0  };
+		const connector: Connector = { id: null, type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', xPosition: 0, yPosition: 0  };
 		this.connectors.push(connector);
-		this.modelChange.emit(this.connectors);
+		this.reportChanges();
 	}
 
 	trackByIndex(index: number, obj: any): any {
@@ -82,7 +89,22 @@ export class ConnectorComponent implements OnInit {
 
 	onDelete(index: number): void {
 		this.connectors.splice(index, 1);
-		this.modelChange.emit(this.connectors);
+		this.reportChanges();
+	}
+
+	reportChanges(): void {
+		const added = this.connectors.filter((item) => item.id === null);
+
+		const edited = this.connectors.filter((item) => {
+			return this.originalConnectors.find((original) => original.id === item.id);
+		});
+
+		const deleted = this.originalConnectors.filter((item) => {
+			return !this.connectors.find((original) => original.id === item.id);
+		});
+
+		console.log({added, edited, deleted});
+		this.modelChange.emit({added, edited, deleted});
 	}
 
 }
