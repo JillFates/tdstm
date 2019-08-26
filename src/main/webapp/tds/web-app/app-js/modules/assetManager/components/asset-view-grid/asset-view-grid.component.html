@@ -1,35 +1,35 @@
 <tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
 
 <kendo-grid
-	            class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component"
-	            [filterable]="true"
-	            [sortable]="{ mode:'single' }"
-	            [data]="gridData"
-	            [skip]="gridState.skip"
-	            [sort]="gridState.sort"
-	            [pageSize]="gridState.take"
-	            [resizable]="true"
-	            [pageable]="{ pageSizes: maxOptions, info: true}"
-	            (dataStateChange)="dataStateChange($event)"
-	            (columnResize)="onWidthChange($event)"
-	            (cellClick)="cellClick($event)"
-	            [rowClass]="rowCallbackClass"
-	>
+	*ngIf="getDynamicConfiguration(); let config"
+		class="tds-kendo-grid without-selectabe-rows asset-explorer-view-grid-component"
+		[filterable]="true"
+		[sortable]="{ mode:'single' }"
+		[data]="gridData"
+		[skip]="gridState.skip"
+		[sort]="gridState.sort"
+		[pageSize]="gridState.take"
+		[resizable]="true"
+		[pageable]="{ pageSizes: maxOptions, info: true}"
+		(dataStateChange)="dataStateChange($event)"
+		(columnResize)="onWidthChange($event)"
+		(cellClick)="cellClick($event)"
+		[rowClass]="rowCallbackClass">
 
 		<!-- Header Toolbar -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
 			<div class="col-sm-6 bulkchange-section">
 				<div class="btn-group btn-between-space-5"
-				     *ngIf="displayCreateButton()">
+				     *ngIf="config.displayCreateButton">
 
-					<button type="button" [disabled]="!canCreateAssets()"
+					<button type="button" [disabled]="!config.canCreateAssets"
 					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
 					        class="btn btn-default dropdown-toggle tds-button-toolbar"
 					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
 						{{ 'GLOBAL.CREATE' | translate }}
 					</button>
 
-					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!canCreateAssets()"
+					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!config.canCreateAssets"
 					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
@@ -50,13 +50,13 @@
 					</ul>
 				</div>
 				<tds-bulk-change-button #tdsBulkChangeButton
-				                        [enabled]="hasSelectedItems()"
+				                        [enabled]="config.hasSelectedItems"
 				                        [showDelete]="true"
 				                        [showEdit]="true"
 				                        [bulkChangeType]="bulkChangeType"
 				                        (clickBulk)="onClickBulkButton()"
 				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="hasSelectedItems() && getSelectedItemsCount(); let counter" class="bulk-change-counter">
+				<div *ngIf="config.hasSelectedItems && config.getSelectedItemsCount; let counter" class="bulk-change-counter">
 					<span class="badge badge-light">{{counter}}</span><label>{{ (counter === 1 ? 'ASSETS.SINGLE_NAME' : 'ASSETS.PLURAL_NAME') | translate }} selected</label>
 				</div>
 				<div class="checkbox just-planning">
@@ -73,7 +73,7 @@
 							id="btnClean"
 							icon="times"
 							title="Clear filters"
-							[disabled]="!hasFilterApplied()"
+							[disabled]="!config.hasFilterApplied"
 							(click)="onClearFilters()">
 					</tds-button-custom>
 				</ng-template>
@@ -85,7 +85,7 @@
 							title="Clear filters"
 							tooltip="Clear filters and Hidden Fields"
 							iconPrefixVendor="glyphicon glyphicon-"
-							[disabled]="!hasFilterApplied()"
+							[disabled]="!config.hasFilterApplied"
 							(click)="onClearHiddenFilters()">
 					</tds-button-custom>
 				</ng-template>
@@ -121,7 +121,8 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="115" [locked]="true" *ngIf="model && model.columns && model.columns.length > 0">
+		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [locked]="true"
+								   *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
 					<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
@@ -148,8 +149,8 @@
 				*ngFor="let column of model.columns; let i = index"
 				[locked]="column.locked"
 				field="{{column.domain}}_{{column.property}}"
-				[minResizableWidth]="column.width || VIEW_COLUMN_MIN_WIDTH"
-				[width]="column.width"
+				[minResizableWidth]="VIEW_COLUMN_MIN_WIDTH_SHRINK"
+				[width]="commonShrunkColumns.includes(column.label)? commonShrunkColumnWidth : column.width"
 				[class]="column.domain"
 		>
 			<ng-template kendoGridHeaderTemplate>
@@ -185,25 +186,25 @@
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && !fieldPipeMap.pipe[column.domain+'_'+column.property]">
                <span [ngClass]="getCellClass(column)">
                    {{fieldPipeMap[column.domain+'_'+column.property]}}
-                   {{dataItem[column.domain+'_'+column.property]}}
+				   {{dataItem[column.domain+'_'+column.property]}}
                </span>
 			</ng-template>
             <!-- DateTime Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'DateTime'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDateTime : userTimeZone }}
                 </div>
             </ng-template>
             <!-- Date Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Date'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsDate : userDateFormat }}
+					{{dataItem[column.domain+'_'+column.property]| tdsDate : userDateFormat }}
                 </div>
             </ng-template>
             <!-- Number Fields Template -->
             <ng-template kendoGridCellTemplate let-dataItem *ngIf="fieldPipeMap.pipe[column.domain+'_'+column.property] === 'Number'">
                 <div>
-                    {{dataItem[column.domain+'_'+column.property]| tdsNumber : fieldPipeMap.metadata[column.domain+'_'+column.property] }}
+					{{dataItem[column.domain+'_'+column.property]| tdsNumber : fieldPipeMap.metadata[column.domain+'_'+column.property] }}
                 </div>
             </ng-template>
 			<!-- Asset Tags Cell Template -->

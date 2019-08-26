@@ -17,7 +17,10 @@ export class TaskService {
 
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
-	private readonly TASK_LIST = `${this.baseURL}/ws/task/listTasks`;
+	private readonly TASK_LIST_URL = `${this.baseURL}/ws/task/listTasks`;
+	private readonly CUSTOM_COLUMNS_URL = `${this.baseURL}/ws/task/customColumns`;
+	private readonly TASK_ACTION_INFO_URL = `${this.baseURL}/ws/task/getInfoForActionBar/{taskId}`;
+	private readonly RESET_TASK_URL = `${this.baseURL}/ws/task/{taskId}/resetAction`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -30,18 +33,6 @@ export class TaskService {
 	retrieveUserToDoCount(): Observable<any> {
 		return this.http.get(`${this.baseURL}/task/retrieveUserToDoCount`)
 			.map((response: any) => response)
-			.catch((error: any) => error);
-	}
-
-	/**
-	 * Get the Comment Categories
-	 * @returns {Observable<any>}
-	 */
-	getCommentCategories(): Observable<any> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
-			.map((response: any) => {
-				return response && response.status === 'success' && response.data;
-			})
 			.catch((error: any) => error);
 	}
 
@@ -217,7 +208,7 @@ export class TaskService {
 			{name: 'commentId', value: metaParam.commentId},
 			{name: 'page', value: currentPage},
 			{name: 'pageSize', value: maxPage},
-			{name: 'filter[filters][0][value]', value: query}
+			{name: 'query', value: query}
 		];
 
 		if (metaParam.eventId) {
@@ -287,11 +278,11 @@ export class TaskService {
 
 	/**
 	 *
-	 * Get categories
+	 * Get Asset Comment Categories
 	 * @returns {Observable<any>}
 	 */
-	getCategories(): Observable<any[]> {
-		return this.http.get(`${this.baseURL}/ws/asset/assetCommentCategories`)
+	getAssetCommentCategories(): Observable<any[]> {
+		return this.http.get(`${this.baseURL}/ws/task/assetCommentCategories`)
 			.map((response: any) => {
 				return response && response.data || [];
 
@@ -371,12 +362,12 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getClassForAsset(assetId: string): Observable<any> {
-		if (assetId) {
+		if (assetId && assetId !== '0') {
 			return this.http.get(`${this.baseURL}/assetEntity/classForAsset?id=${assetId}`)
 				.map((response: any) => response.data || null)
 				.catch((error: any) => error);
 		}
-		return Observable.empty();
+		return Observable.of({});
 	}
 
 	/**
@@ -400,21 +391,86 @@ export class TaskService {
 
 	/**
 	 * POST - Get the List of Task presented on Task Management list.
+	 * @param {any} filters  Object containing the filters to apply for
 	 */
-	getTaskList(eventId: number, justRemaining: boolean, justMyTasks: boolean, viewUnpublished: boolean): Observable<any> {
-		const request = {
-			moveEvent: eventId,
-			justRemaining: justRemaining ? 1 : 0,
-			justMyTasks: justMyTasks ? 1 : 0,
-			viewUnpublished: viewUnpublished ? 1 : 0,
-			sord: 'asc',
-		}
-		return this.http.post(this.TASK_LIST, request).pipe(
-			map((response: any) => response),
+	getTaskList(filters: any): Observable<any> {
+
+		return this.http.post(this.TASK_LIST_URL, filters).pipe(
+			map((response: any) => {
+				if (response.rows) {
+					response.rows = response.rows.map( item => {
+						let newItem = {...item};
+						newItem.taskNumber = newItem.taskNumber.toString();
+						return newItem;
+					})
+				}
+				return response;
+			}),
 			catchError(error => {
 				console.error(error);
 				return error;
 			})
 		);
+	}
+
+	/**
+	 * GET - Get the custom columns tasks.
+	 */
+	getCustomColumns(): Observable<any> {
+		return this.http.get(this.CUSTOM_COLUMNS_URL).pipe(
+			map(response => response),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
+	}
+
+	/**
+	 * POST - Set the new custom columns configuration.
+	 */
+	setCustomColumn(oldColumn: string, newColumn: string, index: number): Observable<any> {
+		const request = {
+			columnValue: newColumn,
+			from: index.toString(),
+			previousValue: oldColumn,
+			type: 'Task_Columns'
+		};
+		return this.http.post(this.CUSTOM_COLUMNS_URL, request).pipe(
+			map(response => response),
+			catchError(error => {
+				console.error(error);
+				return error;
+			})
+		);
+	}
+
+	/**
+	 * GET - Get Task Information for the action bar grid.
+	 * @param taskId: number
+	 */
+	getTaskActionInfo(taskId: number): Observable<any> {
+		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
+			.pipe( map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
+	}
+
+	/**
+	 * POST - Reset Task Action
+ 	 * @param taskId: number
+	 */
+	resetTaskAction(taskId: number): Observable<any> {
+		return this.http.post(this.RESET_TASK_URL.replace('{taskId}', taskId.toString()), null)
+			.pipe(
+				map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
 	}
 }

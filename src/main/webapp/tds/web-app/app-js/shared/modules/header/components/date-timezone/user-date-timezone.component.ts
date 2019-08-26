@@ -12,6 +12,7 @@ import {DateUtils} from '../../../../utils/date.utils';
 import {SortUtils} from '../../../../utils/sort.utils';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -38,6 +39,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 		private shouldReturnData: Boolean,
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
 		super('#datetime-modal');
 	}
@@ -111,9 +113,11 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			datetimeFormat: this.selectedTimeFormat
 		})) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM')	,
+				this.translatePipe.transform('GLOBAL.CANCEL')	,
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.dismiss();

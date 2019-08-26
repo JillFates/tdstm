@@ -71,9 +71,12 @@ export class BreadcrumbNavigationComponent {
 			if (this.route && this.route.snapshot.data['hasPendingChanges']) {
 				e.preventDefault();
 				promptService.open(
-					'Confirmation Required',
-					'You have changes that have not been saved. Do you want to continue and lose those changes?',
-					'Confirm', 'Cancel').then(result => {
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+						translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+						translatePipe.transform('GLOBAL.CONFIRM'),
+						translatePipe.transform('GLOBAL.CANCEL'),
+					)
+					.then(result => {
 					if (result) {
 						this.route.snapshot.data['hasPendingChanges'] = false;
 						window.location.assign(e.currentTarget.href);

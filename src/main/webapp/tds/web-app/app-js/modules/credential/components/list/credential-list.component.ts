@@ -1,5 +1,5 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 // Services
 import {CredentialService} from '../../service/credential.service';
@@ -25,6 +25,9 @@ import {
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS_WIDTH, COMMON_SHRUNK_COLUMNS} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'credential-list',
@@ -34,7 +37,7 @@ import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 		.action-header { width:100%; text-align:center; }
 	`]
 })
-export class CredentialListComponent implements OnInit {
+export class CredentialListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 
 	private state: State = {
@@ -60,6 +63,9 @@ export class CredentialListComponent implements OnInit {
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	private lastCreatedRecordId = 0;
 	public dateFormat = '';
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private route: ActivatedRoute,
@@ -76,6 +82,7 @@ export class CredentialListComponent implements OnInit {
 
 	ngOnInit() {
 		this.userContext.getUserContext()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
 				this.credentialColumnModel = new CredentialColumnModel(`{0:${this.dateFormat}}`);
@@ -118,7 +125,9 @@ export class CredentialListComponent implements OnInit {
 	 */
 	protected onEdit(dataItem: any): void {
 		let credential: CredentialModel = dataItem;
-		this.credentialService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+		this.credentialService.getCredential(credential.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (response: CredentialModel) => {
 			this.openCredentialDialogViewEdit(response, ActionType.EDIT, credential);
 		}, err => console.log(err));
 	}
@@ -131,7 +140,9 @@ export class CredentialListComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Confirm deletion of ' + dataItem.name + ' credential?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.credentialService.deleteCredential(dataItem.id).subscribe(
+					this.credentialService.deleteCredential(dataItem.id)
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
 						(result) => {
 							this.reloadData();
 						},
@@ -148,14 +159,18 @@ export class CredentialListComponent implements OnInit {
 		if (event.columnIndex > 0) {
 			let credential: CredentialModel = event['dataItem'] as CredentialModel;
 			this.selectRow(credential.id);
-			this.credentialService.getCredential(credential.id).subscribe( (response: CredentialModel) => {
+			this.credentialService.getCredential(credential.id)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe( (response: CredentialModel) => {
 				this.openCredentialDialogViewEdit(response, ActionType.VIEW, credential);
 			}, err => console.log(err));
 		}
 	}
 
 	protected reloadData(): void {
-		this.credentialService.getCredentials().subscribe(
+		this.credentialService.getCredentials()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result) => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
@@ -172,7 +187,9 @@ export class CredentialListComponent implements OnInit {
 	}
 
 	private reloadItem(originalModel: CredentialModel): void {
-		this.credentialService.getCredential(originalModel.id).subscribe( (response: CredentialModel) => {
+		this.credentialService.getCredential(originalModel.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe( (response: CredentialModel) => {
 			Object.assign(originalModel, response);
 		}, err => console.log(err));
 	}
@@ -235,5 +252,16 @@ export class CredentialListComponent implements OnInit {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

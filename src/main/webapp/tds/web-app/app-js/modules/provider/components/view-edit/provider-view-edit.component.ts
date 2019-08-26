@@ -6,8 +6,11 @@ import {ProviderModel} from '../../model/provider.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {KEYSTROKE} from '../../../../shared/model/constants';
 import {ProviderService} from '../../service/provider.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
 import {ProviderAssociatedModel} from '../../model/provider-associated.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'provider-view-edit',
@@ -36,7 +39,9 @@ export class ProviderViewEditComponent implements OnInit {
 		public activeDialog: UIActiveDialogService,
 		private dialogService: UIDialogService,
 		private prompt: UIPromptService,
-		private providerService: ProviderService) {
+		private translatePipe: TranslatePipe,
+		private providerService: ProviderService,
+		private permissionService: PermissionService) {
 
 		this.providerModel = Object.assign({}, this.originalModel);
 		this.modalTitle = this.getModalTitle(this.modalType);
@@ -97,9 +102,11 @@ export class ProviderViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();
@@ -180,5 +187,13 @@ export class ProviderViewEditComponent implements OnInit {
 			return 'Create Provider';
 		}
 		return (modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
+	}
+
+	protected isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderDelete);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProviderUpdate);
 	}
 }

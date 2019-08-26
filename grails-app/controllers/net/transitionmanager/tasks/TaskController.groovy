@@ -10,21 +10,17 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import groovy.time.TimeDuration
-import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
-import net.transitionmanager.command.task.AssignToMeCommand
 import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
-import net.transitionmanager.connector.AbstractConnector
-import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -35,7 +31,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
@@ -87,12 +82,38 @@ class TaskController implements ControllerMethods {
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
+	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
+
+	/**
+	 * Used to get the task information by ID
+	 * @param id - the ID of the task to retrieve
+	 * @return JSON map of the Task object
+	 */
+	def task(Long id) {
+		AssetComment task = taskService.fetchTaskById(id, currentPerson())
+		renderAsJson(task:task.taskToMap())
+	}
+
+	/**
+	 * Used to change the state of a task between Started, Done and Hold.
+	 * This will take the task ID and check to make sure that the user has access vs using the
+	 * User CurrentProject.
+	 * @param id - the ID of the task
+	 * @param currentStatus - the current status that we are expecting the task to be in
+	 * @param status - the status to set the task to
+	 * @param message - optional message when setting the task on HOLD
+	 * @return The task as an JSON object is updated
+	 */
+	def changeTaskState(Long id) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, request.JSON.currentStatus, request.JSON.status, request.JSON.message)
+		renderAsJson(task:task.taskToMap())
+	}
 
 	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
@@ -124,8 +145,13 @@ class TaskController implements ControllerMethods {
 				flash.message = map.error
 			}
 
-			def redirParams = []
-
+			def redirParams = [view: requestParams.view]
+			if (requestParams.containsKey('tab') && requestParams.tab) {
+				redirParams.tab = requestParams.tab
+			}
+			if (requestParams.containsKey('sort') && requestParams.sort) {
+				redirParams.sort = requestParams.sort
+			}
 			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
@@ -143,13 +169,19 @@ class TaskController implements ControllerMethods {
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
 	@HasPermission(Permission.TaskEdit)
-	def assignToMe(AssignToMeCommand params) {
+	def assignToMe() {
+		Map requestParams
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
 
 		String errorMsg = ''
 		String assignedToName = ''
 
 		try {
-			Person assignedTo = taskService.assignToMe(params.id as Long, params.status)
+			Person assignedTo = taskService.assignToMe(requestParams.id as Long, requestParams.status)
 			assignedToName = assignedTo.toString()
 		} catch (EmptyResultException | ServiceException e) {
 			errorMsg = e.message
@@ -909,7 +941,7 @@ digraph runbook {
 			AssetComment comment = taskService.changeEstTime(commentId, day)
 			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
 			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
-		} catch (EmptyResultException | ValidationException e) {
+		} catch (EmptyResultException | InvalidParamException e) {
 			retMap['etext'] = e.message
 		}
 		render retMap as JSON
@@ -1064,34 +1096,10 @@ digraph runbook {
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
-    // TODO: <SL> Need @HasPermission annotation
+	@HasPermission(Permission.TaskView)
 	def actionLookUp(Long apiActionId, Long commentId) {
 		Project project = securityService.userCurrentProject
-		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
-		if (!assetComment) {
-			sendNotFound()
-			return
-		}
-
-		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
-			ApiAction apiAction = assetComment.apiAction
-			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
-			DictionaryItem methodInfo = apiActionService.methodDefinition(apiAction)
-
-			List<Map> methodParamsList = apiAction.methodParamsList
-			methodParamsList = taskService.fillLabels(project, methodParamsList)
-
-			Map apiActionPayload = [
-				connector       : connector.name,
-				method      : methodInfo.name,
-				description : methodInfo.description,
-				methodParams: methodParamsList,
-				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
-			]
-			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
-		} else {
-			sendForbidden()
-		}
+		render(view: "_actionLookUp", model: [apiAction: taskActionService.actionLookup(commentId, project)])
 	}
 
 	@HasPermission(Permission.TaskView)
@@ -1113,12 +1121,9 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskView)
 	def list() {
-		// The projectId parameter is mandatory. If not present (or invalid), an exception is thrown.
-		Long projectId = NumberUtil.toPositiveLong(params.projectId)
-		if (!projectId) {
-			throw new InvalidParamException('Missing project id parameter for retrieving tasks.')
-		}
-		Project project = getProjectForWs(projectId)
+		// This will contain a reference to, either the user's project, or the project specified as
+		// a parameter (given that they have access to it)
+		Project project = getProjectForWs()
 
 		// If the params map has an event, validate that it exists and belongs to the project.
 		String eventIdParam = 'eventId'

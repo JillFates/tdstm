@@ -16,6 +16,7 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 import {NumberConfigurationConstraintsModel} from '../number/number-configuration-constraints.model';
 import {AlertType} from '../../../../shared/model/alert.model';
 import { FieldSettingsService } from '../../service/field-settings.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -87,6 +88,7 @@ export class FieldSettingsGridComponent implements OnInit {
 		private loaderService: UILoaderService,
 		private prompt: UIPromptService,
 		private dialogService: UIDialogService,
+		private translate: TranslatePipe,
 		private fieldSettingsService: FieldSettingsService) {
 	}
 
@@ -143,11 +145,49 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * On save all prevent to the user that underlaying data could be deleted
+	 * just whenever there is a delete action pending to be saved
+	 */
 	protected onSaveAll(): void {
-		this.saveEmitter.emit(() => {
-			this.reset();
-		});
+		this.askForDeleteUnderlayingData()
+			.then((deleteUnderLaying: boolean) => {
+				if (deleteUnderLaying) {
+					this.notifySaveAll(deleteUnderLaying)
+				}
+			});
+	}
 
+	/**
+	 * If there is records to be deleted, show the confirmation propmpt dialog asking
+	 * if those fields should be deleted in the back end as well
+	 */
+	private askForDeleteUnderlayingData(): Promise<boolean> {
+		const countFieldsToDelete = this.fieldsToDelete.length;
+
+		if (countFieldsToDelete) {
+			return this.prompt.open(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA', [countFieldsToDelete > 1 ? 'fields' : 'field'] ),
+				this.translate.transform('GLOBAL.YES'),
+				this.translate.transform('GLOBAL.NO'),
+				true);
+		}
+
+		return Promise.resolve(true);
+	}
+
+	/**
+	 * Notify to the host component about a save all action
+	 * Send the flag to inform about deleting the underlaying data
+	 * @param {boolean} deleteUnderLaying True to delete the underlaying data in the backend
+	 */
+	private notifySaveAll(deleteUnderLaying: boolean): void {
+		const savingInfo = {
+			deleteUnderLaying,
+			callback: () => this.reset()
+		}
+		this.saveEmitter.emit(savingInfo);
 	}
 
 	/**
@@ -173,6 +213,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * Delete button action, adds field to the pending to delete queue.
+	 * if field is shared delete for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -184,24 +225,51 @@ export class FieldSettingsGridComponent implements OnInit {
 		dataItem.toBeDeleted = true;
 		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: true
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete,
+				isSharedField: false,
+				addToDeleteCollection: true
+			});
+		}
 	}
 
 	/**
 	 * Undo Delete button action, removes field from pending to delete queue.
+	 * if field is shared undo for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
 		dataItem.toBeDeleted = false;
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: false
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete
+			});
+		}
+
 	}
 
 	/**

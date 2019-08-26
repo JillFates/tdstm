@@ -95,7 +95,7 @@ class UserService implements ServiceMethods {
 
 		boolean autoProvision = domain.autoProvision
 		Long defaultProject = domain.defaultProject
-		String defaultRole = RoleType.ROLE_PREFIX + domain.defaultRole ?: ''
+		String defaultRole = domain.defaultRole ? RoleType.ROLE_PREFIX + domain.defaultRole.toUpperCase() : ''
 		String defaultTimezone = domain.defaultTimezone ?: ''
 
 		PartyGroup company = PartyGroup.get(userInfo.companyId)
@@ -228,10 +228,8 @@ class UserService implements ServiceMethods {
 
 		// Setup what the user roles should be based on the configuration and what came back from the userInfo
 		List newUserRoles = userInfo.roles.size() ? userInfo.roles : []
-		if (defaultRole) {
-			if (!newUserRoles.contains(defaultRole)) {
-				newUserRoles << defaultRole
-			}
+		if (defaultRole && !newUserRoles) {
+			newUserRoles << defaultRole
 		}
 
 		if (createUser) {
@@ -253,6 +251,7 @@ class UserService implements ServiceMethods {
 			if (domain.updateRoles) {
 
 				List roleTypeCodes = SecurityConfigParser.getDomainRoleTypeCodes(config, authority)
+				roleTypeCodes = roleTypeCodes.collect{String role -> RoleType.ROLE_PREFIX + role.toUpperCase()}
 				List roleTypes = RoleType.getAll(roleTypeCodes).findAll()
 
 				// Get the user roles from DB and compare
@@ -739,14 +738,22 @@ class UserService implements ServiceMethods {
 		UserLogin userLogin = securityService.getUserLogin()
 		Person person = securityService.loadCurrentPerson()
 		MoveEvent moveEvent
-		String eventPref = userPreferenceService.getMoveEventId(userLogin)
-		if (eventPref) {
-			moveEvent = GormUtil.findInProject(project, MoveEvent, NumberUtil.toPositiveLong(eventPref), true)
-		}
 		MoveBundle moveBundle
-		String bundlePref = userPreferenceService.getMoveBundleId()
-		if (bundlePref) {
-			moveBundle = GormUtil.findInProject(project, MoveBundle, NumberUtil.toPositiveLong(bundlePref), true)
+		String logoUrl = null
+
+		if (project) {
+			String eventPref = userPreferenceService.getMoveEventId(userLogin)
+			if (eventPref) {
+				moveEvent = GormUtil.findInProject(project, MoveEvent, NumberUtil.toPositiveLong(eventPref))
+			}
+
+			String bundlePref = userPreferenceService.getMoveBundleId()
+			if (bundlePref) {
+				moveBundle = GormUtil.findInProject(project, MoveBundle, NumberUtil.toPositiveLong(bundlePref))
+			}
+
+			logoUrl = projectService.getProjectLogoUrl(project)
+
 		}
 
 		String timezone = userPreferenceService.getTimeZone(userLogin, TimeUtil.defaultTimeZone)
@@ -762,7 +769,7 @@ class UserService implements ServiceMethods {
 			moveBundle: moveBundle,
 			timezone: timezone,
 			dateFormat: dateFormat,
-			logoUrl: projectService.getProjectLogoUrl(project)
+			logoUrl: logoUrl
 		]
 		return new UserContext(contextParams)
 	}

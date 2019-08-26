@@ -30,11 +30,13 @@ export class GridColumnModel {
 	locked ? = false;
 	hidden ? = false;
 	filter?: any;
+	filterable ? = false;
 	headerStyle?: any;
 	headerClass?: Array<string>;
 	cellStyle?: any;
 	cellClass?: string | Array<string>;
 	sort?: SortInfo;
+	columnMenu ? = false;
 
 	constructor() {
 		this.type = 'text';

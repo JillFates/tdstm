@@ -52,8 +52,8 @@ export const en_DICTIONARY: Object = {
 		'FETCH': 'Fetch',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
-			'CONFIRMATION_REQUIRED': 'Confirmation Required',
-			'UNSAVED_CHANGES_MESSAGE' : 'You have changes that have not been saved. Do you want to continue and lose those changes?',
+			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
 		},
@@ -135,6 +135,21 @@ export const en_DICTIONARY: Object = {
 				'REMOVE': 'Remove these'
 			}
 		}
+	},
+	'ASSET_EXPORT': {
+		'ASSET_EXPORT': 'Asset Export',
+		'SELECT_BUNDLE': 'Select one or more bundle(s):',
+		'CHOOSE_ITEM': 'Choose Item(s) to Export:',
+		'EXPORT_BUTTON': 'Export Excel',
+		'BUNDLE_ERROR': '* Select at least one bundle',
+		'ALL_ITEMS': 'All Items',
+		'DATABASE': 'Database',
+		'STORAGE': 'Storage',
+		'ROOM': 'Room',
+		'RACK': 'Rack',
+		'DEPENDENCY': 'Dependency',
+		'CABLING': 'Cabling',
+		'COMMENT': 'Comment'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
@@ -247,7 +262,8 @@ export const en_DICTIONARY: Object = {
 			'MAX_LENGTH': 'Max Length',
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
-		}
+		},
+		'CLEAR_UNDERLAYING_DATA': 'The underlying data will be deleted when you delete the custom {param1}.\nPress Yes to continue, No to cancel.',
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',
@@ -262,6 +278,7 @@ export const en_DICTIONARY: Object = {
 		'REQUEST_NEW_LICENSE': 'Request New License',
 		'LICENSE_REQUEST_COMPLETED': 'License Request Completed',
 		'LICENSE_DETAIL': 'License Detail',
+		'LICENSE_EDIT': 'License Edit',
 		'TRAINING': 'Training',
 		'PRODUCTION': 'Production',
 	},
@@ -311,6 +328,8 @@ export const en_DICTIONARY: Object = {
 		'CHECK_YOUR_EMAIL': 'Check Your Email',
 		'DOMAIN': 'Domain',
 		'FORGOT_PASSWORD': 'Forgot Password',
+		'CHANGE_PASSWORD': 'Change Password',
+		'SAVE_PASSWORD': 'Save Password',
 		'LOGIN': 'Login',
 		'PLEASE_SELECT': 'Please select',
 		'SEND': 'Send',
@@ -321,6 +340,11 @@ export const en_DICTIONARY: Object = {
 			'\t\t\tyou will receive an email with a reset link. If you do not receive this email,\n' +
 			'\t\t\tplease check your spam filter or contact your system administrator to confirm your account is still active.',
 		'WE_WILL_SEND_EMAIL': 'We will send an e-mail to you that contains a link to a page where you can create new password.'
+	},
+	'COMMENT': {
+		'SHOW_COMMENT': 'Comment Detail',
+		'CREATE_COMMENT': 'Comment Create',
+		'EDIT_COMMENT': 'Comment Edit',
 	},
 	'NOTICE': {
 		'ADMIN': 'Admin',
@@ -335,7 +359,7 @@ export const en_DICTIONARY: Object = {
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
 		'POST_NOTICES': 'Post Notices',
 		'TOOLTIP_TITLE': 'Notice title',
-		'TOOLTIP_NOTICE_TYPES': `Pre Login:Appear on Login Form
+		'TOOLTIP_NOTICE_TYPES': `Pre Login: Appear on Login Form
 Post Login: Used for general notices after Login
 Mandatory Acknowledgement: Appear post login and user must Accept otherwise will be logged out`,
 		'TOOLTIP_ACTIVE': 'Notice will only appear when Active as long as it is within the Activation/Expiration date range if set',

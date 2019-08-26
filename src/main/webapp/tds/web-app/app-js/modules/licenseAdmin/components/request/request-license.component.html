@@ -54,7 +54,7 @@
 				</div>
 				<div class="form-group">
 					<div class="col-sm-12">
-						<textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" ng-model="requestLicense.specialInstruction"></textarea>
+						<textarea id="selectSpecialInstructions" class="form-control" rows="3" placeholder="" name="specialInstructions" [(ngModel)]="requestLicense.specialInstruction"></textarea>
 					</div>
 				</div>
 			</div><!-- /.box-body -->
@@ -64,9 +64,6 @@
 		<button type="button" (click)="onCreateRequestLicense()" class="btn btn-primary pull-left" [disabled]="!licenseRequestForm.form.valid">
 			<span class="glyphicon glyphicon-share-alt"></span> Submit Request
 		</button>
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span>{{'GLOBAL.CANCEL' | translate }}</span>
-		</button>
+		<tds-button-cancel (click)="cancelCloseDialog()" class="pull-right"></tds-button-cancel>
 	</div>
 </div>

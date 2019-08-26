@@ -374,4 +374,18 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public getSaveButtonId(): string {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
+	/**
+	 * Group all the dynamic informaction required by the view in just one function
+	 * @return {any} Object with the values required dynamically by the view
+	 */
+	public getDynamicConfiguration(): any {
+		return {
+			isDirty: this.isDirty() ,
+			saveButtonId: this.getSaveButtonId(),
+			canSave: this.canSave(),
+			canSaveAs: this.canSaveAs(),
+			isEditAvailable: this.isEditAvailable(),
+			canShowSaveButton: this.canShowSaveButton(),
+		}
+	}
 }

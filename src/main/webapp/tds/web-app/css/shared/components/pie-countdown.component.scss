@@ -4,22 +4,26 @@
     bg $time + s step-end infinite;
 }
 
+$pie-base-color: #3c8dbc;
+$pie-under-color: #eee;
+
 .pie-countdown {
   // border: 1px solid blue;
 }
   .pie-countdown-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
     align-items: center;
+    justify-content: flex-end;
   }
 
   .pie-countdown .refresh {
-    color: #3c8dbc;
+    color: $pie-base-color;
     cursor: pointer;
   }
 
   .pie-countdown-container .k-dropdown {
+    margin: auto 10px;
     width: 75px;
   }
 
@@ -27,9 +31,9 @@
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        background: #eee;
-        background-image: linear-gradient(to right, transparent 50%, #3c8dbc 0);
-        color: #eee;
+        background: $pie-under-color;
+        background-image: linear-gradient(to right, transparent 50%, $pie-base-color 0);
+        color: $pie-under-color;
       }
       
       .pie-countdown-timer::before {
@@ -48,7 +52,7 @@
       }
       
       @keyframes bg {
-        50% { background: #3c8dbc; }
+        50% { background: $pie-base-color; }
       }
       
       .timer-30-seconds::before {
@@ -61,6 +65,14 @@
       
       .timer-120-seconds::before {
         @include pie-countdown-timer(120);
+      }
+
+      .timer-180-seconds::before {
+        @include pie-countdown-timer(180);
+      }
+
+      .timer-240-seconds::before {
+        @include pie-countdown-timer(240);
       }
       
       .timer-300-seconds::before {

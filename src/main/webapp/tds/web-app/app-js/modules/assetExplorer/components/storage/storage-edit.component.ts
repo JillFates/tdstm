@@ -15,6 +15,8 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import * as focusTrap from 'focus-trap';
 
 export function StorageEditComponent(template: string, editModel: any, metadata: any): any {
 	@Component({
@@ -25,6 +27,7 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		]
 	})
 	class StorageShowComponent extends AssetCommonEdit implements OnInit {
+		private focusTrapElement;
 		constructor(
 			@Inject('model') model: any,
 			activeDialog: UIActiveDialogService,
@@ -34,14 +37,19 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService) {
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe) {
 
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.focusTrapElement = focusTrap.default(<HTMLElement>document.getElementsByClassName('tds-angular-component-content')[0], {
+				initialFocus: '.tds-angular-component-content'
+			});
+			this.focusTrapElement.activate();
 		}
 
 		/**

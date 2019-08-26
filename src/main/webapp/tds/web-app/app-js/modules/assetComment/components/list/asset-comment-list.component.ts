@@ -1,16 +1,19 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS, ModalType} from '../../../../shared/model/constants';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {AssetCommentService} from '../../service/asset-comment.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute} from '@angular/router';
-import {AssetCommentColumnModel, AssetCommentModel} from '../../model/asset-comment.model';
-import {AssetCommentViewEditComponent} from '../view-edit/asset-comment-view-edit.component';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { CompositeFilterDescriptor, process, State } from '@progress/kendo-data-query';
+import { GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS, ModalType } from '../../../../shared/model/constants';
+import { ActionType, COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
+import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { AssetCommentService } from '../../service/asset-comment.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { PreferenceService } from '../../../../shared/services/preference.service';
+import { ActivatedRoute } from '@angular/router';
+import { AssetCommentColumnModel, AssetCommentModel } from '../../model/asset-comment.model';
+import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-edit.component';
+import { ReplaySubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH } from '../../../../shared/constants/common-shrunk-columns';
 
 declare var jQuery: any;
 
@@ -18,8 +21,7 @@ declare var jQuery: any;
 	selector: `asset-comment-list`,
 	templateUrl: 'asset-comment-list.component.html',
 })
-export class AssetCommentListComponent implements OnInit {
-
+export class AssetCommentListComponent implements OnInit, OnDestroy {
 	private state: State = {
 		sort: [{
 			dir: 'asc',
@@ -39,6 +41,9 @@ export class AssetCommentListComponent implements OnInit {
 	public gridData: GridDataResult;
 	public resultSet: AssetCommentModel[];
 	public dateFormat = '';
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -53,14 +58,14 @@ export class AssetCommentListComponent implements OnInit {
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['assetComments'];
 		this.gridData = process(this.resultSet, this.state);
-
 	}
 
 	ngOnInit() {
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
-				this.assetCommentColumnModel = new AssetCommentColumnModel(`{0:${dateFormat}}`);
+				this.assetCommentColumnModel = new AssetCommentColumnModel(`{0:${ dateFormat }}`);
 			});
 	}
 
@@ -103,13 +108,15 @@ export class AssetCommentListComponent implements OnInit {
 	}
 
 	protected reloadData(): void {
-		this.assetCommentService.getAssetComments().subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
-			},
-			(err) => console.log(err));
+		this.assetCommentService.getAssetComments()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
+				(result) => {
+					this.resultSet = result;
+					this.gridData = process(this.resultSet, this.state);
+					setTimeout(() => this.forceDisplayLastRowAddedToGrid(), 100);
+				},
+				(err) => console.log(err));
 	}
 
 	/**
@@ -118,7 +125,7 @@ export class AssetCommentListComponent implements OnInit {
 	 */
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
+		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${ lastIndex }"]`);
 		this.renderer.setStyle(target, 'height', '36px');
 	}
 
@@ -131,7 +138,6 @@ export class AssetCommentListComponent implements OnInit {
 		let commentModel: AssetCommentModel = {
 			id: comment.id,
 			modal: {
-				title: 'Comment Detail',
 				type: type
 			},
 			archive: comment.dateResolved !== null,
@@ -147,9 +153,8 @@ export class AssetCommentListComponent implements OnInit {
 			lastUpdated: comment.lastUpdated,
 			dateCreated: comment.dateCreated
 		};
-
 		this.dialogService.extra(AssetCommentViewEditComponent, [
-			{provide: AssetCommentModel, useValue: commentModel}
+			{ provide: AssetCommentModel, useValue: commentModel }
 		]).then(result => {
 			this.reloadData();
 		}).catch(result => {
@@ -179,5 +184,16 @@ export class AssetCommentListComponent implements OnInit {
 		this.gridData = process(this.resultSet, this.state);
 		// Adjusting the locked column(s) height to prevent cut-off issues.
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 }

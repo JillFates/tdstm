@@ -79,8 +79,7 @@ class AESCodecTests extends Specification {
 			def encodedValue = AESCodec.instance.encode("testvalue", "1234")
 			AESCodec.instance.decode(encodedValue, "4321")
 		then: 'A general security exception is thrown'
-			GeneralSecurityException e = thrown()
-			e.message ==~ /^Given final block not properly padded.*$/
+			thrown GeneralSecurityException
 	}
 
 	/**

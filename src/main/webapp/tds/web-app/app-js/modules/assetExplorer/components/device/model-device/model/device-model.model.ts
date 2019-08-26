@@ -42,4 +42,8 @@ export class DeviceModelDetails {
 	public sourceURL: string;
 	public modelStatus: string;
 	public connectors: Array<Connector>;
+	public cpuType: string;
+	public cpuCount: number;
+	public memorySize: number;
+	public storageSize: number;
 }

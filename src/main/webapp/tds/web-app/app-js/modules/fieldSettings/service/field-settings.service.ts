@@ -65,6 +65,17 @@ export class FieldSettingsService {
 	}
 
 	/**
+	 * Delete the underlaying data for the custom fields selected
+	 * @param {string} payload - Contains the list of fields to be remove grouped by domain
+	 * @returns {any}
+	 */
+	deleteCustomFields(payload: any): Observable<any> {
+		return this.http.post(`${this.fieldSettingsUrl}/ASSETS/DELETE`, JSON.stringify(payload))
+			.map((response: any) => response['_body'] ? response : {status: 'Ok'})
+			.catch((error: any) => Observable.throw(error || 'Server error'));
+	}
+
+	/**
 	 * Checks if `label` matches any other labels inside `fields`.
 	 *    This comparison is case-insensitive and it doesn't take into account any trailing,
 	 *    leading or in-between spaces.
@@ -136,7 +147,7 @@ export class FieldSettingsService {
 					// validate conflicts between field, and labels and field names in the domain
 					return itemLabel === fieldLabel || this.conflictsWithAnotherFieldName(field.label, fields);
 				});
-				if (conflicts.length > 0) {
+				if (conflicts.length > 1) {
 					return true;
 				}
 			}

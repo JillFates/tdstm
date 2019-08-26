@@ -1,9 +1,8 @@
 /*
 	This is the Geb configuration file.
-	
+
 	See: http://www.gebish.org/manual/current/#configuration
 */
-
 
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
@@ -12,7 +11,6 @@ import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.Platform
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
-import org.openqa.selenium.support.ui.SystemClock
 
 waiting {
 	timeout = 20
@@ -43,15 +41,23 @@ environments {
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
             driver = {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
-                //capabilities.setVersion("45.4.0esr")
-                //capabilities.setPlatform(Platform.LINUX)
+								ChromeOptions options = new ChromeOptions();
+
+								options.addArguments("start-maximized");
+				        options.addArguments("enable-automation");
+				        options.addArguments("--no-sandbox");
+				        options.addArguments("--disable-infobars");
+				        options.addArguments("--disable-dev-shm-usage");
+				        options.addArguments("--disable-browser-side-navigation");
+				        options.addArguments("--disable-gpu");
+								capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
                 new RemoteWebDriver( new URL(browserLocation), capabilities )
 		    }
         }
 	}
-
 
 	// run via “./gradlew firefoxTest”
 	// See: http://code.google.com/p/selenium/wiki/FirefoxDriver
@@ -93,8 +99,7 @@ environments {
 // To run the tests with chrome and firefox browsers just run “./gradlew test”
 
 // Set or get the baseUrl of the system to be tested
-baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa12.transitionmanager.net'
+baseUrl = System.properties['geb.build.baseUrl'] ?: 'https://tmqa11.transitionmanager.net'
 println "geb.build.baseUrl: Testing qa environment ${baseUrl}"
 
 //reportsDir = "target/geb-reports"
-

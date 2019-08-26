@@ -1,10 +1,13 @@
-import net.transitionmanager.task.AssetComment
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.i18n.Message
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.i18n.Message
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -19,18 +22,45 @@ class TaskFacadeIntegrationSpec extends Specification {
 
 	@Shared
 	def grailsApplication
-	ProjectTestHelper projectTestHelper = new ProjectTestHelper()
-	MoveEventTestHelper moveEventTestHelper = new MoveEventTestHelper()
-	AssetCommentTestHelper assetCommentTestHelper = new AssetCommentTestHelper()
 
-	Project project
-	MoveEvent moveEvent
+	@Shared
+	private PersonTestHelper personHelper
+
+	@Shared
+	ProjectTestHelper projectTestHelper
+
+	@Shared
+	MoveEventTestHelper moveEventTestHelper
+
+	@Shared
+	AssetCommentTestHelper assetCommentTestHelper
+
+	@Shared
+	Project      project
+
+	@Shared
+	MoveEvent    moveEvent
+
+	@Shared
 	AssetComment assetComment
 
+	@Shared
+	Person       whom
+
+
 	void setup() {
+		personHelper = new PersonTestHelper()
+		projectTestHelper = new ProjectTestHelper()
+		moveEventTestHelper = new MoveEventTestHelper()
+		assetCommentTestHelper = new AssetCommentTestHelper()
+
 		project = projectTestHelper.createProject(null)
+		ProjectService projectService = new ProjectService()
+		PartyGroup owner = projectService.getOwner(project)
+		whom = personHelper.createStaff(owner)
 		moveEvent = moveEventTestHelper.createMoveEvent(project)
 		assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
+
 	}
 
 	void 'test different bean ids when getting prototype TaskFacade bean from SpringContext'() {
@@ -64,8 +94,24 @@ class TaskFacadeIntegrationSpec extends Specification {
 			taskFacade.isStarted()
 	}
 
+	void 'test task error using TaskFacade should put the task on hold when adding null note comment a default message should be added.'() {
+		setup: 'giving a task facade with an asset comment'
+			TaskFacade taskFacade = getTaskFacadeBean()
+		expect:
+			!taskFacade.isOnHold()
+		when: 'marking the task as in error'
+			taskFacade.error(null)
+		then: 'the task status should be updated accordingly'
+			AssetCommentStatus.HOLD == taskFacade.status
+		and: 'task notes should contain the error message passed as the error reason'
+			taskFacade.notes.contains(getExpectedI18NMessage(Message.ApiActionTaskMessageDefaultError))
+		and: 'task isOnHold flag should reflect true'
+			taskFacade.isOnHold()
+	}
+
 	void 'test task done using TaskFacade should complete the task and update status'() {
 		setup: 'giving a task facade with an asset comment'
+			assetComment = assetCommentTestHelper.createAssetComment(project, moveEvent)
 			TaskFacade taskFacade = getTaskFacadeBean()
 		expect:
 			!taskFacade.isDone()
@@ -149,7 +195,7 @@ class TaskFacadeIntegrationSpec extends Specification {
 	 * @return
 	 */
 	private TaskFacade getTaskFacadeBean() {
-		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment)
+		return grailsApplication.getMainContext().getBean(TaskFacade.class, assetComment, whom)
 	}
 
 	/**

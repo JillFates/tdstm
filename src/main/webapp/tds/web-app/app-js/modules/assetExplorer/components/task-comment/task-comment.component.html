@@ -26,6 +26,7 @@
                 <tds-button-create
                         class="float-right button-header-grid"
                         title="Create"
+                        [disabled]="!isTaskCreateAvailable()"
                         tooltip="Create new task"
                         (click)="openTaskCreate()">
                 </tds-button-create>
@@ -109,6 +110,7 @@
                 <tds-button-create
                         class="float-right button-header-grid"
                         title="Create"
+                        [disabled]="!isCommentCreateAvailable()"
                         tooltip="Create new comment"
                         (click)="createComment()">
                 </tds-button-create>

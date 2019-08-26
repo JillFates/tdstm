@@ -134,7 +134,9 @@
 						</g:if>
 					</tds:hasPermission>
 					<span class="button">
+					<tds:hasPermission permission="${Permission.ProjectFieldSettingsView}">
 						<input class="show" type="button" value="Field Settings" onclick="window.location='${createLink(controller:'module', action: 'fieldsettings')}/list';" />
+					</tds:hasPermission>
 					</span>
 				</g:form>
 			</div>
@@ -143,7 +145,10 @@
 			currentMenuId = "#projectMenu";
 			$('.menu-projects-current-project').addClass('active');
 			$('.menu-parent-projects').addClass('active');
-
+			// Every time we land on a page that update the state, we make the proper change inside the model
+			if (stateManagement ) {
+				stateManagement.setProject(${projectInstance?.id}, '${projectInstance.name}', '${projectLogoUrl}');
+			}
 		</script>
 	</body>
 </html>

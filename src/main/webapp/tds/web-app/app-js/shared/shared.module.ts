@@ -11,14 +11,14 @@ import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
 import {UploadModule} from '@progress/kendo-angular-upload';
 import {IntlModule} from '@progress/kendo-angular-intl';
 // NGXS
-import {Store} from '@ngxs/store';
+import {NGXS_PLUGINS, Store} from '@ngxs/store';
 // Shared Services
 import {HeaderService} from './modules/header/services/header.service';
-import {PreferenceService} from '../shared/services/preference.service';
-import {NotifierService} from '../shared/services/notifier.service';
-import {ComponentCreatorService} from '../shared/services/component-creator.service';
-import {UIDialogService, UIActiveDialogService} from '../shared/services/ui-dialog.service';
-import {UILoaderService} from '../shared/services/ui-loader.service';
+import {PreferenceService} from './services/preference.service';
+import {NotifierService} from './services/notifier.service';
+import {ComponentCreatorService} from './services/component-creator.service';
+import {UIDialogService, UIActiveDialogService} from './services/ui-dialog.service';
+import {UILoaderService} from './services/ui-loader.service';
 import {PersonService} from './services/person.service';
 import {WindowService} from './services/window.service';
 import {BulkChangeService} from './services/bulk-change.service';
@@ -29,16 +29,19 @@ import {ValidationRulesDefinitionsService} from './services/validation-rules-def
 import {HttpRequestInterceptor, HTTPFactory} from './providers/http-request-interceptor.provider.';
 import {KendoFileUploadInterceptor, HTTPKendoFactory} from './providers/kendo-file-upload.interceptor';
 import {KendoFileHandlerService} from './services/kendo-file-handler.service';
+import {DialogModule} from '@progress/kendo-angular-dialog';
+import {ProgressBarModule} from 'angular-progress-bar';
 import {PostNoticesManagerService} from '../modules/auth/service/post-notices-manager.service';
 import {PostNoticesService} from '../modules/auth/service/post-notices.service';
 import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
+import {LocalStorageProvider} from './providers/localstorage.provider';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
-import {UILoaderDirective} from '../shared/directives/ui-loader.directive';
-import {UIToastDirective} from '../shared/directives/ui-toast.directive';
-import {UIDialogDirective} from '../shared/directives/ui-dialog.directive';
-import {UIPromptDirective, UIPromptService} from '../shared/directives/ui-prompt.directive';
+import {UILoaderDirective} from './directives/ui-loader.directive';
+import {UIToastDirective} from './directives/ui-toast.directive';
+import {UIDialogDirective} from './directives/ui-dialog.directive';
+import {UIPromptDirective, UIPromptService} from './directives/ui-prompt.directive';
 import {UIModalDecoratorDirective} from './directives/ui-modal-decorator.directive';
 import {UISVGIconDirectiveDirective} from './directives/ui-svg-icon.directive';
 import {UIFloatingHeaderKGridDirective} from './directives/ui-floating-header-k-grid.directive';
@@ -53,6 +56,7 @@ import {UIBooleanPipe} from './pipes/ui-boolean.pipe';
 import {TranslatePipe} from './pipes/translate.pipe';
 import {FilterPipe} from './pipes/filter.pipe';
 import {UtilsPipe} from './pipes/utils.pipe';
+import {SafeHtmlPipe} from './pipes/safe-html.pipe';
 import {DatePipe} from './pipes/date.pipe';
 import {NumericPipe} from './pipes/numeric.pipe';
 import {EscapeUrlEncodingPipe} from './pipes/escape-url-encoding.pipe';
@@ -90,10 +94,12 @@ import {BulkChangeButtonComponent} from './components/bulk-change/components/bul
 import {BulkChangeActionsComponent} from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import {BulkChangeEditComponent} from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
 import {TDSActionButton} from './components/button/action-button.component';
+import {TDSProgressBar} from './components/progress-bar/progress-bar.component';
 import {TDSCustomValidationErrorsComponent} from './components/custom-control/field-validation-errors/field-validation-errors.component';
 import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-editor.component';
 import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
+import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/modal-page-wrapper.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -110,7 +116,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		DateInputsModule,
 		IntlModule,
 		InputsModule,
-		RouterModule
+		RouterModule,
+		DialogModule,
+		ProgressBarModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -122,6 +130,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TranslatePipe,
 		FilterPipe,
 		UtilsPipe,
+		SafeHtmlPipe,
 		DatePipe,
 		NumericPipe,
 		EscapeUrlEncodingPipe,
@@ -168,10 +177,12 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
 		TDSActionButton,
+		TDSProgressBar,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
 		PieCountdownComponent,
-		TDSFilterInputComponent
+		TDSFilterInputComponent,
+		TDSModalPageWrapperComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -229,10 +240,13 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
 		TDSActionButton,
+		TDSProgressBar,
 		TDSCustomValidationErrorsComponent,
 		RichTextEditorComponent,
 		PieCountdownComponent,
-		TDSFilterInputComponent
+		TDSFilterInputComponent,
+		SafeHtmlPipe,
+		TDSModalPageWrapperComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -247,7 +261,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		UserEditPersonComponent,
 		UserDateTimezoneComponent,
 		UserManageStaffComponent,
-		PasswordChangeComponent
+		PasswordChangeComponent,
+		TDSModalPageWrapperComponent
 	]
 })
 export class SharedModule {
@@ -280,6 +295,11 @@ export class SharedModule {
 					useClass: KendoFileUploadInterceptor,
 					useFactory: HTTPKendoFactory,
 					deps: [KendoFileHandlerService],
+					multi: true
+				},
+				{
+					provide: NGXS_PLUGINS,
+					useValue: LocalStorageProvider,
 					multi: true
 				},
 				UIPromptService,

@@ -4,6 +4,7 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
+import com.tdssrc.grails.StringUtil
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.ValidationException
 import net.transitionmanager.command.IdsCommand
@@ -16,6 +17,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
 import net.transitionmanager.reporting.DashboardService
 import net.transitionmanager.security.Permission
@@ -220,38 +222,6 @@ class WsEventController implements ControllerMethods {
 		renderSuccessJson()
 	}
 
-	@HasPermission(Permission.AssetEdit)
-	def markEventAssetAsMoved(String id) {
-		def moveEvent = MoveEvent.get(id.toLong())
-		if (!moveEvent) {
-			log.error 'markEventAssetAsMoved: Specified moveEvent ({}) was not found})', params.moveEventId
-
-			renderErrorJson('An unexpected condition with the event occurred that is preventing an update.')
-			return
-		}
-
-		if (!securityService.isCurrentProjectId(moveEvent.project.id)) {
-			log.error 'markEventAssetAsMoved: moveEvent.project ({}) does not match current project ({})', moveEvent.id, securityService.userCurrentProjectId
-			renderErrorJson('An unexpected condition with the event occurred that is preventing an update')
-			return
-		}
-
-		int assetAffected = 0
-
-		if (moveEvent.moveBundles) {
-			assetAffected = jdbcTemplate.update("update asset_entity  \
-			set plan_status = 'Moved', source_location = target_location, room_source_id = room_target_id ,\
-				rack_source_id = rack_target_id, source_rack_position = target_rack_position, \
-				source_chassis_id = target_chassis_id, source_blade_position = target_blade_position, \
-				target_location = null, room_target_id = null, rack_target_id = null, target_rack_position = null,\
-				target_chassis_id = null, target_blade_position = null\
-			where move_bundle_id in (SELECT mb.move_bundle_id FROM move_bundle mb WHERE mb.move_event_id =  $moveEvent.id) \
-				and plan_status != 'Moved' ")
-		}
-
-		renderSuccessJson(assetAffected)
-	}
-
 	@HasPermission(Permission.DashboardMenuView)
 	def getEventDashboardModel() {
 		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('moveEvent', UserPreferenceEnum.MOVE_EVENT))
@@ -273,5 +243,44 @@ class WsEventController implements ControllerMethods {
 		userPreferenceService.setMoveEventId(moveEvent.id)
 
 		renderSuccessJson([model: dashboardService.getEventDashboardModel(project, moveEvent, viewUnpublished)])
+	}
+
+
+	/*
+	 * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+	 * @param  : moveEventId and moveEvent dialIndicatorValue
+	 */
+	@HasPermission(Permission.EventEdit)
+	def updateEventSummary() {
+		Map requestParams  = request.JSON ?: params
+
+		MoveEvent moveEvent = MoveEvent.get(requestParams.moveEventId)
+		Integer dialIndicator
+		if (StringUtil.toBoolean(requestParams.checkbox)) {
+			dialIndicator = NumberUtil.toPositiveInteger(requestParams.value)
+		}
+		if (dialIndicator  || dialIndicator == 0) {
+			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
+				dialIndicator: dialIndicator, type: 'P')
+			saveWithWarnings moveEventSnapshot
+			if (moveEventSnapshot.hasErrors()) {
+				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+			}
+			else {
+				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
+			}
+
+			saveWithWarnings moveEvent
+		}
+		renderSuccessJson("success")
+	}
+
+
+	/**
+	 * Find and return various task-related stats per category for the given event.
+	 */
+	def taskCategoriesStats(Long moveEventId) {
+		Project project = getProjectForWs()
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId))
 	}
 }

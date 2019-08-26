@@ -49,11 +49,19 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			UserLogin userLogin = securityService.userLogin
 			auditService.saveUserAudit UserAuditBuilder.login()
 
+			// This map will contain all the user-related data that needs to be sent in the response's payload.
+			Map signInInfoMap = [
+				userContext: userService.getUserContext().toMap()
+			]
+
 			if (securityService.shouldLockoutAccount(userLogin)) {
 				// lock account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
-				redirectUri = '/module/auth/login'
+
+				signInInfoMap.notices = [
+					redirectUrl: '/module/auth/login'
+				]
 			} else {
 				userService.updateLastLogin(userLogin)
 				userService.resetFailedLoginAttempts(userLogin)
@@ -65,36 +73,40 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				boolean browserTestiPad = userAgent.toLowerCase().contains('ipad')
 				boolean browserTest = userAgent.toLowerCase().contains('mobile')
 
+				Project project = securityService.userCurrentProject
+
 				if (browserTest) {
 					if (browserTestiPad) {
 						redirectUri = '/projectUtil'
 					} else {
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
+				} else if (userLogin.forcePasswordChange == 'Y') {
+					redirectUri = "/module/auth/changePassword"
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage()
+					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
 				}
 
-				// check if user has unacknowledged notices, if so, redirect user to notices page
-				Project project = securityService.userCurrentProject
-				hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
-				if (hasUnacknowledgedNotices) {
-					addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
-					addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
+				// check if user has unacknowledged notices, if so, redirect user to notices page only if the user has a selected project.
+				if (project) {
+					hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, request.getSession(), userLogin.person)
+					if (hasUnacknowledgedNotices) {
+						addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
+					}
 				}
+
+				addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
 
 				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
-			}
 
-			// This map will contain all the user-related data that needs to be sent in the response's payload.
-			Map signInInfoMap = [
-			    userContext: userService.getUserContext().toMap(),
-				notices: [
+				signInInfoMap.notices = [
 					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
 					redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
 				]
-			]
+			}
+
+
 			response.setHeader('content-type', 'application/json')
 			PrintWriter responseWriter = response.getWriter()
 			responseWriter.print(JsonUtil.toJson(signInInfoMap))
@@ -106,9 +118,11 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		}
 	}
 
-	private String redirectToPrefPage() {
+	private String redirectToPrefPage(Project project) {
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
-		if (userPreferenceService.getCurrentProjectId()) {
+
+
+		if (project) {
 			if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
 				return '/projectUtil'
 			}
@@ -118,13 +132,15 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 				return '/admin/home'
 			}
+		} else {
+			return '/projectUtil'
 		}
 
 		if (startPage == StartPageEnum.USER_DASHBOARD.value || startPage == null) {
-			'/module/user/dashboard'
+			return '/module/user/dashboard'
 		}
 		else {
-			'/projectUtil'
+			return '/projectUtil'
 		}
 	}
 

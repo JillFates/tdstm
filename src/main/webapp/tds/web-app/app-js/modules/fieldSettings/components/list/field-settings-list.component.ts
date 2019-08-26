@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import { Observable } from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 import { FieldSettingsGridComponent } from '../grid/field-settings-grid.component';
 import { FieldSettingsService } from '../../service/field-settings.service';
@@ -13,6 +14,7 @@ import { NotifierService } from '../../../../shared/services/notifier.service';
 import { AlertType } from '../../../../shared/model/alert.model';
 import { ValidationUtils } from '../../../../shared/utils/validation.utils';
 import { Permission } from '../../../../shared/model/permission.model';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'field-settings-list',
@@ -42,6 +44,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
+		private translatePipe: TranslatePipe,
 	) {
 		this.domains = this.route.snapshot.data['fields'];
 		if (this.domains.length > 0) {
@@ -89,10 +92,17 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	 */
 	private initialiseComponent(): void {
 		this.dataSignature = JSON.stringify(this.domains);
+		this.isEditable = this.isEditAvailable();
+		this.initialiseFieldsToDelete();
+	}
+
+	/**
+	 * Set the initial empty structure to hold the fields to delete
+	 */
+	private initialiseFieldsToDelete(): void {
 		for (let domain of this.domains) {
 			this.fieldsToDelete[domain.domain] = [];
 		}
-		this.isEditable = this.isEditAvailable();
 	}
 
 	protected onTabChange(domain: string): void {
@@ -103,7 +113,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 		return this.selectedTab === domain;
 	}
 
-	protected onSaveAll(callback: any): void {
+	protected onSaveAll(savingInfo: any): void {
 		if (this.isEditAvailable()) {
 			let invalid = this.domains.filter(domain => !this.isValid(domain));
 			if (invalid.length === 0) {
@@ -129,7 +139,23 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 				});
 
 				this.fieldService.saveFieldSettings(this.domains)
+					.pipe(
+						switchMap((res: any) => {
+							if (res.status === 'error') {
+								return res;
+							} else {
+								// delete underlaying data
+								return savingInfo.deleteUnderLaying ?
+									this.fieldService.deleteCustomFields(this.fieldsToDelete) :
+									Observable.of(true);
+							}
+						})
+					)
 					.subscribe((res: any) => {
+						if (savingInfo.deleteUnderLaying) {
+							this.initialiseFieldsToDelete();
+						}
+
 						if (res.status === 'error') {
 							let message: string = res.errors.join(',');
 							this.notifier.broadcast({
@@ -138,8 +164,7 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 							});
 						}
 						this.refresh();
-						callback();
-
+						savingInfo.callback();
 					});
 			} else {
 				this.selectedTab = invalid[0].domain;
@@ -157,9 +182,11 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	protected onCancel(callback) {
 		if (this.isDirty()) {
 			this.prompt.open(
-				'Confirmation Required',
-				'You have changes that have not been saved. Do you want to continue and lose those changes?',
-				'Confirm', 'Cancel').then(result => {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			).then(result => {
 					if (result) {
 						this.refresh();
 					} else {
@@ -268,12 +295,27 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
+	 *
 	 * Whenever the user clicks Delete button for a field on the grid, this event is called and
-	 * #this.fieldsToDelete gets updated.
-	 * @param {{domain: string; fieldsToDelete: string[]}} value
+	 * fieldsToDelete gets updated, if the field it is shared it is added to the array, otherwise new value replace old one
+	 * @param {{domain: string; fieldsToDelete: string[]; isSharedField: boolean; addToDeleteCollection: boolean}} value
 	 */
-	protected onDelete(value: { domain: string, fieldsToDelete: string[] }): void {
-		this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+	protected onDelete(value: { domain: string, fieldsToDelete: string[], isSharedField: boolean, addToDeleteCollection: boolean }): void {
+		let fieldsToDelete = this.fieldsToDelete[value.domain] || [];
+
+		if (value.addToDeleteCollection) {
+			if (value.isSharedField) {
+				this.fieldsToDelete[value.domain] = fieldsToDelete.concat(value.fieldsToDelete);
+			} else {
+				this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+			}
+		} else {
+			if (value.isSharedField) {
+				this.fieldsToDelete[value.domain] = fieldsToDelete.filter((field) => value.fieldsToDelete.indexOf(field) === -1);
+			} else {
+				this.fieldsToDelete[value.domain] = value.fieldsToDelete;
+			}
+		}
 	}
 
 	protected onFilter(): void {

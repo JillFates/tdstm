@@ -24,7 +24,6 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
-import net.transitionmanager.command.assetentity.SetImportPreferencesCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
@@ -70,12 +69,12 @@ import org.apache.commons.io.IOUtils
 import org.apache.commons.lang.StringEscapeUtils as SEU
 import org.apache.commons.lang3.BooleanUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.hibernate.criterion.Order
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -88,6 +87,8 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 	static allowedMethods = [delete: 'POST', save: 'POST', update: 'POST']
 	static defaultAction = 'list'
+	static Integer MINUTES_CONSIDERED_TARDY = 300
+	static Integer MINUTES_CONSIDERED_LATE = 600
 
 	// This is a has table that sets what status from/to are available
 	private static final Map statusOptionForRole = [
@@ -120,7 +121,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	DeviceService deviceService
 	def filterService
 	JdbcTemplate jdbcTemplate
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate
 	MoveBundleService moveBundleService
 	PartyRelationshipService partyRelationshipService
 	PersonService personService
@@ -560,7 +560,16 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String actionMode = assetComment.isAutomatic() ? 'A' : 'M'
 
 			ApiAction apiAction = assetComment.apiAction
-			Map apiActionMap = [id: apiAction?.id, name: apiAction?.name]
+
+			Map apiActionMap = [
+				id: apiAction?.id,
+				isRemote: apiAction?.isRemote,
+				name: apiAction?.name,
+				remoteCredentialMethod :
+					(apiAction?.remoteCredentialMethod ? [id: apiAction.remoteCredentialMethod.name(), name:apiAction.remoteCredentialMethod.toString()] : null),
+				script: apiAction?.script,
+				type: apiAction?.actionType?.type
+			]
 
 		// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			assetComment.durationScale = assetComment.durationScale.toString()
@@ -578,60 +587,61 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			if (assetComment?.taskBatch?.recipe) {
 				Recipe recipe = assetComment.taskBatch.recipe
 				recipeMap = [
-				    id: recipe.id,
+					id  : recipe.id,
 					name: recipe.name
 				]
 			}
-			commentList << [
-					assetComment:assetComment,
+				commentList << [
+					action: assetComment.apiAction?.name,
+					actionInvocable: assetComment.isActionInvocableLocally(),
+					actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
+					actionMode: actionMode,
+					actualDuration: TimeUtil.formatDuration(actualDuration),
+					apiAction:apiActionMap,
+					apiActionId: assetComment.apiAction?.id,
+					apiActionInvokedAt: assetComment.apiActionInvokedAt,
 					apiActionList:apiActionList,
-					priorityList: assetEntityService.getAssetPriorityOptions(),
-					durationScale:assetComment.durationScale.value(),
-					durationLocked: assetComment.durationLocked,
-					personCreateObj:personCreateObj,
-					personResolvedObj:personResolvedObj,
+					assetClass: assetComment.assetEntity?.assetClass?.toString(),
+					assetClasses: assetEntityService.getAssetClasses(),
+					assetComment:assetComment,
+					assetId: assetComment.assetEntity?.id ?: "",
+					assetName:assetComment.assetEntity?.assetName ?: "",
+					assetType: assetComment.assetEntity?.assetType,
+					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
+					atStart:atStart,
+					canEdit: canEdit,
+					categories: AssetCommentCategory.list,
+					cssForCommentStatus: cssForCommentStatus,
 					dtCreated:dtCreated ?: "",
 					dtResolved:dtResolved ?: "",
-					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
-					assetName:assetComment.assetEntity?.assetName ?: "",
-					eventName:assetComment.moveEvent?.name ?: "",
 					dueDate:dueDate,
-					etStart:etStart,
+					durationDelta: TimeUtil.formatDuration(durationDelta),
+					durationLocked: assetComment.durationLocked,
+					durationScale:assetComment.durationScale.value(),
 					etFinish:etFinish,
-					atStart:atStart,
+					etStart:etStart,
+					eventList: eventList,
+					eventName:assetComment.moveEvent?.name ?: "",
+					instructionsLinkLabel: instructionsLinkLabel ?: "",
+					instructionsLinkURL: instructionsLinkURL ?: "",
+					lastUpdated: lastUpdated,
 					notes:notes,
-					workflow:workflow,
-					roles:roles?:'Unassigned',
+					personCreateObj:personCreateObj,
+					personResolvedObj:personResolvedObj,
+					predecessorList: predecessorList,
+					predecessorsCount: predecessorsCount,
 					predecessorTable:predecessorTable ?: '',
-					successorTable:successorTable ?: '',
-					cssForCommentStatus: cssForCommentStatus,
+					priorityList: assetEntityService.getAssetPriorityOptions(),
+					recipe: recipeMap,
+					roles:roles?:'Unassigned',
 					statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
+					successorList: successorList,
 					successorsCount: successorsCount,
-				predecessorsCount: predecessorsCount,
-				taskSpecId: assetComment.taskSpec,
-				assetId: assetComment.assetEntity?.id ?: "",
-				assetType: assetComment.assetEntity?.assetType,
-				assetClass: assetComment.assetEntity?.assetClass?.toString(),
-				predecessorList: predecessorList,
-				successorList: successorList,
-				instructionsLinkURL: instructionsLinkURL ?: "",
-				instructionsLinkLabel: instructionsLinkLabel ?: "",
-				canEdit: canEdit,
-				apiAction:apiActionMap,
-				actionMode: actionMode,
-				actionInvocable: assetComment.isActionInvocableLocally(),
-				actionMode: actionMode,
-				lastUpdated: lastUpdated,
-				apiActionId: assetComment.apiAction?.id,
-				action: assetComment.apiAction?.name,
-				recipe: recipeMap,
-				actualDuration: TimeUtil.formatDuration(actualDuration),
-				durationDelta: TimeUtil.formatDuration(durationDelta),
-				eventList: eventList,
-				categories: AssetCommentCategory.list,
-				assetClasses: assetEntityService.getAssetClasses()
-					//action: [id: assetComment.apiAction?.id, name: assetComment.apiAction?.name]
-			]
+					successorTable:successorTable ?: '',
+					percentageComplete: assetComment.percentageComplete,
+					taskSpecId: assetComment.taskSpec,
+					workflow:workflow
+				]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "showComment: show comment view - $errorMsg"
@@ -645,8 +655,15 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def saveComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat
-
-		Map requestParams  = request.JSON
+		// Deal with legacy view parameters.
+		Map requestParams = null
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			params.taskDependency = params.list('taskDependency[]')
+			params.taskSuccessor = params.list('taskSuccessor[]')
+			requestParams = params
+		}
 
 		def map = commentService.saveUpdateCommentAndNotes(tzId, userDTFormat, requestParams, true, flash)
 		if (requestParams.forWhom == "update") {
@@ -944,6 +961,9 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		render (view :'_deviceModelSelect', model:[models : models, forWhom:params.forWhom])
 	}
 
+	/**
+	 * Used to generate the List for Task Manager, which leverages a shared closure with listComment
+	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTasks() {
 		licenseAdminService.checkValidForLicenseOrThrowException()
@@ -1078,25 +1098,125 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	}
 
 	/**
+	 * Generates the List of Comments, which leverages a shared closeure with the above listTasks controller.
+	 */
+	@HasPermission(Permission.CommentView)
+	def listComment() {
+		Project project = controllerService.getProjectForPage(this, 'to view Comments')
+		if (!project) return
+
+		def entities = assetEntityService.entityInfo(project)
+		def moveBundleList = MoveBundle.findAllByProject(project,[sort:'name'])
+		boolean canEditComments = securityService.hasPermission(Permission.AssetEdit)
+
+		[rediectTo: 'comment', servers: entities.servers, applications: entities.applications, dbs: entities.dbs,
+		 files: entities.files, dependencyType: entities.dependencyType, dependencyStatus: entities.dependencyStatus,
+		 assetDependency: new AssetDependency(), moveBundleList: moveBundleList, canEditComments: canEditComments]
+	}
+
+	/**
+	 * Used to generate list of comments using jqgrid
+	 * @return : list of tasks as JSON
+	 */
+	@HasPermission(Permission.CommentView)
+	def listCommentJson() {
+
+		Set<String> definedSortableFields = [
+				  'comment',
+				  'commentType',
+				  'category',
+				  'lastUpdated',
+				  'assetType',
+				  'assetName'
+		]
+
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', 'lastUpdated')
+		String sortOrder = paginationSortOrder('sord')
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue('rows', PREF.ASSET_LIST_SIZE, true)
+		Integer currentPage = paginationPage()
+		Integer rowOffset = paginationRowOffset(currentPage, maxRows)
+
+		Project project = securityService.userCurrentProject
+		List<Date> lastUpdatedTime = params.lastUpdated ? AssetComment.executeQuery('''
+			select lastUpdated from AssetComment
+			where project=:project
+			  and commentType=:comment
+			  and str(lastUpdated) like :lastUpdated
+		''', [project: project, comment: AssetCommentType.COMMENT, lastUpdated: '%' + params.lastUpdated + '%']) : []
+
+		def assetCommentList = AssetComment.createCriteria().list(max: maxRows, offset: rowOffset) {
+			eq("project", project)
+			eq("commentType", AssetCommentType.COMMENT)
+			createAlias("assetEntity","ae")
+			if (params.comment) {
+				ilike('comment', "%$params.comment%")
+			}
+			if (params.commentType) {
+				ilike('commentType', "%$params.commentType%")
+			}
+			if (params.category) {
+				ilike('category', "%$params.category%")
+			}
+			if (lastUpdatedTime) {
+				'in'('lastUpdated',lastUpdatedTime)
+			}
+			if (params.assetType) {
+				ilike('ae.assetType',"%$params.assetType%")
+			}
+			if (params.assetName) {
+				ilike('ae.assetName',"%$params.assetName%")
+			}
+			String sid = sortIndex == 'assetName' || sortIndex  == 'assetType' ? "ae.$sortIndex" : sortIndex
+			order(new Order(sid, sortOrder == 'asc').ignoreCase())
+		}
+
+		int totalRows = assetCommentList.totalCount
+		int numberOfPages = Math.ceil(totalRows / maxRows)
+
+		def results = assetCommentList?.collect {
+			[id: it.id,
+			 cell: ['',
+			        StringUtil.ellipsis(it.comment ?: '', 50).replace("\n", ""),
+			        TimeUtil.formatDate(it.lastUpdated),
+			        it.commentType,
+			        it.assetEntity?.assetName ?:'',
+			        it.assetEntity?.assetType ?:'',
+			        it.category,
+			        it.assetEntity?.id,
+			        it.assetEntity?.assetClass?.toString()
+				]
+			]
+		}
+
+		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
+	}
+
+	/**
 	 * This will be called from TaskManager screen to load jqgrid
 	 * @return : list of tasks as JSON
 	 */
 	@HasPermission(Permission.TaskManagerView)
 	def listTaskJSON() {
 
-		Map<String, String> definedSortableFields = [
-			'taskNumber': 'taskNumber',
-			'comment': 'comment',
-			'assetName': 'assetName',
-			'dueDate': 'dueDate',
-			'status': 'status',
-			'assignedTo': 'assignedTo',
-			'instructionsLink': 'instructionsLink',
-			'category': 'category',
-			'score': 'score'
-		].withDefault { key -> session.TASK?.JQ_FILTERS?.sidx }
+		final String DEFAULT_SORT = ''  // We set this as EMPTY string for compatibility
+		Set<String> definedSortableFields = [
+				  'taskNumber',
+				  'comment',
+				  'assetName',
+				  'dueDate',
+				  'status',
+				  'assignedTo',
+				  'instructionsLink',
+				  'category',
+				  'role',
+				  'assetType',
+				  'score',
+				  DEFAULT_SORT
+		]
 
-		String sortIndex =  definedSortableFields[params.sidx]
+		String defaultSIdx = session.TASK?.JQ_FILTERS?.sidx ?: DEFAULT_SORT
+		String sortIndex = paginationOrderByAlias(definedSortableFields, 'sidx', defaultSIdx)
 		String sortOrder =  paginationSortOrder('sord', session.TASK?.JQ_FILTERS?.sord)
 
 		// Get the pagination and set the user preference appropriately
@@ -1139,7 +1259,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def elapsed = TimeUtil.elapsed(it.statusUpdated, nowGMT)
 			def elapsedSec = elapsed.toMilliseconds() / 1000
 
-			updatedClass = taskService.getUpdatedColumnsCSS(it, elapsedSec)
+			updatedClass = getUpdatedColumnsCSS(it, elapsedSec)
 
 			// clear out the CSS classes for overDue
 			dueClass = ''
@@ -1147,7 +1267,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				dueClass = 'task_overdue'
 			}
 			if (it.estFinish < nowGMT) {
-				Map estimatedColumnsCSS = taskService.getEstimatedColumnsCSS(it, nowGMT)
+				Map estimatedColumnsCSS = getEstimatedColumnsCSS(it, nowGMT)
 				estStartClass = estimatedColumnsCSS['estStartClass']
 				estFinishClass = estimatedColumnsCSS['estFinishClass']
 			}
@@ -1185,7 +1305,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			def status = it.status
 			def userSelectedCols = []
 			(1..5).each { colId ->
-				def value = taskService.getColumnValue(taskPref[colId.toString()], it)
+				def value = taskManagerValues(taskPref[colId.toString()], it)
 				userSelectedCols << (value?.getClass()?.isEnum() ? value?.value() : value)
 			}
 
@@ -1201,14 +1321,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					'',	// 0
 					it.taskNumber,	// 1
 					it.comment, // 2
-					userSelectedCols[0], // getColumnValue(taskPref["1"],it), // 3
-					userSelectedCols[1], // getColumnValue(taskPref["2"],it), // 4
+					userSelectedCols[0], // taskManagerValues(taskPref["1"],it), // 3
+					userSelectedCols[1], // taskManagerValues(taskPref["2"],it), // 4
 					updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '', // 5
 					dueDate, // 6
 					status ?: '', // 7
-					userSelectedCols[2], // getColumnValue(taskPref["3"],it), // 8
-					userSelectedCols[3], // getColumnValue(taskPref["4"],it), // 9
-					userSelectedCols[4], // getColumnValue(taskPref["5"],it), // 10
+					userSelectedCols[2], // taskManagerValues(taskPref["3"],it), // 8
+					userSelectedCols[3], // taskManagerValues(taskPref["4"],it), // 9
+					userSelectedCols[4], // taskManagerValues(taskPref["5"],it), // 10
 					nGraphUrl, // 11
 					it.score ?: 0, // 12
 					status ? 'task_' + it.status.toLowerCase() : 'task_na', // 13
@@ -1231,6 +1351,45 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		session.TASK?.JQ_FILTERS?.sord = sortOrder
 
 		renderAsJson(rows: results, page: currentPage, records: totalRows, total: numberOfPages)
+	}
+
+	/**
+	 * Get assetColumn value based on field name. .
+	 */
+	private taskManagerValues(String fieldName, AssetComment task) {
+		def result
+		switch (fieldName) {
+			case 'apiAction':
+				result = task.apiAction?.toString()
+				break
+			case 'assetName':
+				result = task.assetEntity?.assetName
+				break
+			case 'assetType':
+				result = task.assetEntity?.assetType
+				break
+			case 'assignedTo':
+				result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: '')
+				break
+			case 'resolvedBy':
+				result = task.resolvedBy?.toString() ?: ''
+				break
+			case 'createdBy':
+				result = task.createdBy?.toString() ?: ''
+				break
+			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
+				result = TimeUtil.formatDateTime(task[fieldName])
+				break
+			case "event":
+				result = task.moveEvent?.name
+				break
+			case "bundle":
+				result = task.assetEntity?.moveBundle?.name
+				break
+			default:
+				result = task[fieldName]
+		}
+		return result
 	}
 
 	/**
@@ -1550,7 +1709,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				def defaultPrefs = [colorBy: 'group', appLbl: 'true', maxEdgeCount: '4']
 				def graphPrefs = userPreferenceService.getPreference(PREF.DEP_GRAPH)
 				def prefsObject = graphPrefs ? JSON.parse(graphPrefs) : defaultPrefs
-				def legendTwistiePref = userPreferenceService.getPreference(PREF.LEGEND_TWISTIE_STATE) ?: 'no'
 
 				// front end labels for the Color By groups
 				def colorByGroupLabels = ['group': 'Group', 'bundle': 'Bundle', 'event': 'Event', 'environment': 'Environment', 'sourceLocationName': 'Source Location', 'targetLocationName': 'Target Location']
@@ -1785,7 +1943,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				model.defaultsJson = defaults as JSON
 				model.defaultPrefs = defaultPrefs as JSON
 				model.graphPrefs = prefsObject
-				model.legendTwistiePref = legendTwistiePref
 				model.showControls = params.showControls
 				model.fullscreen = params.fullscreen ?: false
 				model.nodes = graphNodes as JSON
@@ -1931,26 +2088,23 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		list.sort { it.sortOn }
 
 		withFormat {
-			js {
-				renderSuccessJson(list)
-				return
+					js {
+						renderSuccessJson(list)
+						return
+					}
+
+					html {
+						render HtmlUtil.generateSelect(
+							selectId: viewId,
+							selectName: viewId,
+							options: list,
+							optionKey: 'id',
+							optionValue: 'nameRole',
+							optionSelected: selectedId,
+							firstOption: [value  : '0', display: 'Unassigned'])
+					}
+				}
 			}
-
-			html {
-				render HtmlUtil.generateSelect(
-					selectId: viewId,
-					selectName: viewId,
-					options: list,
-					optionKey: 'id',
-					optionValue: 'nameRole',
-					optionSelected: selectedId,
-					firstOption: [value  : '0', display: 'Unassigned'])
-			}
-		}
-
-
-
-	}
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def isAllowToChangeStatus() {
@@ -2137,7 +2291,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		def moveEventId=NumberUtil.toLong(params.moveEvent)
 		def page=Long.parseLong(params.page)
 		def pageSize=Long.parseLong(params.pageSize)
-		def filterDesc=params['filter[filters][0][value]']
+		def filterDesc=params['query']
 
 		if (params.commentId) {
 			task = AssetComment.findByIdAndProject(params.commentId, project)
@@ -2275,10 +2429,24 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.AssetImport)
 	def setImportPreferences() {
-		SetImportPreferencesCommand command = populateCommandObject(SetImportPreferencesCommand)
-		validateCommandObject(command)
+		Map preferencesMap
 
-		userPreferenceService.setPreference(command.preference, command.value)
+		if (request.format == "json") {
+			preferencesMap = request.JSON
+
+		} else {
+			preferencesMap = [:]
+			def key = params.preference
+			def value = params.value
+			if (value) {
+				preferencesMap[key] = value
+			}
+		}
+
+		preferencesMap.each { key, value ->
+			userPreferenceService.setPreference(key, value)
+		}
+
 		render true
 	}
 
@@ -3210,6 +3378,118 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		session.setAttribute 'TOTAL_ASSETS', count
 	}
 
+
+
+	/**
+	 * TODO This method should be refactored to another class.
+	 * Returns a Map with the Estimated Start and Estimated Finish columns CSS class names, according to
+	 * the relation between those estimates and the current date/time. Also uses the Actual Start value
+	 * to make the calculations in case the task is in STARTED status, and a tardy factor value to
+	 * determine when a task is not late yet but it's going to be soon.
+	 * If a task estimate values are not late or tardy, it returns an empty string for the class name.
+	 * For more information see TM-6318.
+	 *
+	 * @param task : The task.
+	 * @param tardyFactor : The value used to evaluate if a task it's going to be late soon.
+	 * @param nowGMT : The actual time in GMT timezone.
+	 * @return : A Map with estStartClass and estFinishClass
+	 * @todo: refactor getEstimatedColumnsCSS into a service and create test cases
+	 */
+	private Map getEstimatedColumnsCSS(AssetComment task, Date nowGMT) {
+
+		String estStartClass = ''
+		String estFinishClass = ''
+
+		Integer durationInMin = task.durationInMinutes()
+		Integer tardyFactor = computeTardyFactor(durationInMin)
+
+		Integer nowInMin = TimeUtil.timeInMinutes(nowGMT)
+		Integer estStartInMin = TimeUtil.timeInMinutes(task.estStart)
+		Integer estFinishInMin = TimeUtil.timeInMinutes(task.estFinish)
+		Integer actStartInMin = TimeUtil.timeInMinutes(task.actStart)
+
+		boolean taskIsActionable = task.isActionable()
+
+		// Determine the Est Start CSS
+ 		if (estStartInMin && (task.status in [ AssetCommentStatus.PENDING, AssetCommentStatus.READY ]) )  {
+			// Note that in the future when we have have slack calculations in the tasks, we can
+			// flag tasks that started late and won't finished by critical path finish times but for
+			// now we will just flag tasks that didn't start by their est start.
+			if (estStartInMin < nowInMin) {
+				estStartClass = 'task_late'
+			} else if ( (estStartInMin - tardyFactor) < nowInMin) {
+				estStartClass = 'task_tardy'
+			}
+		}
+
+		// Determine the Estimated Finish CSS
+		if (estFinishInMin && taskIsActionable) {
+			if (actStartInMin) {
+				// If the task was started then see if it should have completed by now and should be
+				// considered tardy started early but didn't finish by duration + tardy factor.
+				if (estFinishInMin < nowInMin) {
+					estFinishClass = 'task_late'
+				} else if ( (actStartInMin + durationInMin + tardyFactor) < nowInMin ) {
+					// This will clue the PM that the task should have been completed by now
+					estFinishClass = 'task_tardy'
+				}
+			} else {
+				// Check if it would finish late
+				if ( (estFinishInMin - durationInMin) < nowInMin) {
+					estFinishClass = 'task_late'
+				} else if ( (estFinishInMin - durationInMin - tardyFactor) < nowInMin ) {
+					estFinishClass = 'task_tardy'
+				}
+			}
+		}
+
+		return [estStartClass: estStartClass, estFinishClass: estFinishClass]
+	}
+
+    /**
+     * Returns a String with the updated column CSS class name, according to
+     * the relation between now and a particular amount of time (elapsedSec = current time - statusUpdate).
+     * If a task estimate value is not late or tardy, it returns an empty string for the class name.
+     * For more information see TM-11565.
+     *
+     * @param  task : The task.
+     * @param  elapsedSec : The elapsed time in milliseconds (elapsedSec = current time - statusUpdate).
+     * @return  A String with updateClass.
+     */
+    private String getUpdatedColumnsCSS(AssetComment task, def elapsedSec) {
+
+        String updatedClass = ''
+		if (task.status == AssetCommentStatus.READY) {
+			if (elapsedSec >= MINUTES_CONSIDERED_LATE) {   // 10 minutes
+				updatedClass = 'task_late'
+			} else if (elapsedSec >= MINUTES_CONSIDERED_TARDY) {  // 5 minutes
+				updatedClass = 'task_tardy'
+			}
+		} else if (task.status == AssetCommentStatus.STARTED) {
+			def dueInSecs = elapsedSec - (task.duration ?: 0) * 60
+			if (dueInSecs >= MINUTES_CONSIDERED_LATE) {
+				updatedClass='task_late'
+			} else if (dueInSecs >= MINUTES_CONSIDERED_TARDY) {
+				updatedClass='task_tardy'
+			}
+		}
+        return updatedClass
+    }
+
+
+	/**
+	 * TODO This method should be refactored to another class.
+	 * Computes the tardy factor.
+	 * The intent is to adjust the factor as a percent of the duration of the task to factor in
+	 * the additional buffer of time with a minimum factor of 5 minutes and a maximum of 30 minutes.
+	 * @param date : The task duration in minutes.
+	 * @return : the tardy factor.
+	 */
+	private Integer computeTardyFactor(Integer durationInMin) {
+		return Math.min(30, Math.max(5, (Integer)(durationInMin * 0.1)))
+	}
+
+
 	/**
 	 * This class maps a row from the query for AssetDependencies to
 	 * a structure that can be sent to the UI.
@@ -3245,7 +3525,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			]
 		}
 	}
-
 
 
 }

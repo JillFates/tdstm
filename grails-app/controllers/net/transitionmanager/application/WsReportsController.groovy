@@ -27,6 +27,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.StateEngineService
@@ -47,6 +48,7 @@ class WsReportsController implements ControllerMethods {
     ReportsService reportsService
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
+    MoveEventService moveEventService
     CustomDomainService customDomainService
     ControllerService controllerService
     PartyRelationshipService partyRelationshipService
@@ -127,6 +129,7 @@ class WsReportsController implements ControllerMethods {
 
         stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
         Project project = securityService.userCurrentProject
+        def availableMoveEvents = moveEventService.listMoveEvents(project)
         def managers = partyRelationshipService.getProjectStaff(project.id)
         def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_PROJ_MGR")
         def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_MOVE_MGR")
@@ -136,6 +139,8 @@ class WsReportsController implements ControllerMethods {
 
         renderSuccessJson([
                 moveBundleInstance: moveBundle,
+                moveEvent: [id: moveBundle.moveEvent?.id, name: moveBundle.moveEvent?.toString()],
+                availableMoveEvents: availableMoveEvents,
                 projectId: project.id,
                 managers: managers,
                 projectManager: projectManager?.partyIdToId,

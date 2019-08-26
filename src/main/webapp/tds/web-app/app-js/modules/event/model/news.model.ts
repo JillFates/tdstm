@@ -12,8 +12,11 @@ export class NewsDetailModel {
 		message: string;
 		resolution: string;
 		dateCreated: string;
-		isArchived: number,
+		isArchived: number;
+		commentType: string;
 		archivedBy: string;
+		comment: string;
+		displayOption: string;
 		createdBy: {
 			id: number
 		},
@@ -27,6 +30,7 @@ export class NewsDetailModel {
 	dtCreated: string;
 	dtResolved: string;
 	assetName: string;
+	commentType: string;
 
 	constructor() {
 		this.commentObject = {
@@ -36,6 +40,9 @@ export class NewsDetailModel {
 			dateCreated: '',
 			isArchived: null,
 			archivedBy: '',
+			comment: '',
+			displayOption: '',
+			commentType: '',
 			createdBy: {
 				id: null
 			},
@@ -50,4 +57,17 @@ export class NewsDetailModel {
 		this.dtResolved = '';
 		this.assetName = '';
 	}
+}
+
+export const CommentType = {
+	'N': 'News',
+	'I': 'Issue'
+}
+
+export const DisplayOptionGeneric = 'G';
+export const DisplayOptionUser = 'U';
+
+export const DisplayOptions = {
+	DisplayOptionGeneric: 'Generic Comment',
+	DisplayOptionUser: 'UserComment'
 }

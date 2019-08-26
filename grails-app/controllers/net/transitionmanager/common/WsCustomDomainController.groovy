@@ -7,6 +7,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.project.Project
 import grails.gorm.transactions.Transactional
+import org.grails.web.json.JSONArray
 
 @Secured('isAuthenticated()')
 class WsCustomDomainController implements ControllerMethods {
@@ -57,5 +58,15 @@ class WsCustomDomainController implements ControllerMethods {
         String data = customDomainService.jsonFieldSpecsWithCommon(project)
         setContentTypeJson()
         render(data)
+    }
+
+    /**
+     * Entry point to clear all (NULL) requested field values
+     * Jira: TM-14494
+     */
+    def clearFieldSpecsData() {
+        Project project = getProjectForWs()
+        Map <String, JSONArray> clearedFields = customDomainService.clearFieldSpecsData(project, request.JSON)
+        renderSuccessJson(clearedFields)
     }
 }

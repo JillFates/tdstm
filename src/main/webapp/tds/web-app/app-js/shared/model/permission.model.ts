@@ -203,4 +203,12 @@ export class Permission {
 	static WorkflowEdit = 'WorkflowEdit';
 	static WorkflowList = 'WorkflowList';
 	static WorkflowView = 'WorkflowView';
+	static ProviderCreate = 'ProviderCreate';
+	static ProviderDelete = 'ProviderDelete';
+	static ProviderUpdate = 'ProviderUpdate';
+	static ETLScriptCreate = 'ETLScriptCreate';
+	static ETLScriptDelete = 'ETLScriptDelete';
+	static ETLScriptUpdate = 'ETLScriptUpdate';
+	static ETLScriptLoadSampleData = 'ETLScriptLoadSampleData';
+	static CredentialView = 'CredentialView';
 }

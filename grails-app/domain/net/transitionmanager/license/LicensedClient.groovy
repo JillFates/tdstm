@@ -40,7 +40,7 @@ class LicensedClient {
 	String  websitename
 	String  hash
 	String  bannerMessage
-	int     gracePeriodDays = 5
+	int     gracePeriodDays = 14
 
 	/** Date when the change was performed */
 	Date dateCreated
@@ -60,7 +60,7 @@ class LicensedClient {
 	static constraints = {
 		method         nullable: true
 		activationDate nullable: true
-		expirationDate nullable: true
+		expirationDate nullable: true, validator: LicensedClient.&isExpirationValid
 		requestNote    nullable: true
 		hash           nullable: true
 		bannerMessage  nullable: true
@@ -94,7 +94,9 @@ class LicensedClient {
 				websitename		: websitename,
 				bannerMessage	: bannerMessage,
 				gracePeriodDays : gracePeriodDays,
-				activityList	: []
+				activityList	: [],
+				guid            : guid,
+				collectMetrics : collectMetrics
 		]
 
 		return data
@@ -126,7 +128,14 @@ class LicensedClient {
 		}
 		errors
 	}
-
+	
+	static isExpirationValid (Date expirationDate, LicensedClient licensedClient) {
+		if (licensedClient.activationDate && expirationDate < licensedClient.activationDate) {
+			return false
+		}
+		return true
+	}
+	
 	static LicensedClient fetch(JSONElement json, createIfNotFound = false){
 		Closure dateParser = {String strDate ->
 			if(strDate){
@@ -220,6 +229,13 @@ class LicensedClient {
 			lc.gracePeriodDays = json.gracePeriodDays
 		}
 
+		if(json.guid != null){
+			lc.guid = json.guid
+		}
+
+		if(json.collectMetrics != null){
+			lc.collectMetrics = json.collectMetrics
+		}
 		return lc
 	}
 
