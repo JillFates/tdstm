@@ -9,6 +9,7 @@ import {ASSET_IMPORT_FILE_UPLOAD_TYPE, DIALOG_SIZE, FILE_UPLOAD_TYPE_PARAM} from
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {EventModel} from '../../../event/model/event.model';
 
 @Component({
 	selector: `project-create`,
@@ -22,6 +23,7 @@ export class ProjectCreateComponent implements OnInit {
 	public partners;
 	public projectTypes;
 	public projectModel: ProjectModel = null;
+	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
 	private defaultModel = null;
 	public file = new KendoFileUploadBasicConfig();
 	public fetchResult: any;
@@ -86,6 +88,7 @@ export class ProjectCreateComponent implements OnInit {
 			console.log('Dismissed Dialog');
 		});
 	}
+
 	public onSelectFile(e?: any): void {
 		this.file.fileUID = e.files[0].uid;
 	}
@@ -135,14 +138,34 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.fetchResult && this.fetchResult.status === 'success') {
-			//this.projectModel.projectLogo = this.fetchResult.filename;
+		if (this.validateRequiredFields(this.projectModel)) {
+			if (this.fetchResult && this.fetchResult.status === 'success') {
+				// this.projectModel.projectLogo = this.fetchResult.filename;
+			}
+			this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.activeDialog.close();
+				}
+			});
 		}
-		this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.activeDialog.close();
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: ProjectModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
 			}
 		});
+		return returnVal;
 	}
 
 	/**

@@ -117,6 +117,7 @@ class WsProjectController implements ControllerMethods {
 		PartyGroup company = securityService.userLoginPerson.company
 		String companyId = company.id
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+		Project defaultProject = Project.defaultProject
 
 		// Save and load various user preferences
 		userPreferenceService.setCurrentProjectId(project.id)
@@ -147,6 +148,8 @@ class WsProjectController implements ControllerMethods {
 		}
 
 		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
+		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
+		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 
 		renderSuccessJson([
 				clients				 : projectDetails.clients,
@@ -160,7 +163,10 @@ class WsProjectController implements ControllerMethods {
 				projectManagers      : projectService.getProjectManagers(project).collect{ it -> it.toString()},
 				projectLogoForProject: projectLogo,
 				isDeleteable         : isDeleteable,
-				planMethodology      : planMethodology
+				planMethodology      : planMethodology,
+				workflowCodes: projectDetails.workflowCodes,
+				projectTypes: projectTypes,
+				planMethodologies: planMethodologies
 		])
 	}
 

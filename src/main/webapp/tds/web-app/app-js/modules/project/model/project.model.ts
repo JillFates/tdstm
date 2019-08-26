@@ -53,7 +53,7 @@ export class ProjectColumnModel {
 			},
 			{
 				label: 'Comment',
-				property: 'description',
+				property: 'comment',
 				type: 'text',
 				width: '*'
 			}

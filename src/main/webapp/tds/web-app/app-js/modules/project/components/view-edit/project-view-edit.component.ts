@@ -20,9 +20,12 @@ import {DialogService} from '@progress/kendo-angular-dialog';
 export class ProjectViewEditComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
+	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
 	public managers;
 	public client;
 	public clients;
+	public planMethodologies;
+	public projectTypes;
 	public workflowCodes;
 	public projectManagers;
 	public possiblePartners;
@@ -51,7 +54,6 @@ export class ProjectViewEditComponent implements OnInit {
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
 		@Inject('id') private id) {
-		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 		this.projectId = this.id;
 	}
 
@@ -78,6 +80,7 @@ export class ProjectViewEditComponent implements OnInit {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
 		this.getModel(this.projectId);
+		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
 
 	public confirmDeleteProject() {
@@ -142,6 +145,9 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
+				this.workflowCodes = data.workflowCodes;
+				this.projectTypes = data.projectTypes;
+				this.planMethodologies = data.planMethodologies;
 
 				this.updateSavedFields();
 			});
@@ -158,12 +164,32 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		this.projectService.saveProject(this.projectModel, this.projectId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				this.updateSavedFields();
-				this.editing = false;
+		if (this.validateRequiredFields(this.projectModel)) {
+			this.projectService.saveProject(this.projectModel, this.projectId).subscribe((result: any) => {
+				if (result.status === 'success') {
+					this.updateSavedFields();
+					this.editing = false;
+				}
+			});
+		}
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: ProjectModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
 			}
 		});
+		return returnVal;
 	}
 
 	openTimezoneModal() {

@@ -18,7 +18,7 @@ export class ProjectService {
 	}
 
 	getProjects(): Observable<any> {
-		return this.http.get(`../ws/projects/lists`)
+		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
 				response.data.activeProjects.forEach((r) => {
 					r.completion = ((r.completion) ? new Date(r.completion) : '');
@@ -35,7 +35,7 @@ export class ProjectService {
 	}
 
 	getModelForProjectViewEdit(id) {
-		return this.http.get(`../ws/projects/viewEditProject/${id}`)
+		return this.http.get(`../ws/project/viewEditProject/${id}`)
 			.map((response: any) => {
 				return response;
 			})
@@ -43,7 +43,7 @@ export class ProjectService {
 	}
 
 	getModelForProjectCreate() {
-		return this.http.get(`../ws/projects/createProjectModel`)
+		return this.http.get(`../ws/project/createProjectModel`)
 			.map((response: any) => {
 				return response;
 			})
@@ -52,7 +52,7 @@ export class ProjectService {
 	}
 
 	deleteProject(id) {
-		return this.http.delete(`../ws/reports/deleteProject/${id}`)
+		return this.http.delete(`../ws/project/deleteProject/${id}`)
 			.map((response: any) => {
 				return response;
 			})
@@ -62,21 +62,12 @@ export class ProjectService {
 	saveProject(model: ProjectModel, id = ''): Observable<any> {
 		let formData = new FormData();
 		formData.append('file', model.projectLogo);
-		return this.http.post(`../ws/fileSystem/uploadImageFile/${id}`, formData)
+		return this.http.post(`../ws/project/saveProject/${id}`, model)
 				.map((response: any) => {
 					return response;
 				})
 				.catch((error: any) => error);
 	}
-
-	deleteProjectAndAssets(id) {
-		return this.http.delete(`../ws/reports/deleteProjectAndAssets/${id}`)
-			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
-	}
-
 	/**
 	 * Based on provided column, update the structure which holds the current selected filters
 	 * @param {any} column: Column to filter

@@ -36,7 +36,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	private dateTimezoneData = '';
 
 	constructor(
-		private shouldReturnData: Boolean,
+		public shouldReturnData: Boolean,
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
 		private translatePipe: TranslatePipe,

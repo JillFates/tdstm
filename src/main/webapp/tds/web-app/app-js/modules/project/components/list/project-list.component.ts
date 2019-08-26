@@ -69,19 +69,17 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
 			});
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
-		let showId = this.route.snapshot.queryParams['show'];
-		if(showId) {
-			this.showProject(showId);
-		}
 	}
 
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
-			this.showProject(this.route.snapshot.queryParams['show']);
+			setTimeout(() => {
+				this.showProject(this.route.snapshot.queryParams['show']);
+			});
 		}
 	}
 
-	protected toggleShowActive() : void {
+	protected toggleShowActive(): void {
 		this.showActive = !this.showActive;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });

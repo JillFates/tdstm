@@ -695,17 +695,17 @@ class UrlMappings {
 			action = [GET: "projects"]
 		}
 
-		"/ws/projects/lists" {
+		"/ws/project/lists" {
 			controller = "wsProject"
 			action = [GET: "projectsForProjectList"]
 		}
 
-		"/ws/projects/createProjectModel" {
+		"/ws/project/createProjectModel" {
 			controller = "wsProject"
 			action = [GET: "getModelForProjectCreate"]
 		}
 
-		"/ws/projects/viewEditProject/$projectId" {
+		"/ws/project/viewEditProject/$projectId" {
 			controller = "wsProject"
 			action = [GET: "getModelForProjectViewEdit"]
 		}

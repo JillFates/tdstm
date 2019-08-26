@@ -1798,6 +1798,7 @@ class ProjectService implements ServiceMethods {
 					projectCode          : project.projectCode,
 					clientName           : project.client.name,
 					description          : project.description ?: '',
+					comment				 : project.comment ?: '',
 					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',

@@ -16,8 +16,9 @@
                                 [data]="timezonesList"
                                 (valueChange)="onTimezoneSelected($event)">
                         </kendo-dropdownlist>
-                        <b style="padding-left: 30px">Date Format:</b>
+                        <b *ngIf="!shouldReturnData" style="padding-left: 30px">Date Format:</b>
                         <kendo-dropdownlist
+                                *ngIf="!shouldReturnData"
                                 id="dateTimeFormat"
                                 name="dateTimeFormat"
                                 [(ngModel)]="selectedTimeFormat"
