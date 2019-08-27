@@ -85,13 +85,6 @@ export class BreadcrumbNavigationComponent {
 			}
 		});
 
-		this.taskService.retrieveUserToDoCount().subscribe(
-			(result) => {
-				// Please refer to https://kb.transitionmanager.com/display/TMENG/FE%3A+Workaround #3
-				jQuery('#todoCountProjectId').html(result.count);
-			}
-		);
-
 		// Helps to avoid a hardcoded event on the menu being used on the legacy pages 'showMegaMenu'
 		let showMegaMenu = jQuery('.menu-parent-tasks > a');
 		if (showMegaMenu && showMegaMenu[0]) {

@@ -397,6 +397,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
 			'SELECT_START_DATE': 'Select a start date',
 			'SELECT_END_DATE': 'Select an end date'
-		}
+		},
+		'MY_TASKS': 'My Tasks',
 	}
 };
