@@ -46,10 +46,10 @@ export function StorageEditComponent(template: string, editModel: any, metadata:
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
-			this.focusTrapElement = focusTrap.default(<HTMLElement>document.getElementsByClassName('tds-angular-component-content')[0], {
-				initialFocus: '.tds-angular-component-content'
-			});
-			this.focusTrapElement.activate();
+			// this.focusTrapElement = focusTrap.default(<HTMLElement>document.getElementsByClassName('tds-angular-component-content')[0], {
+			// 	initialFocus: '.tds-angular-component-content'
+			// });
+			// this.focusTrapElement.activate();
 		}
 
 		/**

@@ -45,7 +45,6 @@
     "angular-progress-bar": "^1.0.9",
     "codemirror": "5.43.0",
     "core-js": "2.6.4",
-    "focus-trap": "^5.0.2",
     "file-saver": "^2.0.2",
     "jszip": "3.1.5",
     "moment": "2.24.0",
