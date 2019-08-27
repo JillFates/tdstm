@@ -2,6 +2,7 @@ package net.transitionmanager.common
 
 import com.tdsops.tm.enums.ControlType
 import grails.converters.JSON
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.FieldSpecsCacheService
 import net.transitionmanager.exception.ConfigurationException
@@ -707,7 +708,8 @@ class CustomDomainService implements ServiceMethods {
      * @param assetClassName The assetClass to clear the data for.
      * @param fieldNames The fieldNames/columns to clear the data for.
      */
-    private void clearCustomFields(Project project, String assetClassName, List<String> fieldNames) {
+    @Transactional
+    Integer clearCustomFields(Project project, String assetClassName, List<String> fieldNames) {
         if (fieldNames) {
             AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
             String sql = 'update AssetEntity set '
@@ -732,12 +734,13 @@ class CustomDomainService implements ServiceMethods {
      * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
      */
-    private void dataDateToDateTime(Project project, String assetClassName, String fieldName) {
+    @Transactional
+    void dataDateToDateTime(Project project, String assetClassName, String fieldName) {
 
         AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
         String sql = 'update AssetEntity set '
 
-        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%d %H.%i.%s')
+        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%dT%H:%i:%sZ')
                   where project=:project and assetClass=:assetClass
                """
 
@@ -754,12 +757,13 @@ class CustomDomainService implements ServiceMethods {
      * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
      */
-    private void dataDateTimeToDate(Project project, String assetClassName, String fieldName) {
+    @Transactional
+    void dataDateTimeToDate(Project project, String assetClassName, String fieldName) {
 
         AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
         String sql = 'update AssetEntity set '
 
-        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%d')
+        sql += """$fieldName = DATE(STR_TO_DATE($fieldName , '%Y-%m-%dT%TZ'))
                   where project=:project and assetClass=:assetClass
                """
 
@@ -776,7 +780,8 @@ class CustomDomainService implements ServiceMethods {
      * @param assetClassName The assetClass to update the data for.
      * @param fieldName The fieldName/column to update the data for.
      */
-    private void dataToYesNo(Project project, String assetClassName, String fieldName) {
+    @Transactional
+    void dataToYesNo(Project project, String assetClassName, String fieldName) {
 
         AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
         String sql = 'update AssetEntity set '
@@ -802,7 +807,8 @@ class CustomDomainService implements ServiceMethods {
      * @param fieldName The fieldName/column to update the data for.
      * @param maxLength The max length to truncate the string to.
      */
-    private void dataToString(Project project, String assetClassName, String fieldName, Integer maxLength) {
+    @Transactional
+    void dataToString(Project project, String assetClassName, String fieldName, Integer maxLength) {
 
         AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
         String sql = 'update AssetEntity set '
