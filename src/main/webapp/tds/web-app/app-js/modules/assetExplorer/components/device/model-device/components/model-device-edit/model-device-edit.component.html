@@ -34,7 +34,7 @@
                 <h4 class="modal-title">Edit Model</h4>
             </div>
             <div class="modal-body">
-                <form name="editModelForm" role="form" class="form-horizontal left-alignment" #form="ngForm">
+                <form name="form" role="form" class="form-horizontal left-alignment" #form="ngForm">
                     <div class="modal-body-container">
                         <div class="box-body">
                             <div class="form-group">
@@ -57,10 +57,10 @@
                                 <div class="col-md-2">AKA:</div>
                                 <div class="col-md-4">
                                     <tds-aka [aka]="model.akaCollection || []"
+                                             name="aka"
                                              [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.text}"
                                              (validationErrors)="onAkaValidationErrors($event)"
-                                             (modelChange)="onAkaChange($event)"
-                                    ></tds-aka>
+                                             (modelChange)="onAkaChange($event)"></tds-aka>
                                 </div>
                                 <div class="col-md-2">Asset Type:</div>
                                 <div class="col-md-4">
@@ -118,13 +118,9 @@
                             <div class="form-group">
                                 <div class="col-md-2">End of Life Date:</div>
                                 <div class="col-md-4">
-                                    <tds-date-control
-                                            [tabindex]="24"
-                                            class="tm-input-control"
-                                            [(ngModel)]="model.endOfLifeDate"
-                                            name="endOfLifeDate"
-                                            [value]="model.endOfLifeDate">
-                                    </tds-date-control>
+                                    <kendo-datepicker name="endOfLifeDate"
+                                                      [value]="model.endOfLifeDate"
+                                                      [(ngModel)]="model.endOfLifeDate"> </kendo-datepicker>
                                  </div>
                                 <div class="col-md-2">End of Life Status:</div>
                                 <div class="col-md-4">
@@ -234,22 +230,35 @@
                                 <div class="col-md-10">
                                     <tds-connector
                                             [connectors]="model.connectorsCollection"
-                                            (modelChange)="onConnectorsChange($event)"
-                                    ></tds-connector>
+                                            (modelChange)="onConnectorsChange($event)"></tds-connector>
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <div class="col-md-12">
+                                    <input type="text" name="customControls" [(ngModel)]="model.customControls">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button (click)="onSave()" type="button" class="btn btn-primary pull-left"><span
-                        class="fa fa-fw fa-floppy-o"></span> Save
-                </button>
-                <button type="button" class="btn btn-default pull-right" (click)="cancelCloseDialog()">
-                    <span class="glyphicon glyphicon-ban-circle"></span>
-                    <span>Cancel</span>
-                </button>
+            <div class="modal-footer form-group-center">
+                <tds-button-save
+                        class="btn-primary pull-left"
+                        title="Save"
+                        [disabled]="!form.dirty"
+                        (click)="onSave()">
+                </tds-button-save>
+
+                <tds-button-delete
+                        class="btn-danger component-action-delete"
+                        [disabled]="!hasDeleteTaskPermission">
+                </tds-button-delete>
+
+                <tds-button-cancel
+                        class="component-action-cancel pull-right"
+                        (click)="cancelCloseDialog()">
+                </tds-button-cancel>
             </div>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import { clone } from 'ramda';
 
 import { UIExtraDialog } from '../../../../../../../shared/services/ui-dialog.service';
@@ -17,12 +17,14 @@ import {CredentialColumnModel} from '../../../../../../credential/model/credenti
 import {UserContextModel} from '../../../../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../../../../shared/utils/date.utils';
 import {AkaChanges} from '../../../../../../../shared/components/aka/model/aka.model';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'model-device-edit',
 	templateUrl: 'model-device-edit.component.html'
 })
 export class ModelDeviceEditComponent extends UIExtraDialog {
+	@ViewChild('form') protected form: NgForm;
 	private hasAkaValidationErrors = false;
 	public model: any;
 	public manufacturer = null;
@@ -59,7 +61,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			unit: this.model.powerType
 		};
 
-		// this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
+		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
 	}
 
@@ -86,6 +88,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 			value = {id: null};
 		}
 		this.model.manufacturerId = value.id;
+		this.onCustomControlChange();
 	}
 
 	/**
@@ -116,6 +119,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	onAssetTypeValueChange(value: any): void {
 		this.assetType = value;
 		this.model.assetType = this.assetType && this.assetType.id || null;
+		this.onCustomControlChange();
 	};
 
 	/**
@@ -130,6 +134,13 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 */
 	public onAkaChange(akaChanges: AkaChanges): void {
 		this.model.akaChanges = akaChanges;
+		this.onCustomControlChange();
+	}
+
+	public onCustomControlChange(): void {
+		if (this.form.controls && this.form.controls.customControls) {
+			this.form.controls.customControls.markAsDirty();
+		}
 	}
 
 	/**
@@ -137,6 +148,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 */
 	public onConnectorsChange(connectors: any): void {
 		this.model.connectors = connectors;
+		this.onCustomControlChange();
 	}
 
 	onSave() {
@@ -178,7 +190,6 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		};
 
 		console.log(payload);
-
 	}
 
 }
