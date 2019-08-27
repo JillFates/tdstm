@@ -310,11 +310,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			when: 'updating the action status'
 				service.actionError(action, assetComment.id, whom)
 			then: 'Task notes are added'
-				notes.size() == 4
+				notes.size() == 3
 				notes.contains('some message')
-				notes[1] == 'api invocation exception'
-				notes[2] == 'ERROR script failure: api invocation exception'
-				notes[3] == "Placed task on HOLD, previous state was 'Ready'"
+				notes[1] == 'ERROR script failure: api invocation exception'
+				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
 		}
 
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript'() {
@@ -348,11 +347,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			when: 'updating the action status'
 				service.actionDone(action, assetComment.id, whom)
 			then: 'Task notes are added'
-				notes.size() == 4
+				notes.size() == 3
 				notes.contains('some message')
-				notes[1] == 'api invocation exception'
-				notes[2] == 'SUCCESS script failure: api invocation exception'
-				notes[3] == "Placed task on HOLD, previous state was 'Ready'"
+				notes[1] == 'SUCCESS script failure: api invocation exception'
+				notes[2] == "Placed task on HOLD, previous state was 'Ready'"
 		}
 
 	void 'Test updateRemoteActionStatus success with exception thrown in invokeReactionScript for success but not error reaction scripts'() {
@@ -391,10 +389,9 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		when: 'updating the action status'
 			service.actionDone(action, assetComment.id, whom)
 		then: 'Task notes are added'
-			notes.size() == 3
+			notes.size() == 2
 			notes.contains('some message')
-			notes[1] == 'api invocation exception'
-			notes[2] == 'Invoked Task with status: ERROR'
+			notes[1] == 'Invoked Task with status: ERROR'
 	}
 
 	@ConfineMetaClassChanges([ApplicationContextHolder])
