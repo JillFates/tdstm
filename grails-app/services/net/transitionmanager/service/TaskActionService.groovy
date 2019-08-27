@@ -2,6 +2,7 @@ package net.transitionmanager.service
 
 import com.tds.asset.AssetEntity
 import com.tds.asset.AssetComment
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
@@ -167,22 +168,8 @@ class TaskActionService implements ServiceMethods {
 
 		try {
 			apiActionService.invokeReactionScript(code, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
-			// if asset facade is not null and task as an asset entity
-			// let's perform asset validation errors to inform the user about
-			// potential hidden errors during reaction scripts invokation
-			if (assetFacade && asset) {
-				if (!asset.validate()) {
-					asset.errors.allErrors.each {
-						log.info('Task {}-{} has asset entity field validation errors. {}', task.taskNumber, task.comment, it)
-						// add task note with asset entity validation error
-						taskService.addNote(task, whom, i18nMessage(it))
-					}
-					throw new InvalidParamException("Asset: ${asset.assetType}-${asset.assetName} have validation errors.")
-				}
-			}
 		} catch (Exception e) {
 			log.info('Reaction script invoke error. ', e)
-			taskService.addNote(task, whom, e.message)
 			if (code == ReactionScriptCode.ERROR) {
 				taskFacade.error("$code script failure: ${e.message}")
 			} else {
@@ -196,6 +183,18 @@ class TaskActionService implements ServiceMethods {
 		} finally {
 			// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 			ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
+		}
+
+		// if asset facade is not null and task as an asset entity
+		// let's perform asset validation errors to inform the user about
+		// potential hidden errors during reaction scripts invokation
+		if (assetFacade && asset) {
+			if (!asset.validate()) {
+				String errorNote = 'Validation failed while attempting to update the following field(s): ' +
+						GormUtil.allErrorsString(asset)
+				taskFacade.error(errorNote)
+				asset.discard()
+			}
 		}
 	}
 
