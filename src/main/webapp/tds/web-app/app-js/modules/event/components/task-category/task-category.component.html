@@ -3,7 +3,8 @@
             <div class="col-md-2 category-description">{{categories[rowIndex]}}</div>
             <div class="col-md-1 column-navigation">
                     <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
-                          class="glyphicon glyphicon-chevron-left left-arrow" 
+                          class="glyphicon glyphicon-chevron-left left-arrow"
+                          title="Previous"
                           [ngClass]="{'disabled': showFrom === 0}"
                           (click)="onBack()">
                     </span>
@@ -27,7 +28,8 @@
             </div>
             <div class="col-md-1 column-navigation">
                     <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
-                          class="glyphicon glyphicon-chevron-right right-arrow" 
+                          class="glyphicon glyphicon-chevron-right right-arrow"
+                          title="Next"
                           [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  taskCategories.columns}"
                           (click)="onNext()">
                     </span>            
