@@ -19,6 +19,7 @@ import {MinMaxConfigurationPopupComponent} from './components/min-max/min-max-co
 import {SelectListConfigurationPopupComponent} from './components/select-list/selectlist-configuration-popup.component';
 import {FieldSettingsImportanceComponent} from './components/imp/field-settings-imp.component';
 import {NumberConfigurationPopupComponent} from './components/number/number-configuration-popup.component';
+import {FieldTypeSelectorComponent} from './components/field-type-selector/field-type-selector.component';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {FieldsResolveService} from './resolve/fields-resolve.service';
@@ -48,7 +49,8 @@ import {FieldConverterService} from './service/field-converter.service';
 		SelectListConfigurationPopupComponent,
 		FieldSettingsImportanceComponent,
 		MinMaxConfigurationPopupComponent,
-		NumberConfigurationPopupComponent
+		NumberConfigurationPopupComponent,
+		FieldTypeSelectorComponent
 	],
 	providers: [
 		// Resolve

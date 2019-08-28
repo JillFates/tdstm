@@ -318,6 +318,14 @@
 					<option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
 				</select>
 
+				<tds-field-type-selector
+						[name]="dataItem.field"
+						[fieldType]="dataItem.control"
+						[disabled]="dataItem.toBeDeleted"
+						[controls]="availableControls">
+
+				</tds-field-type-selector>
+
 				<span *ngIf="!dataItem.toBeDeleted && isAllowedConfigurationForField(dataItem.control)">
                     <div (click)="openFieldSettingsPopup(dataItem)"
                          class="open-close-dropdown-container text-center">

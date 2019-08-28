@@ -3,7 +3,7 @@ import {TranslatePipe} from '../../../shared/pipes/translate.pipe';
 
 @Injectable()
 export class FieldConverterService {
-	private conversions: any;
+	private conversions = [];
 
 	constructor(private translate: TranslatePipe) {
 		const transform = this.translate.transform.bind(this);
@@ -159,7 +159,7 @@ export class FieldConverterService {
 				to: 'datetime',
 				message: transform('CONVERSIONS.NUMBER_TO_DATETIME')
 			}
-		]
+		];
 	}
 
 	public getConfirmationMessage(from: string, to: string): string {
