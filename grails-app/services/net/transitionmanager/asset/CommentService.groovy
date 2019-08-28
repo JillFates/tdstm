@@ -35,6 +35,8 @@ import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
 
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
+
 /**
  * Methods to manage comments/tasks.
  * @author jmartin
@@ -351,6 +353,8 @@ class CommentService implements ServiceMethods {
 								}
 							}
 						}
+					} else if (params.assignedTo && AUTOMATIC_ROLE == params.assignedTo) {
+						assetComment.assignedTo = securityService.getAutomaticPerson()
 					}
 				}
 

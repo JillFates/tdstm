@@ -57,6 +57,7 @@ import java.security.PublicKey
 
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_USER
+
 /**
  * The SecurityService class provides methods to manage User Roles and Permissions, etc.
  */
@@ -68,6 +69,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * The default security code that should be assigned to individuals if not is specified.
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = ROLE_USER.name()
+	static final String AUTOMATIC_ROLE = 'AUTO'
 
 	AuditService             auditService
 	EmailDispatchService     emailDispatchService
@@ -1987,4 +1989,15 @@ class SecurityService implements ServiceMethods, InitializingBean {
             [(it): 1]
         }
     }
+
+	/**
+	 * Retrieve the Person object that represent the person that completes automated tasks
+	 */
+	Person getAutomaticPerson() {
+		Person a = Person.findByLastNameAndFirstName(Person.SYSTEM_USER_AT.lastName, Person.SYSTEM_USER_AT.firstName)
+		if (! a) {
+			log.error 'Unable to find Automated Task Person as expected'
+		}
+		return a
+	}
 }

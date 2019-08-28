@@ -79,6 +79,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -658,7 +659,7 @@ class TaskService implements ServiceMethods {
 
 		// Override the whom if this is an automated task being completed
 		if (task.isAutomatic() && status == ACS.COMPLETED) {
-			whom = getAutomaticPerson()
+			whom = securityService.getAutomaticPerson()
 		}
 
 		// Trigger the action if it is automatic and the action is local
@@ -1067,7 +1068,7 @@ class TaskService implements ServiceMethods {
 				}
 			}
 			if (!whom) {
-				whom = getAutomaticPerson()
+				whom = securityService.getAutomaticPerson()
 			}
 
 			addNote(task, whom, comment, 0)
@@ -1103,7 +1104,7 @@ class TaskService implements ServiceMethods {
 				}
 			}
 			if (!whom) {
-				whom = getAutomaticPerson()
+				whom = securityService.getAutomaticPerson()
 			}
 
 			String note
@@ -1485,17 +1486,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				return cartInfo[0]
 			}
 		}
-	}
-
-	/**
-	 * Retrieve the Person object that represent the person that completes automated tasks
-	 */
-	Person getAutomaticPerson() {
-		Person a = Person.findByLastNameAndFirstName(Person.SYSTEM_USER_AT.lastName, Person.SYSTEM_USER_AT.firstName)
-		if (! a) {
-			log.error 'Unable to find Automated Task Person as expected'
-		}
-		return a
 	}
 
 	/**

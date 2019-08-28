@@ -472,7 +472,7 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		Person loginPerson = securityService.userLoginPerson
 
 		// Get the ID of the Automated Task Person that shouldn't be in the list
-		Person autoTask = taskService.getAutomaticPerson()
+		Person autoTask = securityService.getAutomaticPerson()
 		Long autoTaskId = autoTask ? autoTask.id : 0
 
 		//
