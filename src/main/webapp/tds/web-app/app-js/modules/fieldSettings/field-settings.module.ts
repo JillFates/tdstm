@@ -25,6 +25,7 @@ import {FieldsResolveService} from './resolve/fields-resolve.service';
 // Services
 import {FieldSettingsService} from './service/field-settings.service';
 import {CustomDomainService} from './service/custom-domain.service';
+import {FieldConverterService} from './service/field-converter.service';
 
 @NgModule({
 	imports: [
@@ -55,7 +56,8 @@ import {CustomDomainService} from './service/custom-domain.service';
 		// Services
 		ModuleResolveService,
 		FieldSettingsService,
-		CustomDomainService
+		CustomDomainService,
+		FieldConverterService
 	],
 	entryComponents: [
 		SelectListConfigurationPopupComponent,
