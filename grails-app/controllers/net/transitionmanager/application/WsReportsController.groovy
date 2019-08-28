@@ -131,8 +131,8 @@ class WsReportsController implements ControllerMethods {
         Project project = securityService.userCurrentProject
         def availableMoveEvents = moveEventService.listMoveEvents(project)
         def managers = partyRelationshipService.getProjectStaff(project.id)
-        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_PROJ_MGR")
-        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_MOVE_MGR")
+        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_PROJ_MGR)
+        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_MOVE_MGR)
 
         //get the all Dashboard Steps that are associated to moveBundle.project
         def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
@@ -188,7 +188,7 @@ class WsReportsController implements ControllerMethods {
 
                 if (projectManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
-                            Party.findById(projectManagerId), "ROLE_PROJ_MGR")
+                            Party.findById(projectManagerId), RoleType.CODE_TEAM_PROJ_MGR)
                 }
                 if (moveManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
