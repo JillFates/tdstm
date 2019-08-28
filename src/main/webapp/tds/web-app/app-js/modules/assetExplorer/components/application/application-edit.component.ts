@@ -57,6 +57,7 @@ export function ApplicationEditComponent(template: string, editModel: any, metad
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**
