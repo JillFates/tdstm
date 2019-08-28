@@ -15,6 +15,7 @@ import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.project.WorkflowTransition
 import org.apache.commons.lang3.StringUtils
 
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_PERSON_CODE
 import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
@@ -285,7 +286,7 @@ class AssetComment {
 	 * @return
 	 */
 	boolean isAutomatic(){
-		AUTOMATIC_ROLE == role
+		AUTOMATIC_PERSON_CODE == role
 	}
 
 	/**

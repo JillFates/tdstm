@@ -70,6 +70,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 */
 	static final String DEFAULT_SECURITY_ROLE_CODE = ROLE_USER.name()
 	static final String AUTOMATIC_ROLE = 'AUTO'
+	static final String AUTOMATIC_PERSON_CODE = 'AUTO'
 
 	AuditService             auditService
 	EmailDispatchService     emailDispatchService
