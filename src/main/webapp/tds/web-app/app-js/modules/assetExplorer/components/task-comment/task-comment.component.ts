@@ -377,8 +377,23 @@ export class TaskCommentComponent implements OnInit {
 		return this.permissionService.hasPermission(Permission.TaskCreate);
 	}
 
+	protected isTaskEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskEdit);
+	}
+
+	protected isTaskDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskDelete);
+	}
+
 	protected isCommentCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentCreate);
 	}
 
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
+	}
 }

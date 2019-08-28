@@ -159,7 +159,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			data: [],
 			total: 0
 		};
-		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetCreate);
 
 		this.selectedAssetsForBulk = [];
 		this.getPreferences()
@@ -759,5 +759,25 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	protected isBulkSelectAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetBulkSelect);
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	protected isTaskCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskCreate);
+	}
+
+	protected isCommentCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentCreate);
+	}
+
+	protected isAssetCloneAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetCreate);
 	}
 }
