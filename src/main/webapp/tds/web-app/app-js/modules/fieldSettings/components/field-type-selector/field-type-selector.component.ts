@@ -12,7 +12,7 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 	@Input() fieldType: string;
 	@Input() disabled: boolean;
 	@Input() name: string;
-	@Output() save: EventEmitter<string> = new EventEmitter<string>();
+	@Output() save: EventEmitter<any> = new EventEmitter<any>();
 	@Output()  fieldTypeChange: EventEmitter<any> = new EventEmitter<any>();
 
 	constructor(private fieldConverterService: FieldConverterService) {}
@@ -35,7 +35,7 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 		this.fieldTypeChange.emit({
 			conversion: conversion,
 			reset: () => { this.reset(conversion.from); },
-			save: () => { this.onSave(conversion.to); },
+			save: () => { this.onSave(conversion); },
 		});
 	}
 
@@ -43,9 +43,9 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 		this.value = previous;
 	}
 
-	onSave(value: string) {
-		this.value = value;
-		this.save.emit(value);
+	onSave(conversion: any) {
+		this.value = conversion.to;
+		this.save.emit(conversion);
 	}
 
 }

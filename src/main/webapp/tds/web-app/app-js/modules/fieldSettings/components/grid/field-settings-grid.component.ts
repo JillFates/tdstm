@@ -406,18 +406,19 @@ export class FieldSettingsGridComponent implements OnInit {
 				break;
 		}
 	}
-	protected  onFieldTypeChangeSave(dataItem: any, value: string): void {
-		dataItem.control = value;
+	protected  onFieldTypeChangeSave(dataItem: any, conversion: any): void {
+		dataItem.control = conversion.to;
+		this.onControlChange(conversion.from, dataItem);
 	}
 
 	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (fieldTypeChange) {
-			this.setIsDirty(true);
 			this.prompt.open(
 				'Confirmation Required',
 				fieldTypeChange.conversion.getWarningMessage(),
 				'Ok', 'Cancel').then(result => {
 				if (result) {
+					this.setIsDirty(true);
 					fieldTypeChange.save();
 				} else {
 					fieldTypeChange.reset();
