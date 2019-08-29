@@ -5,7 +5,7 @@
            [ngClass]="{'to-be-deleted': disabled}"
            id="control{{name}}"
            (ngModelChange)="onChange($event)"
-           [ngModel]="fieldType">
-      <option *ngFor="let c of controls" [ngValue]="c.value">{{c.text}}</option>
+           [(ngModel)]="value">
+      <option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
    </select>
 </div>

@@ -307,23 +307,12 @@
 		<ng-template kendoGridCellTemplate
 		             *ngIf="isEditing; else controlTemp" let-dataItem>
 			<div *ngIf="dataItem.udf">
-				<select class="form-control"
-				        style="float:left;width:100px; padding-top: 0px; padding-bottom: 0px;"
-				        name="control"
-				        [disabled]="dataItem.toBeDeleted"
-				        [ngClass]="{'to-be-deleted': dataItem.toBeDeleted}"
-				        id="control{{dataItem.field}}"
-				        (ngModelChange)="onControlModelChange($event,dataItem)"
-				        [ngModel]="dataItem.control">
-					<option *ngFor="let c of availableControls" [ngValue]="c.value">{{c.text}}</option>
-				</select>
-
 				<tds-field-type-selector
+                        (fieldTypeChange)="onFieldTypeChange(dataItem, $event)"
+                        (save)="onFieldTypeChangeSave(dataItem, $event)"
 						[name]="dataItem.field"
 						[fieldType]="dataItem.control"
-						[disabled]="dataItem.toBeDeleted"
-						[controls]="availableControls">
-
+						[disabled]="dataItem.toBeDeleted">
 				</tds-field-type-selector>
 
 				<span *ngIf="!dataItem.toBeDeleted && isAllowedConfigurationForField(dataItem.control)">
