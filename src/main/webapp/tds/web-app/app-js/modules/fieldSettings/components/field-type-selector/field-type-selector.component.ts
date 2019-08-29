@@ -26,11 +26,20 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 		{ text: CUSTOM_FIELD_CONTROL_TYPE.Number, value: CUSTOM_FIELD_CONTROL_TYPE.Number}
 	];
 
+	/**
+	 * Grab the reference to the initial field type provided
+	 */
 	ngOnInit(): void {
 		this.value = this.fieldType;
 	}
 
-	onChange(newType): void {
+	/**
+	 *  On changing control event report this action to host component
+	 *  in order it will be avaible to decide whether move forward with the change
+	 *  o reset the action
+	 * @param {string }newType New type of control to be assigned
+	 */
+	onChange(newType: string): void {
 		const conversion = this.fieldConverterService.findConversion(this.fieldType, newType);
 		this.fieldTypeChange.emit({
 			conversion: conversion,
@@ -39,11 +48,19 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 		});
 	}
 
-	reset(previous: string) {
+	/**
+	 * Reset type of control change
+	 * @param {string} previous  Previous selected value
+	 */
+	reset(previous: string): void {
 		this.value = previous;
 	}
 
-	onSave(conversion: any) {
+	/**
+	 * Set the current value and report the change to host component
+	 * @param conversion
+	 */
+	onSave(conversion: any): void {
 		this.value = conversion.to;
 		this.save.emit(conversion);
 	}

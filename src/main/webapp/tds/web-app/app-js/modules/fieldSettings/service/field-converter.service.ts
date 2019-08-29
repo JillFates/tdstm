@@ -10,6 +10,10 @@ export class FieldConverterService {
 		/* constructor */
 	}
 
+	/**
+	 * Get the matrix of possible transitions
+	 * @returns {any[]}
+	 */
 	getConversions(): any[] {
 		if (this.conversions) {
 			return this.conversions;
@@ -171,19 +175,23 @@ export class FieldConverterService {
 		return this.conversions;
 	}
 
+	/**
+	 * Get the translated message based upon the key provided
+	 * @param {string} key  Key to identify the right translation
+	 * @returns {Function}  Return the function that call the translation
+	 */
 	private translateMessage(key: string): Function {
 		return () => {
 			return this.translate.transform(key);
 		}
 	}
 
-	/*
-	public getConfirmationMessage(from: string, to: string): string {
-		const conversion = this.getConversion(from, to);
-
-		return conversion ? conversion.message : '';
-	}
-	*/
+	/**
+	 * Based on from/to flags, search for the transition into the transition matrix
+	 * @param {string} from  From this type of control
+	 * @param {string} to To this type of control
+	 * @returns {any}
+	 */
 	public findConversion(from: string, to: string): any {
 		return this.getConversions().find((conversion) => conversion.from === from && conversion.to === to);
 	}

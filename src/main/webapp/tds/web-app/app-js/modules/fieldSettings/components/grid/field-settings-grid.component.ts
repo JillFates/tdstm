@@ -406,11 +406,22 @@ export class FieldSettingsGridComponent implements OnInit {
 				break;
 		}
 	}
+
+	/**
+	 * Event to update the control of the dataItem after the user has confirmed the change action
+	 * @param dataItem  Current grid cell item
+	 * @param conversion Contains the information of this conversion
+	 */
 	protected  onFieldTypeChangeSave(dataItem: any, conversion: any): void {
 		dataItem.control = conversion.to;
 		this.onControlChange(conversion.from, dataItem);
 	}
 
+	/**
+	 * Handle a change of custom control type event
+	 * @param dataItem Current grid cell item
+	 * @param fieldTypeChange contains the info about the conversion, save and reset events
+	 */
 	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
 		if (fieldTypeChange) {
 			this.prompt.open(
