@@ -1896,7 +1896,7 @@ class ProjectService implements ServiceMethods {
 		Project project
 		if (projectCommand.id > 0) {
 			if (securityService.hasAccessToProject(projectCommand.id)) {
-				project = get(Project, projectCommand.id)
+				project = Project.get(projectCommand.id)
 			} else {
 				UserLogin userlogin = securityService.getUserLogin()
 				throw new InvalidParamException("User ${userlogin.username} doesn't have access to the project ${projectCommand.id}.")
@@ -1912,6 +1912,7 @@ class ProjectService implements ServiceMethods {
 			description = projectCommand.description
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
+			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn
 			startDate = projectCommand.startDate

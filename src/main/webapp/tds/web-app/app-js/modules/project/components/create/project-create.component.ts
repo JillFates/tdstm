@@ -53,9 +53,9 @@ export class ProjectCreateComponent implements OnInit {
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
-			defaultBundle: 'TBD',
+			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectReportingMetrics: true,
+			collectMetrics: true,
 			planMethodology: 'Migration Method'
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
@@ -63,6 +63,7 @@ export class ProjectCreateComponent implements OnInit {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
 			maxFileSize: 5000000
 		};
+		this.file.uploadSaveUrl = '/tdstm/ws/fileSystem/uploadImageFile'
 	}
 
 	private getModel() {
@@ -140,7 +141,7 @@ export class ProjectCreateComponent implements OnInit {
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
 			if (this.fetchResult && this.fetchResult.status === 'success') {
-				// this.projectModel.projectLogo = this.fetchResult.filename;
+				this.projectModel.projectLogo = this.fetchResult.filename;
 			}
 			this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
 				if (result.status === 'success') {

@@ -14,9 +14,9 @@ export class ProjectModel {
 	public projectCode: string;
 	public projectType: string;
 	public comment: string;
-	public defaultBundle: string;
+	public defaultBundleName: string;
 	public timeZone: string;
-	public collectReportingMetrics: boolean;
+	public collectMetrics: boolean;
 	public planMethodology: string;
 }
 

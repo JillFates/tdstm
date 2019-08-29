@@ -174,6 +174,9 @@ class WsProjectController implements ControllerMethods {
 	@HasPermission(Permission.ProjectEdit)
 	def saveProject(String projectId) {
 		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
+		if (projectId) {
+			projectCommand.id = projectId.toLong()
+		}
 		Project project = projectService.createOrUpdateProject(projectCommand)
 		renderSuccessJson(project.toMap())
 	}

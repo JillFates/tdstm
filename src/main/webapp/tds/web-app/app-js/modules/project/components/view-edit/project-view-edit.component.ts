@@ -72,9 +72,9 @@ export class ProjectViewEditComponent implements OnInit {
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
-			defaultBundle: 'TBD',
+			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectReportingMetrics: true,
+			collectMetrics: true,
 			planMethodology: 'Migration Method'
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -141,7 +141,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
-				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle.name : '';
+				this.projectModel.defaultBundleName = data.defaultBundle ? data.defaultBundle.name : '';
 				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
