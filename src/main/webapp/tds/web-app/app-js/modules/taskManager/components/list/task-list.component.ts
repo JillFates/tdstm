@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
@@ -321,7 +321,8 @@ export class TaskListComponent {
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute) {
+		private activatedRoute: ActivatedRoute,
+		private router: Router) {
 		this.onLoad();
 	}
 
@@ -586,7 +587,10 @@ export class TaskListComponent {
 	 * On View Neighborhood button handler.
 	 */
 	onViewTaskNeighborHandler(dataItem): void {
-		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
+		// this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
+		this.router.navigate(['neighborhood'], {
+			queryParams: { id: dataItem.id}
+		})
 	}
 
 	/**
@@ -687,7 +691,7 @@ export class TaskListComponent {
 		const request = {
 			id: taskRow.id.toString(),
 			status: taskRow.status
-		}
+		};
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;

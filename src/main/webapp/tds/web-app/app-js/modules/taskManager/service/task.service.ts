@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {SingleCommentModel} from '../../assetExplorer/components/single-comment/model/single-comment.model';
 
@@ -8,6 +8,14 @@ import 'rxjs/add/operator/catch';
 import {ComboBoxSearchModel} from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import {ComboBoxSearchResultModel} from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import {catchError, map} from 'rxjs/operators';
+import {ITask} from '../model/task-edit-create.model';
+import {IGraphTask} from '../../../shared/model/graph-task.model';
+
+export interface IGrapTaskResponseBody {
+	status: string;
+	data: IGraphTask[];
+}
+type GraphTaskType = HttpResponse<IGrapTaskResponseBody>
 
 /**
  * @name TaskService
@@ -18,6 +26,7 @@ export class TaskService {
 	// private instance variable to hold base url
 	private baseURL = '/tdstm';
 	private readonly TASK_LIST_URL = `${this.baseURL}/ws/task/listTasks`;
+	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly CUSTOM_COLUMNS_URL = `${this.baseURL}/ws/task/customColumns`;
 	private readonly TASK_ACTION_INFO_URL = `${this.baseURL}/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${this.baseURL}/ws/task/{taskId}/resetAction`;
@@ -472,5 +481,14 @@ export class TaskService {
 					return error;
 				})
 			);
+	}
+
+	/**
+	 * GET - Find task for neighborhood component
+	 * @param taskId: number | string
+	 */
+	findTask(taskId: number | string): Observable<IGraphTask[]> {
+		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`, { observe: 'response' })
+			.map(res => res.body.data);
 	}
 }
