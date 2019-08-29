@@ -5,7 +5,10 @@ import org.apache.commons.lang3.StringUtils
 
 class Task extends AssetComment {
 
-	String commentType = AssetCommentType.TASK
+	Task() {
+		super()
+		commentType = AssetCommentType.TASK
+	}
 
 	String toString() {
 		return 'Task:' + (taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)

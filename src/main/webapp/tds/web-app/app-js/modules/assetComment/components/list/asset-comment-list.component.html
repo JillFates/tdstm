@@ -5,6 +5,7 @@
             <div class="box-body box-with-empty-header">
                 <kendo-grid
                         [data]="gridData"
+                        class="tds-kendo-grid without-selectabe-rows"
                         [filter]="state.filter"
                         [filterable]="true"
                         (filterChange)="filterChange($event)"
@@ -26,6 +27,7 @@
                             field="{{column.property}}"
                             format="{{column.format}}"
                             [locked]="column.locked"
+                            class="{{column.class}}"
                             [width]="commonShrunkColumns.includes(column.label) ? commonShrunkColumnWidth : !column.width ? COLUMN_MIN_WIDTH : column.width">
                         <ng-template kendoGridHeaderTemplate>
                             <div class="sortable-column" (click)="onClickTemplate($event)">
