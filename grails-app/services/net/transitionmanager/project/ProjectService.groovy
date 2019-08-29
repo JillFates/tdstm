@@ -4,8 +4,11 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalogService
 import net.transitionmanager.asset.ApplicationAssetMap
 import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -14,6 +17,7 @@ import net.transitionmanager.imports.DataScriptService
 import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.license.LicenseCommonService
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.CredentialService
@@ -92,6 +96,7 @@ class ProjectService implements ServiceMethods {
 	CredentialService          credentialService
 	DataScriptService          dataScriptService
 	LicenseCommonService       licenseCommonService
+	FileSystemService          fileSystemService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -1863,7 +1868,7 @@ class ProjectService implements ServiceMethods {
 	 * @param file - the File resource to reference
 	 * @return the ProjectLogo object
 	 */
-	ProjectLogo createOrUpdate(Project project, file) {
+	ProjectLogo createOrUpdateLogo(Project project, file) {
 		assert file
 		assert project
 
@@ -1878,5 +1883,78 @@ class ProjectService implements ServiceMethods {
 		pl.setData file.inputStream
 
 		return pl.save(flush: true)
+	}
+
+	/**
+	 * This methods creates (or updates) a project based on the given CommandObject. It also takes cares of
+	 * cloning the default FieldSettings and creating the default bundle.
+	 * 
+	 * @param projectCommand
+	 * @return
+	 */
+	Project createOrUpdateProject(ProjectCommand projectCommand) {
+		Project project
+		if (projectCommand.id > 0) {
+			if (securityService.hasAccessToProject(projectCommand.id)) {
+				project = get(Project, projectCommand.id)
+			} else {
+				UserLogin userlogin = securityService.getUserLogin()
+				throw new InvalidParamException("User ${userlogin.username} doesn't have access to the project ${projectCommand.id}.")
+			}
+		} else {
+			project = new Project()
+		}
+		
+		project.with {
+			client = PartyGroup.findById(projectCommand.clientId)
+			comment = projectCommand.comment
+			completionDate = projectCommand.completionDate
+			description = projectCommand.description
+			guid = StringUtil.generateGuid()
+			name = projectCommand.projectName
+			projectType = projectCommand.projectType
+			runbookOn = projectCommand.runbookOn
+			startDate = projectCommand.startDate
+			timezone = getTimezone(projectCommand.timeZone)
+			workflowCode = projectCommand.workflowCode
+		}
+
+		project.save(failOnError: true, flush: true)
+
+		// Set the project's owner.
+		setOwner(project, securityService.userLoginPerson.company)
+
+		// Assign partners
+		updateProjectPartners(project, projectCommand.partnerIds)
+
+		// Clone default field settings
+		cloneDefaultSettings(project)
+
+		// Deal with the Project Manager if one is supplied
+		if (projectCommand.projectManagerId > 0) {
+			personService.addToProjectTeam(project.id, projectCommand.projectManagerId, RoleType.CODE_TEAM_PROJ_MGR)
+		}
+
+		// Deal with the adding the project logo if one was supplied
+		if (projectCommand.projectLogo) {
+			File logoFile = fileSystemService.openTempFile(projectCommand.projectLogo)
+			createOrUpdateLogo(project, logoFile)
+		}
+
+		// Set the new project as the user's current project.
+		userPreferenceService.setCurrentProjectId(project.id)
+
+		// Create the default bundle
+		createDefaultBundle(project, projectCommand.defaultBundleName)
+		project.save()
+
+		return project
+	}
+
+	/**
+	 * @return the PersonService instance from the container.
+	 */
+	private PersonService getPersonService() {
+		return ApplicationContextHolder.getBean('personService', PersonService)
 	}
 }

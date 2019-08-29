@@ -53,6 +53,10 @@ class WsFileSystemController implements ControllerMethods{
 		doFileUploadETLAssetImport(uploadTextCommand)
 	}
 
+	def uploadImageFile(ImageFileCommand imageFileCommand) {
+		uploadFile(imageFileCommand)
+	}
+
     /**
      * Endpoint for uploading a file to the server.
      * @param fileUploadCommand

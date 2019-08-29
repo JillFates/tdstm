@@ -11,6 +11,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.Timezone
@@ -170,118 +171,10 @@ class WsProjectController implements ControllerMethods {
 		])
 	}
 
-	private def retrievetimeZone(timezoneValue) {
-		def result
-		if (StringUtil.isBlank(timezoneValue)) {
-			result = Timezone.findByCode(TimeUtil.defaultTimeZone)
-		} else {
-			def tz = Timezone.findByCode(timezoneValue)
-			if (tz) {
-				result = tz
-			} else {
-				result = Timezone.findByCode(TimeUtil.defaultTimeZone)
-			}
-		}
-		return result
-	}
-
 	@HasPermission(Permission.ProjectEdit)
 	def saveProject(String projectId) {
-		Project.withTransaction { status ->
-			def requestParams = request.JSON
-			PartyGroup company = securityService.userLoginPerson.company
-
-			//
-			// Properly set some of the parameters that before injecting into the Project domain
-			//
-			def startDate = requestParams.startDate
-			def completionDate = requestParams.completionDate
-			if (startDate) {
-				requestParams.startDate = TimeUtil.parseISO8601Date(startDate)
-			}
-			if (completionDate) {
-				requestParams.completionDate = TimeUtil.parseISO8601Date(completionDate)
-			}
-			requestParams.runbookOn =  1	// Default to ON
-			requestParams.timeZone = retrievetimeZone(requestParams.timeZone)
-			requestParams.collectReportingMetrics = requestParams.collectMetrics == "1" ? 1: 0
-
-			Project project = new Project(
-					[
-							client:  PartyGroup.findById(requestParams.clientId),
-							name: requestParams.projectName,
-					        projectCode: requestParams.projectCode,
-							description: requestParams.description,
-							comment: requestParams.comment,
-							startDate: requestParams.startDate,
-							completionDate: requestParams.completionDate,
-							workflowCode: requestParams.workflowCode,
-							projectType: requestParams.projectType,
-							runbookOn: requestParams.runbookOn,
-							timezone: requestParams.timeZone
-					]
-			)
-
-			def partnersIds = requestParams.partnerIds
-			params.projectLogo = requestParams.projectLogo
-
-			def logoFile = controllerService.getUploadImageFile(this, 'projectLogo', 50000)
-
-			project.guid = StringUtil.generateGuid()
-
-			if (logoFile instanceof String || project.hasErrors() || !project.save(flush:true)) {
-				if (logoFile instanceof String) {
-					flash.message = logoFile
-				}
-				else {
-					flash.message = 'Some properties were not properly defined'
-				}
-
-				project.discard()
-
-				Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-
-				List<Map> planMethodologies = projectService.getPlanMethodologiesValues(Project.defaultProject)
-
-				renderErrorJson([
-						company: company, projectInstance: project, clients: projectDetails.clients,
-						partners: projectDetails.partners, managers: projectDetails.managers,
-						workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies, prevParam: requestParams
-				] )
-				return
-			}
-
-			projectService.setOwner(project,company)
-
-			// Save the partners to be related to the project
-			projectService.updateProjectPartners(project, partnersIds)
-
-			// Clone any settings from the Default Project
-			projectService.cloneDefaultSettings(project)
-
-			// Deal with the Project Manager if one is supplied
-			Long projectManagerId = NumberUtil.toPositiveLong(requestParams.projectManagerId, -1)
-			if (projectManagerId > 0) {
-				personService.addToProjectTeam(project.id.toString(), projectManagerId.toString(), RoleType.CODE_TEAM_PROJ_MGR)
-			}
-
-			// Deal with the adding the project logo if one was supplied
-			ProjectLogo projectLogo
-
-			if (logoFile) {
-				projectLogo = projectService.createOrUpdate(project, logoFile)
-			}
-
-			userPreferenceService.setCurrentProjectId(project.id)
-
-			/* Create and assign the default Bundle for this project. Although the bundle
-			* is assigned in ProjectService::getDefaultBundle, it's done here too for visibility. */
-			project.defaultBundle = projectService.getDefaultBundle(project, (String)requestParams.defaultBundleName)
-			project.save()
-
-			flash.message = "Project $project was created"
-			renderSuccessJson()
-
-		} // Project.withTransaction
+		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
+		Project project = projectService.createOrUpdateProject(projectCommand)
+		renderSuccessJson(project.toMap())
 	}
 }

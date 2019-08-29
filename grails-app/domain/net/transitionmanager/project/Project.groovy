@@ -141,4 +141,21 @@ class Project extends PartyGroup {
 			throw new UnsupportedOperationException(msg)
 		}
 	}
+
+	/**
+	 * Create a map representation of this Project instance.
+	 * @return a map containing a project's most relevant fields.
+	 */
+	Map toMap() {
+		return [
+		    id: id,
+			projectCode: projectCode,
+			defaultBundle: [
+			    id: defaultBundle.id,
+				name: defaultBundle.name
+			],
+			timezone: timezone.label
+		]
+	}
+
 }
