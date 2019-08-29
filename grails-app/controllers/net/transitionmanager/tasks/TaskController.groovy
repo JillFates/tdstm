@@ -642,7 +642,7 @@ class TaskController implements ControllerMethods {
 		}
 
 		def styleDef = "rounded, filled"
-		def nodesMap = [:]
+		Map<String, Map> nodesMap = [:]
 		def tasks = []
 
 		// helper closure that creates the definition of a node
@@ -684,17 +684,18 @@ class TaskController implements ControllerMethods {
 				}
 
 				nodesMap[task.taskNumber] = [
-				        label     : label,
-						  style     : style,
-						  id        : task.id,
-						  color     : color,
-						  fillcolor : fillcolor,
-						  fontcolor : fontcolor,
-						  fontsize  : fontsize,
-						  tooltip   : tooltip,
-						  category  : task.category,
-						  status    : task.status,
-						  successors: []
+					label     : label,
+					style     : style,
+					id        : task.id,
+					taskNumber: task.taskNumber,
+					color     : color,
+					fillcolor : fillcolor,
+					fontcolor : fontcolor,
+					fontsize  : fontsize,
+					tooltip   : tooltip,
+					category  : task.category,
+					status    : task.status,
+					successors: []
 				]
 			}
 		}
@@ -707,7 +708,8 @@ class TaskController implements ControllerMethods {
 			nodesMap[d.predecessor.taskNumber].successors << d.assetComment.taskNumber
 		}
 
-		renderSuccessJson(nodesMap)
+		List<Map> nodes = nodesMap.collect { key, value -> value }
+		renderSuccessJson(nodes)
 	}
 
 	/**
