@@ -283,11 +283,11 @@ class CustomDomainService implements ServiceMethods {
      * @param project The project to update the custom data for.
      */
     void updateFieldData(Map oldFieldSpec, Map newFieldSpec, String assetClassType, Project project){
-        if(!oldFieldSpec || oldFieldSpec.control == newFieldSpec.control){
+        if(!oldFieldSpec || (oldFieldSpec.control == newFieldSpec.control && oldFieldSpec.shared == newFieldSpec.shared)){
             return
         }
 
-        String key = "${oldFieldSpec.control}-${newFieldSpec.control}"
+        String key = newFieldSpec.shared ? '': "${oldFieldSpec.control}-${newFieldSpec.control}"
 
 
         switch (key) {
