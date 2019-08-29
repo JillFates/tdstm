@@ -174,6 +174,7 @@ import { TaskStatus } from '../../model/task-edit-create.model';
 									*ngIf="dataItem.id && dataItem.status"
 									[task]="dataItem"
 									[showDelayActions]="true"
+									[showDetails]="true"
 									[buttonClass]="'btn-primary'"
 									(start)="updateTaskStatus(dataItem.id, TaskStatus.STARTED)"
 									(done)="updateTaskStatus(dataItem.id, TaskStatus.COMPLETED)"
@@ -181,14 +182,10 @@ import { TaskStatus } from '../../model/task-edit-create.model';
 									(reset)="onResetTaskHandler(dataItem)"
 									(assignToMe)="onAssignToMeHandler(dataItem)"
 									(neighborhood)="onViewTaskNeighborHandler(dataItem)"
-									(delay)="changeTimeEst(dataItem, $event)">
+									(delay)="changeTimeEst(dataItem, $event)"
+									(details)="onOpenTaskDetailHandler(dataItem)">
 								</tds-task-actions>
 							</div>
-							<button
-								class="btn btn-primary btn-xs"
-								(click)="onOpenTaskDetailHandler(dataItem)">
-								<i class="glyphicon glyphicon-zoom-in"></i>Details
-							</button>
 							<button *ngIf="dataItem.parsedInstructions"
 											class="btn btn-primary btn-xs"
 											(click)="openLinkInNewTab(dataItem.parsedInstructions[1])">
