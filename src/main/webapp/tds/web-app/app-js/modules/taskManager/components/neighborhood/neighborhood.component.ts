@@ -52,7 +52,6 @@ export class NeighborhoodComponent implements OnInit {
 		this.taskService.findTask(id)
 			.subscribe((res: IGraphTask[]) => {
 				this.tasks = res;
-				console.log
 				this.generateModel();
 			});
 	}
