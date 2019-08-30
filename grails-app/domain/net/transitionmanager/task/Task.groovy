@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils
 
 class Task extends AssetComment {
 
+	Boolean isCriticalPath
+
 	Task() {
 		super()
 		commentType = AssetCommentType.TASK
