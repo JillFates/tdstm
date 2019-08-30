@@ -289,7 +289,7 @@ export const en_DICTIONARY: Object = {
 			'DATETIME_TO_DATE': 'Changing the control will result in the time part of the data being removed from all data values',
 			'DATETIME_TO_NUMBER': 'Changing the control will result in all data being deleted',
 			'NUMBER_TO_LIST': 'Changing the control will cause a list to be created based on the unique number values already present in the data',
-			'NUMBER_TO_STRING': 'Changing the control will result in all data being deleted',
+			'NUMBER_TO_STRING': 'Changing the control will change the data from numeric format to simple strings',
 			'NUMBER_TO_YES_NO': 'Changing the control will result in all data being deleted',
 			'NUMBER_TO_DATE': 'Changing the control will result in all data being deleted',
 			'NUMBER_TO_DATETIME': 'Changing the control will result in all data being deleted',
