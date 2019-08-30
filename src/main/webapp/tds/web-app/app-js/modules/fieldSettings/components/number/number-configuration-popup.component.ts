@@ -3,14 +3,15 @@ import { FieldSettingsModel } from '../../model/field-settings.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NumberConfigurationConstraintsModel} from './number-configuration-constraints.model';
 import {NumberControlHelper} from '../../../../shared/components/custom-control/number/number-control.helper';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
 
 @Component({
 	selector: 'number-configuration-popup',
 	templateUrl: 'number-configuration-popup.component.html',
 })
-
-export class NumberConfigurationPopupComponent {
-
+export class NumberConfigurationPopupComponent extends ConfigurationCommonComponent {
 	private readonly MIN_EXAMPLE_VALUE = -10000;
 	private readonly MAX_EXAMPLE_VALUE = 10000;
 	public model: NumberConfigurationConstraintsModel;
@@ -21,7 +22,10 @@ export class NumberConfigurationPopupComponent {
 	constructor(
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
-		private activeDialog: UIActiveDialogService) {
+		private activeDialog: UIActiveDialogService,
+		public prompt: UIPromptService,
+		public translate: TranslatePipe) {
+			super(prompt, translate);
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
 			this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
 			this.buildExampleValue();
@@ -76,10 +80,15 @@ export class NumberConfigurationPopupComponent {
 	 * On button save click
 	 */
 	public onSave(): void {
-		delete this.model.isDefaultConfig;
-		this.field.constraints = { ...this.model } as any;
-		this.activeDialog.close(this.hasChanged);
-	}
+		this.displayWarningMessage()
+			.then((confirm: boolean) => {
+				if (confirm) {
+					delete this.model.isDefaultConfig;
+					this.field.constraints = { ...this.model } as any;
+					this.activeDialog.close(this.hasChanged);
+				}
+			});
+		}
 
 	/**
 	 * Close the Dialog but first it verify is not Dirty

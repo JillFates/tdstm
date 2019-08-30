@@ -8,6 +8,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
 
 /**
  *
@@ -22,7 +23,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 	]
 })
 
-export class SelectListConfigurationPopupComponent implements OnInit {
+export class SelectListConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
 
 	public items: any[] = [];
 	public savedItems: any[] = [];
@@ -43,8 +44,9 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
 		private activeDialog: UIActiveDialogService,
-		private translatePipe: TranslatePipe,
-		private promptService: UIPromptService) {
+		public translate: TranslatePipe,
+		public prompt: UIPromptService) {
+		super(prompt, translate);
 	}
 
 	ngOnInit() {
@@ -147,16 +149,21 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Simply sets current list into the field model and it's default value.
 	 */
 	public onSave(): void {
-		let fieldModel = { ...this.field };
-		fieldModel.constraints.values = this.items.map(i => i.value);
-		this.customService.checkConstraints(this.domain, fieldModel)
-			.subscribe(res => {
-				if (res) {
-					this.field.constraints.values = this.items.map(i => i.value);
-					if (this.defaultValue != null) {
-						this.field.default = this.defaultValue;
-					}
-					this.activeDialog.close(this.isDirty());
+		this.displayWarningMessage()
+			.then((confirm: boolean) => {
+				if (confirm) {
+					let fieldModel = { ...this.field };
+					fieldModel.constraints.values = this.items.map(i => i.value);
+					this.customService.checkConstraints(this.domain, fieldModel)
+					.subscribe(res => {
+						if (res) {
+							this.field.constraints.values = this.items.map(i => i.value);
+							if (this.defaultValue != null) {
+								this.field.default = this.defaultValue;
+							}
+							this.activeDialog.close(this.isDirty());
+						}
+					});
 				}
 			});
 	}
@@ -236,11 +243,11 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		if (this.isDirty() || this.newItem.length > 0) {
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
+			this.prompt.open(
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translate.transform('GLOBAL.CONFIRM'),
+				this.translate.transform('GLOBAL.CANCEL'),
 			)
 				.then(confirm => {
 					if (confirm) {
