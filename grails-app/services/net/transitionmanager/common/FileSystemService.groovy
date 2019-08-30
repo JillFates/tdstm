@@ -25,13 +25,24 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.openxml4j.opc.OPCPackage
+import org.apache.poi.openxml4j.opc.PackageAccess
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xssf.eventusermodel.XSSFReader
+import org.apache.poi.xssf.model.SharedStringsTable
+import org.apache.poi.xssf.model.StylesTable
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.web.multipart.MultipartFile
+import org.xml.sax.InputSource
+import org.xml.sax.XMLReader
+import org.xml.sax.helpers.DefaultHandler
+import org.xml.sax.helpers.XMLReaderFactory
+import org.xml.sax.ContentHandler
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
@@ -134,7 +145,7 @@ class FileSystemService implements ServiceMethods {
 	/**
 	 * Build a CVSDataset from the given fileName
 	 * @param fileName
-	 * @return
+	 * @return an instance of {@code CSVDataset}
 	 */
 	CSVDataset buildCVSDataset(String fileName) {
 		validateFilename(fileName)
@@ -145,27 +156,13 @@ class FileSystemService implements ServiceMethods {
 	/**
 	 * Build a ExcelDataset from the given fileName
 	 * @param fileName
-	 * @return
+	 * @return an instance of {@code CSVDataset}
 	 */
 	ExcelDataset buildExcelDataset(String fileName){
 		validateFilename(fileName)
-		// LETS EXTRACT THE HEADER FROM THE SPREADSHEET
-		Workbook workbook = WorkbookFactory.create( new File(fileName) )
-		// Getting the Sheet at index zero
-		Sheet sheet = workbook.getSheetAt(0)
-		// Getting the first row for the header
-		Row row = sheet.getRow(0)
 
 		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName), driver: TDSExcelDriver)
 		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
-
-		// Iterate over the Header Row to build the Header fields
-		Iterator<Cell> cellIterator = row.cellIterator()
-		while ( cellIterator.hasNext() ) {
-			Cell cell = cellIterator.next()
-			String value = cell.toString()
-			dataset.field << new Field(name: value, type: Field.Type.STRING)
-		}
 
 		return dataset
 	}

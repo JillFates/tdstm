@@ -2,42 +2,48 @@ import {Component, OnChanges, Input, Output, EventEmitter, SimpleChanges} from '
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {NewsModel} from './../../model/news.model';
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'tds-news',
 	template: `
-		<div class="event-news-component">
+		<div class="event-news-component" *ngIf="getDynamicConfiguration(); let config">
 			<kendo-tabstrip>
-				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true">
+				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
-				<kendo-tabstrip-tab [title]="'Archive'">
+				<kendo-tabstrip-tab [title]="'Archive'" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
-						<div class="col-sm-5 date" (click)="onSelectedNews(item.id)">{{item.created | tdsDateTime: userTimeZone}}</div>
-						<div class="col-sm-7 description pull-left" (click)="onSelectedNews(item.id)">{{item.text}}</div>
+						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
 				</kendo-tabstrip-tab>
 			</kendo-tabstrip>
-			<tds-button-create (click)="onCreateNews()" class="btn-primary" title="Add News"></tds-button-create>
+			<tds-button-create (click)="onCreateNews()" [disabled]="!isCreateAvailable() || isDisabled" class="btn-primary" title="Add News"></tds-button-create>
 		</div>
 	`
 })
 export class NewsComponent implements OnChanges {
 	@Input() news: Array<NewsModel> = [];
+	@Input() isDisabled: Boolean = false;
 	@Output() selected: EventEmitter<number> = new EventEmitter<number>();
 	@Output() create: EventEmitter<void> = new EventEmitter<void>();
 	public archivedNews: Array<NewsModel> = [];
 	public eventNews: Array<NewsModel> = [];
 	public userTimeZone: string;
 
-	constructor(private userContextService: UserContextService) {
+	constructor(
+		private userContextService: UserContextService,
+		private permissionService: PermissionService) {
+
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				this.userTimeZone = userContext.timezone;
@@ -59,10 +65,12 @@ export class NewsComponent implements OnChanges {
 	/**
 	 * Selecting a news throw the event to notify to the host component
 	 * to open the news details
- 	 * @param {number} id  News id
+ 	 * @param {any} id  News selected
 	*/
-	public onSelectedNews(id: number): void {
-		this.selected.emit(id);
+	public onSelectedNews(news: any): void {
+		if (this.isEditAvailable()) {
+			this.selected.emit(news);
+		}
 	}
 
 	/**
@@ -72,5 +80,24 @@ export class NewsComponent implements OnChanges {
 	*/
 	public onCreateNews(): void {
 		this.create.emit();
+	}
+
+	public isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.NewsCreate);
+	}
+
+	public isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.NewsEdit);
+	}
+
+	/**
+	 * Group all the dynamic informaction required by the view in just one function
+	 * @return {any} Object with the values required dynamically by the view
+	 */
+	public getDynamicConfiguration(): any {
+		return {
+			isEditAvailable: this.isEditAvailable() ,
+			isCreateAvailable: this.isCreateAvailable()
+		}
 	}
 }

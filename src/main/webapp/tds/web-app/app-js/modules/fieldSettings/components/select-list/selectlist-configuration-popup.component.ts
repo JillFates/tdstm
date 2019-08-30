@@ -1,7 +1,7 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, Inject, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -26,7 +26,8 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 
 	public items: any[] = [];
 	public savedItems: any[] = [];
-	public newItem = '';
+	public _newItem = '';
+	private newItemValid = false;
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
 	public sortType: string;
@@ -66,7 +67,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 				if (this.field.constraints.required && indexOfBlank !== ValidationUtils.NOT_FOUND) { // If REQUIRED remove blank(empty) option
 					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === ValidationUtils.NOT_FOUND) { // If NOT REQUIRED and distinctValues have no empty option register it.
-					distinctValues.push('');
 					if (this.field.constraints.values && this.field.constraints.values.indexOf('') === ValidationUtils.NOT_FOUND) { // If it's not yet on current field values add it to items list (not deletable)
 						this.items.splice(0, 0, {deletable: false, value: ''} );
 					}
@@ -116,7 +116,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Adds a new item to the list.
 	 */
 	public onAdd(): void {
-		if (this.items.filter((i) => i.value === this.newItem).length === 0) {
+		if ( this.newItemValid ) {
 			this.items.push({
 				deletable: true,
 				value: this.newItem
@@ -206,6 +206,29 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 			}
 			return 0;
 		}
+	}
+
+	/*
+	 * oluna: I added this setter to change the newItemValid property oly when the value changes instead of
+	 * having a computed property that recalculates everytime. A better approach might be to have a catched property??
+	 */
+	@Input()
+	set newItem(value: string) {
+		this._newItem = value;
+		this.checkNewItemValid();
+	}
+
+	get newItem(): string {
+		return this._newItem;
+	}
+
+	/**
+	 * Check if the _newItem value is not Blank and is not already in the list of existing values
+	 */
+	private checkNewItemValid(): void {
+		const trimValue = this._newItem.trim();
+		this.newItemValid = (trimValue.length >= 0) &&
+			(this.items.filter((i) => i.value === trimValue).length === 0);
 	}
 
 	/**

@@ -1,9 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {EventsService} from '../../service/events.service';
 import {EventModel} from '../../model/event.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {KEYSTROKE} from '../../../../shared/model/constants';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
 	selector: `event-create`,
@@ -15,6 +18,7 @@ export class EventCreateComponent implements OnInit {
 	public assetTags: any[] = [];
 	public eventModel: EventModel = null;
 	private defaultModel = null;
+	private requiredFields = ['name'];
 
 	constructor(
 		private eventsService: EventsService,
@@ -42,6 +46,16 @@ export class EventCreateComponent implements OnInit {
 		this.eventModel = Object.assign({}, this.defaultModel, this.eventModel);
 	}
 
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
+	}
+
 	private getModel() {
 		this.eventsService.getModelForEventCreate().subscribe((result: any) => {
 			this.bundles = result.bundles;
@@ -55,7 +69,7 @@ export class EventCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
+		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
@@ -64,24 +78,22 @@ export class EventCreateComponent implements OnInit {
 		}
 	}
 
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private validateRequiredFields(model: EventModel): boolean {
-		if (!model.name) {
-			alert('Field "Name" is required.');
-			return false;
-		} else {
-			return true;
-		}
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: EventModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**

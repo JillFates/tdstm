@@ -3,7 +3,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
 import { pathOr } from 'ramda';
 import * as R from  'ramda';
-
+// Store
+import {Store} from '@ngxs/store';
+// Action
+import {SetEvent} from '../../action/event.actions';
 // Services
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
@@ -12,13 +15,12 @@ import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services
 import { EventsService } from './../../service/events.service';
 import { NewsModel, NewsDetailModel } from './../../model/news.model';
 import { EventModel, EventPlanStatus } from './../../model/event.model';
-
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
 import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
-
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
 	selector: 'event-dashboard',
@@ -36,14 +38,21 @@ export class EventDashboardComponent implements OnInit {
 	public eventPlanStatus: EventPlanStatus = new EventPlanStatus();
 	public eventDetails = null;
 	public teamTaskMatrix = [];
-	public bundleSteps = null;
+	public taskCategories = null;
+	public hasBundleSteps = false;
 
 	constructor(
+		private route: ActivatedRoute,
 		private eventsService: EventsService,
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private userContextService: UserContextService) {
+		private store: Store) {
+
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userTimeZone = userContext.timezone;
+		});
+
 	}
 
 	ngOnInit() {
@@ -54,11 +63,6 @@ export class EventDashboardComponent implements OnInit {
 	 * Call the endpoints required to populate the initial data
 	*/
 	private populateData(): void {
-		this.userContextService.getUserContext()
-		.subscribe((userContext: UserContextModel) => {
-			this.userTimeZone = userContext.timezone;
-		})
-
 		const services = [
 			this.eventsService.getEvents(),
 			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
@@ -68,10 +72,13 @@ export class EventDashboardComponent implements OnInit {
 			.subscribe((results: any[]) => {
 				const [eventList, preference] = results;
 				this.eventList = eventList;
-				this.selectedEvent = this.getDefaultEvent(preference && preference[PREFERENCES_LIST.MOVE_EVENT] || '')
+
+				let eventId = this.route.snapshot.queryParams['moveEvent'];
+				this.selectedEvent = this.getDefaultEvent(eventId ? eventId : (preference && preference[PREFERENCES_LIST.MOVE_EVENT] || ''));
 				if (this.selectedEvent) {
-					this.onSelectedEvent(this.selectedEvent.id);
+					this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 				}
+
 			});
 	}
 
@@ -88,28 +95,29 @@ export class EventDashboardComponent implements OnInit {
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
 	*/
-	public onSelectedEvent(id: number): void {
+	public onSelectedEvent(id: number, name: string): void {
+		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
+
+		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
+			.subscribe((data: any[]) => {
+				console.log(data);
+				this.taskCategories = data;
+			});
 
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
+				this.hasBundleSteps = false;
 				if (bundles.length) {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 
 					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
-						this.bundleSteps = this.eventsService.getBundleSteps(
-							statusDetails,
-							this.eventDetails.moveBundleSteps,
-							this.userTimeZone,
-							this.eventDetails.moveBundleList,
-							this.selectedEventBundle && this.selectedEventBundle.id
-						);
-
+						this.hasBundleSteps = true;
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
 						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
 						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
@@ -119,7 +127,6 @@ export class EventDashboardComponent implements OnInit {
 						this.eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
 					});
 				} else {
-					this.bundleSteps = this.eventsService.getEmptyBundleSteps();
 					this.eventPlanStatus = new EventPlanStatus();
 				}
 			});
@@ -127,14 +134,19 @@ export class EventDashboardComponent implements OnInit {
 
 	/**
 	 * On click over a news title get the news details and with that show the create/edit news views
- 	 * @param {number} id  News id
+ 	 * @param {any} news selected
 	*/
-	public onSelectedNews(id: number): void {
-		const getNewsDetail = id ? this.eventsService.getNewsDetail(id) : Observable.of(new NewsDetailModel());
+	public onSelectedNews(selectedNews: any): void {
+		const getNewsDetail = selectedNews.id ?
+			this.eventsService.getNewsDetail(selectedNews.id, selectedNews.type) : Observable.of(new NewsDetailModel());
 		getNewsDetail
 			.subscribe((news: NewsDetailModel) => {
-				if (news.commentObject) {
+				if (news.commentObject && news.commentObject.moveEvent) {
 					news.commentObject.moveEvent.id = this.selectedEvent.id;
+				}
+				news.commentType = selectedNews.type;
+				if (news.commentObject.commentType) {
+					news.commentObject.message = news.commentObject.comment;
 				}
 				this.openCreateEditNews(news)
 			})
@@ -198,34 +210,13 @@ export class EventDashboardComponent implements OnInit {
 	}
 
 	/**
-	 * On changing the bundle steps tab, call the endpoint to refresh the status details
-  	 * @param {number} selectedBundleId Current step bundle tab selected
-	*/
-	public onChangeStepsTab(selectedBundleId: number): void {
-		this.eventsService.getEventStatusDetails(selectedBundleId, this.selectedEvent.id)
-		.subscribe((statusDetails: any) => {
-			this.bundleSteps = this.eventsService.getBundleSteps(
-				statusDetails,
-				this.eventDetails.moveBundleSteps,
-				this.userTimeZone,
-				this.eventDetails.moveBundleList,
-				selectedBundleId
-			);
-		});
-	}
-
-	/**
 	 * On countdown timer timeout, call the on selected method to refresh the report
 	*/
 	public onTimeout(): void {
-		this.onSelectedEvent(this.selectedEvent.id);
+		this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 	}
 
-	/**
-	 * Determine if the current event has bundle steps
-	*/
-	public hasBundleSteps(): boolean {
-		return this.bundleSteps && this.bundleSteps.moveBundleList.length > 0;
+	public isEventSelected(): boolean {
+		return this.selectedEvent != null;
 	}
-
 }

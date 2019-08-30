@@ -37,7 +37,7 @@
                         </ng-template>
 
                         <ng-template kendoGridCellTemplate *ngIf="column.property=='name'" let-dataItem>
-                            <a style="color:#2C61AA;font-weight:bold;cursor:pointer" (click)="showEvent(dataItem.id)">{{dataItem[column.property]}}</a>
+                            <a style="color:#2C61AA;font-weight:bold;cursor:pointer" (click)="showEvent(dataItem.id, dataItem.name)">{{dataItem[column.property]}}</a>
                         </ng-template>
 
                         <ng-template kendoGridFilterCellTemplate let-filter>

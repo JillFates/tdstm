@@ -18,6 +18,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils as RSU
 import org.grails.web.json.JSONObject
 import spock.lang.Shared
@@ -127,9 +128,8 @@ class ApiActionServiceIntegrationTests extends Specification{
 				project: project
 			)
 
-			task = new AssetComment(
+			task = new Task(
 				comment: 'Test the crap out of this feature',
-				commentType: AssetCommentType.TASK,
 				assetEntity: asset,
 				project: project,
 				status: AssetCommentStatus.READY,

@@ -1,9 +1,5 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.tm.enums.domain.ValidationType
@@ -15,10 +11,14 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.project.Project
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.time.DateUtils
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
@@ -1769,6 +1769,135 @@ class ETLTransformSpec extends ETLBaseSpec {
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
 			}
-
 	}
+
+	@See('TM-12079')
+	void 'test can use GroovyCollections, Math, RandomStringUtils, RandomUtils, RegExUtils and StringUtils transformations'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,app version,url
+				12134556,Apple Inc.,1.0.0,www.apple.com
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					load 'Name' with Math.random()
+					load 'appVersion' with GroovyCollections.max([2, 4, 6])
+					load 'Description' with RandomStringUtils.randomAlphanumeric(5)
+					load 'appSource' with RandomUtils.nextDouble()
+					load 'appTech' with RegExUtils.removeAll('ABCabc123abc', 'ABC123')
+					load 'license' with StringUtils.getLevenshteinDistance('hello', 'hallo')
+				}
+			""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					assertWith(data[0], RowResult) {
+						errorCount == 0
+						assertWith(fields.assetName, FieldResult) {
+							value != null
+						}
+						assertWith(fields.appVersion, FieldResult) {
+							value == 6
+						}
+						assertWith(fields.description, FieldResult) {
+							value != null
+						}
+						assertWith(fields.appSource, FieldResult) {
+							value != null
+						}
+						assertWith(fields.appTech, FieldResult) {
+							value != null
+						}
+						assertWith(fields.license, FieldResult) {
+							value == 1
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-12079')
+	void 'test can use Math and and StringUtils transformations in transform command'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,vendor name,app version,url,reference id
+				12134556,Apple Inc.,1.0.0,www.apple,
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'application id' transform with toNumber() min(9999999) load 'Name' 
+					extract 'reference id' transform with random() load 'externalRefId' 
+					extract 'vendor name' transform with appendIfMissing('Vendor: ') load 'Vendor'
+					extract 'app version' transform with prependIfMissing('V.') load 'appVersion'
+					extract 'url' transform with appendIfMissing('.com') load 'license'
+				}
+			""".stripIndent())
+
+		then: 'Every column for every row is transformed with toDate transformation'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+
+					assertWith(data[0], RowResult) {
+						errorCount == 0
+						assertWith(fields.assetName, FieldResult) {
+							value == 12134556l
+						}
+						assertWith(fields.externalRefId, FieldResult) {
+							value != null
+						}
+						assertWith(fields.appVendor, FieldResult) {
+							value == 'Vendor: Apple Inc.'
+						}
+						assertWith(fields.appVersion, FieldResult) {
+							value == 'V.1.0.0'
+						}
+						assertWith(fields.license, FieldResult) {
+							value == 'www.apple.com'
+						}
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+
 }

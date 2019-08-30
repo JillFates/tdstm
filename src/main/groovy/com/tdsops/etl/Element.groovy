@@ -21,8 +21,9 @@ import java.text.SimpleDateFormat
  *  //
  * </pre>
  */
-@Slf4j(value='logger')
+@Slf4j(value = 'logger')
 class Element implements RangeChecker, ETLCommand {
+
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
 
@@ -39,8 +40,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * Overrides default assignation to value in case that we are assigning another Element Object
 	 * @param obj
 	 */
-	void setValue ( Object obj ) {
-		this.value = ( obj instanceof Element ) ? obj.value : obj
+	void setValue(Object obj) {
+		this.value = (obj instanceof Element) ? obj.value : obj
 	}
 
 	/**
@@ -131,10 +132,10 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 load aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
-	Element load(LocalVariableDefinition localVariableDefinition){
+	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -178,7 +179,7 @@ class Element implements RangeChecker, ETLCommand {
 	 */
 	Element initialize(String fieldName) {
 		processor.validateStack()
-		if (processor.hasSelectedDomain()){
+		if (processor.hasSelectedDomain()) {
 			this.fieldDefinition = processor.lookUpFieldDefinitionForCurrentDomain(fieldName)
 			this.init = this.value
 			this.originalValue = null
@@ -212,10 +213,10 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 init aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
-	Element init(LocalVariableDefinition localVariableDefinition){
+	Element init(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -226,10 +227,10 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	extract 1 initialize aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws {@code ETLProcessorException}
+	 * @see {@code ETLProcessorException.missingPropertyException}
 	 */
-	Element initialize(LocalVariableDefinition localVariableDefinition){
+	Element initialize(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -241,7 +242,7 @@ class Element implements RangeChecker, ETLCommand {
 	 */
 	def methodMissing(String methodName, args) {
 		// try to delegate the method to the value's class
-		if (value != null && !(value instanceof Element) ) {
+		if (value != null && !(value instanceof Element)) {
 
 			def params = []
 			params.addAll(args)
@@ -261,7 +262,7 @@ class Element implements RangeChecker, ETLCommand {
 			}
 		}
 
-		processor.debugConsole.info "Method missing: ${methodName}, args: ${args}"
+		processor?.debugConsole.info "Method missing: ${methodName}, args: ${args}"
 		throw ETLProcessorException.methodMissing(methodName, args)
 	}
 
@@ -300,28 +301,28 @@ class Element implements RangeChecker, ETLCommand {
 	 * @param params List of parameters that SHOULD contain the position (starting in 1) and the characters to Take from the String
 	 * @return the element instance that received this command
 	 */
-	Element middle(Integer...params) {
+	Element middle(Integer... params) {
 		value = transformStringObject('middle', value) {
 
-			if ( params.size() != 2 ) {
+			if (params.size() != 2) {
 				throw ETLProcessorException.invalidRange('The middle transformation requires two parameters (startAt, numOfChars)')
 			}
 
 			int position = params[0]
 			int take = params[1]
 
-			if ( position <=0 || take <= 0 ) {
+			if (position <= 0 || take <= 0) {
 				throw ETLProcessorException.invalidRange('Must use positive values greater than 0 for "middle" transform function')
 			}
 
 			int size = value.size()
-			if ( position > size ) {
+			if (position > size) {
 				return ""
 			}
 
 			int start = (position - 1)
 			int to = (start + take - 1)
-			if ( to >= size ) {
+			if (to >= size) {
 				to = size - 1
 			}
 			subListRangeCheck(start, to, size)
@@ -341,7 +342,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return the element instance that received this command
 	 */
 	Element substitute(def dictionary) {
-		if(dictionary.containsKey(value)){
+		if (dictionary.containsKey(value)) {
 			value = dictionary[value]
 		}
 		return this
@@ -434,6 +435,87 @@ class Element implements RangeChecker, ETLCommand {
 	}
 
 	/**
+	 * Transform {@code Element#value} from a String to a Long, and set the default value if value is null or blank.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toNumber()
+	 *      load ... transformation with toNumber(120)
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toNumber(Long defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			value = defaultValue
+		} else {
+			Long newValue = NumberUtil.toLong(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Number')
+			}
+		}
+		return this
+	}
+
+	/**
+	 * Transform {@code Element#value} from a string to a Float and automatically rounds to the precision specified.
+	 * If defaultValue provide and value is null or blank then it will be assigned and rounded accordingly.
+	 * If the value was already a decimal then it should be rounded.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toDecimal(2)
+	 *      load ... transformation with toDecimal(2, 12.34)
+	 * <code>
+	 * @see NumberUtil#toDoubleNumber(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toDecimal(Integer precision, Double defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			if (defaultValue) {
+				value = defaultValue.round(precision)
+			}
+
+		} else {
+			Double newValue = NumberUtil.toDoubleNumber(value)
+			if (newValue != null) {
+				value = newValue.round(precision)
+			} else {
+				addToErrors('Unable to transform value to Decimal')
+			}
+		}
+		return this
+	}
+
+	/**
+	 * Transform {@code Element#value} from a String to a Boolean, and set the default value if value is null or blank.
+	 * If the text value can not be converted to a number it should throw an exception.
+	 * <code>
+	 *      load ... transformation with toBoolean()
+	 *      load ... transformation with toBoolean(true)
+	 *      load ... transformation with toBoolean(0)
+	 *      load ... transformation with toBoolean('YES')
+	 * <code>
+	 * @see NumberUtil#toLong(java.lang.Object)
+	 * @return the element instance that received this command
+	 */
+	Element toBoolean(Boolean defaultValue = null) {
+		if (!value) {
+			// set the default value if value is null or blank
+			value = defaultValue
+		} else {
+			Boolean newValue = StringUtil.toBoolean(value)
+			if (newValue != null) {
+				value = newValue
+			} else {
+				addToErrors('Unable to transform value to Boolean')
+			}
+		}
+		return this
+	}
+	/**
 	 * Transform current value in this Element instance to a Date by attempting to use
 	 * the formats 'yyyy-mm-dd' and 'yyyy/mm/dd'.
 	 *
@@ -480,7 +562,7 @@ class Element implements RangeChecker, ETLCommand {
 				// nothing to do
 			}
 		}
-		if (! formatted) {
+		if (!formatted) {
 			addToErrors("Unable to transform value to a date with pattern(s) ${listOfFormats.join(', ')}")
 		}
 
@@ -524,7 +606,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	Element prepend(Object el) {
-		if ( el ) {
+		if (el) {
 			this.value = String.valueOf(el) + this.toString()
 		}
 
@@ -605,22 +687,22 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return the element instance that received this command
 	 */
 	Element format(String formatMask) {
-		if( ! formatMask ) {
-			switch ( value?.class ) {
-				case Date :
-						formatMask = '%1$tY-%1$tm-%1$td'
-						break
+		if (!formatMask) {
+			switch (value?.class) {
+				case Date:
+					formatMask = '%1$tY-%1$tm-%1$td'
+					break
 
-				case [Integer, Long, BigInteger] :
-						formatMask = '%,df'
-						break
+				case [Integer, Long, BigInteger]:
+					formatMask = '%,df'
+					break
 
-				case [Float, Double, BigDecimal] :
-						formatMask = '%,.2f'
-						break
+				case [Float, Double, BigDecimal]:
+					formatMask = '%,.2f'
+					break
 
 				default:
-						formatMask = '%s'
+					formatMask = '%s'
 			}
 		}
 
@@ -707,22 +789,21 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	Element set(Object variableName) {
-		if ( !(variableName instanceof String) ||
-				  processor.hasVariable(variableName) ||
-				  ! processor.binding.isValidETLVariableName(variableName)
+		if (!(variableName instanceof String) ||
+			processor.hasVariable(variableName) ||
+			!processor.binding.isValidETLVariableName(variableName)
 		) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 
-		doSet((String)variableName)
+		doSet((String) variableName)
 	}
 
 	/**
 	 * Create a local variable using variableName parameter.
 	 * It's used in following ETL script command
 	 * <pre>
-	 * 	iterate {
-	 * 	    ...
+	 * 	iterate {* 	    ...
 	 * 		extract 3 transform with lowercase() set myLocalVariable
 	 * 		.....
 	 *} </pre>
@@ -755,7 +836,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @param objects
 	 * @return current instance of Element class
 	 */
-	Element concat(String separator, Object...values){
+	Element concat(String separator, Object... values) {
 		this.value = ETLTransformation.concat(separator, this.value, values)
 		checkLoadedElement()
 		return this
@@ -795,10 +876,10 @@ class Element implements RangeChecker, ETLCommand {
 	 * 	load 'description' with myVar when populated
 	 * </code>
 	 * @param reservedWord
-	 * @return current {@code Element} instance
+	 * @return current{@code Element} instance
 	 */
-	Element when(ReservedWord reservedWord){
-		if(reservedWord != ReservedWord.populated){
+	Element when(ReservedWord reservedWord) {
+		if (reservedWord != ReservedWord.populated) {
 			throw ETLProcessorException.incorrectWhenCommandStructure()
 		}
 
@@ -810,16 +891,14 @@ class Element implements RangeChecker, ETLCommand {
 	/**
 	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
 	 * <code>
-	 *  extract 1 load 'description' when { it > 1000 }
-	 *     ...
-	 * 	load 'description' with myVar when { it > 1000 }
-	 * </code>
+	 *  extract 1 load 'description' when { it > 1000 }*     ...
+	 * 	load 'description' with myVar when { it > 1000 }* </code>
 	 * @param closure Closure to determine if it is necessary
 	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
-	 * @return current {@code Element} instance
+	 * @return current{@code Element} instance
 	 */
-	Element when(Closure closure){
-		if(!closure(value)){
+	Element when(Closure closure) {
+		if (!closure(value)) {
 			processor.removeElement(this)
 		}
 		return this
@@ -831,7 +910,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @param value
 	 * @return an new instance of Element class
 	 */
-	Element copy(Object value){
+	Element copy(Object value) {
 		return new Element(
 			domain: this.domain,
 			value: value,
@@ -853,7 +932,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	def defaultValue(Object value) {
-		if( ! isValueSet() ) {
+		if (!isValueSet()) {
 			this.setValue(value)
 		}
 
@@ -865,9 +944,9 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	private boolean isValueSet() {
-		return ! (
-				  value == null ||
-				  (value instanceof CharSequence) && value.trim().size() == 0
+		return !(
+			value == null ||
+				(value instanceof CharSequence) && value.trim().size() == 0
 		)
 	}
 
@@ -890,12 +969,254 @@ class Element implements RangeChecker, ETLCommand {
 	 *
 	 * @return the joined string
 	 */
-	Element append(String separator, Object...values){
+	Element append(String separator, Object... values) {
 		this.value = ETLTransformation.append(separator, this.value, values)
 		checkLoadedElement()
 		return this
 	}
 
+	/**
+	 * Perform {@code Math#round} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with round() load 'CPU Load'
+	 * </code>
+	 *
+	 * @return current instance of {@code Element}
+	 */
+	Element round() {
+
+		if (!this.value) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply round transformation on non numeric value')
+		} else {
+			this.value = Math.round(this.value)
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code Math#abs} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with abs() load 'CPU Load'
+	 * </code>
+	 *
+	 * @return current instance of {@code Element}
+	 */
+	Element abs() {
+
+		if (!this.value) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply abs transformation on non numeric value')
+		} else {
+			this.value = Math.abs(this.value)
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code Math#ceil} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with ceil() load 'CPU Load'
+	 * </code>
+	 *
+	 * @return current instance of {@code Element}
+	 */
+	Element ceil() {
+
+		if (!this.value) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply ceil transformation on non numeric value')
+		} else {
+			this.value = Math.ceil(this.value)
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code StringUtils#appendIfMissing} over {@code Element#value}
+	 * <code>
+	 * extract 'url' transform with appendIfMissing('com')
+	 * </code>
+	 *
+	 * @param otherValue a {@code String} value
+	 * @return current instance of {@code Element}
+	 */
+	Element appendIfMissing(String otherValue) {
+
+		if (this.value instanceof String) {
+			this.value = StringUtils.appendIfMissing(this.value as String, otherValue)
+		}
+		checkLoadedElement()
+		return this
+	}
+
+
+	/**
+	 * Perform {@code StringUtils#appendIfMissingIgnoreCase} over {@code Element#value}
+	 * <code>
+	 * extract 'url' transform with appendIfMissing('com')
+	 * </code>
+	 *
+	 * @param otherValue a {@code String} value
+	 * @return current instance of {@code Element}
+	 * @see StringUtils#appendIfMissingIgnoreCase(java.lang.String, java.lang.CharSequence, java.lang.CharSequence ...)
+	 */
+	Element appendIfMissingIgnoreCase(String otherValue) {
+
+		if (this.value instanceof String) {
+			this.value = StringUtils.appendIfMissingIgnoreCase(this.value as String, otherValue)
+		}
+		checkLoadedElement()
+		return this
+	}
+	/**
+	 * Perform {@code StringUtils#prependIfMissing} over {@code Element#value}
+	 * <code>
+	 * extract 'url' transform with appendIfMissing('com')
+	 * </code>
+	 *
+	 * @param otherValue a {@code String} value
+	 * @return current instance of {@code Element}
+	 * @see StringUtils#prependIfMissing(java.lang.String, java.lang.CharSequence, boolean, java.lang.CharSequence ...)
+	 */
+	Element prependIfMissing(String otherValue) {
+
+		if (this.value instanceof String) {
+			this.value = StringUtils.prependIfMissing(this.value as String, otherValue)
+		}
+		checkLoadedElement()
+		return this
+	}
+	/**
+	 * Perform {@code StringUtils#prependIfMissingIgnoreCase} over {@code Element#value}
+	 * <code>
+	 * extract 'url' transform with appendIfMissing('com')
+	 * </code>
+	 *
+	 * @param otherValue a {@code String} value
+	 * @return current instance of {@code Element}
+	 * @see StringUtils#prependIfMissingIgnoreCase(java.lang.String, java.lang.CharSequence, boolean, java.lang.CharSequence ...)
+	 */
+	Element prependIfMissingIgnoreCase(String otherValue) {
+
+		if (this.value instanceof String) {
+			this.value = StringUtils.prependIfMissingIgnoreCase(this.value as String, otherValue)
+		}
+		checkLoadedElement()
+		return this
+	}
+	/**
+	 * Perform {@code Math#floor} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with floor() load 'CPU Load'
+	 * </code>
+	 *
+	 * @return current instance of {@code Element}
+	 */
+	Element floor() {
+
+		if (!this.value) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply floor transformation on non numeric value')
+		} else {
+			this.value = Math.floor(this.value)
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code Math#min} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with min(10) load 'CPU Load'
+	 * </code>
+	 *
+	 * @param otherValue
+	 * @return current instance of {@code Element}
+	 */
+	Element min(Number otherValue) {
+
+		if (!this.value || !otherValue) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply min transformation on non numeric value')
+		} else {
+			Double a = this.value as Double
+			Double b = otherValue as Double
+			Double min = Math.min(a, b)
+			if (min == b) {
+				this.value = otherValue
+			}
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code Math#max} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with max(10) load 'CPU Load'
+	 * </code>
+	 *
+	 * @param otherValue
+	 * @return current instance of {@code Element}
+	 */
+	Element max(Number otherValue) {
+
+		if (!this.value || !otherValue) {
+			return this
+		}
+
+		if (!Number.isAssignableFrom(this.value.class)) {
+			addToErrors('Unable to apply min transformation on non numeric value')
+		} else {
+			Double a = this.value as Double
+			Double b = otherValue as Double
+			Double max = Math.max(a, b)
+			if (max == b) {
+				this.value = otherValue
+			}
+		}
+
+		checkLoadedElement()
+		return this
+	}
+
+	/**
+	 * Perform {@code Math#random} over {@code Element#value}
+	 * <code>
+	 * extract 'CPU Utilization' transform with random() load 'CPU Load'
+	 * </code>
+	 *
+	 * @return current instance of {@code Element}
+	 */
+	Element random() {
+		this.value = this.value ? Math.random() : null
+		checkLoadedElement()
+		return this
+	}
 	/**
 	 * Check if the current element instance was started using load command,
 	 * and save it in ETLProcessorResult
@@ -904,8 +1225,8 @@ class Element implements RangeChecker, ETLCommand {
 	 * </pre>
 	 * @see Element#loadedElement
 	 */
-	private void checkLoadedElement(){
-		if(loadedElement){
+	private void checkLoadedElement() {
+		if (loadedElement) {
 			this.originalValue = this.value
 			processor.addElementLoaded(this)
 			loadedElement = false
@@ -916,9 +1237,9 @@ class Element implements RangeChecker, ETLCommand {
 	 * Perform the evaluation of the value parameter and update current element value and original value.
 	 * @param value - can be a variable, string, DOMAIN..., SOURCE... or a function like concat(....)
 	 * <pre>
-	 *		load 'Name' transform with append(',', 'foo', 'bar')
-	 *		initialize 'Name' transform with append(' - ', envVar)
-	 *		extract 'Name' transform with append(' - ', envVar) load 'Name'
+	 * 		load 'Name' transform with append(',', 'foo', 'bar')
+	 * 		initialize 'Name' transform with append(' - ', envVar)
+	 * 		extract 'Name' transform with append(' - ', envVar) load 'Name'
 	 * </pre>
 	 * @return current Element updated
 	 */
@@ -932,11 +1253,10 @@ class Element implements RangeChecker, ETLCommand {
 	/**
 	 * Validates if an ETL script is using incorrectly variable names
 	 * <pre>
-	 *		load 'Name' with aBogusVariableName
-	 *		extract 1 load 'Name' with aBogusVariableName
+	 * 		load 'Name' with aBogusVariableName
+	 * 		extract 1 load 'Name' with aBogusVariableName
 	 * </pre>
-	 * @param localVariableDefinition an instance of @{code LocalVariableDefinition}
-	 * @throws ETLProcessorException
+	 * @param localVariableDefinition an instance of @{code LocalVariableDefinition}* @throws ETLProcessorException
 	 */
 	Element with(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
@@ -946,29 +1266,27 @@ class Element implements RangeChecker, ETLCommand {
 	 * Overriding Equals method for this command in an ETL script.
 	 * <code>
 	 *  .....
-	 *  if (myVar == 'Cool Stuff') {
-	 *      .....
-	 *	}
-	 * </code>
+	 *  if (myVar == 'Cool Stuff') {*      .....
+	 *}* </code>
 	 * @param otherObject
 	 * @return
 	 */
 	boolean equals(otherObject) {
-		if(this.is(otherObject)){
+		if (this.is(otherObject)) {
 			return true
 		}
 
-		if(String.isInstance(otherObject)){
+		if (String.isInstance(otherObject)) {
 			return value.equals(otherObject)
 		}
 
-		if(getClass() != otherObject.class){
+		if (getClass() != otherObject.class) {
 			return false
 		}
 
-		Element element = (Element)otherObject
+		Element element = (Element) otherObject
 
-		if(value != element.value){
+		if (value != element.value) {
 			return false
 		}
 
@@ -1018,10 +1336,10 @@ class Element implements RangeChecker, ETLCommand {
 	String toString() {
 		String retVal = null
 
-		if ( value != null ) {
+		if (value != null) {
 			switch (value.class) {
 				case Date:
-					retVal = ((Date)value).format(DATETIME_FORMAT)
+					retVal = ((Date) value).format(DATETIME_FORMAT)
 					break
 
 				case Number:

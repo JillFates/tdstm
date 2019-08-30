@@ -2,16 +2,19 @@ package net.transitionmanager.action
 
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.connector.AbstractConnector
+import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidConfigurationException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -21,6 +24,7 @@ import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ReactionScriptCode
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
@@ -28,6 +32,7 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.grails.web.json.JSONObject
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.multipart.MultipartFile
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
@@ -159,7 +164,9 @@ class TaskActionService implements ServiceMethods {
 		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
-		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, false)
+
+		AssetEntity asset = task.assetEntity
+		AssetFacade assetFacade = assetService.getAssetFacade(asset, false)
 
 		List<String> filenames = datafile.collect { MultipartFile file ->
 			fileSystemService.writeFile(file, fileSystemService.TMD_PREFIX)
@@ -177,22 +184,32 @@ class TaskActionService implements ServiceMethods {
 		try {
 			apiActionService.invokeReactionScript(code, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
 		} catch (Exception e) {
-
+			log.info('Reaction script invoke error. ', e)
 			if (code == ReactionScriptCode.ERROR) {
 				taskFacade.error("$code script failure: ${e.message}")
 			} else {
-
 				try {
 					script = reactionScripts[ReactionScriptCode.ERROR.name()]
 					apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
 				} catch (Exception ex) {
 					taskFacade.error("$code script failure: ${ex.message}")
 				}
-
 			}
 		} finally {
 			// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 			ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
+		}
+
+		// if asset facade is not null and task as an asset entity
+		// let's perform asset validation errors to inform the user about
+		// potential hidden errors during reaction scripts invokation
+		if (assetFacade && asset) {
+			if (!asset.validate()) {
+				String errorNote = 'Validation failed while attempting to update the following field(s): ' +
+						GormUtil.allErrorsString(asset)
+				taskFacade.error(errorNote)
+				asset.discard()
+			}
 		}
 	}
 
@@ -319,6 +336,52 @@ class TaskActionService implements ServiceMethods {
 			throwException(InvalidParamException, 'apiAction.task.message.actionUnableToReset', 'Unable to reset action due to task status or other circumstances')
 		}
 		return task
+	}
+
+	/**
+	 * This looks up the details of an api action, including parameters, and script, if applicable.
+	 *
+	 * @param taskId The task to look up and API action for.
+	 * @param project The project to use to look up the API action.
+	 *
+	 * @return A map of API action details including:
+	 *    name,
+	 *    script,
+	 *    isRemote,
+	 *    type,
+	 *    connector(name),
+	 *    method,
+	 *    description,
+	 *    methodParams,
+	 *    methodParamsValues
+	 */
+	Map actionLookup(Long taskId, Project project) {
+		AssetComment assetComment = AssetComment.findByIdAndProject(taskId, project)
+		if (!assetComment) {
+			throw new EmptyResultException("Task $taskId not found.")
+		}
+
+		if (assetComment.apiAction) {
+			ApiAction apiAction = assetComment.apiAction
+			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
+
+			List<Map> methodParamsList = apiAction.methodParamsList
+			methodParamsList = taskService.fillLabels(project, methodParamsList)
+
+			return [
+				name              : apiAction.name,
+				script            : renderScript(apiAction.script, assetComment),
+				isRemote          : apiAction.isRemote,
+				type              : apiAction.actionType.type,
+				connector         : connector?.name,  //adding the ? so that I can unit test this.
+				method            : apiAction.connectorMethod,
+				description       : apiAction?.description,
+				methodParams      : methodParamsList,
+				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
+			]
+		} else {
+			throw new AccessDeniedException("Action doesn't exist for users project.")
+		}
 	}
 
 }

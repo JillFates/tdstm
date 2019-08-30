@@ -25,6 +25,7 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.RoleType
 import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
@@ -428,12 +429,12 @@ class MoveEventService implements ServiceMethods {
 			Font projectNameFont = book.createFont()
 			projectNameFont.fontHeightInPoints = (short)14
 			projectNameFont.fontName = 'Arial'
-			projectNameFont.boldweight = Font.BOLDWEIGHT_BOLD
+			projectNameFont.setBold(true)
 
 			CellStyle projectNameCellStyle = book.createCellStyle()
 			projectNameCellStyle.font = projectNameFont
 			projectNameCellStyle.fillBackgroundColor = IndexedColors.SEA_GREEN.index
-			projectNameCellStyle.fillPattern = CellStyle.SOLID_FOREGROUND
+			projectNameCellStyle.fillPattern = FillPatternType.SOLID_FOREGROUND
 
 			WorkbookUtil.addCell(summarySheet, 1, 1, currentProject.name)
 			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
@@ -542,4 +543,44 @@ class MoveEventService implements ServiceMethods {
 
 		return moveBundleSteps
 	}
+
+
+	/**
+	 * Find different stats for the given event, grouped by category.
+	 * @param project
+	 * @param moveEventId
+	 * @return a list with the cor
+	 */
+	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
+		// Fetch the corresponding MoveEvent and throw an exception if not found.
+		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
+		// Query the database for the min/max dates for tasks in the event grouped by category.
+		List taskCategoriesStatsList = AssetComment.createCriteria().list {
+			eq('moveEvent', moveEvent)
+			projections {
+				groupProperty('category')
+				min('actStart')
+				max('dateResolved')
+				min('estStart')
+				max('estFinish')
+			}
+		}
+
+		List<Map> stats = []
+		taskCategoriesStatsList.each { categoryStats ->
+			// Only add to the results if any of the dates has values
+			if (categoryStats[1] || categoryStats[2] || categoryStats[3] || categoryStats[4]) {
+				stats << [
+					"category": categoryStats[0],
+					"actStart": categoryStats[1],
+					"actFinish": categoryStats[2],
+					"estStart": categoryStats[3],
+					"estFinish": categoryStats[4],
+				]
+			}
+		}
+
+		return stats
+	}
+
 }

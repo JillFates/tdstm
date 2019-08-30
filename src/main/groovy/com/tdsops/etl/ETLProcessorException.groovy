@@ -268,5 +268,9 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException extractRequiresNameReadLabelsFirst() {
         new ETLProcessorException("Extract by name requires that 'read labels' is performed first")
     }
+
+    static ETLProcessorException invalidTransformationOnNotNumericValue(Object value) {
+        new ETLProcessorException("Invalid transformation on not numeric value: $value")
+    }
 }
 

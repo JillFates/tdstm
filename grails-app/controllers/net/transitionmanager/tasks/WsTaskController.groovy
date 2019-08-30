@@ -29,7 +29,6 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.QzSignService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-
 /**
  * Handles WS calls of the TaskService.
  *
@@ -363,16 +362,19 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     def getInfoForActionBar(Long taskId) {
         Project project = getProjectForWs()
         AssetComment task = GormUtil.findInProject(project, AssetComment, taskId, true)
+        Map<String, ?> invokeActionDetails = task.getInvokeActionButtonDetails()
         renderAsJson(
                 apiActionId: task.apiAction?.id,
                 apiActionInvokedAt: task.apiActionInvokedAt,
                 apiActionCompletedAt: task.apiActionCompletedAt,
+                invokeActionDetails: invokeActionDetails,
                 assignedTo: task.assignedTo?.id,
                 predecessorsCount: task.taskDependencies.size(),
                 successorsCount: TaskDependency.countByPredecessor(task),
                 category: task.category
         )
     }
+
 
     /**
      * Return a list with all the AssetCommentCategory values.
@@ -381,4 +383,27 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
     def assetCommentCategories() {
         renderSuccessJson(AssetCommentCategory.list)
     }
+
+	/**
+	 * Looks up the API action and provides it's details as a JSON map.
+	 *
+	 * @param taskId The id of the task to use to look up the API action details.
+	 *
+	 * @return A JSON map containing the API action details:
+	 *    name,
+	 *    script,
+	 *    isRemote,
+	 *    type,
+	 *    connector(name),
+	 *    method,
+	 *    description,
+	 *    methodParams,
+	 *    methodParamsValues
+	 */
+	@HasPermission(Permission.TaskView)
+	def actionLookUp(Long taskId) {
+		Project project = securityService.userCurrentProject
+		render view: 'actionLookUp', model: [apiAction: taskActionService.actionLookup(taskId, project)]
+	}
+
 }

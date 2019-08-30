@@ -16,15 +16,14 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
-import {DeviceModel} from '../../../assetExplorer/components/device/model-device/model/device-model.model';
-import {ModelDeviceShowComponent} from '../../../assetExplorer/components/device/model-device/components/model-device-show/model-device-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskCreateComponent} from '../create/task-create.component';
+import { UserContextService } from '../../../auth/service/user-context.service';
+import { UserContextModel } from '../../../auth/model/user-context.model';
 
 @Component({
 	selector: `task-detail`,
@@ -52,6 +51,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public model: any = {};
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
+	private userContext: UserContextModel;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -62,69 +62,28 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private windowService: WindowService,
-		private notifierService: NotifierService) {
+		private notifierService: NotifierService,
+		private userContextService: UserContextService) {
 
 		super('#task-detail-component');
 		this.modalOptions = { isResizable: true, isCentered: true };
+		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 
 	ngOnInit() {
 		this.hasChanges = false;
 		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-		this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
-
+		if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+			this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+		} else {
+			this.currentUserId = this.userContext.user.id;
+		}
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-	}
-
-	/**
-	 * Based upon current task status determines which options to show
-	 */
-	getShowTaskActionsOptions(): TaskActionsOptions {
-		const options = {
-			showDone: false,
-			showStart: false,
-			showAssignToMe: false,
-			showNeighborhood: false,
-			invoke: false,
-			showReset: false
-		};
-
-		if (!this.model) {
-			return options;
-		}
-
-		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
-		const predecessorList = this.model && this.model.predecessorList || [];
-		const successorList = this.model && this.model.successorList || [];
-
-		options.showDone = this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
-
-		options.showStart = this.model.status &&
-			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
-
-		options.showAssignToMe = this.currentUserId !== assignedTo &&
-			this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
-				.indexOf(this.model.status) >= 0;
-
-		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
-
-		options.invoke =
-			this.model.apiAction &&
-			this.model.apiAction.id &&
-			!this.model.apiActionInvokedAt &&
-			this.model.status &&
-			[
-				this.modelHelper.STATUS.READY,
-				this.modelHelper.STATUS.STARTED
-			].indexOf(this.model.status) >= 0;
-
-		options.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
-		return options;
 	}
 
 	/**
@@ -166,7 +125,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 								this.model.assetClass = assetClass;
 							}
 						}
-					})
+					});
 			});
 	}
 

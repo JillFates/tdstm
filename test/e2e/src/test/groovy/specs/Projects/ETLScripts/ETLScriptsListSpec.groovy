@@ -8,6 +8,8 @@ import utils.CommonActions
 import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ETLScriptsListSpec extends GebReportingSpec{
 
@@ -22,6 +24,8 @@ class ETLScriptsListSpec extends GebReportingSpec{
     static firstDSInformation
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

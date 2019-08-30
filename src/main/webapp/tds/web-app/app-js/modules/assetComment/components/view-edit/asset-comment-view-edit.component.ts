@@ -6,6 +6,8 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -22,18 +24,24 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	private dataSignature: string;
 
 	constructor(
+		private translate: TranslatePipe,
 		public assetCommentModel: AssetCommentModel,
 		public userPreferenceService: PreferenceService,
 		public taskManagerService: TaskService,
 		public assetExplorerService: AssetExplorerService,
 		private translatePipe: TranslatePipe,
-		public promptService: UIPromptService) {
+		public promptService: UIPromptService,
+		private permissionService: PermissionService) {
 		super('#asset-comment-view-edit-component');
 	}
 
 	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-		this.loadCommentCategories();
+		// ModalType.VIEW doesn't need the categories,
+		// in fact we need not to load them in that case for permission issues
+		if (this.assetCommentModel.modal.type !== ModalType.VIEW) {
+			this.loadCommentCategories();
+		}
 	}
 
 	/**
@@ -61,8 +69,8 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
-		this.assetCommentModel.modal.title = 'Edit Comment';
 		this.assetCommentModel.modal.type = ModalType.EDIT;
+		this.loadCommentCategories();
 	}
 
 	protected onSave(): void {
@@ -118,5 +126,34 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		} else {
 			this.dismiss();
 		}
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ModalType} modalType
+	 * @returns {string}
+	 */
+	getModalTitle(modalType: ModalType): string {
+		if (modalType === ModalType.EDIT) {
+			return this.translate.transform('COMMENT.EDIT_COMMENT');
+		}
+
+		if (modalType === ModalType.CREATE) {
+			return this.translate.transform('COMMENT.CREATE_COMMENT');
+		}
+
+		if (modalType === ModalType.VIEW) {
+			return this.translate.transform('COMMENT.SHOW_COMMENT');
+		}
+
+		return '';
+	}
+
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
 	}
 }

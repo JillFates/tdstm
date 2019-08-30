@@ -7,6 +7,8 @@ import {DependencyChange, DependencyType} from './model/asset-dependency.model';
 import {BulkActions} from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'asset-dependency',
@@ -98,7 +100,8 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		@Inject('ASSET_DEP_MODEL') public assetDependency: any,
 		private assetService: DependecyService,
 		private promptService: UIPromptService,
-		private translatePipe: TranslatePipe) {
+		private translatePipe: TranslatePipe,
+		private permissionService: PermissionService) {
 		super('#assetDependency');
 
 		this.isEditing = false;
@@ -257,4 +260,13 @@ export class AssetDependencyComponent extends UIExtraDialog {
 					message, this.translatePipe.transform('GLOBAL.CONFIRM'),
 					this.translatePipe.transform('GLOBAL.CANCEL'));
 	}
+
+	public isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetDependencyEdit);
+	}
+
+	public isDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetDependencyDelete);
+	}
+
 }

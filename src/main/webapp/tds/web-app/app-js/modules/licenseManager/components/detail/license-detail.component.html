@@ -1,7 +1,7 @@
 <div tds-autofocus class="modal-content data-script-view-edit-component" >
 	<div class="modal-header">
 		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-		<h4 class="modal-title">{{ 'LICENSE.LICENSE_DETAIL' | translate }}</h4>
+		<h4 class="modal-title">{{ (editMode ? 'LICENSE.LICENSE_EDIT' : 'LICENSE.LICENSE_DETAIL') | translate }}</h4>
 	</div>
 	<div class="modal-body">
 		<form name="licenseRequestForm" role="form" data-toggle="validator" #licenseEditForm='ngForm' class="form-horizontal left-alignment">
@@ -54,7 +54,7 @@
 					<div class="col-sm-5">
 						<div class="form-group">
 							<label class="col-sm-4 control-label">Reporting: </label>
-							<div class="col-sm-8">
+							<div class="col-sm-8 contains-checkbox">
 								<input type="checkbox" name="collectMetrics" [(ngModel)]="licenseModel.collectMetrics" [checked]="licenseModel.collectMetrics" [disabled]="!editMode"/>
 							</div>
 						</div>

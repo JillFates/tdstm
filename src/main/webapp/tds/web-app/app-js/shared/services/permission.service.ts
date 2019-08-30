@@ -20,7 +20,6 @@ export class PermissionService {
 
 	private permissionUrl = '../ws/security/permissions';
 	private permissionsList = new BehaviorSubject([]);
-	private permissions = this.permissionsList.asObservable();
 
 	/**
 	 * @param http
@@ -47,7 +46,7 @@ export class PermissionService {
 				return response.data;
 			}).catch((error: any) => Observable.throw(error || 'Server error'));
 		}
-		return Observable.from(this.permissions);
+		return Observable.of(this.permissionsList);
 	}
 
 	/**

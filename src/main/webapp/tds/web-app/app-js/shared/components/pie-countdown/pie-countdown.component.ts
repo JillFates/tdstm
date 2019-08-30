@@ -8,7 +8,10 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<span *ngIf="!hideRefresh" class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="notifyTimeout()"></span>
+				<span *ngIf="!hideRefresh"
+							class="glyphicon glyphicon-refresh refresh"
+							aria-hidden="true"
+							(click)="onManualUpdate()"></span>
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
@@ -16,13 +19,16 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 					(valueChange)="onSelectedTimerOption($event)"
 					[textField]="'description'">
 				</kendo-dropdownlist>
-				<div class="pie-countdown-timer" [ngClass]="getTimerClass()"></div>
+				<div *ngIf="selectedTimerOption && selectedTimerOption.seconds > 0"
+						 class="pie-countdown-timer"
+						 [ngClass]="getTimerClass()"></div>
 			</div>
 		</div>
 	`
 })
 export class PieCountdownComponent implements OnInit {
 	@Output() timeout: EventEmitter<void> = new EventEmitter<void>();
+	@Output() valueChange: EventEmitter<any> = new EventEmitter<any>();
 	@Input() refreshEverySeconds = 0;
 	@Input() hideRefresh = false;
 	@Input() refreshPreference: string;
@@ -58,20 +64,21 @@ export class PieCountdownComponent implements OnInit {
 					seconds: parseInt(preferences[refreshPref] || '0', 10),
 					description: ''
 				};
-				this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
+				this.setCurrentInterval(this.selectedTimerOption.seconds);
+				this.valueChange.emit(this.selectedTimerOption);
 			});
 	}
 
 	/**
 	 * Set the current interval function based on the current selected unit time
- 	 * @param {number} milliseconds Milliseconds value
+ 	 * @param {number} seconds Seconds value
 	*/
-	private setCurrentInterval(milliseconds: number): void {
+	private setCurrentInterval(seconds: number): void {
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
-		if (milliseconds) {
-			this.interval =  setInterval(() => this.notifyTimeout(), milliseconds);
+		if (seconds) {
+			this.interval =  setInterval(() => this.notifyTimeout(), seconds * 1000);
 		}
 	}
 
@@ -89,9 +96,10 @@ export class PieCountdownComponent implements OnInit {
 				this.selectedTimerOption = {seconds : 0, description: ''};
 				setTimeout(() => {
 					this.selectedTimerOption = timerOption;
-					this.setCurrentInterval(this.selectedTimerOption.seconds * 1000);
+					this.setCurrentInterval(this.selectedTimerOption.seconds);
 				}, 0)
 			});
+		this.valueChange.emit(timerOption);
 	}
 
 	/**
@@ -109,5 +117,18 @@ export class PieCountdownComponent implements OnInit {
 	*/
 	notifyTimeout(): void {
 		this.timeout.emit();
+	}
+
+	/**
+	 * Handle update started by the user
+	 * Grab the reference to the current refresh setting, reset it and restore the reference
+	*/
+	onManualUpdate() {
+		const currentSelected = this.selectedTimerOption;
+		this.onSelectedTimerOption(this.timerOptions[0]);
+		setTimeout(() => {
+			this.onSelectedTimerOption(currentSelected);
+			this.notifyTimeout();
+		}, 100);
 	}
 }

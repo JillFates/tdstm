@@ -217,7 +217,9 @@ class TaskService implements ServiceMethods {
 			t.api_action_id AS apiActionId,
 			t.api_action_invoked_at AS apiActionInvokedAt,
 			t.api_action_completed_at AS apiActionCompletedAt,
-			aa.action_type AS apiActionType
+			aa.action_type AS apiActionType,
+			aa.name as apiActionName, 
+			aa.description as apiActionDescription
 			""")
 
 		// Add in the Sort Scoring Algorithm into the SQL if we're going to return a list
@@ -524,13 +526,16 @@ class TaskService implements ServiceMethods {
 
 			// Attempting to invoke a local action remotely?
 			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
-				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attepted to invoke a local action as remote, which is not allowed')
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attempted to invoke a local action as remote, which is not allowed')
 			}
 
 			// Make sure the use has permission to invoke the action
-			if ( !securityService.hasPermission(whom, Permission.ActionInvoke) ||
-				( ! invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false)) ) {
-				throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+			// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+			if (!whom.isSystemUser()) {
+				if (!securityService.hasPermission(whom, Permission.ActionInvoke) ||
+						(!invokingLocally && !securityService.hasPermission(whom, Permission.ActionRemoteAllowed, false))) {
+					throwException(ApiActionException, 'apiAction.task.message.noPermission', 'Do not have proper permission to invoke actions')
+				}
 			}
 
 			// Prevent action from occuring if the reaction scripts are invalid
@@ -600,7 +605,10 @@ class TaskService implements ServiceMethods {
 			throw new EmptyResultException('Task was not found')
 		}
 		// Validate that the user has access to the project associated with the task
-		securityService.hasAccessToProject(task.project, currentPerson.userLogin)
+		// by pass this check if currentPerson is automatic (used to invoke action from cron job)
+		if (currentPerson && !currentPerson.isSystemUser()) {
+			securityService.hasAccessToProject(task.project, currentPerson.userLogin)
+		}
 
 		return task
 	}
@@ -660,7 +668,7 @@ class TaskService implements ServiceMethods {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
-				task = invokeLocalAction(task, whom)
+				task = invokeLocalAction(task.id, whom)
 				status = task.status
 			}
 		}
@@ -739,6 +747,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
+				task.percentageComplete = 100
 				addNote(task, whom, "Task was Completed")
 				break
 
@@ -5974,6 +5983,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				break
 			case "event": result = task.moveEvent?.name; break
 			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
 				result = result instanceof String ? result : result.toString()
