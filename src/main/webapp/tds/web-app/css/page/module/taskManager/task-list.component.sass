@@ -22,6 +22,23 @@ task-list
   .task-grid
     margin-top:  10px
     height:  80vh
+    .k-grid-content
+      .k-hierarchy-cell
+        > .k-icon
+          height: unset
+          padding: 0
+          &.k-plus:before
+            content: '\e014'
+          &.k-minus:before
+            content: '\e015'
+
+      tr td
+        padding-top: 0px
+        padding-bottom: 0px
+        text-overflow: ellipsis
+        white-space: nowrap
+        line-height: 3px
+
     .k-grid-toolbar
       button
         margin-right:  5px
