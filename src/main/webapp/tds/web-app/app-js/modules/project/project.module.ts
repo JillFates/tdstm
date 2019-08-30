@@ -2,6 +2,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
@@ -10,6 +11,7 @@ import {GridModule} from '@progress/kendo-angular-grid';
 import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
+import {KendoFileUploadInterceptor} from '../../shared/providers/kendo-file-upload.interceptor';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {ProjectListComponent} from './components/list/project-list.component';
@@ -46,7 +48,12 @@ import {UploadModule} from '@progress/kendo-angular-upload';
 		ProjectResolveService,
 		ModuleResolveService,
 		// Services
-		ProjectService
+		ProjectService,
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: KendoFileUploadInterceptor,
+			multi: true
+		}
 	],
 	exports: [
 		ProjectListComponent,

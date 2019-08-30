@@ -18,7 +18,12 @@ import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../mod
 import {AlertType} from '../model/alert.model';
 // Service
 import {NotifierService} from '../services/notifier.service';
-import {FILE_SYSTEM_URL, ETL_SCRIPT_UPLOAD_URL, ASSET_IMPORT_UPLOAD_URL} from '../services/kendo-file-handler.service';
+import {
+	FILE_SYSTEM_URL,
+	ETL_SCRIPT_UPLOAD_URL,
+	ASSET_IMPORT_UPLOAD_URL,
+	IMAGE_UPLOAD_URL
+} from '../services/kendo-file-handler.service';
 import {Router} from '@angular/router';
 import {WindowService} from '../services/window.service';
 // Other
@@ -46,7 +51,8 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 			request.url === FILE_UPLOAD_REMOVE_URL ||
 			request.url === FILE_SYSTEM_URL ||
 			request.url === ETL_SCRIPT_UPLOAD_URL ||
-			request.url === ASSET_IMPORT_UPLOAD_URL) {
+			request.url === ASSET_IMPORT_UPLOAD_URL ||
+			request.url === IMAGE_UPLOAD_URL) {
 			// Continue its flows so it can be catch by another Interceptor
 			return next.handle(request);
 		}

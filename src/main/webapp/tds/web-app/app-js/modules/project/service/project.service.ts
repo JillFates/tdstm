@@ -69,6 +69,14 @@ export class ProjectService {
 				.catch((error: any) => error);
 	}
 
+	uploadProjectLogo(filename: string): Observable<any> {
+		return this.http.post(`../ws/fileSystem/uploadImageFile/${filename}`, null)
+			.map((response: any) => {
+				return response;
+			})
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * Based on provided column, update the structure which holds the current selected filters
 	 * @param {any} column: Column to filter

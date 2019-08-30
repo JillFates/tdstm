@@ -63,7 +63,7 @@ export class ProjectCreateComponent implements OnInit {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
 			maxFileSize: 5000000
 		};
-		this.file.uploadSaveUrl = '/tdstm/ws/fileSystem/uploadImageFile'
+		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 	}
 
 	private getModel() {
@@ -114,6 +114,7 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public onUploadFile(e: UploadEvent): void {
+		e.headers.set('Content-Type', 'multipart/form-data')
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
@@ -128,6 +129,7 @@ export class ProjectCreateComponent implements OnInit {
 			let filename = e.files[0].name;
 			this.fetchResult = { status: 'success', filename: filename };
 			this.projectModel.projectLogo = e.files[0].rawFile;
+			this.projectService.uploadProjectLogo(filename);
 		} else {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
