@@ -43,10 +43,10 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
-		private activeDialog: UIActiveDialogService,
+		public activeDialog: UIActiveDialogService,
 		public translate: TranslatePipe,
 		public prompt: UIPromptService) {
-		super(prompt, translate);
+		super(activeDialog, prompt, translate);
 	}
 
 	ngOnInit() {

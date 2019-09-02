@@ -4,6 +4,7 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'min-max-configuration-popup',
@@ -12,18 +13,18 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 })
 
 export class MinMaxConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
+	@ViewChild('templateForm') protected templateForm: NgForm;
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;
-	private hasChanges: boolean;
 
 	constructor(
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
 		public prompt: UIPromptService,
 		public translate: TranslatePipe,
-		private activeDialog: UIActiveDialogService) {
-		super(prompt, translate);
+		public activeDialog: UIActiveDialogService) {
+		super(activeDialog, prompt, translate);
 	}
 
 	ngOnInit(): void {
@@ -39,7 +40,6 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 	 */
 	public validateModel(): void {
 		this.minIsValid = true;
-		this.hasChanges = true;
 		if (this.model.minSize > this.model.maxSize || this.model.minSize < 0) {
 			this.minIsValid = false;
 		}
@@ -53,28 +53,15 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 			.then((confirm: boolean) => {
 				if (confirm) {
 					this.field.constraints = { ...this.model };
-					this.activeDialog.close(this.hasChanges);
+					this.activeDialog.close(this.isDirty());
 				}
 			});
 	}
 
 	/**
-	 * Close the Dialog but first it verify is not Dirty
+	 * Determine if the form has a dirty state
 	 */
-	public cancelCloseDialog(): void {
-		if (this.hasChanges) {
-			this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translate.transform('GLOBAL.CONFIRM'),
-				this.translate.transform('GLOBAL.CANCEL'),
-			).then((confirm: boolean) => {
-				if (confirm) {
-					this.activeDialog.dismiss();
-				}
-			});
-		} else {
-			this.activeDialog.dismiss();
-		}
+	isDirty(): boolean {
+		return this.templateForm.dirty;
 	}
 }

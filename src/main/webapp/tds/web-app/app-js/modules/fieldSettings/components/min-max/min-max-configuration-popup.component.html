@@ -5,7 +5,7 @@
     </div>
     <div class="modal-body" style="">
         <div class="row" style="margin-top: 15px; margin-bottom: 15px;">
-            <form #templateForm="ngForm">
+            <form #templateForm="ngForm" name="templateForm">
                 <div class="modal-container">
                     <div class="text-center">
                         <div class="form-group">
@@ -46,8 +46,8 @@
     <div class="modal-footer form-group-right">
         <button name="saveButton" class="btn btn-default btn-sm"
                 (click)="onSave()"
-                [ngClass]="{'btn-success': hasChanges}"
-                [disabled]="!hasChanges || (!templateForm.valid && !minIsValid)">
+                [ngClass]="{'btn-success': isDirty()}"
+                [disabled]="!isDirty() || (!templateForm.valid && !minIsValid)">
             <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
         </button>
         <button name="cancelButton" class="btn btn-default btn-sm" (click)="cancelCloseDialog()">

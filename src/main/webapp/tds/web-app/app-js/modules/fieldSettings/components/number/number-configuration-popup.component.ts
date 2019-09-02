@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {Component, Inject, ViewChild} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {NumberConfigurationConstraintsModel} from './number-configuration-constraints.model';
@@ -6,28 +6,31 @@ import {NumberControlHelper} from '../../../../shared/components/custom-control/
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'number-configuration-popup',
 	templateUrl: 'number-configuration-popup.component.html',
 })
 export class NumberConfigurationPopupComponent extends ConfigurationCommonComponent {
+	@ViewChild('templateForm') protected templateForm: NgForm;
 	private readonly MIN_EXAMPLE_VALUE = -10000;
 	private readonly MAX_EXAMPLE_VALUE = 10000;
 	public model: NumberConfigurationConstraintsModel;
 	public localMinRange: number;
 	public exampleValue: number;
-	private hasChanged: boolean;
+	public minRange: number;
 
 	constructor(
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
-		private activeDialog: UIActiveDialogService,
+		public activeDialog: UIActiveDialogService,
 		public prompt: UIPromptService,
 		public translate: TranslatePipe) {
-			super(prompt, translate);
+			super(activeDialog, prompt, translate);
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
 			this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
+			this.minRange = this.localMinRange;
 			this.buildExampleValue();
 	}
 
@@ -51,7 +54,6 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	 * When any configuration changes, recalculate the number format.
 	 */
 	protected onFormatChange(): void {
-		this.hasChanged = true;
 		if (this.localMinRange !== null || this.model.maxRange !== null) {
 			this.model.allowNegative = false;
 		}
@@ -85,7 +87,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 				if (confirm) {
 					delete this.model.isDefaultConfig;
 					this.field.constraints = { ...this.model } as any;
-					this.activeDialog.close(this.hasChanged);
+					this.activeDialog.close(this.isDirty());
 				}
 			});
 		}
@@ -94,7 +96,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 	 * Close the Dialog but first it verify is not Dirty
 	 */
 	public cancelCloseDialog(): void {
-		if (this.hasChanged) {
+		if (this.isDirty()) {
 			this.prompt.open(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
@@ -108,5 +110,12 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 		} else {
 			this.activeDialog.dismiss();
 		}
+	}
+
+	/**
+	 * Determine if the form has a dirty state
+	 */
+	isDirty(): boolean {
+		return this.templateForm.dirty;
 	}
 }

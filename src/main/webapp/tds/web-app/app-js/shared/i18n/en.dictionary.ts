@@ -252,7 +252,7 @@ export const en_DICTIONARY: Object = {
 	'FIELD_SETTINGS': {
 		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
 		the existing data falls outside the new validation ranges.
-		Please proceed with caution, press Confirm to proceed, and change the validation settings,
+		Please proceed with caution, press Confirm to proceed and change the validation settings,
 		or press Cancel to make no changes.`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
