@@ -93,26 +93,6 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 		}
 
 	/**
-	 * Close the Dialog but first it verify is not Dirty
-	 */
-	public cancelCloseDialog(): void {
-		if (this.isDirty()) {
-			this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translate.transform('GLOBAL.CONFIRM'),
-				this.translate.transform('GLOBAL.CANCEL'),
-			).then((confirm: boolean) => {
-				if (confirm) {
-					this.activeDialog.dismiss();
-				}
-			});
-		} else {
-			this.activeDialog.dismiss();
-		}
-	}
-
-	/**
 	 * Determine if the form has a dirty state
 	 */
 	isDirty(): boolean {

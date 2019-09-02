@@ -58,6 +58,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 * Makes a service call to get pre-build distinct values from system.
 	 */
 	private load(): void {
+		this.items = [];
 		this.newItem = '';
 		this.sortType = null;
 		this.defaultValue = null;
@@ -110,7 +111,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 	 */
 	isDirty(): boolean {
 		return (JSON.stringify(this.items) !== JSON.stringify(this.savedItems) ||
-				this.field.default !== this.defaultValue);
+				this.field.default !== this.defaultValue) || this.newItem.length > 0;
 	}
 
 	/**
@@ -236,29 +237,5 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 		const trimValue = this._newItem.trim();
 		this.newItemValid = (trimValue.length >= 0) &&
 			(this.items.filter((i) => i.value === trimValue).length === 0);
-	}
-
-	/**
-	 * Close the Dialog but first it verify is not Dirty
-	 */
-	public cancelCloseDialog(): void {
-		if (this.isDirty() || this.newItem.length > 0) {
-			this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translate.transform('GLOBAL.CONFIRM'),
-				this.translate.transform('GLOBAL.CANCEL'),
-			)
-				.then(confirm => {
-					if (confirm) {
-						this.items = [];
-						this.activeDialog.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.items = [];
-			this.activeDialog.dismiss();
-		}
 	}
 }
