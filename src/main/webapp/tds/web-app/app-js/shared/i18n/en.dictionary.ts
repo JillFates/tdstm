@@ -250,7 +250,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'FIELD_SETTINGS': {
-		'WARNING_CHANGE_VALIDATION': `Changing the validation on a custom field can have adverse effects if
+		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
 		the existing data falls outside the new validation ranges.
 		Please proceed with caution, press Confirm to proceed, and change the validation settings,
 		or press Cancel to make no changes.`,

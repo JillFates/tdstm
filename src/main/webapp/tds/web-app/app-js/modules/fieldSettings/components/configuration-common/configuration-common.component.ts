@@ -15,8 +15,8 @@ export class ConfigurationCommonComponent {
 	protected displayWarningMessage(): Promise<boolean> {
 		return this.prompt.open(
 			this.translate.transform('GLOBAL.CONFIRM'),
-			this.translate.transform('FIELD_SETTINGS.WARNING_CHANGE_VALIDATION'),
-			this.translate.transform('GLOBAL.YES'),
+			this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE'),
+			this.translate.transform('GLOBAL.CONFIRM'),
 			this.translate.transform('GLOBAL.CANCEL'));
 	}
 }

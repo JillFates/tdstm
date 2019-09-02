@@ -3,7 +3,7 @@
         margin-top: 10px;
     }
 </style>
-<div class="modal-content selectlist-configuration-popup">
+<div class="modal-content selectlist-configuration-popup" tds-handle-escape (escPressed)="cancelCloseDialog()">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">Number Configuration - {{field.field}}</h4>
@@ -87,7 +87,10 @@
         </form>
     </div>
     <div class="modal-footer form-group-right">
-        <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid">
+        <button name="saveButton"
+                [ngClass]="{'btn-success': hasChanged}"
+                class="btn btn-default btn-sm" (click)="onSave()"
+                [disabled]="!templateForm.valid">
             <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
         </button>
         <button name="cancelButton" class="btn btn-default btn-sm" (click)="cancelCloseDialog()">

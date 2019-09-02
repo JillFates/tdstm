@@ -1,4 +1,4 @@
-<div class="modal-content selectlist-configuration-popup">
+<div class="modal-content selectlist-configuration-popup" tds-handle-escape (escPressed)="cancelCloseDialog()">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
         <h4 class="modal-title">String Configuration - {{field.field}}</h4>
@@ -17,8 +17,8 @@
                                     [max]="model.maxSize"
                                     style="width: 70px;"
                                     name="minSize"
-                                    (ngModelChange)="validateModel()"
-                            ></kendo-numerictextbox>
+                                    (ngModelChange)="validateModel()">
+                            </kendo-numerictextbox>
                         </div>
                         <small class="text-danger" *ngIf="templateForm.controls.minSize && templateForm.controls.minSize.errors && !minIsValid">
                             {{'FIELD_SETTINGS.MIN_MAX.MIN_LENGTH_ERROR' | translate : [model.maxSize] }}
@@ -44,7 +44,10 @@
         </div>
     </div>
     <div class="modal-footer form-group-right">
-        <button name="saveButton" class="btn btn-default btn-sm" (click)="onSave()" [disabled]="!templateForm.valid && !minIsValid">
+        <button name="saveButton" class="btn btn-default btn-sm"
+                (click)="onSave()"
+                [ngClass]="{'btn-success': hasChanges}"
+                [disabled]="!hasChanges || (!templateForm.valid && !minIsValid)">
             <i class="fa fa-check"></i> {{'GLOBAL.OK' | translate}}
         </button>
         <button name="cancelButton" class="btn btn-default btn-sm" (click)="cancelCloseDialog()">
