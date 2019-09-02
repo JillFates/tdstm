@@ -30,6 +30,7 @@ import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.springframework.jdbc.core.JdbcTemplate
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 
 @Slf4j
 @Transactional
@@ -578,6 +579,8 @@ class MoveEventService implements ServiceMethods {
 					"estFinish": categoryStats[4],
 				]
 			}
+			// Sort by the category "natural" sort order
+			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
 		}
 
 		return stats
