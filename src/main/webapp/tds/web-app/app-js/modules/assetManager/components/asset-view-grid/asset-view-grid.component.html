@@ -106,7 +106,8 @@
 			<ng-template kendoGridHeaderTemplate>
 				<div class="row text-center">
                     <tds-checkbox name="assetsSelector"
-                                  [hasThirdState]="true"
+								  [hasThirdState]="true"
+								  [disabled]="!isBulkSelectAvailable()"
                                   (changeState)="onChangeBulkCheckbox($event)"
                                   id="assetSelector"
                                   [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
@@ -115,7 +116,12 @@
 
 			<ng-template kendoGridCellTemplate let-dataItem>
 				<label class="selectall-checkbox-column text-center">
-					<input type="checkbox" id="checkbox_{{dataItem.common_id}}" [checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" (change)="checkItem(dataItem.common_id, $event.target.checked)" name="checkbox_{{dataItem.common_id}}">
+					<input type="checkbox" id="checkbox_{{dataItem.common_id}}" 
+					[ngStyle]="{'cursor': isBulkSelectAvailable() ? 'pointer' : 'text' }"
+					[disabled]="!isBulkSelectAvailable()"
+					[checked]="bulkCheckboxService.getValueBulkItem(dataItem.common_id)" 
+					(change)="checkItem(dataItem.common_id, $event.target.checked)" 
+					name="checkbox_{{dataItem.common_id}}">
 				</label>
 			</ng-template>
 		</kendo-grid-column>
@@ -134,12 +140,42 @@
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
 			             let-isIssue="dataItem.taskAndCommentFlags.issue">
 				<div class="tds-action-button-set">
-					<tds-button-edit  (click)="showAssetEditView(dataItem, rowIndex)" tooltip="Edit Asset"></tds-button-edit>
-					<tds-button-custom tooltip="Create Task" icon="file-text-o" *ngIf="!isIssue" (click)="createTask(dataItem, rowIndex)"></tds-button-custom>
-					<tds-button-custom tooltip="List Tasks" icon="list-alt" *ngIf="isIssue" (click)="showTask(dataItem, rowIndex)"></tds-button-custom>
-					<tds-button-custom tooltip="Create Comment" icon="comment-o" *ngIf="!isComment" (click)="createComment(dataItem, rowIndex)"></tds-button-custom>
-					<tds-button-custom tooltip="Show Comments" icon="comments-o" *ngIf="isComment" (click)="showComment(dataItem, rowIndex)"></tds-button-custom>
-					<tds-button-clone  (click)="showAssetCloneView(dataItem, rowIndex)"></tds-button-clone>
+					<tds-button-edit  
+						(click)="showAssetEditView(dataItem, rowIndex)" 
+						tooltip="Edit Asset"
+						[disabled]="!isEditAvailable()">
+					</tds-button-edit>
+					<tds-button-custom 
+						tooltip="Create Task" 
+						icon="file-text-o" 
+						*ngIf="!isIssue" 
+						[disabled]="!isTaskCreateAvailable()"
+						(click)="createTask(dataItem, rowIndex)"
+						>
+					</tds-button-custom>
+					<tds-button-custom 
+						tooltip="List Tasks" 
+						icon="list-alt" 
+						*ngIf="isIssue" 
+						(click)="showTask(dataItem, rowIndex)">
+					</tds-button-custom>
+					<tds-button-custom 
+						tooltip="Create Comment" 
+						icon="comment-o" 
+						*ngIf="!isComment" 
+						[disabled]="!isCommentCreateAvailable()"
+						(click)="createComment(dataItem, rowIndex)">
+					</tds-button-custom>
+					<tds-button-custom 
+						tooltip="Show Comments" 
+						icon="comments-o" 
+						*ngIf="isComment" 
+						(click)="showComment(dataItem, rowIndex)">
+					</tds-button-custom>
+					<tds-button-clone  
+						(click)="showAssetCloneView(dataItem, rowIndex)"
+						[disabled]="!isAssetCloneAvailable()">
+					</tds-button-clone>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>

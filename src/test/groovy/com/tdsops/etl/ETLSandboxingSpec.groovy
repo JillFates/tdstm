@@ -282,16 +282,16 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
-				import java.lang.Math
+				import java.lang.Shutdown
 
 				domain Device
 				read labels
-				Math.max 10, 100
+				Shutdown.shutdown()
 				""".stripIndent())
 
 		then: 'An MultipleCompilationErrorsException exception is thrown'
 			MultipleCompilationErrorsException e = thrown MultipleCompilationErrorsException
-			e.errorCollector.errors*.cause*.message == ["Importing [java.lang.Math] is not allowed"]
+			e.errorCollector.errors*.cause*.message == ["Importing [java.lang.Shutdown] is not allowed"]
 	}
 
 	void 'test can disallow unnecessary stars imports using a secure syntax with AST customizer'() {

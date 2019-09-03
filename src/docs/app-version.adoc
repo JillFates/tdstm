@@ -1,0 +1,24 @@
+[[resources-app-version]]
+== Application Version
+
+An Application Version is a resource which represents the version of the Transition Manager Application.
+
+[[resources-artists-list]]
+=== Application Version
+
+A `GET` request will list the Transition Manager application version as JSON.
+
+==== Response structure
+
+include::{snippets}/app-version-example/response-fields.adoc[]
+
+==== Example request
+
+include::{snippets}/app-version-example/curl-request.adoc[]
+
+include::accept-version.adoc[]
+
+==== Example response
+
+include::{snippets}/app-version-example/http-response.adoc[]
+

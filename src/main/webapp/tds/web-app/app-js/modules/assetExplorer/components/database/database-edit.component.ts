@@ -38,7 +38,6 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			promptService: UIPromptService,
 			translatePipe: TranslatePipe
 		) {
-
 			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
@@ -51,6 +50,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**

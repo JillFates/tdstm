@@ -191,13 +191,12 @@
                 </table>
             </div>
             <div *ngIf="editing" class="modal-footer form-group-center">
-                <tds-button-save [disabled]="!validateRequiredFields(eventModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+                <tds-button-save [disabled]="!validateRequiredFields(eventModel) || !isDirty()" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
                 <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
             </div>
             <div *ngIf="!editing" class="modal-footer form-group-center">
                 <tds-button-edit *ngIf="canEditEvent" class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
                 <tds-button-delete *ngIf="canEditEvent" class="btn-danger" (click)="confirmDeleteEvent()"></tds-button-delete>
-                <button *ngIf="canEditEvent" class="btn btn-primary" (click)="confirmMarkAssetsMoved()">Mark Assets Moved</button>
                 <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
             </div>
         </div>

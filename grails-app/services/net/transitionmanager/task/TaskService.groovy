@@ -5983,6 +5983,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				break
 			case "event": result = task.moveEvent?.name; break
 			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
 				result = result instanceof String ? result : result.toString()

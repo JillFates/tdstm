@@ -138,11 +138,13 @@ export const en_DICTIONARY: Object = {
 	},
 	'ASSET_EXPORT': {
 		'ASSET_EXPORT': 'Asset Export',
-		'SELECT_BUNDLE': 'Select one or more bundle(s):',
-		'CHOOSE_ITEM': 'Choose Item(s) to Export:',
+		'SELECT_BUNDLE': 'Select one or more bundles:',
+		'CHOOSE_ITEM': 'Select one or more items to export:',
 		'EXPORT_BUTTON': 'Export Excel',
 		'BUNDLE_ERROR': '* Select at least one bundle',
 		'ALL_ITEMS': 'All Items',
+		'APPLICATION': 'Application',
+		'DEVICE': 'Device',
 		'DATABASE': 'Database',
 		'STORAGE': 'Storage',
 		'ROOM': 'Room',
@@ -249,6 +251,10 @@ export const en_DICTIONARY: Object = {
 	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
+		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
+		the existing data falls outside the new validation ranges.
+		Please proceed with caution, press Confirm to proceed and change the validation settings,
+		or press Cancel to make no changes.`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
@@ -428,6 +434,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 			'ERROR_DOUBLE_ASSIGNMENT': 'One or more tasks are assigned as both a Predecessor and Successor which is not allowed.',
 			'SELECT_START_DATE': 'Select a start date',
 			'SELECT_END_DATE': 'Select an end date'
-		}
+		},
+		'MY_TASKS': 'My Tasks',
 	}
 };

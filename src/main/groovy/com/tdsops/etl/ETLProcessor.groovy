@@ -9,6 +9,10 @@ import groovy.time.TimeDuration
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
+import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomUtils
+import org.apache.commons.lang3.RegExUtils
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -1654,7 +1658,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			// disallow method definitions
 			methodDefinitionAllowed = false
 			// Empty withe list means forbid imports
-			importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
+			importsWhitelist = [
+				'java.lang.Math',
+				'groovy.util.GroovyCollections',
+				'org.apache.commons.lang3.RandomStringUtils',
+				'org.apache.commons.lang3.RandomUtils',
+				'org.apache.commons.lang3.RegExUtils',
+				'org.apache.commons.lang3.StringUtils',
+				'org.springframework.beans.factory.annotation.Autowired',
+			]
 			starImportsWhitelist = []
 			// Language tokens allowed (see http://docs.groovy-lang.org/2.4.3/html/api/org/codehaus/groovy/syntax/Types.html)
 			tokensWhitelist = [
@@ -1671,11 +1683,16 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List,
+				Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
 			].asImmutable()
 		}
 
 		ImportCustomizer customizer = new ImportCustomizer()
+		customizer.addImport('RandomStringUtils', 'org.apache.commons.lang3.RandomStringUtils')
+		customizer.addImport('RandomUtils', 'org.apache.commons.lang3.RandomUtils')
+		customizer.addImport('RegExUtils', 'org.apache.commons.lang3.RegExUtils')
+		customizer.addImport('StringUtils', 'org.apache.commons.lang3.StringUtils')
 
 		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()

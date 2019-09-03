@@ -313,7 +313,25 @@ class WsAssetController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.AssetView)
-	def getModel(Long id, String mode) {
+	def showModel(Long id) {
+		getModel(id, 'show')
+	}
+
+	/**
+	 * Used to retrieve the model data for the edit view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def editModel(Long id) {
+		getModel(id, 'edit')
+	}
+
+	/**
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	private def getModel(Long id, String mode) {
 		final List modes = ['edit','show']
 		if (! modes.contains(mode) || id == null) {
 			sendBadRequest()

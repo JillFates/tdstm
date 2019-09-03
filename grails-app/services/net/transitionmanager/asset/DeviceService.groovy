@@ -1,6 +1,5 @@
 package net.transitionmanager.asset
 
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.domain.AssetEntityHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SizeScale
@@ -10,14 +9,15 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
 
 @Transactional
 class DeviceService implements ServiceMethods {
@@ -194,6 +194,29 @@ class DeviceService implements ServiceMethods {
 		}
 
 		return saveUpdateAssetFromForm(project, params, asset)
+	}
+
+	String getImageName(String assetClassId, String type) {
+		switch (assetClassId) {
+			case AssetClass.APPLICATION.toString(): return AssetType.APPLICATION.toString()
+			case AssetClass.DATABASE.toString(): return AssetType.DATABASE.toString()
+			case AssetClass.STORAGE.toString(): return AssetType.FILES.toString()
+			case AssetClass.DEVICE.toString():
+				if (type in AssetType.virtualServerTypes) {
+					return AssetType.VM.toString()
+				}
+				if (type in AssetType.physicalServerTypes) {
+					return AssetType.SERVER.toString()
+				}
+				if (type in AssetType.storageTypes) {
+					return AssetType.STORAGE.toString()
+				}
+				if (type in AssetType.networkDeviceTypes) {
+					return AssetType.NETWORK.toString()
+				}
+		}
+
+		return 'Other'
 	}
 
 	/**

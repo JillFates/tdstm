@@ -1,5 +1,6 @@
 package net.transitionmanager.strategy.asset
 
+import grails.validation.ValidationException
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
@@ -17,6 +18,8 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.security.SecurityService
+import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.validation.Errors
 
 import java.text.DateFormat
 
@@ -224,7 +227,7 @@ abstract class AssetSaveUpdateStrategy {
 	 * @param isDependent
 	 */
 	@Transactional
-	private void createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
+	private void  createOrUpdateDependency(AssetEntity assetEntity, Map depMap, boolean isDependent) {
 		AssetDependency dependency = null
 		if (depMap.id) {
 			dependency = GormUtil.findInProject(project, AssetDependency, depMap.id, true)
@@ -247,8 +250,12 @@ abstract class AssetSaveUpdateStrategy {
 		if (targetAsset.moveBundle.id != moveBundle.id) {
 			assetEntityService.assignAssetToBundle(project, targetAsset, depMap.moveBundleId.toString())
 		}
-		dependency.updatedBy = currentPerson
-		dependency.save()
+
+		// save only if the dependency has been updated or created
+		if ( dependency.isDirty() || ! dependency.id ) {
+			dependency.updatedBy = currentPerson
+			dependency.save(deepValidate: false)
+		}
 	}
 
 	/**

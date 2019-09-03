@@ -53,4 +53,18 @@ export class DynamicComponent {
 
 	}
 
+	/**
+	 * Added listener to last button to move the focus
+	 * back to the begin of the form.
+	 **/
+	protected onFocusOutOfCancel(): void {
+		let all = document.getElementsByClassName('modal-content tds-angular-component-content')[0];
+		let focusable = all.querySelectorAll('input, select, textarea, [tabindex]:not([tabindex="-1"])');
+		let firstFocusable = <HTMLElement>focusable[0];
+		let lastFocusable = focusable[focusable.length - 1];
+		lastFocusable.addEventListener('focusout', () => {
+			firstFocusable.focus();
+		});
+	}
+
 }

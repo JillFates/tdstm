@@ -10,6 +10,7 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { ActivatedRoute } from '@angular/router';
 import { AssetCommentColumnModel, AssetCommentModel } from '../../model/asset-comment.model';
+import {Permission} from '../../../../shared/model/permission.model';
 import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-edit.component';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -195,5 +196,9 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
 	}
 }

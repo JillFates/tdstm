@@ -575,7 +575,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			}
 				// when popup closes ..
 		}).catch(error => {
-			console.error(error);
+			console.log(error);
 				// when popup is Cancelled.
 			});
 		}

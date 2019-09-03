@@ -1,7 +1,7 @@
 // Angular
 import {Component, OnInit} from '@angular/core';
 // NGXS
-import {Store} from '@ngxs/store';
+import {Select, Store} from '@ngxs/store';
 // Service
 import {LoginService} from '../../service/login.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
@@ -13,6 +13,8 @@ import {Router} from '@angular/router';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {WindowService} from '../../../../shared/services/window.service';
 import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
+import {Observable} from 'rxjs';
+import {withLatestFrom} from 'rxjs/operators';
 
 @Component({
 	selector: 'tds-login',
@@ -20,6 +22,10 @@ import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider'
 })
 
 export class LoginComponent implements OnInit {
+	/**
+	 * Prepare the state to be able to auto - unsubscribe
+	 */
+	@Select(state => state.TDSApp.userContext) userContext$: Observable<any>;
 	/**
 	 * Redirect user is taking place, by default is turned off
 	 */
@@ -64,30 +70,11 @@ export class LoginComponent implements OnInit {
 	 * Get the Login Information and prepare the store subscriber to redirect the user on a Success Login
 	 */
 	ngOnInit(): void {
-
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
 			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
 			this.setFocus();
-		});
-
-		// On success we hide the form and the user is redirected to the saved URL
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			if (userContext && userContext.notices && userContext.notices.redirectUrl) {
-				this.redirectUser = true;
-				if (RouterUtils.isAngularRoute(userContext.notices.redirectUrl)) {
-					this.router.navigate(RouterUtils.getAngularRoute(userContext.notices.redirectUrl));
-				} else {
-					this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
-				}
-			} else if (userContext.error) {
-				// An error has occurred
-				this.notifierService.broadcast({
-					name: 'stopLoader',
-				});
-				this.errMessage = userContext.error;
-			}
 		});
 	}
 
@@ -129,7 +116,24 @@ export class LoginComponent implements OnInit {
 					password: this.loginModel.password,
 					authority: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
 				})
-			);
+			).pipe(
+				withLatestFrom(this.userContext$)
+			).subscribe(([_, userContext]) => {
+				if (userContext && userContext.notices && userContext.notices.redirectUrl) {
+					this.redirectUser = true;
+					if (RouterUtils.isAngularRoute(userContext.notices.redirectUrl)) {
+						this.router.navigate(RouterUtils.getAngularRoute(userContext.notices.redirectUrl));
+					} else {
+						this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
+					}
+				} else if (userContext.error) {
+					// An error has occurred
+					this.notifierService.broadcast({
+						name: 'stopLoader',
+					});
+					this.errMessage = userContext.error;
+				}
+			});
 		}
 	}
 }
