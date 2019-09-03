@@ -192,4 +192,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		console.log(payload);
 	}
 
+	onPowerChange(power: any) {
+		this.onCustomControlChange();
+	}
+
 }

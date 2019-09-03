@@ -1,25 +1,3 @@
-<style>
-    .model-device-edit-component {
-    }
-    .model-device-edit-component input[type=text] {
-        width: 100%;
-    }
-    .model-device-edit-component input[type=checkbox] {
-        cursor: pointer;
-    }
-
-    .model-device-edit-component .dimensions {
-        display: flex;
-    }
-    .model-device-edit-component .dimensions div {
-        padding-right: 5px;
-    }
-
-    .model-device-edit-component .dimensions input {
-        width: 80%;
-    }
-</style>
-
 <div class="modal fade in model-device-edit-component"
      tds-handle-escape (escPressed)="cancelCloseDialog()"
      id="model-device-edit-component"
@@ -130,7 +108,7 @@
                             <div class="form-group">
                                 <div class="col-md-2">Power (Max/Design/Avg):</div>
                                 <div class="col-md-4">
-                                    <tds-power [model]="powerModel"></tds-power>
+                                    <tds-power [model]="powerModel" (change)="onPowerChange($event)"></tds-power>
                                  </div>
                                 <div class="col-md-2">Notes:</div>
                                 <div class="col-md-4">
@@ -226,16 +204,13 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-md-2">Connectors:</div>
+                                <div class="col-md-2">Connectors:
+                                    <input type="text" class="custom-controls" name="customControls" [(ngModel)]="model.customControls">
+                                </div>
                                 <div class="col-md-10">
                                     <tds-connector
                                             [connectors]="model.connectorsCollection"
                                             (modelChange)="onConnectorsChange($event)"></tds-connector>
-                                </div>
-                            </div>
-                             <div class="form-group">
-                                <div class="col-md-12">
-                                    <input type="text" name="customControls" [(ngModel)]="model.customControls">
                                 </div>
                             </div>
                         </div>

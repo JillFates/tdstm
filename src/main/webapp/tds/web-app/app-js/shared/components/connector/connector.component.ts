@@ -8,17 +8,16 @@ import { Connector } from './model/connector.model';
             <button class="add-connector" (click)="onAdd()">Add Connector</button>
             <div>
                 <div class="header">
-                    <div class="delete-command">&nbsp;</div>
                     <div class="component-type">Type</div>
                     <div class="component-label">Label</div>
                     <div class="component-label-position">Label Position</div>
                     <div class="component-position-x">Conn Pos X</div>
                     <div class="component-position-y">Conn Pos Y</div>
+                    <div class="delete-command">&nbsp;</div>
                 </div>
             </div>
             <div class="connections">
                 <div *ngFor="let connector of connectors;let index = index;trackBy:trackByIndex;" class="data-row">
-                    <div class="delete-command"><span class="glyphicon glyphicon-remove" (click)="onDelete(index)" style="cursor: pointer" title="Delete connector"></span></div>
                     <div class="component-type">
                         <kendo-dropdownlist
                                 class="select"
@@ -53,6 +52,7 @@ import { Connector } from './model/connector.model';
                                (blur)="reportChanges()"
 							   [(ngModel)]="connectors[index].yPosition" name="yPosition">
                     </div>
+                    <div class="delete-command"><span class="glyphicon glyphicon-remove delete-connector" (click)="onDelete(index)" title="Delete connector"></span></div>
                 </div>
             </div>
         </div>

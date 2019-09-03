@@ -1,56 +1,18 @@
-<style>
-	.power-component {
-		padding-right: 5px;
-		display: flex;
-		justify-content: space-between;
-	}
-
-		.power-component .arrows,
-		.power-component input {
-			max-width: 100%;
-			width: 100%;
-		}
-
-		.power-component .max,
-		.power-component .design,
-		.power-component .average {
-			flex-basis: 20%;
-			flex-grow: 0;
-		}
-
-		.power-component .arrows {
-			display: flex;
-			flex-basis: 5%;
-			justify-content: center;
-			align-items: center;
-			cursor: pointer;
-		}
-		.power-component .unit {
-			flex-basis: 15%;
-			flex-grow: 0;
-		}
-
-		.power-component .unit .k-dropdown {
-			max-width: 80px;
-		}
-</style>
-
 <div class="power-component">
     <div class="max">
         <input type="number" name="namePlate" [(ngModel)]="model.namePlate" (blur)="setStandardPower()">
     </div>
     <div class="arrows">
-        <p (click)="setStandardPower()">>></p>
+        <div (click)="setStandardPower()">>></div>
     </div>
     <div class="design">
-        <input type="number" name="design" [(ngModel)]="model.design">
+        <input type="number" name="design" [(ngModel)]="model.design" (blur)="reportChanges()">
     </div>
     <div class="average">
-        <input type="number" name="use" [(ngModel)]="model.use">
+        <input type="number" name="use" [(ngModel)]="model.use"  (blur)="reportChanges()">
     </div>
     <div class="unit">
         <kendo-dropdownlist
-                class=""
                 name="powerUnit"
                 [data]="units"
                 (selectionChange)="onUnitsChange($event)"
