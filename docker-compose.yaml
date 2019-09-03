@@ -1,25 +1,49 @@
 version: "3"
 services:
 
-  # TransitionManager Application Container
-  tm-application:
-    container_name: tm-application
+  base: &base
+    build: .
     image: tm-registry.transitionmanager.net/tds-dev/tm-application:latest
     stdin_open: true
     tty: true
-    ports:
-      - "8080:8080"
+    volumes:
+      - .:/opt/tdstm
+      # - .:/home/tmuser/tdstm
+      # - ~/.m2:/home/tmuser/.m2
+      # - ~/.npm:/home/tmuser/.npm
     environment:
       - JAVA_HOME=/usr/java/latest
-    volumes:
-      - .:/home/tmuser/tdstm
-      - ~/.m2:/home/tmuser/.m2
-      - ~/.npm:/home/tmuser/.npm
-    depends_on:
-      - tm-database
 
-  # TransitionManager Database Container
-  tm-database:
+  app:
+    <<: *base
+    container_name: tm-application
+    ports:
+      - 8080:8080
+    command: >
+      ./gradlew -Dcom.tdsops.tm.skp=B3c00l
+                -Duser.timezone=GMT
+                -Dtdstm.gconsole=true
+                -Dtdstm.config.location=./tdstm-config.groovy
+                bootRun
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/tdstm/login/auth"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 20
+    depends_on:
+      - db
+
+  # front:
+  #   <<: *base
+  #   working_dir: src/main/webapp/tds
+  #   container_name: tm-front
+  #   ports:
+  #     - 8080:8080
+  #   command: npm run build-dev
+  #   depends_on:
+  #     - app
+
+  db:
     container_name: tm-database
     image: tm-registry.transitionmanager.net/tds-dev/tm-database:latest
     environment:
@@ -28,11 +52,40 @@ services:
     volumes:
       - ~/.tdstm-data:/data/tranman/
     ports:
-      - "3306:3306"
+      - 3306:3306
 
-  # TransitionManager HTTP Test server (aka: JSON Server)
-  tm-http-test-server:
-    container_name: tm-http-test-server
+  mock-server:
+    container_name: tm-mock-server
     image: tm-registry.transitionmanager.net/tds-dev/tm-http-test-server:latest
     ports:
-      - "3000:3000"
+      - 3000:3000
+
+  selenium:
+    container_name: selenium
+    image: selenium/standalone-chrome-debug:latest
+    ports:
+      - 4444:4444
+
+  test:
+    <<: *base
+    container_name: tm-unit-test
+    command: 'ls -hal && pwd'
+    depends_on:
+      - db
+
+  e2e:
+    <<: *base
+    container_name: tm-e2e
+    working_dir: /opt/tdstm/test/e2e
+    command: >
+      ./gradlew --profile
+                --no-scan
+                --no-build-cache
+                --no-search-upward
+                '--max-workers=1'
+                '-Dtdstm.config.location=./tdstm-config.groovy'
+                '-Dcom.tdsops.tm.skp=B3c00l'
+                --gradle-user-home chrome-gradle
+                --project-cache-dir chrome-gradle-cache
+                '-Dgeb.build.baseUrl=https://tmqa12.tm.tdsops.net'
+                chromeTest
