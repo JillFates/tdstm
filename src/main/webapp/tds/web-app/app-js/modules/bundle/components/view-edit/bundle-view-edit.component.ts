@@ -159,6 +159,10 @@ export class BundleViewEditComponent implements OnInit {
 				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
+				this.managers.forEach((manager, index) => {
+					manager.staff.name = manager.name;
+					this.managers[index] = manager.staff // Limit managers down to just staff
+				});
 				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
 
@@ -177,10 +181,10 @@ export class BundleViewEditComponent implements OnInit {
 			}
 		});
 		this.managers.forEach((manager) => {
-			if (manager.staff.id === this.savedModel.projectManagerId) {
+			if (manager.id === this.savedModel.projectManagerId) {
 				this.projectManager = manager.name;
 			}
-			if (manager.staff.id === this.savedModel.moveManagerId) {
+			if (manager.id === this.savedModel.moveManagerId) {
 				this.moveManager = manager.name;
 			}
 		});
