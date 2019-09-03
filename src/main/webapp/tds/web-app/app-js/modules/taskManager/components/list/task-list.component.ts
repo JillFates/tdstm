@@ -73,7 +73,7 @@ export class TaskListComponent {
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;
-		this.grid = new DataGridOperationsHelper([]);
+		this.grid = new DataGridOperationsHelper([], null, null, null, this.pageSize);
 		this.columnsModel = taskListColumnsModel;
 		this.selectedCustomColumn = {};
 		this.selectedEvent = this.allEventsOption;
@@ -208,7 +208,7 @@ export class TaskListComponent {
 
 		this.taskService.getTaskList(filters)
 			.subscribe(result => {
-				this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
+				this.grid.reloadData(result.rows);
 				this.rowsExpandedMap = {};
 				this.rowsExpanded = false;
 				this.loading = false;
