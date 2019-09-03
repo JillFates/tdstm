@@ -29,6 +29,7 @@ import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
+import org.hibernate.SessionFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 
@@ -79,6 +80,7 @@ class MoveEventService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	ProjectService        projectService
 	ReportsService        reportsService
+	SessionFactory        sessionFactory
 
 	MoveEvent create(Project project, String name) {
 		MoveEvent me = new MoveEvent([project:project, name:name])
@@ -556,27 +558,39 @@ class MoveEventService implements ServiceMethods {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
 		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
 		// Query the database for the min/max dates for tasks in the event grouped by category.
-		List taskCategoriesStatsList = AssetComment.createCriteria().list {
-			eq('moveEvent', moveEvent)
-			projections {
-				groupProperty('category')
-				min('actStart')
-				max('dateResolved')
-				min('estStart')
-				max('estFinish')
-			}
-		}
+		String hql = """
+				select 
+					ac.category,
+					min(ac.actStart),
+					max(ac.dateResolved),
+					min(ac.estStart),
+					max(ac.estFinish),
+					count(*),
+					sum(case when ac.status = 'Completed' then 1 else 0 end),
+					case when (count(*) > 0) then (sum(case when ac.status = 'Completed' then 1 else 0 end)/count(*)*100) else 100 end
+				from AssetComment ac
+					where moveEvent =:moveEvent
+				group by ac.category
+			"""
+
+		def session = sessionFactory.currentSession
+		org.hibernate.Query query = session.createQuery(hql)
+		query.setParameter("moveEvent", moveEvent)
+		List taskCategoriesStatsList = query.list()
 
 		List<Map> stats = []
 		taskCategoriesStatsList.each { categoryStats ->
 			// Only add to the results if any of the dates has values
 			if (categoryStats[1] || categoryStats[2] || categoryStats[3] || categoryStats[4]) {
 				stats << [
-					"category": categoryStats[0],
-					"actStart": categoryStats[1],
-					"actFinish": categoryStats[2],
-					"estStart": categoryStats[3],
-					"estFinish": categoryStats[4],
+					"category": 	categoryStats[0],
+					"actStart": 	categoryStats[1],
+					"actFinish": 	categoryStats[2],
+					"estStart": 	categoryStats[3],
+					"estFinish": 	categoryStats[4],
+					"tskTot": 		categoryStats[5],
+					"tskComp": 		categoryStats[6],
+					"percComp": 	categoryStats[7],
 				]
 			}
 			// Sort by the category "natural" sort order
