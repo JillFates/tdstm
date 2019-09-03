@@ -1,7 +1,7 @@
 import {Component, ViewChild} from '@angular/core';
 import { clone } from 'ramda';
 
-import { UIExtraDialog } from '../../../../../../../shared/services/ui-dialog.service';
+import {UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
 import { UIPromptService } from '../../../../../../../shared/directives/ui-prompt.directive';
 import {ComboBoxSearchModel} from '../../../../../../../shared/components/combo-box/model/combobox-search-param.model';
 import {Observable} from 'rxjs/index';
@@ -18,6 +18,8 @@ import {UserContextModel} from '../../../../../../auth/model/user-context.model'
 import {DateUtils} from '../../../../../../../shared/utils/date.utils';
 import {AkaChanges} from '../../../../../../../shared/components/aka/model/aka.model';
 import {NgForm} from '@angular/forms';
+import {PermissionService} from '../../../../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'model-device-edit',
@@ -36,11 +38,11 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	public powerUnits = PowerUnits;
 	public powerModel: PowerModel;
 	constructor(
+		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe,
 		private assetExplorerService: AssetExplorerService,
-		// private preferenceService: PreferenceService,
 		private prompt: UIPromptService,
 		private deviceModel: DeviceModel,
-		// private userContext: UserContextService,
 		private deviceManufacturer: DeviceManufacturer) {
 		super('#model-device-edit-component');
 		console.log(deviceModel);
@@ -65,13 +67,27 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
 	}
 
-	/***
-	 * Close the Active Dialog
+	/**
+	 * On cancel edition show a prompt to the user, this action will loose the changes
 	 */
-	public cancelCloseDialog(): void {
-		this.dismiss();
+	protected cancelCloseDialog(): void {
+		if (this.isDirty()) {
+			this.prompt.open(
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
+			.then(confirm => {
+				if (confirm) {
+					this.dismiss();
+				}
+			})
+			.catch((error) => console.log(error));
+		} else {
+			this.dismiss();
+		}
 	}
-
 	/**
 	 * On EscKey Pressed close the dialog.
 	 */
@@ -192,8 +208,20 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 		console.log(payload);
 	}
 
+	/**
+	 * Changing values in the power time notify the change to the custom controls
+	 * @param power
+	 */
 	onPowerChange(power: any) {
 		this.onCustomControlChange();
+	}
+
+	/**
+	 * Returns the form dirty state
+	 * @returns {boolean}
+	 */
+	public isDirty(): boolean {
+		return this.form.dirty;
 	}
 
 }

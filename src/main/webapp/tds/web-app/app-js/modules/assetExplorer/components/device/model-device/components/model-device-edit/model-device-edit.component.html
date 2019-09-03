@@ -1,5 +1,4 @@
-<div class="modal fade in model-device-edit-component"
-     tds-handle-escape (escPressed)="cancelCloseDialog()"
+<div class="modal fade in model-device-edit-component" tds-handle-escape (escPressed)="cancelCloseDialog()"
      id="model-device-edit-component"
      data-backdrop="static"
      tabindex="-1" role="dialog">
@@ -123,8 +122,13 @@
                                            type="checkbox"
                                            [(ngModel)]="model.roomObject">
                                 </div>
-                                <div class="col-md-2"></div>
-                                <div class="col-md-4"></div>
+                                <div class="col-md-2">Source TDS</div>
+                                <div class="col-md-4">
+                                    <input class="checkbox"
+                                           name="sourceTDS"
+                                           type="checkbox"
+                                           [(ngModel)]="model.sourceTDS">
+                                </div>
                             </div>
                             <div class="form-group" *ngIf="assetType && assetType.id === 'Blade'">
                                 <div class="col-md-2">Blade Height:</div>
@@ -173,26 +177,15 @@
                             <div class="form-group">
                                 <div class="col-md-2">Created by:</div>
                                 <div class="col-md-4">{{model.createdBy}}</div>
-                                <div class="col-md-2">Source TDS:</div>
-                                <div class="col-md-4">
-                                    <input class="checkbox"
-                                           name="sourceTDS"
-                                           type="checkbox"
-                                           [(ngModel)]="model.sourceTDS">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-2">Updated by:</div>
-                                <div class="col-md-4">{{model.updatedBy}}</div>
-                                <div class="col-md-2">Source URL:</div>
+                                <div class="col-md-2">Source URL</div>
                                 <div class="col-md-4">
                                     <input type="text" name="sourceURL" [(ngModel)]="model.sourceURL">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <div class="col-md-2">Validated by:</div>
-                                <div class="col-md-4">{{model.validatedBy}}</div>
-                                <div class="col-md-2">Model Status:</div>
+                                <div class="col-md-2">Updated by:</div>
+                                <div class="col-md-4">{{model.updatedBy}}</div>
+                                <div class="col-md-2">Model Status</div>
                                 <div class="col-md-4">
                                     <kendo-dropdownlist
                                             class="select"
@@ -201,6 +194,13 @@
                                             [data]="modelStatus"
                                             [(ngModel)]="model.modelStatus">
                                     </kendo-dropdownlist>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Validated by:</div>
+                                <div class="col-md-4">{{model.validatedBy}}</div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
                                 </div>
                             </div>
                             <div class="form-group">

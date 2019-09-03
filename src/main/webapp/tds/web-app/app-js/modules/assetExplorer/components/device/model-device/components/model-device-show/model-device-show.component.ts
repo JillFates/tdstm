@@ -71,7 +71,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 						provide: DeviceManufacturer,
 						useValue: this.deviceManufacturer
 					}
-				], true, false)
+				], false, false)
 			.then((result) => {
 				console.log(result);
 			}).catch((error) => console.log(error));
