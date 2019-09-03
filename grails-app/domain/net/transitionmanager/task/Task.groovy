@@ -17,7 +17,7 @@ class Task extends AssetComment {
 	}
 
 	static mapping = {
-		discriminator value: '0'
+		discriminator value: '1'
 	}
 
 
