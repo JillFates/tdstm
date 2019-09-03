@@ -882,7 +882,6 @@ tds.comments.controller.EditCommentDialogController = function ($scope, $modalIn
 
 	$scope.cssForCommentStatus = "name";
 
-	$scope.workFlowTransition = "";
 	$scope.assignedEditData = "";
 
 	$scope.enableMoveEvent = true;
@@ -1267,18 +1266,6 @@ tds.comments.service.CommentService = function (utils, http, q) {
 			}
 			);
 
-		return deferred.promise;
-	};
-
-	var getWorkflowTransitions = function (assetId, category, id) {
-		var deferred = q.defer();
-		http.post(utils.url.applyRootPath('/assetEntity/retrieveWorkflowTransition?format=json&assetId=' + assetId + '&category=' + category + '&assetCommentId=' + id)).
-			success(function (data, status, headers, config) {
-				deferred.resolve(data);
-			}).
-			error(function (data, status, headers, config) {
-				deferred.reject(data);
-			});
 		return deferred.promise;
 	};
 
@@ -1790,7 +1777,6 @@ tds.comments.service.CommentService = function (utils, http, q) {
 	};
 
 	return {
-		getWorkflowTransitions: getWorkflowTransitions,
 		getAssignedToList: getAssignedToList,
 		getStatusList: getStatusList,
         getLastCreatedTaskSessionParams: getLastCreatedTaskSessionParams,
@@ -1908,7 +1894,6 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 			status: 'Ready',
 			taskDependency: "",
 			taskSuccessor: "",
-			workflowTransition: '',
 			canEdit: true,
 			durationLocked: false
 		};
@@ -1940,13 +1925,11 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 		temp.isResolved = ac.dateResolved != null ? '1' : '0';
 		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
 		temp.mustVerify = ac.mustVerify;
-		temp.override = ac.workflowOverride ? ac.workflowOverride.toString() : '0';
 		temp.priority = ac.priority ? ac.priority.toString() : '3';
 		temp.resolution = ac.resolution;
 		temp.role = ac.role ? ac.role.toString() : '';
 		temp.status = ac.status;
 		temp.taskNumber = ac.taskNumber;
-		temp.workflowTransition = ac.workflowTransition ? ac.workflowTransition.id.toString() : '';
 		temp.canEdit = response.canEdit;
 		temp.durationLocked = response.assetComment.durationLocked;
 
@@ -1963,8 +1946,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 			durationScales: [],
 			priorities: [],
 			predecessorCategories: [],
-			assetSelectValues: [],
-			workflows: []
+			assetSelectValues: []
 		};
 	};
 
@@ -2095,41 +2077,6 @@ tds.comments.directive.AssignedToSelect = function (commentService, alerts, util
 					scope.$parent.$eval(expression);
 				}
 			});
-		}
-	};
-};
-
-/*****************************************
- * Directive workflowTransitionSelect
- */
-tds.comments.directive.WorkflowTransitionSelect = function (commentService, alerts, utils) {
-
-	return {
-		restrict: 'E',
-		scope: {
-			workflows: '=workflows',
-			commentId: '=commentId',
-			assetId: '=assetId',
-			category: '=category',
-			ngModel: '=ngModel'
-		},
-		templateUrl: utils.url.applyRootPath('/components/comment/workflow-transition-select-template.html'),
-
-		link: function (scope, element, attrs) {
-			var refresh = function () {
-				commentService.getWorkflowTransitions(scope.assetId, scope.category, scope.commentId).then(
-					function (data) {
-						scope.workflows = data.data;
-					},
-					function (data) {
-						alerts.showGenericMsg();
-					}
-				);
-			};
-			scope.$watch('category', function (nVal, oVal) {
-				refresh();
-			});
-			refresh();
 		}
 	};
 };
@@ -2926,7 +2873,6 @@ tds.comments.module.factory('commentService', ['utils', '$http', '$q', tds.comme
 tds.comments.module.factory('commentUtils', ['$q', '$interval', 'appCommonData', 'utils', tds.comments.util.CommentUtils]);
 
 tds.comments.module.directive('assignedToSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.AssignedToSelect]);
-tds.comments.module.directive('workflowTransitionSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.WorkflowTransitionSelect]);
 tds.comments.module.directive('statusSelect', ['commentService', 'alerts', 'utils', tds.comments.directive.StatusSelect]);
 tds.comments.module.directive('taskDependencies', ['commentService', 'alerts', 'utils', tds.comments.directive.TaskDependencies]);
 tds.comments.module.directive('actionBar', ['commentService', 'alerts', 'utils', 'commentUtils', '$window', tds.comments.directive.ActionBar]);

@@ -11,7 +11,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 })
 export class BundleCreateComponent implements OnInit {
 	public managers;
-	public workflowCodes;
 	public rooms;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
@@ -36,7 +35,6 @@ export class BundleCreateComponent implements OnInit {
 			projectManagerId: 0,
 			moveManagerId: 0,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);
@@ -48,7 +46,6 @@ export class BundleCreateComponent implements OnInit {
 			this.bundleModel.operationalOrder = 1;
 			this.managers = data.managers;
 			this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-			this.workflowCodes = data.workflowCodes;
 			this.rooms = data.rooms;
 		});
 	}

@@ -29,7 +29,6 @@ class Project extends PartyGroup {
 	Date       startDate   // Date that the project will start
 	Date       completionDate   // Date that the project will finish
 	PartyGroup client
-	String     workflowCode
 	String     projectType = 'Standard'
 	Integer    lastAssetId
 	Integer    runbookOn = 1 // Flag that indicates that the project should use the runbook mode for various screens
@@ -59,7 +58,6 @@ class Project extends PartyGroup {
 		runbookOn nullable: true
 		startDate nullable: true
 		timezone nullable: true
-		workflowCode blank: false
 		planMethodology nullable: true
 		lastAssetId nullable: true
 		runbookOn nullable: true

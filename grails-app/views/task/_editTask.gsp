@@ -83,18 +83,7 @@
 							/>
 						</td>
 					</tr>
-					<tr class="prop" id="workFlowTransitionEditTrId" ng-show="ds.workflows.length > 0">
-						<td valign="top" class="name"><label for="workFlowTransitionEditId">Workflow Step:</label></td>
-						<td valign="top" class="value">
-							<span id="workFlowTransitionEditId">
-							<workflow-transition-select ng-if="ds.workflows.length > 0" workflows="ds.workflows" comment-id='ac.commentId' category='ac.category'
-							 asset-id='ac.assetEntity' ng-model='ac.workflowTransition'></workflow-transition-select>
-							</span>
-							<input type="checkbox" ng-model="ac.override" id="override" name="override" value="0"
-						ng-true-value="1" ng-false-value="0" />
-							<label for="override">Overridden</label>
-						</td>
-					</tr>
+
 					<tr>
 						<td valign="top" class="name"><label for="asset">Asset:</label></td>
 						<td valign="top">

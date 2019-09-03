@@ -168,23 +168,6 @@
 							</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">
-								<label for="workflowCode">Workflow:&nbsp;<span style="color: red">*</span></label>
-							</td>
-							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
-								<g:select id="workflowCode" name="workflowCode"
-									indextab="230"
-									from="${workflowCodes}"
-									value="${projectInstance?.workflowCode}"
-									noSelection="['':'Please Select']" onChange="warnForWorkflow()">
-								</g:select>
-								<g:hasErrors bean="${projectInstance}" field="workflowCode">
-									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="workflowCode" />
-									</div>
-								</g:hasErrors>
-							</td>
-
 							<td class="name"><label>Time Zone:</label></td>
 							<td class="valueNW">
 								<input type="text" id="timezone" name="timezone" value="${timezone ? timezone.code:''}" readonly style="width: 200px; padding-right: 20px">
@@ -247,10 +230,6 @@
 
 		$("#timeZoneSelectPopup").dialog({ autoOpen: false });
 
-		$("#workflowCode").select2({
-			placeholder: "Please Select",
-			width: "75%"
-		});
 		$("#projectType").select2({
 			placeholder: "Please Select",
 			width: "75%"
@@ -335,10 +314,6 @@
 			return allFieldsOK;
 		}
 
-		function warnForWorkflow(){
-			alert("Warning: Changing the workflow for a project underway can create problems!")
-		 return true
-		}
 		function validateForm() {
 			return validateRequiredFields() && validateDates() && Project.validSelectedPartners();
 		}

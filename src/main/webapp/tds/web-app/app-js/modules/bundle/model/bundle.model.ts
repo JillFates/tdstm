@@ -11,7 +11,6 @@ export class BundleModel {
 	public moveManagerId: number;
 	public moveEventId: number;
 	public operationalOrder: number;
-	public workflowCode: string;
 	public useForPlanning: boolean;
 }
 

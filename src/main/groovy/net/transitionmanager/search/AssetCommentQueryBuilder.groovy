@@ -465,8 +465,7 @@ class AssetCommentQueryBuilder {
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished':      [builder: viewUnpublishedBuilder],
-		'workflowTransition':   [property: 'ac.workflowTransition.id', builder: eqBuilder, joinTable: 'ac.workflowTransition'],
+		'viewUnpublished':      [builder: viewUnpublishedBuilder]
 	]
 
 }

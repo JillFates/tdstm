@@ -41,7 +41,6 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			startDate = new Date()
 			completionDate = startDate + 30
 			guid = StringUtil.generateGuid()
-			workflowCode = 'STD_PROCESS'
 			timezone = Timezone.findByCode('GMT')
 			guid = StringUtil.generateGuid()
 		}

@@ -188,7 +188,6 @@ class ProjectController implements ControllerMethods {
 				partnerStaff         : projectDetails.partnerStaff,
 				companyPartners      : projectDetails.companyPartners,
 				projectLogoForProject: projectDetails.projectLogoForProject,
-				workflowCodes        : projectDetails.workflowCodes,
 				projectPartners      : projectPartners,
 				projectManagers      : projectManagers,
 				moveBundles          : moveBundles,
@@ -251,22 +250,21 @@ class ProjectController implements ControllerMethods {
 				def moveBundles = MoveBundle.findAllByProject(project)
 
 				def model = [
-						company: company,
-						projectInstance: project,
-						projectPartner: projectDetails.projectPartner,
-						projectManager: projectDetails.projectManager,
-						moveManager: projectDetails.moveManager,
-						companyStaff: projectDetails.companyStaff,
-						clientStaff: projectDetails.clientStaff,
-						partnerStaff: projectDetails.partnerStaff,
-						companyPartners: projectDetails.companyPartners,
-						workflowCodes: projectDetails.workflowCodes,
-						projectLogoForProject: projectDetails.projectLogoForProject,
-						prevParam: params,
-						projectPartners: projectPartners,
-						projectManagers: projectManagers,
-						moveBundles: moveBundles,
-						planMethodologies: planMethodologies
+					company              : company,
+					projectInstance      : project,
+					projectPartner       : projectDetails.projectPartner,
+					projectManager       : projectDetails.projectManager,
+					moveManager          : projectDetails.moveManager,
+					companyStaff         : projectDetails.companyStaff,
+					clientStaff          : projectDetails.clientStaff,
+					partnerStaff         : projectDetails.partnerStaff,
+					companyPartners      : projectDetails.companyPartners,
+					projectLogoForProject: projectDetails.projectLogoForProject,
+					prevParam            : params,
+					projectPartners      : projectPartners,
+					projectManagers      : projectManagers,
+					moveBundles          : moveBundles,
+					planMethodologies    : planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -305,22 +303,21 @@ class ProjectController implements ControllerMethods {
 				def moveBundles = MoveBundle.findAllByProject(project)
 
 				def model = [
-						company: company,
-						projectInstance: project,
-						projectPartner: projectDetails.projectPartner,
-						projectManager: projectDetails.projectManager,
-						moveManager: projectDetails.moveManager,
-						companyStaff: projectDetails.companyStaff,
-						clientStaff: projectDetails.clientStaff,
-						partnerStaff: projectDetails.partnerStaff,
-						companyPartners: projectDetails.companyPartners,
-						workflowCodes: projectDetails.workflowCodes,
-						projectLogoForProject: projectDetails.projectLogoForProject,
-						prevParam:params,
-						projectPartners: projectPartners,
-						projectManagers: projectManagers,
-						moveBundles:moveBundles,
-						planMethodologies: planMethodologies
+					company              : company,
+					projectInstance      : project,
+					projectPartner       : projectDetails.projectPartner,
+					projectManager       : projectDetails.projectManager,
+					moveManager          : projectDetails.moveManager,
+					companyStaff         : projectDetails.companyStaff,
+					clientStaff          : projectDetails.clientStaff,
+					partnerStaff         : projectDetails.partnerStaff,
+					companyPartners      : projectDetails.companyPartners,
+					projectLogoForProject: projectDetails.projectLogoForProject,
+					prevParam            : params,
+					projectPartners      : projectPartners,
+					projectManagers      : projectManagers,
+					moveBundles          : moveBundles,
+					planMethodologies    : planMethodologies
 				]
 
 				render(view: 'edit', model: model)
@@ -340,9 +337,14 @@ class ProjectController implements ControllerMethods {
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		params.planMethodology = defaultProject.planMethodology
 
-		[clients: projectDetails.clients, company: company, managers: projectDetails.managers,
-		 partners: projectDetails.partners, projectInstance: new Project(params),
-		 workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies]
+		[
+			clients          : projectDetails.clients,
+			company          : company,
+			managers         : projectDetails.managers,
+			partners         : projectDetails.partners,
+			projectInstance  : new Project(params),
+			planMethodologies: planMethodologies
+		]
 	}
 
 	/**
@@ -397,10 +399,14 @@ class ProjectController implements ControllerMethods {
 				List<Map> planMethodologies = projectService.getPlanMethodologiesValues(Project.defaultProject)
 
 				render(view: 'create', model: [
-					company: company, projectInstance: project, clients: projectDetails.clients,
-					partners: projectDetails.partners, managers: projectDetails.managers,
-					workflowCodes: projectDetails.workflowCodes, planMethodologies:planMethodologies, prevParam: params
-				] )
+					company          : company,
+					projectInstance  : project,
+					clients          : projectDetails.clients,
+					partners         : projectDetails.partners,
+					managers         : projectDetails.managers,
+					planMethodologies: planMethodologies,
+					prevParam        : params
+				])
 				return
 			}
 

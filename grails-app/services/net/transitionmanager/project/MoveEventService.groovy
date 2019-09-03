@@ -36,15 +36,15 @@ class MoveEventService implements ServiceMethods {
 
 	private static final List<String> preMoveCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'assignedTo',
 													 'status', 'estStart', '', '', 'notes', 'duration', 'estStart',
-													 'estFinish', 'actStart', 'actFinish', 'workflow']
+													 'estFinish', 'actStart', 'actFinish']
 	private static final List<String> serverCols = ['id', 'application', 'assetName', '','serialNumber', 'assetTag',
 													'manufacturer', 'model', 'assetType', '', '', '']
 	private static final List<String> scheduleCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role',
 													  'assignedTo', 'instructionsLink' , '', 'duration', 'estStart',
-													  'estFinish', 'actStart', 'actFinish', 'workflow']
+													  'estFinish', 'actStart', 'actFinish']
 	private static final List<String> postMoveCols = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status',
 													  'estFinish', 'dateResolved' , 'notes', 'taskDependencies', 'duration',
-													  'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow']
+													  'estStart', 'estFinish', 'actStart', 'actFinish']
 	private static final List<String> impactedCols = ['id', 'assetName', '', 'startupProc', 'description',
 													  'sme', '' ,'' ,'' ,'' ,'' ,'' ]
 	private static final List<String> dbCols = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType',
@@ -69,7 +69,7 @@ class MoveEventService implements ServiceMethods {
 														'resolution', 'resolvedBy', 'createdBy', 'dueDate', 'assignedTo',
 														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
-														'actStart', 'actFinish', 'workflow']
+														'actStart', 'actFinish']
 
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService

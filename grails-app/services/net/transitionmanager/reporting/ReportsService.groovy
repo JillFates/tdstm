@@ -18,7 +18,6 @@ import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
-import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -28,6 +27,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
@@ -45,7 +45,6 @@ import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -571,18 +570,7 @@ class ReportsService implements ServiceMethods {
     }
 
     def getEventsBundelsInfo(moveBundles, MoveEvent moveEvent, eventErrorList) {
-        Set workFlowCode = moveBundles.workflowCode
-        def workFlow = moveBundles.workflowCode
-        def workFlowCodeSelected = [:]
         def steps = [:]
-
-        if (workFlowCode.size() == 1) {
-            workFlowCodeSelected[HtmlUtil.escape(moveEvent.name) + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
-        } else {
-            moveBundles.each {
-                workFlowCodeSelected[HtmlUtil.escape(it.name) + '(Bundle)    Uses WorkFlow '] = it.workflowCode
-            }
-        }
 
         List<String> dashBoardOk = []
         moveBundles.each { moveBundle ->
@@ -602,8 +590,11 @@ class ReportsService implements ServiceMethods {
             }
         }
 
-        [workFlowCodeSelected: workFlowCodeSelected, steps: steps,
-         eventErrorList      : eventErrorList, dashBoardOk: dashBoardOk]
+        [
+            steps         : steps,
+            eventErrorList: eventErrorList,
+            dashBoardOk   : dashBoardOk
+        ]
     }
 
     /**
@@ -1395,7 +1386,7 @@ class ReportsService implements ServiceMethods {
         HSSFSheet tasksSheet = book.getSheet("tasks")
 
         List preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-                                  '', '', '', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart', 'estFinish', 'actStart', 'dateResolved', 'workflow', 'category',
+                                  '', '', '', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart', 'estFinish', 'actStart', 'dateResolved', 'category',
                                   'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
         moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
@@ -1478,7 +1469,6 @@ class ReportsService implements ServiceMethods {
             StringBuilder duration = new StringBuilder()
             def customParam
             String windowColor
-            List<AssetComment> workflow
             def durationHours
 
             if (finishTime && startTime) {
@@ -1500,15 +1490,9 @@ class ReportsService implements ServiceMethods {
                 customParam = it[command.outageWindow]
             }
 
-            if (command.testing) {
-                Long workflowTransitionId = NumberUtil.toPositiveLong(command.testing)
-                WorkflowTransition workflowTransaction = WorkflowTransition.get(workflowTransitionId)
-                workflow = appComments.findAll { it?.workflowTransition == workflowTransaction }.sort { it.actStart }
-                workflow.removeAll([null])
-            }
             appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
                     customParam: customParam ? customParam + (command.outageWindow == 'drRtoDesc' ? 'h' : '') : '',
-                    windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
+                    windowColor: windowColor)
         }
 
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]

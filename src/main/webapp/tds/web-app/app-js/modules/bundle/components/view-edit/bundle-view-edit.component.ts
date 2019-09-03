@@ -17,7 +17,6 @@ export class BundleViewEditComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public managers;
 	public rooms;
-	public workflowCodes;
 	public isDefaultBundle;
 	public sourceRoom;
 	public targetRoom;
@@ -53,7 +52,6 @@ export class BundleViewEditComponent implements OnInit {
 			projectManagerId: 0,
 			moveManagerId: 0,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -135,7 +133,6 @@ export class BundleViewEditComponent implements OnInit {
 
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
 
 				this.updateSavedFields();

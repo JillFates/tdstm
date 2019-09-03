@@ -1,7 +1,5 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.project.Workflow
-
 class ApplicationMigrationCommand {
 
 	/**

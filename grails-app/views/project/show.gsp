@@ -86,10 +86,6 @@
 							<td class="valueNW">${defaultBundle}</td>
 						</tr>
 						<tr class="prop">
-							<td class="name"><label>Workflow:</label></td>
-							<td class="valueNW" nowrap="nowrap">
-								${projectInstance.workflowCode}
-							</td>
 							<td class="name"><label >Time Zone:</label></td>
 							<td class="valueNW">${timezone}</td>
 						</tr>

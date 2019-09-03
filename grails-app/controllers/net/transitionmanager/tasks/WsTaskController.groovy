@@ -315,10 +315,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		// Determine if only unpublished tasks need to be fetched.
 		params['viewUnpublished'] = securityService.viewUnpublished()
 
-		if(params['workflowTransition']){
-			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
-		}
-
 		// Fetch the tasks, the total count and the number of pages.
 		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
 		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)

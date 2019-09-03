@@ -8,15 +8,19 @@ import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 import net.transitionmanager.imports.TaskBatch
-import net.transitionmanager.project.WorkflowTransition
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.StringUtils
 
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.TimeScale.M
 
 class AssetComment {
@@ -61,8 +65,6 @@ class AssetComment {
 	// Date actFinish		// Alias of dateResolved
 
 	Integer slack                     // Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
-	WorkflowTransition workflowTransition   // The transition that this task was cloned from
-	Integer workflowOverride = 0      // Flag that the Transition values (duration) has been overridden
 	String role                       // The team that will perform the task
 	Integer taskNumber                // TODO : constraint type short int min 1, max ?, nullable
 	Integer score                     // Derived property that calculates the weighted score for sorting on priority
@@ -159,8 +161,6 @@ class AssetComment {
 		taskBatch nullable: true
 		taskNumber nullable: true
 		taskSpec nullable: true
-		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
-		workflowTransition nullable: true
 		apiAction nullable: true
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
@@ -185,7 +185,6 @@ class AssetComment {
 			priority sqltype: 'tinyint'
 			resolution sqltype: 'text'
 			taskNumber sqltype: 'shortint unsigned'
-			workflowOverride sqltype: 'tinyint'
 		}
 		/*
 			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER

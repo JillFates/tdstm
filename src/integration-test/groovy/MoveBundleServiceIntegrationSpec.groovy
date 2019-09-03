@@ -300,11 +300,11 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 	}
 
 	void '02. Test lookupList for specific fields and sorting criteria'() {
-		when: 'requesting the id and workflowCode where the results are sorted by id'
-			List result = moveBundleService.lookupList(project, ['id', 'workflowCode'], 'id')
-		then: 'the results include fields id and workflowCode'
+		when: 'requesting the id and guid where the results are sorted by id'
+			List result = moveBundleService.lookupList(project, ['id', 'guid'], 'id')
+		then: 'the results include fields id and guid'
 			result[0].containsKey('id')
-			result[0].containsKey('workflowCode')
+			result[0].containsKey('guid')
 			result[0].keySet().size() == 2
 		and: 'the results are sorted correctly'
 			result[0].id < result[1].id
@@ -485,35 +485,11 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.dependencyBundleCount == 4
 	}
 
-	void '11. Create move bundle'() {
-		when: 'creating a move bundle with blank workflowCode'
-			MoveBundleCommand command = new MoveBundleCommand(
-					name: RandomStringUtils.randomAscii(10),
-					description: RandomStringUtils.randomAscii(10)
-			)
-			moveBundleService.save(command)
-		then: 'exception is thrown'
-			thrown(ValidationException)
-		when: 'fixing failing constraint'
-			command.workflowCode = 'STD'
-			MoveBundle moveBundle = moveBundleService.save(command)
-		then: 'move bundle is saved to db'
-			moveBundle
-			moveBundle.id
-			moveBundle.workflowCode == 'STD'
-		when: 'saving a second move bundle with same name and project'
-			moveBundleService.save(command)
-		then: 'exception is thrown'
-			thrown(ValidationException)
-
-	}
-
 	void '12. Update move bundle'() {
 		given: 'a move bundle'
 			MoveBundleCommand command = new MoveBundleCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					workflowCode: 'STD'
 			)
 			MoveBundle moveBundle = moveBundleService.save(command)
 		when: 'updating a move bundle'
@@ -529,7 +505,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleUpdated.startTime == TimeUtil.parseDateTime('2018-11-13')
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
-			command.workflowCode = null
 			moveBundleService.update(moveBundle.id, command)
 		then: 'exception is thrown'
 			thrown(ValidationException)

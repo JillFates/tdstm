@@ -41,10 +41,7 @@
 				placeholder: "Please Select",
 				width: "75%"
 			});
-			$("#workflowCode").select2({
-				placeholder: "Please Select",
-				width: "75%"
-			});
+
 			$("#projectType").select2({
 				placeholder: "Please Select",
 				width: "75%"
@@ -311,22 +308,6 @@
 							</td>
 						</tr>
 						<tr class="prop">
-							<td class="name">
-								<label for="workflowCode">Workflow:&nbsp;<span style="color: red">*</span></label>
-							</td>
-							<td class="valueNW ${hasErrors(bean:projectInstance,field:'workflowCode','errors')}">
-								<g:select id="workflowCode" name="workflowCode"
-									from="${workflowCodes}"
-									value="${projectInstance?.workflowCode}"
-									noSelection="['STD_PROCESS':'STD_PROCESS']"
-									tabindex="220">
-								</g:select>
-								<g:hasErrors bean="${projectInstance}" field="workflowCode">
-									<div class="errors">
-										<g:renderErrors bean="${projectInstance}" as="list" field="workflowCode" />
-									</div>
-								</g:hasErrors>
-							</td>
 							<td class="name">
 								<label for="projectType">Plan Methodology:&nbsp;</label>
 							</td>

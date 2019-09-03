@@ -47,14 +47,7 @@
 						<td>
 						</td>
 					</tr>
-					<tr id="workFlowShow" ng-show="(acData.workflow)">
-						<td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Step:</label></td>
-						<td valign="top" class="value" id="workFlowShowId">{{acData.workflow}}</td>
-						<td valign="top" class="name" colspan="2"><input type="checkbox" id="overrideShow" name="overrideShow" value="0"
-							ng-true-value="1" ng-false-value="0" ng-disabled="true" ng-model="ac.override" />
-							<label for="override" >Overridden</label>
-						</td>
-					</tr>
+
 					<tr id="assetShowId" class="prop">
 						<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 						<td valign="top" class="value" id="assetShowValueId" colspan="3">
@@ -69,28 +62,7 @@
 							<span ng-hide="acData.instructionsLinkURL.length > 0">{{ac.instructionsLink}}</span>
 						</td>
 					</tr>
-					<tr id="workFlowShow1">
-						<td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="priorityShowId"><b ng-show="ac.priority == 1 || ac.priority == 2">{{ac.priority}}</b><span ng-show="!(ac.priority == 1 || ac.priority == 2)">{{ac.priority}}</span></span>
-						</td>
-					</tr>
-					<tr id="workFlowShow2">
-						<td valign="top" class="name"><label for="dueDateShowId">Due Date:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="dueDateShowId">{{ac.dueDate}}</span>
-						</td>
-					</tr>
-					<tr id="workFlowShow3">
-						<td valign="top" class="name"><label for="durationShowId">Estimated Duration:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="durationShowId" >{{ac.durationText}}</span>
-							<div class="daterangepicker_action daterangepicker_lock_show">
-								<i ng-if="!acData.durationLocked" class="fa fa-fw fa-unlock"></i>
-								<i ng-if="acData.durationLocked" class="fa fa-fw fa-lock"></i>
-							</div>
-						</td>
-					</tr>
+
 					<tr id="estStartShow">
 						<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
 						<td valign="top" class="value" id="estStartShowId" nowrap="nowrap">{{acData.etStart}}</td>

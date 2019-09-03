@@ -1,16 +1,5 @@
 package net.transitionmanager.task
 
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.exception.UnauthorizedException
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.SecurityUtil
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
@@ -21,13 +10,24 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.json.JsonBuilder
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import javax.servlet.http.HttpServletRequest
 
@@ -207,9 +207,6 @@ class TaskImportExportService implements ServiceMethods {
 
 		actualFinish			: [type: 'datetime', ssPos:20, formPos:21, domain: 'C', width:120, locked:false,
 										label: 'Actual Finish', template:changeTmpl('actualFinish'), transform:xfrmDateTimeToString],
-
-		workflowStep			: [type: 'string', ssPos:21, formPos:22, domain: 'C', width:120, locked:false,
-										label: 'WorkFlow Step', template:changeTmpl('workflowStep'), transform:xfrmString],
 
 		category				: [type: 'string', ssPos:22, formPos:23, domain: 'C', width:120, locked:false, modifiable:true,
 										label: 'Category', template:changeTmpl('category'), transform:xfrmString],

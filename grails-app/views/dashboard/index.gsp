@@ -917,11 +917,6 @@
 					remainingTasksNumber = steps[i].tskComp
 					totalTasksNumber = steps[i].tskTot
 				}
-				var firstUrl = taskManagerUrl + "1&step=" +steps[i].wfTranId
-				var secondUrl = taskManagerUrl + "0&step=" +steps[i].wfTranId
-				var linksHtml = "<a href=\""+ firstUrl +"\">" + remainingTasksNumber + "</a> (of <a href=\"" + secondUrl+ "\">" + totalTasksNumber + "</a>)"
-
-				$("#tasks_"+moveBundleId+"_"+steps[i].tid).html(linksHtml);
 
 				$("#plan_start_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planStart));
 				$("#plan_completion_"+moveBundleId+"_"+steps[i].tid).html(tdsCommon.parseAndFormatDateTimeFromZulu(steps[i].planComp));
