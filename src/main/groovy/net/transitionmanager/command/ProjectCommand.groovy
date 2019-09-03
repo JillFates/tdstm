@@ -12,6 +12,7 @@ class ProjectCommand implements CommandObject {
 	List<Long> partnerIds
 	String projectCode
 	String projectLogo
+	String originalFilename
 	Long projectManagerId
 	String projectName
 	String projectType

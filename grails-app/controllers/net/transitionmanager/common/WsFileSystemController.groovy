@@ -1,6 +1,7 @@
 package net.transitionmanager.common
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.FileSystemUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
@@ -70,7 +71,8 @@ class WsFileSystemController implements ControllerMethods{
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def uploadImageFile(UploadImageFileCommand imageFileUploadCommand) {
-		doFileUpload(imageFileUploadCommand)
+		String originalFilename = FileSystemUtil.getOriginalFilename( imageFileUploadCommand.file)
+		doFileUpload(imageFileUploadCommand, '', originalFilename)
 	}
 
     /**
@@ -120,12 +122,12 @@ class WsFileSystemController implements ControllerMethods{
      * @param prefix for the uploaded file name
      * @return
      */
-    private def doFileUpload(FileCommand fileCommand, String prefix = '') {
+    private def doFileUpload(FileCommand fileCommand, String prefix = '', String originalFilename = null) {
         String fileName = fileSystemService.transferFileToFileSystem(fileCommand, prefix)
         if (fileCommand.hasErrors()) {
             renderErrorJson(errorsInValidation(fileCommand.errors))
         } else {
-            renderSuccessJson([filename: fileName])
+            renderSuccessJson([filename: fileName, originalFilename: originalFilename])
         }
     }
 

@@ -1868,18 +1868,11 @@ class ProjectService implements ServiceMethods {
 	 * @param file - the File resource to reference
 	 * @return the ProjectLogo object
 	 */
-	ProjectLogo createOrUpdateLogo(Project project, file) {
+	ProjectLogo createOrUpdateLogo(Project project, File file, String originalFilename) {
 		assert file
 		assert project
 
-		String origFileName = file.originalFilename
-		int slashIndex = Math.max(origFileName.lastIndexOf('/'), origFileName.lastIndexOf('\\'))
-
-		if (slashIndex > -1) {
-			origFileName = origFileName.substring(slashIndex + 1)
-		}
-
-		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
+		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: originalFilename, project: project)
 		pl.setData file.inputStream
 
 		return pl.save(flush: true)
@@ -1928,8 +1921,13 @@ class ProjectService implements ServiceMethods {
 		// Assign partners
 		updateProjectPartners(project, projectCommand.partnerIds)
 
-		// Clone default field settings
-		cloneDefaultSettings(project)
+		if (projectCommand.id > 0) {
+			// Clone default field settings
+			cloneDefaultSettings(project)
+
+			// Create the default bundle
+			createDefaultBundle(project, projectCommand.defaultBundleName)
+		}
 
 		// Deal with the Project Manager if one is supplied
 		if (projectCommand.projectManagerId > 0) {
@@ -1939,14 +1937,12 @@ class ProjectService implements ServiceMethods {
 		// Deal with the adding the project logo if one was supplied
 		if (projectCommand.projectLogo) {
 			File logoFile = fileSystemService.openTempFile(projectCommand.projectLogo)
-			createOrUpdateLogo(project, logoFile)
+			createOrUpdateLogo(project, logoFile, projectCommand.originalFilename)
 		}
 
 		// Set the new project as the user's current project.
 		userPreferenceService.setCurrentProjectId(project.id)
 
-		// Create the default bundle
-		createDefaultBundle(project, projectCommand.defaultBundleName)
 		project.save()
 
 		return project

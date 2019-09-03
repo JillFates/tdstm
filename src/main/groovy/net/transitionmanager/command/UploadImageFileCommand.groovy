@@ -10,21 +10,7 @@ import org.springframework.web.multipart.MultipartFile
  * to the filesystem.
  */
 
-class UploadImageFileCommand implements FileCommand{
-
-    MultipartFile file
-
-    static constraints = {
-
-        /**
-         * Accept empty files, but the extension needs to be valid.
-         */
-        file nullable: false, validator: { file, cmd ->
-            if (!FileSystemUtil.validateExtension(file.getOriginalFilename(), cmd.getValidFileExtension())) {
-                return Message.FileSystemInvalidFileExtension
-            }
-        }
-    }
+class UploadImageFileCommand extends UploadFileCommand {
 
     /**
      * A List of accepted file extensions for validating
