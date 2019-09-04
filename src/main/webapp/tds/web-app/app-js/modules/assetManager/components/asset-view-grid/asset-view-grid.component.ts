@@ -93,6 +93,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
+	private showFullTags = false; // TODO: retrieve this from backend
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -748,6 +749,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}
 
 		return this.assetExplorerService.query(viewId, payload);
+	}
+
+	/**
+	 *
+	 * */
+	public toggleTagsView(): void {
+		this.showFullTags = !this.showFullTags;
 	}
 
 	/**

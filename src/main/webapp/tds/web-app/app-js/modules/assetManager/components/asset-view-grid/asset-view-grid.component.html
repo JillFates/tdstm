@@ -66,6 +66,7 @@
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section">
+				<span title="Toggle Tags" class="tag-arrows-icon" (click)="toggleTagsView()"><i class="fa fa-fw fa-arrows-alt"></i></span>
 				<div *ngIf="hiddenFilters; then hiddenFiltersButton else clearFilters"></div>
 				<ng-template #clearFilters>
 					<tds-button-custom
@@ -90,11 +91,12 @@
 					</tds-button-custom>
 				</ng-template>
 				<tds-button-custom
-				            icon="refresh"
-				            title="Refresh"
-				            isIconButton="true"
-				            class="component-action-reload pull-righ"
-				            (click)="onReload()"></tds-button-custom>
+					icon="refresh"
+					title="Refresh"
+					isIconButton="true"
+					class="component-action-reload pull-righ"
+					(click)="onReload()">
+				</tds-button-custom>
 			</div>
 		</ng-template>
 
@@ -245,9 +247,13 @@
             </ng-template>
 			<!-- Asset Tags Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
-				<div>
-               <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
-                     [ngClass]="tag.css">{{tag.name}}</span>
+				<div class="single-line-tags" [ngClass]="showFullTags ? 'show-full-tags': ''">
+					<ng-template ngFor let-tag [ngForOf]="dataItem[column.domain+'_'+column.property]" let-i="index">
+						<ng-template [ngIf]="i === 2">
+							<span class="dots-for-tags">...</span>
+						</ng-template>
+						<span class="label tag" [ngClass]="tag.css">{{i}} {{tag.name}}</span>
+					</ng-template>
 				</div>
 			</ng-template>
 		</kendo-grid-column>
