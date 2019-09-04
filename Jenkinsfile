@@ -75,8 +75,10 @@ spec:
         stage('Test') {
           container('docker-compose') {
             try {
+                sh "docker-compose -p ${env.BUILD_ID} run e2e cd /opt/tdstm/test/e2e && ls -hal"
                 sh "docker-compose -p ${env.BUILD_ID} run e2e ls -hal"
                 sh "docker-compose -p ${env.BUILD_ID} run e2e pwd"
+                sh "docker-compose -p ${env.BUILD_ID} run e2e cd /opt/tdstm && ls -hal"
             } finally {
                 sh "docker-compose -p ${env.BUILD_ID} down --remove-orphans"
                 sh "docker-compose -p ${env.BUILD_ID} rm"
