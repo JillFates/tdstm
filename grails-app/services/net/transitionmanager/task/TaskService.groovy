@@ -347,31 +347,29 @@ class TaskService implements ServiceMethods {
 			sql.append(sortAndOrder ? ', ' : '').append 'score DESC, task_number ASC'
 		}
 
-		// log.debug "getUserTasks: SQL: $sql"
-		// log.debug "getUserTasks: SQL query args: $queryArgs"
+		log.debug "getUserTasks: SQL: $sql"
+		log.debug "getUserTasks: SQL query args: $queryArgs"
 
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
-		def allTasks = namedParameterJdbcTemplate.queryForList(sql.toString(), queryArgs)
+		List allTasks = namedParameterJdbcTemplate.queryForList(sql.toString(), queryArgs)
 
-		// def allTasks = jdbcTemplate.queryForList(sql.toString(), queryArgs)
-		def format = "yyyy/MM/dd hh:mm:ss"
-		def minAgoFormat = minAgo.format(format)
-		def todoTasks = allTasks.findAll { task ->
+		List todoTasks = allTasks.findAll { task ->
 			task.status == ACS.READY ||
 			(task.status == ACS.HOLD && task.apiActionId != null) ||
 			(task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated >= minAgo)
 		}
 
-		def assignedTasks = allTasks.findAll { task ->
+		List assignedTasks = allTasks.findAll { task ->
 			(task.status == ACS.READY && task.assignedTo == personId) || (task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated >= minAgo)
 		}
+
+		log.debug "getUserTasks: {} tasks found, {} todo tasks, {} assigned tasks", allTasks.size(), todoTasks.size(), assignedTasks.size()
 
 		if (countOnly) {
 			[all: allTasks.size(), todo: todoTasks.size()]
-		}
-		else {
+		} else {
 			[all: allTasks, todo: todoTasks, user: assignedTasks]
 		}
 	}
