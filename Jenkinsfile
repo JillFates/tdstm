@@ -79,6 +79,7 @@ spec:
                 sh "docker-compose -p ${env.BUILD_ID} run e2e ls -hal"
                 sh "docker-compose -p ${env.BUILD_ID} run e2e pwd"
                 sh "docker-compose -p ${env.BUILD_ID} run e2e cd /opt/tdstm && ls -hal"
+                sh "docker-compose -p ${env.BUILD_ID} run e2e"
             } finally {
                 sh "docker-compose -p ${env.BUILD_ID} down --remove-orphans"
                 sh "docker-compose -p ${env.BUILD_ID} rm"
