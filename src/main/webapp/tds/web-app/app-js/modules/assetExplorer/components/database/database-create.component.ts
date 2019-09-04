@@ -49,7 +49,8 @@ export function DatabaseCreateComponent(template, model: any, metadata: any) {
 			this.model.asset.environment = '';
 			this.model.asset.scale = null;
 			this.model.asset.validation = this.defaultValidation;
-			this.focusControlByName('assetName')
+			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**
