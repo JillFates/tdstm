@@ -67,7 +67,7 @@ spec:
 
         stage('Build For Testing') {
           container('docker-compose') {
-            sh "docker build --tag tm"
+            sh "docker build --tag tm ."
           }
         }
 
