@@ -13,9 +13,9 @@
             <div class="modal-body">
                 <form name="form" role="form" class="form-horizontal left-alignment" #form="ngForm">
                     <div class="modal-body-container">
-                        <div class="box-body">
+                        <div class="box-body" *ngIf="form">
                             <div class="form-group">
-                                <div class="col-md-2">Manufacturer:</div>
+                                <div class="col-md-2"><span class="required-field">Manufacturer:</span></div>
                                 <div class="col-md-4">
                                     <tds-combobox
                                             tabindex="1"
@@ -25,10 +25,12 @@
                                             [reloadOnOpen]="true"
                                             (valueChange)="onManufacturerValueChange($event)" >
                                     </tds-combobox>
+                                    <span class="missing-field" *ngIf="!isValidControl('manufacturerName')">Manufacturer is required</span>
                                 </div>
-                                <div class="col-md-2">Model Name:</div>
+                                <div class="col-md-2"><span class="required-field">Model Name:</span></div>
                                 <div class="col-md-4">
-                                    <input type="text" tabindex="20" name="modelName" [(ngModel)]="model.modelName">
+                                    <input type="text" tabindex="20" name="modelName" required [(ngModel)]="model.modelName">
+                                    <span class="missing-field" *ngIf="!isValidControl('modelName')">Model name is required</span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -215,6 +217,7 @@
                             <div class="form-group">
                                 <div class="col-md-2">Connectors:
                                     <input type="text" class="custom-controls" name="customControls" [(ngModel)]="model.customControls">
+                                    <input type="text" class="custom-controls" name="manufacturerName" required [(ngModel)]="model.manufacturerName" >
                                 </div>
                                 <div class="col-md-10">
                                     <tds-connector
@@ -232,7 +235,7 @@
                         tabindex="40"
                         class="btn-primary pull-left"
                         title="Save"
-                        [disabled]="!form.dirty || !hasEditModelPermission"
+                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission"
                         (click)="onSave()">
                 </tds-button-save>
 

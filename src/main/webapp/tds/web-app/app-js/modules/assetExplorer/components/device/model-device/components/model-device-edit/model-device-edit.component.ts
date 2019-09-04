@@ -57,6 +57,8 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			id: this.deviceManufacturer.id,
 			text: this.deviceManufacturer.name
 		};
+		this.model.manufacturerName = this.deviceManufacturer.name;
+
 		this.assetType = {
 			id: this.deviceModel.assetType,
 			text: this.deviceModel.assetType
@@ -114,6 +116,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			value = {id: null};
 		}
 		this.model.manufacturerId = value.id;
+		this.model.manufacturerName = value.text;
 		this.onCustomControlChange();
 	}
 
@@ -253,6 +256,20 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 					})
 			}
 		});
+	}
+
+	/**
+	 * Determine if the state for an specific controls is valid
+	 * @param controlName Name of the control to be checked
+	 * @returns {boolean}
+	 */
+	isValidControl(controlName): boolean {
+		if (!this.form || !this.form.controls[controlName]) {
+			return true;
+		}
+
+		return this.form.controls[controlName].valid;
+
 	}
 
 }

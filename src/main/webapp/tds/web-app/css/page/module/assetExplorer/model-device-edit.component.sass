@@ -1,4 +1,11 @@
 .model-device-edit-component
+	font-size: 13px
+	.missing-field
+		color: $color-message-error--red
+	.required-field::after
+		content: "*"
+		color: $color-message-error--red
+		margin-left: 4px
 	input[type=text]
 		width: 100%
 	input[type=checkbox]
@@ -19,4 +26,6 @@
 		padding: 5px
 	.custom-controls
 		visibility: hidden
+		width: 0
+		height: 0
 
