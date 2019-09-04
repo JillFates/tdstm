@@ -31,7 +31,7 @@ class StaffListSpec extends GebReportingSpec {
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
     static originalDetails = [userCompany,firstName,middleName,lastName,userName,userEmail]
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

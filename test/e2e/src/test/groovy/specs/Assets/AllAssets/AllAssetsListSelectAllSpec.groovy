@@ -19,7 +19,7 @@ class AllAssetsListSelectAllSpec extends GebReportingSpec {
     static assetsCountToBeSelected = 3
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage
