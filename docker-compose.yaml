@@ -17,6 +17,7 @@ services:
   app:
     <<: *base
     container_name: tm-application
+    working_dir: /opt/tdstm
     ports:
       - 8080:8080
     command: >

@@ -86,5 +86,3 @@ RUN echo ">>> Setting up git config" && \
 # Define the user working directory
 
 COPY . /opt/tdstm/
-
-WORKDIR /opt/tdstm/
