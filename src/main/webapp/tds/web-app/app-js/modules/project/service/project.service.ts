@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
@@ -59,22 +59,13 @@ export class ProjectService {
 			.catch((error: any) => error);
 	}
 
-	saveProject(model: ProjectModel, id = ''): Observable<any> {
-		let formData = new FormData();
-		formData.append('file', model.projectLogo);
+	saveProject(model, originalFilename: string = '', id = ''): Observable<any> {
+		model['originalFilename'] = originalFilename;
 		return this.http.post(`../ws/project/saveProject/${id}`, model)
 				.map((response: any) => {
 					return response;
 				})
 				.catch((error: any) => error);
-	}
-
-	uploadProjectLogo(filename: string): Observable<any> {
-		return this.http.post(`../ws/fileSystem/uploadImageFile/${filename}`, null)
-			.map((response: any) => {
-				return response;
-			})
-			.catch((error: any) => error);
 	}
 
 	/**

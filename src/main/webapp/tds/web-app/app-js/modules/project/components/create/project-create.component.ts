@@ -25,6 +25,7 @@ export class ProjectCreateComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
 	private defaultModel = null;
+	private logoOriginalFilename;
 	public file = new KendoFileUploadBasicConfig();
 	public fetchResult: any;
 	public transformResult: ApiResponseModel;
@@ -129,7 +130,8 @@ export class ProjectCreateComponent implements OnInit {
 			let filename = e.files[0].name;
 			this.fetchResult = { status: 'success', filename: filename };
 			this.projectModel.projectLogo = e.files[0].rawFile;
-			this.projectService.uploadProjectLogo(filename);
+
+			this.logoOriginalFilename = response.originalFilename;
 		} else {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
@@ -145,7 +147,7 @@ export class ProjectCreateComponent implements OnInit {
 			if (this.fetchResult && this.fetchResult.status === 'success') {
 				this.projectModel.projectLogo = this.fetchResult.filename;
 			}
-			this.projectService.saveProject(this.projectModel).subscribe((result: any) => {
+			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
 				}
