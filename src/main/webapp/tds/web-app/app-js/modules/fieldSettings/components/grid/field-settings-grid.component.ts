@@ -73,16 +73,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
-
-	private readonly availableControls = [
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.List, value: CUSTOM_FIELD_CONTROL_TYPE.List},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.String, value: CUSTOM_FIELD_CONTROL_TYPE.String},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.YesNo, value: CUSTOM_FIELD_CONTROL_TYPE.YesNo},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.Date, value: CUSTOM_FIELD_CONTROL_TYPE.Date},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.DateTime, value: CUSTOM_FIELD_CONTROL_TYPE.DateTime},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.Number, value: CUSTOM_FIELD_CONTROL_TYPE.Number}
-	];
-	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
+	public availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
 	constructor(
 		private loaderService: UILoaderService,
@@ -414,6 +405,41 @@ export class FieldSettingsGridComponent implements OnInit {
 				delete dataItem.constraints.minSize
 				break;
 		}
+	}
+
+	/**
+	 * Event to update the control of the dataItem after the user has confirmed the change action
+	 * @param dataItem  Current grid cell item
+	 * @param conversion Contains the information of this conversion
+	 */
+	protected  onFieldTypeChangeSave(dataItem: any, conversion: any): void {
+		dataItem.control = conversion.to;
+		this.onControlChange(conversion.from, dataItem);
+	}
+
+	/**
+	 * Handle a change of custom control type event
+	 * @param dataItem Current grid cell item
+	 * @param fieldTypeChange contains the info about the conversion, save and reset events
+	 */
+	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
+		if (fieldTypeChange) {
+			this.prompt.open(
+				'Confirmation Required',
+				fieldTypeChange.conversion.getWarningMessage(),
+				'Ok', 'Cancel').then(result => {
+				if (result) {
+					this.setIsDirty(true);
+					fieldTypeChange.save();
+				} else {
+					fieldTypeChange.reset();
+				}
+			});
+
+			return;
+		}
+
+		console.error('Cannot find custom field transition');
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
