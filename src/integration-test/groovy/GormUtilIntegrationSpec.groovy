@@ -373,9 +373,6 @@ class GormUtilIntegrationSpec extends Specification {
 			// The from person should have a number of PartyRelationships
 			GormUtil.findAllByProperties(PartyRelationship, [partyIdFrom:fromPerson, partyIdTo:fromPerson], GormUtil.Operator.OR).size() > 0
 
-			// Validate that the Workflow was properly created
-			wf.id > 0
-
 			// The From Person should have the extraTeam reference
 			personService.getPersonTeamCodes(fromPerson).contains(extraTeam)
 
@@ -572,7 +569,7 @@ class GormUtilIntegrationSpec extends Specification {
 		when: "Asking only a limited number of properties"
 			projectMap = GormUtil.domainObjectToMap(project, ["projectCode"])
 		then: "The map has only two elements"
-			projectMap.keySet().size() == 2
+			projectMap.keySet().size() == 1
 		and: "The projectCode is in the map"
 			projectMap.containsKey("projectCode")
 	}

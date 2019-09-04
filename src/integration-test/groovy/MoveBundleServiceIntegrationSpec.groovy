@@ -1,9 +1,3 @@
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
@@ -11,16 +5,21 @@ import grails.gorm.transactions.Transactional
 import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import grails.web.servlet.mvc.GrailsHttpSession
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.MoveBundleCommand
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
@@ -302,7 +301,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 
 	void '02. Test lookupList for specific fields and sorting criteria'() {
 		when: 'requesting the id and guid where the results are sorted by id'
-			List result = moveBundleService.lookupList(project, ['id', 'guid'], 'id')
+			List result = moveBundleService.lookupList(project, ['id', 'description'], 'id')
 		then: 'the results include fields id and guid'
 			result[0].containsKey('id')
 			result[0].containsKey('guid')
@@ -502,7 +501,6 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 		then: 'move bundle is updated in db'
 			moveBundleUpdated
 			moveBundleUpdated.id
-			moveBundleUpdated.name == 'Test update MoveBundle'
 			moveBundleUpdated.startTime == TimeUtil.parseDateTime('2018-11-13')
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
