@@ -304,7 +304,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			List result = moveBundleService.lookupList(project, ['id', 'description'], 'id')
 		then: 'the results include fields id and guid'
 			result[0].containsKey('id')
-			result[0].containsKey('guid')
+			result[0].containsKey('description')
 			result[0].keySet().size() == 2
 		and: 'the results are sorted correctly'
 			result[0].id < result[1].id
@@ -502,8 +502,10 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleUpdated
 			moveBundleUpdated.id
 			moveBundleUpdated.startTime == TimeUtil.parseDateTime('2018-11-13')
+			moveBundleUpdated.name == 'Test update MoveBundle'
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
+			command.name = null
 			moveBundleService.update(moveBundle.id, command)
 		then: 'exception is thrown'
 			thrown(ValidationException)

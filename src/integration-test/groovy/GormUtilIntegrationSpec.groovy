@@ -379,16 +379,10 @@ class GormUtilIntegrationSpec extends Specification {
 		when: 'the persons are merged together things should look differently'
 			GormUtil.mergeDomainReferences(fromPerson, toPerson, true)
 			List persons = GormUtil.findAllByProperties(Person, personMap)
-
-			// Reload the Workflow so we can check for changed references
-			wf.refresh()
 		then:
 			// We should now only have one person that matches the To person
 			persons.size() == 1
 			persons[0].id == toPerson.id
-
-			// Validate that direct references switch over (case 1)
-			wf.updatedBy.id == toPerson.id
 
 			// The case 2A is validated by the fact that the merge did not encounter duplicate distinct key references when cloning over PartyRelationship
 
