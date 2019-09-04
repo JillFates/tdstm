@@ -1,9 +1,9 @@
-version: "3.7"
+version: "3.3"
 services:
 
   base: &base
     build: .
-    image: tm-registry.transitionmanager.net/tds-dev/tm-application:latest
+    image: tm:latest
     stdin_open: true
     tty: true
     volumes:
@@ -78,7 +78,7 @@ services:
     container_name: tm-e2e
     working_dir: /opt/tdstm/test/e2e
     command: >
-      cd /opt/tdstm/test/e2e && ./gradlew --profile
+      ./gradlew --profile
                 --no-scan
                 --no-build-cache
                 --no-search-upward
