@@ -88,7 +88,3 @@ RUN echo ">>> Setting up git config" && \
 COPY . /opt/tdstm/
 
 WORKDIR /opt/tdstm/
-
-RUN ./gradlew
-
-RUN cd /opt/tdstm/test/e2e && ./gradlew
