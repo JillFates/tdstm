@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { clone } from 'ramda';
 
 import {UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
@@ -10,6 +10,7 @@ import {AssetExplorerService} from '../../../../../../assetManager/service/asset
 import {DeviceModel} from '../../model/device-model.model';
 import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
 import {PowerModel, PowerUnits} from '../../../../../../../shared/components/power/model/power.model';
+import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PreferenceService} from '../../../../../../../shared/services/preference.service';
 import {UserContextService} from '../../../../../../auth/service/user-context.service';
 import {takeUntil} from 'rxjs/operators';
@@ -20,14 +21,17 @@ import {AkaChanges} from '../../../../../../../shared/components/aka/model/aka.m
 import {NgForm} from '@angular/forms';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../../../../shared/pipes/translate.pipe';
+import {ModelService} from '../../../../../service/model.service';
 
 @Component({
 	selector: 'model-device-edit',
 	templateUrl: 'model-device-edit.component.html'
 })
-export class ModelDeviceEditComponent extends UIExtraDialog {
+export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 	@ViewChild('form') protected form: NgForm;
 	private hasAkaValidationErrors = false;
+	public hasDeleteModelPermission: boolean;
+	public hasEditModelPermission: boolean;
 	public model: any;
 	public manufacturer = null;
 	public dateFormat = '';
@@ -38,6 +42,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	public powerUnits = PowerUnits;
 	public powerModel: PowerModel;
 	constructor(
+		private modelService: ModelService,
 		private permissionService: PermissionService,
 		private translatePipe: TranslatePipe,
 		private assetExplorerService: AssetExplorerService,
@@ -65,6 +70,11 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 
 		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
+	}
+
+	ngOnInit() {
+		this.hasDeleteModelPermission = this.permissionService.hasPermission(Permission.ModelDelete);
+		this.hasEditModelPermission = this.permissionService.hasPermission(Permission.ModelEdit);
 	}
 
 	/**
@@ -222,6 +232,27 @@ export class ModelDeviceEditComponent extends UIExtraDialog {
 	 */
 	public isDirty(): boolean {
 		return this.form.dirty;
+	}
+
+	/**
+	 * Prompt confirm delete a task
+	 * delegate operation to host component
+	 */
+	deleteModel(): void {
+		this.prompt.open(
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('MODEL.DELETE_MODEL')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'))
+		.then(result => {
+			if (result) {
+				this.modelService.deleteModel(this.model.id)
+					.subscribe((response) => {
+						console.log(response);
+						this.dismiss();
+					})
+			}
+		});
 	}
 
 }

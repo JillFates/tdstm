@@ -55,4 +55,13 @@ export class ModelService {
 		.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
 		.catch((error: any) => error.json());
 	}
+
+	deleteModel(id: string): Observable<any> {
+		const url = `${this.modelUrl}/update`;
+		const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
+
+		return this.http.post(url, {id, '_action_delete': 'Delete'}, {headers: headers, responseType: 'text'})
+		.catch((error: any) => error);
+	}
+
 }

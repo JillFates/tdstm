@@ -359,6 +359,9 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'PROVIDER': 'Provider',
 		'PROVIDERS': 'Providers',
 	},
+	'MODEL': {
+		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
+	},
 	'TASK_MANAGER': {
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',

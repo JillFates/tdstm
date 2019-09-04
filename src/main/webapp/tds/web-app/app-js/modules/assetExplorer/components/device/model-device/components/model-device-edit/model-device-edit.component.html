@@ -232,14 +232,15 @@
                         tabindex="40"
                         class="btn-primary pull-left"
                         title="Save"
-                        [disabled]="!form.dirty"
+                        [disabled]="!form.dirty || !hasEditModelPermission"
                         (click)="onSave()">
                 </tds-button-save>
 
                 <tds-button-delete
                         tabindex="41"
+                        (click)="deleteModel()"
                         class="btn-danger component-action-delete"
-                        [disabled]="!hasDeleteTaskPermission">
+                        [disabled]="!hasDeleteModelPermission">
                 </tds-button-delete>
 
                 <tds-button-cancel
