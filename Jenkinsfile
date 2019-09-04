@@ -4,7 +4,7 @@ node {
     def options = [
         git_repository                   : 'ssh://git@git.tdsops.com:7999/tm/tdstm.git',
         git_credentials                  : 'ad45d40d-c460-4878-a4d0-87b02297fcfc',
-        git_branch                       : 'feat/docker-compose',
+        git_branch                       : 'feat/TM-15566_chrome-driver',
         kubernetes_secrets               : ['tm-registry'],
     ]
     def tmlabel = "Playground-${BUILD_NUMBER}-${UUID.randomUUID().toString()}"
