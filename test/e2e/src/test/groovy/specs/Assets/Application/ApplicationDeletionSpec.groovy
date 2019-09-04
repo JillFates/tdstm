@@ -10,6 +10,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ApplicationDeletionSpec extends GebReportingSpec {
 
@@ -29,6 +31,8 @@ class ApplicationDeletionSpec extends GebReportingSpec {
     ]
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+
         testCount = 0
         to LoginPage
         login()

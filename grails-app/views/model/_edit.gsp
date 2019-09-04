@@ -133,9 +133,9 @@
 				<input type="hidden" id="powerUseIdH" value="${modelInstance?.powerUse}" >
 				<g:select id="ptype" name='powerType' value="${tds.powerType()}" from="${['Watts','Amps']}" onchange="updatePowerType(this.value,'Edit')"/>
 			</td>
-			<td>Notes:</td>
+			<td>CPU Type:</td>
 			<td>
-				<input type="text" name="description" id="descriptionId" value="${HtmlUtil.escape(modelInstance.description)}">
+				<input type="text" name="cpuType" id="cpuTypeId" value="${HtmlUtil.escape(modelInstance.cpuType)}">
 			</td>
 		</tr>
 
@@ -145,7 +145,7 @@
 			<td>Rear image:</td>
 			<td><input size="20" type="file" name="rearImage" id="rearImageId" accept="image/*" />
 			</td>-->
-		</tr>
+
 		<tr>
 			<td valign="top" class="name">
 				<label for="description">Room Object:</label>
@@ -153,15 +153,12 @@
 			<td valign="top" class="value ${hasErrors(bean:modelInstance,field:'roomObject','errors')}">
 				<g:checkBox id="roomObject" name="roomObject" value='${modelInstance.roomObject}'/>
 			</td>
-			<!--<td>Use Image:</td>
-			<td>
-				<g:if test="${modelInstance.useImage}">
-					<input type="checkbox" name="useImage" id="useImageId"  checked="checked" onclick="showImage(this.id)"/>
-				</g:if>
-				<g:else>
-					<input type="checkbox" name="useImage" id="useImageId" onclick="showImage(this.id)"/>
-				</g:else>
-			</td>-->
+			<td>CPU Count:</td>
+			<td><input type="number" min="0" max="10000" name="cpuCount" id="weightId" value="${modelInstance?.cpuCount}">
+				<g:hasErrors bean="${modelInstance}" field="cpuCount">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="modelWeight" /></div>
+				</g:hasErrors>
+			</td>
 		</tr>
 		<tr id="bladeRowsId" style="display: ${modelInstance.assetType == 'Blade Chassis' ? 'block' : 'none'}">
 			<td valign="top" class="name">Blade Rows:</td>
@@ -196,6 +193,34 @@
 		<tr>
 			<td>Created By :</td>
 			<td>${modelInstance?.createdBy}</td>
+			<td>Memory Size:</td>
+			<td><input type="number" min="0" max="10000" step="any" name="memorySize" id="weightId" value="${modelInstance?.memorySize}">
+				<g:hasErrors bean="${modelInstance}" field="memorySize">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="memorySize" /></div>
+				</g:hasErrors>
+			</td>
+		</tr>
+		<tr>
+			<td>Updated By :</td>
+			<td>${modelInstance?.updatedBy}</td>
+			<td>Storage Size:</td>
+			<td><input type="number" min="0" max="10000" step="any" name="storageSize" id="weightId" value="${modelInstance?.storageSize}">
+				<g:hasErrors bean="${modelInstance}" field="storageSize">
+					<div class="errors"><g:renderErrors bean="${modelInstance}" as="list" field="storageSize" /></div>
+				</g:hasErrors>
+			</td>
+		</tr>
+		<tr>
+			<td>Validated By :</td>
+			<td>${modelInstance?.validatedBy}</td>
+			<td>Notes:</td>
+			<td>
+				<input type="text" name="description" id="descriptionId" value="${HtmlUtil.escape(modelInstance.description)}">
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
 			<td>Source TDS:</td>
 			<td>
 				<g:if test="${modelInstance.sourceTDS}">
@@ -207,8 +232,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Updated By :</td>
-			<td>${modelInstance?.updatedBy}</td>
+			<td></td>
+			<td></td>
 			<td>Source URL :</td>
 			<td><input type="text" name="sourceURL" id="sourceURLId" value="${HtmlUtil.escape(modelInstance?.sourceURL)}">
 				<g:hasErrors bean="${modelInstance}" field="sourceURL">
@@ -217,8 +242,8 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Validated By :</td>
-			<td>${modelInstance?.validatedBy}</td>
+			<td></td>
+			<td></td>
 			<td>Model Status :</td>
 			<g:if test="${modelInstance.powerUse >0}">
 				<td><g:select id="modelStatus" name='modelStatus' value ="${modelInstance?.modelStatus}" from="${['new','full','valid']}"></g:select>

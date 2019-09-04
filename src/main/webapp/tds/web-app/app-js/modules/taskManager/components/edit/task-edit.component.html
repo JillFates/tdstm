@@ -271,7 +271,7 @@
 
                                                 </tr>
 
-                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop">
                                                     <td class="label N edge-cell" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>
@@ -298,15 +298,47 @@
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                     <td class="label N status-cell" nowrap="nowrap">
-                                                        <label><span>Status</span></label>
+                                                            <label><span>Status</span></label>
                                                     </td>
                                                     <td class="valueNW task-status vertical-note-status">
-                                                        <kendo-dropdownlist
-                                                                name="statusList"
-                                                                [class]="'form-control status task-' + model.status.toLowerCase()"
-                                                                [data]="model.statusList"
-                                                                [(ngModel)]="model.status">
-                                                        </kendo-dropdownlist>
+                                                            <kendo-dropdownlist
+                                                                    name="statusList"
+                                                                    [class]="'form-control status task-' + model.status.toLowerCase()"
+                                                                    [data]="model.statusList"
+                                                                    [(ngModel)]="model.status">
+                                                            </kendo-dropdownlist>
+                                                    </td>
+
+                                                    <td class="label N edge-cell" nowrap="nowrap">
+                                                        <label><span>Actual Start/Finish</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <span class="read-only-dates">{{model.actualStart}}-{{model.actualFinish}}</span>
+                                                    </td>
+
+                                                    <td class="label N edge-cell" nowrap="nowrap">
+                                                        <label><span>TaskSpec ID</span></label>
+                                                    </td>
+
+                                                    <td class="valueNW">
+                                                        <span class="read-only-dates">{{model.taskSpec}}</span>
+                                                    </td>
+                                                </tr>
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label N edge-cell" nowrap="nowrap">
+                                                            <label><span>Completion %</span></label>
+                                                    </td>
+    
+                                                    <td class="valueNW completion">
+                                                        <tds-number-control
+                                                            name="percentageComplete"
+                                                            [autoCorrect]="true"
+                                                            [(ngModel)]="model.percentageComplete"
+                                                            [format]="'n'"
+                                                            [min]="0"
+                                                            [max]="100">
+                                                        </tds-number-control>
                                                     </td>
 
                                                     <td></td>

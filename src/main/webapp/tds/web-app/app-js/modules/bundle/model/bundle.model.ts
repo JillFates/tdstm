@@ -1,6 +1,7 @@
 import {ModalType} from '../../../shared/model/constants';
 
 export class BundleModel {
+	public id?: any;
 	public name: string;
 	public description: string;
 	public fromId: number;
@@ -9,7 +10,7 @@ export class BundleModel {
 	public completionTime: Date;
 	public projectManagerId: number;
 	public moveManagerId: number;
-	public moveEventId: number;
+	public moveEvent: any;
 	public operationalOrder: number;
 	public useForPlanning: boolean;
 }
@@ -35,7 +36,7 @@ export class BundleColumnModel {
 				label: 'Planning',
 				property: 'planning',
 				type: 'boolean',
-				width: 80
+				width: 100
 			},
 			{
 				label: 'Asset Quantity',

@@ -78,7 +78,7 @@
 								id="category" name="category"
 								required="true"
 								ng-model="ac.category" datasource="ds.categories"
-								from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}"
+								from="${com.tdsops.tm.enums.domain.AssetCommentCategory.list}"
 								noSelection="['':'Please select']"
 							/>
 						</td>
@@ -143,6 +143,12 @@
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td>
 							<status-select comment-id='ac.commentId' ng-model='ac.status'></status-select>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="status">Completion %:</label></td>
+						<td>
+							<input	type="number" min="0" max="100" name="percentageComplete" ng-model="acData.percentageComplete">
 						</td>
 					</tr>
 					<tr class="prop">

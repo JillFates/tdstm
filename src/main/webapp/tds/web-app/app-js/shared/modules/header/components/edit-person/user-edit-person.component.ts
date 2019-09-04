@@ -5,6 +5,7 @@ import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {PermissionService} from '../../../../services/permission.service';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 @Component({
 	selector: 'user-edit-person',
@@ -23,6 +24,7 @@ export class UserEditPersonComponent {
 		public passwordChangeModel: PasswordChangeModel,
 		private headerService: HeaderService,
 		private permissionService: PermissionService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService) {
 		this.startPageOptions = [];
@@ -39,9 +41,11 @@ export class UserEditPersonComponent {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.savedPersonModel) !== JSON.stringify(this.personModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

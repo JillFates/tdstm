@@ -83,7 +83,6 @@ class MoveBundleService implements ServiceMethods {
 		MoveBundle.executeUpdate('UPDATE MoveBundle SET moveEvent=null where moveEvent=:me', [me: moveEvent])
 		for (id in moveBundleIds) {
 			moveEvent.addToMoveBundles(MoveBundle.get(id))
-
 		}
 	}
 

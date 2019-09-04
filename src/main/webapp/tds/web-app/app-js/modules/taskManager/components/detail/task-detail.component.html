@@ -162,6 +162,24 @@
                                                     </td>
                                                     <td class="valueNW"><span>{{model.durationDelta}}</span></td>
                                                 </tr>
+
+                                                <tr *ngIf="!collapsedTaskDetail" class="prop">
+                                                    <td class="label N" nowrap="nowrap">
+                                                         <label><span>Completion %:</span></label>
+                                                    </td>
+                                                    <td class="valueNW">
+                                                        <div class="progress completion">
+                                                                <div class="progress-bar" role="progressbar" 
+                                                                    [style.width.%]="model.percentageComplete" 
+                                                                    [attr.aria-valuenow]="model.percentageComplete" 
+                                                                    [attr.aria-valuemin]="0" 
+                                                                    [attr.aria-valuemax]="100">
+                                                                    {{model.percentageComplete}} %
+                                                                </div>
+                                                        </div>	
+                                                    </td>
+                                                </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -294,13 +312,15 @@
                         <span>Edit</span>
                     </button>
                     <tds-task-actions
+														*ngIf="model.id && model.status"
+														[task]="model"
                             (start)="onStartTask()"
                             (done)="onDoneTask()"
                             (invoke)="onInvoke()"
+														(reset)="onReset()"
                             (assignToMe)="onAssignToMe()"
-                            (neighborhood)="onNeighborhood()"
-                            [options]="getShowTaskActionsOptions()"
-                    ></tds-task-actions>
+                            (neighborhood)="onNeighborhood()">
+										</tds-task-actions>
                 </div>
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
                     <i class="glyphicon glyphicon-trash action-button"></i>

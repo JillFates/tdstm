@@ -279,6 +279,14 @@ class CommentService implements ServiceMethods {
 				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
 			}
 
+			if (params.percentageComplete) {
+				if (NumberUtil.isaNumber(params.percentageComplete)) {
+					assetComment.percentageComplete = params.percentageComplete
+				} else {
+					assetComment.percentageComplete = Integer.parseInt(params.percentageComplete)
+				}
+			}
+
 			// Issues (aka tasks) have a number of additional properties to be managed
 			if (assetComment.commentType == AssetCommentType.TASK) {
 				if (params.containsKey('moveEvent')) {
@@ -351,7 +359,7 @@ class CommentService implements ServiceMethods {
 			if (isNew) {
 				userPreferenceService.setPreference(PREF.TASK_CREATE_STATUS, params.status)
 			}
-			taskService.setTaskStatus(assetComment, params.status)
+			taskService.setTaskStatus(assetComment, params.status, currentPerson)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note

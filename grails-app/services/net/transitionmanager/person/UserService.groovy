@@ -746,14 +746,14 @@ class UserService implements ServiceMethods {
 			Integer id = NumberUtil.toPositiveLong(eventPref)
 
 			if (id) {
-				moveEvent = GormUtil.findInProject(project, MoveEvent, id, true)
+				moveEvent = GormUtil.findInProject(project, MoveEvent, id)
 			}
 
 			String bundlePref = userPreferenceService.getMoveBundleId()
 			id = NumberUtil.toPositiveLong(bundlePref)
 
 			if (bundlePref) {
-				moveBundle = GormUtil.findInProject(project, MoveBundle, id, true)
+				moveBundle = GormUtil.findInProject(project, MoveBundle, id)
 			}
 
 			logoUrl = projectService.getProjectLogoUrl(project)

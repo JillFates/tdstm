@@ -11,7 +11,7 @@ import {
 	OnDestroy, HostListener
 } from '@angular/core';
 import {Observable, ReplaySubject} from 'rxjs';
-import {takeUntil} from "rxjs/operators";
+import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
 import {
 	DataStateChangeEvent,
@@ -20,7 +20,7 @@ import {
 } from '@progress/kendo-angular-grid';
 
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {VIEW_COLUMN_MIN_WIDTH, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
+import {VIEW_COLUMN_MIN_WIDTH, VIEW_COLUMN_MIN_WIDTH_SHRINK, ViewColumn, ViewSpec} from '../../../assetExplorer/model/view-spec.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {
@@ -63,7 +63,7 @@ import {NumberConfigurationConstraintsModel} from '../../../fieldSettings/compon
 import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from "../../../../shared/constants/common-shrunk-columns";
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -107,6 +107,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	public currentFields = [];
 	public justPlanning = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
+	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
 	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
 	public showMessage = true;
 	public typingTimeout: any;
@@ -158,7 +159,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			data: [],
 			total: 0
 		};
-		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetExplorerCreate);
+		this.canCreateAssets = this.permissionService.hasPermission(Permission.AssetCreate);
 
 		this.selectedAssetsForBulk = [];
 		this.getPreferences()
@@ -758,5 +759,25 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	ngOnDestroy(): void {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
+	}
+
+	protected isBulkSelectAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetBulkSelect);
+	}
+
+	protected isEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetEdit);
+	}
+
+	protected isTaskCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskCreate);
+	}
+
+	protected isCommentCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentCreate);
+	}
+
+	protected isAssetCloneAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.AssetCreate);
 	}
 }

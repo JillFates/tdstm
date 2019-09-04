@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {BundleService} from '../../service/bundle.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -6,6 +6,8 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `bundle-view-edit-component`,
@@ -15,6 +17,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleModel: BundleModel = null;
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
+	public moveEvents;
 	public managers;
 	public rooms;
 	public isDefaultBundle;
@@ -27,6 +30,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleId;
 	public editing = false;
 	protected userTimeZone: string;
+	private requiredFields = ['name', 'workflowCode'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
@@ -35,6 +39,7 @@ export class BundleViewEditComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
+		private translatePipe: TranslatePipe,
 		@Inject('id') private id) {
 		this.canEditBundle = this.permissionService.hasPermission('BundleEdit');
 		this.bundleId = this.id;
@@ -50,6 +55,7 @@ export class BundleViewEditComponent implements OnInit {
 			startTime: '',
 			completionTime: '',
 			projectManagerId: 0,
+			moveEvent: {},
 			moveManagerId: 0,
 			operationalOrder: 1,
 			useForPlanning: false,
@@ -57,6 +63,22 @@ export class BundleViewEditComponent implements OnInit {
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.bundleModel = Object.assign({}, defaultBundle, this.bundleModel);
 		this.getModel(this.bundleId);
+	}
+
+	// Close dialog if back button is pressed
+	@HostListener('window:popstate', ['$event'])
+	onPopState(event) {
+		this.activeDialog.close()
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	public confirmDeleteBundle() {
@@ -130,11 +152,17 @@ export class BundleViewEditComponent implements OnInit {
 				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
 				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
 				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
 
+				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				this.rooms = data.rooms;
+				this.managers.forEach((manager, index) => {
+					manager.staff.name = manager.name;
+					this.managers[index] = manager.staff // Limit managers down to just staff
+				});
 
+				this.rooms = data.rooms;
 				this.updateSavedFields();
 			});
 	}
@@ -150,17 +178,17 @@ export class BundleViewEditComponent implements OnInit {
 			}
 		});
 		this.managers.forEach((manager) => {
-			if (manager.staff.id === this.savedModel.projectManagerId) {
+			if (manager.id === this.savedModel.projectManagerId) {
 				this.projectManager = manager.name;
 			}
-			if (manager.staff.id === this.savedModel.moveManagerId) {
+			if (manager.id === this.savedModel.moveManagerId) {
 				this.moveManager = manager.name;
 			}
 		});
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
@@ -170,15 +198,26 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
-		}
+	public isDirty() {
+		return JSON.stringify(this.savedModel) !== JSON.stringify(this.bundleModel);
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: BundleModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**
@@ -195,9 +234,11 @@ export class BundleViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close();
@@ -212,9 +253,11 @@ export class BundleViewEditComponent implements OnInit {
 	public cancelEdit(): void {
 		if (JSON.stringify(this.bundleModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.editing = false;

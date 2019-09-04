@@ -9,6 +9,7 @@ import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-opera
 import {TaskColumnsModel, CommentColumnsModel} from './model/task-comment-columns.model';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
 import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
 import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
@@ -20,6 +21,7 @@ import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: `task-comment`,
@@ -60,7 +62,8 @@ export class TaskCommentComponent implements OnInit {
 		public taskManagerService: TaskService,
 		private userContextService: UserContextService,
 		private preferenceService: PreferenceService,
-		private translate: TranslatePipe) {
+		private translate: TranslatePipe,
+		private permissionService: PermissionService) {
 		this.getPreferences();
 	}
 
@@ -153,7 +156,9 @@ export class TaskCommentComponent implements OnInit {
 	 */
 	public openTaskComment(comment: any, modalType: ModalType): void {
 		if (comment.commentInstance.taskNumber && comment.commentInstance.taskNumber !== 'null') {
-			this.openTaskDetail(comment);
+			if (this.canOpenTaskDetail()) {
+				this.openTaskDetail(comment);
+			}
 		} else {
 			this.openCommentDetail(comment, modalType);
 		}
@@ -368,5 +373,41 @@ export class TaskCommentComponent implements OnInit {
 				return resolve(true);
 			}, err => reject(false));
 		});
+	}
+
+	protected isTaskCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskCreate);
+	}
+
+	protected isTaskEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskEdit);
+	}
+
+	protected isTaskDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.TaskDelete);
+	}
+
+	protected isCommentCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentCreate);
+	}
+
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
+	}
+
+	// NOTE TM-15753 - This method and the permissions checked inside are placed here to match
+	// the permissions required on the back end to access this screens.
+	// However according to the Role Permissions, the user should only need the 'TaskView' permission
+	// that is available to all users. To change this in the BE is not trivial, a refactor should be
+	// done in the FE (this is also accessed by the Task Manager) to be able to change the permissions on the BE,
+	// because the Show and Edit functions on Tasks are not loosely coupled in the FE.
+	// I'm adding this method here, that should be removed once this is taken care of in a sepparate ticket.
+	protected canOpenTaskDetail(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentCreate) &&
+		this.permissionService.hasPermission(Permission.TaskCreate);
 	}
 }

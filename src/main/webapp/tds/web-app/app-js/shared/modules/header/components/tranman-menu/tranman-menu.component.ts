@@ -1,25 +1,39 @@
 // Angular
-import {Component} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 // Model
 import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {Permission} from '../../../../model/permission.model';
 // Service
 import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
 import {PermissionService} from '../../../../services/permission.service';
+import { TaskService } from '../../../../../modules/taskManager/service/task.service';
 
 @Component({
 	selector: 'tds-tranman-menu',
 	templateUrl: 'tranman-menu.component.html',
 })
 
-export class TranmanMenuComponent {
+export class TranmanMenuComponent implements OnInit {
 	protected permission: Permission = Permission;
 	public userContext: UserContextModel;
+	taskTodoCount: number
 
 	constructor(
 		private appSettingsService: UserContextService,
-		private permissionService: PermissionService) {
+		private permissionService: PermissionService,
+		private taskService: TaskService) {
+		this.taskTodoCount = 0;
 		this.getUserContext();
+	}
+
+	/**
+	 * Set My Task count
+	 */
+	ngOnInit(): void {
+		this.taskService.retrieveUserToDoCount()
+			.subscribe(result => {
+				this.taskTodoCount = result.count;
+			});
 	}
 
 	protected getUserContext(): void {

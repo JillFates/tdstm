@@ -12,22 +12,16 @@
             <div class="dialog" style="border: 1px solid #5F9FCF">
                 <div>
                     <table id="updateCommentTable" class="inner">
-                        <tr class="prop">
-                            <td valign="top" class="name">
-                                <label><b>Dictionary:</b></label>
-                            </td>
-                            <td valign="top" class="value">
-                                <label>${apiAction.agent}</label>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">
-                                <label><b>Method:</b></label>
-                            </td>
-                            <td valign="top" class="value">
-                                <label>${apiAction.method}</label>
-                            </td>
-                        </tr>
+						<g:if test="${apiAction.type == 'WebAPI'}">
+							<tr class="prop">
+								<td valign="top" class="name">
+									<label><b>Method:</b></label>
+								</td>
+								<td valign="top" class="value">
+									<label>${apiAction.method}</label>
+								</td>
+							</tr>
+						</g:if>
                         <tr class="prop">
                             <td valign="top" class="name" >
                                 <label><b>Description:</b></label>
@@ -36,6 +30,38 @@
                                 <textarea cols="80" rows="4" name="actionDescription" ng-maxlength="4000" readonly>${apiAction.description}</textarea>
                             </td>
                         </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Type:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                                <label>${apiAction.type}</label>
+                            </td>
+                        </tr>
+						<tr class="prop">
+                            <td valign="top" class="name" >
+                                <label><b>Is Remote:</b></label>
+                            </td>
+                            <td valign="top" class="value">
+                               <g:if test="${apiAction.isRemote == true}">
+                                    <input class="checkbox" type="checkbox" checked disabled>
+                               </g:if>
+                               <g:else>
+                                    <input class="checkbox" type="checkbox" disabled>
+                               </g:else>
+                            </td>
+                        </tr>
+                        <g:if test="${apiAction.type != 'WebAPI'}">
+							<tr class="prop">
+								<td valign="top" class="script" >
+									<label><b>Script:</b></label>
+								</td>
+								<td valign="top" class="value">
+									<textarea cols="80" rows="6" name="actionScript" readonly>${apiAction.script}</textarea>
+								</td>
+							</tr>
+						</g:if>
+
                         <tr class="prop">
                             <td valign="top" colspan="2">
                                 <table id="updateCommentTableInnerTable">
@@ -51,8 +77,8 @@
                                         <g:each var="methodParam" in="${apiAction.methodParams}">
                                             <tr>
                                                 <td>${methodParam.paramName}</td>
-                                                <td>${methodParam.contextLabel}</td>
-                                                <td>${methodParam.fieldNameLabel}</td>
+                                                <td>${methodParam.contextLabel ?: methodParam.context}</td>
+                                                <td>${methodParam.fieldNameLabel ?: methodParam.fieldName}</td>
                                                 <td>${apiAction.methodParamsValues[methodParam.paramName]}</td>
                                             </tr>
                                         </g:each>

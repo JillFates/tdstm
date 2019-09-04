@@ -4,6 +4,7 @@ export class QueryColumn {
 }
 
 export const VIEW_COLUMN_MIN_WIDTH = 110;
+export const VIEW_COLUMN_MIN_WIDTH_SHRINK = 20;
 
 export class ViewColumn extends QueryColumn {
 	width ? = VIEW_COLUMN_MIN_WIDTH;

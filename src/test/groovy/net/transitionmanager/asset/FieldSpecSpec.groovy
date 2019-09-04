@@ -152,16 +152,16 @@ class FieldSpecSpec extends Specification {
 			]
 
 		expect: 'can check if FieldSpec is custom or not'
-			new FieldSpec(fieldSpecMap).getHibernateCastSentence('A.custom10') == castSentence
+			new FieldSpec(fieldSpecMap).getHibernateCastSentence('custom10') == castSentence
 
 		where:
 			control    | field       | label             | precision | separator | allowNegative || castSentence
-			'String'   | 'assetName' | 'Name'            | null      | false     | false         || "cast(A.custom10 as $StringType.INSTANCE.name)"
-			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || "$FieldSpec.CAST_BIG_DECIMAL_FUNCTION(A.custom10, 2)"
-			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || "cast_long(A.custom10)"
-			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_long(A.custom10)"
-			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(A.custom10, '%Y-%m-%d')"
-			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(A.custom10, '%Y-%m-%dT%TZ')"
+			'String'   | 'assetName' | 'Name'            | null      | false     | false         || "cast(AE.custom10 as $StringType.INSTANCE.name)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 2         | true      | false         || "$FieldSpec.CAST_BIG_DECIMAL_FUNCTION(AE.custom10, 2)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | 0         | false     | false         || "cast_long(AE.custom10)"
+			'Number'   | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_long(AE.custom10)"
+			'Date'     | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(AE.custom10, '%Y-%m-%d')"
+			'DateTime' | 'custom10'  | 'My Cutsom Field' | null      | false     | false         || "cast_date_time(AE.custom10, '%Y-%m-%dT%TZ')"
 	}
 
 }

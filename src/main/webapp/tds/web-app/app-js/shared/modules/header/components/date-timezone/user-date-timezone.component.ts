@@ -12,6 +12,7 @@ import {DateUtils} from '../../../../utils/date.utils';
 import {SortUtils} from '../../../../utils/sort.utils';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -38,6 +39,7 @@ export class UserDateTimezoneComponent implements OnInit {
 		private headerService: HeaderService,
 		public activeDialog: UIActiveDialogService,
 		private preferenceService: PreferenceService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
 	}
 
@@ -110,9 +112,11 @@ export class UserDateTimezoneComponent implements OnInit {
 			datetimeFormat: this.selectedTimeFormat
 		})) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM')	,
+				this.translatePipe.transform('GLOBAL.CANCEL')	,
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.dismiss();

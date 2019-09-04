@@ -21,6 +21,7 @@ import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -334,8 +335,8 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 		and: 'an asset not assigned to the Bundle (associated with the Default Bundle by default) is created'
 			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.SERVER)
 		and: 'some tasks are generated for the Event'
-			def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
-			def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
+			def task1 = new Task (taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, project: project).save(flush: true)
+			def task2 = new Task(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, project: project).save(flush: true)
 		and: 'the deleteBundleAndAssets method is called'
 			moveBundleService.deleteBundleAndAssets(bundle)
 		then: 'the Bundle should be deleted'

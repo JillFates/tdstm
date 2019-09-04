@@ -21,6 +21,11 @@ export class UIAutoCenterDirective implements AfterViewInit, OnInit, OnDestroy {
 				'display': 'block',
 				'visibility': 'hidden'
 			});
+
+			jQuery(this.modalDialog).draggable({
+				containment: '#tdsUiDialog',
+				handle: '.modal-header'
+			});
 		}
 	}
 

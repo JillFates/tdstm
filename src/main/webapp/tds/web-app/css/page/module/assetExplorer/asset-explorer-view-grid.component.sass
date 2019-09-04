@@ -1,10 +1,20 @@
 .asset-explorer-view-grid-component
   $grid-font-icon-size: 20px
+  kendo-grid-list
+    .k-grid-content
+      .k-grid-table
+        tbody
+          tr
+            td
+              text-overflow: initial !important
   .k-grid-pager
     .k-icon
       font-size: $grid-font-icon-size
 
   .k-grid-header
+    .k-filter-row
+      td
+        vertical-align: top
     .k-icon
       font-size: $grid-font-icon-size
     tr

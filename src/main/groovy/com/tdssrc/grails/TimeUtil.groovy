@@ -4,8 +4,8 @@ import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.TimeScale
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import groovy.util.logging.Slf4j
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.time.DateFormatUtils
 import org.springframework.util.Assert
@@ -1103,4 +1103,31 @@ class TimeUtil {
 	static boolean canParseDateTime(String dateString) {
 		parseISO8601DateTime(dateString)
 	}
+
+	/**
+	 * Convert a given Time Duration into minutes.
+	 * @param timeDuration
+	 * @return
+	 */
+	static Integer toMinutes(TimeDuration timeDuration) {
+		return timeDuration.toMilliseconds() / 60000
+	}
+
+	/**
+	 * Returns a {@code Date} adding minutes to current time {@code nowGMT( )}
+	 * <pre>
+	 *     TimeUtil.dateFrom(-10, pointInTime)
+	 *     TimeUtil.dateFrom(120) // Implicit from {@code TimeUtil#nowGMT}
+	 * </pre>
+	 * @param minutes
+	 * @return an instance of {@code Date}
+	 */
+	static Date dateFromUsingMinutes(int minutes, Date pointInTime = nowGMT()) {
+		Date time = null
+		use(TimeCategory) {
+			time = pointInTime + minutes.minutes
+		}
+		return time
+	}
+
 }

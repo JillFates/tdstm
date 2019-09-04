@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e0c5ed6c-dd05-4ac9-a78a-3418ea0d8d88",
+		"_postman_id": "87dd3b33-27c1-4443-a39f-f299e669f915",
 		"name": "DeviceEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -94,7 +94,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
 					"host": [
 						"{{host}}"
 					],
@@ -199,7 +199,7 @@
 						"exec": [
 							"pm.test(\"Save bundle id\", function () {",
 							"    var jsonObject = JSON.parse(responseBody);",
-							"    var bundleId = jsonObject[0].bundleId;",
+							"    var bundleId = jsonObject.data[0].id;",
 							"    pm.environment.set(\"bundleId\", bundleId);",
 							"});",
 							"",
@@ -215,14 +215,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/moveBundle/retrieveBundleList",
+					"raw": "{{host}}/tdstm/ws/reports/moveBundles",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"moveBundle",
-						"retrieveBundleList"
+						"ws",
+						"reports",
+						"moveBundles"
 					]
 				}
 			},

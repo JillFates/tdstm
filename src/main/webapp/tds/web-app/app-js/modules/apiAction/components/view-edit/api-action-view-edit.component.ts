@@ -1,34 +1,44 @@
-import {Component, ViewChild, ViewChildren, HostListener, OnInit, QueryList, ElementRef, Inject} from '@angular/core';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {
+	Component,
+	ElementRef,
+	HostListener,
+	OnDestroy,
+	OnInit,
+	QueryList,
+	ViewChild,
+	ViewChildren
+} from '@angular/core';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
 import {
 	APIActionModel,
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	APIActionType,
+	EVENT_BEFORE_CALL_TEXT,
 	EventReaction,
 	EventReactionType,
-	EVENT_BEFORE_CALL_TEXT,
 	Languages
 } from '../../model/api-action.model';
-import {ProviderModel} from '../../../provider/model/provider.model';
-import {Permission} from '../../../../shared/model/permission.model';
-import {APIActionService} from '../../service/api-action.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../../shared/model/data-list-grid.model';
-import {INTERVAL, INTERVALS, KEYSTROKE} from '../../../../shared/model/constants';
-import {DictionaryModel, AgentMethodModel, CredentialModel} from '../../model/agent.model';
-import {DataScriptModel} from '../../../dataScript/model/data-script.model';
-import {NgForm} from '@angular/forms';
-import {CustomDomainService} from '../../../fieldSettings/service/custom-domain.service';
-import {ObjectUtils} from '../../../../shared/utils/object.utils';
-import {SortUtils} from '../../../../shared/utils/sort.utils';
-import {DateUtils} from '../../../../shared/utils/date.utils';
-import {CodeMirrorComponent} from '../../../../shared/modules/code-mirror/code-mirror.component';
+import { ProviderModel } from '../../../provider/model/provider.model';
+import { Permission } from '../../../../shared/model/permission.model';
+import { APIActionService } from '../../service/api-action.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { ActionType, COLUMN_MIN_WIDTH } from '../../../../shared/model/data-list-grid.model';
+import { INTERVAL, INTERVALS, KEYSTROKE } from '../../../../shared/model/constants';
+import { AgentMethodModel, CredentialModel, DictionaryModel } from '../../model/agent.model';
+import { DataScriptModel } from '../../../dataScript/model/data-script.model';
+import { NgForm } from '@angular/forms';
+import { CustomDomainService } from '../../../fieldSettings/service/custom-domain.service';
+import { ObjectUtils } from '../../../../shared/utils/object.utils';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
+import { DateUtils } from '../../../../shared/utils/date.utils';
+import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
 import * as R from 'ramda';
-import {forkJoin, Observable} from 'rxjs';
-import {CHECK_ACTION} from '../../../../shared/components/check-action/model/check-action.model';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import { forkJoin, Observable, ReplaySubject } from 'rxjs';
+import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { takeUntil } from 'rxjs/operators';
 
 declare var jQuery: any;
 
@@ -44,25 +54,29 @@ enum NavigationTab {
 	selector: 'api-action-view-edit',
 	templateUrl: 'api-action-view-edit.component.html',
 	styles: [`
-        .has-error, .has-error:focus {
-            border: 1px #f00 solid;
-        }
-		.invalid-form {
-			color: red;
-			font-weight: bold;
-		}
-		.script-error {
-			margin-bottom: 18px;
-		}
-		label.url-label {
-            width: 146px;
-		}
-        .url-input {
-	        width: 82%;
-        }
+      .has-error, .has-error:focus {
+          border: 1px #f00 solid;
+      }
+
+      .invalid-form {
+          color: red;
+          font-weight: bold;
+      }
+
+      .script-error {
+          margin-bottom: 18px;
+      }
+
+      label.url-label {
+          width: 146px;
+      }
+
+      .url-input {
+          width: 82%;
+      }
 	`]
 })
-export class APIActionViewEditComponent implements OnInit {
+export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	// Forms
 	@ViewChild('apiActionForm') apiActionForm: NgForm;
 	@ViewChild('scriptForm') scriptForm: NgForm;
@@ -70,14 +84,11 @@ export class APIActionViewEditComponent implements OnInit {
 	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
-
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
-
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
-
 	public apiActionModel: APIActionModel;
 	public providerList = new Array<ProviderModel>();
 	public dictionaryList = new Array<DictionaryModel>();
@@ -95,17 +106,20 @@ export class APIActionViewEditComponent implements OnInit {
 	public actionTypes = ActionType;
 	private dataSignature: string;
 	private dataParameterListSignature: string;
+	private requiredFields = ['name', 'provider', 'actionType'];
 	private intervals = INTERVALS;
 	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
-	public selectedInterval = {value: 0, interval: ''};
-	public selectedLapsed = {value: 0, interval: ''};
-	public selectedStalled = {value: 0, interval: ''};
+	public selectedInterval = { value: 0, interval: '' };
+	public selectedLapsed = { value: 0, interval: '' };
+	public selectedStalled = { value: 0, interval: '' };
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
+	public PLEASE_SELECT = null;
 	public commonFieldSpecs;
 	protected actionTypesList = [];
 	protected  remoteCredentials = [];
 	protected defaultItem = {id: '', value: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')};
+	public SUPPLIED_CREDENTIAL = 'SUPPLIED';
 	public assetClassesForParameters = [
 		{
 			assetClass: 'COMMON',
@@ -137,16 +151,15 @@ export class APIActionViewEditComponent implements OnInit {
 		rows: 10,
 		cols: 4
 	};
-
 	public validInfoForm = false;
 	public validParametersForm = true;
 	public invalidScriptSyntax = false;
 	public checkActionModel = CHECK_ACTION;
-	private lastSelectedDictionaryModel: DictionaryModel = {
+	lastSelectedDictionaryModel: DictionaryModel = {
 		id: 0,
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
-	private lastSelectedAgentMethodModel: AgentMethodModel = {
+	lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: '0',
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
@@ -160,6 +173,7 @@ export class APIActionViewEditComponent implements OnInit {
 	};
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
+	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -178,30 +192,29 @@ export class APIActionViewEditComponent implements OnInit {
 	ngOnInit(): void {
 		// Sub Objects are not being created, just copy
 		this.apiActionModel = R.clone(this.originalModel);
-
 		// set the default empty values for dictionary in case it is not defined
 		if (!this.apiActionModel.dictionary) {
 			this.apiActionModel.dictionary = this.defaultDictionaryModel;
 		}
-
 		this.selectedInterval = R.clone(this.originalModel.polling.frequency);
 		this.selectedLapsed = R.clone(this.originalModel.polling.lapsedAfter);
 		this.selectedStalled = R.clone(this.originalModel.polling.stalledAfter);
 		this.apiActionModel.script = this.apiActionModel.script || '';
+		this.apiActionModel.isRemote = this.isRemote();
 
 		this.dataParameterListSignature = '';
 		this.parameterList = [];
-
 		// Fork Join load list api calls.
-		const observables = forkJoin<any>(
-			this.apiActionService.getProviders(),
-			this.apiActionService.getAPIActionEnums(),
-			this.customDomainService.getCommonFieldSpecsWithShared()
-		);
 		/**
 		 * Note!! with this fork joined api calls, now the last api call load list should always be getDataScripts()
 		 */
-		observables.subscribe({
+		forkJoin<any>(
+			this.apiActionService.getProviders(),
+			this.apiActionService.getAPIActionEnums(),
+			this.customDomainService.getCommonFieldSpecsWithShared()
+		)
+		.pipe(takeUntil(this.unsubscribeOnDestroy$))
+		.subscribe({
 			next: result => {
 				this.getProviders(result[0]);
 				this.getAgents(result[1]);
@@ -209,6 +222,17 @@ export class APIActionViewEditComponent implements OnInit {
 			},
 			complete: () => this.prepareFormListener(),
 		});
+	}
+
+	/**
+	 * unsubscribe from all subscriptions on destroy hook.
+	 * @HostListener decorator ensures the OnDestroy hook is called on events like
+	 * Page refresh, Tab close, Browser close, navigation to another view.
+	 */
+	@HostListener('window:beforeunload')
+	ngOnDestroy(): void {
+		this.unsubscribeOnDestroy$.next();
+		this.unsubscribeOnDestroy$.complete();
 	}
 
 	private getModalTitle(): void {
@@ -225,13 +249,13 @@ export class APIActionViewEditComponent implements OnInit {
 			if (this.simpleInfoForm) {
 				this.formValidStates.simpleInfoForm.isConfiguredValidators = true;
 			}
-
 			if (this.apiActionForm) {
-				this.apiActionForm.valueChanges.subscribe(val => {
+				this.apiActionForm.valueChanges
+					.pipe(takeUntil(this.unsubscribeOnDestroy$))
+					.subscribe(val => {
 					this.verifyIsValidForm();
 				});
 			}
-
 			this.verifyIsValidForm();
 			this.dataSignature = JSON.stringify(this.apiActionModel);
 		}, 0);
@@ -242,12 +266,11 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getProviders(result): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.providerList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.provider = this.providerList[0];
 			this.modifySignatureByProperty('provider');
 		}
 		this.providerList.push(...result);
-
 		this.getCredentials();
 	}
 
@@ -256,7 +279,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	getAgents(result: any): void {
 		if (this.modalType === ActionType.CREATE) {
-			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.dictionaryList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.dictionary = this.dictionaryList[0];
 			this.modifySignatureByProperty('dictionary');
 		}
@@ -264,7 +287,7 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -273,23 +296,21 @@ export class APIActionViewEditComponent implements OnInit {
 		if (!this.apiActionModel.httpMethod) {
 			this.apiActionModel.httpMethod = this.httpMethodList[0];
 		}
-
 		if (result && result.data.actionTypes) {
 			this.actionTypesList = [];
 			const keys = Object.keys(result.data.actionTypes);
 			keys.forEach((key: string) => {
-				this.actionTypesList.push({id: key, name: result.data.actionTypes[key]});
+				this.actionTypesList.push({ id: key, name: result.data.actionTypes[key] });
 			});
 			if (this.apiActionModel.tabActionType === APIActionType.HTTP_API) {
-				this.apiActionModel.actionType = { id: this.WEB_API};
+				this.apiActionModel.actionType = { id: this.WEB_API };
 			}
 		}
-
 		if (result && result.data.remoteCredentialMethods) {
 			this.remoteCredentials = [];
 			const keys = Object.keys(result.data.remoteCredentialMethods);
 			keys.forEach((key: string) => {
-				this.remoteCredentials.push({id: key, value: result.data.remoteCredentialMethods[key]});
+				this.remoteCredentials.push({ id: key, value: result.data.remoteCredentialMethods[key] });
 			});
 		}
 	}
@@ -298,7 +319,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of Credentials
 	 */
 	getCredentials(): void {
-		this.apiActionService.getCredentials().subscribe(
+		this.apiActionService.getCredentials()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
 			(result: any) => {
 				if (this.modalType === ActionType.CREATE || !this.apiActionModel.credential) {
 					this.agentCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
@@ -316,17 +339,21 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Get the list of DataScript
 	 */
 	getDataScripts(): void {
-		this.apiActionService.getDataScripts().subscribe(
-			(result: any) => {
-				result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
+		this.apiActionService.getDataScripts()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(
+			(result) => {
 				if (this.modalType === ActionType.CREATE) {
 					this.datascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 					this.apiActionModel.defaultDataScript = this.datascriptList[0];
 					this.modifySignatureByProperty('defaultDataScript');
 				}
-				this.datascriptList.push(...result);
-				if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
-					this.onProviderValueChange(this.apiActionModel.provider, true);
+				if (result.length > 0) {
+					result = result.sort((a, b) => SortUtils.compareByProperty(a, b, 'name'));
+					this.datascriptList.push(...result);
+					if (this.apiActionModel.provider && this.apiActionModel.provider.id !== 0) {
+						this.onProviderValueChange(this.apiActionModel.provider, true);
+					}
 				}
 				this.loadingLists = false;
 			},
@@ -380,6 +407,24 @@ export class APIActionViewEditComponent implements OnInit {
 				},
 				(err) => console.log(err));
 		}
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: APIActionModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**
@@ -442,6 +487,7 @@ export class APIActionViewEditComponent implements OnInit {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
+		console.log(this.modalType);
 		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
@@ -455,7 +501,9 @@ export class APIActionViewEditComponent implements OnInit {
 		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
 			.then((res) => {
 				if (res) {
-					this.apiActionService.deleteAPIAction(this.apiActionModel.id).subscribe(
+					this.apiActionService.deleteAPIAction(this.apiActionModel.id)
+						.pipe(takeUntil(this.unsubscribeOnDestroy$))
+						.subscribe(
 						(result) => {
 							this.activeDialog.dismiss(result);
 						},
@@ -488,7 +536,6 @@ export class APIActionViewEditComponent implements OnInit {
 				}, 1000);
 			}
 		}
-
 		if (tab === NavigationTab.Script) {
 			this.disableCodeMirrors();
 			if (!this.formValidStates.scriptForm.isConfiguredValidators) {
@@ -499,7 +546,6 @@ export class APIActionViewEditComponent implements OnInit {
 				}, 1000);
 			}
 		}
-
 		this.editModeFromView = false;
 		if (this.currentTab === 0) {
 			this.verifyIsValidForm();
@@ -507,11 +553,9 @@ export class APIActionViewEditComponent implements OnInit {
 		if (tab === NavigationTab.Info) {
 			this.prepareFormListener();
 		}
-
 		if (tab === NavigationTab.Reactions) {
 			this.disableCodeMirrors();
 		}
-
 		this.currentTab = tab;
 	}
 
@@ -519,7 +563,9 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Disables codemirrors on the current tab if not in edit state
 	 */
 	private disableCodeMirrors () {
-		this.codeMirrorComponents.changes.subscribe((comps: QueryList<CodeMirrorComponent>) => {
+		this.codeMirrorComponents.changes
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((comps: QueryList<CodeMirrorComponent>) => {
 			comps.forEach((child) => {
 				this.codeMirrorComponent = child;
 				setTimeout(() => {
@@ -528,22 +574,19 @@ export class APIActionViewEditComponent implements OnInit {
 			});
 		});
 	}
-	
+
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
 	 */
 	protected isTabEnabled(actionType: APIActionType): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
-
 		if (actionType === APIActionType.HTTP_API) {
 			return actionTypeId === this.WEB_API;
 		}
-
 		if (actionType === APIActionType.SCRIPT) {
 			return actionTypeId !== null && actionTypeId !== this.WEB_API;
 		}
-
 		return false;
 	}
 
@@ -559,7 +602,6 @@ export class APIActionViewEditComponent implements OnInit {
 		if (this.editModeFromView) {
 			this.validInfoForm = this.editModeFromView;
 		}
-
 		if (this.apiActionParametersForm) {
 			this.validParametersForm = this.apiActionParametersForm.valid;
 		}
@@ -567,13 +609,13 @@ export class APIActionViewEditComponent implements OnInit {
 
 	/**
 	 * On a new Dictionary selected
-	 * @param value
+	 * @param dictionaryModel
 	 */
-	protected onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
+	onDictionaryValueChange(dictionaryModel: DictionaryModel): void {
 		dictionaryModel = dictionaryModel ?  dictionaryModel : this.defaultDictionaryModel;
 		this.apiActionModel.dictionary = dictionaryModel;
 
-		if (this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
+		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedDictionaryModel && this.lastSelectedDictionaryModel.id !== 0) {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadDictionaryModel(dictionaryModel, res);
@@ -586,7 +628,9 @@ export class APIActionViewEditComponent implements OnInit {
 	private loadDictionaryModel(dictionaryModel: DictionaryModel, changeAgent: boolean): void {
 		if (changeAgent) {
 			if (dictionaryModel.id !== 0) {
-				this.apiActionService.getActionMethodById(dictionaryModel.id).subscribe(
+				this.apiActionService.getActionMethodById(dictionaryModel.id)
+					.pipe(takeUntil(this.unsubscribeOnDestroy$))
+					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
 						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
@@ -625,8 +669,8 @@ export class APIActionViewEditComponent implements OnInit {
 	 * Listener for the Select when the Value Method Changes.
 	 * @param event
 	 */
-	protected onMethodValueChange(event: any): void {
-		if (this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
+	onMethodValueChange(event: any): void {
+		if (this.modalType === this.actionTypes.EDIT && this.lastSelectedAgentMethodModel && this.lastSelectedAgentMethodModel.id !== '0') {
 			this.prompt.open('Confirmation Required', 'Changing the Dictionary or Method will overwrite many of the settings of the Action. Are you certain that you want to proceed?', 'Yes', 'No')
 				.then((res) => {
 					this.loadAgentMethodModel(res);
@@ -649,7 +693,6 @@ export class APIActionViewEditComponent implements OnInit {
 			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
 			this.apiActionModel.producesData = this.apiActionModel.agentMethod.producesData;
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
-
 			this.guardParams();
 			this.parameterList = this.apiActionModel.agentMethod.methodParams;
 			this.parameterList.forEach((parameter) => {
@@ -678,10 +721,10 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	private populateReactionScripts(): void {
 		const methodScripts = this.apiActionModel.agentMethod.script;
-		APIActionModel.createBasicReactions(this.apiActionModel);
+		APIActionModel.createBasicReactions(this.apiActionModel, this.apiActionModel.actionType && this.apiActionModel.actionType.id === this.WEB_API);
 		for (let reactionType in methodScripts) {
 			if (methodScripts[reactionType]) {
-				let match = this.apiActionModel.eventReactions.find( item => item.type === reactionType);
+				let match = this.apiActionModel.eventReactions.find(item => item.type === reactionType);
 				if (match) {
 					match.value = methodScripts[reactionType];
 					match.open = true;
@@ -696,7 +739,7 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	private populateHttpMethod(): void {
 		const httpMethod = this.apiActionModel.agentMethod.httpMethod;
-		const match = this.httpMethodList.find( item => item === httpMethod);
+		const match = this.httpMethodList.find(item => item === httpMethod);
 		if (match) {
 			this.apiActionModel.httpMethod = httpMethod;
 		}
@@ -714,7 +757,6 @@ export class APIActionViewEditComponent implements OnInit {
 			if (!item.context || item.context === 'null' || item.context === null) {
 				this.apiActionModel.agentMethod.methodParams.splice(index, 1);
 			}
-
 			if (item.param) {
 				if (item.param === 'null' || item.param === null) {
 					item.param = '';
@@ -722,7 +764,6 @@ export class APIActionViewEditComponent implements OnInit {
 				item['paramName'] = item.param;
 				delete item.param;
 			}
-
 			if (item.property) {
 				if (item.property === 'null' || item.property === null) {
 					item.property = '';
@@ -743,6 +784,7 @@ export class APIActionViewEditComponent implements OnInit {
 		pollingObject.interval = interval.interval;
 		pollingObject.value = newVal;
 	}
+
 	/**
 	 * On a new Provider Value change
 	 * @param value
@@ -750,18 +792,15 @@ export class APIActionViewEditComponent implements OnInit {
 	protected onProviderValueChange(providerModel: ProviderModel, previousValue: boolean): void {
 		// Populate only the Credentials that are related to the provider
 		this.providerCredentialList = new Array<CredentialModel>();
-		this.providerCredentialList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		this.providerCredentialList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 		this.providerCredentialList = this.providerCredentialList.concat(this.agentCredentialList.filter((credential) => (credential.provider) && credential.provider.id === providerModel.id));
-
 		// Populate only the DataScripts that are related to the provider
 		this.providerDatascriptList = new Array<DataScriptModel>();
-		this.providerDatascriptList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+		this.providerDatascriptList.push({ id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 		this.providerDatascriptList = this.providerDatascriptList.concat(this.datascriptList.filter((dataScript) => (dataScript.provider) && dataScript.provider.id === providerModel.id));
-
 		if (previousValue) {
 			this.apiActionModel.defaultDataScript = this.providerDatascriptList.find((datascript) => datascript.id === this.apiActionModel.defaultDataScript.id);
 			this.modifySignatureByProperty('defaultDataScript');
-
 			this.apiActionModel.credential = this.providerCredentialList.find((credential) => credential.id === this.apiActionModel.credential.id);
 			this.modifySignatureByProperty('credential');
 		} else {
@@ -796,7 +835,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	showsEventLabel(): boolean {
 		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
-
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
 				return eventReaction.type === event;
@@ -811,7 +849,6 @@ export class APIActionViewEditComponent implements OnInit {
 	 */
 	showsCustomizeLabel(): boolean {
 		let events = [EventReactionType.PRE, EventReactionType.FINAL];
-
 		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
 			let eventItem = events.find((event) => {
 				return eventReaction.type === event;
@@ -869,7 +906,6 @@ export class APIActionViewEditComponent implements OnInit {
 					dataItem.fieldName = property;
 				}
 			}
-
 			this.verifyIsValidForm();
 		}
 	}
@@ -916,7 +952,9 @@ export class APIActionViewEditComponent implements OnInit {
 					}
 				});
 			}
-			this.apiActionService.validateCode(scripts).subscribe(
+			this.apiActionService.validateCode(scripts)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
 				(result: any) => {
 					this.invalidScriptSyntax = false;
 					result.forEach((eventResult: any) => {
@@ -944,14 +982,18 @@ export class APIActionViewEditComponent implements OnInit {
 	 * @param {EventReaction} eventReaction
 	 */
 	verifyCode(eventReaction: EventReaction): void {
-		this.validateAllSyntax(eventReaction).subscribe();
+		this.validateAllSyntax(eventReaction)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
 	}
 
 	/**
 	 * Execute the API to validated every Syntax Value.
 	 */
 	onCheckAllSyntax(): void {
-		this.validateAllSyntax().subscribe();
+		this.validateAllSyntax()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
 	}
 
 	/**
@@ -1021,31 +1063,37 @@ export class APIActionViewEditComponent implements OnInit {
 
 	canSave(): boolean {
 		const actionTypeId = R.pathOr(null, ['actionType', 'id'], this.apiActionModel);
-
-		if (this.hasEarlyAccessTMRPermission &&  actionTypeId === this.WEB_API) {
+		if (this.hasEarlyAccessTMRPermission && actionTypeId === this.WEB_API) {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
 				(this.httpAPIForm && this.httpAPIForm.valid) &&
-				this.validParametersForm
+				this.validParametersForm && this.validateRequiredFields(this.apiActionModel)
 			);
 		}
-
 		if (this.hasEarlyAccessTMRPermission && actionTypeId !== null && actionTypeId !== this.WEB_API) {
 			return (
 				(this.simpleInfoForm && this.simpleInfoForm.valid) &&
-				(this.scriptForm && this.scriptForm.valid)	 &&
-				this.validParametersForm
+				(this.scriptForm && this.scriptForm.valid) &&
+				this.validParametersForm && this.validateRequiredFields(this.apiActionModel)
 			);
 		}
-
-		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm);
+		return (this.apiActionForm && this.apiActionForm.valid && this.validParametersForm && this.validateRequiredFields(this.apiActionModel));
 	}
 
 	onChangeType(type: any): void {
 		const language = Languages[type.id];
-
 		if (language) {
 			this.codeMirror.mode = language
+		}
+		this.apiActionModel.isRemote = this.isRemote();
+
+		// on create api action, set the default value for is remote action
+		if (this.modalType === ActionType.CREATE ) {
+			APIActionModel.createBasicReactions(this.apiActionModel, type.id === this.WEB_API);
+			if (this.apiActionModel.isRemote) {
+				this.setSelectEventReaction('ERROR', true);
+				this.setSelectEventReaction('SUCCESS', true);
+			}
 		}
 	}
 
@@ -1053,5 +1101,38 @@ export class APIActionViewEditComponent implements OnInit {
 		const cloned =  Object.assign({}, this.codeMirror, properties);
 
 		return cloned;
+	}
+
+	/**
+	 * Based on the action type determines if the invocation is remote
+	*/
+	isRemote(): boolean {
+		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== 'WEB_API');
+	}
+
+	/**
+	 * Determine if the current credential type selected is Supplied by Transition Manager
+	*/
+	isSuppliedCredential(): boolean {
+		const id = R.pathOr('', ['remoteCredentialMethod', 'id'], this.apiActionModel);
+
+		return id === this.SUPPLIED_CREDENTIAL;
+	}
+
+	/**
+	 * Get a specific event reaction searching by type and set its selected property
+	*/
+	setSelectEventReaction(type: string, selected: boolean): void {
+		const evenReaction = this.apiActionModel.eventReactions.find((item: EventReaction) => item.type === type);
+		if (evenReaction) {
+			evenReaction.selected = selected;
+		}
+	}
+
+	/**
+	 * Extract the datascript name
+	 */
+	getDataScriptName(): string {
+		return (this.apiActionModel && this.apiActionModel.defaultDataScript && this.apiActionModel.defaultDataScript.name) || '';
 	}
 }

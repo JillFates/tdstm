@@ -182,8 +182,6 @@ function buildMap () {
 		$('#svgContainerId').removeClass('containsSpinner')
 		GraphUtil.force.on("tick", tick)
 		updateElementPositions(function(){
-			GraphUtil.restoreDependencyPanel('Type');
-			GraphUtil.restoreDependencyPanel('Status');
 			GraphUtil.applyShowHideDependencies();
 		});
 	})
@@ -636,7 +634,7 @@ function createBehaviorHandler () {
 		
 		// if the user wasn't in region selection mode and they clicked in place, deselect all nodes
 		} else if (clicked && !multiselect) {
-			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE)
+			modifyNodeSelection([], GraphUtil.SELECT_MODES.REPLACE_NO_TOGGLE)
 		}
 	}
 }

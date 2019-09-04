@@ -7,6 +7,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class TagsListSpec extends GebReportingSpec {
     def testKey
@@ -18,6 +20,8 @@ class TagsListSpec extends GebReportingSpec {
     static tagDescription
 
     def setupSpec() {
+        CachingDriverFactory.clearCache()
+        
         testCount = 0
         to LoginPage
         login()

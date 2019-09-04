@@ -15,6 +15,7 @@ import {AssetCommonEdit} from '../asset/asset-common-edit';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export function DatabaseEditComponent(template, editModel, metadata: any) {
 
@@ -34,9 +35,10 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService) {
-
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe
+		) {
+			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {
@@ -48,6 +50,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**

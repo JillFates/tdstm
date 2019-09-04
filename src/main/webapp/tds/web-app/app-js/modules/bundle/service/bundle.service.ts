@@ -66,6 +66,7 @@ export class BundleService {
 			completionTime: model.completionTime,
 			projectManager: model.projectManagerId,
 			moveManager: model.moveManagerId,
+			moveEvent: model.moveEvent,
 			operationalOrder: model.operationalOrder,
 			useForPlanning: model.useForPlanning
 		};

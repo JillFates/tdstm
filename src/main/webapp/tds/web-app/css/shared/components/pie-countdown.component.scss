@@ -66,6 +66,14 @@ $pie-under-color: #eee;
       .timer-120-seconds::before {
         @include pie-countdown-timer(120);
       }
+
+      .timer-180-seconds::before {
+        @include pie-countdown-timer(180);
+      }
+
+      .timer-240-seconds::before {
+        @include pie-countdown-timer(240);
+      }
       
       .timer-300-seconds::before {
         @include pie-countdown-timer(300);

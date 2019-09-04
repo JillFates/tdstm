@@ -570,7 +570,7 @@ class WsDashboardController implements ControllerMethods {
 
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
-			if(!key) key = Application.UNKNOWN
+			if(!key) key = Application.PLAN_METHODOLOGY_UNKNOWN
 
 			if(!groups[key]) groups[key] = 0
 
@@ -587,7 +587,7 @@ class WsDashboardController implements ControllerMethods {
 		if (customFieldSetting?.constraints?.values) {
 			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 				if ( ! it ) {
-					result[Application.UNKNOWN] = 0
+					result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 				} else if (groupPlanMethodologyCount[it]) {
 					result[it] = 0
 				}
@@ -640,17 +640,18 @@ class WsDashboardController implements ControllerMethods {
 				AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
 		String time
-		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated", order:"desc"])?.lastUpdated
+		Date date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated", order:"desc"])?.lastUpdated
 
-		def today = new Date()
-		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
-		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
+		Date today = new Date()
+		Date todayClearedTime = today.clearTime()
+		String issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status not in (:status) and a.commentType =:type AND a.isPublished = true"
+		Map issueArgs = [project:project, status: [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED], type:AssetCommentType.TASK.toString()]
 
-		def openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
-		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate:today]).size()
-		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
+		Integer openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
+		Integer dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate: todayClearedTime]).size()
+		List<AssetComment> issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
 			and a.category in (:category) AND a.isPublished = true",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category: AssetComment.planningCategories])
-		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category: AssetComment.planningCategories, dueDate:today]).size()
+		Integer generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category: AssetComment.planningCategories, dueDate:today]).size()
 
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')

@@ -29,6 +29,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
@@ -41,6 +42,7 @@ class WsReportsController implements ControllerMethods {
     ReportsService reportsService
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
+    MoveEventService moveEventService
     CustomDomainService customDomainService
     ControllerService controllerService
     PartyRelationshipService partyRelationshipService
@@ -119,12 +121,15 @@ class WsReportsController implements ControllerMethods {
         }
 
         Project project = securityService.userCurrentProject
+        def availableMoveEvents = moveEventService.listMoveEvents(project)
         def managers = partyRelationshipService.getProjectStaff(project.id)
-        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_PROJ_MGR")
-        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_MOVE_MGR")
+        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_PROJ_MGR)
+        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_MOVE_MGR)
 
         renderSuccessJson([
                 moveBundleInstance: moveBundle,
+                moveEvent: [id: moveBundle.moveEvent?.id, name: moveBundle.moveEvent?.toString()],
+                availableMoveEvents: availableMoveEvents,
                 projectId: project.id,
                 managers: managers,
                 projectManager: projectManager?.partyIdToId,
@@ -168,7 +173,7 @@ class WsReportsController implements ControllerMethods {
 
                 if (projectManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
-                            Party.findById(projectManagerId), "ROLE_PROJ_MGR")
+                            Party.findById(projectManagerId), RoleType.CODE_TEAM_PROJ_MGR)
                 }
                 if (moveManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,

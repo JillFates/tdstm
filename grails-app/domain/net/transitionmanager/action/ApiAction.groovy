@@ -126,6 +126,9 @@ class ApiAction {
 	// Flag that the action should be invoked remotely
 	Boolean isRemote = false
 
+	//A flag for remote tasks to know if they should record debug info.
+	Boolean debugEnabled = false
+
 	// How the authentication for remote scripts will be performed
 	RemoteCredentialMethod remoteCredentialMethod
 
@@ -417,5 +420,17 @@ class ApiAction {
 		}
 
 		return true
+	}
+
+	/**
+	 * Return action name joined with description if description is not null
+	 * @return
+	 */
+	String joinNameAndDescription() {
+		if (!description) {
+			return name
+		} else {
+			return name + ' : ' + description
+		}
 	}
 }

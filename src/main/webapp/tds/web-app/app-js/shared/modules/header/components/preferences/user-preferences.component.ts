@@ -22,6 +22,8 @@ export class UserPreferencesComponent implements OnInit {
 		let modal = document.getElementsByClassName('modal-dialog') as HTMLCollectionOf<HTMLElement>;
 
 		if (modal.length !== 0) {
+			// TODO: Refactor the Dialog so it is no longer a Table
+			modal[0].style.width = '-moz-fit-content';
 			modal[0].style.width = 'fit-content';
 		}
 	}

@@ -135,7 +135,7 @@ export class UIModalDecoratorDirective implements AfterViewInit, OnDestroy {
 	 * Enable draggable capability to the host attached to this directive
 	 */
 	private enableDraggable(enable: boolean): void {
-		const element = jQuery(this.el.nativeElement);
+		const element = jQuery(jQuery(this.el.nativeElement).closest('.modal-dialog'));
 
 		if (enable) {
 			element.draggable({
