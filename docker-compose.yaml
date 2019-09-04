@@ -78,6 +78,7 @@ services:
     container_name: tm-e2e
     working_dir: /opt/tdstm/test/e2e
     command: >
+      cd /opt/tdstm/test/e2e &&
       ./gradlew --profile
                 --no-scan
                 --no-build-cache
