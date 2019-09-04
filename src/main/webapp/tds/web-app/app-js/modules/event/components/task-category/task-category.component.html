@@ -21,8 +21,14 @@
                             </a>
 
                             <ng-template #categoryValue>
-                                <span [innerHtml]="column.text"></span>
+                                <div *ngIf="column.compose; else simpleValue">
+                                    Compose Value
+                                </div>
                             </ng-template>
+
+                            <ng-template #simpleValue>
+                                <span [innerHtml]="column.text"></span>
+                           </ng-template>
                     </div>
                 </div>
             </div>
