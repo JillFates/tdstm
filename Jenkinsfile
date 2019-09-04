@@ -67,7 +67,7 @@ spec:
 
         stage('Build For Testing') {
           container('docker-compose') {
-            sh "docker build --tag tm ."
+            sh "docker-compose -p ${env.BUILD_ID} build e2e"
           }
         }
 
