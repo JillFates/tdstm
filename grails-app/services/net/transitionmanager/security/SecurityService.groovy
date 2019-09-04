@@ -1995,10 +1995,14 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * Retrieve the Person object that represent the person that completes automated tasks
 	 */
 	Person getAutomaticPerson() {
-		Person a = Person.findByLastNameAndFirstName(Person.SYSTEM_USER_AT.lastName, Person.SYSTEM_USER_AT.firstName)
-		if (! a) {
+		Person person = Person.where {
+			firstName == Person.SYSTEM_USER_AT.firstName
+			lastName == Person.SYSTEM_USER_AT.lastName
+		}.get()
+
+		if (! person) {
 			log.error 'Unable to find Automated Task Person as expected'
 		}
-		return a
+		return person
 	}
 }
