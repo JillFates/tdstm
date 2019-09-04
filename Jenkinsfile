@@ -74,7 +74,7 @@ spec:
         stage('Test') {
           container('docker-compose') {
             try {
-                sh "docker-compose -p ${env.BUILD_ID} up e2e"
+                sh "docker-compose -p ${env.BUILD_ID} run e2e"
             } finally {
                 sh "docker-compose -p ${env.BUILD_ID} down --remove-orphans"
                 sh "docker-compose -p ${env.BUILD_ID} rm"
