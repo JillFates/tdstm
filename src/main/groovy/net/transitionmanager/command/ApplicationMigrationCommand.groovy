@@ -22,9 +22,6 @@ class ApplicationMigrationCommand {
 	 */
 	String stopCategory
 
-	/** Workflow Transition ID */
-	Long testing
-
 
 	String outageWindow
 }

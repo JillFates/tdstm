@@ -332,7 +332,6 @@ class WsReportsController implements ControllerMethods {
      * @param sme: The id of the SME selected value.
      * @param startCategory: string.
      * @param stopCategory: string.
-     * @param testing: integer - The id of the Workflow.
      * @param outageWindow: string - The custom field.
      * @returns The rendered gsp view.
      */

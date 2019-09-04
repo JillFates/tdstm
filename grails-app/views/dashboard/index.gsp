@@ -238,25 +238,25 @@
 														${moveBundleStep.label}
 													</g:else>
 												</li>
-												<li id="percentage_${moveBundle.id}_${moveBundleStep.transitionId}"></li>
+												<li id="percentage_${moveBundle.id}"></li>
 												<g:if test="${runbookOn == 1 }">
-													<li class="tasks" id="tasks_${moveBundle.id}_${moveBundleStep.transitionId}">&nbsp</li>
+													<li class="tasks" id="tasks_${moveBundle.id}">&nbsp</li>
 												</g:if>
 												<li class="schstart">
-													<span id="plan_start_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+													<span id="plan_start_${moveBundle.id}"></span>&nbsp;
 												</li>
 												<li class="schfinish">
-													<span id="plan_completion_${moveBundle.id}_${moveBundleStep.transitionId}"></span>&nbsp;
+													<span id="plan_completion_${moveBundle.id}"></span>&nbsp;
 												</li>
-												<li class="actstart" id="li_start_${moveBundle.id}_${moveBundleStep.transitionId}">
-													<div id="act_start_${moveBundle.id}_${moveBundleStep.transitionId}" title=""></div>
+												<li class="actstart" id="li_start_${moveBundle.id}">
+													<div id="act_start_${moveBundle.id}" title=""></div>
 												</li>
-												<li class="actfinish" id="li_finish_${moveBundle.id}_${moveBundleStep.transitionId}">
-													<div id="act_completion_${moveBundle.id}_${moveBundleStep.transitionId}" title=""></div>
+												<li class="actfinish" id="li_finish_${moveBundle.id}">
+													<div id="act_completion_${moveBundle.id}" title=""></div>
 												</li>
 											</ul>
-											<!-- <div id="chartdiv_${moveBundle.id}_${moveBundleStep.transitionId}" align="center" style="display: none;">
-												<img id="chart_${moveBundle.id}_${moveBundleStep.transitionId}"
+											<!-- <div id="chartdiv_${moveBundle.id}" align="center" style="display: none;">
+												<img id="chart_${moveBundle.id}"
 																	src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
 														</div> -->
 										</div>

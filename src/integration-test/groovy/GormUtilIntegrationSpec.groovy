@@ -346,8 +346,7 @@ class GormUtilIntegrationSpec extends Specification {
 
 	def '17. Testing mergeDomainReferences'() {
 		// This logic need to test several different aspects of merging persons which include:
-		//    1. Replacing references (e.g. Workflow.updatedBy)
-		//    2. Cloning domain where references are part of domain identity (e.g. PartyRelationship)
+		//    1. Cloning domain where references are part of domain identity (e.g. PartyRelationship)
 		//			a) Ignore domain records that the target already has an equivilant (Staff assignment to same company and project)
 		//			b) Clone a new domain record where To domain does not have equivilant (e.g. Team assignments)
 		//			c) Delete original domain rows

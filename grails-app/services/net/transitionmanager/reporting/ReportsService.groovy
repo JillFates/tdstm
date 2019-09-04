@@ -142,7 +142,6 @@ class ReportsService implements ServiceMethods {
             clientAccess           : eventsProjectInfo.clientAccess,
             projectStaffList       : eventsProjectInfo.projectStaffList,
             list                   : eventsProjectInfo.list,
-            workFlowCodeSelected   : eventBundleInfo.workFlowCodeSelected,
             steps                  : eventBundleInfo.steps,
             moveBundleSize         : moveBundles.size(),
             moveBundles            : moveBundles,

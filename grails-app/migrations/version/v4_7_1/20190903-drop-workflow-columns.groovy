@@ -88,5 +88,15 @@ databaseChangeLog = {
 		dropTable(tableName: 'workflow')
 	}
 
+	changeSet(author: 'tpelletier', id: 'TM-15170-9') {
+		comment('drop transition_id')
+
+		preConditions(onFail: 'MARK_RAN') {
+			columnExists(tableName: 'move_bundle_step', columnName: 'transition_id')
+		}
+
+		dropColumn(tableName: 'move_bundle_step', columnName: 'transition_id')
+	}
+
 
 }
