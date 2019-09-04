@@ -18,6 +18,7 @@
                                 <div class="col-md-2">Manufacturer:</div>
                                 <div class="col-md-4">
                                     <tds-combobox
+                                            tabindex="1"
                                             [(model)]="manufacturer"
                                             [serviceRequest]="searchManufacturers"
                                             [searchOnScroll]="false"
@@ -27,13 +28,14 @@
                                 </div>
                                 <div class="col-md-2">Model Name:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="modelName" [(ngModel)]="model.modelName">
+                                    <input type="text" tabindex="20" name="modelName" [(ngModel)]="model.modelName">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">AKA:</div>
                                 <div class="col-md-4">
                                     <tds-aka [aka]="model.akaCollection || []"
+                                             [tabindex]="2"
                                              name="aka"
                                              [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.text}"
                                              (validationErrors)="onAkaValidationErrors($event)"
@@ -42,6 +44,7 @@
                                 <div class="col-md-2">Asset Type:</div>
                                 <div class="col-md-4">
                                     <tds-combobox
+                                            [tabindex]="21"
                                             [(model)]="assetType"
                                             [serviceRequest]="searchAssetTypes"
                                             [searchOnScroll]="false"
@@ -54,6 +57,7 @@
                                 <div class="col-md-2">USize:</div>
                                 <div class="col-md-4">
                                     <kendo-dropdownlist
+                                            tabindex="3"
                                             class="select"
                                             name="usize"
                                             [data]="usize"
@@ -64,60 +68,62 @@
                                 <div class="col-md-4">
                                     <div class="dimensions">
                                         <div>H</div>
-                                        <div><input type="number" name="modelHeight" [(ngModel)]="model.modelHeight"></div>
+                                        <div><input type="number" name="modelHeight" tabindex="22" [(ngModel)]="model.modelHeight"></div>
                                         <div>W</div>
-                                        <div><input type="number" name="modelWidth" [(ngModel)]="model.modelWidth"></div>
+                                        <div><input type="number" name="modelWidth" tabindex="23" [(ngModel)]="model.modelWidth"></div>
                                         <div>D</div>
-                                        <div><input type="number" name="modelDepth" [(ngModel)]="model.modelDepth"></div>
+                                        <div><input type="number" name="modelDepth" tabindex="24" [(ngModel)]="model.modelDepth"></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Weight (pounds):</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="modelName" [(ngModel)]="model.modelWeight">
+                                    <input type="text" tabindex="4" name="modelName" [(ngModel)]="model.modelWeight">
                                 </div>
                                 <div class="col-md-2">Layout Style:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="layoutStyle" [(ngModel)]="model.layoutStyle">
+                                    <input type="text" tabindex="25" name="layoutStyle" [(ngModel)]="model.layoutStyle">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Product Line:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="productLine" [(ngModel)]="model.productLine">
+                                    <input type="text" tabindex="5" name="productLine" [(ngModel)]="model.productLine">
                                 </div>
                                 <div class="col-md-2">Model Family:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="modelFamily" [(ngModel)]="model.modelFamily">
+                                    <input type="text" tabindex="26" name="modelFamily" [(ngModel)]="model.modelFamily">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">End of Life Date:</div>
                                 <div class="col-md-4">
                                     <kendo-datepicker name="endOfLifeDate"
+                                                      tabindex="7"
                                                       [value]="model.endOfLifeDate"
                                                       [(ngModel)]="model.endOfLifeDate"> </kendo-datepicker>
                                  </div>
                                 <div class="col-md-2">End of Life Status:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="endOfLifeStatus" [(ngModel)]="model.endOfLifeStatus">
+                                    <input type="text" tabindex="27" name="endOfLifeStatus" [(ngModel)]="model.endOfLifeStatus">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Power (Max/Design/Avg):</div>
                                 <div class="col-md-4">
-                                    <tds-power [model]="powerModel" (change)="onPowerChange($event)"></tds-power>
+                                    <tds-power [model]="powerModel" [tabindex]="8" (change)="onPowerChange($event)"></tds-power>
                                  </div>
                                 <div class="col-md-2">Notes:</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="notes" [(ngModel)]="model.description">
+                                    <input type="text" tabindex="28" name="notes" [(ngModel)]="model.description">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Room Object:</div>
                                 <div class="col-md-4">
                                     <input class="checkbox"
+                                           tabindex="9"
                                            name="roomObject"
                                            type="checkbox"
                                            [(ngModel)]="model.roomObject">
@@ -125,6 +131,7 @@
                                 <div class="col-md-2">Source TDS</div>
                                 <div class="col-md-4">
                                     <input class="checkbox"
+                                           tabindex="29"
                                            name="sourceTDS"
                                            type="checkbox"
                                            [(ngModel)]="model.sourceTDS">
@@ -134,6 +141,7 @@
                                 <div class="col-md-2">Blade Height:</div>
                                 <div class="col-md-4">
                                      <kendo-dropdownlist
+                                            tabindex="10"
                                             class="select"
                                             name="bladeHeight"
                                             [valuePrimitive]="true"
@@ -147,39 +155,39 @@
 
                             <div *ngIf="assetType && assetType.id === 'Blade Chassis'">
                                 <div class="form-group">
-                                                           <div class="col-md-2">Blade Rows:</div>
-                                                           <div class="col-md-4">
-                                                           <input type="text" name="bladeRows" [(ngModel)]="model.bladeRows">
-                                                           </div>
-                                                           <div class="col-md-2"></div>
-                                                           <div class="col-md-4">
-                                                           </div>
-                                                           </div>
+                                    <div class="col-md-2">Blade Rows:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="11" type="text" name="bladeRows" [(ngModel)]="model.bladeRows">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
                                 <div class="form-group">
-                                                           <div class="col-md-2">Blade Count:</div>
-                                                           <div class="col-md-4">
-                                                           <input type="text" name="bladeCount" [(ngModel)]="model.bladeCount">
-                                                           </div>
-                                                           <div class="col-md-2"></div>
-                                                           <div class="col-md-4">
-                                                           </div>
-                                                           </div>
+                                    <div class="col-md-2">Blade Count:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="12" type="text" name="bladeCount" [(ngModel)]="model.bladeCount">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
                                 <div class="form-group">
-                                                           <div class="col-md-2">Blade Label Count:</div>
-                                                           <div class="col-md-4">
-                                                           <input type="text" name="bladeLabelCount" [(ngModel)]="model.bladeLabelCount">
-                                                           </div>
-                                                           <div class="col-md-2"></div>
-                                                           <div class="col-md-4">
-                                                           </div>
-                                                           </div>
+                                    <div class="col-md-2">Blade Label Count:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="13" type="text" name="bladeLabelCount" [(ngModel)]="model.bladeLabelCount">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Created by:</div>
                                 <div class="col-md-4">{{model.createdBy}}</div>
                                 <div class="col-md-2">Source URL</div>
                                 <div class="col-md-4">
-                                    <input type="text" name="sourceURL" [(ngModel)]="model.sourceURL">
+                                    <input type="text" tabindex="30" name="sourceURL" [(ngModel)]="model.sourceURL">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -190,6 +198,7 @@
                                     <kendo-dropdownlist
                                             class="select"
                                             name="modelStatus"
+                                            tabindex="31"
                                             [valuePrimitive]="true"
                                             [data]="modelStatus"
                                             [(ngModel)]="model.modelStatus">
@@ -209,6 +218,7 @@
                                 </div>
                                 <div class="col-md-10">
                                     <tds-connector
+                                            [tabindex]="32"
                                             [connectors]="model.connectorsCollection"
                                             (modelChange)="onConnectorsChange($event)"></tds-connector>
                                 </div>
@@ -219,6 +229,7 @@
             </div>
             <div class="modal-footer form-group-center">
                 <tds-button-save
+                        tabindex="40"
                         class="btn-primary pull-left"
                         title="Save"
                         [disabled]="!form.dirty"
@@ -226,11 +237,13 @@
                 </tds-button-save>
 
                 <tds-button-delete
+                        tabindex="41"
                         class="btn-danger component-action-delete"
                         [disabled]="!hasDeleteTaskPermission">
                 </tds-button-delete>
 
                 <tds-button-cancel
+                        tabindex="42"
                         class="component-action-cancel pull-right"
                         (click)="cancelCloseDialog()">
                 </tds-button-cancel>

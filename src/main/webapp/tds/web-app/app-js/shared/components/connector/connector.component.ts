@@ -5,7 +5,7 @@ import { Connector } from './model/connector.model';
 	selector: 'tds-connector',
 	template: `
         <div class="tds-connector-component">
-            <button class="add-connector" (click)="onAdd()">Add Connector</button>
+            <button class="add-connector" [tabindex]="tabindex" (click)="onAdd()">Add Connector</button>
             <div>
                 <div class="header">
                     <div class="component-type">Type</div>
@@ -20,6 +20,7 @@ import { Connector } from './model/connector.model';
                 <div *ngFor="let connector of connectors;let index = index;trackBy:trackByIndex;" class="data-row">
                     <div class="component-type">
                         <kendo-dropdownlist
+								[tabindex]="tabindex"
                                 class="select"
                                 name="modelType"
                                 (selectionChange)="reportChanges()"
@@ -29,12 +30,14 @@ import { Connector } from './model/connector.model';
                     </div>
                     <div class="component-label">
                         <input type="text"
+                               [tabindex]="tabindex"
 							   (blur)="reportChanges()"
                                [(ngModel)]="connectors[index].label"
                                name="labelValue">
                     </div>
                     <div class="component-label-position">
                         <kendo-dropdownlist
+                                [tabindex]="tabindex"
                                 class="select"
 								(selectionChange)="reportChanges()"
                                 name="modelPosition"
@@ -44,21 +47,26 @@ import { Connector } from './model/connector.model';
                     </div>
                     <div class="component-position-x">
                         <input type="number"
+                               [tabindex]="tabindex"
                                (blur)="reportChanges()"
 							   [(ngModel)]="connectors[index].xPosition" name="xPosition">
                     </div>
                     <div class="component-position-y">
                         <input type="number"
+                               [tabindex]="tabindex"
                                (blur)="reportChanges()"
 							   [(ngModel)]="connectors[index].yPosition" name="yPosition">
                     </div>
-                    <div class="delete-command"><span class="glyphicon glyphicon-remove delete-connector" (click)="onDelete(index)" title="Delete connector"></span></div>
+                    <div class="delete-command">
+						<span class="glyphicon glyphicon-remove delete-connector" [tabindex]="tabindex" (click)="onDelete(index)" title="Delete connector"></span>
+					</div>
                 </div>
             </div>
         </div>
 	`
 })
 export class ConnectorComponent implements OnInit {
+	@Input('tabindex') tabindex: string;
 	@Input('connectors') originalConnectors: Connector[];
 	@Output('modelChange') modelChange = new EventEmitter<any>();
 	positions: string[];

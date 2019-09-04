@@ -11,6 +11,7 @@ import {convert} from './units-converter.helper';
 export class PowerComponent implements  OnInit {
 	readonly units =   PowerUnits;
 	@Input() model: PowerModel;
+	@Input() tabindex: string;
 	@Output() change: EventEmitter<any> = new EventEmitter<any>();
 	constructor(
 		private modelService: ModelService
