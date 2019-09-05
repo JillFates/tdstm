@@ -42,8 +42,6 @@ import {NoticeService} from './service/notice.service';
 		NoticeListComponent,
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
-		StandardNoticesComponent,
-		MandatoryNoticesComponent,
 		PostNoticesComponent
 	],
 	providers: [
@@ -57,15 +55,11 @@ import {NoticeService} from './service/notice.service';
 		NoticeListComponent,
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
-		StandardNoticesComponent,
-		MandatoryNoticesComponent,
 		PostNoticesComponent
 	],
 	entryComponents: [
 		NoticeViewEditComponent,
 		ViewHtmlComponent,
-		StandardNoticesComponent,
-		MandatoryNoticesComponent,
 		PostNoticesComponent
 	]
 })
