@@ -1,26 +1,26 @@
 package net.transitionmanager.imports
 
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.Project
-import net.transitionmanager.security.Permission
+import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.common.ControllerService
+import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
-import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.Project
+import net.transitionmanager.security.Permission
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
 
-import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class DataTransferBatchController implements ControllerMethods {
 
@@ -210,29 +210,27 @@ class DataTransferBatchController implements ControllerMethods {
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
 
-		List<Map<String, Object>> dataTransferErrorList =
-			jdbcTemplate.queryForList("select d.asset_entity_id, d.import_value, d.row_id, a.attribute_code, d.field_name, d.error_text"
-				+ " FROM data_transfer_value d"
-				+ " where d.data_transfer_batch_id = ?"
-				+ " and has_error = 1", dataTransferBatchId)
+		List<Map<String, Object>> dataTransferErrorList = DataTransferValue.where {
+			dataTransferBatch.id == dataTransferBatchId && hasError == 1
+		}.list()
 
-		def completeDataTransferErrorList = []
 		def currentValues
 
-		dataTransferErrorList.each {
-			println it.inspect()
-			println "*** it.asset_entity_id = ${it.asset_entity_id}"
-			AssetEntity assetEntity = AssetEntity.read( it.asset_entity_id )
-			println "*** assetEntity=$assetEntity, it.field_name=${it.field_name}"
-			currentValues = assetEntity?.(it.field_name)
+		List completeDataTransferErrorList = dataTransferErrorList.collect { DataTransferValue dataTransferError ->
+			AssetEntity assetEntity = AssetEntity.read(dataTransferError.assetEntityId)
+			currentValues = assetEntity?.(dataTransferError.fieldName)
 
-			completeDataTransferErrorList << [
+			println dataTransferError.inspect()
+			println "*** dataTransferError.assetEntityId = ${dataTransferError.assetEntityId}"
+			println "*** assetEntity=$assetEntity, dataTransferError.fieldName=${dataTransferError.fieldName}"
+
+			return [
 				assetName   : assetEntity.assetName,
 				assetTag    : assetEntity.assetTag ?: '',
-				attribute   : it.field_name,
-				error       : it.error_text,
+				attribute   : dataTransferError.fieldName,
+				error       : dataTransferError.errorText,
 				currentValue: currentValues,
-				importValue : it.import_value
+				importValue : dataTransferError.importValue
 			]
 		}
 
