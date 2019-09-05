@@ -1872,10 +1872,10 @@ class ProjectService implements ServiceMethods {
 		assert file
 		assert project
 
-		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: originalFilename, project: project)
-		pl.setData file.inputStream
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: originalFilename, project: project)
+		projectLogo.setDatafile(new FileInputStream(file))
 
-		return pl.save(flush: true)
+		return projectLogo.save(flush: true)
 	}
 
 	/**
@@ -1921,7 +1921,7 @@ class ProjectService implements ServiceMethods {
 		// Assign partners
 		updateProjectPartners(project, projectCommand.partnerIds)
 
-		if (projectCommand.id > 0) {
+		if (!projectCommand.id) {
 			// Clone default field settings
 			cloneDefaultSettings(project)
 
