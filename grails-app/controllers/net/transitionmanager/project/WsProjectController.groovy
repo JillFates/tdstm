@@ -180,4 +180,25 @@ class WsProjectController implements ControllerMethods {
 		Project project = projectService.createOrUpdateProject(projectCommand)
 		renderSuccessJson(project.toMap())
 	}
+
+	/**
+	 * Used to delete the user's current project
+	 */
+	@HasPermission(Permission.ProjectDelete)
+	def deleteProject(String projectId) {
+		def id = projectId.toLong()
+		Project project = Project.get(id)
+		if (!project) return
+
+		log.info "Project $project.name($project.id) is going to be deleted by $securityService.currentUsername"
+		try {
+			def message = projectService.deleteProject(project.id, true)
+
+			flash.message = "Project $project.name deleted"
+			renderSuccessJson(flash.message)
+		} catch (Exception ex) {
+			flash.message = ex.message
+			renderErrorJson(flash.message)
+		}
+	}
 }

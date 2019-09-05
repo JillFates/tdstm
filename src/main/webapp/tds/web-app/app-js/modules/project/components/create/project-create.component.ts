@@ -57,12 +57,12 @@ export class ProjectCreateComponent implements OnInit {
 			defaultBundleName: 'TBD',
 			timeZone: '',
 			collectMetrics: true,
-			planMethodology: 'Migration Method'
+			planMethodology: ''
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
 		this.file.uploadRestrictions = {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
-			maxFileSize: 5000000
+			maxFileSize: 50000
 		};
 		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 	}
@@ -127,9 +127,9 @@ export class ProjectCreateComponent implements OnInit {
 			this.clearFilename();
 			this.file.fileUID = null;
 		} else if (e.files[0]) { // file uploaded successfully
-			let filename = e.files[0].name;
+			let filename = response.filename;
 			this.fetchResult = { status: 'success', filename: filename };
-			this.projectModel.projectLogo = e.files[0].rawFile;
+			this.projectModel.projectLogo = response.filename;
 
 			this.logoOriginalFilename = response.originalFilename;
 		} else {
@@ -144,9 +144,6 @@ export class ProjectCreateComponent implements OnInit {
 
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
-			if (this.fetchResult && this.fetchResult.status === 'success') {
-				this.projectModel.projectLogo = this.fetchResult.filename;
-			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();

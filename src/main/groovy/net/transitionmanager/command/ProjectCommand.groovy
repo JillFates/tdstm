@@ -10,6 +10,7 @@ class ProjectCommand implements CommandObject {
 	String description
 	Long id
 	List<Long> partnerIds
+	String planMethodology
 	String projectCode
 	String projectLogo
 	String originalFilename

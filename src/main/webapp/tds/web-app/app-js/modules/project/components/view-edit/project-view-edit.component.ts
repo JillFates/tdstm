@@ -43,6 +43,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public fetchResult: any;
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
+	private logoOriginalFilename;
 
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
@@ -75,10 +76,15 @@ export class ProjectViewEditComponent implements OnInit {
 			defaultBundleName: 'TBD',
 			timeZone: '',
 			collectMetrics: true,
-			planMethodology: 'Migration Method'
+			planMethodology: ''
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
+		this.file.uploadRestrictions = {
+			allowedExtensions: ['.jpg', '.png', '.gif'],
+			maxFileSize: 50000
+		};
+		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 		this.getModel(this.projectId);
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
@@ -86,8 +92,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public confirmDeleteProject() {
 		this.promptService.open(
 			'Confirmation Required',
-			'WARNING: Deleting this project will remove any teams and any related step data',
-			'Confirm', 'Cancel')
+			'WARNING: Are you sure you want to delete this project? This cannot be undone.', 'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
 					this.deleteProject();
@@ -130,6 +135,11 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectModel.partnerIds.push(partner.id);
 				});
 
+				this.planMethodologies = [];
+				data.planMethodologies.forEach((methodology) => {
+					this.planMethodologies.push(methodology.label);
+				});
+
 				this.possibleManagers = data.possibleManagers ? data.possibleManagers : [];
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
@@ -138,6 +148,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.clientId = data.client ? data.client.id : 0;
 				this.projectModel.startDate = new Date(this.projectModel.startDate);
 				this.projectModel.completionDate = new Date(this.projectModel.completionDate);
+				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
@@ -147,7 +158,6 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.timeZone = data.timezone;
 				this.workflowCodes = data.workflowCodes;
 				this.projectTypes = data.projectTypes;
-				this.planMethodologies = data.planMethodologies;
 
 				this.updateSavedFields();
 			});
@@ -165,10 +175,11 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
-			this.projectService.saveProject(this.projectModel, this.projectId).subscribe((result: any) => {
+			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename, this.projectId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
 					this.editing = false;
+					this.projectLogoId = result.data.projectLogoId;
 				}
 			});
 		}
@@ -226,6 +237,7 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public onUploadFile(e: UploadEvent): void {
+		e.headers.set('Content-Type', 'multipart/form-data')
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
@@ -237,9 +249,11 @@ export class ProjectViewEditComponent implements OnInit {
 			this.clearFilename();
 			this.file.fileUID = null;
 		} else if (e.files[0]) { // file uploaded successfully
-			let filename = e.files[0].name;
+			let filename = response.filename;
 			this.fetchResult = { status: 'success', filename: filename };
-			this.projectModel.projectLogo = e.files[0].rawFile;
+			this.projectModel.projectLogo = response.filename;
+
+			this.logoOriginalFilename = response.originalFilename;
 		} else {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };

@@ -722,6 +722,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/project/$projectId?" {
+			controller = "wsProject"
+			action = [
+					DELETE: "deleteProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]

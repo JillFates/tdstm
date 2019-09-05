@@ -1801,7 +1801,7 @@ class ProjectService implements ServiceMethods {
 					guid                 : project.guid,
 					projectName          : project.name,
 					projectCode          : project.projectCode,
-					clientName           : project.client.name,
+					clientName           : project.client.toString(),
 					description          : project.description ?: '',
 					comment				 : project.comment ?: '',
 					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
@@ -1873,8 +1873,7 @@ class ProjectService implements ServiceMethods {
 		assert project
 
 		ProjectLogo projectLogo = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: originalFilename, project: project)
-		projectLogo.setDatafile(new FileInputStream(file))
-
+		projectLogo.setData(new FileInputStream(file))
 		return projectLogo.save(flush: true)
 	}
 
@@ -1905,6 +1904,7 @@ class ProjectService implements ServiceMethods {
 			description = projectCommand.description
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
+			planMethodology = projectCommand.planMethodology
 			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn

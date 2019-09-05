@@ -52,7 +52,7 @@ export class ProjectService {
 	}
 
 	deleteProject(id) {
-		return this.http.delete(`../ws/project/deleteProject/${id}`)
+		return this.http.delete(`../ws/project/${id}`)
 			.map((response: any) => {
 				return response;
 			})
