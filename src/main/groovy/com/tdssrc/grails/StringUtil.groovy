@@ -16,6 +16,7 @@ class StringUtil {
 	private static final List<String> trueList = ['y', 'yes', 't', 'true', '1'].asImmutable()
 	private static final List<String> falseList = ['n', 'no', 'f', 'false', '0'].asImmutable()
 	static final String PLACEHOLDER_REGEXP = /\{([^\}]*)\}/
+	static final String DOUBLE_PLACEHOLDER_REGEXP = /\{\{([^\}\}]*)\}\}/
 
 	/**
 	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer
@@ -408,13 +409,13 @@ class StringUtil {
 	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {COLOR}', [COLOR:'Red'] )
 	 * </pre>
 	 */
-	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
+	static String replacePlaceholders(String text, Map params, String placeholderRegex = PLACEHOLDER_REGEXP) throws InvalidParamException {
 		if (params == null) {
 			throw new InvalidParamException('Parameters map for placeholder replacement is null')
 		}
 
 		StringBuffer sb = new StringBuffer()
-		Matcher m = text =~ PLACEHOLDER_REGEXP
+		Matcher m = text =~ placeholderRegex
 		Set<String> missing = []
 
 		while (m.find()) {
