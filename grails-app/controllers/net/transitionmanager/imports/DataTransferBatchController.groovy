@@ -210,7 +210,7 @@ class DataTransferBatchController implements ControllerMethods {
 	def errorsListView() {
 		long dataTransferBatchId = params.long('id')
 
-		List<Map<String, Object>> dataTransferErrorList = DataTransferValue.where {
+		List<DataTransferValue> dataTransferErrorList = DataTransferValue.where {
 			dataTransferBatch.id == dataTransferBatchId && hasError == 1
 		}.list()
 
