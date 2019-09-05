@@ -38,6 +38,10 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.TimeLine
+import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -86,6 +90,7 @@ class TaskController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
+	TimeLineService timeLineService
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
@@ -1008,8 +1013,11 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
+
+
+		TimelineSummary summary = timeLineService.executeCPA(me, tasks, deps)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
