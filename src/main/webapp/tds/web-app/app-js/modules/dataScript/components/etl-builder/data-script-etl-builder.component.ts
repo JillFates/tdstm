@@ -406,7 +406,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * if value is present return value otherwise returns init
 	 */
 	protected getInitOrValue(dataItem): string {
-		if (dataItem.value) {
+		if (dataItem.value !== undefined && dataItem.value !== null) {
 			return dataItem.value;
 		} else {
 			return (dataItem.init || '');
