@@ -118,13 +118,15 @@ class ActionHttpRequestElements {
 	 */
 	protected String buildQueryStringParams() {
 		String qs = ''
-		URLCodec urlCodec = new URLCodec()
-
 		qs = extraParams.collect { k, v ->
 			// These parameters are injected into the Params but should be moved to something else
 			// TODO :JPM 3/2018 : TM-9963
 			if (! paramsToIgnored.contains(k)) {
-				urlCodec.encode(k) + '=' + urlCodec.encode( v.toString() )
+				/*
+				 * Since the encoded prameters are unencoded in AbstractConnector::buildMethodParamsWithContext:128
+				 * It is safe to encode in here
+				 */
+				k + '=' + UrlUtil.encode(v.toString())
 			}
 		}.join('&')
 		return qs
@@ -237,8 +239,9 @@ class ActionHttpRequestElements {
 
 		// Now load extraParams with the parameters that were not used as placeholders
 		if (placeholderNames) {
-			this.extraParams = actionRequest.params.getAllProperties().findAll {k, v ->
-				! placeholderNames.contains(k) }
+			this.extraParams = actionRequest.params.getAllProperties().findAll { k, v ->
+				! placeholderNames.contains(k)
+			}
 		} else {
 			this.extraParams = actionRequest.params.getAllProperties().clone()
 		}
