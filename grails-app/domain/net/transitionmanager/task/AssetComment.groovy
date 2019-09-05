@@ -168,7 +168,7 @@ class AssetComment {
 
 	static mapping = {
 		// TM-15253. Add discriminator for Task domain class
-		discriminator column: "content_type", value: '1', type: 'integer', formula: "case when comment_type = 'issue' then 0 else 1 end"
+		discriminator value: '0', type: 'integer', formula: "case when comment_type = 'issue' then 1 else 0 end"
 		autoTimestamp false
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
