@@ -5305,6 +5305,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					teamTaskMap[role.id] = [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role]
 				}
 			}
+			// also add an entry for the tasks that are not associated to any role, if there are any
+			def noTeamTasks = AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, null, publishedValues)
+			noTeamTasks.addAll(AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, "", publishedValues))
+			def noTeamDoneTasks = noTeamTasks.findAll { it.status == 'Completed' }
+			if (noTeamTasks) {
+				teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount:noTeamTasks.size(), teamDoneCount:noTeamDoneTasks.size(), role:RoleType.NO_ROLE]
+			}
 		}
 		return teamTaskMap
 	}
