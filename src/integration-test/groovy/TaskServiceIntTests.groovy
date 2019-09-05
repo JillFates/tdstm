@@ -172,7 +172,7 @@ class TaskServiceIntTests extends Specification{
 
     void 'invocation of an api action show return status as started'() {
         setup: 'giving a local api action'
-            Person whom = taskService.getAutomaticPerson()
+            Person whom = securityService.getAutomaticPerson()
             Project project = projectTestHelper.getProject()
             createPersonAndUsers()
             Provider provider = providerTestHelper.createProvider(project)
