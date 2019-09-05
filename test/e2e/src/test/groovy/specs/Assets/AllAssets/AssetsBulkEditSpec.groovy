@@ -32,7 +32,7 @@ class AssetsBulkEditSpec extends GebReportingSpec {
     static noRecordsMessage = "No records available"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

@@ -1036,6 +1036,119 @@
         "show": 1,
         "udf": 1
       },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "DateTime",
+        "field": "custom20",
+        "imp": "Y",
+        "label": "date time required",
+        "order": 110,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "required": 0
+        },
+        "control": "Date",
+        "field": "custom21",
+        "imp": "Y",
+        "label": "date time required",
+        "order": 110,
+        "shared": 1,
+        "show": 1,
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 200,
+          "minSize": 0,
+          "required": 0
+        },
+        "control": "String",
+        "default": "QAE2E0EAo5",
+        "field": "custom22",
+        "imp": "B",
+        "label": "StringToYesNo",
+        "order": 117,
+        "shared": 0,
+        "show": 0,
+        "tip": "QAE2E Non-Displayed Application Field for testing purposes",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0,
+          "values": [
+            "",
+            "Yes",
+            "no",
+            "yes",
+            "YeS",
+            "xyz"
+          ]
+        },
+        "control": "List",
+        "default": "",
+        "field": "custom23",
+        "imp": "N",
+        "label": "List to YesNo",
+        "order": 101,
+        "shared": 0,
+        "show": 1,
+        "tip": "List any network interfaces that need to be updated",
+        "udf": 1
+      },
+      {
+        "bulkChangeActions": [
+          "replace",
+          "clear"
+        ],
+        "constraints": {
+          "maxSize": 255,
+          "minSize": 0,
+          "required": 0,
+          "values": [
+            "",
+            "12345",
+            "1234",
+            "12345678901234567890",
+            "qwertyuiopqwertyuiower",
+            "xyz"
+          ]
+        },
+        "control": "List",
+        "default": "",
+        "field": "custom24",
+        "imp": "N",
+        "label": "To String truncation",
+        "order": 101,
+        "shared": 0,
+        "show": 1,
+        "tip": "List any network interfaces that need to be updated",
+        "udf": 1
+      }
     ],
     "version": 121
   },
@@ -1546,7 +1659,7 @@
         "show": 1,
         "tip": "Tags",
         "udf": 0
-      },
+      }
     ],
     "version": 41
   },
@@ -2474,7 +2587,7 @@
         "show": 1,
         "tip": "Tags",
         "udf": 0
-      },
+      }
     ],
     "version": 41
   },
@@ -2966,7 +3079,7 @@
         "show": 1,
         "tip": "Tags",
         "udf": 0
-      },
+      }
     ],
     "version": 42
   }

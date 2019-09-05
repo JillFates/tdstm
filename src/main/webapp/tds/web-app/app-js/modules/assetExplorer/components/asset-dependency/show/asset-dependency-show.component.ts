@@ -58,7 +58,7 @@ import {DependencyChange, DependencyType} from '../model/asset-dependency.model'
                 <label class="dependency-label dependency-comment">{{dependencyA?.comment}}</label>
                 <div *ngIf="dependencyA && dependencyB">
                     <tds-button-delete
-                            class="btn-danger"
+                            class="btn-danger delete-button-dependency-show-modal"
                             (click)="onDeleteDependency(DependencyType.dependencyA)"
                             tooltip="Delete dependency">
                     </tds-button-delete>
@@ -69,7 +69,7 @@ import {DependencyChange, DependencyType} from '../model/asset-dependency.model'
                 <div *ngIf="dependencyB">
                     <tds-button-delete
                             (click)="onDeleteDependency(DependencyType.dependencyB)"
-                            class="btn-danger"
+                            class="btn-danger delete-button-dependency-show-modal"
                             tooltip="Delete dependency">
                     </tds-button-delete>
                 </div>

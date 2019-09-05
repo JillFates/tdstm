@@ -104,7 +104,6 @@ class Person extends Party {
 	static transients = [
 		'assignedProjects',
 		'assignedTeams',
-		'automaticPerson',
 		'company',
 		'domainReferences',
 		'enabled',
@@ -263,11 +262,12 @@ class Person extends Party {
 	}
 
 	/**
-	 * The Person that completes automated tasks
-	 * This method should not have been implemented here as it is in the TaskService
+	 * Whether person is automatic user used to execute tasks
+	 *
+	 * @return boolean
 	 */
-	Person getAutomaticPerson() {
-		throw new RuntimeException('Person.getAutomaticPerson() deprecated - use TaskService.getAutomaticPerson()')
+	boolean isAutomatic() {
+		return SYSTEM_USER_AT.firstName == firstName && SYSTEM_USER_AT.lastName == lastName
 	}
 
 	/**

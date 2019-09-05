@@ -1,9 +1,8 @@
 package net.transitionmanager.task.timeline
 
-
 import groovy.transform.CompileStatic
 import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 
 @CompileStatic
@@ -120,13 +119,13 @@ class TaskTimeLineGraph {
 		}
 
 		/**
-		 * Adds a new {@code AssetComment} task in
+		 * Adds a new {@code Task} task in
 		 * {@code TaskTimeLineGraph} builder creation.
 		 *
-		 * @param task a instance of {@code AssetComment}
+		 * @param task a instance of {@code Task}
 		 * @return current instance of {@code Builder}
 		 */
-		Builder withVertex(AssetComment task) {
+		Builder withVertex(Task task) {
 
 			checkAndAddCurrentVertex()
 			currentVertex = new TaskVertex(
@@ -145,8 +144,8 @@ class TaskTimeLineGraph {
 		 * @param tasks
 		 * @return current instance of {@code Builder}
 		 */
-		Builder withVertices(AssetComment... tasks) {
-			tasks.each { AssetComment task -> withVertex(task) }
+		Builder withVertices(Task... tasks) {
+			tasks.each { Task task -> withVertex(task) }
 			return this
 		}
 
@@ -155,8 +154,8 @@ class TaskTimeLineGraph {
 		 * @param tasks
 		 * @return current instance of {@code Builder}
 		 */
-		Builder withVertices(List<AssetComment> tasks) {
-			tasks.each { AssetComment task -> withVertex(task) }
+		Builder withVertices(List<Task> tasks) {
+			tasks.each { Task task -> withVertex(task) }
 			return this
 		}
 

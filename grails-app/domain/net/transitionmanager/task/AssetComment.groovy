@@ -14,6 +14,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.StringUtils
 
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
@@ -108,7 +109,6 @@ class AssetComment {
 	static final List<String> postMoveCategories = AssetCommentCategory.postMoveCategories
 	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
 	static final List<String> planningCategories = AssetCommentCategory.planningCategories
-	static final String AUTOMATIC_ROLE = 'AUTO'
 
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
@@ -168,7 +168,7 @@ class AssetComment {
 
 	static mapping = {
 		// TM-15253. Add discriminator for Task domain class
-		discriminator column: "content_type", value: '1', type: 'integer', formula: "case when comment_type = 'issue' then 0 else 1 end"
+		discriminator value: '0', type: 'integer', formula: "case when comment_type = 'issue' then 1 else 0 end"
 		autoTimestamp false
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
@@ -283,8 +283,8 @@ class AssetComment {
 	 * Determines if the task is Automatic processed
 	 * @return
 	 */
-	boolean isAutomatic(){
-		AUTOMATIC_ROLE == role
+	boolean isAutomatic() {
+		AUTOMATIC_ROLE == role || (assignedTo && assignedTo.isAutomatic())
 	}
 
 	/**
