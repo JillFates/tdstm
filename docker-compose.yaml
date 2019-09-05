@@ -1,0 +1,92 @@
+version: "3.3"
+services:
+
+  base: &base
+    build: .
+    # image: tm:latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/opt/tdstm
+      # - .:/home/tmuser/tdstm
+      # - ~/.m2:/home/tmuser/.m2
+      # - ~/.npm:/home/tmuser/.npm
+    environment:
+      - JAVA_HOME=/usr/java/latest
+
+  app:
+    <<: *base
+    container_name: tm-application
+    working_dir: /opt/tdstm
+    ports:
+      - 8080:8080
+    command: >
+      ./gradlew -Dcom.tdsops.tm.skp=B3c00l
+                -Duser.timezone=GMT
+                -Dtdstm.gconsole=true
+                -Dtdstm.config.location=./tdstm-config.groovy
+                bootRun
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/tdstm/login/auth"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 20
+    depends_on:
+      - db
+
+  # front:
+  #   <<: *base
+  #   working_dir: src/main/webapp/tds
+  #   container_name: tm-front
+  #   ports:
+  #     - 8080:8080
+  #   command: npm run build-dev
+  #   depends_on:
+  #     - app
+
+  db:
+    container_name: tm-database
+    image: tm-registry.transitionmanager.net/tds-dev/tm-database:latest
+    environment:
+      - TM_MYSQL_USER=tdstmapp
+      - TM_MYSQL_PASSWD=tdstmpswd
+    volumes:
+      - ~/.tdstm-data:/data/tranman/
+    ports:
+      - 3306:3306
+
+  mock-server:
+    container_name: tm-mock-server
+    image: tm-registry.transitionmanager.net/tds-dev/tm-http-test-server:latest
+    ports:
+      - 3000:3000
+
+  selenium:
+    container_name: selenium
+    image: selenium/standalone-chrome-debug:latest
+    ports:
+      - 4444:4444
+
+  test:
+    <<: *base
+    container_name: tm-unit-test
+    command: 'ls -hal && pwd'
+    depends_on:
+      - db
+
+  e2e:
+    <<: *base
+    container_name: tm-e2e
+    working_dir: /opt/tdstm/test/e2e
+    command: >
+      ./gradlew --profile
+                --no-scan
+                --no-build-cache
+                --no-search-upward
+                '--max-workers=1'
+                '-Dtdstm.config.location=./tdstm-config.groovy'
+                '-Dcom.tdsops.tm.skp=B3c00l'
+                --gradle-user-home chrome-gradle
+                --project-cache-dir chrome-gradle-cache
+                '-Dgeb.build.baseUrl=https://tmqa12.tm.tdsops.net'
+                chromeTest
