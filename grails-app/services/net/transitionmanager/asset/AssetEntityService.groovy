@@ -2976,22 +2976,22 @@ class AssetEntityService implements ServiceMethods {
 				}
 				clonedAsset = assetToClone.clone(defaultValues)
 
-				// Cloning assets dependencies if requested
-				if (clonedAsset.save() && command.cloneDependencies) {
+				// TM-15827: since we are cloning we don't need to validate anything
+				if (clonedAsset.save(validate: false, deepValidate:false) && command.cloneDependencies) {
 					for (dependency in assetToClone.supportedDependencies()) {
 						AssetDependency clonedDependency = dependency.clone([
 								dependent: clonedAsset,
 								status   : AssetDependencyStatus.QUESTIONED
 						])
 
-						clonedDependency.save()
+						clonedDependency.save(validate: false, deepValidate:false)
 					}
 					for (dependency in assetToClone.requiredDependencies()) {
 						AssetDependency clonedDependency = dependency.clone([
 								asset : clonedAsset,
 								status: AssetDependencyStatus.QUESTIONED
 						])
-						clonedDependency.save()
+						clonedDependency.save(validate: false, deepValidate:false)
 					}
 				}
 				// copy asset Tags
