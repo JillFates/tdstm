@@ -20,6 +20,14 @@ class Task extends AssetComment {
 		discriminator value: '1'
 	}
 
+	final static String batchUpdateSQLSentence = '''
+		update asset_comment 
+		   set is_critical_path = ?,
+		       slack = ?,
+		       est_start = ?,
+		       est_finish = ?
+         where asset_comment_id = ?
+	'''
 
 }
 

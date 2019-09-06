@@ -19,8 +19,8 @@ databaseChangeLog = {
 		}
 
 		addColumn(tableName: 'asset_comment') {
-			column(name: 'is_critical_path', type: 'TINYINT(1)') {
-				constraints(nullable: 'true')
+			column(name: 'is_critical_path', type: 'TINYINT(1)', defaultValue: '0') {
+				constraints(nullable: 'false')
 			}
 		}
 	}

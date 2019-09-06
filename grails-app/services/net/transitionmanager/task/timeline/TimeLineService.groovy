@@ -43,23 +43,21 @@ class TimeLineService implements ServiceMethods {
 	 * Updates {@code TaskVertex} in {@code Task} domain class.
 	 * In particular, we are using {@code JdbcTemplate} looking for a better performance.
 	 *
-	 * @param tasks
+	 * @param tasks a list of {@code TaskVertex} after CPA calculation
+	 * @see TimeLine#calculate(java.util.Date, java.util.Date)
 	 */
 	private void updateVertexListInDatabase(List<TaskVertex> tasks) {
 
-		String sqlSentence = '''
-			UPDATE asset_comment 
-				set is_critical_path = ?
-				where id = ?
-		'''
-
-		jdbcTemplate.batchUpdate(sqlSentence, new BatchPreparedStatementSetter() {
+		jdbcTemplate.batchUpdate(Task.batchUpdateSQLSentence, new BatchPreparedStatementSetter() {
 
 			@Override
 			void setValues(PreparedStatement ps, int i) throws SQLException {
 				TaskVertex task = tasks.get(i)
 				ps.setBoolean(1, task.criticalPath)
-				ps.setLong(2, task.taskId)
+				ps.setInt(2, task.slack)
+				ps.setTimestamp(3, new java.sql.Timestamp(task.earliestStartDate.time))
+				ps.setTimestamp(4, new java.sql.Timestamp(task.earliestFinishDate.time))
+				ps.setLong(5, task.taskId)
 			}
 
 			@Override
