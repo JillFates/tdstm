@@ -115,7 +115,7 @@ class WsDashboardController implements ControllerMethods {
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
 					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id
 					WHERE a.move_bundle_id = $moveBundleId AND t.move_event_id = $moveEventId ${viewUnpublished ? '' : 'AND t.is_published = 1'}
-					Group by t.asset_comment_id
+					Group by t.category
 				"""
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 				// log.info "bundleData() SQL = $taskStatsSql"
