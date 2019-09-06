@@ -10,24 +10,19 @@ class Task extends AssetComment {
 	Task() {
 		super()
 		commentType = AssetCommentType.TASK
+		isCriticalPath = false
 	}
 
-	String toString() {
-		return 'Task:' + (taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
+	static constraints = {
+		actStart nullable: true
 	}
 
 	static mapping = {
 		discriminator value: '1'
 	}
 
-	final static String batchUpdateSQLSentence = '''
-		update asset_comment 
-		   set is_critical_path = ?,
-		       slack = ?,
-		       est_start = ?,
-		       est_finish = ?
-         where asset_comment_id = ?
-	'''
-
+	String toString() {
+		return 'Task:' + (taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
+	}
 }
 

@@ -1,5 +1,6 @@
 package net.transitionmanager.task.timeline
 
+import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.Task
@@ -10,8 +11,13 @@ import org.springframework.jdbc.core.JdbcTemplate
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
+@Transactional
 class TimeLineService implements ServiceMethods {
 
+	/**
+	 * Instance of {@code JdbcTemplate} used to save CPA results in Database
+	 * with a better performance.
+	 */
 	JdbcTemplate jdbcTemplate
 
 	/**
@@ -42,13 +48,24 @@ class TimeLineService implements ServiceMethods {
 	/**
 	 * Updates {@code TaskVertex} in {@code Task} domain class.
 	 * In particular, we are using {@code JdbcTemplate} looking for a better performance.
+	 * It saves the following fields from {@code TaskVertex} in {@code Task} domain class:
+	 * Task#slack
 	 *
 	 * @param tasks a list of {@code TaskVertex} after CPA calculation
 	 * @see TimeLine#calculate(java.util.Date, java.util.Date)
 	 */
 	private void updateVertexListInDatabase(List<TaskVertex> tasks) {
 
-		jdbcTemplate.batchUpdate(Task.batchUpdateSQLSentence, new BatchPreparedStatementSetter() {
+		String batchUpdateSQLSentence = '''
+			update asset_comment 
+			   set is_critical_path = ?,
+				   slack = ?,
+				   est_start = ?,
+				   est_finish = ?
+			 where asset_comment_id = ?
+		'''
+
+		jdbcTemplate.batchUpdate(batchUpdateSQLSentence, new BatchPreparedStatementSetter() {
 
 			@Override
 			void setValues(PreparedStatement ps, int i) throws SQLException {

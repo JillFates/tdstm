@@ -1014,9 +1014,6 @@ digraph runbook {
 		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-
-		TimelineSummary summary = timeLineService.executeCPA(me, tasks, deps)
-
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
 			if (!(it.predecessor in tasks) && it.predecessor.isPublished in publishedValues)
