@@ -55,13 +55,13 @@ export class BundleViewEditComponent implements OnInit {
 		const defaultBundle = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
+			projectManagerId: null,
 			moveEvent: {},
-			moveManagerId: 0,
+			moveManagerId: null,
 			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
@@ -154,11 +154,11 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
-				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
+				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : null;
+				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : null;
+				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
+				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
