@@ -1,12 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {of, Observable, BehaviorSubject} from 'rxjs';
 import {distinct, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 
 import {TaskService} from '../../service/task.service';
-import {LayeredDigraphLayoutComponent} from '../../../../shared/components/layered-digraph-layout/layered-digraph-layout.component';
+import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
 import {IGraphTask} from '../../../../shared/model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 
 export interface ILinkPath {
 	from: number | string;
@@ -19,26 +20,33 @@ export interface ILinkPath {
 	// styleUrls: ['../../../../../css/page/module/taskManager/neighborhood.component.scss']
 })
 export class NeighborhoodComponent implements OnInit {
-	tasks: any[];
+	tasks: IGraphTask[];
 	nodeData$: Observable<any[]>;
 	links$: Observable<any[]>;
-	@ViewChild('graph') graph: LayeredDigraphLayoutComponent;
+	@ViewChild('graph') graph: DiagramLayoutComponent;
+	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
 	statusTypes = {
-		started: 'play',
-		pause: 'pause',
+		started: 'start',
+		pause: 'hold',
 		clock: 'clock',
 		unknown: 'unknown',
-		pending: 'clock'
+		pending: 'pending',
+		ready: 'ready',
+		forward: 'forward'
 	};
 	opened: boolean;
 	selectedTask: any;
 	filterText: string;
 	textFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
 	icons = FA_ICONS;
+	selectedEvent: {text: string, value: string | number};
+	eventList: {text: string, value: string | number}[];
+	isEventDropdownOpen: boolean;
 
 	constructor(
 			private taskService: TaskService,
-			private activatedRoute: ActivatedRoute
+			private activatedRoute: ActivatedRoute,
+			private renderer: Renderer2
 		) {}
 
 	ngOnInit() {
@@ -46,20 +54,28 @@ export class NeighborhoodComponent implements OnInit {
 		this.activatedRoute.queryParams.subscribe(params => {
 			if (params && params.id) { this.loadTasks(params.id); }
 		});
+		this.eventsDropdownOpened();
+		this.eventsDropdownClosed();
 	}
 
 	loadTasks(id: number): void {
 		this.taskService.findTask(id)
 			.subscribe((res: IGraphTask[]) => {
 				this.tasks = res;
+				this.eventList = this.getEventList(this.tasks);
 				this.generateModel();
 			});
 	}
 
-	loadFromSelectedTask(id): void {
-		this.taskService.findTask(id)
+	getEventList(tasks: IGraphTask[]): {text: string, value: string | number}[] {
+		return tasks.map(t => ({text: t.label, value: t.id}));
+	}
+
+	loadFromSelectedTask(id?: number): void {
+		this.taskService.findTask(this.selectedEvent.value)
 		.subscribe(res => {
 			this.tasks = res;
+			this.eventList = this.getEventList(this.tasks);
 			this.generateModel();
 		});
 	}
@@ -73,7 +89,7 @@ export class NeighborhoodComponent implements OnInit {
 		const copySize = tasksCopy.length - 1;
 		tasksCopy.map((t: IGraphTask) => {
 			t.key = t.taskNumber;
-			console.log('determined icon: ', t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending);
+			console.log('determined icon: ', t.status, t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending);
 			t.icon = t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending;
 			nodeDataArr.push(t);
 		});
@@ -93,6 +109,19 @@ export class NeighborhoodComponent implements OnInit {
 			}));
 		}
 		return [];
+	}
+
+	treeLayout(): void {
+		console.log('Tree Layout selected');
+		this.graph.setTreeLayout();
+	}
+
+	layeredDigraphLayout(): void {
+		this.graph.layeredDigraphLayout();
+	}
+
+	forceDirectedLayout(): void {
+		this.graph.setForceDirectedLayout();
 	}
 
 	highlightAll(): void {
@@ -136,6 +165,22 @@ export class NeighborhoodComponent implements OnInit {
 
 	public open() {
 		this.opened = true;
+	}
+
+	eventsDropdownOpened(): void {
+		this.eventsDropdown.open.subscribe(() => {
+			console.log('events dropdown opened ');
+			this.isEventDropdownOpen = false;
+			this.graph.resetOverviewIndex();
+		})
+	}
+
+	eventsDropdownClosed(): void {
+		this.eventsDropdown.close.subscribe(() => {
+			console.log('events dropdown closed ');
+			this.isEventDropdownOpen = false;
+			this.graph.restoreOverviewIndex();
+		})
 	}
 
 	filterChange(): void {

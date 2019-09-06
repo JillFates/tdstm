@@ -1,16 +1,16 @@
 import {
-		Component,
-		OnInit,
-		Input,
-		Output,
-		AfterViewInit,
-		OnChanges,
-		SimpleChanges,
-		EventEmitter,
-		Renderer2
+	Component,
+	OnInit,
+	Input,
+	Output,
+	AfterViewInit,
+	OnChanges,
+	SimpleChanges,
+	EventEmitter,
+	Renderer2, ViewChild, ElementRef
 } from '@angular/core';
 import * as go from 'gojs';
-import {ICONS_PATH} from '../gojs-diagrams/icons-path';
+import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../constants/icons-path';
 import {
 	Adornment,
 	Binding,
@@ -23,7 +23,9 @@ import {
 	Spot,
 	TextBlock
 } from 'gojs';
-import {TaskService} from '../../../modules/taskManager/service/task.service';
+import {ITaskGraphIcon} from '../../model/task-graph-icon';
+import {container} from '@angular/core/src/render3';
+import {icon} from '@fortawesome/fontawesome-svg-core';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -46,12 +48,68 @@ const categoryColors = {
 						id="digraph-layout-container"
 						[style.width]="containerWidth"
 						[style.height]="containerHeight"></div>
-				<div id="overview-container" class="overview-container"></div>
+				<div id="ctx-menu" *ngIf="shouldShowCtxMenu" #ctxMenu>
+					<ul>
+						<li id="start">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.start.icon" [styles]="{ color: ctxMenuIcons.start.color }">
+								</fa-icon>
+								Start
+							</button>
+						</li>
+						<li id="done">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.done.icon" [styles]="{ color: ctxMenuIcons.done.color }">
+								</fa-icon>
+								Done
+							</button>
+						</li>
+						<li id="hold">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.hold.icon" [styles]="{ color: ctxMenuIcons.hold.color }">
+								</fa-icon>
+								Hold
+							</button>
+						</li>
+						<li id="invoke">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.invoke.icon" [styles]="{ color: ctxMenuIcons.invoke.color }">
+								</fa-icon>
+								Invoke
+							</button>
+						</li>
+						<li id="edit">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.edit.icon" [styles]="{ color: ctxMenuIcons.edit.color }">
+								</fa-icon>
+								Edit
+							</button>
+						</li>
+						<li id="view">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.view.icon" [styles]="{ color: ctxMenuIcons.view.color }">
+								</fa-icon>
+								View
+							</button>
+						</li>
+						<li id="assign-to-me">
+							<button class="btn">
+								<fa-icon [icon]="ctxMenuIcons.assignToMe.icon" [styles]="{ color: ctxMenuIcons.assignToMe.color }">
+								</fa-icon>
+								Assign to me
+							</button>
+						</li>
+					</ul>
+				</div>
+				<div
+					id="overview-container"
+					class="overview-container"
+					[class.reset-overview-index]="resetOvIndex"></div>
 		</div>
 	`,
-	// styleUrls: ['../../../../../css/shared/components/layered-digraph-layout.component.scss']
+	// styleUrls: ['../../../../../css/shared/components/diagram-layout.component.scss']
 })
-export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnChanges {
+export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges {
 	@Input() name: string;
 	@Input() model: any;
 	@Input() nodeDataArray = [];
@@ -64,25 +122,31 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() editClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() showTaskDetailsClicked: EventEmitter<number> = new EventEmitter<number>();
-	stateIcons = ICONS_PATH;
+	stateIcons = STATE_ICONS_PATH;
+	categoryIcons = CATEGORY_ICONS_PATH;
+	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 	diagram: go.Diagram;
 	myModel: go.Model;
-	layouts: string[] = ['TreeLayout', 'ForceDirectedLayout', 'GridLayout', 'LayeredDigraphLayout'];
-	selectedLayout = 'TreeLayout';
 	direction = 0;
 	diagramAvailable = false;
 	tasks: any[];
 	actualNodeTemplate: number;
 	diagramOverview: Overview;
+	resetOvIndex: boolean;
+	@ViewChild('ctxMenu') ctxMenu: ElementRef;
+	shouldShowCtxMenu = false;
 
-	constructor(private taskService: TaskService, renderer: Renderer2) {}
+	constructor(private renderer: Renderer2) { /* Constructor */ }
 
 	ngOnInit() {
-		console.log('model');
+		this.renderer.listen(this.ctxMenu.nativeElement, 'contextmenu', (e) => {
+				e.preventDefault();
+				return false;
+			});
 	}
 
 	ngOnChanges(simpleChanges: SimpleChanges): void {
-		if (simpleChanges && ( simpleChanges.nodeDataArray && simpleChanges.linksPath)
+		if (simpleChanges && (simpleChanges.nodeDataArray && simpleChanges.linksPath)
 				&& !(simpleChanges.nodeDataArray.firstChange && simpleChanges.linksPath.firstChange)
 		) {
 			// console.log('simpleChange: ', simpleChanges);
@@ -93,10 +157,12 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 	}
 
 	ngAfterViewInit() {
-		this.loadModel();
-		// console.log('diagram', this.nodeDataArray, this.linksPath);
-		this.initialiseDiagramContainer();
-		this.generateDiagram();
+		if (this.nodeDataArray && this.linksPath) {
+			this.loadModel();
+			// console.log('diagram', this.nodeDataArray, this.linksPath);
+			this.initialiseDiagramContainer();
+			this.generateDiagram();
+		}
 	}
 
 	initialiseDiagramContainer(): void {
@@ -124,20 +190,21 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 	generateDiagram(): void {
 		// console.log('generate');
 		this.diagram.startTransaction('generateDiagram');
-		this.diagram.initialDocumentSpot = Spot.TopCenter;
-		this.diagram.initialViewportSpot = Spot.TopCenter;
+		this.diagram.initialDocumentSpot = Spot.TopLeft;
+		this.diagram.initialViewportSpot = Spot.TopLeft;
 		this.diagram.undoManager.isEnabled = true;
 		this.diagram.allowZoom = true;
-		this.diagram.initialAutoScale = go.Diagram.UniformToFill;
+		// this.diagram.initialAutoScale = go.Diagram.UniformToFill;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
-		this.diagram.layout = this.layeredDigraphLayout();
 		this.diagram.allowSelect = true;
 		this.diagram.commitTransaction('generateDiagram');
+		this.setTreeLayout();
 		this.diagram.model = this.myModel;
 		this.diagramAvailable = true;
 		this.overrideMouseWheel();
 		this.overviewTemplate();
+		this.diagram.commandHandler.zoomToFit();
 	}
 
 	overviewTemplate() {
@@ -146,18 +213,32 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 		this.diagramOverview.contentAlignment = go.Spot.Center;
 	}
 
-	layeredDigraphLayout(opts?: any): go.LayeredDigraphLayout {
+	layeredDigraphLayout(opts?: any): void {
 		// console.log('direction: ', this.direction);
 		const ldl = new go.LayeredDigraphLayout();
 		ldl.direction = 0;
 		ldl.layerSpacing = 25;
 		ldl.columnSpacing = 25;
 		ldl.cycleRemoveOption = go.LayeredDigraphLayout.CycleDepthFirst;
-		return ldl;
+
+		this.diagram.commit(d => d.layout = ldl);
+	}
+
+	setTreeLayout(opts?: any): void {
+		const treeLayout = new go.TreeLayout();
+		treeLayout.angle = 0;
+		treeLayout.layerSpacing = 35;
+		this.diagram.commit(d => d.layout = treeLayout);
+	}
+
+	setForceDirectedLayout(opts?: any): void {
+		const forceDirectedLayout = new go.ForceDirectedLayout();
+		forceDirectedLayout.arrangementSpacing = new go.Size(100, 105);
+		this.diagram.commit(d => d.layout = forceDirectedLayout);
 	}
 
 	setDiagramNodeTemplate(): void {
-		this.diagram.nodeTemplate = this.horizontalNodeTemplate();
+		this.diagram.nodeTemplate = this.setNodeTemplate();
 	}
 
 	setDiagramLinksTemplate(): void {
@@ -189,16 +270,15 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 		this.direction = dir.target.value;
 	}
 
-	horizontalNodeTemplate(): go.Node {
+	setNodeTemplate(): go.Node {
 		console.log('default template');
 		this.actualNodeTemplate = NodeTemplateEnum.HIGH_SCALE;
-		const node = new go.Node(Panel.Horizontal);
-		node.background = '#3c8dbc';
-		// node.background = 'lightblue';
+		const node = new go.Node(go.Panel.Horizontal);
+		// node.background = '#ddd'; // '#3c8dbc';
+		// // node.background = 'lightblue';
 		node.selectionAdorned = true;
-		node.add(this.iconShape());
-		node.add(this.categoryIconShape());
-		node.add(this.textBlockShape());
+		// node.add(this.containerShape());
+		node.add(this.containerPanel());
 		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
@@ -208,7 +288,6 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
 		// node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
-
 		return node;
 	}
 
@@ -233,19 +312,34 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 		return selAdornmentTemplate;
 	}
 
-	categoryIconShape(options?: any): Shape {
-		if (options) { return options; }
+	containerShape(): go.Shape {
+		const container = new go.Shape();
+		container.figure = 'RoundedRectangle';
+		container.strokeWidth = 2;
+		container.stroke = '#ddd';
+		container.fill = 'white';
 
-		const  categoryIconShape = new Shape();
-		categoryIconShape.figure = 'RoundedRectangle';
-		categoryIconShape.margin = 8;
-		categoryIconShape.strokeWidth = 2;
-		categoryIconShape.alignment = Spot.LeftCenter;
-		categoryIconShape.desiredSize = new go.Size(25, 25);
-		categoryIconShape.stroke = 'yellow';
-		categoryIconShape.bind(new Binding('geometry', 'category',
-			(val: any) => this.getIcon(val)));
-		return categoryIconShape;
+		return container;
+	}
+
+	containerPanel(): go.Panel {
+		const panel = new go.Panel(go.Panel.Auto);
+		panel.background = '#fff';
+
+		panel.add(this.containerShape());
+		panel.add(this.panelBody());
+
+		return panel;
+	}
+
+	panelBody(): go.Panel {
+		const panel = new go.Panel(go.Panel.Horizontal);
+
+		panel.add(this.iconShape());
+		panel.add(this.categoryIconShape());
+		panel.add(this.textBlockShape());
+
+		return panel;
 	}
 
 	iconShape(options?: any): Shape {
@@ -253,16 +347,38 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 
 		const  iconShape = new Shape();
 		iconShape.figure = 'RoundedRectangle';
-		iconShape.margin = 8;
+		iconShape.margin = 5;
 		iconShape.strokeWidth = 2;
-		iconShape.alignment = Spot.LeftCenter;
 		iconShape.stroke = 'white';
+		iconShape.fill = 'white';
 		iconShape.desiredSize = new go.Size(25, 25);
-		iconShape.bind(new Binding('background', 'color'));
+		iconShape.isGeometryPositioned = true;
+		iconShape.position = new go.Point(0, 0);
+		iconShape.bind(new Binding('background', 'icon',
+			(val: any) => this.getStatusBackground(this.stateIcons[val])));
 		iconShape.bind(new Binding('geometry', 'icon',
-			(val: any) => this.getIcon(val)));
+			(val: any) => this.getIcon(this.stateIcons[val])));
+
+		console.log('icon position: ', iconShape.isGeometryPositioned);
 
 		return iconShape;
+	}
+
+	categoryIconShape(options?: any): Shape {
+		if (options) { return options; }
+
+		const  categoryIconShape = new Shape();
+		categoryIconShape.figure = 'RoundedRectangle';
+		categoryIconShape.margin = 8;
+		categoryIconShape.strokeWidth = 2;
+		categoryIconShape.desiredSize = new go.Size(25, 25);
+		categoryIconShape.stroke = '#ddd';
+		categoryIconShape.fill = '#908f8f';
+		categoryIconShape.bind(new Binding('geometry', 'category',
+			(val: any) => this.getIcon(this.categoryIcons[val])));
+
+		console.log('category icon shape position: ', categoryIconShape.position);
+		return categoryIconShape;
 	}
 
 	textBlockShape(options?: any): TextBlock {
@@ -270,20 +386,25 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 
 		const textBlock = new TextBlock();
 		textBlock.margin = 8;
-		textBlock.stroke = 'white';
+		textBlock.stroke = 'black';
 		textBlock.font = 'bold 16px sans-serif';
+		// textBlock.wrap = TextBlock.WrapBreakAll;
 		textBlock.bind(new Binding('text', 'label'));
 		return textBlock;
 	}
 
-	getIcon(name: string): any {
-		if (!this.stateIcons[name]) {
-			console.log('notFound: ', name);
-			return go.Geometry.parse(this.stateIcons.unknown);
+	getIcon(icon: ITaskGraphIcon): any {
+		if (!icon) {
+			console.log('notFound: ', icon);
+			return go.Geometry.parse(this.categoryIcons.unknown.icon);
 			// return this.stateIcons.unknown;
 		}
-		return go.Geometry.parse(this.stateIcons[name]);
+		return go.Geometry.parse(icon.icon);
 		// return this.stateIcons[name];
+	}
+
+	getStatusBackground(icon: ITaskGraphIcon): string {
+		return icon.background;
 	}
 
 	zoomIn(): void {
@@ -304,10 +425,6 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 		this.diagram.commit(d => {
 			d.selectCollection(d.nodes);
 		});
-	}
-
-	highlightSelectedNode(node: go.GraphObject): void {
-		// TODO
 	}
 
 	highlightNodesByCategory(matches: any[]): void {
@@ -333,16 +450,12 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 	highlightNodesByText(match: string): void {
 		this.diagram.commit(d => {
 			if (match.length <= 0) { return d.clearSelection(); }
-			const highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().startsWith(match.toLowerCase()));
+			const highlightCollection = d.nodes.filter(f => f.data.label.toLowerCase().includes(match.toLowerCase()));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
 			}
 		});
-	}
-
-	findNode(): void {
-		console.log(this.diagram.findPartForData({ key: '1', name: 'Ruben', source: '' }));
 	}
 
 	overrideMouseWheel(): void {
@@ -378,7 +491,7 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 	}
 
 	highScaleNodeTemplate(): void {
-		this.diagram.commit(() => this.diagram.nodeTemplate = this.horizontalNodeTemplate());
+		this.diagram.commit(() => this.diagram.nodeTemplate = this.setNodeTemplate());
 	}
 
 	mediumScaleNodeTemplate(): void {
@@ -439,18 +552,29 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 
 	contextMenu(): any {
 		const $ = go.GraphObject.make;
-		return $('ContextMenu',  // that has one button
-							$('ContextMenuButton',
-									$(go.TextBlock, { text: 'Change Color', stroke: '#3c8dbc'}),
-									{ click: (e: go.InputEvent, obj: go.GraphObject) => this.changeColor(e, obj, this.diagram) }),
-							$('ContextMenuButton',
-									$(go.TextBlock, { text: 'Show Detail', stroke: '#3c8dbc'}),
-									{ click: (e: go.InputEvent, obj: go.GraphObject) => this.showTaskDetails(obj, this.diagram) }),
-							$('ContextMenuButton',
-									$(go.TextBlock, { text: 'Edit', stroke: '#3c8dbc'}),
-									{ click: (e: go.InputEvent, obj: go.GraphObject) => this.editTask(obj, this.diagram) })
+		return $(go.HTMLInfo,  // that has one button
+			{ show: () => this.showCtxMenu, mainElement: this.ctxMenu.nativeElement }
+							// $('ContextMenuButton',
+							// 		$(go.TextBlock, { text: 'Change Color', stroke: '#3c8dbc'}),
+							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.changeColor(e, obj, this.diagram) }),
+							// $('ContextMenuButton',
+							// 		$(go.TextBlock, { text: 'Show Detail', stroke: '#3c8dbc'}),
+							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.showTaskDetails(obj, this.diagram) }),
+							// $('ContextMenuButton',
+							// 		$(go.TextBlock, { text: 'Edit', stroke: '#3c8dbc'}),
+							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.editTask(obj, this.diagram) })
 							// more ContextMenuButtons would go here
 					); // end Adornment
+	}
+
+	showCtxMenu(obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool): void {
+		this.renderer.setStyle(this.ctxMenu.nativeElement, 'display', 'block');
+
+		this.shouldShowCtxMenu = true;
+
+		const mousePt = diagram.lastInput.viewPoint;
+		this.renderer.setStyle(this.ctxMenu.nativeElement, 'left', `${mousePt.x}px`);
+		this.renderer.setStyle(this.ctxMenu.nativeElement, 'top', `${mousePt.y}px`);
 	}
 
 	showTaskDetails(obj: go.GraphObject, diagram: go.Diagram): void {
@@ -483,6 +607,14 @@ export class LayeredDigraphLayoutComponent implements OnInit, AfterViewInit, OnC
 			d.model.set(nodedata, 'color', newcolor);
 		}, 'changed color');
 
+	}
+
+	resetOverviewIndex(): void {
+		this.resetOvIndex = true;
+	}
+
+	restoreOverviewIndex(): void {
+		this.resetOvIndex = false;
 	}
 
 }

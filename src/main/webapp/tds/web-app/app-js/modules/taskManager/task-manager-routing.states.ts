@@ -49,7 +49,6 @@ export const TaskManagerRoute: Routes = [
 		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
 		data: {
 			page: {
-				title: 'Neighborhood',
 				// instruction: '',
 				// menu: ['Task', 'Task Manager'],
 				// topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-task-manager', subMenu: true}

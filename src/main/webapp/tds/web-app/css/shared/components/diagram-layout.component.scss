@@ -1,9 +1,7 @@
-body {
-  width: 100%;
-}
-
 .layered-digraph-layout-container {
   position: relative;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .overview-container {
@@ -11,9 +9,12 @@ body {
   width: 200px;
   height: 100px;
   top: 10px;
-  left: 10px;
+  left: 15px;
   background-color: aliceblue;
   z-index: 300; /* make sure its in front */
   border: solid 1px blue;
 }
 
+.reset-overview-index {
+  z-index: 2;
+}

@@ -1,105 +1,78 @@
 <div class="neighborhood-container">
-
-  <div style="margin-top: 5px;"></div>
-
   <div class="row task-manager-header">
-    <div class="col-md-4 float-left">
-      TaskManager
+    <div class="col-md-4 k-align-self-center">
+      <p class="task-graph-title">Task Graph</p>
     </div>
-    <div class="col-md-3 text-center">
-      <button class="btn">
-        <fa-icon [icon]="icons.faList" size="lg"></fa-icon>
+    <div class="col-md-3 text-center k-align-self-center">
+      <button class="neighborhood-btn btn" (click)="layeredDigraphLayout()">
+        <fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
       </button>
-      <button class="btn">
-        <fa-icon [icon]="icons.faLayerGroup" size="lg"></fa-icon>
+      <button class="neighborhood-btn btn" (click)="treeLayout()">
+        <fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
       </button>
-      <button class="btn">
-        <fa-icon [icon]="icons.faBars" size="lg"></fa-icon>
+      <button class="neighborhood-btn btn" (click)="forceDirectedLayout()">
+        <fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
       </button>
     </div>
     
-    <div class="col-md-3">
-      <label class="d-inline-block task-chk-container">
-        My Task
-        <input  type="checkbox" checked="checked" />
-        <span class="checkmark"></span>
-      </label>
-      <div ngbDropdown class="d-inline-block float-right">
-        <button class="btn" id="dropdownBasic1" ngbDropdownToggle>Choose Task</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="task-dropdown-items-container">
-          <button ngbDropdownItem *ngFor="let task of tasks" (click)="loadFromSelectedTask(task.id)">{{task.comment}}</button>
-        </div>
-      </div>
+    <div class="col-md-3 k-align-self-center">
+<!--      <label class="d-inline-block task-chk-container">-->
+<!--        My Task-->
+<!--        <input  type="checkbox" checked="checked" />-->
+<!--        <span class="checkmark"></span>-->
+<!--      </label>-->
+<!--      <div ngbDropdown class="d-inline-block float-right">-->
+<!--        <button class="btn" id="dropdownBasic1" ngbDropdownToggle>Choose Task</button>-->
+<!--        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="task-dropdown-items-container">-->
+<!--          <button class="btn" ngbDropdownItem *ngFor="let task of tasks" (click)="loadFromSelectedTask(task.id)">{{task.label}}</button>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
 
-    <div class="col-md-2 task-options">
-      <button class="btn">
-        <fa-icon [icon]="icons.faAdjust" size="lg"></fa-icon>
-      </button>
-      <button class="btn">
-        <fa-icon [icon]="icons.faSortAmountDown" size="lg"></fa-icon>
-      </button>
-      <button class="btn">
-        <fa-icon [icon]="icons.faCog" size="lg"></fa-icon>
-      </button>
-      <button class="btn">
+    <div class="col-md-2 task-options k-align-self-center">
+      <button class="refresh-container-btn btn">
         <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
       </button>
     </div>
   </div>
-  
-  <div style="margin-top: 5px;"></div>
 
   <div class="row task-manager-sub-header">
-    <div class="col-md-9">
-      <button class="btn" (click)="highlightAll()">
-        All
-      </button>
-      <!-- Highlight by task category -->
-      <button class="btn" (click)="highlightByCategory('physical')">
-        <fa-icon [icon]="icons.faLayerGroup" size="lg"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByCategory('server')">
-        <fa-icon [icon]="icons.faServer" size="lg"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByCategory('database')">
-        <fa-icon [icon]="icons.faDatabase" size="lg"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByCategory('shutdown')">
-        <fa-icon [icon]="icons.faBoxOpen" size="lg"></fa-icon>
-      </button>
-        <button class="btn" (click)="highlightByCategory('shutdown')">
-            <fa-icon [icon]="icons.faTruck" size="lg"></fa-icon>
-        </button>
-
-      <!-- Highlight by task status -->
-      <button class="btn" (click)="highlightByStatus('Pending')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: #ddd;"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByStatus('unknown')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: red;"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByStatus('Stop')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: orange;"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByStatus('pending')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: yellow;"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByStatus('pending')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: blue;"></fa-icon>
-      </button>
-      <button class="btn" (click)="highlightByStatus('Started')">
-        <fa-icon [icon]="icons.faCircle" size="sm" style="color: green;"></fa-icon>
-      </button>
-      <button class="btn" (click)="zoomIn()">
-        <fa-icon [icon]="icons.faSearchPlus" size="lg" style="color: rgb(122, 122, 122);"></fa-icon>
-      </button>
-      <button class="btn" (click)="zoomOut()">
-        <fa-icon [icon]="icons.faSearchMinus" size="lg" style="color: rgb(122, 122, 122);"></fa-icon>
+    <div class="col-md-4">
+      <label>Event: </label>
+      <kendo-dropdownlist
+        textField="text"
+        valueField="value"
+        [data]="eventList"
+        (selectionChange)="loadFromSelectedTask($event)"
+        [(ngModel)]="selectedEvent"
+        (open)="eventsDropdownOpened()"
+        (close)="eventsDropdownClosed()"
+        #eventsDropdown>
+      </kendo-dropdownlist>
+    </div>
+    <div class="col-md-4 highlight-filter-container">
+      <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
+      <label class="d-inline-block task-chk-container">
+        My Tasks
+        <input  type="checkbox" checked="checked" />
+        <span class="checkmark"></span>
+      </label>
+      <button class="btn">
+        <fa-icon [icon]="icons.faSignal" size="lg" [rotate]="270"></fa-icon>
       </button>
     </div>
-    <div class="col-md-3">
-      <input type="text" class="form-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
+    <div class="col-md-4">
+      <label class="d-inline-block task-chk-container">
+        <input  type="checkbox" checked="checked" />
+        <span class="checkmark"></span>
+        Minimize Auto Tasks
+      </label>
+
+      <label class="d-inline-block task-chk-container">
+        <input  type="checkbox"/>
+        <span class="checkmark"></span>
+        View Unpublished
+      </label>
     </div>
   </div>
   <div class="row">

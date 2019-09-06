@@ -104,7 +104,7 @@ import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/moda
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
-import {LayeredDigraphLayoutComponent} from './components/layered-digraph-layout/layered-digraph-layout.component';
+import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @NgModule({
@@ -186,7 +186,7 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
-		LayeredDigraphLayoutComponent
+		DiagramLayoutComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -251,7 +251,7 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
-		LayeredDigraphLayoutComponent,
+		DiagramLayoutComponent,
 		FontAwesomeModule
 	],
 	entryComponents: [
