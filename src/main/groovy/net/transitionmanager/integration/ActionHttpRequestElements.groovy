@@ -1,5 +1,6 @@
 package net.transitionmanager.integration
 
+import org.apache.commons.codec.net.URLCodec
 import org.springframework.http.HttpMethod
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.UrlUtil
@@ -96,16 +97,19 @@ class ActionHttpRequestElements {
 	 * @return a string containing all query string parameters
 	 */
 	String queryString(HttpMethod method) {
+		String buildQueryStr = new String(queryString ?: '')
+
 		if (HttpMethod.GET == method) {
 			String queryStringParams = buildQueryStringParams()
 			if (queryStringParams) {
-				return [queryString, queryStringParams].join('&')
-			} else {
-				return queryString
+				if (buildQueryStr) {
+					buildQueryStr += '&'
+				}
+				buildQueryStr += queryStringParams
 			}
-		} else {
-			return queryString
 		}
+
+		return buildQueryStr
 	}
 
 	/**
@@ -114,12 +118,15 @@ class ActionHttpRequestElements {
 	 */
 	protected String buildQueryStringParams() {
 		String qs = ''
-		// Integer x=0
 		qs = extraParams.collect { k, v ->
 			// These parameters are injected into the Params but should be moved to something else
 			// TODO :JPM 3/2018 : TM-9963
 			if (! paramsToIgnored.contains(k)) {
-				k + '=' + v.toString()
+				/*
+				 * Since the encoded prameters are unencoded in AbstractConnector::buildMethodParamsWithContext:128
+				 * It is safe to encode in here
+				 */
+				k + '=' + UrlUtil.encode(v.toString())
 			}
 		}.join('&')
 		return qs
@@ -150,6 +157,7 @@ class ActionHttpRequestElements {
 	String getBaseUrl() { return baseUrl }
 	String getUrlPath() { return urlPath }
 	String getQueryString() { return queryString }
+
 	Map getExtraParams() { return extraParams }
 	Map getQueryParams() { return queryParams }
 
@@ -224,15 +232,16 @@ class ActionHttpRequestElements {
 
 		// Split the URI into 3 parts and update the baseUrl and urlPath
 		URL url = new URL(baseUrl)
-		queryString = url.getQuery()
+		queryString = url.getQuery() ?: ''
 		urlPath = url.getPath()
 		Integer numCharsNotBase = urlPath.size() + (queryString ? 1 + queryString.size() : 0)
 		baseUrl = baseUrl.substring(0, baseUrl.size() - numCharsNotBase )
 
 		// Now load extraParams with the parameters that were not used as placeholders
 		if (placeholderNames) {
-			this.extraParams = actionRequest.params.getAllProperties().findAll {k, v ->
-				! placeholderNames.contains(k) }
+			this.extraParams = actionRequest.params.getAllProperties().findAll { k, v ->
+				! placeholderNames.contains(k)
+			}
 		} else {
 			this.extraParams = actionRequest.params.getAllProperties().clone()
 		}

@@ -57,7 +57,7 @@ class RecipeTaskGenerationSpec extends GebReportingSpec {
     ].join('\\n')
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

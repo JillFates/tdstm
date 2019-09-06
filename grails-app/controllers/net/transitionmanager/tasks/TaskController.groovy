@@ -506,7 +506,7 @@ digraph runbook {
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
 
 					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-					if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+					if (task.isAutomatic()) {
 						fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 						color = taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
@@ -733,9 +733,7 @@ digraph runbook {
 
 				fillcolor = taskStatusColorMap[colorKey][1]
 
-				// log.info "task $it.task: role $it.role, $AssetComment.AUTOMATIC_ROLE, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
-				// if ("$it.roll" == "$AssetComment.AUTOMATIC_ROLE") {
-				if ("${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+				if (it.isAutomatic()) {
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'

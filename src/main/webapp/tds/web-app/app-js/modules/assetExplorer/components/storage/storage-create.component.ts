@@ -44,6 +44,7 @@ export function StorageCreateComponent(template: string, model: any, metadata: a
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**
