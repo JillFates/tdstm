@@ -534,7 +534,7 @@ class MoveEventService implements ServiceMethods {
 		List<MoveBundleStep> moveBundleSteps = []
 
 		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle} ORDER BY mbs.transitionId")
+			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
 
 			if (step) {
 				moveBundleSteps.addAll(step)
