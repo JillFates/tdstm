@@ -141,6 +141,10 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get ghe models for the specific bundle
+	 * @param id  bundle id
+	 */
 	private getModel(id) {
 		this.bundleService.getModelForBundleViewEdit(id)
 			.subscribe((result) => {
