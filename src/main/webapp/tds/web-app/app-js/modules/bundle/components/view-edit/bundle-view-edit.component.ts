@@ -47,6 +47,10 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.loadModel();
+	}
+
+	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
 			name: '',
@@ -194,6 +198,9 @@ export class BundleViewEditComponent implements OnInit {
 		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
+					this.bundleModel.startTime = this.bundleModel.startTime || '';
+					this.bundleModel.completionTime = this.bundleModel.completionTime || '';
+
 					this.updateSavedFields();
 					this.editing = false;
 				}
