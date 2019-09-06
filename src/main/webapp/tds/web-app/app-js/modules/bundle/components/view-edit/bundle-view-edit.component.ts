@@ -50,6 +50,10 @@ export class BundleViewEditComponent implements OnInit {
 		this.loadModel();
 	}
 
+	/**
+	 * Set up the initial default values for the model
+	 * @returns {any}
+	 */
 	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
