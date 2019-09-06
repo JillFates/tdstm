@@ -1,6 +1,6 @@
 <div class="plan-versus-status-component">
     <img src="/tdstm/assets/i/dials/dial-{{getImageDial(currentProgress || 0)}}.png" 
-        (click)="onClickChart()">
+        (click)="onClickChart()" [ngStyle]="{'cursor': isDisabled ? 'text' : 'pointer' }">
     <div class="title">Event Status vs. Plan</div>
     <form  *ngIf="showEditControl" name="statusForm" role="form" data-toggle="validator" #form='ngForm' class="form-horizontal left-alignment update-controls">
         <kendo-numerictextbox

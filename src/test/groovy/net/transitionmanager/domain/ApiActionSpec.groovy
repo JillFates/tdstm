@@ -13,13 +13,14 @@ import net.transitionmanager.action.Provider
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.project.Project
+import net.transitionmanager.task.Task
 import spock.lang.Specification
 import spock.lang.Title
 import test.helper.ApiCatalogTestHelper
 import test.helper.mock.ProjectMock
 
 @Title('Tests for the ApiAction domain class')
-class ApiActionSpec extends Specification implements DataTest{
+class ApiActionSpec extends Specification implements DataTest {
 
 	private Project      project
 	private Provider     provider
@@ -29,7 +30,7 @@ class ApiActionSpec extends Specification implements DataTest{
 	private AssetEntity  asset
 
 	void setupSpec(){
-		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetEntity, AssetComment
+		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetEntity, AssetComment, Task
 	}
 
 	private static final String paramsJson = """
@@ -82,9 +83,8 @@ class ApiActionSpec extends Specification implements DataTest{
 				project: project
 		)
 
-		task = new AssetComment(
+		task = new Task(
 				comment:'Test the crap out of this feature',
-				commentType: AssetCommentType.TASK,
 				assetEntity: asset,
 				project: project,
 				status: AssetCommentStatus.READY,

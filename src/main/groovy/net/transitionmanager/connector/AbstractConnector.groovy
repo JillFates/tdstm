@@ -124,7 +124,7 @@ class AbstractConnector {
 					// Shouldn't actually ever get here but just in case - put a bullet in this execution
 					throw new InvalidRequestException("Parameter context ${param.context} is not supported")
 			}
-			if (value && param.encoded == 1) {
+			if (value && param.encoded) {
 				value = UrlUtil.decode(value)
 			}
 			methodParams.put(param.paramName, value)

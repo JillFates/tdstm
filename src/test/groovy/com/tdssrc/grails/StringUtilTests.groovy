@@ -2,6 +2,7 @@ package com.tdssrc.grails
 
 import spock.lang.Specification
 import net.transitionmanager.exception.InvalidParamException
+import spock.lang.Unroll
 
 /**
  * Unit test cases for the StringUtil class
@@ -348,15 +349,28 @@ class StringUtilTests extends Specification {
 			'BEER' == set[0]
 	}
 
+	@Unroll
 	void 'Test replacePlaceholders method for safe calls'() {
 		expect:
 			result == StringUtil.replacePlaceholders(text, map)
 
 		where:
-			text							| map					      | result
-			'Color { COLOR }'			| [COLOR:'red']			| 'Color red'
-			'Letters {1}, {2}, {1}'	| ['1':'A', '2': 'Z']	| 'Letters A, Z, A'
-			'{first.name}'				| ['first.name': 'Tom']	| 'Tom'
+			text                    | map                   | result
+			'Color { COLOR }'       | [COLOR: 'red']        | 'Color red'
+			'Letters {1}, {2}, {1}' | ['1': 'A', '2': 'Z']  | 'Letters A, Z, A'
+			'{first.name}'          | ['first.name': 'Tom'] | 'Tom'
+	}
+
+	@Unroll
+	void 'Test replacePlaceholders double curly method for safe calls'() {
+		expect:
+			result == StringUtil.replacePlaceholders(text, map, StringUtil.DOUBLE_PLACEHOLDER_REGEXP)
+
+		where:
+			text                          | map                   | result
+			'Color {{ COLOR }}'           | [COLOR: 'red']        | 'Color red'
+			'Letters {{1}}, {{2}}, {{1}}' | ['1': 'A', '2': 'Z']  | 'Letters A, Z, A'
+			'{{first.name}}'              | ['first.name': 'Tom'] | 'Tom'
 	}
 
 	void 'Test replacePlaceholders method for bad cases'() {

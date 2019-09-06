@@ -21,7 +21,7 @@ class StaffListCleanUpSpec extends GebReportingSpec {
     static usersToBeDeleted = []
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

@@ -16,7 +16,6 @@ import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {TaskActionsOptions} from '../task-actions/task-actions.component';
 import {WindowService} from '../../../../shared/services/window.service';
 import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
@@ -81,59 +80,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		} else {
 			this.currentUserId = this.userContext.user.id;
 		}
-
 		this.loadTaskDetail();
 		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-	}
-
-	/**
-	 * Based upon current task status determines which options to show
-	 */
-	getShowTaskActionsOptions(): TaskActionsOptions {
-		const options = {
-			showDone: false,
-			showStart: false,
-			showAssignToMe: false,
-			showNeighborhood: false,
-			invoke: false,
-			showReset: false
-		};
-
-		if (!this.model) {
-			return options;
-		}
-
-		const assignedTo = this.model.assignedTo && this.model.assignedTo.id;
-		const predecessorList = this.model && this.model.predecessorList || [];
-		const successorList = this.model && this.model.successorList || [];
-
-		options.showDone = this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.STARTED].indexOf(this.model.status) >= 0;
-
-		options.showStart = this.model.status &&
-			[this.modelHelper.STATUS.READY].indexOf(this.model.status) >= 0;
-
-		options.showAssignToMe = this.userContext.person.id !== assignedTo &&
-			this.model.status &&
-			[this.modelHelper.STATUS.READY, this.modelHelper.STATUS.PENDING, this.modelHelper.STATUS.STARTED]
-				.indexOf(this.model.status) >= 0;
-
-		options.showNeighborhood = predecessorList.concat(successorList).length > 0;
-
-		options.invoke =
-			this.model.apiAction &&
-			this.model.apiAction.id &&
-			!this.model.apiActionInvokedAt &&
-			this.model.status &&
-			[
-				this.modelHelper.STATUS.READY,
-				this.modelHelper.STATUS.STARTED
-			].indexOf(this.model.status) >= 0;
-
-		options.showReset = this.model.apiAction && this.model.apiAction.id && this.model.status === this.modelHelper.STATUS.HOLD;
-		return options;
 	}
 
 	/**
@@ -175,7 +125,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 								this.model.assetClass = assetClass;
 							}
 						}
-					})
+					});
 			});
 	}
 

@@ -395,19 +395,19 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 	}
 
 	@ConfineMetaClassChanges([ApplicationContextHolder])
-	void 'Test  renderScript without username/password'() {
+	void 'Test renderScript without username/password'() {
 		when: 'rendering a script without username/password'
-			String renderedScript = service.renderScript('echo {param1}',assetComment)
+			String renderedScript = service.renderScript('echo {{param1}}',assetComment)
 		then: 'The script is rendered to a string'
 			renderedScript == 'echo xk324-kj1i2-23ks-9sdl'
 	}
 
 	@ConfineMetaClassChanges([ApplicationContextHolder])
-	void 'Test  renderScript with username/password'() {
+	void 'Test renderScript with username/password'() {
 		when: 'rendering a script with username/password'
-			String renderedScript = service.renderScript('echo {param1} \necho {username} \necho {password}',assetComment)
+			String renderedScript = service.renderScript('echo {{param1}} \necho {{username}} \necho {{password}}',assetComment)
 		then: 'The script is rendered to a string'
-			renderedScript == 'echo xk324-kj1i2-23ks-9sdl \necho {username} \necho {password}'
+			renderedScript == 'echo xk324-kj1i2-23ks-9sdl \necho {{username}} \necho {{password}}'
 	}
 
 	@ConfineMetaClassChanges([TaskActionService])

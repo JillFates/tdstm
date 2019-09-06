@@ -8,6 +8,7 @@ import grails.gorm.transactions.Transactional
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
 
 @Transactional
@@ -20,17 +21,16 @@ class AssetCommentTestHelper {
 	 * @param published
 	 * @return the task created.
 	 */
-	AssetComment createAssetComment(Project project, MoveEvent moveEvent, boolean published = true) {
-		AssetComment assetComment = new AssetComment(
+	Task createAssetComment(Project project, MoveEvent moveEvent, boolean published = true) {
+		Task task = new Task(
 				project: project,
 				moveEvent: moveEvent,
 				comment: 'Test AssetComment-' + RandomStringUtils.randomAlphabetic(10),
 				status: AssetCommentStatus.READY,
-				commentType: AssetCommentType.TASK,
 				duration: 0,
 				isPublished: published
 		).save(flush: true)
-		return assetComment
+		return task
 	}
 
 	/**
@@ -39,16 +39,15 @@ class AssetCommentTestHelper {
 	 * @param: project
 	 * @returm the task
 	 */
-	AssetComment createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
-		AssetComment existingTask = AssetComment.findWhere([comment: taskName, project: project])
+	Task createTask(String taskName, Project project, Person person, MoveEvent moveEvent) {
+		Task existingTask = Task.findWhere([comment: taskName, project: project])
 		if (!existingTask) {
-			AssetComment assetComment = new AssetComment(
+			Task assetComment = new Task(
 					project: project,
 					moveEvent: moveEvent,
 					createdBy: person,
 					comment: taskName,
 					status: AssetCommentStatus.READY,
-					commentType: AssetCommentType.TASK,
 					sendNotification: true
 			).save(flush: true)
 			return assetComment

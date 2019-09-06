@@ -1,4 +1,4 @@
-import {ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
@@ -21,9 +21,6 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { TaskEditComponent } from '../edit/task-edit.component';
-import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
-import { DateUtils } from '../../../../shared/utils/date.utils';
 import {ObjectUtils} from '../../../../shared/utils/object.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone, hasIn } from 'ramda';
@@ -34,284 +31,34 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
+import { TaskStatus } from '../../model/task-edit-create.model';
 
 @Component({
 	selector: 'task-list',
-	template: `
-		<div class="content body tds-kendo-grid">
-			<section>
-				<div class="box-body box-with-empty-header">
-					<div class="row top-filters">
-						<div class="col-sm-7">
-							<label class="control-label" for="fetch">Event</label>
-							<kendo-dropdownlist
-								style="width: 200px; padding-right: 20px"
-								name="eventList"
-								class="form-control event-dropdown"
-								[data]="eventList"
-								[textField]="'name'"
-								[valueField]="'id'"
-								[(ngModel)]="selectedEvent"
-								(valueChange)="onEventSelect()">
-							</kendo-dropdownlist>
-							<label for="one">
-								<input
-									type="checkbox"
-									name="one"
-									id="one"
-									[(ngModel)]="justRemaining"
-									(ngModelChange)="onFiltersChange()">
-								Just Remaining
-							</label>
-							<label for="two">
-								<input
-									type="checkbox"
-									name="two"
-									id="two"
-									[(ngModel)]="justMyTasks"
-									(ngModelChange)="onFiltersChange()">
-								Just Mine
-							</label>
-							<label for="three">
-								<input
-									type="checkbox"
-									name="three" id="three"
-									[(ngModel)]="viewUnpublished"
-									(ngModelChange)="onFiltersChange()">
-								View Unpublished
-							</label>
-						</div>
-						<div class="col-sm-5 text-right">
-							<tds-button-custom class="btn-primary"
-																 (click)="onViewTaskGraphHandler()"
-																 title="View Task Graph"
-																 tooltip="View Task Graph"
-																 icon="sitemap">
-							</tds-button-custom>
-							<tds-button-custom class="btn-primary"
-																 (click)="onViewTimelineHandler()"
-																 title="View Timeline"
-																 tooltip="View Timeline"
-																 icon="table">
-							</tds-button-custom>
-							<div class="refresh-control">
-								<tds-pie-countdown
-									[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
-									(timeout)="search()"
-									[hideRefresh]="true"
-									[customOptions]="[{seconds: 0, description: 'Manual'},
-																		{seconds: 60, description: '1 Min'},
-																		{seconds: 120, description: '2 Min'},
-																		{seconds: 180, description: '3 Min'},
-																		{seconds: 240, description: '4 Min'},
-																		{seconds: 300, description: '5 Min'}]">
-								</tds-pie-countdown>
-							</div>
-						</div>
-					</div>
-					<kendo-grid
-						#gridComponent
-						*ngIf="!hideGrid"
-						class="task-grid"
-						[data]="grid.gridData"
-						[pageSize]="grid.state.take"
-						[skip]="grid.state.skip"
-						[pageable]="{pageSizes: grid.defaultPageOptions, info: true}"
-						(pageChange)="grid.pageChange($event)"
-						[filter]="grid.state.filter"
-						[filterable]="true"
-						(filterChange)="grid.filterChange($event)"
-						[resizable]="true"
-						[columnMenu]="true"
-						[sort]="grid.state.sort"
-						[sortable]="{mode:'single'}"
-						(detailExpand)="onRowDetailExpandHandler($event)"
-						(detailCollapse)="onRowDetailCollapseHandler($event)"
-						(sortChange)="grid.sortChange($event)"
-						(cellClick)="onCellClickHandler($event)">
-						<!-- Column Menu -->
-						<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
-							<div class="k-column-list">
-								<label *ngFor="let custom of allAvailableCustomColumns;"
-											 [ngClass]="{'invisible': custom.property === currentCustomColumns[column.field]}"
-											 class="k-column-list-item ng-star-inserted">
-									<input type="radio"
-												 value="{{custom.property}}"
-												 (ngModelChange)="onCustomColumnChange(column.field, custom, service)"
-												 [(ngModel)]="selectedCustomColumn[column.field]">
-									<span class="k-checkbox-label"> {{custom.label}} </span>
-								</label>
-							</div>
-						</ng-template>
-						<!-- Toolbar -->
-						<ng-template kendoGridToolbarTemplate [position]="'top'">
-							<div class="button-toolbar">
-								<tds-button-create
-									(click)="onCreateTaskHandler()"
-									[title]="'Create Task'">
-								</tds-button-create>
-								<tds-button-edit
-									(click)="onBulkActionHandler()"
-									[title]="'Bulk Action'">
-								</tds-button-edit>
-								<tds-button-custom
-									icon="times"
-									[disabled]="!areFiltersDirty()"
-									(click)="onClearFiltersHandler()"
-									[title]="'Clear Filters'">
-								</tds-button-custom>
-								<tds-button-custom
-									icon="refresh"
-									title="Refresh"
-									isIconButton="true"
-									class="component-action-reload pull-right"
-									(click)="onFiltersChange()">
-								</tds-button-custom>
-							</div>
-						</ng-template>
-						<!-- Row Detail Template -->
-						<div *kendoGridDetailTemplate="let dataItem, let rowIndex = rowIndex" class="task-action-buttons-wrapper">
-							<div class="task-action-buttons">
-								<button
-									*ngIf="dataItem.status!='Started' && dataItem.status!='Completed'"
-									class="btn btn-primary btn-xs"
-									(click)="updateTaskStatus(dataItem.id,'Started')">
-									<i class="fa fa-play"></i>Start
-								</button>
-								<button
-									*ngIf="dataItem.status!='Completed'"
-									class="btn btn-primary btn-xs"
-									(click)="updateTaskStatus(dataItem.id,'Completed')">
-									<i class="fa fa-check"></i>Done
-								</button>
-								<button
-									*ngIf="dataItem.invokeButton !== null && dataItem.invokeButton"
-									class="btn btn-primary btn-xs"
-									[title]="dataItem.invokeButton.tooltipText || ''"
-									[disabled]="dataItem.invokeButton && dataItem.invokeButton.disabled"
-									(click)="invokeActionHandler(dataItem)">
-									<i class="fa fa-gear"></i> {{dataItem.invokeButton.label || '' }}
-								</button>
-								<button class="btn btn-primary btn-xs"
-												*ngIf="dataItem.apiActionId && dataItem.status === 'Hold'"
-												(click)="onResetTaskHandler(dataItem)">
-									<i class="fa fa-power-off"></i>Reset Action
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="onOpenTaskDetailHandler(dataItem)">
-									<i class="glyphicon glyphicon-zoom-in"></i>Details
-								</button>
-							</div>
-							<button *ngIf="dataItem.loadedActions && userContext.person.id !== dataItem.assignedTo
-							&& (dataItem.status === 'Pending' || dataItem.status === 'Ready' || dataItem.status === 'Started')"
-											(click)="onAssignToMeHandler(dataItem)"
-											class="btn btn-primary btn-xs">
-								<i class="fa fa-user"></i>Assign To Me
-							</button>
-							<button *ngIf="dataItem.successors > 0 || dataItem.predecessors > 0"
-											(click)="onViewTaskNeighborHandler(dataItem)"
-											class="btn btn-primary btn-xs">
-								<i class="fa fa-sitemap"></i>Neighborhood
-							</button>
-							<button *ngIf="dataItem.parsedInstructions"
-											class="btn btn-primary btn-xs"
-											(click)="openLinkInNewTab(dataItem.parsedInstructions[1])">
-								{{dataItem.parsedInstructions[0]}}
-							</button>
-							<div *ngIf="dataItem.category && dataItem.category !== 'moveday' && dataItem.status ==='Ready'" class="task-action-buttons">
-								<span style="margin-right:16px">Delay for:</span>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 1)">
-									<i class="fa fa-forward"></i>1 day
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 2)">
-									<i class="fa fa-forward"></i>2 day
-								</button>
-								<button
-									class="btn btn-primary btn-xs"
-									(click)="changeTimeEst(dataItem, 7)">
-									<i class="fa fa-forward"></i>7 day
-								</button>
-							</div>
-						</div>
-						<kendo-grid-column *ngFor="let column of columnsModel"
-															 field="{{column.property}}"
-															 [locked]="column.locked"
-															 format="{{column.format}}"
-															 [headerClass]="column.headerClass ? column.headerClass : ''"
-															 [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-															 [class]="column.cellClass ? column.cellClass : ''"
-															 [style]="column.cellStyle ? column.cellStyle : ''"
-															 [width]="!column.width ? 100 : column.width"
-															 [filterable]=""
-															 [columnMenu]="column.columnMenu">
-							<!-- Header -->
-							<ng-template kendoGridHeaderTemplate>
-								<div class="sortable-column">
-									<label> {{column.label}}</label>
-								</div>
-							</ng-template>
-							<!-- task Number -->
-							<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>
-								<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)">{{dataItem.taskNumber}}</span>
-							</ng-template>
-							<!-- asset name -->
-							<ng-template kendoGridCellTemplate *ngIf="currentCustomColumns[column.property] === 'assetName'"
-													 let-dataItem>
-								<span class="is-grid-link"
-											(click)="onOpenAssetDetailHandler(dataItem)">{{dataItem[column.property]}}</span>
-							</ng-template>
-							<!-- updated -->
-							<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
-								<span class="task-updated-cell {{dataItem.updatedClass}}">{{dataItem.updatedTime}}</span>
-							</ng-template>
-							<!-- status -->
-							<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-								<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
-							</ng-template>
-							<ng-template kendoGridFilterCellTemplate let-filter>
-								<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
-									<div *ngIf="column.type === 'text'; then stringFilter"></div>
-									<ng-template #stringFilter>
-										<input [(ngModel)]="column.filter" (keyup)="grid.onFilter(column)"
-													 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-										<span *ngIf="column.filter" (click)="grid.clearValue(column)"
-													style="cursor:pointer;color:#656565;pointer-events:all"
-													class="fa fa-times form-control-feedback"></span>
-									</ng-template>
-								</div>
-							</ng-template>
-						</kendo-grid-column>
-					</kendo-grid>
-				</div>
-			</section>
-		</div>
-	`
+	templateUrl: './task-list.component.html'
 })
 export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
-	private readonly allEventsOption = { id: 0, name: 'All Events' };
-	private urlParams = {};
-	TASK_MANAGER_REFRESH_TIMER = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
-	selectedEvent = this.allEventsOption;
+	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
+	TaskStatus: any = TaskStatus;
+	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	justRemaining: boolean;
-	justMyTasks = false;
+	justMyTasks: boolean;
 	viewUnpublished: boolean;
 	eventList: any;
-	grid: DataGridOperationsHelper = new DataGridOperationsHelper([]);
-	columnsModel: Array<GridColumnModel> = taskListColumnsModel;
-	loading = true;
-	hideGrid = true;
+	grid: DataGridOperationsHelper;
+	columnsModel: Array<GridColumnModel>;
+	loading: boolean;
+	hideGrid: boolean;
+	selectedCustomColumn: any;
+	selectedEvent: any;
+	private urlParams: any;
 	private pageSize: number;
-	private currentCustomColumns: any = {};
+	private currentCustomColumns: any;
 	private allAvailableCustomColumns: Array<any>;
-	selectedCustomColumn = {};
 	private userContext: UserContextModel;
-	private rowsExpanded = false;
+	private rowsExpanded: boolean;
+	private rowsExpandedMap: any;
 
 	constructor(
 		private taskService: TaskService,
@@ -321,8 +68,19 @@ export class TaskListComponent {
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute,
-		private router: Router) {
+		private activatedRoute: ActivatedRoute) {
+		this.justMyTasks = false;
+		this.loading = true;
+		this.hideGrid = true;
+		this.rowsExpanded = false;
+		this.grid = new DataGridOperationsHelper([], null, null, null, this.pageSize);
+		this.columnsModel = taskListColumnsModel;
+		this.selectedCustomColumn = {};
+		this.selectedEvent = this.allEventsOption;
+		this.urlParams = {};
+		this.currentCustomColumns = {};
+		this.rowsExpanded = false;
+		this.rowsExpandedMap = {};
 		this.onLoad();
 	}
 
@@ -450,7 +208,7 @@ export class TaskListComponent {
 
 		this.taskService.getTaskList(filters)
 			.subscribe(result => {
-				this.grid = new DataGridOperationsHelper(result.rows, null, null, null, this.pageSize);
+				this.grid.reloadData(result.rows);
 				this.rowsExpandedMap = {};
 				this.rowsExpanded = false;
 				this.loading = false;
@@ -486,7 +244,7 @@ export class TaskListComponent {
 	 * On Any other change.
 	 * @param selection: Array<any>
 	 */
-	onFiltersChange($event ?: any) {
+	onFiltersChange($event ?: any): void {
 		this.search();
 	}
 
@@ -494,7 +252,7 @@ export class TaskListComponent {
 	 * Search for a task on the current grid data and expands it. The rest of the rows gets collapsed.
 	 * @param taskId: number
 	 */
-	searchTaskAndExpandRow(taskId: number) {
+	searchTaskAndExpandRow(taskId: number): void {
 		(this.gridComponent.data as GridDataResult).data.forEach((item, index) => {
 			if (item.id === taskId) {
 				this.gridComponent.expandRow(index);
@@ -529,7 +287,7 @@ export class TaskListComponent {
 			}
 		}).catch(result => {
 			if (result) {
-				console.log(result);
+				// console.log(result);
 			}
 		});
 	}
@@ -569,7 +327,7 @@ export class TaskListComponent {
 	 * @param taskRow: any
 	 * @param days: string
 	 */
-	changeTimeEst(taskRow: any, days: string) {
+	changeTimeEst(taskRow: any, days: string): void {
 		this.taskService.changeTimeEst(taskRow.id, days)
 			.subscribe(() => {
 				taskRow.updatedTime = '0s';
@@ -586,11 +344,8 @@ export class TaskListComponent {
 	/**
 	 * On View Neighborhood button handler.
 	 */
-	onViewTaskNeighborHandler(dataItem): void {
-		// this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
-		this.router.navigate(['neighborhood'], {
-			queryParams: { id: dataItem.id}
-		})
+	onViewTaskNeighborHandler(dataItem: any): void {
+		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
 	}
 
 	/**
@@ -605,7 +360,7 @@ export class TaskListComponent {
 	 * Opens a link in a new browser tab
 	 * @param url
 	 */
-	openLinkInNewTab(url): void {
+	openLinkInNewTab(url: string): void {
 		window.open(url, '_blank');
 	}
 
@@ -614,16 +369,16 @@ export class TaskListComponent {
 	 * @param assetId: number
 	 * @param assetClass: string
 	 */
-	onOpenAssetDetailHandler(taskRow: any) {
+	onOpenAssetDetailHandler(taskRow: any): void {
 		this.dialogService.open(AssetShowComponent,
 			[UIDialogService,
 				{ provide: 'ID', useValue: taskRow.assetEntityId },
 				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
 				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
 			], DIALOG_SIZE.LG).then(result => {
-			console.log('success: ' + result);
+			// console.log('success: ' + result);
 		}).catch(result => {
-			console.log('rejected: ' + result);
+			console.error('rejected: ' + result);
 		});
 	}
 
@@ -645,33 +400,16 @@ export class TaskListComponent {
 	 */
 	invokeActionHandler(taskRow: any): void {
 		this.taskService.invokeAction(taskRow.id)
-			.subscribe(() => {
+			.subscribe(result => {
 				this.search(parseInt(taskRow.id, 0));
-			})
+			});
 	}
 
-	private rowsExpandedMap: any = {};
 	/**
 	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		const taskRow = $event.dataItem;
-		if (!taskRow.loadedActions) {
-			this.taskService.getTaskActionInfo(taskRow.id).subscribe(result => {
-				taskRow.loadedActions = true;
-				taskRow.predecessors = result.predecessorsCount;
-				taskRow.sucessors = result.successorsCount;
-				taskRow.assignedTo = result.assignedTo;
-				taskRow.apiActionId = result.apiActionId;
-				taskRow.apiActionCompletedAt = result.apiActionCompletedAt;
-				taskRow.apiActionInvokedAt = result.apiActionInvokedAt;
-				taskRow.category = result.category;
-				if (result.invokeActionDetails) {
-					taskRow.invokeButton = {...result.invokeActionDetails};
-				}
-			});
-		}
 		this.rowsExpandedMap[$event.index] = true;
 	}
 
@@ -691,7 +429,7 @@ export class TaskListComponent {
 		const request = {
 			id: taskRow.id.toString(),
 			status: taskRow.status
-		};
+		}
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;

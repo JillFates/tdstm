@@ -22,7 +22,7 @@ class ExportAccountsSpec extends GebReportingSpec {
     static fullFileName = fileName + "." + fileExtension
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

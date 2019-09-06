@@ -5,6 +5,11 @@ import {Select, Store} from '@ngxs/store';
 // Service
 import {LoginService} from '../../service/login.service';
 import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PostNoticesManagerService} from '../../service/post-notices-manager.service';
+// Components
+import {MandatoryNoticesComponent} from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import {StandardNoticesComponent} from '../../../noticeManager/components/standard-notices/standard-notices.component';
 // Models
 import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
 import {Login, LoginInfo, Logout} from '../../action/login.actions';
@@ -15,6 +20,7 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
 import {Observable} from 'rxjs';
 import {withLatestFrom} from 'rxjs/operators';
+import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 
 @Component({
 	selector: 'tds-login',
@@ -26,6 +32,10 @@ export class LoginComponent implements OnInit {
 	 * Prepare the state to be able to auto - unsubscribe
 	 */
 	@Select(state => state.TDSApp.userContext) userContext$: Observable<any>;
+	/**
+	 * Current User Context Model
+	 */
+	public userContextModel: UserContextModel = null;
 	/**
 	 * Redirect user is taking place, by default is turned off
 	 */
@@ -50,6 +60,7 @@ export class LoginComponent implements OnInit {
 		username: '',
 		password: ''
 	};
+
 	/**
 	 * For Auh label to show
 	 */
@@ -60,10 +71,10 @@ export class LoginComponent implements OnInit {
 		private store: Store,
 		private router: Router,
 		private notifierService: NotifierService,
+		private dialogService: UIDialogService,
+		private postNoticesManager: PostNoticesManagerService,
 		private windowService: WindowService) {
-		// Due issues on Legacy Page, need to close the session every time you land on the login page
-		this.store.dispatch(new Logout());
-		localStorage.removeItem(APP_STATE_KEY);
+		this.destroyInitialSession();
 	}
 
 	/**
@@ -118,22 +129,121 @@ export class LoginComponent implements OnInit {
 				})
 			).pipe(
 				withLatestFrom(this.userContext$)
-			).subscribe(([_, userContext]) => {
-				if (userContext && userContext.notices && userContext.notices.redirectUrl) {
-					this.redirectUser = true;
-					if (RouterUtils.isAngularRoute(userContext.notices.redirectUrl)) {
-						this.router.navigate(RouterUtils.getAngularRoute(userContext.notices.redirectUrl));
-					} else {
-						this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(userContext.notices.redirectUrl);
-					}
-				} else if (userContext.error) {
-					// An error has occurred
-					this.notifierService.broadcast({
-						name: 'stopLoader',
-					});
-					this.errMessage = userContext.error;
-				}
-			});
+			).subscribe(([_, userContext]) => this.validateLogin(_, userContext));
 		}
+	}
+
+	/**
+	 * Validates and redirect the User
+	 * Also invoke the Notices if they are available
+	 * @param _
+	 * @param userContext
+	 */
+	private validateLogin(_, userContext: UserContextModel): void {
+		this.userContextModel = userContext;
+		if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
+			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices.length > 0) {
+				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map((notice: NoticeModel) => {
+					notice.sequence = notice.sequence || 0;
+					return notice;
+				});
+				this.showNotices();
+			} else {
+				this.navigateTo();
+			}
+
+		} else if (this.userContextModel.error) {
+			// An error has occurred
+			this.notifierService.broadcast({
+				name: 'stopLoader',
+			});
+			this.errMessage = this.userContextModel.error;
+		}
+	}
+
+	/**
+	 * First show the standard notices, then show the mandatory
+	 * Because the bootstrap modal is necessary a delay among them
+	 */
+	private showNotices(): void {
+		const hasStandardNotices = this.filterPostNotices(false).length > 0;
+
+		this.showMandatoryNotices()
+			.then(() => {
+				if (hasStandardNotices) {
+					setTimeout(() => {
+						this.showStandardNotices()
+							.then(() => {
+								this.postNoticesManager.notifyContinue()
+									.subscribe(() => this.navigateTo())
+							})
+							.catch((error) => this.navigateTo());
+					}, 600);
+				} else {
+					this.postNoticesManager.notifyContinue()
+						.subscribe(() => this.navigateTo())
+				}
+			})
+			.catch(() => {
+				this.destroyInitialSession();
+			});
+	}
+
+	/**
+	 * Open the view to show standard notices
+	 */
+	private showStandardNotices() {
+		const notices = this.filterPostNotices(false);
+
+		return notices.length ? this.dialogService.open(StandardNoticesComponent, [{
+			provide: Notices,
+			useValue: {notices: notices}
+		}]) : Promise.resolve(true);
+	}
+
+	/**
+	 * Open the view to show mandatory notices
+	 */
+	private showMandatoryNotices() {
+		const notices = this.filterPostNotices(true);
+
+		return notices.length ? this.dialogService
+				.open(MandatoryNoticesComponent, [{provide: Notices, useValue: {notices: notices}}])
+			:
+			Promise.resolve(true);
+	}
+
+	/**
+	 * Filter post notices
+	 * @param {Boolean} mandatory True for get mandatory, False for get Standard
+	 */
+	private filterPostNotices(mandatory: boolean): any[] {
+		return this.userContextModel.postNotices.notices
+			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
+			.map((notice: NoticeModel) => {
+				return {...notice, notShowAgain: false};
+			});
+	}
+
+	/**
+	 * Navigate to specific url
+	 * Because it could be a grails route not handled by Angular the navigation should be done through window service
+	 */
+	private navigateTo() {
+		this.redirectUser = true;
+		if (RouterUtils.isAngularRoute(this.userContextModel.notices.redirectUrl)) {
+			this.router.navigate(RouterUtils.getAngularRoute(this.userContextModel.notices.redirectUrl));
+		} else {
+			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(this.userContextModel.notices.redirectUrl);
+		}
+	}
+
+	/**
+	 * Due issues on Legacy Page, need to close the session every time you land on the login page
+	 * Or after you decide to cancel a mandatory Notice
+	 */
+	private destroyInitialSession() {
+		this.store.dispatch(new Logout());
+		localStorage.removeItem(APP_STATE_KEY);
 	}
 }

@@ -17,7 +17,7 @@ class AssetExportSpec extends GebReportingSpec {
     static fileName = "TM_Demo-${projName}-"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage
