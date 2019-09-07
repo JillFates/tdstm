@@ -61,9 +61,11 @@ export class NeighborhoodComponent implements OnInit {
 	loadTasks(id: number): void {
 		this.taskService.findTask(id)
 			.subscribe((res: IGraphTask[]) => {
-				this.tasks = res;
-				this.eventList = this.getEventList(this.tasks);
-				this.generateModel();
+				if (res && res.length > 0) {
+					this.tasks = res;
+					this.eventList = this.getEventList(this.tasks);
+					this.generateModel();
+				}
 			});
 	}
 
