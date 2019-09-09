@@ -64,4 +64,11 @@ export class ModelService {
 		.catch((error: any) => error);
 	}
 
+	updateModel(payload: any): Observable<any> {
+		const url = `${this.modelUrl}/../ws/model`;
+
+		return this.http.post(url, payload)
+			.catch((error: any) => error);
+	}
+
 }

@@ -182,43 +182,48 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 
 	onSave() {
 		const payload = {
-			id: this.model.id,
-			modelName: this.model.Name,
+			// aka: this.model.akaChanges || [],
 			assetType: this.model.assetType,
-			usize: this.model.usize,
-			modelHeight: this.model.modelHeight,
-			modelWidth: this.model.modelWidth,
-			modelDepth: this.model.modelDepth,
-			modelWeight: this.model.modelWeight,
-			layoutStyle: this.model.layoutStyle,
-			productLine: this.model.productLine,
-			modelFamily: this.model.modelFamily,
-			endOfLifeStatus: this.model.endOfLifeStatus,
-			powerNameplate: this.model.powerNamePlate,
-			powerDesign: this.model.powerDesign,
-			powerUse: this.model.powerUse,
-			powerType: this.model.powerType,
-			cpuType: this.model.cpuType,
-			cpuCount: this.model.cpuCount,
-			bladeRows: this.model.bladeRows || '',
-			bladeCount: this.model.bladeCount || '',
-			bladeLabelCount: this.model.bladeLabelCount || '',
+			bladeCount: this.model.bladeCount || 0,
 			bladeHeight: this.model.bladeHeight,
-			memorySize: this.model.memorySize,
-			storageSize: this.model.storageSize,
-			description: this.model.description,
-			sourceURL: this.model.sourceURL,
-			modelStatus: this.model.modelStatus,
-			manufacturerId: this.model.manufacturerId,  // ---------------
-			endOfLifeDate: this.model.endOfLifeDate,
-			sourceTDS: this.model.sourceTDS ? 1 : 0,
-			roomObject: this.model.roomObject ? 1 : 0,
-			aka: this.model.akaChanges || [],
-			connectors: this.model.connectors || [],
+			bladeLabelCount: this.model.bladeLabelCount || 0,
+			bladeRows: this.model.bladeRows || 0,
+			// connectors: this.model.connectors || [],
 			connectorsCount: 0,
+			cpuCount: this.model.cpuCount || 0,
+			cpuType: this.model.cpuType,
+			description: this.model.description,
+			endOfLifeDate: this.model.endOfLifeDate,
+			endOfLifeStatus: this.model.endOfLifeStatus,
+			id: this.model.id,
+			layoutStyle: this.model.layoutStyle,
+			manufacturer: this.model.manufacturerId,  // ---------------
+			memorySize: this.model.memorySize,
+			depth: this.model.modelDepth,
+			modelFamily: this.model.modelFamily,
+			height: this.model.modelHeight,
+			modelName: this.model.Name,
+			modelStatus: this.model.modelStatus,
+			weight: this.model.modelWeight,
+			width: this.model.modelWidth,
+			powerDesign: this.model.powerDesign,
+			powerNameplate: this.model.powerNamePlate,
+			powerType: this.model.powerType,
+			powerUse: this.model.powerUse,
+			productLine: this.model.productLine,
+			roomObject: this.model.roomObject,
+			sourceTDS: this.model.sourceTDS ? 1 : 0,
+			sourceURL: this.model.sourceURL,
+			storageSize: this.model.storageSize,
+			usize: this.model.usize,
 		};
 
 		console.log(payload);
+		this.modelService.updateModel(payload)
+			.subscribe((result) => {
+				console.log('The update result is');
+				console.log(result);
+			});
 	}
 
 	/**
