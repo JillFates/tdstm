@@ -59,7 +59,7 @@ export class ProjectService {
 			.catch((error: any) => error);
 	}
 
-	saveProject(model, originalFilename: string = '', id = ''): Observable<any> {
+	saveProject(model, originalFilename = '', id = ''): Observable<any> {
 		model['originalFilename'] = originalFilename;
 		return this.http.post(`../ws/project/saveProject/${id}`, model)
 				.map((response: any) => {

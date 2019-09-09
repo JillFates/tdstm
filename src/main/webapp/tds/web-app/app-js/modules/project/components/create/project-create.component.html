@@ -72,7 +72,7 @@
                         <tr class="prop">
                             <td valign="top" class="name">Associated Partners:</td>
                             <td valign="top" class="value">
-                                <kendo-dropdownlist style="display: block; margin-bottom: 2px" *ngFor="let partnerId of projectModel.partnerIds; let i = index" [data]="partners" [ngModel]="partnerId" (valueChange)="projectModel.partnerIds[i] = $event" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
+                                <kendo-dropdownlist style="display: block; margin-bottom: 2px" *ngFor="let partnerId of projectModel.partnerIds; let i = index" [data]="partners" [ngModel]="partnerId" (selectionChange)="partnerId = $event" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
                                 <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
                             </td>
                         </tr>

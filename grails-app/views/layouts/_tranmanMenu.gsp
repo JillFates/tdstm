@@ -115,7 +115,7 @@
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
-                                Providers
+                                moduProviders
                             </g:link>
                         </li>
                          <tds:hasPermission permission="${Permission.CredentialView}">

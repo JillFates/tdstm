@@ -12,6 +12,9 @@ import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-up
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {DialogService} from '@progress/kendo-angular-dialog';
+import {Store} from '@ngxs/store';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {RouterUtils} from '../../../../shared/utils/router.utils';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -54,6 +57,7 @@ export class ProjectViewEditComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
+		private store: Store,
 		@Inject('id') private id) {
 		this.projectId = this.id;
 	}
@@ -159,6 +163,11 @@ export class ProjectViewEditComponent implements OnInit {
 				this.workflowCodes = data.workflowCodes;
 				this.projectTypes = data.projectTypes;
 
+				this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+					if (userContext) {
+						userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId};
+					}
+				});
 				this.updateSavedFields();
 			});
 	}

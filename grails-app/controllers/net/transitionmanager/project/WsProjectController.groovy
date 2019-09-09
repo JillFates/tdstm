@@ -19,10 +19,15 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyGroupService
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
+import org.apache.tomcat.util.descriptor.web.ContextService
 
 /**
  * Handles WS calls of the ProjectsService
@@ -36,6 +41,8 @@ class WsProjectController implements ControllerMethods {
 	PersonService personService
 	ProjectService projectService
 	ControllerService controllerService
+	UserPreferenceService userPreferenceService
+	ContextService contextService
 
 	/**
 	 * Gets the projects associated to a user
@@ -115,6 +122,7 @@ class WsProjectController implements ControllerMethods {
 		Project project = Project.get(projectId)
 		if (!project) return
 
+		userPreferenceService.setCurrentProjectId(project.id)
 		PartyGroup company = securityService.userLoginPerson.company
 		String companyId = company.id
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
