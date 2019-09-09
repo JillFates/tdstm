@@ -82,6 +82,5 @@ class TimeLineService implements ServiceMethods {
 				return tasks.size()
 			}
 		})
-
 	}
 }
