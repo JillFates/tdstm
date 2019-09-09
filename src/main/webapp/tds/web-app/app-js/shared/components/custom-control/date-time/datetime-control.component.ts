@@ -54,10 +54,10 @@ import {ValidationRulesFactoryService} from '../../../services/validation-rules-
 export class TDSDateTimeControlComponent extends TDSCustomControl implements OnInit, OnChanges {
 	private readonly KENDO_DATETIME_DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm:ss';
 	protected outputFormat: string;
-	protected selectedDate;
-	protected selectedTime;
+	protected selectedDate: any;
+	protected selectedTime: string;
 	public displayFormat: string;
-	public dateValue: Date;
+	public dateValue: any;
 
 	constructor(
 		private userPreferenceService: PreferenceService,
@@ -71,6 +71,13 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 	 * OnInit set a date value.
 	 */
 	ngOnInit(): void {
+		this.updateValue();
+	}
+
+	/**
+	 * Update the date and time values
+	 */
+	updateValue(): void {
 		let localDateFormatted = DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone());
 		this.dateValue = this.value ? DateUtils.toDateUsingFormat(localDateFormatted, DateUtils.SERVER_FORMAT_DATETIME) : null;
 		this.selectedDate = this.dateValue ? DateUtils.convertToGMT(this.dateValue, this.userPreferenceService.getUserTimeZone()).substr(0, 10) : null;
@@ -93,8 +100,20 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 				this.dateValue.setDate(value.getDate());
 				this.setValueDateTime();
 			}
+		} else {
+			this.resetValue();
 		}
 		this.onTouched();
+	}
+
+	/**
+	 * Reset the current date and time values
+	 */
+	private resetValue(): void {
+		this.value = null;
+		this.dateValue = '';
+		this.selectedDate = '';
+		this.selectedTime = '';
 	}
 
 	/**
@@ -116,6 +135,8 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 				this.dateValue = tempDate;
 				this.setValueDateTime();
 			}
+		} else {
+			this.resetValue();
 		}
 		this.onTouched();
 	}
