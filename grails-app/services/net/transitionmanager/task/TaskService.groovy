@@ -38,6 +38,7 @@ import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
+import net.transitionmanager.command.task.ListTaskCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
@@ -79,6 +80,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -5706,14 +5708,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * 				totalCounts: The total number of rows.
 	 * 				numberOfPages: The number of pages that will be used to show this rows.
 	 */
-	Map getTaskRows(Project project, Map params, String sortIndex, String sortOrder) {
+	Map getTaskRows(Project project, ListTaskCommand params, String sortIndex, String sortOrder, Integer maxRows= null, Integer rowOffset= null) {
 
 		Date today = new Date().clearTime()
 
 		// Fetch the tasks, and the total count.
-		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder)
+		Map filterResults = commentService.filterTasks(project, params.toMap(), sortIndex, sortOrder, maxRows, rowOffset)
 		List<AssetComment> tasks = filterResults.tasks
-		Integer totalCount = tasks.size()
+		Integer totalCount = filterResults.totalCount
 
 		Date updatedTime
 		String dueClass
