@@ -399,7 +399,7 @@ class ApiCatalogUtil {
 
 			Map methods = [:]
 			jsonDictionaryTransformed.get(ACDK.DICTIONARY).get(ACDK.METHOD).each { entry ->
-				methods[entry.apiMethod] = entry
+				methods[entry.name] = entry
 			}
 			return methods
 		} catch (Exception e) {

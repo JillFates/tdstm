@@ -26,7 +26,7 @@ class ProjectListCleanUpSpec extends GebReportingSpec {
     static projectName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

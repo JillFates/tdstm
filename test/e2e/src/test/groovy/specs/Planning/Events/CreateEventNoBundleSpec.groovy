@@ -29,7 +29,7 @@ class CreateEventNoBundleSpec extends GebReportingSpec {
     static maxNumberOfBundles = 1
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

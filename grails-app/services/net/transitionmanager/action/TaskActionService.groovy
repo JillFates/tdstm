@@ -287,10 +287,10 @@ class TaskActionService implements ServiceMethods {
 	String renderScript(String script,  AssetComment task) {
 		AbstractConnector connector = apiActionService.connectorInstanceForAction(task.apiAction)
 		Map params = connector.buildMethodParamsWithContext(task.apiAction, task)
-		params.username = '{username}'
-		params.password = '{password}'
+		params.username = '{{username}}'
+		params.password = '{{password}}'
 
-		return StringUtil.replacePlaceholders(script, params)
+		return StringUtil.replacePlaceholders(script, params, StringUtil.DOUBLE_PLACEHOLDER_REGEXP)
 	}
 
 	/**
