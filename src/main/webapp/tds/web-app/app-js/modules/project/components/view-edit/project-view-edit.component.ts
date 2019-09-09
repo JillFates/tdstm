@@ -15,6 +15,7 @@ import {DialogService} from '@progress/kendo-angular-dialog';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
+import {SetProject} from '../../actions/project.actions';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -163,6 +164,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.workflowCodes = data.workflowCodes;
 				this.projectTypes = data.projectTypes;
 
+				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId}));
 				this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 					if (userContext) {
 						userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId};
