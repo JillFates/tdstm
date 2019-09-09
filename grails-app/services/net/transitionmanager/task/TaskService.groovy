@@ -5310,7 +5310,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			noTeamTasks.addAll(AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, "", publishedValues))
 			def noTeamDoneTasks = noTeamTasks.findAll { it.status == 'Completed' }
 			if (noTeamTasks) {
-				teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount:noTeamTasks.size(), teamDoneCount:noTeamDoneTasks.size(), role:RoleType.NO_ROLE]
+				teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount:noTeamTasks.size(), teamDoneCount:noTeamDoneTasks.size(), role:[id: RoleType.NO_ROLE, description: 'Not Assigned']]
 			}
 		}
 		return teamTaskMap
