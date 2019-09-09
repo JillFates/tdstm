@@ -90,7 +90,6 @@ class TaskController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
-	TimeLineService timeLineService
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
