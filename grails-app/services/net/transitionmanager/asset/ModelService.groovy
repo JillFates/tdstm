@@ -1,7 +1,9 @@
 package net.transitionmanager.asset
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.command.ModelCommand
 import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -17,6 +19,7 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
 import net.transitionmanager.model.ModelConnector
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.jdbc.core.JdbcTemplate
@@ -550,4 +553,28 @@ class ModelService implements ServiceMethods {
 
 		return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
     }
+
+	/**
+	 * Create or Update a Model instance based on the given command object.
+	 * @param project - user's current project.
+	 * @param modelCommand
+	 * @return the model (created or updated)
+	 */
+	Model createOrUpdateModel(Project project, ModelCommand modelCommand) {
+		Model model = (Model) GormUtil.populateDomainFromCommand(project, Model, modelCommand.id, modelCommand, null, true)
+
+		if (modelCommand.powerType && modelCommand.powerType.equalsIgnoreCase('Amps')) {
+			model.powerNameplate = NumberUtil.toInteger(model.powerNameplate, 0) * 120
+			model.powerDesign = NumberUtil.toInteger(model.powerDesign, 0) * 120
+			model.powerUse = NumberUtil.toInteger(model.powerUse, 0) * 120
+		}
+
+		if (modelCommand.modelStatus == 'valid') {
+			model.validatedBy = securityService.loadCurrentPerson()
+		}
+
+		model.save()
+
+		return model
+	}
 }
