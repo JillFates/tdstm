@@ -70,11 +70,11 @@
                 </tds-button-delete>
 
 				<tds-button-close *ngIf="assetCommentModel.modal.type === modalType.VIEW; else cancelButton"
-								  (click)="cancelCloseDialog()" class="pull-right">
+								  (click)="closeDialog()" class="pull-right">
 				</tds-button-close>
 
 				<ng-template #cancelButton>
-					<tds-button-cancel (click)="cancelCloseDialog()" class="pull-right">
+					<tds-button-cancel (click)="cancelDialog()" class="pull-right">
 					</tds-button-cancel>
 				</ng-template>
 			</div>
