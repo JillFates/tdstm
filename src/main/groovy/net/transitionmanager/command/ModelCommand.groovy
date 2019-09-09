@@ -1,10 +1,6 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.asset.Rack
 import net.transitionmanager.manufacturer.Manufacturer
-import net.transitionmanager.model.ModelConnector
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 
 class ModelCommand implements CommandObject{
 
@@ -36,12 +32,15 @@ class ModelCommand implements CommandObject{
 	String productLine
 	Boolean roomObject
 	String sourceURL
-	Integer sourceTDS = 1
-	Integer sourceTDSVersion = 1
+	Integer sourceTDS
+	Integer sourceTDSVersion
 	Double storageSize
 	Integer useImage
 	Integer usize
 	Double weight
 	Integer width
+
+	Map aka
+	Map connectors
 
 }

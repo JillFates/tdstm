@@ -575,6 +575,101 @@ class ModelService implements ServiceMethods {
 
 		model.save()
 
+		if (modelCommand.aka) {
+			deleteAkas(model, modelCommand)
+			createOrUpdateAkas(model, modelCommand)
+		}
+		if (modelCommand.connectors) {
+			deleteConnectors(model, modelCommand)
+			createOrUpdateConnectors(model, modelCommand)
+		}
+		
 		return model
+	}
+
+	/**
+	 *
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void createOrUpdateConnectors(Model model, ModelCommand modelCommand) {
+		List<Map> connectorsMap = modelCommand.connectors.added + modelCommand.aka.edited
+		for (Map connectorInfo in connectorsMap) {
+			ModelConnector modelConnector
+			if (connectorInfo.id > 0) {
+				modelConnector = ModelConnector.where {
+					id == connectorInfo.id
+					model == model
+				}.find()
+			} else {
+				modelConnector = new ModelConnector([model: model])
+			}
+			modelConnector.with {
+				connector = connectorInfo.connector
+				label = connectorInfo.label
+				type = connectorInfo.type
+				labelPosition = connectorInfo.labelPosition
+				connectorPosX = connectorInfo.connectorPosX
+				connectorPosY = connectorInfo.connectorPosY
+				status = connectorInfo.status
+			}
+			modelConnector.save()
+		}
+	}
+
+	/**
+	 * Delete all connectors of this model marked for deletion.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void deleteConnectors(Model model, ModelCommand modelCommand) {
+		if (modelCommand.connectors?.deleted) {
+			List<Long> connectorIds = modelCommand.connectors.deleted.collect { Map connectorInfo -> connectorInfo.id}
+			ModelConnector.where {
+				model == model
+				id in connectorIds
+			}.deleteAll()
+		}
+	}
+
+	/**
+	 * Create or update existing Model Aliases based on the information available
+	 * in the Command Object instance.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void createOrUpdateAkas(Model model, ModelCommand modelCommand) {
+		List<Map> akasMap = modelCommand.aka.added + modelCommand.aka.edited
+		for (Map akaInfo in akasMap) {
+			ModelAlias modelAlias
+			if (akaInfo.id > 0) {
+				modelAlias = ModelAlias.where {
+					id == akaInfo.id
+					model == model
+				}.find()
+			} else {
+				modelAlias = new ModelAlias([model: model])
+			}
+			modelAlias.with {
+				manufacturer = model.manufacturer
+				name = akaInfo.name
+			}
+			modelAlias.save()
+		}
+	}
+
+	/**
+	 * Delete all the Model Aliases marked for deletion.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void deleteAkas(Model model, ModelCommand modelCommand) {
+		if (modelCommand.aka?.deleted) {
+			List<Long> akaIds = modelCommand.aka.deleted.collect { Map akaInfo -> akaInfo.id}
+			ModelAlias.where {
+				model == model
+				id in akaIds
+			}.deleteAll()
+		}
 	}
 }
