@@ -1,7 +1,7 @@
 import {
 	Component,
 	ElementRef,
-	HostListener,
+	HostListener, Input,
 	OnDestroy,
 	OnInit,
 	QueryList,
@@ -174,6 +174,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	isApiActionParametersFormValid = true;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -487,7 +488,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
-		console.log(this.modalType);
 		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
@@ -602,9 +602,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (this.editModeFromView) {
 			this.validInfoForm = this.editModeFromView;
 		}
-		if (this.apiActionParametersForm) {
-			this.validParametersForm = this.apiActionParametersForm.valid;
-		}
+		this.validParametersForm = this.isApiActionParametersFormValid;
 	}
 
 	/**
@@ -867,25 +865,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Add a new argument to the list of parameters and refresh the list.
-	 */
-	onAddParameter(): void {
-		this.parameterList.push({
-			paramName: '',
-			desc: '',
-			type: 'string',
-			context: '',
-			fieldName: '',
-			currentFieldList: [],
-			value: '',
-			readonly: false,
-			required: false,
-			encoded: false
-		});
-		this.verifyIsValidForm();
-	}
-
-	/**
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
 	 * if the value is USER_DEF, the field will become a text input field
 	 */
@@ -906,26 +885,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					dataItem.fieldName = property;
 				}
 			}
-			this.verifyIsValidForm();
-		}
-	}
-
-	/**
-	 * Make the Field from Context, filterable
-	 * @param filter
-	 */
-	public filterChange(filter: any, dataItem: any): void {
-		dataItem.currentFieldList = dataItem.sourceFieldList.filter((s) => s.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
-	}
-
-	/**
-	 * Delete from the paramaters the argument passed.
-	 * @param dataItem
-	 */
-	onDeleteParameter(event: any, dataItem: APIActionParameterModel): void {
-		let parameterIndex = this.parameterList.indexOf(dataItem);
-		if (parameterIndex >= 0) {
-			this.parameterList.splice(parameterIndex, 1);
+			dataItem.fieldName = dataItem.fieldName && dataItem.fieldName.field ? dataItem.fieldName.field : '';
 			this.verifyIsValidForm();
 		}
 	}
@@ -1013,33 +973,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	isViewMode(): boolean {
 		return this.modalType === this.actionTypes.VIEW;
-	}
-
-	/**
-	 * Get the Label value to show on the UI like Application instead of APPLICATION
-	 * @param context
-	 * @returns {string}
-	 */
-	getAssetClassValue(context: any): string {
-		let assetClass = this.assetClassesForParameters.find((param) => {
-			return param.assetClass === context || param.assetClass === context.assetClass;
-		});
-		if (assetClass && assetClass.value) {
-			return assetClass.value;
-		}
-		return context;
-	};
-
-	/**
-	 * Workaround to stop propagation on shared events on Kendo
-	 * Clicking on enter was causing other events to execute
-	 * @param event
-	 */
-	public getOnInputKey(event: any): void {
-		if (event.key === KEYSTROKE.ENTER) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
 	}
 
 	private focusForm() {
@@ -1134,5 +1067,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	getDataScriptName(): string {
 		return (this.apiActionModel && this.apiActionModel.defaultDataScript && this.apiActionModel.defaultDataScript.name) || '';
+	}
+
+	onParametersFormChange(event: {parameterList: Array<any>, isFormValid: boolean}): void {
+		this.isApiActionParametersFormValid = event.isFormValid;
+		this.parameterList = this.parameterList;
+		this.verifyIsValidForm();
 	}
 }
