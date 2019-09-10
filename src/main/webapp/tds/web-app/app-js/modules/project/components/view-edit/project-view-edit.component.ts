@@ -48,6 +48,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
 	private logoOriginalFilename;
+	public retrieveImageTimestamp = (new Date()).getTime(); // Update this to refresh the project logo
 
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
@@ -165,11 +166,6 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectTypes = data.projectTypes;
 
 				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId}));
-				this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-					if (userContext) {
-						userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId};
-					}
-				});
 				this.updateSavedFields();
 			});
 	}
@@ -190,7 +186,15 @@ export class ProjectViewEditComponent implements OnInit {
 				if (result.status === 'success') {
 					this.updateSavedFields();
 					this.editing = false;
-					this.projectLogoId = result.data.projectLogoId;
+					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
+					this.retrieveImageTimestamp = (new Date()).getTime();
+
+					this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+						if (userContext) {
+							userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp};
+						}
+					});
+					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp}));
 				}
 			});
 		}

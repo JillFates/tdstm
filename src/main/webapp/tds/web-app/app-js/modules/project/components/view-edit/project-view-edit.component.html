@@ -81,7 +81,7 @@
                                 <td valign="top" class="name">Project Logo:</td>
 
                                 <td valign="top" class="value">
-                                    <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId"/>
+                                    <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId + '?' + retrieveImageTimestamp"/>
                                 </td>
                             </tr>
 
@@ -112,7 +112,7 @@
 
                             <tr class="prop">
                                 <td valign="top" class="name">Collect Reporting Metrics:</td>
-                                <td> <input id="collectMetrics" type="checkbox" [disabled]="true" [ngModel]="savedModel?.collectMetrics"/></td>
+                                <td> <input id="collectMetrics" type="checkbox" style="margin-top:0px" [disabled]="true" [ngModel]="savedModel?.collectMetrics"/></td>
                             </tr>
 
                             <tr class="prop">
@@ -303,7 +303,7 @@
 
                     <tr class="prop">
                         <td valign="top" class="name">Collect Reporting Metrics:</td>
-                        <td> <input type="checkbox" name="collectMetrics" id="collectMetrics" value="true" checked="checked" [(ngModel)]="projectModel.collectMetrics"/></td>
+                        <td> <input type="checkbox" name="collectMetrics" id="collectMetrics" value="true" checked="checked" style="margin-top:0px" [(ngModel)]="projectModel.collectMetrics"/></td>
                     </tr>
 
                     <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
