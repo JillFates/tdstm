@@ -27,8 +27,8 @@ export class PowerComponent implements  OnInit {
 	 * convert to standard units and report the change
 	 */
 	setStandardPower() {
-		this.model.design = parseInt(this.model.namePlate.toString(), 10) * 0.5;
-		this.model.use = parseInt(this.model.namePlate.toString(), 10) * 0.33;
+		this.model.design = parseInt(this.model.powerNameplate.toString(), 10) * 0.5;
+		this.model.use = parseInt(this.model.powerNameplate.toString(), 10) * 0.33;
 		this.reportChanges();
 	}
 
@@ -48,7 +48,7 @@ export class PowerComponent implements  OnInit {
 			.subscribe(() => {
 				const converted = convert(unit, this.model);
 
-				this.model.namePlate = converted.namePlate;
+				this.model.powerNameplate = converted.powerNameplate;
 				this.model.design = converted.design;
 				this.model.use = converted.use;
 				this.reportChanges();

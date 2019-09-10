@@ -49,13 +49,13 @@ import { Connector } from './model/connector.model';
                         <input type="number"
                                [tabindex]="tabindex"
                                (blur)="reportChanges()"
-							   [(ngModel)]="connectors[index].xPosition" name="xPosition">
+							   [(ngModel)]="connectors[index].connectorPosX" name="connectorPosX">
                     </div>
                     <div class="component-position-y">
                         <input type="number"
                                [tabindex]="tabindex"
                                (blur)="reportChanges()"
-							   [(ngModel)]="connectors[index].yPosition" name="yPosition">
+							   [(ngModel)]="connectors[index].connectorPosY" name="connectorPosY">
                     </div>
                     <div class="delete-command">
 						<span class="glyphicon glyphicon-remove delete-connector" [tabindex]="tabindex" (click)="onDelete(index)" title="Delete connector"></span>
@@ -69,6 +69,7 @@ export class ConnectorComponent implements OnInit {
 	@Input('tabindex') tabindex: string;
 	@Input('connectors') originalConnectors: Connector[];
 	@Output('modelChange') modelChange = new EventEmitter<any>();
+	index = 0;
 	positions: string[];
 	types: string[];
 	modelTypeSelected: string;
@@ -86,7 +87,7 @@ export class ConnectorComponent implements OnInit {
 
 	onAdd(): void {
 		const count = this.connectors.length;
-		const connector: Connector = { id: null, type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', xPosition: 0, yPosition: 0  };
+		const connector: Connector = { id: null, type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', connectorPosX: 0, connectorPosY: 0};
 		this.connectors.push(connector);
 		this.reportChanges();
 	}
@@ -111,8 +112,32 @@ export class ConnectorComponent implements OnInit {
 			return !this.connectors.find((original) => original.id === item.id);
 		});
 
-		console.log({added, edited, deleted});
-		this.modelChange.emit({added, edited, deleted});
+		const changes = {
+			added: this.addConnectorOrder(added),
+			edited: this.addConnectorOrder(edited),
+			deleted: this.addConnectorOrder(deleted)
+		};
+
+		this.modelChange.emit(changes);
 	}
 
+	/**
+	 * Add to each connector the order
+	 * @param {any[]} items collection items
+	 * @returns {any}
+	 */
+	addConnectorOrder(items: any[]): any {
+		return  items.map((item: any) => {
+			this.index = this.index + 1;
+			return {
+				id: item.id,
+				type: item.type,
+				label: item.label,
+				labelPosition: item.labelPosition,
+				xPosition: item.connectorPosX,
+				yPosition: item.connectorPosY,
+				connector: this.index
+			};
+		});
+	}
 }

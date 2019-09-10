@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import { clone } from 'ramda';
 
 import {UIExtraDialog} from '../../../../../../../shared/services/ui-dialog.service';
@@ -22,13 +22,15 @@ import {NgForm} from '@angular/forms';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
 import {TranslatePipe} from '../../../../../../../shared/pipes/translate.pipe';
 import {ModelService} from '../../../../../service/model.service';
+import {ConnectorComponent} from '../../../../../../../shared/components/connector/connector.component';
 
 @Component({
 	selector: 'model-device-edit',
 	templateUrl: 'model-device-edit.component.html'
 })
-export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
+export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, AfterViewInit {
 	@ViewChild('form') protected form: NgForm;
+	@ViewChild(ConnectorComponent) protected connectors: ConnectorComponent;
 	private hasAkaValidationErrors = false;
 	public hasDeleteModelPermission: boolean;
 	public hasEditModelPermission: boolean;
@@ -64,7 +66,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			text: this.deviceModel.assetType
 		};
 		this.powerModel = {
-			namePlate: this.model.powerNameplate,
+			powerNameplate: this.model.powerNameplate,
 			design: this.model.powerDesign,
 			use: this.model.powerUse,
 			unit: this.model.powerType
@@ -72,6 +74,10 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 
 		this.model.endOfLifeDate =  DateUtils.stringDateToDate(this.model.endOfLifeDate);
 		this.usize = Array.from(Array(53).keys()).filter((num) => num > 0);
+	}
+
+	ngAfterViewInit() {
+		this.connectors.reportChanges();
 	}
 
 	ngOnInit() {
@@ -182,13 +188,13 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 
 	onSave() {
 		const payload = {
-			// aka: this.model.akaChanges || [],
+			aka: this.model.akaChanges || [],
 			assetType: this.model.assetType,
 			bladeCount: this.model.bladeCount || 0,
 			bladeHeight: this.model.bladeHeight,
 			bladeLabelCount: this.model.bladeLabelCount || 0,
 			bladeRows: this.model.bladeRows || 0,
-			// connectors: this.model.connectors || [],
+			connectors: this.model.connectors || [],
 			connectorsCount: 0,
 			cpuCount: this.model.cpuCount || 0,
 			cpuType: this.model.cpuType,
@@ -207,7 +213,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			weight: this.model.modelWeight,
 			width: this.model.modelWidth,
 			powerDesign: this.model.powerDesign,
-			powerNameplate: this.model.powerNamePlate,
+			powerNameplate: this.model.powerNameplate,
 			powerType: this.model.powerType,
 			powerUse: this.model.powerUse,
 			productLine: this.model.productLine,
@@ -231,7 +237,13 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 	 * @param power
 	 */
 	onPowerChange(power: any) {
-		this.onCustomControlChange();
+		if (power.unit) {
+			this.model.powerNameplate = power.powerNameplate;
+			this.model.powerDesign = power.design;
+			this.model.powerUse = power.use;
+			this.model.powerType = power.unit;
+			this.onCustomControlChange();
+		}
 	}
 
 	/**

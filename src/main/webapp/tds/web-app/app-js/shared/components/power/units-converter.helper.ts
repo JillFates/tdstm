@@ -5,19 +5,19 @@ const [watts, amps] = PowerUnits;
 
 const converter = {
 	[watts]: (model: PowerModel): PowerModel => {
-		let {namePlate, design, use} = model;
+		let {powerNameplate, design, use} = model;
 
 		return {
-			namePlate: namePlate * FACTOR,
+			powerNameplate: powerNameplate * FACTOR,
 			design: design * FACTOR,
 			use: use * FACTOR
 		}
 	} ,
 	[amps]: (model: PowerModel): PowerModel => {
-		let {namePlate, design, use} = model;
+		let {powerNameplate, design, use} = model;
 
 		return {
-			namePlate: namePlate / FACTOR,
+			powerNameplate: powerNameplate / FACTOR,
 			design: design / FACTOR,
 			use: use / FACTOR
 		}

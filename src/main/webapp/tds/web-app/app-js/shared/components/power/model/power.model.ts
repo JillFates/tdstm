@@ -1,5 +1,5 @@
 export interface PowerModel {
-	namePlate: number;
+	powerNameplate: number;
 	design: number;
 	use: number;
 	unit?: string;
