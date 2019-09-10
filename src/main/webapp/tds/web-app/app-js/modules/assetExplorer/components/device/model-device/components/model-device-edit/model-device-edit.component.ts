@@ -202,7 +202,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			depth: this.model.modelDepth,
 			modelFamily: this.model.modelFamily,
 			height: this.model.modelHeight,
-			modelName: this.model.Name,
+			modelName: this.model.modelName,
 			modelStatus: this.model.modelStatus,
 			weight: this.model.modelWeight,
 			width: this.model.modelWidth,
@@ -216,13 +216,13 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit {
 			sourceURL: this.model.sourceURL,
 			storageSize: this.model.storageSize,
 			usize: this.model.usize,
+			useImage: 0
 		};
 
 		console.log(payload);
 		this.modelService.updateModel(payload)
 			.subscribe((result) => {
-				console.log('The update result is');
-				console.log(result);
+				this.close(payload);
 			});
 	}
 

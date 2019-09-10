@@ -73,7 +73,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 					}
 				], false, false)
 			.then((result) => {
-				console.log(result);
+				this.close(result);
 			}).catch((error) => console.log(error));
 	}
 }

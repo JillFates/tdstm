@@ -27,6 +27,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	})
 	class DeviceShowComponent extends AssetCommonShow {
 		protected manufacturerName: string;
+		protected modelName: string;
 
 		constructor(
 			activeDialog: UIActiveDialogService,
@@ -52,7 +53,9 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			return this.manufacturerName;
 		}
 
-		showModel(modelId: string, manufacturerId: string): void {
+		showModel(modelId: string, manufacturerId: string, assetEntity: any): void {
+			console.log(assetEntity);
+
 			forkJoin(
 				this.modelService.getModelAsJSON(modelId),
 				this.manufacturerService.getDeviceManufacturer(manufacturerId)
@@ -72,31 +75,9 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 						}
 					], false, false)
 				.then((result) => {
-					console.log(result);
+					this.modelName = result.modelName;
 				}).catch((error) => console.log(error));
 			});
-
-			/*
-			this.manufacturerService.getDeviceManufacturer(manufacturerId)
-			.pipe(
-				switchMap((manufacturer: any) => {
-					console.log()
-					return this.modelService.getModelAsJSON(modelId)
-				})
-			).subscribe((deviceModel: DeviceModel) => {
-					this.dialogService.extra(ModelDeviceShowComponent,
-						[UIDialogService,
-							{
-								provide: DeviceModel,
-								useValue: deviceModel
-							}
-						], false, false)
-						.then((result) => {
-							console.log(result);
-						}).catch((error) => console.log(error));
-				});
-			*/
-
 		}
 
 		showManufacturer(id: string): void {
@@ -153,6 +134,14 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				.catch( error => console.log('error', error));
 		}
 
+		/**
+		 * Return the current model name or the default one
+		 * @param {string} defaultName
+		 * @returns {string}
+		 */
+		getModelName(defaultName: string): string {
+			return this.modelName || defaultName;
+		}
 	}
 	return DeviceShowComponent;
 }
