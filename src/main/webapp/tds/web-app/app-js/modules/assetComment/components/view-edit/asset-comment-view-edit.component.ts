@@ -6,6 +6,8 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TaskService} from '../../../taskManager/service/task.service';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -28,13 +30,18 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		public taskManagerService: TaskService,
 		public assetExplorerService: AssetExplorerService,
 		private translatePipe: TranslatePipe,
-		public promptService: UIPromptService) {
+		public promptService: UIPromptService,
+		private permissionService: PermissionService) {
 		super('#asset-comment-view-edit-component');
 	}
 
 	ngOnInit(): void {
 		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-		this.loadCommentCategories();
+		// ModalType.VIEW doesn't need the categories,
+		// in fact we need not to load them in that case for permission issues
+		if (this.assetCommentModel.modal.type !== ModalType.VIEW) {
+			this.loadCommentCategories();
+		}
 	}
 
 	/**
@@ -63,6 +70,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	 */
 	protected onEdit(): void {
 		this.assetCommentModel.modal.type = ModalType.EDIT;
+		this.loadCommentCategories();
 	}
 
 	protected onSave(): void {
@@ -101,7 +109,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public cancelCloseDialog(): void {
+	public cancelDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
@@ -118,6 +126,10 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		} else {
 			this.dismiss();
 		}
+	}
+
+	public closeDialog(): void {
+		this.dismiss();
 	}
 
 	/**
@@ -139,5 +151,13 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		}
 
 		return '';
+	}
+
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
 	}
 }

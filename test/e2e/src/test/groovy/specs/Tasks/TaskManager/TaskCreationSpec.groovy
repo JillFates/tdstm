@@ -26,7 +26,7 @@ class TaskCreationSpec extends GebReportingSpec {
     static taskTeam = "Unassigned"  //TODO verify other team id values
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

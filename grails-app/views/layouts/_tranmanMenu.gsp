@@ -311,8 +311,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Tasks</li>
                             <li class="menu-child-item menu-parent-tasks-my-tasks">
-                                <a href="/tdstm/task/listUserTasks">My Tasks (
-                                    <span id="todoCountProjectId">&nbsp;</span>)</a>
+                                <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
                             </li>
                             <tds:hasPermission permission="${Permission.TaskManagerView}">
                                 <li class="menu-child-item menu-parent-tasks-task-manager">

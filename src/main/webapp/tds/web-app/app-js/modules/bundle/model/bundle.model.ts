@@ -6,8 +6,8 @@ export class BundleModel {
 	public description: string;
 	public fromId: number;
 	public toId: number;
-	public startTime: Date;
-	public completionTime: Date;
+	public startTime: any;
+	public completionTime: any;
 	public projectManagerId: number;
 	public moveManagerId: number;
 	public moveEvent: any;

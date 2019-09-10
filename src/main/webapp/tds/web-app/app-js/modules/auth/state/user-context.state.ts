@@ -63,10 +63,13 @@ export class UserContextState {
 
 	@Action(Logout)
 	logout(ctx: StateContext<UserContextModel>) {
-		ctx.setState({});
-		return this.authService.logout().pipe(
-			tap()
-		);
+		const state = ctx.getState();
+		if (state.user) {
+			ctx.setState({});
+			return this.authService.logout().pipe(
+				tap()
+			);
+		}
 	}
 
 	@Action(SessionExpired)

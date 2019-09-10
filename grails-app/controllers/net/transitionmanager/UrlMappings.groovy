@@ -171,13 +171,9 @@ class UrlMappings {
 
 		"/ws/asset/createTemplate/$domainName" (controller:'wsAsset', action:'getCreateTemplate', method:'GET')
 
-		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
-			mode = 'show'
-		}
+		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'showModel', method:'GET')
 
-		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
-			mode = 'edit'
-		}
+		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'editModel', method:'GET')
 
 		"/ws/asset/defaultCreateModel/$assetClass?" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 

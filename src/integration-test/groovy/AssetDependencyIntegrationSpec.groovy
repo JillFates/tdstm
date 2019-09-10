@@ -76,7 +76,7 @@ class AssetDependencyIntegrationSpec extends Specification {
 
 		and:
 			!assetDependency.validate(['dependent'])
-			assetDependency.errors['dependent'].code == 'invalid.dependent'
+			assetDependency.errors['dependent'].code == 'assetDependency.dependent.invalid.dependent'
 	}
 
 }

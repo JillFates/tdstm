@@ -20,7 +20,7 @@ class TagsListSpec extends GebReportingSpec {
     static tagDescription
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

@@ -3,7 +3,6 @@ import {Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
 // Service
-import {NoticeService} from '../../service/notice.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 // Model
@@ -21,7 +20,6 @@ export class StandardNoticesComponent extends NoticeCommonComponent implements O
 	constructor(
 		protected model: Notices,
 		protected activeDialog: UIActiveDialogService,
-		protected noticeService: NoticeService,
 		protected userContextService: UserContextService,
 		private postNoticesManager: PostNoticesManagerService,
 		protected sanitizer: DomSanitizer) {

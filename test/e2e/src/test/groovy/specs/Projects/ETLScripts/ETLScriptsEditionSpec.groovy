@@ -23,7 +23,7 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
     static datascriptInfo
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

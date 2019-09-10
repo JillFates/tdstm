@@ -211,4 +211,8 @@ export class Permission {
 	static ETLScriptUpdate = 'ETLScriptUpdate';
 	static ETLScriptLoadSampleData = 'ETLScriptLoadSampleData';
 	static CredentialView = 'CredentialView';
+	static AssetDependenciesBulkSelect = 'AssetDependenciesBulkSelect';
+	static AssetBulkSelect = 'AssetBulkSelect'
+	static AssetDependencyEdit = 'AssetDependencyEdit';
+	static AssetDependencyDelete = 'AssetDependencyDelete';
 }

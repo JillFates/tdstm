@@ -215,4 +215,8 @@ export class EventDashboardComponent implements OnInit {
 	public onTimeout(): void {
 		this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
 	}
+
+	public isEventSelected(): boolean {
+		return this.selectedEvent != null;
+	}
 }

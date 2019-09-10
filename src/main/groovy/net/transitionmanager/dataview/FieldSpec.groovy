@@ -265,19 +265,19 @@ class FieldSpec {
 		switch (control) {
 			case 'Number':
 				if (hibernateType == CAST_BIG_DECIMAL_FUNCTION) {
-					castSentence = "$CAST_BIG_DECIMAL_FUNCTION($property, $precision)"
+					castSentence = "$CAST_BIG_DECIMAL_FUNCTION(AE.$property, $precision)"
 				} else {
-					castSentence = "$CAST_LONG_FUNCTION($property)"
+					castSentence = "$CAST_LONG_FUNCTION(AE.$property)"
 				}
 				break
 			case 'DateTime':
-				castSentence = "$CAST_DATE_TIME_FUNCTION($property, '%Y-%m-%dT%TZ')"
+				castSentence = "$CAST_DATE_TIME_FUNCTION(AE.$property, '%Y-%m-%dT%TZ')"
 				break
 			case 'Date':
-				castSentence = "$CAST_DATE_TIME_FUNCTION($property, '%Y-%m-%d')"
+				castSentence = "$CAST_DATE_TIME_FUNCTION(AE.$property, '%Y-%m-%d')"
 				break
 			default:
-				castSentence = "cast($property as $hibernateType)"
+				castSentence = "cast(AE.$property as $hibernateType)"
 				break
 		}
 
