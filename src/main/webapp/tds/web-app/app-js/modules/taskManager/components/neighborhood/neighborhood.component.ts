@@ -8,6 +8,7 @@ import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layo
 import {IGraphTask} from '../../../../shared/model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {IMoveEvent} from '../../../../shared/model/move-event.model';
 
 export interface ILinkPath {
 	from: number | string;
@@ -39,8 +40,8 @@ export class NeighborhoodComponent implements OnInit {
 	filterText: string;
 	textFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
 	icons = FA_ICONS;
-	selectedEvent: {text: string, value: string | number};
-	eventList: {text: string, value: string | number}[];
+	selectedEvent: IMoveEvent;
+	eventList$: Observable<IMoveEvent[]>;
 	isEventDropdownOpen: boolean;
 
 	constructor(
@@ -50,10 +51,15 @@ export class NeighborhoodComponent implements OnInit {
 		) {}
 
 	ngOnInit() {
+		this.loadAll();
+	}
+
+	loadAll(): void {
 		this.subscribeToHighlightFilter();
 		this.activatedRoute.queryParams.subscribe(params => {
 			if (params && params.id) { this.loadTasks(params.id); }
 		});
+		this.loadEventList();
 		this.eventsDropdownOpened();
 		this.eventsDropdownClosed();
 	}
@@ -63,21 +69,23 @@ export class NeighborhoodComponent implements OnInit {
 			.subscribe((res: IGraphTask[]) => {
 				if (res && res.length > 0) {
 					this.tasks = res;
-					this.eventList = this.getEventList(this.tasks);
 					this.generateModel();
 				}
 			});
 	}
 
-	getEventList(tasks: IGraphTask[]): {text: string, value: string | number}[] {
-		return tasks.map(t => ({text: t.label, value: t.id}));
+	loadEventList() {
+		this.taskService.findMoveEvents().subscribe(res => {
+			this.eventList$ = of(res);
+			this.selectedEvent = res[0];
+			this.loadFromSelectedEvent(this.selectedEvent.id);
+		});
 	}
 
-	loadFromSelectedTask(id?: number): void {
-		this.taskService.findTask(this.selectedEvent.value)
+	loadFromSelectedEvent(id?: number): void {
+		this.taskService.findTasksByMoveEventId(this.selectedEvent.id)
 		.subscribe(res => {
 			this.tasks = res;
-			this.eventList = this.getEventList(this.tasks);
 			this.generateModel();
 		});
 	}
@@ -198,6 +206,10 @@ export class NeighborhoodComponent implements OnInit {
 				console.log('text: ', text);
 				this.graph.highlightNodesByText(text);
 		});
+	}
+
+	refreshDiagram(): void {
+		this.loadAll();
 	}
 
 }

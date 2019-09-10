@@ -139,10 +139,10 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	constructor(private renderer: Renderer2) { /* Constructor */ }
 
 	ngOnInit() {
-		document.addEventListener('contextmenu', (e) => {
-				e.preventDefault();
-				return false;
-			});
+		// document.addEventListener('contextmenu', (e) => {
+		// 		e.preventDefault();
+		// 		return false;
+		// 	});
 	}
 
 	ngOnChanges(simpleChanges: SimpleChanges): void {

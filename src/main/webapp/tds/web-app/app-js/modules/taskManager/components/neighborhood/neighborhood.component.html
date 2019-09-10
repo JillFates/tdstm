@@ -30,7 +30,7 @@
     </div>
 
     <div class="col-md-2 task-options k-align-self-center">
-      <button class="refresh-container-btn btn">
+      <button class="refresh-container-btn btn" (click)="refreshDiagram()">
         <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
       </button>
     </div>
@@ -40,13 +40,14 @@
     <div class="col-md-4">
       <label>Event: </label>
       <kendo-dropdownlist
-        textField="text"
-        valueField="value"
-        [data]="eventList"
-        (selectionChange)="loadFromSelectedTask($event)"
+        textField="name"
+        valueField="id"
+        [data]="eventList$ | async"
+        (selectionChange)="loadFromSelectedEvent($event)"
         [(ngModel)]="selectedEvent"
         (open)="eventsDropdownOpened()"
         (close)="eventsDropdownClosed()"
+        [value]="selectedEvent"
         #eventsDropdown>
       </kendo-dropdownlist>
     </div>
@@ -82,7 +83,7 @@
     [linksPath]="links$ | async"
     [containerWidth]="'100%'"
     [containerHeight]="'800px'"
-    (nodeClicked)="loadFromSelectedTask($event)"
+    (nodeClicked)="loadTasks($event)"
     (showTaskDetailsClicked)="showTaskDetails($event)"
     (editClicked)="editTask($event)"
     #graph></tds-layered-digraph-layout>
