@@ -24,7 +24,6 @@ import {TaskListComponent} from './components/list/task-list.component';
 import {ReportsService} from '../reports/service/reports.service';
 import {NeighborhoodComponent} from './components/neighborhood/neighborhood.component';
 import {DialogsModule} from '@progress/kendo-angular-dialog';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
 	imports: [
@@ -44,9 +43,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 		DialogsModule,
 		// Route
 		TaskManagerRouteModule,
-		// NGX Bootstrap
-		NgbModule,
-		DropDownsModule
 	],
 	declarations: [
 		TaskListComponent,

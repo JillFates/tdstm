@@ -78,11 +78,11 @@ export class NeighborhoodComponent implements OnInit {
 		this.taskService.findMoveEvents().subscribe(res => {
 			this.eventList$ = of(res);
 			this.selectedEvent = res[0];
-			this.loadFromSelectedEvent(this.selectedEvent.id);
 		});
 	}
 
 	loadFromSelectedEvent(id?: number): void {
+		if (this.tasks) { return; }
 		this.taskService.findTasksByMoveEventId(this.selectedEvent.id)
 		.subscribe(res => {
 			this.tasks = res;

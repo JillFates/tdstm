@@ -59,9 +59,7 @@
     "ramda": "0.25.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "zone.js": "0.10.0",
-    "@ng-bootstrap/ng-bootstrap": "4.0.0",
-    "ngx-bootstrap": "5.1.2"
+    "zone.js": "0.10.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",
