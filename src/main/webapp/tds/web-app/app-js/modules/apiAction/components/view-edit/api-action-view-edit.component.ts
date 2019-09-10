@@ -161,7 +161,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	};
 	lastSelectedAgentMethodModel: AgentMethodModel = {
 		id: '0',
-		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+		dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
@@ -287,7 +287,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.agentMethodList.push({ id: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -487,7 +487,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
-		console.log(this.modalType);
 		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
@@ -633,8 +632,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-
+						this.agentMethodList.push({id: 0, dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
 						}
@@ -649,7 +647,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+				this.agentMethodList.push({id: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -688,6 +686,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private loadAgentMethodModel(changeMethod: boolean): void {
 		if (changeMethod) {
 			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+			this.apiActionModel.agentMethod.dictionaryMethodName = this.apiActionModel.agentMethod.name;
 			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
 			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
