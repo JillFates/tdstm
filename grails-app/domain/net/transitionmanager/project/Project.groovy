@@ -147,10 +147,14 @@ class Project extends PartyGroup {
 	 * @return a map containing a project's most relevant fields.
 	 */
 	Map toMap() {
-		def logo = ProjectLogo.findByProject(this)
-		def logoId = 0
+		ProjectLogo logo = ProjectLogo.findByProject(this)
+		Map projectLogoMap = null
 		if(logo) {
-			logoId = logo.getId()
+			projectLogoMap = [
+			    id: logo.id,
+				name: logo.name,
+				partnerImage: logo.partnerImage
+			]
 		}
 		return [
 		    id: id,
@@ -160,7 +164,7 @@ class Project extends PartyGroup {
 				name: defaultBundle.name
 			],
 			timezone: timezone.label,
-			projectLogoId: logoId
+		    projectLogoForProject: projectLogoMap
 		]
 	}
 

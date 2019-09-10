@@ -1872,7 +1872,8 @@ class ProjectService implements ServiceMethods {
 		assert file
 		assert project
 
-		ProjectLogo projectLogo = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: originalFilename, project: project)
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project) ?: new ProjectLogo(project: project)
+		projectLogo.name = originalFilename
 		projectLogo.setData(new FileInputStream(file))
 		return projectLogo.save(flush: true)
 	}
