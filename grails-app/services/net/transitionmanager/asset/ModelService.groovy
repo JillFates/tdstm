@@ -593,7 +593,7 @@ class ModelService implements ServiceMethods {
 	 * @param modelCommand
 	 */
 	private void createOrUpdateConnectors(Model model, ModelCommand modelCommand) {
-		List<Map> connectorsMap = modelCommand.connectors.added + modelCommand.aka.edited
+		List<Map> connectorsMap = modelCommand.connectors.added + modelCommand.connectors.edited
 		for (Map connectorInfo in connectorsMap) {
 			ModelConnector modelConnector
 			if (connectorInfo.id > 0) {
@@ -605,14 +605,18 @@ class ModelService implements ServiceMethods {
 				modelConnector = new ModelConnector([model: model])
 			}
 			modelConnector.with {
-				connector = connectorInfo.connector
 				label = connectorInfo.label
 				type = connectorInfo.type
 				labelPosition = connectorInfo.labelPosition
-				connectorPosX = connectorInfo.connectorPosX
-				connectorPosY = connectorInfo.connectorPosY
-				status = connectorInfo.status
+				connectorPosX = connectorInfo.xPosition
+				connectorPosY = connectorInfo.yPosition
+				connector = connectorInfo.connector
 			}
+
+			if (connectorInfo.status) {
+				modelConnector.status = connectorInfo.status
+			}
+
 			modelConnector.save()
 		}
 	}
