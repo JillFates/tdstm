@@ -283,9 +283,7 @@ export class TaskEditCreateModelHelper {
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
-		const deletedItems = this.model.deletedPredecessorList
-			.concat(this.model.deletedSuccessorList)
-			.join(',');
+		const deletedItems = this.model.deletedPredecessorList.concat(this.model.deletedSuccessorList);
 
 		const payload =  {
 			assetClass: assetClass.id,
@@ -371,9 +369,7 @@ export class TaskEditCreateModelHelper {
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
-		const deletedItems = this.model.deletedPredecessorList
-			.concat(this.model.deletedSuccessorList)
-			.join(',');
+		const deletedItems = this.model.deletedPredecessorList.concat(this.model.deletedSuccessorList);
 
 		return  {
 			assetClass: assetClass.id,
