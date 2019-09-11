@@ -1,4 +1,7 @@
 package net.transitionmanager.task.timeline
+
+import com.tdssrc.grails.StopWatch
+
 /**
  * Summary of results applied to a {@code TimeLine}
  * over an instance of {@code TaskTimeLineGraph}.
@@ -27,6 +30,10 @@ class TimelineSummary {
 	 * {@code List} of {@codeCriticalPathRoute} detected during critical path calculation
 	 */
 	List<CriticalPathRoute> criticalPathRoutes = []
+	/**
+	 * Elapsed time in minutes to complete a critical path analysis.
+	 */
+	String elapsedTime
 
 	TimelineSummary(Date windowStartTime, Date windowEndTime, Date currentTime) {
 		this.windowStartTime = windowStartTime

@@ -29,8 +29,9 @@ class TimeLineService implements ServiceMethods {
 	 * @param taskDependencies a List of {@code TaskDependency}
 	 *
 	 * @return CPA calculation results in an instance of {@code TimelineSummary}
+	 * 			and an instance {@code TaskTimeLineGraph}
 	 */
-	TimelineSummary executeCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
+	List executeCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
 
 		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
 			.withVertices(tasks)
@@ -38,11 +39,11 @@ class TimeLineService implements ServiceMethods {
 			.build()
 
 		TimelineSummary summary = new TimeLine(graph)
-			.calculate(event.estStartTime, event.estCompletionTime)
+			.calculate(new Date(event.estStartTime.time), new Date(event.estCompletionTime.time))
 
 		updateVertexListInDatabase(graph.vertices.toList())
 
-		return summary
+		return [graph, summary]
 	}
 
 	/**
