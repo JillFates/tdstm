@@ -11,9 +11,11 @@
             </div>
             <div class="col-md-8">
                 <div class="row">
+                    <!--[style.background-color]="rowIndex === 1 && column.compose ? column.compose.color : ''"-->
                     <div *ngFor="let column of getColumns(row);" 
                             class="col-md-{{colSize}} {{column.classes}}" 
-                            [ngClass]="{'heading': rowIndex === 0}">
+                            [ngClass]="{'heading': rowIndex === 0}"
+                            [style.background-color]="rowIndex === 1 && column.compose ? column.compose.color : ''">
                             <a *ngIf="rowIndex === 0; else categoryValue"
                                [routerLink]="['/taskManager', 'list']"
                                [queryParams]="{category: column.text}">
@@ -21,8 +23,17 @@
                             </a>
 
                             <ng-template #categoryValue>
-                                <div *ngIf="column.compose; else simpleValue">
-                                    Compose Value
+                                <div *ngIf="rowIndex ===2 && column.compose; else simpleValue">
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                        [queryParams]="{category: column.compose.category, status: 'completed', justRemaining: 0}">
+                                        <span [innerHtml]="column.compose.tskComp"></span>
+                                    </a>
+                                    of (
+                                        <a [routerLink]="['/taskManager', 'list']"
+                                        [queryParams]="{category: column.compose.category, justRemaining: 0}">
+                                            <span [innerHtml]="column.compose.tskTot"></span>
+                                        </a>
+                                    )
                                 </div>
                             </ng-template>
 
