@@ -53,16 +53,20 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			return this.manufacturerName;
 		}
 
-		showModel(modelId: string, manufacturerId: string, assetEntity: any): void {
-			console.log(assetEntity);
-
+		/**
+		 * Open up the model show view
+		 * @param {string} modelId
+		 * @param {string} manufacturerId
+		 */
+		showModel(modelId: string, manufacturerId: string): void {
+			if (this.modelName === null) {
+				return;
+			}
 			forkJoin(
 				this.modelService.getModelAsJSON(modelId),
 				this.manufacturerService.getDeviceManufacturer(manufacturerId)
 			).subscribe((results: any) => {
 				const [deviceModel, deviceManufacturer] = results;
-				console.log(deviceModel);
-				console.log(deviceManufacturer);
 				this.dialogService.extra(ModelDeviceShowComponent,
 					[UIDialogService,
 						{
@@ -75,7 +79,11 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 						}
 					], false, false)
 				.then((result) => {
-					this.modelName = result.modelName;
+					if (result === null) {
+						this.modelName = null;
+					} else {
+						this.modelName = result.modelName;
+					}
 				}).catch((error) => console.log(error));
 			});
 		}
@@ -83,7 +91,6 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		showManufacturer(id: string): void {
 			this.manufacturerService.getDeviceManufacturer(id)
 				.subscribe((deviceManufacturer: DeviceManufacturer) => {
-
 					this.dialogService.extra(ManufacturerShowComponent,
 						[UIDialogService,
 							{
@@ -140,6 +147,10 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 		 * @returns {string}
 		 */
 		getModelName(defaultName: string): string {
+			if (this.modelName === null) {
+				return '';
+			}
+
 			return this.modelName || defaultName;
 		}
 	}

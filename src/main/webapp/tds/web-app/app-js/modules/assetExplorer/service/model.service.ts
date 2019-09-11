@@ -56,19 +56,27 @@ export class ModelService {
 		.catch((error: any) => error.json());
 	}
 
+	/**
+	 * Delete a model
+	 * @param {string} id Model id to delete
+	 * @returns {Observable<any>}
+	 */
 	deleteModel(id: string): Observable<any> {
-		const url = `${this.modelUrl}/update`;
-		const headers = new HttpHeaders({'Content-Type': 'application/x-www-form-urlencoded'});
+		const url = `${this.modelUrl}/../ws/model/${id}`;
 
-		return this.http.post(url, {id, '_action_delete': 'Delete'}, {headers: headers, responseType: 'text'})
+		return this.http.delete(url)
 		.catch((error: any) => error);
 	}
 
+	/**
+	 * Update the model information
+	 * @param payload
+	 * @returns {Observable<any>}
+	 */
 	updateModel(payload: any): Observable<any> {
 		const url = `${this.modelUrl}/../ws/model`;
 
 		return this.http.post(url, payload)
 			.catch((error: any) => error);
 	}
-
 }

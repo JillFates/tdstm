@@ -56,7 +56,7 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
 									<td class="valueNW ${standardFieldSpecs.model.imp?:''}">
 										<tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
-											<a (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}', assetEntity)" [innerText]="getModelName('${assetEntity.model}')"></a>
+											<a (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
 											<g:if test="${!assetEntity.model?.isValid()}">
 												<span style="color: red;">
 													<b>?</b>

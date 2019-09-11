@@ -270,8 +270,9 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 			if (result) {
 				this.modelService.deleteModel(this.model.id)
 					.subscribe((response) => {
-						console.log(response);
-						this.dismiss();
+						if (response && response.status !== 'error') {
+							this.close(null);
+						}
 					})
 			}
 		});
