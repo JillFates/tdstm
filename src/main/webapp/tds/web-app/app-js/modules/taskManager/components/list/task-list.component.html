@@ -76,8 +76,8 @@
 				[data]="grid.gridData"
 				[pageSize]="grid.state.take"
 				[skip]="grid.state.skip"
-				[pageable]="{pageSizes: grid.defaultPageOptions, info: true}"
-				(pageChange)="grid.pageChange($event)"
+				[pageable]="{pageSizes: [25,50,100,250,500,1000], info: true}"
+				(pageChange)="onPageChangeHandler($event)"
 				[filter]="grid.state.filter"
 				[filterable]="true"
 				(filterChange)="grid.filterChange($event)"
@@ -85,9 +85,9 @@
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
 				[sortable]="{mode:'single'}"
+				(sortChange)="onSortChangeHandler($event)"
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
-				(sortChange)="grid.sortChange($event)"
 				(cellClick)="onCellClickHandler($event)">
 				<!-- Column Menu -->
 				<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">

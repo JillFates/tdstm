@@ -328,7 +328,7 @@ export class DataGridOperationsHelper {
 	/**
 	 * Notify the event to update the grid height
 	 */
-	private notifyUpdateGridHeight(): void {
+	public notifyUpdateGridHeight(): void {
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
