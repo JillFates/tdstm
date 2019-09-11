@@ -452,7 +452,8 @@ class CommentService implements ServiceMethods {
 					cssClass: css,
 					statusCss: taskService.getCssClassForStatus(assetComment.status),
 					assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
-					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13)
+					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13),
+					lastUpdatedTimePassed: TimeUtil.elapsed(assetComment.lastUpdated, TimeUtil.nowGMT())
 				]
 
 				// Now refine if the task should be sent based on it being new or updated
