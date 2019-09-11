@@ -28,8 +28,8 @@ import {ReportsService} from '../reports/service/reports.service';
 		// Angular
 		CommonModule,
 		SharedModule,
-		AssetExplorerModule,
 		FormsModule,
+		AssetExplorerModule,
 		// Kendo
 		DropDownsModule,
 		GridModule,

@@ -10,6 +10,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class StaffListSpec extends GebReportingSpec {
     def testKey
@@ -29,6 +31,8 @@ class StaffListSpec extends GebReportingSpec {
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
     static originalDetails = [userCompany,firstName,middleName,lastName,userName,userEmail]
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

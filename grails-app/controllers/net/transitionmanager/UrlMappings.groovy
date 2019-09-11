@@ -60,6 +60,20 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/asset/bundlesAndPreferencesForAssetExport" {
+			controller = 'wsAsset'
+			action = [
+			    GET: 'bundlesAndPreferencesForAssetExport'
+			]
+		}
+
+		"/ws/asset/exportAssets" {
+			controller = 'wsAsset'
+			action = [
+			    POST: 'exportAssets'
+			]
+		}
+
 		"/ws/asset/clone" {
 			controller = "wsAsset"
 			action = [
@@ -157,13 +171,9 @@ class UrlMappings {
 
 		"/ws/asset/createTemplate/$domainName" (controller:'wsAsset', action:'getCreateTemplate', method:'GET')
 
-		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
-			mode = 'show'
-		}
+		"/ws/asset/showModel/$id" (controller:'wsAsset', action:'showModel', method:'GET')
 
-		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'getModel', method:'GET') {
-			mode = 'edit'
-		}
+		"/ws/asset/editModel/$id" (controller:'wsAsset', action:'editModel', method:'GET')
 
 		"/ws/asset/defaultCreateModel/$assetClass?" (controller:'wsAsset', action:'getDefaultCreateModel', method:'GET')
 
@@ -251,11 +261,6 @@ class UrlMappings {
 		"/ws/moveEvent/saveEvent/$id?" {
 			controller = "wsEvent"
 			action = [POST:"saveEvent"]
-		}
-
-		"/ws/moveEvent/markAssetsMoved/$id" {
-			controller = "wsEvent"
-			action = [PUT:"markEventAssetAsMoved"]
 		}
 
 		"/ws/moveEvent/deleteEvent/$id" {
@@ -522,6 +527,13 @@ class UrlMappings {
 		"/ws/task/$id/changeTaskState" {
 			controller = "Task"
 			action = [POST:"changeTaskState"]
+		}
+
+		"/ws/task/$taskId/actionLookUp" {
+			controller = 'wsTask'
+			action = [
+				GET: 'actionLookUp'
+			]
 		}
 
         "/ws/task/$id/changeTime" {
@@ -1518,6 +1530,8 @@ class UrlMappings {
 			controller = 'singleApp'
 			action = 'index'
 		}
+
+
 
 		//ROOT map to the auth/index action
 		"/" (controller: "auth")

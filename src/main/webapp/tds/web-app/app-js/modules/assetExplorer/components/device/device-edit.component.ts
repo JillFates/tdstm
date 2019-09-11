@@ -47,6 +47,7 @@ export function DeviceEditComponent(template, editModel, metadata: any) {
 			this.initModel();
 			this.toggleAssetTypeFields();
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**

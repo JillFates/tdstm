@@ -21,7 +21,7 @@ export class SortUtils {
 	 * @returns {number}
 	 */
 	public static compareByProperty(a, b, property) {
-		if (a[property]) {
+		if (a[property] || !isNaN(a[property])) {
 			let propA = a[property];
 			let propB = b[property];
 

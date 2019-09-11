@@ -7,6 +7,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class RecipeDeletionSpec extends GebReportingSpec {
     def testKey
@@ -17,6 +19,8 @@ class RecipeDeletionSpec extends GebReportingSpec {
     static recipesNameList = [baseName, "Geb Recipe Test"]
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()
@@ -43,5 +47,3 @@ class RecipeDeletionSpec extends GebReportingSpec {
             bulkDelete maxNumberOfBulkRecipesToBeDeleted, recipesNameList
     }
 }
-
-

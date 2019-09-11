@@ -134,32 +134,32 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				}
 				this.dateFormat = dateFormat;
 				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
-
-				if (assetClasses) {
-					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
-				}
 				if (categories) {
 					this.model.categoriesList = [''].concat(categories);
 				}
-
 				if (events) {
 					this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
 				}
-
 				if (taskDefaults && taskDefaults.preferences) {
 					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT']  || '', text: '' };
 					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 					this.metaParam = this.getMetaParam();
 				}
-
-				if (classForAsset && classForAsset.assetClass) {
-					this.model.assetClass = {id: classForAsset.assetClass, text: ''};
-				} else {
+				if (assetClasses) {
+					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
+				}
+				// on CREATE mode
+				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+					this.model.assetClass = (classForAsset && classForAsset.assetClass)
+						? {id: classForAsset.assetClass, text: ''}
+						: {id: this.model.assetClasses[0].id, text: ''};
+					// on EDIT mode and empty assetClass
+				} else if (!this.model.assetClass || !this.model.assetClass.id) {
 					this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
 				}
-
 				jQuery('[data-toggle="popover"]').popover();
+				this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
 			});
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);

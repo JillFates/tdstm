@@ -1,13 +1,14 @@
 /**
  * Created by David Ontiveros on 5/31/2017.
  */
-import {Component, Inject, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, Inject, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import { FieldSettingsModel } from '../../model/field-settings.model';
 import { CustomDomainService } from '../../service/custom-domain.service';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
 
 /**
  *
@@ -22,11 +23,12 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 	]
 })
 
-export class SelectListConfigurationPopupComponent implements OnInit {
+export class SelectListConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
 
 	public items: any[] = [];
 	public savedItems: any[] = [];
-	public newItem = '';
+	public _newItem = '';
+	private newItemValid = false;
 	public show = false; // first time should open automatically.
 	public defaultValue: string = null;
 	public sortType: string;
@@ -41,9 +43,10 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
 		private customService: CustomDomainService,
-		private activeDialog: UIActiveDialogService,
-		private translatePipe: TranslatePipe,
-		private promptService: UIPromptService) {
+		public activeDialog: UIActiveDialogService,
+		public translate: TranslatePipe,
+		public prompt: UIPromptService) {
+		super(activeDialog, prompt, translate);
 	}
 
 	ngOnInit() {
@@ -55,6 +58,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Makes a service call to get pre-build distinct values from system.
 	 */
 	private load(): void {
+		this.items = [];
 		this.newItem = '';
 		this.sortType = null;
 		this.defaultValue = null;
@@ -66,7 +70,6 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 				if (this.field.constraints.required && indexOfBlank !== ValidationUtils.NOT_FOUND) { // If REQUIRED remove blank(empty) option
 					distinctValues.splice(indexOfBlank, 1);
 				} else if (!this.field.constraints.required && indexOfBlank === ValidationUtils.NOT_FOUND) { // If NOT REQUIRED and distinctValues have no empty option register it.
-					distinctValues.push('');
 					if (this.field.constraints.values && this.field.constraints.values.indexOf('') === ValidationUtils.NOT_FOUND) { // If it's not yet on current field values add it to items list (not deletable)
 						this.items.splice(0, 0, {deletable: false, value: ''} );
 					}
@@ -108,7 +111,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 */
 	isDirty(): boolean {
 		return (JSON.stringify(this.items) !== JSON.stringify(this.savedItems) ||
-				this.field.default !== this.defaultValue);
+				this.field.default !== this.defaultValue) || this.newItem.length > 0;
 	}
 
 	/**
@@ -116,7 +119,7 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Adds a new item to the list.
 	 */
 	public onAdd(): void {
-		if (this.items.filter((i) => i.value === this.newItem).length === 0) {
+		if ( this.newItemValid ) {
 			this.items.push({
 				deletable: true,
 				value: this.newItem
@@ -147,16 +150,21 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 	 * Simply sets current list into the field model and it's default value.
 	 */
 	public onSave(): void {
-		let fieldModel = { ...this.field };
-		fieldModel.constraints.values = this.items.map(i => i.value);
-		this.customService.checkConstraints(this.domain, fieldModel)
-			.subscribe(res => {
-				if (res) {
-					this.field.constraints.values = this.items.map(i => i.value);
-					if (this.defaultValue != null) {
-						this.field.default = this.defaultValue;
-					}
-					this.activeDialog.close(this.isDirty());
+		this.displayWarningMessage()
+			.then((confirm: boolean) => {
+				if (confirm) {
+					let fieldModel = { ...this.field };
+					fieldModel.constraints.values = this.items.map(i => i.value);
+					this.customService.checkConstraints(this.domain, fieldModel)
+					.subscribe(res => {
+						if (res) {
+							this.field.constraints.values = this.items.map(i => i.value);
+							if (this.defaultValue != null) {
+								this.field.default = this.defaultValue;
+							}
+							this.activeDialog.close(this.isDirty());
+						}
+					});
 				}
 			});
 	}
@@ -208,27 +216,26 @@ export class SelectListConfigurationPopupComponent implements OnInit {
 		}
 	}
 
-	/**
-	 * Close the Dialog but first it verify is not Dirty
+	/*
+	 * oluna: I added this setter to change the newItemValid property oly when the value changes instead of
+	 * having a computed property that recalculates everytime. A better approach might be to have a catched property??
 	 */
-	public cancelCloseDialog(): void {
-		if (this.isDirty() || this.newItem.length > 0) {
-			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
-				this.translatePipe.transform('GLOBAL.CONFIRM'),
-				this.translatePipe.transform('GLOBAL.CANCEL'),
-			)
-				.then(confirm => {
-					if (confirm) {
-						this.items = [];
-						this.activeDialog.dismiss();
-					}
-				})
-				.catch((error) => console.log(error));
-		} else {
-			this.items = [];
-			this.activeDialog.dismiss();
-		}
+	@Input()
+	set newItem(value: string) {
+		this._newItem = value;
+		this.checkNewItemValid();
+	}
+
+	get newItem(): string {
+		return this._newItem;
+	}
+
+	/**
+	 * Check if the _newItem value is not Blank and is not already in the list of existing values
+	 */
+	private checkNewItemValid(): void {
+		const trimValue = this._newItem.trim();
+		this.newItemValid = (trimValue.length >= 0) &&
+			(this.items.filter((i) => i.value === trimValue).length === 0);
 	}
 }

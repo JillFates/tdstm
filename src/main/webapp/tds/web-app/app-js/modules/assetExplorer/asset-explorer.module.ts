@@ -95,7 +95,8 @@ import {ModelDeviceEditComponent} from './components/device/model-device/compone
 		AssetDependencyShowComponent,
 		AssetDependencyEditComponent,
 		TaskCommentDialogComponent,
-		TaskCommentComponent
+		TaskCommentComponent,
+		TaskActionsComponent
 	],
 	entryComponents: [
 		AssetShowComponent,

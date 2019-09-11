@@ -17,16 +17,16 @@ import test.helper.ApplicationTestHelper
 class BulkChangeListIntegrationSpec extends Specification  {
 
 	@Shared
-	ApplicationTestHelper applicationTestHelper = new ApplicationTestHelper()
+	ApplicationTestHelper applicationTestHelper
 
 	@Shared
 	FileSystemService fileSystemService
 
 	@Shared
-	test.helper.MoveBundleTestHelper moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+	test.helper.MoveBundleTestHelper moveBundleTestHelper
 
 	@Shared
-	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
+	test.helper.ProjectTestHelper projectTestHelper
 
 	@Shared
 	Project project
@@ -65,6 +65,10 @@ class BulkChangeListIntegrationSpec extends Specification  {
 	AssetEntity device3
 
 	void setup() {
+		projectTestHelper = new test.helper.ProjectTestHelper()
+		moveBundleTestHelper = new test.helper.MoveBundleTestHelper()
+		applicationTestHelper = new ApplicationTestHelper()
+
 		project = projectTestHelper.createProject()
 		otherProject = projectTestHelper.createProject()
 		moveBundle = moveBundleTestHelper.createBundle(project, null)

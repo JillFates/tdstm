@@ -24,10 +24,7 @@
 			<div class="modal-footer form-group-center">
 				<a style="color: #fff;" href="mailto:{{licenseEmail.toEmail}}?cc={{licenseEmail.ccEmail}}&subject={{licenseEmail.subject}}&body={{licenseEmail.body | tdsEscapeURLEncoding}}" target="_top"><button type="submit" class="btn btn-primary pull-left"><i class="fa fa-fw fa-envelope"></i> Email Request</button></a>
 				<button [copy-clipboard]="licenseEmail.body" type="button" class="btn btn-primary"><i class="fa fa-fw fa-cut"></i> Copy to Clipboard</button>
-				<button (click)="cancelCloseDialog($event)" type="button" class="btn btn-default pull-right">
-					<span class="glyphicon glyphicon-ban-circle"></span>
-					<span>{{'GLOBAL.CLOSE' | translate }}</span>
-				</button>
+				<tds-button-cancel (click)="cancelCloseDialog($event)" class="pull-right"></tds-button-cancel>
 			</div>
 		</div>
 	</div>

@@ -39,7 +39,8 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
 									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
 										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
-											<a (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
+											<a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
+                                            <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
 										</tdsAngular:tooltipSpan>
 									</td>
 
@@ -54,18 +55,19 @@
                                 </tr>
                                 <tr class="prop">
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
-									<td class="valueNW ${standardFieldSpecs.model.imp?:''}">
-										<tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
-											<a (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
-											<g:if test="${!assetEntity.model?.isValid()}">
-												<span style="color: red;">
-													<b>?</b>
-												</span>
-											</g:if>
-										</tdsAngular:tooltipSpan>
-									</td>
+									    <td class="valueNW ${standardFieldSpecs.model.imp?:''}">
+                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
+                                                <a *ngIf="isModelLinkAvailable()"
+                                                   (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
+                                                <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
+                                                <g:if test="${! assetEntity.model?.isValid()}">
+                                                    <span style="color: red;">
+                                                        <b>?</b>
+                                                    </span>
+                                                </g:if>
+                                            </tdsAngular:tooltipSpan> 
+									    </td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
-
                                    <g:if test="${!(assetEntity.assetType in ['VM'])}">
                                         <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
                                             [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="roomSource" />}"
@@ -213,7 +215,8 @@
             </tds-button-edit>
 
             <tds-button-clone
-                    (click)="onCloneAsset()">
+                    (click)="onCloneAsset()"
+                    [permissions]="['${Permission.AssetCreate}']">
             </tds-button-clone>
 
             <tds-button-custom

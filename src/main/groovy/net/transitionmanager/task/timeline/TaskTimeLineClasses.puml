@@ -1,0 +1,71 @@
+@startuml
+
+class TaskVertex {
+    id: String
+    duration: int
+    earliestStartTime: int
+    latestStartTime: int
+    earliestEndTime: int
+    latestEndTime: int
+
+    successors: List<TaskVertex>
+    predecessors: List<TaskVertex>
+}
+
+class TaskTimeLineGraph {
+	Set<TaskVertex> vertices
+	List<TaskVertex> starts = []
+	List<TaskVertex> sinks = []
+
+	getStart(): TaskVertex
+	getSink(): TaskVertex
+}
+
+class  TaskTimeLineGraph.Builder {
+	vertices: List<TaskVertex>
+
+	Builder withVertices(AssetComment... tasks)
+	Builder withEdge(TaskDependency taskDependency)
+	TaskTimeLineGraph build()
+}
+
+class TimeLine {
+    TimelineSummary calculate(\n\t\tDate windowStartTime,\n\t\tDate windowEndTime,\n\t\tDate currentTime = TimeUtil.nowGMT()\n)
+    void executeCriticalPathAnalysis()
+    void doDijkstraForLatestTimes(TaskVertex vertex, GraphPath graphPath)
+}
+
+class GraphPath {
+    Stack<TaskVertex> vertices
+    Map<TaskVertex, Boolean> visitedMap
+}
+note top of TimeLine
+    It calculates critical path
+    using deep first search
+end note
+
+TaskTimeLineGraph *- TaskVertex : successors
+TaskTimeLineGraph *- TaskVertex : predecessors
+
+
+TaskTimeLineGraph.Builder -- TaskTimeLineGraph : builds an instance
+TimeLine -- TaskTimeLineGraph : uses
+
+class CriticalPathRoute {
+	List<TaskVertex> vertices
+}
+
+class TimelineSummary {
+    Date windowStartTime
+	Date windowEndTime
+	Date currentTime
+    List<List<TaskVertex>> cycles = []
+    List<CriticalPathRoute> criticalPathRoutes = []
+}
+together {
+    class TimelineSummary
+    class TaskVertex
+    class CriticalPathRoute
+    class TaskTimeLineGraph
+}
+@enduml

@@ -6,7 +6,7 @@
 import {Injectable, ComponentRef, HostListener, OnDestroy} from '@angular/core';
 
 import { NotifierService } from './notifier.service';
-import {MODAL_SIZE, DEFAULT_DIALOG_SIZE, DEFAULT_ENABLE_ESC} from '../model/constants';
+import {MODAL_SIZE, DEFAULT_DIALOG_SIZE, DEFAULT_ENABLE_ESC, ModalType} from '../model/constants';
 
 @Injectable()
 export class UIDialogService {
@@ -20,10 +20,11 @@ export class UIDialogService {
 	 * @param {Array<any>} params
 	 * @param {MODAL_SIZE} size
 	 * @param {boolean} enableEsc
+	 * @param {ModalType} modalType
 	 * @returns {Promise<any>}
 	 */
 	open(
-		component: any, params: Array<any>, size: MODAL_SIZE = DEFAULT_DIALOG_SIZE, enableEsc = DEFAULT_ENABLE_ESC): Promise<any> {
+		component: any, params: Array<any>, size: MODAL_SIZE = DEFAULT_DIALOG_SIZE, enableEsc = DEFAULT_ENABLE_ESC, modalType = ModalType.VIEW): Promise<any> {
 		return new Promise((resolve, reject) => {
 			this.notifier.broadcast({
 				name: 'dialog.open',
@@ -32,7 +33,8 @@ export class UIDialogService {
 				params: params,
 				resolve: resolve,
 				reject: reject,
-				escape: enableEsc
+				escape: enableEsc,
+				modalType: modalType
 			});
 		});
 	}

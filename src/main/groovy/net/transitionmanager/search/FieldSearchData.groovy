@@ -137,7 +137,7 @@ class FieldSearchData {
            the corresponding AssetClass needs to be included to keep the search consistent and avoid
            matches for this custom field in other domains.
         */
-        if (isCustomField() && parsedInfo.parameters) {
+        if (!isShared() && isCustomField() && parsedInfo.parameters) {
             /* Generate a name for the AssetClass parameter that will be unique for each domain.
                This is so when the user mixes custom fields from different domains, nothing is returned. */
             AssetClass assetClass = AssetClass.lookup(domain)
@@ -187,6 +187,10 @@ class FieldSearchData {
 
     boolean isManyToMany() {
         return searchInfo.manyToManyQueries != null
+    }
+
+    boolean isShared() {
+        return searchInfo.fieldSpec?.shared
     }
 
     boolean isCustomField() {

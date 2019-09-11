@@ -1,5 +1,7 @@
 package net.transitionmanager.integration
 
+import com.tdssrc.grails.UrlUtil
+import org.apache.http.client.utils.URIBuilder
 import spock.lang.Specification
 import org.springframework.http.HttpMethod
 
@@ -12,6 +14,7 @@ class ActionActionHttpRequestElementsUnitSpec extends Specification {
 	static String url = 'https://{host}.example.com/rest/{method}/{action}/something?format={format}&limit=50'
 	static String expectedPost = 'https://xray.example.com/rest/query/update/something?format=json&limit=50'
 	static String queryStringGet = 'extra=xyzzy&desc=this is cool'
+	static String encodedQueryStringGet = 'extra=xyzzy&desc=this+is+cool'
 	static String expectedGet = expectedPost + '&' + queryStringGet
 	static Map queryParams = [
 		format: 'json',
@@ -52,16 +55,18 @@ class ActionActionHttpRequestElementsUnitSpec extends Specification {
 		when: 'calling the buildQueryStringParams method'
 			String result = ahre.buildQueryStringParams()
 		then: 'the value returned should include all of the parametes not consumed by  placeholders'
-			queryStringGet == result
+
+			encodedQueryStringGet == result
 	}
 
     def 'test the uri method'() {
 
         given: 'an ActionHttpRequestElements is instantiated'
 			ActionHttpRequestElements ahre = new ActionHttpRequestElements(url, new ActionRequest(params))
+	        // new URIBuilder(expectedGet)
 
 		expect: 'that calling uril(GET) should return all query string parameters'
-			expectedGet == ahre.uri(HttpMethod.GET)
+			(expectedPost + '&' + encodedQueryStringGet) == ahre.uri(HttpMethod.GET)
 		and: 'that calling uril(POST) should return only the query string parameters that were explicit in the original URI'
 			expectedPost == ahre.uri(HttpMethod.POST)
     }

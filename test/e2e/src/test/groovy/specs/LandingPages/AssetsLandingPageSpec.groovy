@@ -9,6 +9,8 @@ import pages.Assets.AssetViewManager.*
 import pages.Assets.AssetViews.*
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This class sweeps over the Assets Menu.
  * It checks every single landing page.
@@ -22,6 +24,8 @@ class AssetsLandingPageSpec extends GebReportingSpec {
     static assetPagesLinks = 18
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

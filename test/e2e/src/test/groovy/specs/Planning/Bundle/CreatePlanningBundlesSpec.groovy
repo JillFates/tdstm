@@ -14,6 +14,8 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class CreatePlanningBundlesSpec extends GebReportingSpec {
 
@@ -25,6 +27,8 @@ class CreatePlanningBundlesSpec extends GebReportingSpec {
                          "STD_PROCESS","on"]
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+
         testCount = 0
         to LoginPage
         login()

@@ -59,7 +59,8 @@
 			</tds-button-edit>
 
 			<tds-button-clone
-					(click)="onCloneAsset()">
+					(click)="onCloneAsset()"
+					[permissions]="['${Permission.AssetCreate}']">
 			</tds-button-clone>
 
 			<tds-button-custom

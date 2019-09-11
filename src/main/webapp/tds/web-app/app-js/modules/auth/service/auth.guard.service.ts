@@ -10,12 +10,14 @@ import {PermissionService} from '../../../shared/services/permission.service';
 import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
 // Others
 import {Observable} from 'rxjs';
+import {WindowService} from '../../../shared/services/window.service';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
 
 	constructor(
 		private permissionService: PermissionService,
+		private windowService: WindowService,
 		private router: Router,
 		private store: Store) {
 	}
@@ -44,8 +46,8 @@ export class AuthGuardService implements CanActivate {
 			// If you don't have permission, kick it from the application
 			console.error('AuthGuardService:', err);
 			localStorage.removeItem(APP_STATE_KEY);
-			this.store.dispatch(new Logout());
-			return Observable.of(false);
+			this.windowService.getWindow().location.href = '/tdstm/module/auth/login';
+			return Observable.of(true);
 		});
 	}
 }

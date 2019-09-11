@@ -109,6 +109,7 @@
                 <div *ngIf="!isEditing; else buttonsEditModeTemplate">
                     <div class="pull-left">
                         <tds-button-edit
+                                [disabled]="!isEditAvailable()"
                                 class="btn-primary"
                                 tooltip="Edit dependencies"
                                 (click)="setEditMode(true)">
@@ -116,6 +117,7 @@
                     </div>
 
                     <tds-button-delete  *ngIf="dependencyA && !dependencyB"
+                                        [disabled]="!isDeleteAvailable()"
                                         class="btn-danger"
                                         (click)="onDeleteDependency(DependencyType.dependencyA)"
                                         tooltip="Delete dependency">

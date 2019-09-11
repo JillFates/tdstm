@@ -13,6 +13,8 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import spock.lang.Shared
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class AssetsBulkDeleteSpec extends GebReportingSpec {
 
@@ -26,6 +28,8 @@ class AssetsBulkDeleteSpec extends GebReportingSpec {
     static numberOfAssetsToBeDeleted = 2
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

@@ -25,6 +25,7 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.RoleType
 import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
@@ -428,12 +429,12 @@ class MoveEventService implements ServiceMethods {
 			Font projectNameFont = book.createFont()
 			projectNameFont.fontHeightInPoints = (short)14
 			projectNameFont.fontName = 'Arial'
-			projectNameFont.boldweight = Font.BOLDWEIGHT_BOLD
+			projectNameFont.setBold(true)
 
 			CellStyle projectNameCellStyle = book.createCellStyle()
 			projectNameCellStyle.font = projectNameFont
 			projectNameCellStyle.fillBackgroundColor = IndexedColors.SEA_GREEN.index
-			projectNameCellStyle.fillPattern = CellStyle.SOLID_FOREGROUND
+			projectNameCellStyle.fillPattern = FillPatternType.SOLID_FOREGROUND
 
 			WorkbookUtil.addCell(summarySheet, 1, 1, currentProject.name)
 			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)

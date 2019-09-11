@@ -182,8 +182,6 @@ function buildMap () {
 		$('#svgContainerId').removeClass('containsSpinner')
 		GraphUtil.force.on("tick", tick)
 		updateElementPositions(function(){
-			GraphUtil.restoreDependencyPanel('Type');
-			GraphUtil.restoreDependencyPanel('Status');
 			GraphUtil.applyShowHideDependencies();
 		});
 	})

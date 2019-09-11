@@ -64,9 +64,6 @@
 		<button type="button" (click)="onCreateRequestLicense()" class="btn btn-primary pull-left" [disabled]="!licenseRequestForm.form.valid">
 			<span class="glyphicon glyphicon-share-alt"></span> Submit Request
 		</button>
-		<button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-			<span class="glyphicon glyphicon-ban-circle"></span>
-			<span>{{'GLOBAL.CANCEL' | translate }}</span>
-		</button>
+		<tds-button-cancel (click)="cancelCloseDialog()" class="pull-right"></tds-button-cancel>
 	</div>
 </div>

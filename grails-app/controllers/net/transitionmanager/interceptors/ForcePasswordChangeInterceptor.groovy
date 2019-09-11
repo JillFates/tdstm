@@ -9,7 +9,7 @@ class ForcePasswordChangeInterceptor {
 	SecurityService securityService
 
 	// controllerNames in this list must be excluded. Otherwise they may cause weird behavior like multiple redirects.
-	static final List EXCLUDED_CONTROLLER_NAMES = [null, 'css', 'dist', 'images'].asImmutable()
+	static final List EXCLUDED_CONTROLLER_NAMES = [null, 'css', 'dist', 'images', 'singleApp'].asImmutable()
 
 	ForcePasswordChangeInterceptor() {
 		matchAll()

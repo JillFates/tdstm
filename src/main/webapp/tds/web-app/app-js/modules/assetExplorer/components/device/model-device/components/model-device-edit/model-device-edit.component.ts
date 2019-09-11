@@ -234,8 +234,10 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 		};
 
 		this.modelService.updateModel(payload)
-			.subscribe((result) => {
-				this.close(payload);
+			.subscribe((response: any) => {
+				if (response && response.status !== 'error') {
+					this.close(payload);
+				}
 			});
 	}
 

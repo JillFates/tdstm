@@ -19,7 +19,7 @@
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<tds-button-create  [id]="'btnCreateProvider'" (click)="onCreateProvider()" [title]="'PROVIDER.CREATE_PROVIDER' | translate">
+						<tds-button-create  [id]="'btnCreateProvider'" (click)="onCreateProvider()" [disabled]="!isCreateAvailable()" [title]="'PROVIDER.CREATE_PROVIDER' | translate">
 						</tds-button-create>
 						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
 					</ng-template>
@@ -35,8 +35,8 @@
 						             let-dataItem
 						             let-rowIndex="rowIndex">
 							<div class="tds-action-button-set">
-								<tds-button-edit (click)="onEdit(dataItem)"></tds-button-edit>
-								<tds-button-delete (click)="onDelete(dataItem)"></tds-button-delete>
+								<tds-button-edit [disabled]="!isUpdateAvailable()" (click)="onEdit(dataItem)"></tds-button-edit>
+								<tds-button-delete [disabled]="!isDeleteAvailable()" (click)="onDelete(dataItem)"></tds-button-delete>
 							</div>
 						</ng-template>
 					</kendo-grid-command-column>

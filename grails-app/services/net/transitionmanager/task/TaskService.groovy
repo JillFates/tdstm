@@ -79,6 +79,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -347,31 +348,29 @@ class TaskService implements ServiceMethods {
 			sql.append(sortAndOrder ? ', ' : '').append 'score DESC, task_number ASC'
 		}
 
-		// log.debug "getUserTasks: SQL: $sql"
-		// log.debug "getUserTasks: SQL query args: $queryArgs"
+		log.debug "getUserTasks: SQL: $sql"
+		log.debug "getUserTasks: SQL query args: $queryArgs"
 
 		// Get all tasks from the database and then filter out the TODOs based on a filtering
-		def allTasks = namedParameterJdbcTemplate.queryForList(sql.toString(), queryArgs)
+		List allTasks = namedParameterJdbcTemplate.queryForList(sql.toString(), queryArgs)
 
-		// def allTasks = jdbcTemplate.queryForList(sql.toString(), queryArgs)
-		def format = "yyyy/MM/dd hh:mm:ss"
-		def minAgoFormat = minAgo.format(format)
-		def todoTasks = allTasks.findAll { task ->
+		List todoTasks = allTasks.findAll { task ->
 			task.status == ACS.READY ||
 			(task.status == ACS.HOLD && task.apiActionId != null) ||
 			(task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated >= minAgo)
 		}
 
-		def assignedTasks = allTasks.findAll { task ->
+		List assignedTasks = allTasks.findAll { task ->
 			(task.status == ACS.READY && task.assignedTo == personId) || (task.status == ACS.STARTED && task.assignedTo == personId) ||
-			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated?.format(format) >= minAgoFormat)
+			(task.status == ACS.COMPLETED && task.assignedTo == personId && task.statusUpdated >= minAgo)
 		}
+
+		log.debug "getUserTasks: {} tasks found, {} todo tasks, {} assigned tasks", allTasks.size(), todoTasks.size(), assignedTasks.size()
 
 		if (countOnly) {
 			[all: allTasks.size(), todo: todoTasks.size()]
-		}
-		else {
+		} else {
 			[all: allTasks, todo: todoTasks, user: assignedTasks]
 		}
 	}
@@ -526,7 +525,7 @@ class TaskService implements ServiceMethods {
 
 			// Attempting to invoke a local action remotely?
 			if (! invokingLocally && taskWithLock.isActionInvocableLocally()) {
-				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attepted to invoke a local action as remote, which is not allowed')
+				throwException(ApiActionException, 'apiAction.task.message.notRemoteAction', 'Attempted to invoke a local action as remote, which is not allowed')
 			}
 
 			// Make sure the use has permission to invoke the action
@@ -658,7 +657,7 @@ class TaskService implements ServiceMethods {
 
 		// Override the whom if this is an automated task being completed
 		if (task.isAutomatic() && status == ACS.COMPLETED) {
-			whom = getAutomaticPerson()
+			whom = securityService.getAutomaticPerson()
 		}
 
 		// Trigger the action if it is automatic and the action is local
@@ -747,6 +746,7 @@ class TaskService implements ServiceMethods {
 				task.assignedTo = assignee
 				task.resolvedBy = assignee
 				task.actFinish = now
+				task.percentageComplete = 100
 				addNote(task, whom, "Task was Completed")
 				break
 
@@ -1066,7 +1066,7 @@ class TaskService implements ServiceMethods {
 				}
 			}
 			if (!whom) {
-				whom = getAutomaticPerson()
+				whom = securityService.getAutomaticPerson()
 			}
 
 			addNote(task, whom, comment, 0)
@@ -1102,7 +1102,7 @@ class TaskService implements ServiceMethods {
 				}
 			}
 			if (!whom) {
-				whom = getAutomaticPerson()
+				whom = securityService.getAutomaticPerson()
 			}
 
 			String note
@@ -1484,17 +1484,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				return cartInfo[0]
 			}
 		}
-	}
-
-	/**
-	 * Retrieve the Person object that represent the person that completes automated tasks
-	 */
-	Person getAutomaticPerson() {
-		Person a = Person.findByLastNameAndFirstName(Person.SYSTEM_USER_AT.lastName, Person.SYSTEM_USER_AT.firstName)
-		if (! a) {
-			log.error 'Unable to find Automated Task Person as expected'
-		}
-		return a
 	}
 
 	/**
@@ -5982,6 +5971,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				break
 			case "event": result = task.moveEvent?.name; break
 			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
 				result = result instanceof String ? result : result.toString()

@@ -8,7 +8,10 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<span *ngIf="!hideRefresh" class="glyphicon glyphicon-refresh refresh" aria-hidden="true" (click)="onManualUpdate()"></span>
+				<span *ngIf="!hideRefresh"
+							class="glyphicon glyphicon-refresh refresh"
+							aria-hidden="true"
+							(click)="onManualUpdate()"></span>
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"
@@ -16,13 +19,16 @@ import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.ser
 					(valueChange)="onSelectedTimerOption($event)"
 					[textField]="'description'">
 				</kendo-dropdownlist>
-				<div class="pie-countdown-timer" [ngClass]="getTimerClass()"></div>
+				<div *ngIf="selectedTimerOption && selectedTimerOption.seconds > 0"
+						 class="pie-countdown-timer"
+						 [ngClass]="getTimerClass()"></div>
 			</div>
 		</div>
 	`
 })
 export class PieCountdownComponent implements OnInit {
 	@Output() timeout: EventEmitter<void> = new EventEmitter<void>();
+	@Output() valueChange: EventEmitter<any> = new EventEmitter<any>();
 	@Input() refreshEverySeconds = 0;
 	@Input() hideRefresh = false;
 	@Input() refreshPreference: string;
@@ -59,6 +65,7 @@ export class PieCountdownComponent implements OnInit {
 					description: ''
 				};
 				this.setCurrentInterval(this.selectedTimerOption.seconds);
+				this.valueChange.emit(this.selectedTimerOption);
 			});
 	}
 
@@ -92,6 +99,7 @@ export class PieCountdownComponent implements OnInit {
 					this.setCurrentInterval(this.selectedTimerOption.seconds);
 				}, 0)
 			});
+		this.valueChange.emit(timerOption);
 	}
 
 	/**

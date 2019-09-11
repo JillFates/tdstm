@@ -8,6 +8,8 @@ import pages.Tasks.Cookbook.*
 import pages.Tasks.TaskManager.*
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This class sweeps over the Tasks Menu.
  * It checks every single landing page.
@@ -20,6 +22,8 @@ class TasksLandingPageSpec extends GebReportingSpec {
     static testCount
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

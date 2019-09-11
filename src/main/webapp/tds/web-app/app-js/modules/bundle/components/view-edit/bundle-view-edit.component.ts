@@ -7,6 +7,7 @@ import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/
 import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `bundle-view-edit-component`,
@@ -30,6 +31,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleId;
 	public editing = false;
 	protected userTimeZone: string;
+	private requiredFields = ['name', 'workflowCode'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
@@ -45,17 +47,25 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.loadModel();
+	}
+
+	/**
+	 * Set up the initial default values for the model
+	 * @returns {any}
+	 */
+	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
+			projectManagerId: null,
 			moveEvent: {},
-			moveManagerId: 0,
+			moveManagerId: null,
 			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
@@ -69,6 +79,16 @@ export class BundleViewEditComponent implements OnInit {
 	@HostListener('window:popstate', ['$event'])
 	onPopState(event) {
 		this.activeDialog.close()
+	}
+
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
 	}
 
 	public confirmDeleteBundle() {
@@ -125,6 +145,10 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get ghe models for the specific bundle
+	 * @param id  bundle id
+	 */
 	private getModel(id) {
 		this.bundleService.getModelForBundleViewEdit(id)
 			.subscribe((result) => {
@@ -138,15 +162,19 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
-				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
+				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : null;
+				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : null;
+				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
+				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
+				this.managers.forEach((manager, index) => {
+					manager.staff.name = manager.name;
+					this.managers[index] = manager.staff // Limit managers down to just staff
+				});
 				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
 
@@ -165,19 +193,22 @@ export class BundleViewEditComponent implements OnInit {
 			}
 		});
 		this.managers.forEach((manager) => {
-			if (manager.staff.id === this.savedModel.projectManagerId) {
+			if (manager.id === this.savedModel.projectManagerId) {
 				this.projectManager = manager.name;
 			}
-			if (manager.staff.id === this.savedModel.moveManagerId) {
+			if (manager.id === this.savedModel.moveManagerId) {
 				this.moveManager = manager.name;
 			}
 		});
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.bundleModel.startTime, this.bundleModel.completionTime)) {
+		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
+					this.bundleModel.startTime = this.bundleModel.startTime || '';
+					this.bundleModel.completionTime = this.bundleModel.completionTime || '';
+
 					this.updateSavedFields();
 					this.editing = false;
 				}
@@ -185,15 +216,26 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
-		}
+	public isDirty() {
+		return JSON.stringify(this.savedModel) !== JSON.stringify(this.bundleModel);
+	}
+
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: BundleModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
+			}
+		});
+		return returnVal;
 	}
 
 	/**

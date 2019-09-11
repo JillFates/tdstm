@@ -256,7 +256,7 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 			cache.put(new Element(projectId, licState))
 			List<DomainLicense> licenses = DomainLicense.where {
 				(status == DomainLicense.Status.ACTIVE) && (hash != null) &&
-						  (project == projectId) || (project == 'all')
+						  ( (project == projectId) || (project == 'all') )
 			}.list()
 
 			if ( ! licenses ) { // UNLICENSED
@@ -292,9 +292,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 
 						if ( ! errorMessage ) {
 							errorMessage = """
-								|Error loading license:<br/> 
-								|current host:<br/><strong>${currentHost}</strong><br/>
-								|licensed host:<br/><strong>${hostName}</strong>
+								|Licensed host changed:<br/> 
+								|current:<br/><strong>${currentHost}</strong><br/>
+								|licensed:<br/><strong>${hostName}</strong>
 							""".stripMargin()
 						}
 
@@ -306,9 +306,9 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					){
 						if ( ! errorMessage ) {
 							errorMessage = """
-								|Error loading license:<br/> 
-								|current website:<br/><strong>${fqdn}</strong><br/>
-								|licensed website:<br/><strong>${websitename}</strong>
+								|Licensed website changed:<br/> 
+								|current:<br/><strong>${fqdn}</strong><br/>
+								|licensed:<br/><strong>${websitename}</strong>
 							""".stripMargin()
 						}
 
@@ -327,21 +327,6 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 					return (nowTime >= lic.goodAfterDate && nowTime <= lic.goodBeforeDate)
 
 				}
-
-
-				if (! licenseObjs ) {
-					licState.state = State.EXPIRED
-
-					String message = "The license has expired. A new license is required in order to enable all features of the application."
-					if (errorMessage) {
-						message += '<hr/>' + errorMessage
-					}
-
-					licState.message = message
-					licState.valid = false
-					return licState
-				}
-
 
 				Map stackedlicense = licenseObjs.inject([
 						  numberOfLicenses: 0,
@@ -366,35 +351,42 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 				licState.numberOfLicenses = stackedlicense.numberOfLicenses
 				licState.goodAfterDate = stackedlicense.goodAfterDate ? new Date(stackedlicense.goodAfterDate) : null
 				licState.goodBeforeDate = stackedlicense.goodBeforeDate ? new Date(stackedlicense.goodBeforeDate) : null
-				licState.type = firstLicense.type
-				licState.banner = firstLicense.bannerMessage
+				if (firstLicense) {
+					licState.type = firstLicense.type
+					licState.banner = firstLicense.bannerMessage
+				}
 
-				if( licState?.numberOfLicenses == 0 ){
+				long numServers = assetEntityService.countServers(project)
+				log.debug("NumServers: {}", numServers)
+
+				if( !licenseObjs && licState?.numberOfLicenses == 0 ){
 					licState.state = State.UNLICENSED
-					licState.message = "A license is required in order to enable all features of the application."
+					String message = "A license is required in order to enable all features of the application.<br/>$numServers servers detected."
+					if (errorMessage) {
+						message += '<hr/>' + errorMessage
+					}
+					licState.message = message
 					licState.valid = false
 					licState.banner = ""
 					return licState
 				}
 
-				long numServers = assetEntityService.countServers(project)
-				log.debug("NumServers: {}", numServers)
-				if (numServers <= licState.numberOfLicenses) {
+				if ( numServers > licState.numberOfLicenses ) {
+					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
+					if( gracePeriod > 0 ) {
+						licState.state = State.UNLICENSED // State.NONCOMPLIANT
+						licState.message = "The Server count has exceeded the license limit of ${licState.numberOfLicenses} by ${numServers - licState.numberOfLicenses} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
+						licState.valid = true
+					} else {
+						licState.state = State.UNLICENSED // State.INBREACH
+						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${licState.numberOfLicenses} to re-enable all application features."
+						licState.valid = false
+					}
+				} else {
 					licState.state = State.VALID
 					licState.message = ""
 					licState.lastCompliantDate = now
 					licState.valid = true
-				} else {
-					int gracePeriod = gracePeriodDaysRemaining(gracePeriodDays, licState.lastCompliantDate)
-					if(gracePeriod > 0) {
-						licState.state = State.NONCOMPLIANT
-						licState.message = "The Server count has exceeded the license limit of ${license.max} by ${numServers - license.max} servers. The application functionality will be limited in ${gracePeriod} days if left unresolved."
-						licState.valid = true
-					} else {
-						licState.state = State.INBREACH
-						licState.message = "The Server count has exceeded the license limit beyond the grace period. Please reduce the server count below the limit of ${license.max} to re-enable all application features."
-						licState.valid = false
-					}
 				}
 
 			}
@@ -493,12 +485,11 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 		}
 
 		def jsonData = JSON.parse(licObj.subject)
-		//String installationNum = jsonData.installationNum
-		//int gracePeriodDays	   = jsonData.gracePeriodDays
-		String bannerMessage   = jsonData.bannerMessage
-		String project		   = jsonData.project
-		String hostName 	   = jsonData.hostName
-		String websitename 	   = jsonData.websitename
+
+		String bannerMessage = jsonData.bannerMessage
+		String project       = jsonData.project
+		String hostName      = jsonData.hostName
+		String websitename   = jsonData.websitename
 
 		log.debug("LicenseAdminService - Project: {}", project)
 
