@@ -1,8 +1,9 @@
 package net.transitionmanager.command
 
-
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.asset.Room
+import net.transitionmanager.project.Project
 
 
 class MoveBundleCommand implements CommandObject {
@@ -16,8 +17,8 @@ class MoveBundleCommand implements CommandObject {
 	MoveEvent moveEvent
 	String workflowCode
 	Boolean useForPlanning = true
-	Room sourceRoom
-	Room targetRoom
+	Long sourceRoomId
+	Long targetRoomId
 	Boolean tasksCreated = false
 
 	static constraints = {
@@ -28,9 +29,9 @@ class MoveBundleCommand implements CommandObject {
 		moveEvent nullable: true
 		name blank: false, unique: ['project']
 		operationalOrder range: 1..25
-		sourceRoom nullable: true
+		sourceRoomId nullable: true
 		startTime nullable: true
-		targetRoom nullable: true
+		targetRoomId nullable: true
 		tasksCreated nullable: true
 		workflowCode blank: false
 	}

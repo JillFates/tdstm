@@ -226,4 +226,17 @@ trait ServiceMethods {
 		throw ex
 	}
 
+	@CompileStatic
+	<T> T getOrCreate(Class<T> type, Object id, Project currentProject, boolean throwException = true) {
+		T instance
+		if (id != null) {
+			instance = get(type, id, currentProject, throwException)
+		} else {
+			instance = type.newInstance()
+			if (instance.hasProperty('project')) {
+				instance['project'] = currentProject
+			}
+		}
+		return instance
+	}
 }

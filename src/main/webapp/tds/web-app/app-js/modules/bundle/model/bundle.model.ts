@@ -8,8 +8,6 @@ export class BundleModel {
 	public toId: number;
 	public startTime: any;
 	public completionTime: any;
-	public projectManagerId: number;
-	public moveManagerId: number;
 	public moveEvent: any;
 	public operationalOrder: number;
 	public workflowCode: string;

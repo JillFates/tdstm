@@ -492,18 +492,18 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10)
 			)
-			moveBundleService.save(command)
+			moveBundleService.saveOrUpdate(command, project)
 		then: 'exception is thrown'
 			thrown(ValidationException)
 		when: 'fixing failing constraint'
 			command.workflowCode = 'STD'
-			MoveBundle moveBundle = moveBundleService.save(command)
+			MoveBundle moveBundle = moveBundleService.saveOrUpdate(command, project)
 		then: 'move bundle is saved to db'
 			moveBundle
 			moveBundle.id
 			moveBundle.workflowCode == 'STD'
 		when: 'saving a second move bundle with same name and project'
-			moveBundleService.save(command)
+			moveBundleService.saveOrUpdate(command, project)
 		then: 'exception is thrown'
 			thrown(ValidationException)
 
@@ -516,13 +516,13 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 					description: RandomStringUtils.randomAscii(10),
 					workflowCode: 'STD'
 			)
-			MoveBundle moveBundle = moveBundleService.save(command)
+			MoveBundle moveBundle = moveBundleService.saveOrUpdate(command, project)
 		when: 'updating a move bundle'
 			command.id = moveBundle.id
 			command.startTime = TimeUtil.parseDateTime('2018-11-13')
 			command.completionTime = TimeUtil.parseDateTime('2018-11-30')
 			command.name = 'Test update MoveBundle'
-			MoveBundle moveBundleUpdated = moveBundleService.update(moveBundle.id, command)
+			MoveBundle moveBundleUpdated = moveBundleService.saveOrUpdate(command, project, moveBundle.id)
 		then: 'move bundle is updated in db'
 			moveBundleUpdated
 			moveBundleUpdated.id
@@ -531,7 +531,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
 			command.workflowCode = null
-			moveBundleService.update(moveBundle.id, command)
+			moveBundleService.saveOrUpdate(command, project, moveBundle.id)
 		then: 'exception is thrown'
 			thrown(ValidationException)
 	}

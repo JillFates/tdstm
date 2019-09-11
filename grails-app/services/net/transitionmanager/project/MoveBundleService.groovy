@@ -22,22 +22,15 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.Room
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveBundleStep
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyType
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagService
@@ -914,32 +907,22 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 * Update a move bundle
-	 * @param id - move bundle id to update
-	 * @param command - move bundle command object
-	 * @return
+	 * Create or Update a MoveBundle instance based on the information provided in the Command Object.
+	 * @param moveBundleCommand
+	 * @param project
+	 * @param moveBundleId
+	 * @return the MoveBundle created or updated.
 	 */
-	MoveBundle update(Long id, MoveBundleCommand command) {
-		MoveBundle moveBundle = findById(id, true)
-		command.populateDomain(moveBundle, false, ['constraintsMap'])
-
+	MoveBundle saveOrUpdate(MoveBundleCommand moveBundleCommand, Project project, Long moveBundleId = null) {
+		MoveBundle moveBundle = getOrCreate(MoveBundle, moveBundleId, project)
+		moveBundleCommand.populateDomain(moveBundle, false, ['constraintsMap', 'sourceRoomId', 'targetRoomId'])
+		if (moveBundleCommand.sourceRoomId) {
+			moveBundle.sourceRoom = get(Room, moveBundleCommand.sourceRoomId, project, true)
+		}
+		if (moveBundleCommand.targetRoomId) {
+			moveBundle.targetRoom = get(Room, moveBundleCommand.targetRoomId, project, true)
+		}
 		moveBundle.save()
-
-		return moveBundle
-	}
-
-	/**
-	 * Save a new move bundle
-	 * @param command - move bundle command object
-	 * @return
-	 */
-	MoveBundle save(MoveBundleCommand command) {
-		MoveBundle moveBundle = new MoveBundle()
-		command.populateDomain(moveBundle, false, ['constraintsMap'])
-		moveBundle.project = securityService.getUserCurrentProject()
-
-		moveBundle.save()
-
 		return moveBundle
 	}
 
