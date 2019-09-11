@@ -10,6 +10,8 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang3.StringUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+import java.sql.Timestamp
+
 class SqlUtil {
 	public static final String COMMA = ","
 	public static final String STRING_QUOTE = "'"
@@ -310,6 +312,11 @@ class SqlUtil {
 			return
 		}
 
+		if (isDateOrDatetimeField(fieldSearchData)) {
+			// call new method to add date/datetime filter logic
+			handleDateOrDatetimeField(fieldSearchData);
+		}
+
 		String originalFilter = fieldSearchData.filter.trim()
 
 		switch(originalFilter) {
@@ -445,6 +452,55 @@ class SqlUtil {
 				break
 
 			/* Scenario 3: Starts with '-' or '!' */
+			case ~/^(-|!).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				operator = 'NOT IN'
+				break
+		}
+
+		Object paramValue = parseEnumParameter(fieldSearchData)
+		if (paramValue) {
+			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
+			if (operator == 'NOT IN') {
+				fieldSearchData.sqlSearchExpression = '( ' + expression + ' OR ' + fieldSearchData.whereProperty + ' IS NULL )'
+			} else {
+				fieldSearchData.sqlSearchExpression = expression
+			}
+
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
+		} else {
+			// Particular Scenario. Because we are filtering here and not in the SQL sentence directly,
+			// we need to solve those cases where filter does not match with any of the enumeration values.
+			// Then, to manage this case, we simply add a false where clause, expecting an empty list of results.
+			fieldSearchData.sqlSearchExpression = " 1 = 0"
+		}
+	}
+
+	/**
+	 *
+	 * @param fieldSearchData
+	 */
+	private static void handleDateOrDatetimeField(FieldSearchData fieldSearchData) {
+
+		String operator = 'BETWEEN'
+		fieldSearchData.useWildcards = true
+
+		switch (fieldSearchData.filter) {
+		/* Scenario 1: Starts with '!=' */
+			case ~/^(!=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(2)
+				fieldSearchData.useWildcards = false
+				operator = 'NOT IN'
+				break
+
+		/* Scenario 2: Starts with '=' */
+			case ~/^(=).*/:
+				fieldSearchData.filter = fieldSearchData.filter.substring(1)
+				fieldSearchData.useWildcards = false
+				operator = 'IN'
+				break
+
+		/* Scenario 3: Starts with '-' or '!' */
 			case ~/^(-|!).*/:
 				fieldSearchData.filter = fieldSearchData.filter.substring(1)
 				operator = 'NOT IN'
@@ -786,6 +842,16 @@ class SqlUtil {
 	private static boolean isEnumerationField(FieldSearchData fsd) {
 		return fsd.type?.isEnum()
 	}
+
+	/**
+	 *
+	 * @param fsd
+	 * @return
+	 */
+	private static boolean isDateOrDatetimeField(FieldSearchData fsd) {
+		return (fsd.type in [Date, Timestamp])
+	}
+
 	/**
 	 * Determine if the field being used for filtering is numeric.
 	 * @param fsd

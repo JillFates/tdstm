@@ -734,7 +734,8 @@ class DataviewService implements ServiceMethods {
 		Class type = typeFor(column)
 		String filter = filterFor(column)
 
-		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
+//		if (StringUtil.isNotBlank(filter) && !(type in [Date, Timestamp])) {
+		if (StringUtil.isNotBlank(filter)) {
 			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
 
 			String property = propertyFor(column)
