@@ -311,6 +311,8 @@ export class TaskListComponent {
 					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
 						this.search();
 					});
+				} else if (result.shouldOpenTask) {
+					this.onOpenTaskDetailHandler(result.commentInstance);
 				} else {
 					this.search();
 				}
