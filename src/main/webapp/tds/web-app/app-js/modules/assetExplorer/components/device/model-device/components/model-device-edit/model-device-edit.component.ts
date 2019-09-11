@@ -23,6 +23,7 @@ import {PermissionService} from '../../../../../../../shared/services/permission
 import {TranslatePipe} from '../../../../../../../shared/pipes/translate.pipe';
 import {ModelService} from '../../../../../service/model.service';
 import {ConnectorComponent} from '../../../../../../../shared/components/connector/connector.component';
+import {AkaComponent} from '../../../../../../../shared/components/aka/aka.component';
 
 @Component({
 	selector: 'model-device-edit',
@@ -31,6 +32,7 @@ import {ConnectorComponent} from '../../../../../../../shared/components/connect
 export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, AfterViewInit {
 	@ViewChild('form') protected form: NgForm;
 	@ViewChild(ConnectorComponent) protected connectors: ConnectorComponent;
+	@ViewChild(AkaComponent) protected akas: AkaComponent;
 	private hasAkaValidationErrors = false;
 	public hasDeleteModelPermission: boolean;
 	public hasEditModelPermission: boolean;

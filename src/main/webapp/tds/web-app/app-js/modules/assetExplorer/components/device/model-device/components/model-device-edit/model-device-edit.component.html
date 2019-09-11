@@ -36,7 +36,7 @@
                             <div class="form-group">
                                 <div class="col-md-2">AKA:</div>
                                 <div class="col-md-4">
-                                    <tds-aka [aka]="model.akaCollection || []"
+                                    <tds-aka #akas [aka]="model.akaCollection || []"
                                              [tabindex]="2"
                                              name="aka"
                                              [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.text}"
@@ -236,7 +236,7 @@
                         tabindex="40"
                         class="btn-primary pull-left"
                         title="Save"
-                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission"
+                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission || (akas && akas.hasError)"
                         (click)="onSave()">
                 </tds-button-save>
 
