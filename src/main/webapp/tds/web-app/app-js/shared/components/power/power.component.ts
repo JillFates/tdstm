@@ -23,8 +23,8 @@ export class PowerComponent {
 	 * convert to standard units and report the change
 	 */
 	setStandardPower() {
-		this.model.design = parseInt(this.model.powerNameplate.toString(), 10) * 0.5;
-		this.model.use = parseInt(this.model.powerNameplate.toString(), 10) * 0.33;
+		this.model.design = Math.floor(this.model.powerNameplate * 0.5);
+		this.model.use = Math.floor(this.model.powerNameplate * 0.33);
 		this.reportChanges();
 	}
 

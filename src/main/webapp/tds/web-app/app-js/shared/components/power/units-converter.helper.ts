@@ -11,18 +11,18 @@ const converter = {
 		let {powerNameplate, design, use} = model;
 
 		return {
-			powerNameplate: powerNameplate * FACTOR,
-			design: design * FACTOR,
-			use: use * FACTOR
+			powerNameplate: Math.floor(powerNameplate * FACTOR),
+			design: Math.floor(design * FACTOR),
+			use: Math.floor(use * FACTOR)
 		}
 	} ,
 	[amps]: (model: PowerModel): PowerModel => {
 		let {powerNameplate, design, use} = model;
 
 		return {
-			powerNameplate: powerNameplate / FACTOR,
-			design: design / FACTOR,
-			use: use / FACTOR
+			powerNameplate: Math.floor(powerNameplate / FACTOR),
+			design: Math.floor(design / FACTOR),
+			use: Math.floor(use / FACTOR)
 		}
 	}
 };

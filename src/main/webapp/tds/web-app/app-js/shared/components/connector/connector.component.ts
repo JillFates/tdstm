@@ -21,48 +21,48 @@ import { Connector } from './model/connector.model';
                 </div>
             </div>
             <div class="connections">
-                <div *ngFor="let connector of connectors;let index = index;trackBy:trackByIndex;" class="data-row">
+                <div *ngFor="let connector of connectors;let ix = index;" class="data-row">
                     <div class="component-type">
                         <kendo-dropdownlist
 								[tabindex]="tabindex"
                                 class="select"
                                 name="modelType"
-                                (selectionChange)="reportChanges()"
+                                (selectionChange)="typeChange($event, ix)"
                                 [data]="types"
-                                [(ngModel)]="connectors[index].type">
+                                [(ngModel)]="connectors[ix].type">
                         </kendo-dropdownlist>
                     </div>
                     <div class="component-label">
                         <input type="text"
                                [tabindex]="tabindex"
 							   (blur)="reportChanges()"
-                               [(ngModel)]="connectors[index].label"
+                               [(ngModel)]="connectors[ix].label"
                                name="labelValue">
                     </div>
                     <div class="component-label-position">
                         <kendo-dropdownlist
                                 [tabindex]="tabindex"
                                 class="select"
-								(selectionChange)="reportChanges()"
+								(selectionChange)="positionChange($event, ix)"
                                 name="modelPosition"
                                 [data]="positions"
-                                [(ngModel)]="connectors[index].labelPosition">
+                                [(ngModel)]="connectors[ix].labelPosition">
                         </kendo-dropdownlist>
                     </div>
                     <div class="component-position-x">
                         <input type="number"
                                [tabindex]="tabindex"
                                (blur)="reportChanges()"
-							   [(ngModel)]="connectors[index].connectorPosX" name="connectorPosX">
+							   [(ngModel)]="connectors[ix].connectorPosX" name="connectorPosX">
                     </div>
                     <div class="component-position-y">
                         <input type="number"
                                [tabindex]="tabindex"
                                (blur)="reportChanges()"
-							   [(ngModel)]="connectors[index].connectorPosY" name="connectorPosY">
+							   [(ngModel)]="connectors[ix].connectorPosY" name="connectorPosY">
                     </div>
                     <div class="delete-command">
-						<span class="glyphicon glyphicon-remove delete-connector" [tabindex]="tabindex" (click)="onDelete(index)" title="Delete connector"></span>
+						<span class="glyphicon glyphicon-remove delete-connector" [tabindex]="tabindex" (click)="onDelete(ix)" title="Delete connector"></span>
 					</div>
                 </div>
             </div>
@@ -73,7 +73,7 @@ export class ConnectorComponent implements OnInit {
 	@Input('tabindex') tabindex: string;
 	@Input('connectors') originalConnectors: Connector[];
 	@Output('modelChange') modelChange = new EventEmitter<any>();
-	index = 0;
+	order = 0;
 	positions: string[];
 	types: string[];
 	modelTypeSelected: string;
@@ -120,6 +120,26 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	/**
+	 * On position change update the connectors collection
+	 * @param value
+	 * @param {number} index
+	 */
+	positionChange(value: any, index: number): void {
+		this.connectors[index].labelPosition = value;
+		this.reportChanges();
+	}
+
+	/**
+	 * On type change update the connectors collection
+	 * @param value
+	 * @param {number} index
+	 */
+	typeChange(value: any, index: number): void {
+		this.connectors[index].type = value;
+		this.reportChanges();
+	}
+
+	/**
 	 * Report about aka changes to the host component
 	 */
 	reportChanges(): void {
@@ -149,7 +169,7 @@ export class ConnectorComponent implements OnInit {
 	 */
 	addConnectorOrder(items: any[]): any {
 		return  items.map((item: any) => {
-			this.index = this.index + 1;
+			this.order = this.order + 1;
 			return {
 				id: item.id,
 				type: item.type,
@@ -157,7 +177,7 @@ export class ConnectorComponent implements OnInit {
 				labelPosition: item.labelPosition,
 				xPosition: item.connectorPosX,
 				yPosition: item.connectorPosY,
-				connector: item.id || this.index
+				connector: item.id || this.order
 			};
 		});
 	}
