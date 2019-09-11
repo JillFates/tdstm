@@ -6,7 +6,11 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
 	selector: 'tds-aka',
 	template: `
         <div class="aka-component">
-            <button (click)="onAdd('')" [tabindex]="tabindex" [disabled]="hasError" id="btnAdAka">Add AKA</button>
+            <tds-button-add id="btnAddAka" class="btn-primary"
+                            [tabindex]="tabindex" [disabled]="hasError"
+                            [title]="'AKA.ADD' | translate"
+                            (click)="onAdd('')">
+            </tds-button-add>
             <div class="aka-items">
                 <div class="aka-item" *ngFor="let aka of akas;let index = index;trackBy:trackByIndex;">
                     <input type="text" [tabindex]="tabindex" [(ngModel)]="akas[index]" (change)="onAkaChange($event, index)" [disabled]="hasError && indexError !== index">

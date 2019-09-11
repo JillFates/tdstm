@@ -5,7 +5,11 @@ import { Connector } from './model/connector.model';
 	selector: 'tds-connector',
 	template: `
         <div class="tds-connector-component">
-            <button class="add-connector" [tabindex]="tabindex" (click)="onAdd()">Add Connector</button>
+            <tds-button-add id="btnAddConnector" class="add-connector btn-primary"
+                            [tabindex]="tabindex"
+                            [title]="'CONNECTORS.ADD' | translate"
+                            (click)="onAdd()">
+            </tds-button-add>
             <div>
                 <div class="header">
                     <div class="component-type">Type</div>
@@ -136,7 +140,7 @@ export class ConnectorComponent implements OnInit {
 				labelPosition: item.labelPosition,
 				xPosition: item.connectorPosX,
 				yPosition: item.connectorPosY,
-				connector: this.index
+				connector: item.id || this.index
 			};
 		});
 	}

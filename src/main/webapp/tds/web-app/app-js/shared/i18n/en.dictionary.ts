@@ -71,6 +71,12 @@ export const en_DICTIONARY: Object = {
 		},
 		'TOTAL': 'Total'
 	},
+	'AKA': {
+		'ADD': 'Add AKA'
+	},
+	'CONNECTORS': {
+		'ADD': 'Add Connector'
+	},
 	'ASSETS': {
 		'APPLICATION': 'Application',
 		'DATABASE': 'Database',
