@@ -69,11 +69,11 @@
                 </a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-child-item menu-projects-active-projects">
-                        <a href="/tdstm/project/list?active=active" class="mmlink">List Projects</a>
+                        <a [routerLink]="['/project','list']" [queryParams]="{active:'active'}" class="mmlink">List Projects</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-projects-current-project">
-                        <a href="/tdstm/projectUtil/index" class="mmlink">
+                        <a [routerLink]="['/project','list']" [queryParams]="{show:userContext.project.id}" class="mmlink">
                             <span class="menu-link-project-name">Project Details</span>
                         </a>
                     </li>
@@ -158,11 +158,6 @@
                     <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',2,'show']" id="2">
                             <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/database_menu.svg"></image></svg> Databases
-                        </a>
-                    </li>
-                    <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',5,'show']" id="5">
-                            <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storagePhysical_menu.svg"></image></svg> Physical Storage
                         </a>
                     </li>
                     <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">

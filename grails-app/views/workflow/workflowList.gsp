@@ -68,7 +68,7 @@
 		<g:if test="${workflow?.process}">
 			<div style="height:60px; width:300px; overflow-x:auto;"><ul>
 				<g:each in="${Project.findAllByWorkflowCode(workflow?.process)}" var="project">
-				<li><g:link controller="project" action="show" id="${project.id}">${project?.name}</g:link></li>
+				<li><a href="/tdstm/module/project/list?show=${project.id}">${project?.name}</a></li>
 				</g:each>
 				</ul>
 			</div>
