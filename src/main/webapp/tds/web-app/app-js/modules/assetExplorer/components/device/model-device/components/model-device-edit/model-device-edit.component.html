@@ -102,6 +102,7 @@
                                 <div class="col-md-2">End of Life Date:</div>
                                 <div class="col-md-4">
                                     <kendo-datepicker name="endOfLifeDate"
+                                                      [popupSettings]="{ appendTo: 'component' }"
                                                       tabindex="7"
                                                       [value]="model.endOfLifeDate"
                                                       [(ngModel)]="model.endOfLifeDate"> </kendo-datepicker>
