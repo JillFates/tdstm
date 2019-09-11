@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 
 import {PowerModel, PowerUnits} from './model/power.model';
 import {ModelService} from '../../../modules/assetExplorer/service/model.service';
@@ -8,7 +8,7 @@ import {convert} from './units-converter.helper';
 	selector: 'tds-power',
 	templateUrl: 'power.component.html'
 })
-export class PowerComponent implements  OnInit {
+export class PowerComponent {
 	readonly units =   PowerUnits;
 	@Input() model: PowerModel;
 	@Input() tabindex: string;
@@ -17,10 +17,6 @@ export class PowerComponent implements  OnInit {
 		private modelService: ModelService
 	) {
 		console.log('Constructor');
-	}
-
-	ngOnInit() {
-		console.log('On init');
 	}
 
 	/**

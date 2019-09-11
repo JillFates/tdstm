@@ -174,6 +174,9 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 		this.onCustomControlChange();
 	}
 
+	/**
+	 * On custom controls changes mark the state as dirty
+	 */
 	public onCustomControlChange(): void {
 		if (this.form.controls && this.form.controls.customControls) {
 			this.form.controls.customControls.markAsDirty();
@@ -188,6 +191,9 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 		this.onCustomControlChange();
 	}
 
+	/**
+	 * Build the payload and call the endpoint to persist the changes
+	 */
 	onSave() {
 		const payload = {
 			aka: this.model.akaChanges || [],
@@ -205,7 +211,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 			endOfLifeStatus: this.model.endOfLifeStatus,
 			id: this.model.id,
 			layoutStyle: this.model.layoutStyle,
-			manufacturer: this.model.manufacturerId,  // ---------------
+			manufacturer: this.model.manufacturerId,
 			memorySize: this.model.memorySize,
 			depth: this.model.modelDepth,
 			modelFamily: this.model.modelFamily,
@@ -227,7 +233,6 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 			useImage: 0
 		};
 
-		console.log(payload);
 		this.modelService.updateModel(payload)
 			.subscribe((result) => {
 				this.close(payload);

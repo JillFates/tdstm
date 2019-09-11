@@ -13,6 +13,11 @@ export class ModelService {
 	constructor(private http: HttpClient) {
 	}
 
+	/**
+	 * Get the model needed to display the model view
+	 * @param {string} id
+	 * @returns {Observable<DeviceModel>}
+	 */
 	getModelAsJSON(id: string): Observable<DeviceModel> {
 		const url = `${this.modelUrl}/retrieveModelAsJSON?id=${id}`;
 
@@ -21,6 +26,11 @@ export class ModelService {
 			.catch((error: any) => error);
 	}
 
+	/**
+	 * Call the endpoint to set the model power type
+	 * @param {string} unit
+	 * @returns {Observable<any>}
+	 */
 	setPower(unit: string): Observable<any> {
 		const url = `${this.modelUrl}/../project/setPower?p=${unit}`;
 
@@ -29,18 +39,13 @@ export class ModelService {
 		.catch((error: any) => error);
 	}
 
-	editModel(id: string): Observable<String> {
-		// 'redirect'To': 'modelDialog'
-		const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
-
-		const url = `${this.modelUrl}/edit?id=${id}`;
-		return this.http.post(url, JSON.stringify({
-			id: id,
-			redirectTo: 'modelDialog'
-		}), {headers, responseType: 'text'})
-		.map((response: any) => response)
-	}
-
+	/**
+	 * Call the endpoint in charge of determing if the alias is valid
+	 * @param {string} alias
+	 * @param {number} id
+	 * @param {string} parentName
+	 * @returns {Observable<boolean>}
+	 */
 	isValidAlias(alias: string, id: number, parentName: string): Observable<boolean> {
 		const url = `/tdstm/manufacturer/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
 
@@ -48,6 +53,11 @@ export class ModelService {
 		.map((res: any) => res === 'valid')
 	}
 
+	/**
+	 * Get the manufacturer information searching by id
+	 * @param {string} id
+	 * @returns {Observable<any>}
+	 */
 	getDeviceManufacturer(id: string): Observable<any> {
 		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
 		return this.http.post(url, '')

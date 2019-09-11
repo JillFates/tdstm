@@ -89,6 +89,9 @@ export class ConnectorComponent implements OnInit {
 		this.connectors = [...this.originalConnectors];
 	}
 
+	/**
+	 * Add a new empty aka element
+	 */
 	onAdd(): void {
 		const count = this.connectors.length;
 		const connector: Connector = { id: null, type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', connectorPosX: 0, connectorPosY: 0};
@@ -96,15 +99,29 @@ export class ConnectorComponent implements OnInit {
 		this.reportChanges();
 	}
 
+	/**
+	 * Used by ngFor in order to improve it
+	 * @param {number} index
+	 * @param obj
+	 * @returns {any}
+	 */
+
 	trackByIndex(index: number, obj: any): any {
 		return index;
 	}
 
+	/**
+	 * Delete an aka and report the changes to the host component
+	 * @param {number} index
+	 */
 	onDelete(index: number): void {
 		this.connectors.splice(index, 1);
 		this.reportChanges();
 	}
 
+	/**
+	 * Report about aka changes to the host component
+	 */
 	reportChanges(): void {
 		const added = this.connectors.filter((item) => item.id === null);
 
