@@ -273,7 +273,7 @@ class ApiActionService implements ServiceMethods {
 			try {
 				invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
 						new ApiActionResponse(),
-						new TaskFacade(),
+						new TaskFacade(null, null),
 						new AssetFacade(null, null, true),
 						new ApiActionJob()
 				)
@@ -326,7 +326,7 @@ class ApiActionService implements ServiceMethods {
 			try {
 				invokeReactionScript(ReactionScriptCode.PRE, preScript, actionRequest,
 						new ApiActionResponse(),
-						new TaskFacade(),
+						new TaskFacade(null, null),
 						new AssetFacade(null, null, true),
 						new ApiActionJob()
 				)
