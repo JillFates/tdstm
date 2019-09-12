@@ -12,7 +12,12 @@ import {
 } from '@progress/kendo-angular-grid';
 import { ReportsService } from '../../../reports/service/reports.service';
 import { TaskService } from '../../service/task.service';
-import { DIALOG_SIZE, GRID_DEFAULT_PAGE_SIZE, ModalType } from '../../../../shared/model/constants';
+import {
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	ModalType
+} from '../../../../shared/model/constants';
 import { forkJoin } from 'rxjs';
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
@@ -53,6 +58,7 @@ export class TaskListComponent {
 	hideGrid: boolean;
 	selectedCustomColumn: any;
 	selectedEvent: any;
+	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private urlParams: any;
 	private pageSize: number;
 	private currentCustomColumns: any;

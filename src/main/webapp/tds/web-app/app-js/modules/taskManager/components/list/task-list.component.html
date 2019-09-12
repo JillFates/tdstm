@@ -76,7 +76,7 @@
 				[data]="grid.gridData"
 				[pageSize]="grid.state.take"
 				[skip]="grid.state.skip"
-				[pageable]="{pageSizes: [25,50,100,250,500,1000], info: true}"
+				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 				(pageChange)="onPageChangeHandler($event)"
 				[filter]="grid.state.filter"
 				[filterable]="true"
