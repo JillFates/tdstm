@@ -5,10 +5,10 @@ import {ActivatedRoute} from '@angular/router';
 
 import {TaskService} from '../../service/task.service';
 import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
-import {IGraphTask} from '../../../../shared/model/graph-task.model';
+import {IGraphTask} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
-import {IMoveEvent} from '../../../../shared/model/move-event.model';
+import {IMoveEvent} from '../../model/move-event.model';
 
 export interface ILinkPath {
 	from: number | string;
