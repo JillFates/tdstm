@@ -26,6 +26,7 @@ import {
 import {ITaskGraphIcon} from '../../model/task-graph-icon';
 import {container} from '@angular/core/src/render3';
 import {icon} from '@fortawesome/fontawesome-svg-core';
+import {FA_ICONS} from '../../constants/fontawesome-icons';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -48,7 +49,18 @@ const categoryColors = {
 						id="digraph-layout-container"
 						[style.width]="containerWidth"
 						[style.height]="containerHeight"></div>
-				<div id="ctx-menu" *ngIf="shouldShowCtxMenu" #ctxMenu>
+			<div id="graph-control-btn-group">
+				<button class="btn btn-block">
+					<fa-icon [icon]="faIcons.faCog" size="lg"></fa-icon>
+				</button>
+				<button class="btn btn-block" (click)="zoomIn()">
+					<fa-icon [icon]="faIcons.faSearchPlus" size="lg"></fa-icon>
+				</button>
+				<button class="btn btn-block" (click)="zoomOut()">
+					<fa-icon [icon]="faIcons.faSearchMinus" size="lg"></fa-icon>
+				</button>
+			</div>
+				<div id="ctx-menu" #ctxMenu>
 					<ul>
 						<li id="start">
 							<button class="btn">
@@ -125,6 +137,7 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	stateIcons = STATE_ICONS_PATH;
 	categoryIcons = CATEGORY_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
+	faIcons = FA_ICONS;
 	diagram: go.Diagram;
 	myModel: go.Model;
 	direction = 0;

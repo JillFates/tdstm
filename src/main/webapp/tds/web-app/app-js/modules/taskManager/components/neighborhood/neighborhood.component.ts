@@ -1,5 +1,5 @@
-import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {of, Observable, BehaviorSubject} from 'rxjs';
+import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {of, Observable, BehaviorSubject, Subscription} from 'rxjs';
 import {distinct, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 
@@ -43,6 +43,11 @@ export class NeighborhoodComponent implements OnInit {
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
 	isEventDropdownOpen: boolean;
+	refreshCountdown$: Observable<number>;
+	refreshCountdownSubscription: Subscription;
+	refreshCountdownTime = 30;
+	refreshCount: number;
+	@ViewChild('refreshCircle') refreshCircle: ElementRef;
 
 	constructor(
 			private taskService: TaskService,
@@ -51,6 +56,7 @@ export class NeighborhoodComponent implements OnInit {
 		) {}
 
 	ngOnInit() {
+		this.setRefreshTime();
 		this.loadAll();
 	}
 
@@ -208,8 +214,33 @@ export class NeighborhoodComponent implements OnInit {
 		});
 	}
 
+	setRefreshTime(): void {
+		this.refreshCount = this.refreshCountdownTime;
+		this.refreshCountdown$ = Observable.interval(1000)
+			.map(x => Math.floor(--this.refreshCount));
+
+		this.refreshCountdownSubscription = this.refreshCountdown$
+			.subscribe(x => this.refreshCount =  x <= 0 ? this.refreshCountdownTime : x);
+	}
+
+	onRefreshCountdownClick(): void {
+		this.refreshCountdownTime += 30;
+
+		this.renderer.setStyle(
+				this.refreshCircle.nativeElement,
+				'animation', `countdown ${this.refreshCountdownTime}s linear infinite forwards !important`);
+
+		this.refreshCountdownSubscription.unsubscribe();
+
+		this.setRefreshTime();
+	}
+
 	refreshDiagram(): void {
 		this.loadAll();
+	}
+
+	avoidDefault(): boolean {
+		return false;
 	}
 
 }
