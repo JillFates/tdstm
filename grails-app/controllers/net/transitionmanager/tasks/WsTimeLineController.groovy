@@ -53,6 +53,7 @@ class WsTimeLineController implements ControllerMethods {
 	}
 
 	/**
+	 * Builds a Map structure to be used in controller method response
 	 *
 	 * @param graph an instance of {@code TaskTimeLineGraph}
 	 * @param summary an instance of {@code TimelineSummary}
