@@ -103,7 +103,29 @@
 										</span>
 									</td>
 								</tr>
-
+								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
+									<tr title="Execute critical path analysis">
+										<td colspan="3" style="padding-left :0px">
+											<span>select asset_comment_id,
+											COMMENT,
+											is_critical_path,
+											comment_type,
+											duration,
+											duration_scale,
+											status,
+											act_start,
+											est_start,
+											est_finish,
+											slack
+											from asset_comment this_
+											where this_.comment_type = 'issue';
+												<label id="calculateCPAButton" class="pointer" onclick="calculateCPA()">
+													&nbsp;Calculate CPA
+												</label>
+											</span>
+										</td>
+									</tr>
+								</tds:hasPermission>
 								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
@@ -115,7 +137,6 @@
 									</td>
 								</tr>
 								</tds:hasPermission>
-
 							</table>
 						</form>
 					</div>

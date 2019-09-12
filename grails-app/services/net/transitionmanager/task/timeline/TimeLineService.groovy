@@ -22,15 +22,17 @@ class TimeLineService implements ServiceMethods {
 
 	/**
 	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
-	 * and returning an instance of {@code TimelineSummary} with results.
+	 * and returning an instance of {@code TimelineSummary} with results
+	 * and instance of {@code TaskTimeLineGraph}.
 	 *
 	 * @param event an instance of {@code MoveEvent}
 	 * @param tasks a List of {@code Task}
 	 * @param taskDependencies a List of {@code TaskDependency}
 	 *
-	 * @return CPA calculation results in an instance of {@code TimelineSummary}
+	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
+	 * 			and instance of {@code TaskTimeLineGraph}
 	 */
-	TimelineSummary executeCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
+	List calculateCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
 
 		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
 			.withVertices(tasks)
@@ -40,9 +42,31 @@ class TimeLineService implements ServiceMethods {
 		TimelineSummary summary = new TimeLine(graph)
 			.calculate(event.estStartTime, event.estCompletionTime)
 
+		return [graph, summary]
+	}
+
+	/**
+	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
+	 * and returning an instance of {@code TimelineSummary} with results
+	 * and instance of {@code TaskTimeLineGraph}.
+	 * It also update {@code Task} domain in database
+	 *
+	 * It throws an Exception if {@code TimelineSummary#cycles} is not empty.
+	 *
+	 * @param event an instance of {@code MoveEvent}
+	 * @param tasks a List of {@code Task}
+	 * @param taskDependencies a List of {@code TaskDependency}
+	 *
+	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
+	 * 			and instance of {@code TaskTimeLineGraph}
+	 */
+	List updateTaskFromCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
+
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = calculateCPA(event, tasks, taskDependencies)
+
 		updateVertexListInDatabase(graph.vertices.toList())
 
-		return summary
+		return [graph, summary]
 	}
 
 	/**
