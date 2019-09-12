@@ -39,6 +39,9 @@ class RoleType {
 	public static final String CODE_PARTY_TEAM    = 'TEAM'
 	public static final String CODE_TEAM_MEMBER   = 'TEAM_MEMBER'
 
+	/* Just represents something without a role associated */
+	public static final String NO_ROLE = "NO_ROLE"
+
 	String id
 	String description
 	String help
