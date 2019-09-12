@@ -304,7 +304,7 @@ export class APIActionParameterModel {
 	desc?: string;
 	type?: string;
 	context?: string;
-	fieldName?: string;
+	fieldName?: any;
 	value?: string;
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;

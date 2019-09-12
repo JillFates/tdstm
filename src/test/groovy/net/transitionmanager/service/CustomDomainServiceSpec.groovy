@@ -1,26 +1,29 @@
 package net.transitionmanager.service
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.FieldSpecsCacheService
-import net.transitionmanager.asset.Files
+import com.tdsops.tm.enums.ControlType
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.SettingType
 import com.tdssrc.grails.StringUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.FieldSpecsCacheService
+import net.transitionmanager.asset.Files
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.Setting
 import net.transitionmanager.common.SettingService
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.dataview.FieldSpecProject
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.Setting
-import net.transitionmanager.common.Timezone
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
 class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<CustomDomainService>, DataTest {
 
@@ -86,6 +89,70 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			AssetEntity || 'Yes'
 			Database    || 'Yes'
 			Files       || 'Yes'
+	}
+
+
+	@ConfineMetaClassChanges([CustomDomainService])
+	@Unroll
+	void "test updateFieldData from #oldFieldSpec.control to #newFieldSpec.control"() {
+
+		setup: 'given flags to track data change calls, and meta class overrides for the calls'
+			boolean dataDateToDateTimeCalled = false
+			boolean dataDateTimeToDateCalled = false
+			boolean dataToYesNoCalled = false
+			boolean dataToStringCalled = false
+			boolean clearCustomFieldsCalled = false
+
+			service.metaClass.dataDateToDateTime = { Project project, String assetClassName, String fieldName -> dataDateToDateTimeCalled = true }
+			service.metaClass.dataDateTimeToDate = { Project project, String assetClassName, String fieldName -> dataDateTimeToDateCalled = true }
+			service.metaClass.dataToYesNo = { Project project, String assetClassName, String fieldName -> dataToYesNoCalled = true }
+			service.metaClass.dataToString = { Project project, String assetClassName, String fieldName, Integer maxLength -> dataToStringCalled = true }
+			service.metaClass.clearCustomFields = { Project project, String assetClassName, List<String> fieldNames -> clearCustomFieldsCalled = true }
+
+		expect: 'when updateFieldData is called the flags are set appropriately'
+			service.updateFieldData(oldFieldSpec, newFieldSpec, AssetType.APPLICATION.name, defaultProject)
+			dataDateToDateTimeCalled == dataDateToDateTimeSet
+			dataDateTimeToDateCalled == dataDateTimeToDateSet
+			dataToYesNoCalled == dataToYesNoSet
+			dataToStringCalled == dataToStringSet
+			clearCustomFieldsCalled == clearCustomFieldsSet
+
+		where:
+			oldFieldSpec                                              | newFieldSpec                                                       || dataDateToDateTimeSet | dataDateTimeToDateSet | dataToYesNoSet | dataToStringSet | clearCustomFieldsSet
+			[field: 'testField', control: ControlType.DATE.value]     | [control: ControlType.DATETIME.value, constraints: [maxSize: 255]] || true                  | false                 | false          | false           | false
+
+			[field: 'testField', control: ControlType.DATETIME.value] | [control: ControlType.DATE.value, constraints: [maxSize: 255]]     || false                 | true                  | false          | false           | false
+
+			[field: 'testField', control: ControlType.STRING.value]   | [control: ControlType.YES_NO.value, constraints: [maxSize: 255]]   || false                 | false                 | true           | false           | false
+			[field: 'testField', control: ControlType.LIST.value]     | [control: ControlType.YES_NO.value, constraints: [maxSize: 255]]   || false                 | false                 | true           | false           | false
+
+			[field: 'testField', control: ControlType.NUMBER.value]   | [control: ControlType.LIST.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | false
+			[field: 'testField', control: ControlType.STRING.value]   | [control: ControlType.LIST.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | false
+			[field: 'testField', control: ControlType.YES_NO.value]   | [control: ControlType.LIST.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | false
+			[field: 'testField', control: ControlType.DATETIME.value] | [control: ControlType.LIST.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | false
+			[field: 'testField', control: ControlType.DATE.value]     | [control: ControlType.LIST.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | false
+
+			[field: 'testField', control: ControlType.NUMBER.value]   | [control: ControlType.STRING.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | true            | false
+			[field: 'testField', control: ControlType.YES_NO.value]   | [control: ControlType.STRING.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | true            | false
+			[field: 'testField', control: ControlType.DATE.value]     | [control: ControlType.STRING.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | true            | false
+			[field: 'testField', control: ControlType.DATETIME.value] | [control: ControlType.STRING.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | true            | false
+			[field: 'testField', control: ControlType.LIST.value]     | [control: ControlType.STRING.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | true            | false
+
+			[field: 'testField', control: ControlType.NUMBER.value]   | [control: ControlType.DATETIME.value, constraints: [maxSize: 255]] || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.YES_NO.value]   | [control: ControlType.DATETIME.value, constraints: [maxSize: 255]] || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.LIST.value]     | [control: ControlType.DATETIME.value, constraints: [maxSize: 255]] || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.STRING.value]   | [control: ControlType.DATETIME.value, constraints: [maxSize: 255]] || false                 | false                 | false          | false           | true
+
+			[field: 'testField', control: ControlType.NUMBER.value]   | [control: ControlType.DATE.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.YES_NO.value]   | [control: ControlType.DATE.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.LIST.value]     | [control: ControlType.DATE.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.STRING.value]   | [control: ControlType.DATE.value, constraints: [maxSize: 255]]     || false                 | false                 | false          | false           | true
+
+			[field: 'testField', control: ControlType.NUMBER.value]   | [control: ControlType.YES_NO.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.DATE.value]     | [control: ControlType.YES_NO.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | false           | true
+			[field: 'testField', control: ControlType.DATETIME.value] | [control: ControlType.YES_NO.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | false           | true
+
+			[field: 'testField', control: ControlType.STRING.value]   | [control: ControlType.NUMBER.value, constraints: [maxSize: 255]]   || false                 | false                 | false          | false           | true
 	}
 
 

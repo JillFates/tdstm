@@ -50,6 +50,7 @@ export function DatabaseEditComponent(template, editModel, metadata: any) {
 			this.model.asset.environment = this.model.asset.environment || '';
 
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**

@@ -82,12 +82,12 @@
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
-                            <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
+                            <g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
                         </li>
                         <li class="divider"></li>
                         <g:if test="${currProject}">
                             <li class="menu-child-item menu-projects-current-project">
-                                <g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')">Project Details</g:link>
+                                <g:link class="mmlink" controller="module" action="project" id="list" params="[show:currProject.id]" onclick="hideMegaMenu('projectMegaMenu')">Project Details</g:link>
                             </li>
                             <li class="menu-child-item menu-projects-project-staff">
                                 <g:link class="mmlink" controller="person" action="manageProjectStaff" onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link>
@@ -115,7 +115,7 @@
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
-                                Providers
+                                moduProviders
                             </g:link>
                         </li>
                          <tds:hasPermission permission="${Permission.CredentialView}">
@@ -311,8 +311,7 @@
                         <ul class="dropdown-menu menu-item-expand" role="menu">
                             <li class="menu-parent-item">Tasks</li>
                             <li class="menu-child-item menu-parent-tasks-my-tasks">
-                                <a href="/tdstm/task/listUserTasks">My Tasks (
-                                    <span id="todoCountProjectId">&nbsp;</span>)</a>
+                                <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
                             </li>
                             <tds:hasPermission permission="${Permission.TaskManagerView}">
                                 <li class="menu-child-item menu-parent-tasks-task-manager">

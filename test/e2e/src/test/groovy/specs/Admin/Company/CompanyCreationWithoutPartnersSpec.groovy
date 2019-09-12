@@ -29,7 +29,7 @@ class CompanyCreationWithoutPartnersSpec extends GebReportingSpec {
     static successCreationMessage = "PartyGroup "+companyInfo.name+" created"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

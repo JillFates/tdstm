@@ -103,8 +103,8 @@ class ApiCatalogTestHelper {
     },
     "method": [
       {
-        "apiMethod": "ApplicationList",
-        "name": "Application List (cmdb_ci_appl)",
+        "name": "ApplicationList",
+        "apiMethod": "callEndpoint",
         "description": "List of all Applications",
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
@@ -119,8 +119,8 @@ class ApiCatalogTestHelper {
         ]
       },
       {
-        "apiMethod": "DatabaseList",
-        "name": "Database List (cmdb_ci_database)",
+        "name": "DatabaseList",
+        "apiMethod": "callEndpoint",
         "description": "List of databases",
         "endpointUrl": "https://{HOSTNAME}.service-now.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
@@ -132,8 +132,8 @@ class ApiCatalogTestHelper {
         ]
       },
       {
+        "name": "callEndpoint",
         "apiMethod": "callEndpoint",
-        "name": "Method used by application tests",
         "description": "Call endpoint",
         "endpointUrl": "https://{HOSTNAME}.about.com/{TABLE}.do",
         "docUrl": "http://about.com/docs#appList",
@@ -189,8 +189,8 @@ class ApiCatalogTestHelper {
         },
         "method": [
             {
+                "name": "callEndpoint",
                 "apiMethod": "callEndpoint",
-                "name": "Call Endpoint",
                 "description": "Performs a call to an HTTP endpoint",
                 "endpointUrl": "https://SOME-DOMAIN/SOME/PATH",
                 "docUrl": "http://about.com/docs#appList",

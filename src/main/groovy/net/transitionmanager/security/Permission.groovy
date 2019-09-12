@@ -32,6 +32,7 @@ interface Permission {
 			AssetDelete                   = 'AssetDelete',
 			AssetEdit                     = 'AssetEdit',
 			AssetExport                   = 'AssetExport',
+			AssetBulkSelect               = 'AssetBulkSelect',
 			AssetExplorerCreate			  = 'AssetExplorerCreate',
 			AssetExplorerSystemList		  = 'AssetExplorerSystemList',
 			AssetExplorerDelete			  = 'AssetExplorerDelete',

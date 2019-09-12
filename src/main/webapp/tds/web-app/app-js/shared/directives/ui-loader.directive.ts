@@ -25,6 +25,7 @@ export class UILoaderDirective {
 		this.httpRequestHandlerCompleted();
 		this.httpRequestHandlerCompletedWithErrors();
 		this.notificationRouteChange();
+		this.notificationDisableProgress();
 		this.loaderConfig = this.loaderService.loaderConfig;
 	}
 
@@ -40,6 +41,15 @@ export class UILoaderDirective {
 		this.notifierService.on('notificationRouteChange', (event) => {
 			// No idle period, show loader as soon as possible
 			this.loaderService.show();
+		});
+	}
+
+	/**
+	 * To control when the animation can be disabled
+	 */
+	notificationDisableProgress(): void {
+		this.notifierService.on('notificationDisableProgress', (event: any) => {
+			this.loaderService.disableProgress(event.disabled);
 		});
 	}
 
