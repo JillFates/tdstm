@@ -197,11 +197,6 @@
                                     <tds:svgIcon name="database_menu" width="16" height="16" /> Databases
                                 </g:link>
                             </li>
-                            <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Physical Storage
-                                </g:link>
-                            </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
                                     <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Logical Storage
