@@ -70,8 +70,12 @@ export class NeighborhoodComponent implements OnInit {
 		this.eventsDropdownClosed();
 	}
 
-	loadTasks(id: number): void {
-		this.taskService.findTask(id)
+	/**
+		* Load tasks
+		* @param {number} taskNumber to load tasks from
+	 **/
+	loadTasks(taskNumber: number): void {
+		this.taskService.findTask(taskNumber)
 			.subscribe((res: IGraphTask[]) => {
 				if (res && res.length > 0) {
 					this.tasks = res;
@@ -80,6 +84,9 @@ export class NeighborhoodComponent implements OnInit {
 			});
 	}
 
+	/**
+	 * Load events to fill events dropdown
+	 **/
 	loadEventList() {
 		this.taskService.findMoveEvents().subscribe(res => {
 			this.eventList$ = of(res);
@@ -87,7 +94,11 @@ export class NeighborhoodComponent implements OnInit {
 		});
 	}
 
-	loadFromSelectedEvent(id?: number): void {
+	/**
+	 * Load tasks
+	 * @param {number} moveEventId of moveEvent to load tasks from
+	 **/
+	loadFromSelectedEvent(moveEventId?: number): void {
 		if (this.tasks) { return; }
 		this.taskService.findTasksByMoveEventId(this.selectedEvent.id)
 		.subscribe(res => {
@@ -96,6 +107,9 @@ export class NeighborhoodComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * generate model to be used by diagram with task specific data
+	 **/
 	generateModel(): void {
 		const nodeDataArr = [];
 		const linksPath = [];
@@ -116,6 +130,9 @@ export class NeighborhoodComponent implements OnInit {
 		this.links$ = of(linksPath);
 	}
 
+	/**
+	 * Load events to fill events dropdown
+	 **/
 	getLinksPath(task: IGraphTask): ILinkPath[] {
 		const t = Object.assign({}, task);
 		if (t.successors) {
@@ -127,37 +144,61 @@ export class NeighborhoodComponent implements OnInit {
 		return [];
 	}
 
+	/**
+	 * TreeLayout to use (if selected) by the diagram
+	 **/
 	treeLayout(): void {
 		console.log('Tree Layout selected');
 		this.graph.setTreeLayout();
 	}
 
+	/**
+	 * LayeredDigraphLayout to use (if selected) by the diagram
+	 **/
 	layeredDigraphLayout(): void {
 		this.graph.layeredDigraphLayout();
 	}
 
+	/**
+	 * ForceDirectedLayout to use (if selected) by the diagram
+	 **/
 	forceDirectedLayout(): void {
 		this.graph.setForceDirectedLayout();
 	}
 
+	/**
+	 * highlight all nodes on the diagram
+	 **/
 	highlightAll(): void {
 		this.graph.highlightAllNodes();
 	}
 
+	/**
+	 * highlight nodes by category name on the diagram
+	 **/
 	highlightByCategory(category: string): void {
 		const matches = [category];
 		this.graph.highlightNodesByCategory(matches);
 	}
 
+	/**
+	 * highlight nodes by status type on the diagram
+	 **/
 	highlightByStatus(status: string): void {
 		const matches = [status];
 		this.graph.highlightNodesByStatus(matches);
 	}
 
+	/**
+	 * Zoom in on the diagram
+	 **/
 	zoomIn() {
 		this.graph.zoomIn();
 	}
 
+	/**
+	 * Zoom out on the diagram
+	 **/
 	zoomOut() {
 		this.graph.zoomOut();
 	}
@@ -183,6 +224,9 @@ export class NeighborhoodComponent implements OnInit {
 		this.opened = true;
 	}
 
+	/**
+	 * When events dropdown is opened remove z-index from minimap so that the options are visible
+	 **/
 	eventsDropdownOpened(): void {
 		this.eventsDropdown.open.subscribe(() => {
 			console.log('events dropdown opened ');
@@ -191,6 +235,9 @@ export class NeighborhoodComponent implements OnInit {
 		})
 	}
 
+	/**
+	 * When events dropdown is closed reset z-index on minimap so that it's visible on top of th diagram
+	 **/
 	eventsDropdownClosed(): void {
 		this.eventsDropdown.close.subscribe(() => {
 			console.log('events dropdown closed ');
@@ -199,10 +246,16 @@ export class NeighborhoodComponent implements OnInit {
 		})
 	}
 
+	/**
+	 * When highlight filter change update search
+	 **/
 	filterChange(): void {
 		this.textFilter.next(this.filterText);
 	}
 
+	/**
+	 * Highlight filter subscription
+	 **/
 	subscribeToHighlightFilter(): void {
 		this.textFilter
 			.pipe(
