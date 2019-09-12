@@ -2,10 +2,12 @@ package net.transitionmanager.action
 
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.command.task.ActionCommand
@@ -30,7 +32,6 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.grails.web.json.JSONObject
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.multipart.MultipartFile
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
@@ -162,7 +163,9 @@ class TaskActionService implements ServiceMethods {
 		TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, task, whom)
 		JSONObject reactionScripts = (JSONObject) ThreadLocalUtil.getThreadVariable(ActionThreadLocalVariable.REACTION_SCRIPTS)
 		String script = reactionScripts[code.name()]
-		AssetFacade assetFacade = assetService.getAssetFacade(task.assetEntity, false)
+
+		AssetEntity asset = task.assetEntity
+		AssetFacade assetFacade = assetService.getAssetFacade(asset, false)
 
 		List<String> filenames = datafile.collect { MultipartFile file ->
 			fileSystemService.writeFile(file, fileSystemService.TMD_PREFIX)
@@ -180,22 +183,32 @@ class TaskActionService implements ServiceMethods {
 		try {
 			apiActionService.invokeReactionScript(code, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
 		} catch (Exception e) {
-
+			log.info('Reaction script invoke error. ', e)
 			if (code == ReactionScriptCode.ERROR) {
 				taskFacade.error("$code script failure: ${e.message}")
 			} else {
-
 				try {
 					script = reactionScripts[ReactionScriptCode.ERROR.name()]
 					apiActionService.invokeReactionScript(ReactionScriptCode.ERROR, script, actionRequest, apiActionResponse, taskFacade, assetFacade, new ApiActionJob())
 				} catch (Exception ex) {
 					taskFacade.error("$code script failure: ${ex.message}")
 				}
-
 			}
 		} finally {
 			// When the API call has finished the ThreadLocal variables need to be cleared out to prevent a memory leak
 			ThreadLocalUtil.destroy(ApiActionService.THREAD_LOCAL_VARIABLES)
+		}
+
+		// if asset facade is not null and task as an asset entity
+		// let's perform asset validation errors to inform the user about
+		// potential hidden errors during reaction scripts invokation
+		if (assetFacade && asset) {
+			if (!asset.validate()) {
+				String errorNote = 'Validation failed while attempting to update the following field(s): ' +
+						GormUtil.allErrorsString(asset)
+				taskFacade.error(errorNote)
+				asset.discard()
+			}
 		}
 	}
 
@@ -273,10 +286,10 @@ class TaskActionService implements ServiceMethods {
 	String renderScript(String script,  AssetComment task) {
 		AbstractConnector connector = apiActionService.connectorInstanceForAction(task.apiAction)
 		Map params = connector.buildMethodParamsWithContext(task.apiAction, task)
-		params.username = '{username}'
-		params.password = '{password}'
+		params.username = '{{username}}'
+		params.password = '{{password}}'
 
-		return StringUtil.replacePlaceholders(script, params)
+		return StringUtil.replacePlaceholders(script, params, StringUtil.DOUBLE_PLACEHOLDER_REGEXP)
 	}
 
 	/**
@@ -366,7 +379,7 @@ class TaskActionService implements ServiceMethods {
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 		} else {
-			throw new AccessDeniedException("Action doesn't exist for users project.")
+			throw new IllegalArgumentException("Action doesn't exist for users project.")
 		}
 	}
 

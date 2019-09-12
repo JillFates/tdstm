@@ -23,7 +23,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
     static provName2 = randStr2 + E2E
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

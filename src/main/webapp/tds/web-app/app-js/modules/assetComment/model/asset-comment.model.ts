@@ -38,7 +38,8 @@ export class AssetCommentColumnModel {
 				property: 'comment',
 				type: 'text',
 				width: 574,
-				locked: true
+				locked: true,
+				class: 'column-cursor-pointer'
 			},
 			{
 				label: 'Asset',

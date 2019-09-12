@@ -65,12 +65,12 @@ class CustomDomainServiceTests extends Specification {
 
     // A list of assets that will be used by a few test cases
     private static final List ASSETS = [
-        [name:RSU.randomAlphabetic(10), description: 'Red'],
-        [name:RSU.randomAlphabetic(10), description: 'Green'],
-        [name: RSU.randomAlphabetic(10), description: 'Blue'],
-        [name: RSU.randomAlphabetic(10), description: 'Blue'],
-        [name: RSU.randomAlphabetic(10), description: ''],
-        [name: RSU.randomAlphabetic(10), description: null]
+        [name:RSU.randomAlphabetic(10), description: 'Red', custom20: '2019-03-21T21:31:00Z', custom21: '2019-08-16', custom22: 'YES', custom23: 'Yes', custom24: '12345'],
+        [name:RSU.randomAlphabetic(10), description: 'Green', custom20: '2019-04-21T21:31:00Z', custom21: '2019-08-17', custom22: 'No', custom23: 'no', custom24: '1234'],
+        [name: RSU.randomAlphabetic(10), description: 'Blue', custom20: '2019-05-21T21:31:00Z', custom21: '2019-08-18', custom22: 'nO', custom23: 'yes', custom24: '12345678901234567890'],
+        [name: RSU.randomAlphabetic(10), description: 'Blue', custom20: '2019-06-21T21:31:00Z', custom21: '2019-08-19', custom22: 'Nope', custom23: 'YeS', custom24: 'qwertyuiopqwertyuiower'],
+        [name: RSU.randomAlphabetic(10), description: '', custom20: '2019-07-21T21:31:00Z', custom21: '2019-08-21', custom22: 'what the', custom23: 'xyz', custom24: 'xyz'],
+        [name: RSU.randomAlphabetic(10), description: null, custom20: '2019-08-21T21:31:00Z', custom21: '2019-08-22', custom22: 'YeS', custom23: 'NO', custom24: 'abc']
     ]
 
     /**
@@ -79,7 +79,15 @@ class CustomDomainServiceTests extends Specification {
      */
     private void createAssets(Project project) {
         for (asset in ASSETS) {
-            assetHelper.createDevice(project, 'Server', [assetName:asset.name, description: asset.description])
+            assetHelper.createDevice(project, 'Server', [
+                assetName  : asset.name,
+                description: asset.description,
+                custom20   : asset.custom20,
+                custom21   : asset.custom21,
+                custom22   : asset.custom22,
+                custom23   : asset.custom23,
+                custom24   : asset.custom24
+            ])
         }
     }
 
@@ -288,6 +296,313 @@ class CustomDomainServiceTests extends Specification {
             Map assetClassFieldMap = exportFields[domain].fields.find {it.field == 'assetClass'}
         then: 'the assetClass field is included in the result'
             assetClassField != null
+    }
+
+    void 'Test clearCustomFields'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            Integer rowsUpdated =customDomainService.clearCustomFields(project, AssetClass.DEVICE.name(), ['custom20'])
+            List assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == null
+            assetList[0].custom21 == '2019-08-16'
+            assetList[0].custom22 == 'YES'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == null
+            assetList[1].custom21 == '2019-08-17'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'no'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == null
+            assetList[2].custom21 == '2019-08-18'
+            assetList[2].custom22 == 'nO'
+            assetList[2].custom23 == 'yes'
+            assetList[2].custom24 == '12345678901234567890'
+
+            assetList[3].custom20 == null
+            assetList[3].custom21 == '2019-08-19'
+            assetList[3].custom22 == 'Nope'
+            assetList[3].custom23 == 'YeS'
+            assetList[3].custom24 == 'qwertyuiopqwertyuiower'
+
+            assetList[4].custom20 == null
+            assetList[4].custom21 == '2019-08-21'
+            assetList[4].custom22 == 'what the'
+            assetList[4].custom23 == 'xyz'
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == null
+            assetList[5].custom21 == '2019-08-22'
+            assetList[5].custom22 == 'YeS'
+            assetList[5].custom23 == 'NO'
+            assetList[5].custom24 == 'abc'
+    }
+
+    void 'Test dataDateToDateTime'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            customDomainService.dataDateToDateTime(project, AssetClass.DEVICE.name(), 'custom21')
+            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == '2019-03-21T21:31:00Z'
+            assetList[0].custom21 == '2019-08-16T00:00:00Z'
+            assetList[0].custom22 == 'YES'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == '2019-04-21T21:31:00Z'
+            assetList[1].custom21 == '2019-08-17T00:00:00Z'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'no'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == '2019-05-21T21:31:00Z'
+            assetList[2].custom21 == '2019-08-18T00:00:00Z'
+            assetList[2].custom22 == 'nO'
+            assetList[2].custom23 == 'yes'
+            assetList[2].custom24 == '12345678901234567890'
+
+            assetList[3].custom20 == '2019-06-21T21:31:00Z'
+            assetList[3].custom21 == '2019-08-19T00:00:00Z'
+            assetList[3].custom22 == 'Nope'
+            assetList[3].custom23 == 'YeS'
+            assetList[3].custom24 == 'qwertyuiopqwertyuiower'
+
+            assetList[4].custom20 == '2019-07-21T21:31:00Z'
+            assetList[4].custom21 == '2019-08-21T00:00:00Z'
+            assetList[4].custom22 == 'what the'
+            assetList[4].custom23 == 'xyz'
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == '2019-08-21T21:31:00Z'
+            assetList[5].custom21 == '2019-08-22T00:00:00Z'
+            assetList[5].custom22 == 'YeS'
+            assetList[5].custom23 == 'NO'
+            assetList[5].custom24 == 'abc'
+    }
+
+    void 'Test dataDateTimeToDate'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            customDomainService.dataDateTimeToDate(project, AssetClass.DEVICE.name(), 'custom20')
+            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == '2019-03-21'
+            assetList[0].custom21 == '2019-08-16'
+            assetList[0].custom22 == 'YES'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == '2019-04-21'
+            assetList[1].custom21 == '2019-08-17'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'no'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == '2019-05-21'
+            assetList[2].custom21 == '2019-08-18'
+            assetList[2].custom22 == 'nO'
+            assetList[2].custom23 == 'yes'
+            assetList[2].custom24 == '12345678901234567890'
+
+            assetList[3].custom20 == '2019-06-21'
+            assetList[3].custom21 == '2019-08-19'
+            assetList[3].custom22 == 'Nope'
+            assetList[3].custom23 == 'YeS'
+            assetList[3].custom24 == 'qwertyuiopqwertyuiower'
+
+            assetList[4].custom20 == '2019-07-21'
+            assetList[4].custom21 == '2019-08-21'
+            assetList[4].custom22 == 'what the'
+            assetList[4].custom23 == 'xyz'
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == '2019-08-21'
+            assetList[5].custom21 == '2019-08-22'
+            assetList[5].custom22 == 'YeS'
+            assetList[5].custom23 == 'NO'
+            assetList[5].custom24 == 'abc'
+    }
+
+    void 'Test StringToYesNo'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            customDomainService.dataToYesNo(project, AssetClass.DEVICE.name(), 'custom22')
+            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == '2019-03-21T21:31:00Z'
+            assetList[0].custom21 == '2019-08-16'
+            assetList[0].custom22 == 'Yes'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == '2019-04-21T21:31:00Z'
+            assetList[1].custom21 == '2019-08-17'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'no'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == '2019-05-21T21:31:00Z'
+            assetList[2].custom21 == '2019-08-18'
+            assetList[2].custom22 == 'No'
+            assetList[2].custom23 == 'yes'
+            assetList[2].custom24 == '12345678901234567890'
+
+            assetList[3].custom20 == '2019-06-21T21:31:00Z'
+            assetList[3].custom21 == '2019-08-19'
+            assetList[3].custom22 == null
+            assetList[3].custom23 == 'YeS'
+            assetList[3].custom24 == 'qwertyuiopqwertyuiower'
+
+            assetList[4].custom20 == '2019-07-21T21:31:00Z'
+            assetList[4].custom21 == '2019-08-21'
+            assetList[4].custom22 == null
+            assetList[4].custom23 == 'xyz'
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == '2019-08-21T21:31:00Z'
+            assetList[5].custom21 == '2019-08-22'
+            assetList[5].custom22 == 'Yes'
+            assetList[5].custom23 == 'NO'
+            assetList[5].custom24 == 'abc'
+    }
+
+
+    void 'Test ListToYesNo'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            customDomainService.dataToYesNo(project, AssetClass.DEVICE.name(), 'custom23')
+            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == '2019-03-21T21:31:00Z'
+            assetList[0].custom21 == '2019-08-16'
+            assetList[0].custom22 == 'YES'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == '2019-04-21T21:31:00Z'
+            assetList[1].custom21 == '2019-08-17'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'No'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == '2019-05-21T21:31:00Z'
+            assetList[2].custom21 == '2019-08-18'
+            assetList[2].custom22 == 'nO'
+            assetList[2].custom23 == 'Yes'
+            assetList[2].custom24 == '12345678901234567890'
+
+            assetList[3].custom20 == '2019-06-21T21:31:00Z'
+            assetList[3].custom21 == '2019-08-19'
+            assetList[3].custom22 == 'Nope'
+            assetList[3].custom23 == 'Yes'
+            assetList[3].custom24 == 'qwertyuiopqwertyuiower'
+
+            assetList[4].custom20 == '2019-07-21T21:31:00Z'
+            assetList[4].custom21 == '2019-08-21'
+            assetList[4].custom22 == 'what the'
+            assetList[4].custom23 == null
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == '2019-08-21T21:31:00Z'
+            assetList[5].custom21 == '2019-08-22'
+            assetList[5].custom22 == 'YeS'
+            assetList[5].custom23 == 'No'
+            assetList[5].custom24 == 'abc'
+    }
+
+    void 'Test dataToString'() {
+
+        given: 'a project'
+            Project project = projectHelper.createProjectWithDefaultBundle()
+            Setting.findAllByProjectAndType(project, SettingType.CUSTOM_DOMAIN_FIELD_SPEC)*.delete(flush: true)
+        and: 'the project has field settings specifications'
+            projectService.cloneDefaultSettings(project)
+        and: 'the project has assets with existing data values'
+            createAssets(project)
+
+        when: ''
+            customDomainService.dataToString(project, AssetClass.DEVICE.name(), 'custom24', 5)
+            List<AssetEntity> assetList = AssetEntity.findAllByProject(project)*.refresh()
+        then: ''
+            assetList[0].custom20 == '2019-03-21T21:31:00Z'
+            assetList[0].custom21 == '2019-08-16'
+            assetList[0].custom22 == 'YES'
+            assetList[0].custom23 == 'Yes'
+            assetList[0].custom24 == '12345'
+
+            assetList[1].custom20 == '2019-04-21T21:31:00Z'
+            assetList[1].custom21 == '2019-08-17'
+            assetList[1].custom22 == 'No'
+            assetList[1].custom23 == 'no'
+            assetList[1].custom24 == '1234'
+
+            assetList[2].custom20 == '2019-05-21T21:31:00Z'
+            assetList[2].custom21 == '2019-08-18'
+            assetList[2].custom22 == 'nO'
+            assetList[2].custom23 == 'yes'
+            assetList[2].custom24 == '12345'
+
+            assetList[3].custom20 == '2019-06-21T21:31:00Z'
+            assetList[3].custom21 == '2019-08-19'
+            assetList[3].custom22 == 'Nope'
+            assetList[3].custom23 == 'YeS'
+            assetList[3].custom24 == 'qwert'
+
+            assetList[4].custom20 == '2019-07-21T21:31:00Z'
+            assetList[4].custom21 == '2019-08-21'
+            assetList[4].custom22 == 'what the'
+            assetList[4].custom23 == 'xyz'
+            assetList[4].custom24 == 'xyz'
+
+            assetList[5].custom20 == '2019-08-21T21:31:00Z'
+            assetList[5].custom21 == '2019-08-22'
+            assetList[5].custom22 == 'YeS'
+            assetList[5].custom23 == 'NO'
+            assetList[5].custom24 == 'abc'
     }
 
 }

@@ -47,17 +47,25 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.loadModel();
+	}
+
+	/**
+	 * Set up the initial default values for the model
+	 * @returns {any}
+	 */
+	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
+			projectManagerId: null,
 			moveEvent: {},
-			moveManagerId: 0,
+			moveManagerId: null,
 			operationalOrder: 1,
 			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
@@ -137,6 +145,10 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get ghe models for the specific bundle
+	 * @param id  bundle id
+	 */
 	private getModel(id) {
 		this.bundleService.getModelForBundleViewEdit(id)
 			.subscribe((result) => {
@@ -150,15 +162,19 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
-				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
+				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : null;
+				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : null;
+				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
+				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
 				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
+				this.managers.forEach((manager, index) => {
+					manager.staff.name = manager.name;
+					this.managers[index] = manager.staff // Limit managers down to just staff
+				});
 				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
 
@@ -177,10 +193,10 @@ export class BundleViewEditComponent implements OnInit {
 			}
 		});
 		this.managers.forEach((manager) => {
-			if (manager.staff.id === this.savedModel.projectManagerId) {
+			if (manager.id === this.savedModel.projectManagerId) {
 				this.projectManager = manager.name;
 			}
-			if (manager.staff.id === this.savedModel.moveManagerId) {
+			if (manager.id === this.savedModel.moveManagerId) {
 				this.moveManager = manager.name;
 			}
 		});
@@ -190,6 +206,9 @@ export class BundleViewEditComponent implements OnInit {
 		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
+					this.bundleModel.startTime = this.bundleModel.startTime || '';
+					this.bundleModel.completionTime = this.bundleModel.completionTime || '';
+
 					this.updateSavedFields();
 					this.editing = false;
 				}

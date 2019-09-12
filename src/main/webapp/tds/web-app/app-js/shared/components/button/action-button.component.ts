@@ -39,7 +39,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 			[ngClass]="buttonClasses">
 				<div class="tds-action-button-container">
 					<i class="{{configuredIconPrefixVendor + (icon || button.icon)}}"></i>
-					<span class="title">{{titleButton}}</span>
+					<span *ngIf="titleButton" class="title">{{titleButton}}</span>
 				</div>
 				<ng-content></ng-content>
 		</button>
@@ -112,7 +112,8 @@ export class TDSActionButton implements OnInit, OnChanges {
 			'btn': true,
 			'btn-action': true,
 			'tds-action-button': true,
-			'not-has-all-permissions': !this.hasAllPermissions
+			'not-has-all-permissions': !this.hasAllPermissions,
+			'no-title-right': !this.titleButton
 		};
 		buttonClasses[this.buttonSelectorName] = true;
 

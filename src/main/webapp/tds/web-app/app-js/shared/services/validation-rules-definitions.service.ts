@@ -34,8 +34,8 @@ export class ValidationRulesDefinitionsService {
 			const err = {
 				range: {
 					given: c.value,
-					max: maxValue || Number.MAX_VALUE,
-					min: minValue || Number.MIN_VALUE
+					max: (!isNaN(maxValue) ? maxValue : Number.MAX_VALUE),
+					min: (!isNaN(minValue) ? minValue : Number.MIN_VALUE)
 				}
 			};
 

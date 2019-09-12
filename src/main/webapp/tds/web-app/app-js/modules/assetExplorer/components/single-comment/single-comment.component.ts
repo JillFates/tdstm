@@ -9,6 +9,8 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
@@ -31,7 +33,8 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		public assetExplorerService: AssetExplorerService,
 		public promptService: UIPromptService,
 		private translatePipe: TranslatePipe,
-		private userPreferenceService: PreferenceService) {
+		private userPreferenceService: PreferenceService,
+		private permissionService: PermissionService) {
 		super('#single-comment-component');
 	}
 
@@ -39,7 +42,6 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-				this.loadCommentCategories();
 			});
 	}
 
@@ -68,6 +70,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	 * Change to Edit view
 	 */
 	protected onEdit(): void {
+		this.loadCommentCategories();
 		this.singleCommentModel.modal.title = 'Edit Comment';
 		this.singleCommentModel.modal.type = ModalType.EDIT;
 	}
@@ -125,5 +128,13 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		} else {
 			this.dismiss();
 		}
+	}
+
+	protected isCommentEditAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	protected isCommentDeleteAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.CommentDelete);
 	}
 }

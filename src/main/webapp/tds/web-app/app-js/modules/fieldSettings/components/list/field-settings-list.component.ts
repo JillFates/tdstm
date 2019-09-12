@@ -265,10 +265,11 @@ export class FieldSettingsListComponent implements OnInit, OnDestroy {
 	}
 
 	protected onShare(value: { field: FieldSettingsModel, domain: string }): void {
+
 		if (value.field.shared) {
 			this.prompt.open(
 				'Confirmation Required',
-				`This will overwrite field ${value.field.field} in all asset classes. Do you want to continue?`,
+				this.translatePipe.transform('FIELD_SETTINGS.ON_SHARED', [value.field.field]),
 				'Confirm', 'Cancel').then(result => {
 					if (result) {
 						this.handleSharedField(value.field, value.domain);

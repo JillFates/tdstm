@@ -1,10 +1,12 @@
 package net.transitionmanager.common
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.FileSystemUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.FileCommand
 import net.transitionmanager.command.UploadFileCommand
+import net.transitionmanager.command.UploadImageFileCommand
 import net.transitionmanager.command.UploadTextCommand
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.i18n.Message
@@ -62,6 +64,17 @@ class WsFileSystemController implements ControllerMethods{
 	    doFileUpload(fileUploadCommand)
     }
 
+	/**
+	 * Endpoint for uploading specifically an image file to the server.
+	 * @param imageFileUploadCommand
+	 * @return
+	 */
+	@HasPermission(Permission.UserGeneralAccess)
+	def uploadImageFile(UploadImageFileCommand imageFileUploadCommand) {
+		String originalFilename = FileSystemUtil.getOriginalFilename( imageFileUploadCommand.file)
+		doFileUpload(imageFileUploadCommand, '', originalFilename)
+	}
+
     /**
      * Endpoint for uploading a file from the ETLDesigner to the server.
      * @param fileUploadCommand
@@ -109,12 +122,12 @@ class WsFileSystemController implements ControllerMethods{
      * @param prefix for the uploaded file name
      * @return
      */
-    private def doFileUpload(FileCommand fileCommand, String prefix = '') {
+    private def doFileUpload(FileCommand fileCommand, String prefix = '', String originalFilename = null) {
         String fileName = fileSystemService.transferFileToFileSystem(fileCommand, prefix)
         if (fileCommand.hasErrors()) {
             renderErrorJson(errorsInValidation(fileCommand.errors))
         } else {
-            renderSuccessJson([filename: fileName])
+            renderSuccessJson([filename: fileName, originalFilename: originalFilename])
         }
     }
 

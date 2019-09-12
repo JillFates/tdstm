@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -30,7 +30,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit {
+	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit, AfterViewInit {
 		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		moveBundleList = [];
@@ -61,6 +61,10 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			this.initModel();
 			this.focusControlByName('assetName');
 			this.model.asset.validation = this.defaultValidation;
+		}
+
+		ngAfterViewInit() {
+			this.onFocusOutOfCancel();
 		}
 
 		/**

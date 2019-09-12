@@ -23,7 +23,7 @@ class ViewManagerCreationSpec extends GebReportingSpec {
     def filteredName=""
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

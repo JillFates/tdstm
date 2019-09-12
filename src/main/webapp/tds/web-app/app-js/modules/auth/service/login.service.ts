@@ -8,6 +8,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {NoticeModel} from '../../noticeManager/model/notice.model';
 import {StringUtils} from '../../../shared/utils/string.utils';
+import {SortUtils} from '../../../shared/utils/sort.utils';
 
 /**
  * @name LoginService
@@ -31,9 +32,12 @@ export class LoginService {
 		return this.http.get(this.authUrl + 'loginInfo')
 			.map((response: any) => {
 				if (response.data && response.data.notices) {
-					response.data.notices = response.data.notices.map((notice: any) => {
+					// Filter not active notices
+					response.data.notices = response.data.notices.filter((notice: any) => notice.active).map((notice: any) => {
+						notice.sequence = notice.sequence || 0;
 						return this.cleanNotice(notice);
 					});
+					response.data.notices = response.data.notices.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 				}
 				return response && response.data;
 			})
