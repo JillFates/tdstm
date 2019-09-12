@@ -14,6 +14,10 @@ import javax.servlet.http.HttpSession
 import java.sql.Timestamp
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 /**
  * The TimeUtil class contains a collection of useful Time manipulation methods
@@ -70,10 +74,12 @@ class TimeUtil {
 	static final String FULL = 'F'
 	static final String ABBREVIATED = 'A'
 
-	public static final String GRANULARITY_SECONDS = "S"
-	public static final String GRANULARITY_MINUTES = "M"
-	public static final String GRANULARITY_HOURS = "H"
-	public static final String GRANULARITY_DAYS = "D"
+	static final String GRANULARITY_SECONDS = "S"
+	static final String GRANULARITY_MINUTES = "M"
+	static final String GRANULARITY_HOURS = "H"
+	static final String GRANULARITY_DAYS = "D"
+
+	static final String GMT_OFFSET = '+00:00'
 
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of SECONDS from an existing date
@@ -587,6 +593,29 @@ class TimeUtil {
 		} catch (e) {
 			logger.debug "parseDateTimeWithFormatter() encountered invalid DateTime ({}) ", dateString
 		}
+	}
+
+	/**
+	 * Gets the time zone offset for a time zone defaulting to userPreference or the default time zone.
+	 *
+	 * @param timeZoneInput The timezone to get an offset for, which will default to the userPreference timezone, if set, and the default time zone otherwise
+	 *
+	 * @return the timezone offset as a string in format '+01:00' or '-03:00'
+	 */
+	@CompileStatic
+	static String getTimeZoneOffset(String timeZoneInput = null){
+		String timeZone = timeZoneInput ?: userPreferenceService.getTimeZone() ?: defaultTimeZone
+
+		if(timeZone == defaultTimeZone){
+			return GMT_OFFSET
+		}
+
+		ZoneId zone = ZoneId.of(timeZone)
+		LocalDateTime date = LocalDateTime.now()
+		ZonedDateTime zonedDateTime = date.atZone(zone)
+		ZoneOffset offset = zonedDateTime.getOffset()
+
+		return String.format("%s", offset)
 	}
 
 	/**

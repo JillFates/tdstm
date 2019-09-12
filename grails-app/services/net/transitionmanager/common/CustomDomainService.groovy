@@ -1,6 +1,7 @@
 package net.transitionmanager.common
 
 import com.tdsops.tm.enums.ControlType
+import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
 import net.transitionmanager.asset.AssetEntity
@@ -736,11 +737,12 @@ class CustomDomainService implements ServiceMethods {
      */
     @Transactional
     void dataDateToDateTime(Project project, String assetClassName, String fieldName) {
+       String timeOffset = TimeUtil.timeZoneOffset
 
         AssetClass assetClass = AssetClass.safeValueOf(assetClassName)
         String sql = 'update AssetEntity set '
 
-        sql += """$fieldName = DATE_FORMAT($fieldName , '%Y-%m-%dT%H:%i:%sZ')
+        sql += """$fieldName = DATE_FORMAT( CONVERT_TZ( $fieldName, '$timeOffset', '+00:00') , '%Y-%m-%dT%H:%i:%sZ')
                   where project=:project and assetClass=:assetClass
                """
 
