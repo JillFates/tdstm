@@ -66,7 +66,6 @@
 				</div>
 			</div>
 			<div class="col-sm-6 filters-section">
-				<span title="Toggle Tags" class="tag-arrows-icon" (click)="toggleTagsView()"><i class="fa fa-fw fa-arrows-alt"></i></span>
 				<div *ngIf="hiddenFilters; then hiddenFiltersButton else clearFilters"></div>
 				<ng-template #clearFilters>
 					<tds-button-custom
@@ -197,6 +196,11 @@
 						<label> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NO_LONGER_EXISTS_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 					</div>
 				</div>
+				<i *ngIf="column.property === 'tagAssets'"
+				   class="fa"
+				   [ngClass]="showFullTags ? 'fa-angle-double-down' : 'fa-angle-double-right'"
+				   style="margin-top: 3px;"
+				   (click)="onToggleTagsView($event)" title="Toggle Tags View"></i>
 			</ng-template>
 
 			<!-- Default Generic Filter Template -->
