@@ -109,7 +109,7 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 	/**
 	 * Close the Dialog but first it verify is not Dirty
 	 */
-	public cancelCloseDialog(): void {
+	public cancelDialog(): void {
 		if (this.isDirty()) {
 			this.promptService.open(
 				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
@@ -126,6 +126,10 @@ export class AssetCommentViewEditComponent extends UIExtraDialog implements  OnI
 		} else {
 			this.dismiss();
 		}
+	}
+
+	public closeDialog(): void {
+		this.dismiss();
 	}
 
 	/**

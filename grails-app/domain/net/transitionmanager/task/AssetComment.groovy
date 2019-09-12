@@ -369,13 +369,11 @@ class AssetComment {
 			return null
 		}
 
-		if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && !apiActionCompletedAt) {
+		if ((canInvokeRemotely || canInvokeOnServer) && status in [READY, STARTED] && apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } started at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
 		} else if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } completed at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == READY && !apiActionInvokedAt && !apiActionCompletedAt) {
-			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == STARTED && !apiActionInvokedAt && !apiActionCompletedAt) {
+		} else if (!canInvokeRemotely && canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
 		} else if (canInvokeRemotely && !canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${apiAction.name}, must be invoked from TM Desktop")

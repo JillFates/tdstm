@@ -139,4 +139,31 @@ class Project extends PartyGroup {
 			throw new UnsupportedOperationException(msg)
 		}
 	}
+
+	/**
+	 * Create a map representation of this Project instance.
+	 * @return a map containing a project's most relevant fields.
+	 */
+	Map toMap() {
+		ProjectLogo logo = ProjectLogo.findByProject(this)
+		Map projectLogoMap = null
+		if(logo) {
+			projectLogoMap = [
+			    id: logo.id,
+				name: logo.name,
+				partnerImage: logo.partnerImage
+			]
+		}
+		return [
+		    id: id,
+			projectCode: projectCode,
+			defaultBundle: [
+			    id: defaultBundle.id,
+				name: defaultBundle.name
+			],
+			timezone: timezone.label,
+		    projectLogoForProject: projectLogoMap
+		]
+	}
+
 }

@@ -11,6 +11,7 @@ export const PROGRESSBAR_FAIL_STATUS = 'Failed';
 export const FILE_SYSTEM_URL = '../ws/fileSystem';
 export const ETL_SCRIPT_UPLOAD_URL = '../ws/fileSystem/uploadFileETLDesigner';
 export const ASSET_IMPORT_UPLOAD_URL = '../ws/fileSystem/uploadFileETLAssetImport';
+export const IMAGE_UPLOAD_URL = '../ws/fileSystem/uploadImageFile';
 
 @Injectable()
 export class KendoFileHandlerService {

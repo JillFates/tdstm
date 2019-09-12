@@ -20,9 +20,11 @@ export class BundleService {
 	getBundles(): Observable<BundleModel[]> {
 		return this.http.get(`../ws/reports/moveBundles`)
 			.map((response: any) => {
-				response.data.forEach((r) => {
-					r.completion = ((r.completion) ? new Date(r.completion) : '');
-					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
+				response.data.forEach((item: any) => {
+					item.completion = item.completion ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.completion), DateUtils.SERVER_FORMAT_DATE) : '';
+					item.startDate = item.startDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.startDate), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return response.data;
 			})

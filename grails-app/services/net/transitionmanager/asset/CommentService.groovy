@@ -390,11 +390,11 @@ class CommentService implements ServiceMethods {
 				if (params.manageDependency) {
 					def taskDependencies = params['taskDependency']
 					def taskSuccessors = params['taskSuccessor']
-					def deletedPreds = params.deletedPreds
+					def deletedPreds = params.deletedPreds.collect { NumberUtil.toLong(it) }
 
 					// If we're updating, we'll delete the existing dependencies and then readd them following
 					if (!isNew && deletedPreds) {
-						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( $deletedPreds ) ")
+						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( :deletedPreds ) ", [deletedPreds:deletedPreds])
 					}
 					// Iterate over the predecessor ids and validate that the exist and are associated with the project
 					taskDependencies.each { preds ->

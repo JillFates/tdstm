@@ -691,9 +691,38 @@ class UrlMappings {
 			action = [GET: "projects"]
 		}
 
+		"/ws/project/lists" {
+			controller = "wsProject"
+			action = [GET: "projectsForProjectList"]
+		}
+
+		"/ws/project/createProjectModel" {
+			controller = "wsProject"
+			action = [GET: "getModelForProjectCreate"]
+		}
+
+		"/ws/project/viewEditProject/$projectId" {
+			controller = "wsProject"
+			action = [GET: "getModelForProjectViewEdit"]
+		}
+
 		"/ws/project/userProjects" {
 			controller = "wsProject"
 			action = [GET:"userProjects"]
+		}
+
+		"/ws/project/saveProject/$projectId?" {
+			controller = "wsProject"
+			action = [
+					POST: "saveProject"
+			]
+		}
+
+		"/ws/project/$projectId?" {
+			controller = "wsProject"
+			action = [
+					DELETE: "deleteProject"
+			]
 		}
 
 		"/ws/manufacturer/merge" {
@@ -833,6 +862,13 @@ class UrlMappings {
 			controller = "wsFileSystem"
 			action = [
 			        POST: "uploadText"
+			]
+		}
+
+		"/ws/fileSystem/uploadImageFile" {
+			controller = "wsFileSystem"
+			action = [
+					POST: "uploadImageFile"
 			]
 		}
 

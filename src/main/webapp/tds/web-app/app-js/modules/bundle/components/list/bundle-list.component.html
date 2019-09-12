@@ -16,7 +16,6 @@
                         (sortChange)="sortChange($event)"
                         [pageable]="{pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
                         (pageChange)="pageChange($event)"
-                        (cellClick)="cellClick($event)"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                         <a *ngIf="canEditBundle" (click)="openCreateBundle()"><button type="button" class="btn btn-default action-toolbar-btn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></a>
