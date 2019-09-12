@@ -26,7 +26,7 @@ class ProviderCleanUpSpec extends GebReportingSpec{
     static provName = "E2E Provider"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

@@ -32,7 +32,6 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import net.transitionmanager.task.TaskService
 import org.grails.web.json.JSONObject
-import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.multipart.MultipartFile
 /**
  * A service to hand status updates, from invoking remote actions on TMD.
@@ -287,10 +286,10 @@ class TaskActionService implements ServiceMethods {
 	String renderScript(String script,  AssetComment task) {
 		AbstractConnector connector = apiActionService.connectorInstanceForAction(task.apiAction)
 		Map params = connector.buildMethodParamsWithContext(task.apiAction, task)
-		params.username = '{username}'
-		params.password = '{password}'
+		params.username = '{{username}}'
+		params.password = '{{password}}'
 
-		return StringUtil.replacePlaceholders(script, params)
+		return StringUtil.replacePlaceholders(script, params, StringUtil.DOUBLE_PLACEHOLDER_REGEXP)
 	}
 
 	/**
@@ -380,7 +379,7 @@ class TaskActionService implements ServiceMethods {
 				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
 			]
 		} else {
-			throw new AccessDeniedException("Action doesn't exist for users project.")
+			throw new IllegalArgumentException("Action doesn't exist for users project.")
 		}
 	}
 

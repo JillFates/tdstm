@@ -249,7 +249,15 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
+	'PROJECTS': {
+		'LIST': 'Project List'
+	},
 	'FIELD_SETTINGS': {
+		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
+		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
+		the existing data falls outside the new validation ranges.
+		Please proceed with caution, press Confirm to proceed and change the validation settings,
+		or press Cancel to make no changes.`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
@@ -262,7 +270,39 @@ export const en_DICTIONARY: Object = {
 			'MIN_LENGTH_ERROR': 'Value must be between 0 and {param1}',
 			'MAX_LENGTH_ERROR': 'Value must be between {param1} and 255'
 		},
-		'CLEAR_UNDERLAYING_DATA': 'The underlying data will be deleted when you delete the custom {param1}.\nPress Yes to continue, No to cancel.',
+		'CONVERSIONS': {
+			'ALL_DELETED': 'Changing the control will cause all strings to be deleted',
+			'LIST_TO_STRING': 'Changing the control will lose all list options and all list elements will convert to strings, and any data that is longer than the string control default will be truncated',
+			'LIST_TO_YES_NO': 'Changing the control will lose all list options and only list elements that are "Yes" and "No" will be retained, all other data will be deleted',
+			'LIST_TO_DATE': 'Changing the control will lose all list options and all data will be deleted',
+			'LIST_TO_DATETIME': 'Changing the control will lose all list options and all data will be deleted',
+			'LIST_TO_NUMBER': 'Changing the control will lose all list options and all data will be deleted',
+			'STRING_TO_LIST': 'Changing the control will cause a list to be created based on existing unique string values',
+			'STRING_TO_YES_NO': 'Changing the control will result in only strings that are "Yes" and "No" to be retained, all other data will be deleted',
+			'STRING_TO_DATE': 'Changing the control will cause all strings to be deleted',
+			'STRING_TO_DATETIME': 'Changing the control will cause all strings to be deleted',
+			'STRING_TO_NUMBER': 'Changing the control will cause all strings to be deleted',
+			'YES_NO_TO_LIST': 'Changing the control will default to list elements of "Yes" and "No"',
+			'YES_NO_TO_STRING': 'Changing the control will change the data to strings "Yes" and "No"',
+			'YES_NO_TO_DATE': 'Changing the control will result in all data being deleted',
+			'YES_NO_TO_DATETIME': 'Changing the control will result in all data being deleted',
+			'YES_NO_TO_NUMBER': 'Changing the control will result in all data being deleted',
+			'DATE_TO_LIST': 'Changing the control will cause a list to be created based on the unique date values already present in the data',
+			'DATE_TO_STRING': 'Changing the control will change the data from date format to simple strings',
+			'DATE_TO_YES_NO': 'Changing the control will result in all data being deleted',
+			'DATE_TO_DATETIME': 'Changing the control will result in the 00:00:00 timestamp being appended to all date values',
+			'DATE_TO_NUMBER': 'Changing the control will result in all data being deleted',
+			'DATETIME_TO_LIST': 'Changing the control will cause a list to be created based on the unique date/time values already present in the data',
+			'DATETIME_TO_STRING': 'Changing the control will change the data from date/time format to simple strings',
+			'DATETIME_TO_YES_NO': 'Changing the control will result in all data being deleted',
+			'DATETIME_TO_DATE': 'Changing the control will result in the time part of the data being removed from all data values',
+			'DATETIME_TO_NUMBER': 'Changing the control will result in all data being deleted',
+			'NUMBER_TO_LIST': 'Changing the control will cause a list to be created based on the unique number values already present in the data',
+			'NUMBER_TO_STRING': 'Changing the control will change the data from numeric format to simple strings',
+			'NUMBER_TO_YES_NO': 'Changing the control will result in all data being deleted',
+			'NUMBER_TO_DATE': 'Changing the control will result in all data being deleted',
+			'NUMBER_TO_DATETIME': 'Changing the control will result in all data being deleted',
+		}
 	},
 	'LICENSE': {
 		'ADMIN': 'License Admin',

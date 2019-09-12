@@ -54,6 +54,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -501,7 +502,7 @@ digraph runbook {
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
 
 					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-					if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+					if (task.isAutomatic()) {
 						fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 						color = taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
@@ -663,7 +664,9 @@ digraph runbook {
 					t.status,
 					IFNULL(CONCAT(first_name,' ', last_name),'') AS hard_assign,
 					t.is_published AS isPublished,
-					t.duration
+					t.duration,
+					first_name,
+					last_name
 				FROM asset_comment t
 				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
@@ -728,9 +731,8 @@ digraph runbook {
 
 				fillcolor = taskStatusColorMap[colorKey][1]
 
-				// log.info "task $it.task: role $it.role, $AssetComment.AUTOMATIC_ROLE, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
-				// if ("$it.roll" == "$AssetComment.AUTOMATIC_ROLE") {
-				if ("${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+				if(it.role == AUTOMATIC_ROLE ||
+				   (Person.SYSTEM_USER_AT.firstName == it.firstName && Person.SYSTEM_USER_AT.lastName == it.lastName)){
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
@@ -765,19 +767,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
-
-//				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString())
-//				// convert the URI into a web-safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
-//				def svgFile = new File(filename)
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:tasks]
-//				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("runbook-${moveEventId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:tasks, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")

@@ -15,6 +15,7 @@ import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.project.WorkflowTransition
 import org.apache.commons.lang3.StringUtils
 
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
 import static com.tdsops.tm.enums.domain.TimeScale.M
@@ -106,7 +107,6 @@ class AssetComment {
 	static final List<String> postMoveCategories = AssetCommentCategory.postMoveCategories
 	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
 	static final List<String> planningCategories = AssetCommentCategory.planningCategories
-	static final String AUTOMATIC_ROLE = 'AUTO'
 
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
@@ -168,7 +168,7 @@ class AssetComment {
 
 	static mapping = {
 		// TM-15253. Add discriminator for Task domain class
-		discriminator column: "content_type", value: '1', type: 'integer', formula: "case when comment_type = 'issue' then 0 else 1 end"
+		discriminator value: '0', type: 'integer', formula: "case when comment_type = 'issue' then 1 else 0 end"
 		autoTimestamp false
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
@@ -284,8 +284,8 @@ class AssetComment {
 	 * Determines if the task is Automatic processed
 	 * @return
 	 */
-	boolean isAutomatic(){
-		AUTOMATIC_ROLE == role
+	boolean isAutomatic() {
+		AUTOMATIC_ROLE == role || (assignedTo && assignedTo.isAutomatic())
 	}
 
 	/**
@@ -370,13 +370,11 @@ class AssetComment {
 			return null
 		}
 
-		if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && !apiActionCompletedAt) {
+		if ((canInvokeRemotely || canInvokeOnServer) && status in [READY, STARTED] && apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } started at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
 		} else if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } completed at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == READY && !apiActionInvokedAt && !apiActionCompletedAt) {
-			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == STARTED && !apiActionInvokedAt && !apiActionCompletedAt) {
+		} else if (!canInvokeRemotely && canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
 		} else if (canInvokeRemotely && !canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${apiAction.name}, must be invoked from TM Desktop")

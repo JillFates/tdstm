@@ -26,7 +26,7 @@ class ProviderEditionSpec extends GebReportingSpec{
     static edit = " edited"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

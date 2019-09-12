@@ -34,7 +34,7 @@ class CompanyEditionSpec extends GebReportingSpec {
     ]
     static newValues
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

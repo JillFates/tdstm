@@ -15,7 +15,7 @@ class ImportAccountsSpec extends GebReportingSpec {
     static projName = "TM-Demo"
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

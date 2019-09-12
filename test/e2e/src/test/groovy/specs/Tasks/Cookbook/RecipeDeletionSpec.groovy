@@ -19,7 +19,7 @@ class RecipeDeletionSpec extends GebReportingSpec {
     static recipesNameList = [baseName, "Geb Recipe Test"]
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

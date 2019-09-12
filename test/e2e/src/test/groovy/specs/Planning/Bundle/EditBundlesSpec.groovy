@@ -29,7 +29,7 @@ class EditBundlesSpec extends GebReportingSpec {
     static  originalBundleData =[]
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
 
         testCount = 0
         to LoginPage

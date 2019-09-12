@@ -52,7 +52,7 @@ export class ChangePasswordComponent implements OnInit {
 			if (!res && !res.data.success) {
 				this.error = 'An error occurred, please try again later.';
 			} else {
-				this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute('/project/show');
+				this.router.navigate(['project', 'list'], { queryParams: { show: this.userContext.project.id }});
 			}
 		});
 	}
