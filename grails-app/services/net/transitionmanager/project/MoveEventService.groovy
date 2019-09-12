@@ -30,7 +30,6 @@ import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
-import org.hibernate.SessionFactory
 import org.springframework.jdbc.core.JdbcTemplate
 import com.tdsops.tm.enums.domain.AssetCommentCategory
 
@@ -83,7 +82,6 @@ class MoveEventService implements ServiceMethods {
 	UserPreferenceService userPreferenceService
 	ProjectService        projectService
 	ReportsService        reportsService
-	SessionFactory        sessionFactory
 
 	MoveEvent create(Project project, String name) {
 		MoveEvent me = new MoveEvent([project:project, name:name])
@@ -578,10 +576,7 @@ class MoveEventService implements ServiceMethods {
 				group by ac.category
 			"""
 
-		def session = sessionFactory.currentSession
-		org.hibernate.Query query = session.createQuery(hql)
-		query.setParameter("moveEvent", moveEvent)
-		List taskCategoriesStatsList = query.list()
+		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
 		List<Map> stats = []
 		taskCategoriesStatsList.each { categoryStats ->
