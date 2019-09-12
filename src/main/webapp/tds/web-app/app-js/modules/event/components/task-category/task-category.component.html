@@ -37,8 +37,14 @@
                             </ng-template>
 
                             <ng-template #simpleValue>
-                                <span [innerHtml]="column.text"></span>
+                                <div *ngIf="rowIndex  <= RowType.Tasks; else dateValue">
+                                    <span [innerHtml]="column.text"></span>
+                                </div>
                            </ng-template>
+
+                            <ng-template #dateValue>
+                                <span>{{column.text | tdsDateTime: userTimeZone: dateTimeFormat}}</span>
+                            </ng-template>
                     </div>
                 </div>
             </div>
