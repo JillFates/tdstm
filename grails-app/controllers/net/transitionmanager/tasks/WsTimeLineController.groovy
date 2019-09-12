@@ -60,13 +60,26 @@ class WsTimeLineController implements ControllerMethods {
 		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.executeCPA(moveEvent, tasks, deps)
 
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
+
 		try {
 
 			results << "Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>"
 			results << "Start Vertices: " << (graph.starts.size() > 0 ? graph.starts : 'none') << '<br/>'
 			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? graph.sinks : 'none') << '<br/>'
-			results << "Cyclical Maps: "
 
+			if (!summary.cycles.isEmpty()) {
+				results << "Cyclical Maps: "
+
+				results << '<ol>'
+				summary.cycles.each { List<TaskVertex> cycle ->
+					results << "<li> Circular Reference Stack: <ul>"
+					cycle.each { TaskVertex taskVertex ->
+						results << "<li>$taskVertex.taskNumber $taskVertex.taskComment"
+					}
+					results << '</ul>'
+				}
+				results << '</ol>'
+			}
 
 			results << '<br/>'
 			results << "Pass Elapsed Time: $summary.elapsedTime<br/>"
