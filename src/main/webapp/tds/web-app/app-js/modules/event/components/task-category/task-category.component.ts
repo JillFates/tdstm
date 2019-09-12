@@ -73,7 +73,6 @@ export class TaskCategoryComponent {
 	 * Return a boolean indicating if there are task present
 	*/
 	private hasTasks(): boolean {
-		console.log(this.taskCategories.tasks);
 		return this.taskCategories && this.taskCategories.tasks;
 	}
 }
