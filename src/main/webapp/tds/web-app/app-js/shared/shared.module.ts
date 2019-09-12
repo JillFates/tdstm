@@ -106,6 +106,7 @@ import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
 
 @NgModule({
 	imports: [
@@ -186,7 +187,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
-		DiagramLayoutComponent
+		DiagramLayoutComponent,
+		CircleCountdownComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -252,7 +254,8 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
 		DiagramLayoutComponent,
-		FontAwesomeModule
+		FontAwesomeModule,
+		CircleCountdownComponent
 	],
 	entryComponents: [
 		DynamicComponent,

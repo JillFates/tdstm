@@ -33,12 +33,7 @@
       <button class="refresh-container-btn btn" (click)="refreshDiagram()">
         <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
       </button>
-      <div id="countdown" (click)="onRefreshCountdownClick()">
-        <div id="countdown-number">{{refreshCount}}</div>
-        <svg id="countdown-circle-container">
-          <circle id="countdown-circle" r="13" cx="15" cy="15" [style.animation]="" #refreshCircle></circle>
-        </svg>
-      </div>
+      <tds-circle-countdown></tds-circle-countdown>
     </div>
   </div>
 
