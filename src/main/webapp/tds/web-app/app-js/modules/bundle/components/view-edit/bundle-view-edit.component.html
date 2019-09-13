@@ -45,16 +45,12 @@
 
                         <tr class="prop">
                             <td valign="top" class="name">Start Time:</td>
-
                             <td valign="top" class="value">{{savedModel?.startTime | tdsDateTime: userTimeZone}}</td>
-
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Completion Time:</td>
-
                             <td valign="top" class="value">{{savedModel?.completionTime | tdsDateTime: userTimeZone}}</td>
-
                         </tr>
 
                         <tr class="prop">
@@ -80,20 +76,12 @@
                             <td valign="top" class="value">
                                 <a routerLink="event/list" [queryParams]="{'show': savedModel?.moveEvent.id}">{{savedModel?.moveEvent.name}}</a>
                             </td>
-
                         </tr>
 
                         <tr class="prop">
                             <td valign="top" class="name">Order:</td>
 
                             <td valign="top" class="value">{{savedModel?.operationalOrder}}</td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">WorkFlow Code</td>
-
-                            <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
-
                         </tr>
 
                         <tr class="prop">
@@ -194,12 +182,6 @@
                             <td valign="top" class="name">Order:</td>
                             <td valign="top" class="value">
                                 <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode" [data]="workflowCodes"></kendo-dropdownlist>
                             </td>
                         </tr>
 

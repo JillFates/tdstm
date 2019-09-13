@@ -18,6 +18,7 @@ declare var jQuery: any;
         <kendo-combobox #innerComboBox
                         [data]="datasource"
                         [(ngModel)]="model"
+						[tabindex]="tabindex"
                         [textField]="'text'"
                         [valueField]="'id'"
                         [placeholder]="placeholder"
@@ -62,6 +63,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Output() modelChange = new EventEmitter<string>();
 	@Input('model') model: any;
 	@Input('metaParam') metaParam: any;
+	@Input('tabindex') tabindex: string;
 	// Passing Callback functions
 	@Input('serviceRequest') serviceRequest: Function;
 	// Params

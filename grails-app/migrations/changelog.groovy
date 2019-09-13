@@ -70,4 +70,6 @@ databaseChangeLog = {
 	include file: 'version/v4_7_1/20190819-add-role-user-to-the-comment-view-permission.groovy'
 	include file: 'version/v4_7_1/20190823-add-asset-bulk-select-permission.groovy'
 	include file: 'version/v4_7_1/20190828-add-CPA-results-in-task.groovy'
+	include file: 'version/v4_7_1/20190903-drop-workflow-columns.groovy'
+	include file: 'version/v4_7_1/20190905-add-dictionaryMethodName.groovy'
 }

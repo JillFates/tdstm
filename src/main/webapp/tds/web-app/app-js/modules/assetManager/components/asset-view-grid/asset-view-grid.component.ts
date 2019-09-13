@@ -67,7 +67,8 @@ import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../sh
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
-	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE
+	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE,
+	WRAP_TAGS_COLUMN: PREFERENCE_WRAP_TAGS_COLUMN,
 } = PREFERENCES_LIST;
 declare var jQuery: any;
 
@@ -93,6 +94,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
+	private showFullTags = false;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -106,6 +108,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	public currentFields = [];
 	public justPlanning = false;
+	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
 	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
@@ -165,12 +168,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.getPreferences()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((preferences: any) => {
-			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
-
-			this.bulkCheckboxService.setPageSize(this.gridState.take);
-			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
-			this.justPlanningChange.emit(this.justPlanning);
-			this.onReload();
+				this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
+				this.bulkCheckboxService.setPageSize(this.gridState.take);
+				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
+				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
+				this.showFullTags = this.toggleTagsColumn;
+				this.justPlanningChange.emit(this.justPlanning);
+				this.onReload();
 		});
 
 		// Iterate Fields to get reference for this context
@@ -206,7 +210,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private getPreferences(): Observable<any> {
-		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
+		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING, PREFERENCE_WRAP_TAGS_COLUMN);
 	}
 
 	/**
@@ -748,6 +752,20 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}
 
 		return this.assetExplorerService.query(viewId, payload);
+	}
+
+	/**
+	 * Toggles and saves the user preference to either hide or show all the tags inline or inline-block
+	 * */
+	public onToggleTagsView(event): void {
+		event.stopPropagation();
+		event.preventDefault();
+		this.showFullTags = !this.showFullTags;
+		this.preferenceService.setPreference(PREFERENCE_WRAP_TAGS_COLUMN, this.showFullTags.toString())
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(() => {
+				// nothing to do here
+			});
 	}
 
 	/**
