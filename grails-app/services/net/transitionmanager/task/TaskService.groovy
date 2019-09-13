@@ -38,6 +38,7 @@ import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
+import net.transitionmanager.command.task.ListTaskCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
@@ -56,7 +57,6 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
@@ -71,6 +71,7 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -1912,22 +1913,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		// TODO : Need to change out the categories to support all ???
 		def categories = GormUtil.asQuoteCommaDelimitedString(ACC.moveDayCategories)
 
-		// Get the various workflow steps that will be used to populate things like the workflows ids, durations, teams, etc when creating tasks
-		def workflowSteps = []
-		if (bundleIds.size()) {
-			// TODO : JPM 9/2014 - need to address to support non-Event/Bundle generation
-			def workflowStepSql = "select mb.move_bundle_id AS moveBundleId, wft.*, mbs.* \
-				from move_bundle mb \
-				left outer join workflow wf ON wf.process = mb.workflow_code \
-				left outer join workflow_transition wft ON wft.workflow_id=wf.workflow_id \
-				left outer join move_bundle_step mbs ON mbs.move_bundle_id=mb.move_bundle_id AND mbs.transition_id=wft.trans_id \
-				where mb.move_bundle_id IN (${GormUtil.asCommaDelimitedString(bundleIds)})"
-			workflowSteps = jdbcTemplate.queryForList(workflowStepSql)
-		}
-
-		// log.debug "Workflow steps SQL= $workflowStepSql"
-		// log.debug "Found ${workflowSteps.size()} workflow steps for moveEvent $moveEvent"
-
 		/**
 		 * A helper closure used by generateRunbook to link a task to its predecessors by asset or milestone
 		 * @param AssetComment (aka Task)
@@ -1972,35 +1957,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			}
 		}
 
-		//
-		/**
-		 * getWorkflowStep - a Closure used to lookup the workflow step from a few parameters
-		 * @param String workflowStepCode
-		 * @param Integer moveBundleId (default null)
-		 * @return Map from workflowSteps list or null if not found
-		 */
-		def getWorkflowStep = { workflowStepCode, moveBundleId=null ->
-			def wfsd
-			if (moveBundleId && workflowStepCode) {
-				wfsd = workflowSteps.find{ it.moveBundleId==moveBundleId && it.code == workflowStepCode }
-				if (!wfsd) {
-					exceptions.append("Unable to find workflow step code $workflowStepCode for bundleId $moveBundleId<br>")
-					exceptCnt++
-				}
-			} else if (workflowStepCode) {
-				// We have a workflow code but don't know which bundle. This will happen on the start and Completed tasks as there are no
-				// Assets associated to the step and therefore can't tie it to a bundle. This is a bit of a hack in that it is just going to
-				// find the first bundle. We could improve this to find the one with the latest completion time which is what we're getting
-				// it for in a Milestone.
-				wfsd = workflowSteps.find{ it.code == workflowStepCode }
-				if (!wfsd) {
-					exceptions.append("Unable to find workflow step code $workflowStepCode<br>")
-					exceptCnt++
-				}
-			}
-			return wfsd
-		}
-
 		/**
 		 * A helper closure that bumps the predecessor task's associated assets to the current task if the previous task
 		 * was a collection type task.
@@ -2040,7 +1996,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 		def recipeVersion 	// Holds reference to the recipeVersion that the TaskBatch points to
 		def maxPreviousEstFinish       		// Holds the max Est Finish from the previous taskSpec
-		def workflow
 		def recipe 			// The recipe Map
 		def recipeId 		// The id of the recipe
 		def recipeTasks 	// The list of Tasks within the recipe
@@ -2225,12 +2180,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					}
 				}
 
-				// ----
-
-				// Get the Workflow code if there is one specified in the task spec and then lookup the code for the workflow details
-				def taskWorkflowCode = taskSpec.containsKey('workflow') ? taskSpec.workflow : null
-				workflow = taskWorkflowCode ? getWorkflowStep(taskWorkflowCode) : null
-
 				// Validate that the taskSpec has the proper type
 				def stepType
 
@@ -2294,7 +2243,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 						isGroupingSpec = true
 
-						newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow)
+						newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions)
 						def prevMilestone = latestMilestone
 						latestMilestone = newTask
 
@@ -2424,7 +2373,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 								// Track what tasks were created by the taskSpec
 								taskSpecTasks[taskSpec.id] = []
 
-								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, workflow, settings, exceptions)
+								def actionTasks = createAssetActionTasks(action, contextObj, whom, projectStaff,recipeId, taskSpec, groups, settings, exceptions)
 
 								if (actionTasks.size() > 0) {
 									// Throw the new task(s) into the collective taskList using the id as the key
@@ -2471,9 +2420,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						// Create a task for each asset based on the filtering of the taskSpec
 						//
 						assetsForTask?.each { asset ->
-							workflow = getWorkflowStep(taskWorkflowCode, asset.moveBundle.id)
 
-							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow, asset)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, asset)
 
 							tasksNeedingPredecessors << newTask
 							taskSpecTasks[taskSpec.id] << newTask
@@ -3546,7 +3494,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param asset - The asset associated with the task if there appropriate
 	 * @return AssetComment (aka Task)
 	 */
-	def createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflow=null, asset=null) {
+	def createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, asset=null) {
 		def task = new AssetComment(
 			taskNumber: sequenceService.next(settings.clientId, 'TaskNumber'),
 			taskBatch: settings.taskBatch,
@@ -3610,17 +3558,13 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			task.comment = "** Error computing title **"
 		}
 
-		if ( workflow && workflow.workflow_transition_id ) {
-			task.workflowTransition = WorkflowTransition.read(workflow.workflow_transition_id)
-		}
-
 		if (! task.save(flush:true, failOnError:false)) {
 			log.error("createTaskFromSpec: Failed creating task error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
 		// Perform the assignment logic
-		errMsg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
+		errMsg = assignWhomAndTeamToTask(task, taskSpec, projectStaff, settings)
 		if (errMsg) {
 			exceptions.append("$errMsg<br>")
 		}
@@ -3629,7 +3573,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		log.info 'Saved task {} - {}', task.id, task.toString()
 
 		// Set any scheduling constraints on the task
-		setTaskConstraints(task, taskSpec, workflow, projectStaff, exceptions)
+		setTaskConstraints(task, taskSpec, projectStaff, exceptions)
 
 		return task
 	}
@@ -4643,7 +4587,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param StringBuilder exceptions
 	 * @return List<AssetComment> the list of tasks that were created
 	 */
-	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, workflow, settings, exceptions) {
+	def createAssetActionTasks(action, contextObj, whom, projectStaff, recipeId, taskSpec, groups, settings, exceptions) {
 		def taskList = []
 		String loc 			// used for racks
 		def msg
@@ -4824,8 +4768,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 
 				task.durationLocked = taskSpec.containsKey('durationLocked') ? taskSpec.durationLocked.toBoolean() :  false
 
-				// TODO - Normalize this logic and sadd logic to update from Workflow if exists
-
 				if (!save(task, true)) {
 					throw new RuntimeException("Error while trying to create task - error=${GormUtil.allErrorsString(task)}")
 				}
@@ -4847,12 +4789,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				task.setTmpAssociatedAssets(assocAssets)
 
 				// Perform the AssignedTo logic
-				msg = assignWhomAndTeamToTask(task, taskSpec, workflow, projectStaff, settings)
+				msg = assignWhomAndTeamToTask(task, taskSpec, projectStaff, settings)
 				if (msg)
 					exceptions.append(msg).append('<br>')
 
 				// Set any scheduling constraints on the task
-				setTaskConstraints(task, taskSpec, workflow, projectStaff, exceptions)
+				setTaskConstraints(task, taskSpec, projectStaff, exceptions)
 
 				taskList << task
 			}
@@ -4947,20 +4889,19 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *    contains @ - the value will be used to lookup the person associated to the project by their email address (case insensitive)
 	 *    Otherwise - will lookup the person by their name whom are associated to the project
 	 * 3. References to #propertyName can cause double indirection if the property contains a second #propertyNam
-	 * 4. The team property will be set if present in the task spec, which will override the workflow team if workflow is also provided.
+	 * 4. The team property will be set if present in the task spec.
 	 * 5. In the event that the whom or team are provided and are not found then an error message will be returned
 	 *
 	 * @param The task that an individual and/or a team will be assigned to based on the task spec
 	 * @param The recipe task specification
-	 * @param The workflow object associated with the taskSpec
 	 * @param The list of staff associated with the project
 	 * @param settings : general settings for task generation.
 	 * @return Return null if successfor or a String error message indicating the cause of the failure
 	 */
-	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
+	private String assignWhomAndTeamToTask(AssetComment task, Map taskSpec, List projectStaff, Map settings) {
 		def msg
-		def msg1 = assignTeam(task, taskSpec, workflow, projectStaff, settings)
-		def msg2 = assignWhom(task, taskSpec, workflow, projectStaff, settings)
+		def msg1 = assignTeam(task, taskSpec, projectStaff, settings)
+		def msg2 = assignWhom(task, taskSpec, projectStaff, settings)
 
 		if (msg1) {
 			if (msg2) {
@@ -4994,7 +4935,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * @param taskSpec - the map with all of the task
 	 * @param settings - map of settings for task generation.
 	 */
-	private String assignWhom(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
+	private String assignWhom(AssetComment task, Map taskSpec, List projectStaff, Map settings) {
 		def person
 
 		if (taskSpec.containsKey('whom') && taskSpec.whom.size() > 1) {
@@ -5108,13 +5049,12 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 *
 	 * @param task - current task.
 	 * @param taskSpec - a map with all the task info.
-	 * @param workflow
 	 * @param projectStaff
 	 * @param settings : map of settings for task generation.
 	 *
 	 * @return error msg, null if none.
 	 */
-	private String assignTeam(AssetComment task, Map taskSpec, workflow, List projectStaff, Map settings) {
+	private String assignTeam(AssetComment task, Map taskSpec, List projectStaff, Map settings) {
 		// Set the Team independently of the direct person assignment
 		if (taskSpec.containsKey('team')) {
 			def team = taskSpec.team
@@ -5154,9 +5094,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			} else {
 				return "Invalid team specified ($taskSpec.team)"
 			}
-		} else if (workflow && workflow.role_id) {
-			// Assign the default role/team for the workflow specified in the taskSpec
-			task.role = workflow.role_id
 		}
 
 		return null
@@ -5180,7 +5117,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	/**
 	 * Helper method to set any scheduling constraints on a task
 	 */
-	private void setTaskConstraints(AssetComment task, Map taskSpec, workflow, List projectStaff, StringBuilder exceptions) {
+	private void setTaskConstraints(AssetComment task, Map taskSpec, List projectStaff, StringBuilder exceptions) {
 		def ctype
 		def cdt
 		def dateTime
@@ -5694,14 +5631,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * 				totalCounts: The total number of rows.
 	 * 				numberOfPages: The number of pages that will be used to show this rows.
 	 */
-	Map getTaskRows(Project project, Map params, String sortIndex, String sortOrder) {
+	Map getTaskRows(Project project, ListTaskCommand params, String sortIndex, String sortOrder, Integer maxRows= null, Integer rowOffset= null) {
 
 		Date today = new Date().clearTime()
 
 		// Fetch the tasks, and the total count.
-		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder)
+		Map filterResults = commentService.filterTasks(project, params.toMap(), sortIndex, sortOrder, maxRows, rowOffset)
 		List<AssetComment> tasks = filterResults.tasks
-		Integer totalCount = tasks.size()
+		Integer totalCount = filterResults.totalCount
 
 		Date updatedTime
 		String dueClass

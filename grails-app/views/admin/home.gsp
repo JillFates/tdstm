@@ -65,7 +65,7 @@ a:hover {
 					<g:if test="${moveEventsList}">
 						<g:each in="${moveEventsList}" status="i"  var="eventList">
 						<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-							<td><g:link controller="project" action="show" id="${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</g:link></td>
+							<td><a href="/tdstm/module/project/list?show=${eventList?.moveEvent?.project?.id}">${eventList?.moveEvent?.project?.name} - ${eventList?.moveEvent?.name}</a></td>
 							<td>${eventList?.status }</td>
 							<td><tds:convertDateTime date="${eventList?.startTime}" timeZone="${tds.timeZone()}"/></td>
 							<td><tds:convertDateTime date="${eventList?.completionTime}" timeZone="${tds.timeZone()}"/></td>
@@ -93,7 +93,7 @@ a:hover {
 						<g:if test="${upcomingBundles}">
 							<g:each in="${upcomingBundles}" status="i"  var="bundle">
 							<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-								<td><g:link controller="project" action="show" id="${bundle.project?.id}">${bundle.project?.name} - ${bundle.name}</g:link></td>
+								<td><a href="/tdstm/module/project/list?show=${bundle.project?.id}"">${bundle.project?.name} - ${bundle.name}</a></td>
 								<td><tds:convertDateTime date="${bundle.startTime}" timeZone="${tds.timeZone()}"/></td>
 								<td><tds:convertDateTime date="${bundle.completionTime}" timeZone="${tds.timeZone()}"/></td>
 							</tr>

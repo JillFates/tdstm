@@ -39,7 +39,7 @@ export class APIActionColumnModel {
 			},
 			{
 				label: 'Method',
-				property: 'connectorMethod',
+				property: 'dictionaryMethodName',
 				type: 'text',
 				width: 125
 			}, {
@@ -304,7 +304,7 @@ export class APIActionParameterModel {
 	desc?: string;
 	type?: string;
 	context?: string;
-	fieldName?: string;
+	fieldName?: any;
 	value?: string;
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;

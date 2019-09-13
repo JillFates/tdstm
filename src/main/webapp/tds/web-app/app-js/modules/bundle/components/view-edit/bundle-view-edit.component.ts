@@ -20,7 +20,6 @@ export class BundleViewEditComponent implements OnInit {
 	public moveEvents;
 	public managers;
 	public rooms;
-	public workflowCodes;
 	public isDefaultBundle;
 	public sourceRoom;
 	public targetRoom;
@@ -47,19 +46,26 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.loadModel();
+	}
+
+	/**
+	 * Set up the initial default values for the model
+	 * @returns {any}
+	 */
+	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
+			projectManagerId: null,
 			moveEvent: {},
-			moveManagerId: 0,
+			moveManagerId: null,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -137,6 +143,10 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get ghe models for the specific bundle
+	 * @param id  bundle id
+	 */
 	private getModel(id) {
 		this.bundleService.getModelForBundleViewEdit(id)
 			.subscribe((result) => {
@@ -150,11 +160,11 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
-				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
+				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : null;
+				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : null;
+				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
+				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
+				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
 				this.managers = data.managers;
@@ -163,9 +173,8 @@ export class BundleViewEditComponent implements OnInit {
 					manager.staff.name = manager.name;
 					this.managers[index] = manager.staff // Limit managers down to just staff
 				});
-				this.workflowCodes = data.workflowCodes;
-				this.rooms = data.rooms;
 
+				this.rooms = data.rooms;
 				this.updateSavedFields();
 			});
 	}
@@ -194,6 +203,9 @@ export class BundleViewEditComponent implements OnInit {
 		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
+					this.bundleModel.startTime = this.bundleModel.startTime || '';
+					this.bundleModel.completionTime = this.bundleModel.completionTime || '';
+
 					this.updateSavedFields();
 					this.editing = false;
 				}

@@ -1,6 +1,3 @@
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
 import com.tds.test.TestDomain
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Rollback
@@ -9,19 +6,20 @@ import grails.gorm.validation.Constraint
 import grails.test.mixin.integration.Integration
 import grails.validation.Validateable
 import net.transitionmanager.action.Credential
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.Setting
+import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.notice.Notice
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.PersonService
+import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.RoleType
-import org.apache.commons.lang3.RandomStringUtils
 import org.grails.core.exceptions.InvalidPropertyException
 import org.grails.datastore.gorm.validation.constraints.builtin.UniqueConstraint
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -346,23 +344,9 @@ class GormUtilIntegrationSpec extends Specification {
 			GormUtil.findAllByProperties(Person, personMap, GormUtil.Operator.OR).size() == 3
 	}
 
-	/**
-	 * Helper method to create a Workflow object
-	 * @param whom - the person that last modified the domain record
-	 * @return a newly minted Workflow that references the person
-	 */
-	private Workflow createWorkflow(Person whom) {
-		Workflow wf = new Workflow(process: RandomStringUtils.randomAlphabetic(10), updatedBy:whom)
-		if (!wf.save(flush:true)) {
-			throw new RuntimeException("Unable to save new Workflow due to " + GormUtil.allErrorsString(wf))
-		}
-		return wf
-	}
-
 	def '17. Testing mergeDomainReferences'() {
 		// This logic need to test several different aspects of merging persons which include:
-		//    1. Replacing references (e.g. Workflow.updatedBy)
-		//    2. Cloning domain where references are part of domain identity (e.g. PartyRelationship)
+		//    1. Cloning domain where references are part of domain identity (e.g. PartyRelationship)
 		//			a) Ignore domain records that the target already has an equivilant (Staff assignment to same company and project)
 		//			b) Clone a new domain record where To domain does not have equivilant (e.g. Team assignments)
 		//			c) Delete original domain rows
@@ -381,8 +365,6 @@ class GormUtilIntegrationSpec extends Specification {
 
 			Person toPerson = personHelper.createPerson(adminPerson, project.client, project, personMap+[firstName:'To'])
 
-			Workflow wf = createWorkflow(fromPerson)
-
 			// println "***** fromPerson=$fromPerson (${fromPerson.id}), toPerson=$toPerson (${toPerson.id})"
 		then: 'we should expect the following'
 			GormUtil.findAllByProperties(Person, personMap).size() == 2
@@ -390,25 +372,16 @@ class GormUtilIntegrationSpec extends Specification {
 			// The from person should have a number of PartyRelationships
 			GormUtil.findAllByProperties(PartyRelationship, [partyIdFrom:fromPerson, partyIdTo:fromPerson], GormUtil.Operator.OR).size() > 0
 
-			// Validate that the Workflow was properly created
-			wf.id > 0
-
 			// The From Person should have the extraTeam reference
 			personService.getPersonTeamCodes(fromPerson).contains(extraTeam)
 
 		when: 'the persons are merged together things should look differently'
 			GormUtil.mergeDomainReferences(fromPerson, toPerson, true)
 			List persons = GormUtil.findAllByProperties(Person, personMap)
-
-			// Reload the Workflow so we can check for changed references
-			wf.refresh()
 		then:
 			// We should now only have one person that matches the To person
 			persons.size() == 1
 			persons[0].id == toPerson.id
-
-			// Validate that direct references switch over (case 1)
-			wf.updatedBy.id == toPerson.id
 
 			// The case 2A is validated by the fact that the merge did not encounter duplicate distinct key references when cloning over PartyRelationship
 
@@ -417,21 +390,6 @@ class GormUtilIntegrationSpec extends Specification {
 
 			// All PartyRelationship for the From person should now be gone - tests cloning where equivilants are ignored (case 2C)
 			GormUtil.findAllByProperties(PartyRelationship, [partyIdFrom:fromPerson, partyIdTo:fromPerson], GormUtil.Operator.OR).size() == 0
-
-	}
-
-	def '18. Testing mergeDomainReferences for invalid parameters'() {
-		when: 'called with non-domain classes'
-			GormUtil.mergeDomainReferences(new Date(), new Date())
-		then: 'an exception should occur'
-			RuntimeException e = thrown()
-
-		when: 'called with domain classes missing necessary domainReferences property'
-			Workflow wf1 = createWorkflow(null)
-			Workflow wf2 = createWorkflow(null)
-			GormUtil.mergeDomainReferences(wf1, wf2)
-		then: 'an exception should occur'
-			e = thrown()
 
 	}
 
@@ -602,13 +560,11 @@ class GormUtilIntegrationSpec extends Specification {
 		then: "The map doesn't have a key for the excluded property"
 			!projectMap.containsKey("timezone")
 		when: "Asking only a limited number of properties"
-			projectMap = GormUtil.domainObjectToMap(project, ["projectCode", "workflowCode"])
+			projectMap = GormUtil.domainObjectToMap(project, ["projectCode"])
 		then: "The map has only two elements"
-			projectMap.keySet().size() == 2
+			projectMap.keySet().size() == 1
 		and: "The projectCode is in the map"
 			projectMap.containsKey("projectCode")
-		and: "The workflowCode is also in the map"
-			projectMap.containsKey("workflowCode")
 	}
 
 	void '23. Test validateErrorsI18n for validatable class'() {

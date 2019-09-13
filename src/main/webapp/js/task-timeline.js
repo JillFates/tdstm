@@ -2523,10 +2523,10 @@ function exportCriticalPath() {
     }
 }
 
-function calculateCPA() {
+function baselinePlan() {
     var eventId = $('#moveEventId').val();
-    if (eventId && (eventId != 0) && (!$('#calculateCPAButton').hasClass('disabledLabel'))) {
-        window.open(tdsCommon.createAppURL("/wsTimeLine/calculateCPA?id=" + eventId), '_blank');
+    if (eventId && (eventId != 0) && (!$('#baselinePlanButton').hasClass('disabledLabel'))) {
+        window.open(tdsCommon.createAppURL("/wsTimeLine/baseline?id=" + eventId), '_blank');
     }
 }
 
