@@ -6,7 +6,6 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.RunbookService
@@ -24,45 +23,51 @@ import java.text.DateFormat
 class WsTimeLineController implements ControllerMethods {
 
 	TimeLineService timeLineService
-	RunbookService runbookService
-	UserPreferenceService userPreferenceService
 
 	@HasPermission(Permission.TaskTimelineView)
-	def baselining() {
+	def calculateCPA() {
+		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		List<Task> tasks = runbookService.getEventTasks(moveEvent)
+		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
+
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
+
+		if (!summary.cycles.isEmpty()) {
+			throw new RuntimeException('Can not calculate critical path analysis with cycles')
+		}
+
+		render(buildResponse(graph, summary) as JSON)
+	}
+
+	@HasPermission(Permission.TaskTimelineView)
+	def baseline() {
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.executeCPA(moveEvent, tasks, deps)
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
 
-		Map<String, ?> data = [
-			windowStartTime   : summary.windowStartTime,
-			windowEndTime     : summary.windowEndTime,
-			cycles            : summary.cycles.collect { List<TaskVertex> cycle ->
-				cycle.collect { [taskId: it.taskId, taskComment: it.taskComment] }
-			},
-			criticalPathRoutes: summary.criticalPathRoutes.collect { CriticalPathRoute route ->
-				route.vertices.collect { [taskId: it.taskId, taskComment: it.taskComment] }
-			}
-		]
-		render(data as JSON)
+		if (!summary.cycles.isEmpty()) {
+			throw new RuntimeException('Can not calculate critical path analysis with cycles')
+		}
+
+		render(buildResponse(graph, summary) as JSON)
 	}
 
 	@HasPermission(Permission.TaskViewCriticalPath)
-	def baseliningResults() {
+	def exportCPA() {
 
 		boolean showAll = params.showAll == 'true'
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.executeCPA(moveEvent, tasks, deps)
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
 
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
 		try {
-
 			results << "Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>"
 			results << "Start Vertices: " << (graph.starts.size() > 0 ? graph.starts : 'none') << '<br/>'
 			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? graph.sinks : 'none') << '<br/>'
@@ -154,7 +159,6 @@ class WsTimeLineController implements ControllerMethods {
 						"<td>${task.assetEntity ? task.assetEntity.assetName.encodeAsHTML() : ''}</td>"
 				}
 
-
 				def criticalPath = task.isCriticalPath
 
 				results << """<tr>
@@ -186,4 +190,40 @@ class WsTimeLineController implements ControllerMethods {
 		render results.toString()
 	}
 
+	/**
+	 * Builds a Map structure to be used in controller method response
+	 *
+	 * @param graph an instance of {@code TaskTimeLineGraph}
+	 * @param summary an instance of {@code TimelineSummary}
+	 * @return a{@code Map} used to build a respons in JSON format
+	 */
+	private Map<String, ?> buildResponse(TaskTimeLineGraph graph, TimelineSummary summary) {
+
+		return [
+			windowStartTime   : summary.windowStartTime,
+			windowEndTime     : summary.windowEndTime,
+			cycles            : summary.cycles.collect { List<TaskVertex> cycle ->
+				cycle.collect { [taskId: it.taskId, taskComment: it.taskComment] }
+			},
+			criticalPathRoutes: summary.criticalPathRoutes.collect { CriticalPathRoute route ->
+				route.vertices.collect { [taskId: it.taskId, taskComment: it.taskComment] }
+			},
+			vertices          : graph.getVertices().collect { TaskVertex taskVertex ->
+				[
+					id                : taskVertex.taskId,
+					number            : taskVertex.taskNumber,
+					comment           : taskVertex.taskComment,
+					criticalPath      : taskVertex.isCriticalPath(),
+					duration          : taskVertex.duration,
+					slack             : taskVertex.slack,
+					actualStart       : taskVertex.actualStart,
+					status            : taskVertex.status,
+					earliestStartDate : taskVertex.earliestStartDate,
+					earliestFinishDate: taskVertex.earliestFinishDate,
+					latestStartDate   : taskVertex.latestStartDate,
+					latestFinishDate  : taskVertex.latestFinishDate
+				]
+			}
+		]
+	}
 }
