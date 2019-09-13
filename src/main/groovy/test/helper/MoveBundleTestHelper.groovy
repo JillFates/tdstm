@@ -16,9 +16,7 @@ class MoveBundleTestHelper {
             name = RandomStringUtils.randomAlphabetic(10)
         }
 
-        String workflowCode = RandomStringUtils.randomAlphabetic(10)
-
-        MoveBundle bundle = new MoveBundle([name:name, project:project, workflowCode: workflowCode, useForPlanning: useForPlanning])
+        MoveBundle bundle = new MoveBundle([name:name, project:project, useForPlanning: useForPlanning])
         bundle.save(failOnError:true, flush: true)
 
         return bundle
@@ -36,8 +34,7 @@ class MoveBundleTestHelper {
     MoveBundle createBundle(String name, Project project, MoveEvent event, Boolean useForPlanning = true) {
         MoveBundle bundle = MoveBundle.findWhere([name: name, project: project])
         if (!bundle){
-            String workflowCode = RandomStringUtils.randomAlphabetic(10)
-            bundle = new MoveBundle([name:name, project:project, moveEvent: event,  workflowCode: workflowCode, useForPlanning: useForPlanning])
+            bundle = new MoveBundle([name:name, project:project, moveEvent: event, useForPlanning: useForPlanning])
             bundle.save(flush: true, failOnError:true)
         } else if (!bundle.moveEvent){
             bundle.moveEvent = event

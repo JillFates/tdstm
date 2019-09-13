@@ -7,16 +7,14 @@ import grails.converters.JSON
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
-import net.transitionmanager.project.StateEngineService
 import org.springframework.jdbc.core.JdbcTemplate
 
 import grails.plugin.springsecurity.annotation.Secured
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class MoveEventNewsController implements ControllerMethods {
-	
+
 	JdbcTemplate jdbcTemplate
-	StateEngineService stateEngineService
-	
+
 	/* will return the list of AssetComments and MoveEventNews
 	 * @param : moveEventId?type=[N|I}&state=[L|A]&maxLen= n &sort=[A|D]
 	 * @return : union (AssetComments , MoveEventNews)
@@ -37,7 +35,6 @@ class MoveEventNewsController implements ControllerMethods {
 		//def offsetTZ = ( new Date().getTimezoneOffset() / 60 )
 
 		if (moveEvent) {
-			def holdId = stateEngineService.getStateId(moveEvent.project.workflowCode, "Hold")
 			def assetCommentsQuery = new StringBuilder("""SELECT ac.asset_comment_id as id,  'I' as type,
 									now() as created,
 									if(display_option = 'G', CONCAT_WS(':',ae.asset_name, 'is on hold' ), comment) as text,
