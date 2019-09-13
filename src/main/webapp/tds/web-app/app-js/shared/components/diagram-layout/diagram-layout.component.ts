@@ -23,10 +23,9 @@ import {
 	Spot,
 	TextBlock
 } from 'gojs';
-import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
-import {container} from '@angular/core/src/render3';
 import {icon} from '@fortawesome/fontawesome-svg-core';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
+import {ITaskGraphIcon} from '../../model/task-graph-icon';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -42,13 +41,13 @@ const categoryColors = {
 };
 
 @Component({
-	selector: 'tds-layered-digraph-layout',
+	selector: 'tds-diagram-layout',
 	template: `
-		<div class="layered-digraph-layout-container">
-				<div
-						id="digraph-layout-container"
-						[style.width]="containerWidth"
-						[style.height]="containerHeight"></div>
+		<div class="diagram-layout-container">
+			<div
+					id="diagram-layout-container"
+					[style.width]="containerWidth"
+					[style.height]="containerHeight"></div>
 			<div id="graph-control-btn-group">
 				<button class="btn btn-block">
 					<fa-icon [icon]="faIcons.faCog" size="lg"></fa-icon>

@@ -1,4 +1,4 @@
-<div class="neighborhood-container">
+<div class="neighborhood-container content body">
   <div class="row task-manager-header">
     <div class="col-md-4 k-align-self-center">
       <p class="task-graph-title">Task Graph</p>
@@ -88,18 +88,17 @@
       </label>
     </div>
   </div>
-  <div class="row">
-    <tds-layered-digraph-layout
-    style="width: 100%"
+  <div class="row diagram-container">
+    <tds-diagram-layout
     [nodeDataArray]="nodeData$ | async"
     [linksPath]="links$ | async"
     [containerWidth]="'100%'"
-    [containerHeight]="'530px'"
+    [containerHeight]="'100%'"
     (nodeClicked)="loadTasks($event)"
     (showTaskDetailsClicked)="showTaskDetails($event)"
     (editClicked)="editTask($event)"
     (contextmenu)="avoidDefault()"
-    #graph></tds-layered-digraph-layout>
+    #graph></tds-diagram-layout>
   </div>
     <kendo-dialog title="Task" *ngIf="opened" (close)="close('cancel')" [minWidth]="250" [width]="450">
       <p style="margin: 30px; text-align: center; color: #7a7a7a;">Show/Edit task details for <span style="font-weight: bold;">{{selectedTask.id}}</span></p>
