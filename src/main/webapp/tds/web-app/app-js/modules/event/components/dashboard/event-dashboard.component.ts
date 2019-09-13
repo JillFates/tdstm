@@ -40,6 +40,7 @@ export class EventDashboardComponent implements OnInit {
 	public teamTaskMatrix = [];
 	public taskCategories = null;
 	public hasBundleSteps = false;
+	readonly defaultTime = '00:00:00';
 
 	constructor(
 		private route: ActivatedRoute,
@@ -133,6 +134,10 @@ export class EventDashboardComponent implements OnInit {
 					});
 				} else {
 					this.eventPlanStatus = new EventPlanStatus();
+					this.eventPlanStatus.startDate = this.eventDetails.moveEvent.estStartTime;
+					this.eventPlanStatus.status = this.eventDetails.moveEvent.runbookStatus;
+					this.eventPlanStatus.description = this.eventDetails.moveEvent.description;
+					this.eventPlanStatus.dayTime = this.defaultTime;
 				}
 			});
 	}
