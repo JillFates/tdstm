@@ -9,8 +9,8 @@ import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/
 import { catchError, map } from 'rxjs/operators';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
-import {IGraphTask} from '../../../shared/model/graph-task.model';
-import {IMoveEvent} from '../../../shared/model/move-event.model';
+import {IGraphTask} from '../model/graph-task.model';
+import {IMoveEvent} from '../model/move-event.model';
 
 export interface IGrapTaskResponseBody {
 	status: string;
