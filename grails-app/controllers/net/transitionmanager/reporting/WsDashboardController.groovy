@@ -315,8 +315,7 @@ class WsDashboardController implements ControllerMethods {
 			         compTime: TimeUtil.formatDateTime(revisedComp, TimeUtil.FORMAT_DATE_TIME_11)],
 			steps: dataPointsForEachStep,
 			runbookOn: project.runbookOn,
-			eventStartDate: moveEvent.estStartTime,
-			moveEvent: moveEvent.estStartTime
+			eventStartDate: moveEvent.estStartTime
 		])
 	}
 

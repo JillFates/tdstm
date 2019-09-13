@@ -99,15 +99,19 @@ export class EventDashboardComponent implements OnInit {
 		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
 
-		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
-			.subscribe((data: any[]) => {
-				console.log(data);
-				this.taskCategories = data;
-			});
-
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
+
+				this.eventsService.getTaskCategoriesStats(
+					id,
+					this.userTimeZone,
+					this.eventDetails.moveEvent.estStartTime,
+					this.eventDetails.moveEvent.estCompletionTime)
+				.subscribe((data: any[]) => {
+					this.taskCategories = data;
+				});
+
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
 				this.hasBundleSteps = false;

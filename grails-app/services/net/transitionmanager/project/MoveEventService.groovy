@@ -639,7 +639,7 @@ class MoveEventService implements ServiceMethods {
 				color = "red" // past completed time and tasks remain
 			} else {
 				if (longestRemainingInMinutes && estimatedFinish < new Date().minutes + longestRemainingInMinutes) {
-					color = "FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
+					color = "#FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
 				}
 			}
 		}

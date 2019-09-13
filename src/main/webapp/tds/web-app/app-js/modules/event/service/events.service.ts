@@ -364,9 +364,9 @@ export class EventsService {
  	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Category status details
 	*/
-	getTaskCategoriesStats(eventId: number, userTimeZone: string): Observable<any> {
+	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
-			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone))
+			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}
 
@@ -376,7 +376,7 @@ export class EventsService {
  	 * @param {CategoryTask[]} data  Raw task category results
 	 * @returns {any} Array of task category cells
 	*/
-	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string): any {
+	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string, plannedStart: any, plannedCompletion: any): any {
 		const results: Array<Array<TaskCategoryCell>> = [];
 
 		const headerRow: TaskCategoryCell[] = [];
@@ -397,8 +397,10 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].text =   item.percComp + '%';
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
-			results[CatagoryRowType.PlannedStart][index].text =   DateUtils.formatUserDateTime(userTimeZone, item.estStart);
-			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+			results[CatagoryRowType.PlannedStart][index].text =
+				item.estStart ? DateUtils.formatUserDateTime(userTimeZone, item.estStart) : plannedStart;
+			results[CatagoryRowType.PlannedCompletion][index].text =
+				item.estFinish ? DateUtils.formatUserDateTime(userTimeZone, item.estFinish) : plannedCompletion;
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
 		});
