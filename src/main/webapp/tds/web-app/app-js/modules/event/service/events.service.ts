@@ -387,11 +387,11 @@ export class EventsService {
 
 		const columnsLength = headerRow.length;
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'column-percents'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary estimated-start'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary estimated-completion'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary actual-start'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary actual-completion'));
 
 		data.forEach((item: CategoryTask, index: number) => {
 			results[CatagoryRowType.Percent][index].text =   item.percComp + '%';

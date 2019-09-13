@@ -99,6 +99,7 @@ export class EventDashboardComponent implements OnInit {
 		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
 
+		this.eventDetails = null;
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
