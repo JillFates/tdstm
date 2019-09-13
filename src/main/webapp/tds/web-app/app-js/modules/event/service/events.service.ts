@@ -402,7 +402,12 @@ export class EventsService {
 			results[CatagoryRowType.PlannedCompletion][index].text =
 				item.estFinish ? DateUtils.formatUserDateTime(userTimeZone, item.estFinish) : plannedCompletion;
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
+			if (item.actFinish > item.estFinish) {
+				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
+				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
+			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
