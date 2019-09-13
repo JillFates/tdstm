@@ -107,8 +107,8 @@
 									<tr title="Execute critical path analysis">
 										<td colspan="3" style="padding-left :0px">
 											<span>
-												<label id="calculateCPAButton" class="pointer" onclick="calculateCPA()">
-													&nbsp;Calculate CPA
+												<label id="baselinePlanButton" class="pointer" onclick="baselinePlan()">
+													&nbsp;Baseline Plan
 												</label>
 											</span>
 										</td>
