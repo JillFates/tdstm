@@ -42,7 +42,7 @@ beans = {
 	permissionEvaluator(TdsPermissionEvaluator)
 
 	userDetailsService(TdsUserDetailsService)
-	saltSource(TdsSaltSource)
+	tdsSaltSource(TdsSaltSource)
 
 	preAuthenticationChecks(TdsPreAuthenticationChecks) {
 		auditService = ref('auditService')
@@ -55,7 +55,7 @@ beans = {
 		passwordService = ref('passwordService')
 	}
 
-	passwordEncoder(TdsPasswordEncoder) {
+	tdsPasswordEncoder(TdsPasswordEncoder) {
 		grailsApplication = ref('grailsApplication')
 		passwordService = ref('passwordService')
 	}
@@ -78,7 +78,8 @@ beans = {
 		passwordService = ref('passwordService')
 		userDetailsService = ref('userDetailsService')
 		passwordEncoder = ref('passwordEncoder')
-		saltSource = ref('saltSource')
+		tdsPasswordEncoder = ref('tdsPasswordEncoder')
+		tdsSaltSource = ref('tdsSaltSource')
 		preAuthenticationChecks = ref('preAuthenticationChecks')
 		postAuthenticationChecks = ref('postAuthenticationChecks')
 		authoritiesMapper = ref('authoritiesMapper')
