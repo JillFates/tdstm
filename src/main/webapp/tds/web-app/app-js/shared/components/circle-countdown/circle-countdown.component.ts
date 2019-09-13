@@ -3,7 +3,13 @@ import {Observable, Subscription} from 'rxjs';
 
 @Component({
 	selector: 'tds-circle-countdown',
-	template: ``
+	template: `
+		<div id="countdown" (click)="onRefreshCountdownClick()">
+			<div id="countdown-number">{{refreshCount}}</div>
+			<svg id="countdown-circle-container">
+				<circle id="countdown-circle" r="13" cx="15" cy="15" #refreshCircle></circle>
+			</svg>
+		</div>`
 })
 export class CircleCountdownComponent implements OnInit {
 

@@ -33,7 +33,18 @@
       <button class="refresh-container-btn btn" (click)="refreshDiagram()">
         <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
       </button>
-      <tds-circle-countdown></tds-circle-countdown>
+      <div class="neighborhood-pie-countdown-container">
+        <tds-pie-countdown
+          [refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+          (timeout)="refreshDiagram()"
+          [hideRefresh]="true"
+          [customOptions]="[{seconds: 0, description: 'Manual'},
+																		{seconds: 60, description: '1 Min'},
+																		{seconds: 180, description: '3 Min'},
+																		{seconds: 300, description: '5 Min'},
+																		{seconds: 600, description: '10 Min'}]">
+        </tds-pie-countdown>
+      </div>
     </div>
   </div>
 

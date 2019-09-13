@@ -9,6 +9,7 @@ import {IGraphTask} from '../../../../shared/model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../../../shared/model/move-event.model';
+import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 export interface ILinkPath {
 	from: number | string;
@@ -43,6 +44,7 @@ export class NeighborhoodComponent implements OnInit {
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
 	isEventDropdownOpen: boolean;
+	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 
 	constructor(
 			private taskService: TaskService,

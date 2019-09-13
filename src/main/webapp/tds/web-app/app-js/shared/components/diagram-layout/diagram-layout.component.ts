@@ -23,7 +23,7 @@ import {
 	Spot,
 	TextBlock
 } from 'gojs';
-import {ITaskGraphIcon} from '../../model/task-graph-icon';
+import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
 import {container} from '@angular/core/src/render3';
 import {icon} from '@fortawesome/fontawesome-svg-core';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
