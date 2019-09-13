@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "87dd3b33-27c1-4443-a39f-f299e669f915",
+		"_postman_id": "de3caf86-3d2c-432c-9764-01bc9cbafd52",
 		"name": "DeviceEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
@@ -94,7 +94,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1\n\n",
+					"raw": "{{host}}/tdstm/assetEntity/listJson?filter=all&event=&type=&plannedStatus=&assetName=&planStatus=&moveBundle=&assetType=&model=&sourceLocationName=&sourceRackName=&targetLocationName=&targetRackName=&assetTag=&serialNumber=&moveBundleId=&manufacturer=&unassigned=&rows=100&page=1",
 					"host": [
 						"{{host}}"
 					],
