@@ -23,6 +23,7 @@ import java.text.DateFormat
 class WsTimeLineController implements ControllerMethods {
 
 	TimeLineService timeLineService
+	RunbookService runbookService
 
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
@@ -63,7 +64,7 @@ class WsTimeLineController implements ControllerMethods {
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
 
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
