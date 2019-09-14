@@ -1235,7 +1235,7 @@ digraph runbook {
 					<tr><th>Id</th><th>Task #</th><th>Action</th>
 					<th>Est Duration</th>
 					$durationExtra
-					<th>Earliest Start</th><th>Latest Start</th><th>Latest Start</th><th>Constraint Time</th>
+					<th>Earliest Start</th><th>Latest Start</th><th>Slack</th><th>Constraint Time</th>
 					$timesExtra
 					<th>Act Finish</th><th>Priority</th><th>Critical Path</td><th>Team</th><th>Individual</th><th>Category</th>
 					$tailExtra
