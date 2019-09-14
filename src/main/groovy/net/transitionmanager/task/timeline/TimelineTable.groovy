@@ -162,6 +162,10 @@ class TimelineTable {
 		sink.latestFinish = sink.earliestFinish
 		sink.latestFinishDate = sink.earliestFinishDate
 
+		if(!windowEndTime) {
+			windowEndTime = sink.latestFinishDate
+		}
+
 		Integer windowEndTimeDifference = 0
 		if (!sink.hasStarted() && !sink.hasFinished() && windowEndTime > sink.latestFinishDate) {
 			use(TimeCategory) {
