@@ -2198,9 +2198,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					Map invokeSpec = taskSpec["invoke"]
 					if (invokeSpec.containsKey("method")) {
 						String apiActionName = invokeSpec["method"].trim()
-						apiAction = ApiAction.findByName(apiActionName)
+						apiAction = ApiAction.where {
+							project == project
+							name == apiActionName
+						}.get()
+						if (!apiAction) {
+							throw new EmptyResultException("ApiAction with name: ${apiActionName} does not exist.")
+						}
 					}
-
 				}
 
 				// Collection of the task settings passed around to functions more conveniently
@@ -2216,7 +2221,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 					publishTasks: publishTasks,
 					apiAction   : apiAction,
 					teamCodes   : teamCodeList,
-					apiAction   : apiAction,
 					event       : event,
 					project     : taskBatch.project
 				]
