@@ -17,7 +17,7 @@ export class BundleCreateComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
 	private defaultModel = null;
-	private requiredFields = ['name', 'workflowCode'];
+	private requiredFields = ['name'];
 
 	constructor(
 		private bundleService: BundleService,
@@ -56,7 +56,6 @@ export class BundleCreateComponent implements OnInit {
 		this.bundleService.getModelForBundleCreate().subscribe((result: any) => {
 			let data = result.data;
 			this.bundleModel.operationalOrder = 1;
-			this.workflowCodes = data.workflowCodes;
 			this.rooms = data.rooms;
 		});
 	}
