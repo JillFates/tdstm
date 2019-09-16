@@ -1917,7 +1917,6 @@ class ProjectService implements ServiceMethods {
 			runbookOn = projectCommand.runbookOn
 			startDate = projectCommand.startDate
 			timezone = getTimezone(projectCommand.timeZone)
-			workflowCode = projectCommand.workflowCode
 		}
 
 		project.save(failOnError: true, flush: true)

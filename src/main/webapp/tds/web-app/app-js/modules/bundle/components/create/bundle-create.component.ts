@@ -18,7 +18,7 @@ export class BundleCreateComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
 	private defaultModel = null;
-	private requiredFields = ['name', 'workflowCode'];
+	private requiredFields = ['name'];
 
 	constructor(
 		private bundleService: BundleService,

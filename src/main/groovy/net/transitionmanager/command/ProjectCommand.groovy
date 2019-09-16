@@ -20,6 +20,4 @@ class ProjectCommand implements CommandObject {
 	Integer runbookOn
 	Date startDate
 	String timeZone
-	String workflowCode
-
 }
