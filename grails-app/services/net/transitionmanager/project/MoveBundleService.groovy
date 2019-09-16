@@ -15,7 +15,6 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.asset.Room
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetDependencyBundle
 import net.transitionmanager.asset.AssetEntity
@@ -23,6 +22,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.AssetOptionsService
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Room
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
@@ -31,15 +31,6 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.party.PartyType
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveBundleStep
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventSnapshot
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagService
