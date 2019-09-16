@@ -1,7 +1,9 @@
 package net.transitionmanager.asset
 
+import com.tdssrc.grails.NumberUtil
 import net.transitionmanager.asset.AssetCableMap
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.command.ModelCommand
 import net.transitionmanager.exception.ServiceException
 import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetCableStatus
@@ -17,6 +19,7 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.model.ModelAlias
 import net.transitionmanager.model.ModelConnector
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import org.springframework.jdbc.core.JdbcTemplate
@@ -550,4 +553,127 @@ class ModelService implements ServiceMethods {
 
 		return [toModel: toModel, mergedModels: mergedModels, assetsUpdated: assetsUpdated]
     }
+
+	/**
+	 * Create or Update a Model instance based on the given command object.
+	 * @param project - user's current project.
+	 * @param modelCommand
+	 * @return the model (created or updated)
+	 */
+	Model createOrUpdateModel(Project project, ModelCommand modelCommand) {
+		Model model = (Model) GormUtil.populateDomainFromCommand(project, Model, modelCommand.id, modelCommand, null, true)
+
+		if (modelCommand.powerType && modelCommand.powerType.equalsIgnoreCase('Amps')) {
+			model.powerNameplate = NumberUtil.toInteger(model.powerNameplate, 0) * 120
+			model.powerDesign = NumberUtil.toInteger(model.powerDesign, 0) * 120
+			model.powerUse = NumberUtil.toInteger(model.powerUse, 0) * 120
+		}
+
+		if (modelCommand.modelStatus == 'valid') {
+			model.validatedBy = securityService.loadCurrentPerson()
+		}
+
+		model.save()
+
+		if (modelCommand.aka) {
+			deleteAkas(model, modelCommand)
+			createOrUpdateAkas(model, modelCommand)
+		}
+		if (modelCommand.connectors) {
+			deleteConnectors(model, modelCommand)
+			createOrUpdateConnectors(model, modelCommand)
+		}
+		
+		return model
+	}
+
+	/**
+	 *
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void createOrUpdateConnectors(Model model, ModelCommand modelCommand) {
+		List<Map> connectorsMap = modelCommand.connectors.added + modelCommand.connectors.edited
+		for (Map connectorInfo in connectorsMap) {
+			ModelConnector modelConnector
+			if (connectorInfo.id > 0) {
+				modelConnector = ModelConnector.where {
+					id == connectorInfo.id
+					model == model
+				}.find()
+			} else {
+				modelConnector = new ModelConnector([model: model])
+			}
+			modelConnector.with {
+				label = connectorInfo.label
+				type = connectorInfo.type
+				labelPosition = connectorInfo.labelPosition
+				connectorPosX = connectorInfo.xPosition
+				connectorPosY = connectorInfo.yPosition
+				connector = connectorInfo.connector
+			}
+
+			if (connectorInfo.status) {
+				modelConnector.status = connectorInfo.status
+			}
+
+			modelConnector.save()
+		}
+	}
+
+	/**
+	 * Delete all connectors of this model marked for deletion.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void deleteConnectors(Model model, ModelCommand modelCommand) {
+		if (modelCommand.connectors?.deleted) {
+			List<Long> connectorIds = modelCommand.connectors.deleted.collect { Map connectorInfo -> connectorInfo.id}
+			ModelConnector.where {
+				model == model
+				id in connectorIds
+			}.deleteAll()
+		}
+	}
+
+	/**
+	 * Create or update existing Model Aliases based on the information available
+	 * in the Command Object instance.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void createOrUpdateAkas(Model model, ModelCommand modelCommand) {
+		List<Map> akasMap = modelCommand.aka.added + modelCommand.aka.edited
+		for (Map akaInfo in akasMap) {
+			ModelAlias modelAlias
+			if (akaInfo.id > 0) {
+				modelAlias = ModelAlias.where {
+					id == akaInfo.id
+					model == model
+				}.find()
+			} else {
+				modelAlias = new ModelAlias([model: model])
+			}
+			modelAlias.with {
+				manufacturer = model.manufacturer
+				name = akaInfo.name
+			}
+			modelAlias.save()
+		}
+	}
+
+	/**
+	 * Delete all the Model Aliases marked for deletion.
+	 * @param model
+	 * @param modelCommand
+	 */
+	private void deleteAkas(Model model, ModelCommand modelCommand) {
+		if (modelCommand.aka?.deleted) {
+			List<Long> akaIds = modelCommand.aka.deleted.collect { Map akaInfo -> akaInfo.id}
+			ModelAlias.where {
+				model == model
+				id in akaIds
+			}.deleteAll()
+		}
+	}
 }

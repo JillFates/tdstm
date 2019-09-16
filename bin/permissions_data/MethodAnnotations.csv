@@ -518,14 +518,6 @@ userLogin,updatePassword,UserResetOwnPassword
 userLogin,sendPasswordReset,UserResetPassword
 widget,progressBar,
 widget,progressBarFailed,
-workflow,home,WorkflowList
-workflow,workflowList,WorkflowView
-workflow,createWorkflow,WorkflowCreate
-workflow,updateWorkflowSteps,WorkflowEdit
-workflow,updateWorkflowRoles,WorkflowEdit
-workflow,deleteTransitionFromWorkflow,WorkflowEdit
-workflow,deleteWorkflow,WorkflowDelete
-workflow,saveActorName,WorkflowEdit
 wsAdmin,unlockAccount,UserUnlock
 wsApplication,listInBundle,AssetView
 wsCookbook,createRecipe,RecipeCreate

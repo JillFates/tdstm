@@ -22,7 +22,6 @@ import net.transitionmanager.party.PartyRole
 import net.transitionmanager.project.MoveEventNews
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.Workflow
 import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -142,8 +141,7 @@ class Person extends Party {
 			[domain: PasswordReset, 		onDelete: 'null',   properties: ['createdBy'] ],
 			[domain: RecipeVersion, 		onDelete: 'null',   properties: ['createdBy'] ],
 			[domain: TaskBatch, 			onDelete: 'null',   properties: ['createdBy'] ],
-			[domain: UserLogin, 			onDelete: 'delete', properties: ['person'] ],
-			[domain: Workflow, 				onDelete: 'null',   properties: ['updatedBy'] ]
+			[domain: UserLogin, 			onDelete: 'delete', properties: ['person'] ]
 	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been

@@ -13,7 +13,6 @@ import {EventModel} from '../../../event/model/event.model';
 	templateUrl: 'bundle-create.component.html',
 })
 export class BundleCreateComponent implements OnInit {
-	public workflowCodes;
 	public rooms;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
@@ -38,7 +37,6 @@ export class BundleCreateComponent implements OnInit {
 			startTime: '',
 			completionTime: '',
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);

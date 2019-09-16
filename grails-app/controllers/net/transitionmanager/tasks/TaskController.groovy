@@ -38,6 +38,10 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.TimeLine
+import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -54,6 +58,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -663,7 +668,9 @@ digraph runbook {
 					t.status,
 					IFNULL(CONCAT(first_name,' ', last_name),'') AS hard_assign,
 					t.is_published AS isPublished,
-					t.duration
+					t.duration,
+					first_name,
+					last_name
 				FROM asset_comment t
 				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
@@ -728,7 +735,8 @@ digraph runbook {
 
 				fillcolor = taskStatusColorMap[colorKey][1]
 
-				if (it.isAutomatic()) {
+				if(it.role == AUTOMATIC_ROLE ||
+				   (Person.SYSTEM_USER_AT.firstName == it.firstName && Person.SYSTEM_USER_AT.lastName == it.lastName)){
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
@@ -763,19 +771,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
-
-//				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString())
-//				// convert the URI into a web-safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
-//				def svgFile = new File(filename)
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:tasks]
-//				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("runbook-${moveEventId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:tasks, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
@@ -1006,8 +1001,8 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1240,7 +1235,7 @@ digraph runbook {
 					<tr><th>Id</th><th>Task #</th><th>Action</th>
 					<th>Est Duration</th>
 					$durationExtra
-					<th>Earliest Start</th><th>Latest Start</th><th>Constraint Time</th>
+					<th>Earliest Start</th><th>Latest Start</th><th>Slack</th><th>Constraint Time</th>
 					$timesExtra
 					<th>Act Finish</th><th>Priority</th><th>Critical Path</td><th>Team</th><th>Individual</th><th>Category</th>
 					$tailExtra

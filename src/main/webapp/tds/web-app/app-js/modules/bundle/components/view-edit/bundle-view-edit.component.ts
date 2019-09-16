@@ -19,7 +19,6 @@ export class BundleViewEditComponent implements OnInit {
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public moveEvents;
 	public rooms;
-	public workflowCodes;
 	public isDefaultBundle;
 	public sourceRoom;
 	public targetRoom;
@@ -62,7 +61,6 @@ export class BundleViewEditComponent implements OnInit {
 			completionTime: '',
 			moveEvent: {},
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -162,9 +160,7 @@ export class BundleViewEditComponent implements OnInit {
 				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
-				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
-
 				this.updateSavedFields();
 			});
 	}

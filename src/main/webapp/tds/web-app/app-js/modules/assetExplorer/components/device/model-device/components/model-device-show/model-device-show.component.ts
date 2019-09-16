@@ -4,8 +4,10 @@ import {DeviceModel} from '../../model/device-model.model';
 import {AssetExplorerService} from '../../../../../../assetManager/service/asset-explorer.service';
 import {Permission} from '../../../../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../../../../shared/services/permission.service';
-import {TDSModalPageWrapperComponent} from '../../../../../../../shared/components/modal-page-wrapper/modal-page-wrapper.component';
 import {ModelService} from '../../../../../service/model.service';
+import {ModelDeviceEditComponent} from '../model-device-edit/model-device-edit.component';
+import {DeviceManufacturer} from '../../../manufacturer/model/device-manufacturer.model';
+import {UIPromptService} from '../../../../../../../shared/directives/ui-prompt.directive';
 
 @Component({
 	selector: 'model-device-show',
@@ -15,6 +17,7 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 	constructor(
 		private dialogService: UIDialogService,
 		public deviceModel: DeviceModel,
+		public deviceManufacturer: DeviceManufacturer,
 		private assetExplorerService: AssetExplorerService,
 		private permissionService: PermissionService,
 		private modelService: ModelService) {
@@ -57,20 +60,20 @@ export class ModelDeviceShowComponent extends UIExtraDialog {
 			return;
 		}
 
-		this.dialogService.extra(TDSModalPageWrapperComponent,
+		this.dialogService.extra(ModelDeviceEditComponent,
 				[
-					{provide: 'title', useValue: 'Edit Model'},
-					{provide: 'url', useValue: this.getEditModelUrl()}
-				], true, false)
+					UIPromptService,
+					{
+						provide: DeviceModel,
+						useValue: this.deviceModel
+					},
+					{
+						provide: DeviceManufacturer,
+						useValue: this.deviceManufacturer
+					}
+				], false, false)
 			.then((result) => {
-				console.log(result);
+				this.close(result);
 			}).catch((error) => console.log(error));
-	}
-
-	/**
-	 * get the url for the model edit view
-	*/
-	private getEditModelUrl(): string {
-		return `/tdstm/model/edit?id=${this.deviceModel.id}&angularModalDialog=true`;
 	}
 }

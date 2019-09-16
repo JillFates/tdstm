@@ -78,7 +78,7 @@
                                         <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset?.scale}"/>
                                         <td data-for="sizeScale" class="${standardFieldSpecs.size.imp ?: ''}">
                                             <kendo-dropdownlist
-                                                    [tabIndex]="5"
+												    [tabIndex]="5"
                                                     class="tm-input-control"
                                                     name="modelAssetScaleName"
                                                     [data]="${SizeScale.getAsJsonList() as JSON}"

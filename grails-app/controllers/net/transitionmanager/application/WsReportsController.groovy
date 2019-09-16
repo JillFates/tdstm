@@ -13,34 +13,28 @@ import grails.validation.ValidationException
 import net.transitionmanager.asset.Room
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.MoveBundleCommand
-import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
+import net.transitionmanager.command.reports.ApplicationConflictsCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.StepSnapshot
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.command.reports.ApplicationConflictsCommand
-
 
 @Secured("isAuthenticated()")
 class WsReportsController implements ControllerMethods {
@@ -52,7 +46,6 @@ class WsReportsController implements ControllerMethods {
     CustomDomainService customDomainService
     ControllerService controllerService
     PartyRelationshipService partyRelationshipService
-    StateEngineService stateEngineService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -156,15 +149,12 @@ class WsReportsController implements ControllerMethods {
         }
         Project project = getProjectForWs()
         def smeList = reportsService.getSmeList(moveBundleId, true)
-        def testingList = WorkflowTransition.findAll(
-                'FROM WorkflowTransition where workflow=? order by transId',
-                [Workflow.findByProcess(project.workflowCode)])
         List outageList = customDomainService.fieldSpecs(project, AssetClass.APPLICATION.toString(), CustomDomainService.ALL_FIELDS, ["field", "label"])
         def categories = GormUtil.getConstrainedProperties(AssetComment).category.inList.collect { entry -> [
                 id: entry,
                 text: entry
         ]}
-        renderSuccessJson([smeList: smeList.sort{it.lastName}, testingList: testingList, outageList: outageList,  categories: categories ])
+        renderSuccessJson([smeList: smeList.sort{it.lastName}, outageList: outageList,  categories: categories ])
     }
 
     /**
@@ -221,7 +211,6 @@ class WsReportsController implements ControllerMethods {
      * @param sme: The id of the SME selected value.
      * @param startCategory: string.
      * @param stopCategory: string.
-     * @param testing: integer - The id of the Workflow.
      * @param outageWindow: string - The custom field.
      * @returns The rendered gsp view.
      */

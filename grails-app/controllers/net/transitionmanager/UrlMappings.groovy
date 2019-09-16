@@ -474,6 +474,16 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/model" {
+			controller = "wsModel"
+			action = [POST: "save"]
+		}
+
+		"/ws/model/$id" {
+			controller = "wsModel"
+			action = [DELETE: "delete"]
+		}
+
 		"/ws/task/listTasks" {
 			controller = "wsTask"
 			action = [POST:"listTasks"]

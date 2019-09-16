@@ -10,7 +10,6 @@ export class BundleModel {
 	public completionTime: any;
 	public moveEvent: any;
 	public operationalOrder: number;
-	public workflowCode: string;
 	public useForPlanning: boolean;
 }
 
