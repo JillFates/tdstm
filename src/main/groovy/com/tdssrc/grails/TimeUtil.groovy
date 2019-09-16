@@ -80,6 +80,43 @@ class TimeUtil {
 	static final String GRANULARITY_DAYS = "D"
 
 	static final String GMT_OFFSET = '+00:00'
+	static final List ZERO_OFFSET_TIMEZONES = [
+		'GMT',
+		'Etc/GMT-0',
+		'Atlantic/St_Helena',
+		'Etc/GMT+0',
+		'Africa/Banjul',
+		'Etc/GMT',
+		'Africa/Freetown',
+		'Africa/Bamako',
+		'Africa/Conakry',
+		'Universal',
+		'Africa/Nouakchott',
+		'UTC',
+		'Etc/Universal',
+		'Atlantic/Azores',
+		'Africa/Abidjan',
+		'Africa/Accra',
+		'Etc/UCT',
+		'GMT0',
+		'Zulu',
+		'Africa/Ouagadougou',
+		'Atlantic/Reykjavik',
+		'Etc/Zulu',
+		'Iceland',
+		'Africa/Lome',
+		'Greenwich',
+		'Etc/GMT0',
+		'America/Danmarkshavn',
+		'Africa/Dakar',
+		'America/Scoresbysund',
+		'Africa/Bissau',
+		'Etc/Greenwich',
+		'Africa/Timbuktu',
+		'UCT',
+		'Africa/Monrovia',
+		'Etc/UTC'
+	]
 
 	/**
 	 * Used to adjust a datetime by adding or subtracting a specified number of SECONDS from an existing date
@@ -606,7 +643,7 @@ class TimeUtil {
 	static String getTimeZoneOffset(String timeZoneInput = null){
 		String timeZone = timeZoneInput ?: userPreferenceService.getTimeZone() ?: defaultTimeZone
 
-		if(timeZone == defaultTimeZone){
+		if(timeZone == defaultTimeZone || timeZone in ZERO_OFFSET_TIMEZONES){
 			return GMT_OFFSET
 		}
 
