@@ -72,18 +72,26 @@ class MoveBundle extends Party {
 	}
 
 	Map toMap() {
+		Map moveEventMap
+		if (moveEvent) {
+			moveEventMap = [
+			    id: moveEvent.id,
+				name: moveEvent.name
+			]
+		}
 		[
-			name            : name,
-			description     : description,
-			startTime       : startTime,
-			completionTime  : completionTime,
+		    id: id,
+			name: name,
+			description: description,
+			startTime: startTime,
+			completionTime: completionTime,
 			operationalOrder: operationalOrder,
-			moveEvent       : [id: moveEvent?.id, name: moveEvent?.name],
-			useForPlanning  : useForPlanning,
-			sourceRoom      : sourceRoom.toString(),
-			targetRoom      : targetRoom.toString(),
-			tasksCreated    : tasksCreated,
-			assets          : assets
+			moveEvent: moveEventMap,
+			useForPlanning: useForPlanning,
+			sourceRoom: sourceRoom.toString(),
+			targetRoom: targetRoom.toString(),
+			tasksCreated: tasksCreated,
+			assets: assets
 		]
 	}
 }
