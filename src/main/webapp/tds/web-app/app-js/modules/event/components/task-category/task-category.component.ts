@@ -1,7 +1,7 @@
 // Angular
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {EventRowType} from './../../model/event.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
@@ -51,9 +51,10 @@ export class TaskCategoryComponent {
 		this.showFrom = 0;
 		this.elementsToShow = 6;
 
-		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
-			this.userTimeZone = this.preferenceService.getUserTimeZone();
-			this.dateFormat = this.preferenceService.getUserCurrentDateFormatOrDefault(); // this.preferenceService.getUserDateFormat();
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+		.subscribe((preferences) => {
+			this.userTimeZone =  preferences.CURR_TZ;
+			this.dateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
 			this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		});
 	}

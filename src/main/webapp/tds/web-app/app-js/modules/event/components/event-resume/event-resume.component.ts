@@ -1,7 +1,7 @@
 // Angular
 import {Component, Input, } from '@angular/core';
 import {EventPlanStatus} from '../../model/event.model';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
@@ -14,10 +14,10 @@ export class EventResumeComponent {
 	@Input() event: EventPlanStatus = null;
 
 	constructor(private preferenceService: PreferenceService) {
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-		.subscribe(() => {
-			this.userTimeZone = this.preferenceService.getUserTimeZone();
-			this.dateTimeFormat = `${this.preferenceService.getUserCurrentDateFormatOrDefault()} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+		.subscribe((preferences) => {
+			this.userTimeZone =  preferences.CURR_TZ;
+			this.dateTimeFormat = `${preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat()} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		});
 	}
 

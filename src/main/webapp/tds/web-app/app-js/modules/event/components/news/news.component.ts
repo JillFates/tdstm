@@ -49,12 +49,13 @@ export class NewsComponent implements OnChanges {
 		private userContextService: UserContextService,
 		private permissionService: PermissionService) {
 
-		this.preferenceService.getSinglePreference(PREFERENCES_LIST.CURR_TZ) // getUserDatePreferenceAsKendoFormat()
-			.subscribe((timeZone: string) => {
-				this.userTimeZone = timeZone ||  this.preferenceService.getUserTimeZone();
-				this.dateFormat = this.preferenceService.getUserCurrentDateFormatOrDefault(); // this.preferenceService.getUserDateFormat();
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.subscribe((preferences) => {
+				this.userTimeZone =  preferences.CURR_TZ;
+				this.dateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
 				this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
-		});
+			});
+
 	}
 
 	/**
