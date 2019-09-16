@@ -1,5 +1,5 @@
-import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {of, Observable, BehaviorSubject, Subscription} from 'rxjs';
+import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {of, Observable, BehaviorSubject} from 'rxjs';
 import {distinct, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 
@@ -9,6 +9,7 @@ import {IGraphTask} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
+import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 
 export interface ILinkPath {
 	from: number | string;
@@ -43,11 +44,7 @@ export class NeighborhoodComponent implements OnInit {
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
 	isEventDropdownOpen: boolean;
-	refreshCountdown$: Observable<number>;
-	refreshCountdownSubscription: Subscription;
-	refreshCountdownTime = 30;
-	refreshCount: number;
-	@ViewChild('refreshCircle') refreshCircle: ElementRef;
+	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 
 	constructor(
 			private taskService: TaskService,
@@ -56,7 +53,6 @@ export class NeighborhoodComponent implements OnInit {
 		) {}
 
 	ngOnInit() {
-		this.setRefreshTime();
 		this.loadAll();
 	}
 
@@ -265,27 +261,6 @@ export class NeighborhoodComponent implements OnInit {
 				console.log('text: ', text);
 				this.graph.highlightNodesByText(text);
 		});
-	}
-
-	setRefreshTime(): void {
-		this.refreshCount = this.refreshCountdownTime;
-		this.refreshCountdown$ = Observable.interval(1000)
-			.map(x => Math.floor(--this.refreshCount));
-
-		this.refreshCountdownSubscription = this.refreshCountdown$
-			.subscribe(x => this.refreshCount =  x <= 0 ? this.refreshCountdownTime : x);
-	}
-
-	onRefreshCountdownClick(): void {
-		this.refreshCountdownTime += 30;
-
-		this.renderer.setStyle(
-				this.refreshCircle.nativeElement,
-				'animation', `countdown ${this.refreshCountdownTime}s linear infinite forwards !important`);
-
-		this.refreshCountdownSubscription.unsubscribe();
-
-		this.setRefreshTime();
 	}
 
 	refreshDiagram(): void {

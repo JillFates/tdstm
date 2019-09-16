@@ -41,13 +41,13 @@ const categoryColors = {
 };
 
 @Component({
-	selector: 'tds-layered-digraph-layout',
+	selector: 'tds-diagram-layout',
 	template: `
-		<div class="layered-digraph-layout-container">
-				<div
-						id="digraph-layout-container"
-						[style.width]="containerWidth"
-						[style.height]="containerHeight"></div>
+		<div class="diagram-layout-container">
+			<div
+					id="diagram-layout-container"
+					[style.width]="containerWidth"
+					[style.height]="containerHeight"></div>
 			<div id="graph-control-btn-group">
 				<button class="btn btn-block">
 					<fa-icon [icon]="faIcons.faCog" size="lg"></fa-icon>
