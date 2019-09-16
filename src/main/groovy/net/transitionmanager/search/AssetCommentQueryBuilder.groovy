@@ -472,8 +472,7 @@ class AssetCommentQueryBuilder {
 		'percentageComplete':	[property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished':      [builder: viewUnpublishedBuilder],
-		'workflowTransition':   [property: 'ac.workflowTransition.id', builder: eqBuilder, joinTable: 'ac.workflowTransition'],
+		'viewUnpublished':      [builder: viewUnpublishedBuilder]
 	]
 
 }

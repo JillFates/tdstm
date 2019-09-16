@@ -19,7 +19,7 @@ waiting {
 environments {
 
     // Grid default URL
-	System.properties['browser.location.default'] = "http://ad2dc1selgrd01.tdsops.net:4444/wd/hub"
+	System.properties['browser.location.default'] = "http://chrome:4444"
 
     // Use Grid default URL if browser.location is not set
     def browserLocation = System.properties['browser.location'] ?: System.properties['browser.location.default']
@@ -34,8 +34,7 @@ environments {
             driver = {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--start-maximized");
-                def driverinstance = new ChromeDriver(chromeOptions)
-                driverinstance
+								new ChromeDriver(chromeOptions)
             }
         } else {  // use remote grid URL as default
             println "browser.location: Using remote grid as browser location: ${browserLocation}"
@@ -43,19 +42,28 @@ environments {
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome()
 								ChromeOptions options = new ChromeOptions();
 
-								options.addArguments("start-maximized");
-				        options.addArguments("enable-automation");
+								options.addArguments("--headless");
+								options.addArguments("--start-maximized");
+				        options.addArguments("--enable-automation");
 				        options.addArguments("--no-sandbox");
 				        options.addArguments("--disable-infobars");
 				        options.addArguments("--disable-dev-shm-usage");
 				        options.addArguments("--disable-browser-side-navigation");
 				        options.addArguments("--disable-gpu");
+
+								options.addArguments("--verbose");
+								options.addArguments("--enable-logging");
+								options.addArguments("--v=1");
+								options.addArguments("--user-data-dir=/home/automation");
+								options.addArguments("--log-path=chromedriver.log")
+
 								capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 
                 capabilities.setCapability("acceptSslCerts", true)
                 capabilities.setCapability("unexpectedAlertBehaviour", "dismiss")
-                new RemoteWebDriver( new URL(browserLocation), capabilities )
-		    }
+
+								new RemoteWebDriver(new URL(browserLocation), capabilities)
+				    }
         }
 	}
 

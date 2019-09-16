@@ -1,7 +1,6 @@
 package net.transitionmanager.project
 
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
 import net.transitionmanager.party.Party
@@ -15,7 +14,6 @@ class MoveBundle extends Party {
 	Date       completionTime              // Planned Completion Time of the MoveBundle
 	Integer    operationalOrder = 1     // Order that the bundles are performed in (NOT BEING USED)
 	MoveEvent  moveEvent
-	String     workflowCode
 	Boolean    useForPlanning = true
 	Room       sourceRoom
 	Room       targetRoom
@@ -40,7 +38,6 @@ class MoveBundle extends Party {
 		startTime nullable: true
 		targetRoom nullable: true
 		tasksCreated nullable: true
-		workflowCode blank: false, size: 0..255
 	}
 
 	static mapping = {
@@ -75,14 +72,21 @@ class MoveBundle extends Party {
 	}
 
 	Map toMap() {
+		Map moveEventMap
+		if (moveEvent) {
+			moveEventMap = [
+			    id: moveEvent.id,
+				name: moveEvent.name
+			]
+		}
 		[
-		    name: name,
+		    id: id,
+			name: name,
 			description: description,
 			startTime: startTime,
 			completionTime: completionTime,
 			operationalOrder: operationalOrder,
-			moveEvent: [id: moveEvent?.id, name: moveEvent?.name],
-			workflowCode: workflowCode,
+			moveEvent: moveEventMap,
 			useForPlanning: useForPlanning,
 			sourceRoom: sourceRoom.toString(),
 			targetRoom: targetRoom.toString(),

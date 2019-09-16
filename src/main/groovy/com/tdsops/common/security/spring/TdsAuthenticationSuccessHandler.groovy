@@ -102,7 +102,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 				signInInfoMap.notices = [
 					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
-					redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
+					redirectUrl: redirectUri
 				]
 			}
 

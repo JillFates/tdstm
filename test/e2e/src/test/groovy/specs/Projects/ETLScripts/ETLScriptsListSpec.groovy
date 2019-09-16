@@ -24,7 +24,7 @@ class ETLScriptsListSpec extends GebReportingSpec{
     static firstDSInformation
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

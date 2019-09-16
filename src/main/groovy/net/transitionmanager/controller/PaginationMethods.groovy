@@ -23,14 +23,28 @@ trait PaginationMethods {
 	 *
 	 * @param paramName - the name of the parameter that represents the rows per page (default to 25)
 	 * @param userPreferenceCode - the User Preference Code name used to save the user preference, if null then not used
-	 * @param updatePreference - flag if the User Preference should be updated which if true and a preference code is indicated 
+	 * @param updatePreference - flag if the User Preference should be updated which if true and a preference code is indicated
+	 *
 	 * @return an acceptable max rows per page value
 	 */
-	Long paginationMaxRowValue(CharSequence paramName='rows', UserPreferenceEnum userPreferenceCode=null, boolean updatePreference=true) {
+	Long paginationMaxRowValue(CharSequence paramName = 'rows', UserPreferenceEnum userPreferenceCode = null, boolean updatePreference = true) {
+		return paginationMaxRowValue(Pagination.maxRowForParam(params[paramName]), userPreferenceCode)
+	}
+
+	/**
+	 * Returns the number of rows to be displayed in a datagrid based on param or user preference if indicated. This will
+	 * attempt to use the param passed in. If the value is not in the accepted list then it will use the user preference
+	 * if it exists and is valid or the default value (25). If the user preference is supplied then it will set it if the
+	 * parameter is different than the current or add if doesn't exist based on the updatePreference parameter.
+	 *
+	 * @param maxRow - the max number of rows from the parameters (default to 25)
+	 * @param userPreferenceCode - the User Preference Code name used to save the user preference, if null then not used
+	 *
+	 * @return an acceptable max rows per page value
+	 */
+	Long paginationMaxRowValue(Integer maxRow, UserPreferenceEnum userPreferenceCode = null) {
 		UserPreferenceService userPreferenceService
 
-		Integer maxRow = Pagination.maxRowForParam(params[paramName])
-		
 		// Get the bean and the user's saved preference as we'll need it soon
 		if (userPreferenceCode) {
 			userPreferenceService = ApplicationContextHolder.getBean('userPreferenceService')

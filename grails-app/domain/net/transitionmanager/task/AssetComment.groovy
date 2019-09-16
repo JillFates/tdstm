@@ -8,15 +8,20 @@ import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
 import net.transitionmanager.imports.TaskBatch
-import net.transitionmanager.project.WorkflowTransition
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.StringUtils
 
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.*
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.TimeScale.M
 
 class AssetComment {
@@ -61,8 +66,6 @@ class AssetComment {
 	// Date actFinish		// Alias of dateResolved
 
 	Integer slack                     // Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
-	WorkflowTransition workflowTransition   // The transition that this task was cloned from
-	Integer workflowOverride = 0      // Flag that the Transition values (duration) has been overridden
 	String role                       // The team that will perform the task
 	Integer taskNumber                // TODO : constraint type short int min 1, max ?, nullable
 	Integer score                     // Derived property that calculates the weighted score for sorting on priority
@@ -106,7 +109,6 @@ class AssetComment {
 	static final List<String> postMoveCategories = AssetCommentCategory.postMoveCategories
 	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
 	static final List<String> planningCategories = AssetCommentCategory.planningCategories
-	static final String AUTOMATIC_ROLE = 'AUTO'
 
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
@@ -156,8 +158,6 @@ class AssetComment {
 		taskBatch nullable: true
 		taskNumber nullable: true
 		taskSpec nullable: true
-		workflowOverride nullable: true            // TODO : add range to workflowOverride constraint
-		workflowTransition nullable: true
 		apiAction nullable: true
 		apiActionInvokedAt nullable: true
 		apiActionCompletedAt nullable: true
@@ -168,7 +168,7 @@ class AssetComment {
 
 	static mapping = {
 		// TM-15253. Add discriminator for Task domain class
-		discriminator column: "content_type", value: '1', type: 'integer', formula: "case when comment_type = 'issue' then 0 else 1 end"
+		discriminator value: '0', type: 'integer', formula: "case when comment_type = 'issue' then 1 else 0 end"
 		autoTimestamp false
 		createdBy column: 'created_by'
 		id column: 'asset_comment_id'
@@ -183,7 +183,6 @@ class AssetComment {
 			priority sqltype: 'tinyint'
 			resolution sqltype: 'text'
 			taskNumber sqltype: 'shortint unsigned'
-			workflowOverride sqltype: 'tinyint'
 		}
 		/*
 			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER
@@ -284,8 +283,8 @@ class AssetComment {
 	 * Determines if the task is Automatic processed
 	 * @return
 	 */
-	boolean isAutomatic(){
-		AUTOMATIC_ROLE == role
+	boolean isAutomatic() {
+		AUTOMATIC_ROLE == role || (assignedTo && assignedTo.isAutomatic())
 	}
 
 	/**
@@ -370,13 +369,11 @@ class AssetComment {
 			return null
 		}
 
-		if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && !apiActionCompletedAt) {
+		if ((canInvokeRemotely || canInvokeOnServer) && status in [READY, STARTED] && apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } started at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
 		} else if ((canInvokeRemotely || canInvokeOnServer) && status == STARTED && apiActionInvokedAt && apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${ apiAction.name } completed at ${TimeUtil.formatDateTime(apiActionInvokedAt, TimeUtil.FORMAT_DATE_TIME_2)}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == READY && !apiActionInvokedAt && !apiActionCompletedAt) {
-			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
-		} else if (!canInvokeRemotely && canInvokeOnServer && status == STARTED && !apiActionInvokedAt && !apiActionCompletedAt) {
+		} else if (!canInvokeRemotely && canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(false, "Click to invoke action ${apiAction.joinNameAndDescription()}")
 		} else if (canInvokeRemotely && !canInvokeOnServer && status in [READY, STARTED] && !apiActionInvokedAt && !apiActionCompletedAt) {
 			return getInvokeButtonDetails(true, "Action ${apiAction.name}, must be invoked from TM Desktop")

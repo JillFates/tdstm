@@ -26,7 +26,7 @@ class ViewManagerSharedViewsSpec extends GebReportingSpec {
     static user=2, pass=3
 
     def setupSpec() {
-        CachingDriverFactory.clearCache()
+        CachingDriverFactory.clearCacheAndQuitDriver()
         
         testCount = 0
         to LoginPage

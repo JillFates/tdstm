@@ -264,6 +264,10 @@ export class DeviceCommonComponent extends AssetCommonEdit {
 	 * @param value
 	 */
 	protected onModelValueChange(value: any): void {
+		if (!value) {
+			return;
+		}
+
 		this.model.asset.assetTypeSelectValue.id = value.assetType;
 		this.model.asset.manufacturerSelectValue.id = value.manufacturerId;
 		this.model.asset.modelSelectValue.id = value.id;

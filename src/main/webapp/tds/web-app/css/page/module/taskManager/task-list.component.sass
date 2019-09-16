@@ -22,6 +22,27 @@ task-list
   .task-grid
     margin-top:  10px
     height:  80vh
+    .k-grid-content
+      .k-hierarchy-cell
+        > .k-icon
+          height: unset
+          padding: 0
+          &.k-plus:before
+            content: '\e014'
+          &.k-minus:before
+            content: '\e015'
+
+      tr td
+        padding-top: 0px
+        padding-bottom: 0px
+        text-overflow: ellipsis
+        white-space: nowrap
+        line-height: 3px
+
+      tr.k-grid-norecords td
+        line-height: 22px
+        text-align: center
+
     .k-grid-toolbar
       button
         margin-right:  5px
@@ -43,6 +64,7 @@ task-list
     .task-status
       padding-left: 0px
       padding-right: 100%
+      text-overflow: unset !important
       span
         padding: 50px 100vw 50px 3px
         font-weight: bold
