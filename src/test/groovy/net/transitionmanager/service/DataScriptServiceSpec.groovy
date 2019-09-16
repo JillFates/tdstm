@@ -1,30 +1,27 @@
 package net.transitionmanager.service
 
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.imports.DataScriptService
 import spock.lang.Specification
 
-@TestFor(DataScriptService)
-@TestMixin(GrailsUnitTestMixin)
-class DataScriptServiceSpec extends Specification {
+class DataScriptServiceSpec extends Specification implements ServiceUnitTest<DataScriptService> , DataTest{
 
 	FileSystemService fileSystemService
 
-	static doWithSpring = {
+	Closure doWithSpring() {{ ->
 		coreService(CoreService) {
 			grailsApplication = ref('grailsApplication')
 		}
+
 		fileSystemService(FileSystemService) {
 			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
 		}
 		settingService(SettingService)
-	}
+	}}
 
 	def setup() {
 		service.grailsApplication = grailsApplication

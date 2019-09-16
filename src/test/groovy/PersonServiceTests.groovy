@@ -1,9 +1,8 @@
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.person.PersonService
 import spock.lang.Specification
 
-@TestFor(PersonService)
-class PersonServiceTests extends Specification {
+class PersonServiceTests extends Specification implements ServiceUnitTest<PersonService> {
 
 	private int count = 0
 

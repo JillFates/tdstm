@@ -1,22 +1,13 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.AssetEntity
 import getl.data.Field
-import grails.test.mixin.Mock
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
+import grails.testing.gorm.DataTest
+import net.transitionmanager.asset.AssetEntity
 
-@Mock([AssetEntity])
-class TDSJSONDriverSpec extends ETLBaseSpec {
+class TDSJSONDriverSpec extends ETLBaseSpec implements DataTest{
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
+	void setupSpec(){
+		mockDomains AssetEntity
 	}
 
 	void 'test can read fields from a plain JSON array'() {
@@ -37,7 +28,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields[3].name == 'vendor name'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -61,7 +52,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields[3].name == 'vendor name'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 

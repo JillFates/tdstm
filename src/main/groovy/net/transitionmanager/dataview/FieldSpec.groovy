@@ -9,7 +9,6 @@ import org.hibernate.type.StringType
 import org.hibernate.type.TimestampType
 
 import java.sql.Timestamp
-
 /**
  * Manage Field Spec definition using the following JSON structure saved in Database
  * <pre>
@@ -312,7 +311,9 @@ class FieldSpec {
 		'Number'  : { FieldSpec fieldSpec -> fieldSpec.precision > 0 ? BigDecimal : Long },
 		'Date'    : { FieldSpec fieldSpec -> Date },
 		'DateTime': { FieldSpec fieldSpec -> Timestamp },
-	].withDefault { String key -> { FieldSpec fieldSpec -> String } }.asImmutable()
+	].withDefault { String key ->
+		{ FieldSpec fieldSpec -> String }
+	}
 
 	/**
 	 * <p>This Map determines hibernate cast type for FieldSearchData.</p>
@@ -328,5 +329,5 @@ class FieldSpec {
 		'DateTime': { FieldSpec fieldSpec -> TimestampType.INSTANCE.name },
 	].withDefault { String key ->
 		{ FieldSpec fieldSpec -> StringType.INSTANCE.name }
-	}.asImmutable()
+	}
 }

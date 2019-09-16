@@ -1,12 +1,11 @@
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.TaskDependency
 import com.tdsops.metaclass.CustomMethods
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.TaskDependency
 import spock.lang.Specification
 
-@TestFor(RunbookService)
-class RunbookServiceTests extends Specification {
+class RunbookServiceTests extends Specification implements ServiceUnitTest<RunbookService> {
 
 	private static final List<Map> mapData = [
 		[id: 1, name: 'John',  color: 'blue'],
