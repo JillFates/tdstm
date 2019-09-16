@@ -5,7 +5,7 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'tds-news',
@@ -49,10 +49,11 @@ export class NewsComponent implements OnChanges {
 		private userContextService: UserContextService,
 		private permissionService: PermissionService) {
 
-		this.preferenceService.getUserDatePreferenceAsKendoFormat().subscribe((dateFormat) => {
-			this.userTimeZone = this.preferenceService.getUserTimeZone();
-			this.dateFormat = this.preferenceService.getUserCurrentDateFormatOrDefault(); // this.preferenceService.getUserDateFormat();
-			this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+		this.preferenceService.getSinglePreference(PREFERENCES_LIST.CURR_TZ) // getUserDatePreferenceAsKendoFormat()
+			.subscribe((timeZone: string) => {
+				this.userTimeZone = timeZone ||  this.preferenceService.getUserTimeZone();
+				this.dateFormat = this.preferenceService.getUserCurrentDateFormatOrDefault(); // this.preferenceService.getUserDateFormat();
+				this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		});
 	}
 
