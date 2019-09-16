@@ -486,21 +486,15 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 	}
 
 	void '11. Create move bundle'() {
-		when: 'creating a move bundle with blank workflowCode'
+		when: 'creating a move bundle'
 			MoveBundleCommand command = new MoveBundleCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10)
 			)
-			moveBundleService.saveOrUpdate(command, project)
-		then: 'exception is thrown'
-			thrown(ValidationException)
-		when: 'fixing failing constraint'
-			command.workflowCode = 'STD'
 			MoveBundle moveBundle = moveBundleService.saveOrUpdate(command, project)
 		then: 'move bundle is saved to db'
 			moveBundle
 			moveBundle.id
-			moveBundle.workflowCode == 'STD'
 		when: 'saving a second move bundle with same name and project'
 			moveBundleService.saveOrUpdate(command, project)
 		then: 'exception is thrown'
