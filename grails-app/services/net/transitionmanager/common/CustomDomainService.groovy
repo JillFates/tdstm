@@ -239,6 +239,10 @@ class CustomDomainService implements ServiceMethods {
                     if ( field.control == ControlType.LIST.value() && ! field.constraints?.values ) {
                         List<String> values = distinctValues(project, assetClassType, [fieldSpec: field])
 
+                        if(isYesNoToList(fieldsLookUp[(String)field.field],field)){
+                            values = ['Yes', 'No']
+                        }
+
                         if (values) {
 
                             if (!field.constraints) {
@@ -272,6 +276,18 @@ class CustomDomainService implements ServiceMethods {
         }
 
         fieldSpecsCacheService.removeFieldSpecs(project, domain)
+    }
+
+    /**
+     * Test the control values to see if we are switch from a yes/no to a list.
+     *
+     * @param oldFieldSpec The old specification used for the field name, and to determine what the old control was.
+     * @param newFieldSpec The new Specification, what the field was updated to, used to determine what the new control is.
+     *
+     * @return True is the fields was a yes/no and it now being changed to a list.
+     */
+    boolean isYesNoToList(Map oldFieldSpec, Map newFieldSpec) {
+        oldFieldSpec.control == ControlType.YES_NO.value && newFieldSpec.control == ControlType.LIST.value
     }
 
     /**

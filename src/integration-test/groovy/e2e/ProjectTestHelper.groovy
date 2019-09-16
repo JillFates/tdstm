@@ -33,7 +33,6 @@ class ProjectTestHelper extends test.helper.ProjectTestHelper {
                 startDate = nowDate
                 completionDate = nowDate + 30
                 guid = StringUtil.generateGuid()
-                workflowCode = 'STD_PROCESS'
                 timezone = Timezone.findByCode('GMT')
             }
             project.save(flush: true)

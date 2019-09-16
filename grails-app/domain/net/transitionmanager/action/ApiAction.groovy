@@ -34,6 +34,9 @@ class ApiAction {
 	// The method on the connector to invoke
 	String connectorMethod
 
+	// The name of the method from a dictionary just for reference.
+	String dictionaryMethodName
+
 	Provider provider
 
 	Project project
@@ -146,6 +149,7 @@ class ApiAction {
 		callbackMode nullable: true
 		commandLine nullable: true, size: 0..1024
 		connectorMethod size: 1..64
+		dictionaryMethodName nullable: true
 		credential nullable: true, validator: crossProviderValidator()
 		defaultDataScript nullable: true, validator: crossProviderValidator()
 		description nullable: true

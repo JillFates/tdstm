@@ -105,14 +105,18 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 		where:
 			endTime | now     | actStart | status     | statusUpdated || dur | rem | elap | sla | es      | ef      | ls      | lf
 			'06:30' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			null    | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'07:00' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
 			'06:30' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			null    | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:30' | '06:20' | '06:00'  | STARTED    | '06:00'       || 30  | 10  | 20   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:30' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'07:00' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			null    | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'07:00' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:30' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:70' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			null    | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex and a larger window end time'() {
@@ -457,9 +461,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 30).addEdgeTo(B)
-				.withVertex(2, B, 40)
-				.withVertex(3, C, 120)
+				.withVertex(1l, 1, A, 30).addEdgeTo(B)
+				.withVertex(2l, 2, B, 40)
+				.withVertex(3l, 3, C, 120)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -523,9 +527,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 30).addEdgeTo(B)
-				.withVertex(2, B, 40)
-				.withVertex(3, C, 30)
+				.withVertex(1l, 1, A, 30).addEdgeTo(B)
+				.withVertex(2l, 2, B, 40)
+				.withVertex(3l, 3, C, 30)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -590,9 +594,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 30).addEdgesTo(B, C)
-				.withVertex(2, B, 40)
-				.withVertex(3, C, 20)
+				.withVertex(1l, 1, A, 30).addEdgesTo(B, C)
+				.withVertex(2l, 2, B, 40)
+				.withVertex(4l, 3, C, 20)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -729,12 +733,15 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 		where:
 			endTime | current | startA  | statusA    | startB  | statusB    | startC  | statusC    || cpA  | slackA | esA     | efA     | lsA     | lfA     | cpB  | slackB | esB     | efB     | lsB     | lfB     | cpC   | slackC | esC     | efC     | lsC     | lfC
 			'07:10' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
+			null    | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
 			'07:20' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 10     | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
 			'07:10' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
+			null    | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
 			'07:10' | '06:10' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
 			'07:20' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
 			'07:10' | '06:40' | '06:00' | TERMINATED | '06:30' | STARTED    | '06:30' | STARTED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
 			'07:10' | '07:10' | '06:00' | TERMINATED | '06:30' | TERMINATED | '06:30' | TERMINATED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
+			null    | '07:10' | '06:00' | TERMINATED | '06:30' | TERMINATED | '06:30' | TERMINATED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex defining one sink'() {
@@ -745,9 +752,9 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, B, 4).addEdgeTo(D)
-				.withVertex(2, C, 2).addEdgeTo(D)
-				.withVertex(3, D, 5)
+				.withVertex(1l, 1, B, 4).addEdgeTo(D)
+				.withVertex(2l, 2, C, 2).addEdgeTo(D)
+				.withVertex(3l, 3, D, 5)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -770,10 +777,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 3).addEdgesTo(B, D, C)
-				.withVertex(2, B, 4).addEdgeTo(D)
-				.withVertex(3, C, 2).addEdgeTo(D)
-				.withVertex(4, D, 5)
+				.withVertex(1l, 1, A, 3).addEdgesTo(B, D, C)
+				.withVertex(2l, 2, B, 4).addEdgeTo(D)
+				.withVertex(3l, 3, C, 2).addEdgeTo(D)
+				.withVertex(4l, 4, D, 5)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -796,11 +803,11 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 3).addEdgesTo(B, C)
-				.withVertex(2, B, 4).addEdgeTo(E)
-				.withVertex(3, E, 0).addEdgeTo(D) // Task with duration zero in critical path
-				.withVertex(4, C, 2).addEdgeTo(D)
-				.withVertex(5, D, 5)
+				.withVertex(1l, 1, A, 3).addEdgesTo(B, C)
+				.withVertex(2l, 2, B, 4).addEdgeTo(E)
+				.withVertex(3l, 3, E, 0).addEdgeTo(D) // Task with duration zero in critical path
+				.withVertex(4l, 4, C, 2).addEdgeTo(D)
+				.withVertex(5l, 5, D, 5)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -825,11 +832,11 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			Date currentTime = hourInDay('06:00')
 
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, A, 3).addEdgesTo(B, C)
-				.withVertex(2, B, 4).addEdgeTo(D)
-				.withVertex(3, E, 0).addEdgeTo(D) // Task with duration zero, NOT in critical path
-				.withVertex(4, C, 2).addEdgeTo(E)
-				.withVertex(5, D, 5)
+				.withVertex(1l, 1, A, 3).addEdgesTo(B, C)
+				.withVertex(2l, 2, B, 4).addEdgeTo(D)
+				.withVertex(3l, 3, E, 0).addEdgeTo(D) // Task with duration zero, NOT in critical path
+				.withVertex(4l, 4, C, 2).addEdgeTo(E)
+				.withVertex(5l, 5, D, 5)
 				.build()
 
 		when: 'TimeLine calculates its critical path'
@@ -853,10 +860,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 		and:
 			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
-				.withVertex(1, B, 4).addEdgeTo(D)
-				.withVertex(2, D, 5)
-				.withVertex(3, C, 2).addEdgeTo(D)
-				.withVertex(4, A, 3).addEdgesTo(B, C)
+				.withVertex(1l, 1, B, 4).addEdgeTo(D)
+				.withVertex(2l, 2, D, 5)
+				.withVertex(3l, 3, C, 2).addEdgeTo(D)
+				.withVertex(4l, 4, A, 3).addEdgesTo(B, C)
 				.build()
 
 		when: 'TimeLine calculates its critical path'

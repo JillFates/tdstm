@@ -18,6 +18,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import { forkJoin } from 'rxjs';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 
@@ -28,6 +29,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 	})
 	class DeviceShowComponent extends AssetCommonShow {
 		protected manufacturerName: string;
+		protected modelName: string;
 
 		constructor(
 			activeDialog: UIActiveDialogService,
@@ -54,26 +56,44 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			return this.manufacturerName;
 		}
 
-		showModel(id: string): void {
-			this.modelService.getModelAsJSON(id)
-				.subscribe((deviceModel: DeviceModel) => {
-					this.dialogService.extra(ModelDeviceShowComponent,
-						[UIDialogService,
-							{
-								provide: DeviceModel,
-								useValue: deviceModel
-							}
-						], false, false)
-						.then((result) => {
-							console.log(result);
-						}).catch((error) => console.log(error));
-				});
+		/**
+		 * Open up the model show view
+		 * @param {string} modelId
+		 * @param {string} manufacturerId
+		 */
+		showModel(modelId: string, manufacturerId: string): void {
+			if (this.modelName === null) {
+				return;
+			}
+			forkJoin(
+				this.modelService.getModelAsJSON(modelId),
+				this.manufacturerService.getDeviceManufacturer(manufacturerId)
+			).subscribe((results: any) => {
+				const [deviceModel, deviceManufacturer] = results;
+				this.dialogService.extra(ModelDeviceShowComponent,
+					[UIDialogService,
+						{
+							provide: DeviceModel,
+							useValue: deviceModel
+						},
+						{
+							provide: DeviceManufacturer,
+							useValue: deviceManufacturer
+						}
+					], false, false)
+				.then((result) => {
+					if (result === null) {
+						this.modelName = null;
+					} else {
+						this.modelName = result.modelName;
+					}
+				}).catch((error) => console.log(error));
+			});
 		}
 
 		showManufacturer(id: string): void {
 			this.manufacturerService.getDeviceManufacturer(id)
 				.subscribe((deviceManufacturer: DeviceManufacturer) => {
-
 					this.dialogService.extra(ManufacturerShowComponent,
 						[UIDialogService,
 							{
@@ -132,6 +152,18 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 				.catch( error => console.log('error', error));
 		}
 
+		/**
+		 * Return the current model name or the default one
+		 * @param {string} defaultName
+		 * @returns {string}
+		 */
+		getModelName(defaultName: string): string {
+			if (this.modelName === null) {
+				return '';
+			}
+
+			return this.modelName || defaultName;
+		}
 	}
 	return DeviceShowComponent;
 }

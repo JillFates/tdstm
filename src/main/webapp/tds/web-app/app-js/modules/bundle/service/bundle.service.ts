@@ -70,7 +70,6 @@ export class BundleService {
 			moveManager: model.moveManagerId,
 			moveEvent: model.moveEvent,
 			operationalOrder: model.operationalOrder,
-			workflowCode: model.workflowCode,
 			useForPlanning: model.useForPlanning
 		};
 		return this.http.post(`../ws/reports/saveBundle/${id}`, JSON.stringify(postRequest))
