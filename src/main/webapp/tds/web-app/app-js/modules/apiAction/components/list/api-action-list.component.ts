@@ -200,7 +200,7 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.apiActionService.getAPIAction(originalModel.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((response: APIActionModel) => {
-			Object.assign(originalModel, response);
+				Object.assign(originalModel, response);
 		}, error => console.log(error));
 	}
 
