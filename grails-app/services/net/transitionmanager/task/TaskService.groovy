@@ -5234,6 +5234,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						sum(case when ac.status = 'Completed' then 1 else 0 end)
 						from AssetComment ac
 						where ac.moveEvent =:moveEvent
+						and ac.isPublished in (${publishedValues.join(",")})
 					group by ac.role
 				"""
 
