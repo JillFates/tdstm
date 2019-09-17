@@ -10,7 +10,6 @@ export class ProjectModel {
 	public partnerIds: number[];
 	public projectLogo: File;
 	public projectManagerId: number;
-	public workflowCode: string;
 	public projectCode: string;
 	public projectType: string;
 	public comment: string;
