@@ -133,16 +133,10 @@
                                            type="checkbox"
                                            [(ngModel)]="model.roomObject">
                                 </div>
-                                <div class="col-md-2">
-                                    CPU Count:
-                                    <!--Source TDS-->
-                                </div>
+                                <div class="col-md-2">CPU Count:</div>
                                 <div class="col-md-4">
                                     <input type="number" min="0" tabindex="29"
                                            name="cpuCount" [(ngModel)]="model.cpuCount">
-                                    <!--
-                                    @@@
-                                           -->
                                 </div>
                             </div>
                             <div class="form-group" *ngIf="assetType && assetType.id === 'Blade'">
@@ -197,23 +191,15 @@
                                     Memory Size:
                                 </div>
                                 <div class="col-md-4">
-                                    <!--@@@ -->
                                     <input type="number" min="0" tabindex="30" name="memorySize" [(ngModel)]="model.memorySize">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="col-md-2">Updated by:</div>
                                 <div class="col-md-4">{{model.updatedBy}}</div>
-                                <div class="col-md-2">
-                                    <!--Model Status-->
-                                    Storage Size:
-                                </div>
+                                <div class="col-md-2">Storage Size:</div>
                                 <div class="col-md-4">
                                     <input type="number" min="0" tabindex="31" name="storageSize" [(ngModel)]="model.storageSize">
-                                    <!--
-                                    @@@
-
-                                    -->
                                 </div>
                             </div>
                             <div class="form-group">
