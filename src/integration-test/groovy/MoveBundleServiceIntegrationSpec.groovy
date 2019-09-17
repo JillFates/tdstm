@@ -485,19 +485,36 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.dependencyBundleCount == 4
 	}
 
+	void '11. Create move bundle'() {
+		when: 'creating a move bundle'
+			MoveBundleCommand command = new MoveBundleCommand(
+					name: RandomStringUtils.randomAscii(10),
+					description: RandomStringUtils.randomAscii(10)
+			)
+			MoveBundle moveBundle = moveBundleService.saveOrUpdate(command, project)
+		then: 'move bundle is saved to db'
+			moveBundle
+			moveBundle.id
+		when: 'saving a second move bundle with same name and project'
+			moveBundleService.saveOrUpdate(command, project)
+		then: 'exception is thrown'
+			thrown(ValidationException)
+
+	}
+
 	void '12. Update move bundle'() {
 		given: 'a move bundle'
 			MoveBundleCommand command = new MoveBundleCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
 			)
-			MoveBundle moveBundle = moveBundleService.save(command)
+			MoveBundle moveBundle = moveBundleService.saveOrUpdate(command, project)
 		when: 'updating a move bundle'
 			command.id = moveBundle.id
 			command.startTime = TimeUtil.parseDateTime('2018-11-13')
 			command.completionTime = TimeUtil.parseDateTime('2018-11-30')
 			command.name = 'Test update MoveBundle'
-			MoveBundle moveBundleUpdated = moveBundleService.update(moveBundle.id, command)
+			MoveBundle moveBundleUpdated = moveBundleService.saveOrUpdate(command, project, moveBundle.id)
 		then: 'move bundle is updated in db'
 			moveBundleUpdated
 			moveBundleUpdated.id
@@ -506,7 +523,7 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
 			command.name = null
-			moveBundleService.update(moveBundle.id, command)
+			moveBundleService.saveOrUpdate(command, project, moveBundle.id)
 		then: 'exception is thrown'
 			thrown(ValidationException)
 	}

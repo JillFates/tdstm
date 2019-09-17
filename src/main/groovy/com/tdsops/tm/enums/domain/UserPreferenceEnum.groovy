@@ -83,7 +83,8 @@ enum UserPreferenceEnum {
 	EVENTDB_REFRESH('RefreshEventDB'),
 	TASKGRAPH_REFRESH('Task Graph Refresh Timer'),
 	TIMELINE_REFRESH('Timeline Graph Refresh Timer'),
-	VIEW_MANAGER_DEFAULT_SORT('View Manager Default Sort')
+	VIEW_MANAGER_DEFAULT_SORT('View Manager Default Sort'),
+	WRAP_TAGS_COLUMN('Wrap Tags Column')
 
 	static final Map<UserPreferenceEnum, ?> DEFAULT_VALUES = [
 			  (PRINT_LABEL_QUANTITY) : 2

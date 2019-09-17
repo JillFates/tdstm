@@ -38,6 +38,10 @@ import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.TimeLine
+import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -997,8 +1001,8 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		def tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		def deps = runbookService.getTaskDependencies(tasks)
+		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1231,7 +1235,7 @@ digraph runbook {
 					<tr><th>Id</th><th>Task #</th><th>Action</th>
 					<th>Est Duration</th>
 					$durationExtra
-					<th>Earliest Start</th><th>Latest Start</th><th>Constraint Time</th>
+					<th>Earliest Start</th><th>Latest Start</th><th>Slack</th><th>Constraint Time</th>
 					$timesExtra
 					<th>Act Finish</th><th>Priority</th><th>Critical Path</td><th>Team</th><th>Individual</th><th>Category</th>
 					$tailExtra

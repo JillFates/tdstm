@@ -386,12 +386,17 @@ export class EventsService {
 		results.push(headerRow);
 
 		const columnsLength = headerRow.length;
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'column-percents'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
 
 		data.forEach((item: CategoryTask, index: number) => {
+			results[CatagoryRowType.Percent][index].text =   item.percComp + '%';
+			results[CatagoryRowType.Percent][index].compose =   item;
+			results[CatagoryRowType.TaskCompleted][index].compose =   item;
 			results[CatagoryRowType.PlannedStart][index].text =   DateUtils.formatUserDateTime(userTimeZone, item.estStart);
 			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ceeed9d3-fa62-460c-82db-41b110480a73",
+		"_postman_id": "7f578833-f9ff-4b70-821a-99e36cff44da",
 		"name": "Set task context",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
