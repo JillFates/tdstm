@@ -51,10 +51,10 @@ export class CredentialViewEditComponent {
 	@ViewChild('apiActionForm', {static: false}) apiActionForm: NgForm;
 	@ViewChild('apiActionReactionForm', {static: false}) apiActionReactionForm: NgForm;
 
-	@ViewChild('apiActionProvider', {static: false}) apiActionProvider: DropDownListComponent;
-	@ViewChild('credentialStatus', {static: false}) credentialStatus: DropDownListComponent;
-	@ViewChild('apiActionAgentMethod', {static: false}) apiActionAgentMethod: DropDownListComponent;
-	@ViewChild('apiActionCredential', {static: false}) apiActionCredential: DropDownListComponent;
+	@ViewChild('apiActionProvider', { read: DropDownListComponent, static: true }) apiActionProvider: DropDownListComponent;
+	@ViewChild('credentialStatus', { read: DropDownListComponent, static: true }) credentialStatus: DropDownListComponent;
+	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent, static: true }) apiActionAgentMethod: DropDownListComponent;
+	@ViewChild('apiActionCredential', { read: DropDownListComponent, static: true }) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('credentialsContainer', {static: false}) credentialsContainer: ElementRef;

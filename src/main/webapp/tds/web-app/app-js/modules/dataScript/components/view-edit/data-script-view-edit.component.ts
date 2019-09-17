@@ -28,7 +28,7 @@ const DEBOUNCE_MILLISECONDS = 800;
 	`]
 })
 export class DataScriptViewEditComponent implements OnInit {
-	@ViewChild('dataScriptProvider', {static: false}) dataScriptProvider: DropDownListComponent;
+	@ViewChild('dataScriptProvider', { read: DropDownListComponent, static: true }) dataScriptProvider: DropDownListComponent;
 	@ViewChild('dataScriptContainer', {static: false}) dataScriptContainer: ElementRef;
 	public dataScriptModel: DataScriptModel;
 	public providerList = new Array<ProviderModel>();

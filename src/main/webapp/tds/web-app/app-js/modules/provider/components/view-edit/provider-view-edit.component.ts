@@ -23,7 +23,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class ProviderViewEditComponent implements OnInit {
 
-	@ViewChild('providerNameElement', {static: false}) providerNameElement: ElementRef;
+	@ViewChild('providerNameElement', {read: ElementRef, static: true}) providerNameElement: ElementRef;
 	@ViewChild('providerContainer', {static: false}) providerContainer: ElementRef;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
