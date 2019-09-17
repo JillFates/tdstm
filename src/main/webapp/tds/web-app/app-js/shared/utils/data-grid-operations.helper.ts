@@ -335,4 +335,25 @@ export class DataGridOperationsHelper {
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
+
+	/**
+	 * Calculates and returns the current page number based on the current grid state & skip states.
+	 */
+	public getCurrentPage(): number {
+		return (this.state.skip / this.state.take) + 1;
+	}
+
+	/**
+	 * Calculates and returns the real row index based on the current pagination state.
+	 */
+	getRowPaginatedIndex(rowIndex: number): number {
+		return ( rowIndex + (this.getCurrentPage() - 1) * this.getPageSize());
+	}
+
+	/**
+	 * Returns grid take, since is the equivalent to page size number.
+	 */
+	public getPageSize(): number {
+		return this.state.take;
+	}
 }
