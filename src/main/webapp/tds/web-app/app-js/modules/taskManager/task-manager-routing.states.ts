@@ -6,6 +6,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 // Services
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {TaskListComponent} from './components/list/task-list.component';
+import {NeighborhoodComponent} from './components/neighborhood/neighborhood.component';
 // Components
 
 /**
@@ -17,6 +18,9 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-tasks';
 export class TaskManagerRoutingStates {
 	public static readonly TASK_MANAGER_LIST = {
 		url: 'list'
+	};
+	public static readonly TASK_NEIGHBORHOOD = {
+		url: 'neighborhood'
 	};
 }
 
@@ -34,6 +38,24 @@ export const TaskManagerRoute: Routes = [
 			requiresAuth: true,
 		},
 		component: TaskListComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
+		data: {
+			page: {
+				// instruction: '',
+				// menu: ['Task', 'Task Manager'],
+				// topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-task-manager', subMenu: true}
+			},
+			requiresAuth: true,
+		},
+		component: NeighborhoodComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

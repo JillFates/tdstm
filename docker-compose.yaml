@@ -61,11 +61,11 @@ services:
     ports:
       - 3000:3000
 
-  selenium:
-    container_name: selenium
-    image: selenium/standalone-chrome-debug:latest
-    ports:
-      - 4444:4444
+  chrome:
+    container_name: chrome
+    image: tm-registry.transitionmanager.net/tds-ci/chrome:latest
+    environment:
+      - CHROMEDRIVER_WHITELISTED_IPS=''
 
   test:
     <<: *base
@@ -78,6 +78,8 @@ services:
     <<: *base
     container_name: tm-e2e
     working_dir: /opt/tdstm/test/e2e
+    depends_on:
+      - chrome
     command: >
       ./gradlew --profile
                 --no-scan

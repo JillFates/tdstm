@@ -104,6 +104,9 @@ import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/moda
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
+import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
 
 @NgModule({
 	imports: [
@@ -118,7 +121,8 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		InputsModule,
 		RouterModule,
 		DialogModule,
-		ProgressBarModule
+		ProgressBarModule,
+		FontAwesomeModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -182,7 +186,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		RichTextEditorComponent,
 		PieCountdownComponent,
 		TDSFilterInputComponent,
-		TDSModalPageWrapperComponent
+		TDSModalPageWrapperComponent,
+		DiagramLayoutComponent,
+		CircleCountdownComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -246,7 +252,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
-		TDSModalPageWrapperComponent
+		TDSModalPageWrapperComponent,
+		DiagramLayoutComponent,
+		FontAwesomeModule,
+		CircleCountdownComponent
 	],
 	entryComponents: [
 		DynamicComponent,
