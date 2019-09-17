@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3a839bc5-3dd1-4bae-82a7-826f8e8f7c03",
+		"_postman_id": "3df64818-e2a0-42dd-9fe4-6c009999d2d3",
 		"name": "DataScript Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -45,7 +45,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

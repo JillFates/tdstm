@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e045c59d-c4ae-4dc4-860b-c4d06401aa15",
+		"_postman_id": "babd9b39-7b56-49bd-a654-f557ad9db8b0",
 		"name": "ListEvents",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

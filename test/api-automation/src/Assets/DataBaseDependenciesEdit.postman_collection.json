@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "cfaf1e30-69dc-4fe7-8b1a-d97ba9beb812",
+		"_postman_id": "0fc49705-0042-4df9-8328-c0ceedaabb21",
 		"name": "DataBaseDependencyEdit",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
