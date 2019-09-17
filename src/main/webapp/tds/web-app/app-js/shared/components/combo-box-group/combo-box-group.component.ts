@@ -35,7 +35,7 @@ import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
 	`
 })
 export class TDSComboBoxGroupComponent implements OnInit {
-	@ViewChild('innerComboBoxGroup') innerComboBoxGroup: ComboBoxComponent;
+	@ViewChild('innerComboBoxGroup', {static: false}) innerComboBoxGroup: ComboBoxComponent;
 	@Output() modelChange = new EventEmitter<string>();
 	@Output() isFixedChange = new EventEmitter<number>();
 	@Input('model') model: any;

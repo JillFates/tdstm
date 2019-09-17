@@ -87,19 +87,13 @@ div#main-loader {
   position: fixed;
   width: 100%;
   height: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   background: rgba(0, 0, 0, 0.5);
   top: 0px;
   left: 0px;
   z-index: 1150; }
   div#main-loader #loader-icon {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
     margin: 0 auto; }
     div#main-loader #loader-icon .loader,
@@ -125,6 +119,7 @@ div#main-loader {
       position: relative;
       font-size: 11px;
       -webkit-transform: translateZ(0);
+      -ms-transform: translateZ(0);
       transform: translateZ(0);
       -webkit-animation-delay: -0.16s;
       animation-delay: -0.16s; }
@@ -135,11 +130,9 @@ div#main-loader {
   0%,
   80%,
   100% {
-    -webkit-box-shadow: 0 0 #ffffff;
     box-shadow: 0 0 #ffffff;
     height: 4em; }
   40% {
-    -webkit-box-shadow: 0 -2em #ffffff;
     box-shadow: 0 -2em #ffffff;
     height: 5em; } }
 
@@ -147,11 +140,9 @@ div#main-loader {
   0%,
   80%,
   100% {
-    -webkit-box-shadow: 0 0 #ffffff;
     box-shadow: 0 0 #ffffff;
     height: 4em; }
   40% {
-    -webkit-box-shadow: 0 -2em #ffffff;
     box-shadow: 0 -2em #ffffff;
     height: 5em; } }
 
@@ -161,6 +152,8 @@ svg {
 div.modal-dialog {
   padding: 0px; }
   div.modal-dialog div.modal-content {
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
     border-radius: 0px;
     border: 0px; }
     div.modal-dialog div.modal-content div#listCommentsTasksPopup div#commentsListDialog div.list {
@@ -176,6 +169,8 @@ div.modal-dialog {
       color: #fff !important;
       background: #5f9fcf 50% 50% repeat-x !important;
       border-color: #5f9fcf !important;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
       border-radius: 0px;
       height: 39px;
       padding-top: 10px; }
@@ -474,14 +469,8 @@ div.graphContainer {
   background-color: none;
   position: relative; }
   div.graphContainer label {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none; }
   div.graphContainer .ignoresMouse {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     pointer-events: none !important; }
   div.graphContainer div#toolsContainerId {
@@ -518,9 +507,6 @@ div.graphContainer {
       div.graphContainer div#toolsContainerId div#graphToolbarId > div, div.graphContainer div#toolsContainerId div#graphToolbarId > span {
         vertical-align: middle; }
       div.graphContainer div#toolsContainerId div#graphToolbarId h4 {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
         font-size: 12px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab {
@@ -709,13 +695,10 @@ div.graphContainer {
       div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon {
         opacity: 0.9999; }
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:hover {
-          -webkit-filter: saturate(1.5);
           filter: saturate(1.5); }
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:active {
-          -webkit-filter: saturate(10);
           filter: saturate(10); }
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.disabled {
-          -webkit-filter: saturate(0);
           filter: saturate(0);
           opacity: 0.5;
           cursor: default; }
@@ -915,36 +898,21 @@ form .btn-with-close-icon .fa-close {
   cursor: pointer; }
 
 .f-grid {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
   flex-direction: row;
-  -ms-flex-wrap: wrap;
   flex-wrap: wrap; }
   .f-grid .f-column-1,
   .f-grid .f-column-2,
   .f-grid .f-column-3,
   .f-grid .f-column-4 {
-    -ms-flex-preferred-size: auto;
     flex-basis: auto; }
   .f-grid .f-column-1 {
-    -webkit-box-ordinal-group: 2;
-    -ms-flex-order: 1;
     order: 1; }
   .f-grid .f-column-2 {
-    -webkit-box-ordinal-group: 3;
-    -ms-flex-order: 2;
     order: 2; }
   .f-grid .f-column-3 {
-    -webkit-box-ordinal-group: 4;
-    -ms-flex-order: 3;
     order: 3; }
   .f-grid .f-column-4 {
-    -webkit-box-ordinal-group: 5;
-    -ms-flex-order: 4;
     order: 4; }
 
 .dates-info {
@@ -1407,11 +1375,14 @@ div#postLoginMessages div.modal-footer {
 div.content-wrapper div.ui-widget-header {
   background: #5f9fcf 50% 50% repeat-x !important;
   border-color: #5f9fcf !important;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
   border-radius: 0px; }
   div.content-wrapper div.ui-widget-header * {
-    -webkit-box-sizing: content-box;
     box-sizing: content-box; }
   div.content-wrapper div.ui-widget-header div.ui-corner-bottom {
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
     border-radius: 0px; }
   div.content-wrapper div.ui-widget-header div.ui-jqgrid-view {
     overflow-x: hidden; }
@@ -1422,62 +1393,53 @@ div.content-wrapper div.ui-widget-header {
     div.content-wrapper div.ui-widget-header div.ui-jqgrid-view div.ui-jqgrid-titlebar {
       background: #5f9fcf 50% 50% repeat-x !important;
       border-color: #5f9fcf !important;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
       border-radius: 0px; }
     div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-htable {
       border-collapse: inherit; }
       div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-htable thead {
-        -webkit-box-sizing: initial !important;
         box-sizing: initial !important; }
         div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-htable thead tr {
-          -webkit-box-sizing: initial !important;
           box-sizing: initial !important; }
           div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-htable thead tr th.ui-th-column input {
             color: #000; }
           div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-htable thead tr th {
-            -webkit-box-sizing: initial !important;
             box-sizing: initial !important; }
     div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable {
       border-collapse: inherit; }
       div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody {
-        -webkit-box-sizing: initial !important;
         box-sizing: initial !important; }
         div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody tr {
-          -webkit-box-sizing: initial !important;
           box-sizing: initial !important; }
           div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody tr td {
-            -webkit-box-sizing: initial !important;
             box-sizing: initial !important; }
             div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody tr td span {
-              -webkit-box-sizing: initial !important;
               box-sizing: initial !important; }
             div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody tr td div.asset-tag-selector-component-content {
-              display: -webkit-box;
-              display: -ms-flexbox;
               display: flex;
-              -webkit-box-orient: horizontal;
-              -webkit-box-direction: normal;
-              -ms-flex-direction: row;
               flex-direction: row;
-              -ms-flex-wrap: wrap;
               flex-wrap: wrap; }
               div.content-wrapper div.ui-widget-header div.ui-jqgrid-view table.ui-jqgrid-btable tbody tr td div.asset-tag-selector-component-content span {
-                max-width: -webkit-fit-content;
-                max-width: -moz-fit-content;
                 max-width: fit-content;
                 height: 20px;
                 margin-top: 3px; }
 
 div.ui-dialog {
   padding: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
   border-radius: 0px;
   border: 0px;
   top: 30px;
   -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
   box-sizing: content-box;
   background-color: #fff;
   background: #fff; }
   div.ui-dialog > div {
     -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
     box-sizing: content-box; }
   div.ui-dialog div.ui-dialog-content {
     background-color: #fff;
@@ -1499,11 +1461,15 @@ div.ui-dialog {
     border: 0px;
     border-top: 1px solid #e5e5e5;
     margin-top: 0px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
     border-radius: 0px;
     background: white none; }
   div.ui-dialog div.ui-widget-header {
     background: #5f9fcf 50% 50% repeat-x !important;
     border-color: #5f9fcf !important;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
     border-radius: 0px;
     padding-top: 7px;
     font-size: 16px; }
@@ -1727,12 +1693,9 @@ div.content-wrapper div.container div#item1 div#highlightFormId span#filterOptio
   width: 20px;
   padding-top: 3px; }
   div.content-wrapper div.container div#item1 div#highlightFormId span#filterOptionsButtonId.open svg {
-    -webkit-transform: rotate(0deg);
     transform: rotate(0deg); }
   div.content-wrapper div.container div#item1 div#highlightFormId span#filterOptionsButtonId svg {
-    -webkit-transform: rotate(-90deg);
     transform: rotate(-90deg);
-    -webkit-transform-origin: 6px 6px;
     transform-origin: 6px 6px;
     height: 12px;
     width: 12px; }
@@ -1881,7 +1844,6 @@ div.content-wrapper div.container .body table.show-project-table {
   border-collapse: initial; }
 
 div.content-wrapper div.container .body .nav {
-  -webkit-box-sizing: content-box !important;
   box-sizing: content-box !important; }
 
 div.content-wrapper div.container .body .buttons form span.button input.show {
@@ -1906,15 +1868,12 @@ div.content-wrapper div.container .body div#roomListView {
 
 div.content-wrapper div.container .body div.dialog div.action-wrapper {
   text-align: right;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   margin-left: auto;
   margin-right: 10px;
   margin-bottom: 10px; }
 
 div.content-wrapper div.container .body div.nav {
-  -webkit-box-sizing: content-box !important;
   box-sizing: content-box !important; }
 
 div.content-wrapper div.container .body table#assetEntityTable {
@@ -1924,7 +1883,6 @@ div.content-wrapper div.container .body table#assetEntityTable {
 div.content-wrapper div.container .body.move-event-edit div.nav,
 div.content-wrapper div.container .body.move-event-create div.nav,
 div.content-wrapper div.container .body.move-event-show div.nav {
-  -webkit-box-sizing: content-box !important;
   box-sizing: content-box !important; }
 
 div.content-wrapper div.container .body.move-event-edit table,
@@ -2140,8 +2098,6 @@ div.content-wrapper section.dashboard-task-summary-wrapper div.box div#newssecti
   background: none;
   border: none; }
   div.content-wrapper section.dashboard-task-summary-wrapper div.box div#newssection div.prog_bar_text {
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
     display: inline-flex;
     text-align: center; }
 
@@ -2171,45 +2127,35 @@ div.content-wrapper div.execution-phase-wrapper {
   margin-left: 20px; }
 
 .planning-dashboard {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   min-height: 200px; }
   .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
     max-width: 285px; }
   .planning-dashboard .execution-phase {
-    -ms-flex-preferred-size: 50%;
     flex-basis: 50%; }
 
 @media (max-width: 1000px) {
   .planning-dashboard {
-    -ms-flex-wrap: wrap;
     flex-wrap: wrap; }
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
       max-width: 285px; }
     .planning-dashboard .execution-phase {
-      -ms-flex-preferred-size: 100%;
       flex-basis: 100%; } }
 
 @media (min-width: 1001px) and (max-width: 1200px) {
   .planning-dashboard {
-    -ms-flex-wrap: wrap;
     flex-wrap: wrap; }
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
       max-width: 285px; }
     .planning-dashboard .execution-phase {
-      -ms-flex-preferred-size: 100%;
       flex-basis: 100%; } }
 
 @media (min-width: 1201px) {
   .planning-dashboard {
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex; }
     .planning-dashboard .discovery-phase, .planning-dashboard .analysis-phase {
       max-width: 285px; }
     .planning-dashboard .execution-phase {
-      -ms-flex-preferred-size: 49%;
       flex-basis: 49%; } }
 
 /* Cookbook */

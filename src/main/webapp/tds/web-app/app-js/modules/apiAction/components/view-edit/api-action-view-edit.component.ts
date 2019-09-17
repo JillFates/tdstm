@@ -78,14 +78,14 @@ enum NavigationTab {
 })
 export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	// Forms
-	@ViewChild('apiActionForm') apiActionForm: NgForm;
-	@ViewChild('scriptForm') scriptForm: NgForm;
-	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
-	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
-	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
-	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
+	@ViewChild('apiActionForm', {static: false}) apiActionForm: NgForm;
+	@ViewChild('scriptForm', {static: false}) scriptForm: NgForm;
+	@ViewChild('simpleInfoForm', {static: false}) simpleInfoForm: NgForm;
+	@ViewChild('httpAPIForm', {static: false}) httpAPIForm: NgForm;
+	@ViewChild('apiActionParametersForm', {static: false}) apiActionParametersForm: NgForm;
+	@ViewChild('apiActionReactionForm', {static: false}) apiActionReactionForm: NgForm;
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
-	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
+	@ViewChild('apiActionContainer', {static: false}) apiActionContainer: ElementRef;
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';

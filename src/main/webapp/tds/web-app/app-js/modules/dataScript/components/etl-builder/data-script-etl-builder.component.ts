@@ -32,8 +32,8 @@ import {FieldReferencePopupComponent} from '../../../../shared/components/field-
 	templateUrl: 'data-script-etl-builder.component.html'
 })
 export class DataScriptEtlBuilderComponent extends UIExtraDialog implements AfterViewInit {
-	@ViewChild('codeMirror') codeMirrorComponent: CodeMirrorComponent;
-	@ViewChild('resizableForm') resizableForm: ElementRef;
+	@ViewChild('codeMirror', {static: false}) codeMirrorComponent: CodeMirrorComponent;
+	@ViewChild('resizableForm', {static: false}) resizableForm: ElementRef;
 	public collapsed = {
 		code: true,
 		sample: false,

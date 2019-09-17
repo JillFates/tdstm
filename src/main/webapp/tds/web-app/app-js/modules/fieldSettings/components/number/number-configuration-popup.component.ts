@@ -13,7 +13,7 @@ import {NgForm} from '@angular/forms';
 	templateUrl: 'number-configuration-popup.component.html',
 })
 export class NumberConfigurationPopupComponent extends ConfigurationCommonComponent {
-	@ViewChild('templateForm') protected templateForm: NgForm;
+	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 	private readonly MIN_EXAMPLE_VALUE = -10000;
 	private readonly MAX_EXAMPLE_VALUE = 10000;
 	public model: NumberConfigurationConstraintsModel;

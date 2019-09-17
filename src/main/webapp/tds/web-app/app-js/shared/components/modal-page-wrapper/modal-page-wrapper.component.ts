@@ -41,7 +41,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 export class TDSModalPageWrapperComponent extends UIExtraDialog implements AfterViewInit {
 	public isVisible = false;
 	private hasBeenSubmited = false;
-	@ViewChild('targetFrame') targetFrame: ElementRef;
+	@ViewChild('targetFrame', {static: false}) targetFrame: ElementRef;
 	constructor(
 		@Inject('title') public title: string,
 		@Inject('url') public url: string,

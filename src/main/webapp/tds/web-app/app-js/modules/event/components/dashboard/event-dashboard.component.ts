@@ -28,7 +28,7 @@ import {ActivatedRoute} from '@angular/router';
 })
 
 export class EventDashboardComponent implements OnInit {
-	@ViewChild('planVersusStatus') public planVersusStatus: PlanVersusStatusComponent;
+	@ViewChild('planVersusStatus', {static: false}) public planVersusStatus: PlanVersusStatusComponent;
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;

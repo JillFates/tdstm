@@ -43,8 +43,8 @@ export class FieldSettingsGridComponent implements OnInit {
 	@Input('domains') domainsList: DomainModel[];
 	@Input('isEditable') isEditable: boolean;
 	@Input('gridFilter') gridFilter: any;
-	@ViewChild('minMax') minMax: MinMaxConfigurationPopupComponent;
-	@ViewChild('selectList') selectList: SelectListConfigurationPopupComponent;
+	@ViewChild('minMax', {static: false}) minMax: MinMaxConfigurationPopupComponent;
+	@ViewChild('selectList', {static: false}) selectList: SelectListConfigurationPopupComponent;
 	public domains: DomainModel[] = [];
 	private fieldsSettings: FieldSettingsModel[];
 	public gridData: GridDataResult;

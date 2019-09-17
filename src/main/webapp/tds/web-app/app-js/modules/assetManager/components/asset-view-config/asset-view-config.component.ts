@@ -28,7 +28,7 @@ declare var jQuery: any;
 	templateUrl: 'asset-view-config.component.html'
 })
 export class AssetViewConfigComponent implements OnInit {
-	@ViewChild('select') select: AssetViewSelectorComponent;
+	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 
 	public data: any = null;
 	private dataSignature: string;

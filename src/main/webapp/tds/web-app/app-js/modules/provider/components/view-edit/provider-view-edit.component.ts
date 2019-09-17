@@ -23,8 +23,8 @@ import {Permission} from '../../../../shared/model/permission.model';
 })
 export class ProviderViewEditComponent implements OnInit {
 
-	@ViewChild('providerNameElement', {read: ElementRef}) providerNameElement: ElementRef;
-	@ViewChild('providerContainer') providerContainer: ElementRef;
+	@ViewChild('providerNameElement', {static: false}) providerNameElement: ElementRef;
+	@ViewChild('providerContainer', {static: false}) providerContainer: ElementRef;
 	public providerModel: ProviderModel;
 	public modalTitle: string;
 	public actionTypes = ActionType;

@@ -48,16 +48,16 @@ declare var jQuery: any;
 export class CredentialViewEditComponent {
 
 	// Forms
-	@ViewChild('apiActionForm') apiActionForm: NgForm;
-	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
+	@ViewChild('apiActionForm', {static: false}) apiActionForm: NgForm;
+	@ViewChild('apiActionReactionForm', {static: false}) apiActionReactionForm: NgForm;
 
-	@ViewChild('apiActionProvider', { read: DropDownListComponent }) apiActionProvider: DropDownListComponent;
-	@ViewChild('credentialStatus', { read: DropDownListComponent }) credentialStatus: DropDownListComponent;
-	@ViewChild('apiActionAgentMethod', { read: DropDownListComponent }) apiActionAgentMethod: DropDownListComponent;
-	@ViewChild('apiActionCredential', { read: DropDownListComponent }) apiActionCredential: DropDownListComponent;
+	@ViewChild('apiActionProvider', {static: false}) apiActionProvider: DropDownListComponent;
+	@ViewChild('credentialStatus', {static: false}) credentialStatus: DropDownListComponent;
+	@ViewChild('apiActionAgentMethod', {static: false}) apiActionAgentMethod: DropDownListComponent;
+	@ViewChild('apiActionCredential', {static: false}) apiActionCredential: DropDownListComponent;
 
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
-	@ViewChild('credentialsContainer') credentialsContainer: ElementRef;
+	@ViewChild('credentialsContainer', {static: false}) credentialsContainer: ElementRef;
 
 	public codeMirrorComponent: CodeMirrorComponent;
 	public credentialModel: CredentialModel;

@@ -30,7 +30,7 @@ import { SortUtils } from '../../../../shared/utils/sort.utils';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
-	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
+	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 
 	protected modalType = ModalType;

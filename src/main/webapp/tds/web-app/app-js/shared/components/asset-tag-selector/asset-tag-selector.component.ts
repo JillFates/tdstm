@@ -62,7 +62,7 @@ declare var jQuery: any;
 })
 
 export class AssetTagSelectorComponent implements OnChanges, OnInit {
-	@ViewChild('assetTagSelectorComponent') assetTagSelectorComponent: MultiSelectComponent;
+	@ViewChild('assetTagSelectorComponent', {static: false}) assetTagSelectorComponent: MultiSelectComponent;
 	@Input('tagList') sourceTagList: Array<TagModel>;
 	// Used to control if the Switch is require for the UI
 	@Input('showSwitch') showSwitch = true;
