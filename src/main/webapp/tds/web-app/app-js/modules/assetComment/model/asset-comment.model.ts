@@ -3,7 +3,7 @@ import {ModalType} from '../../../shared/model/constants';
 export class AssetCommentModel {
 	public id?: string;
 	public modal: {
-		title:  string;
+		title?:  string;
 		type: ModalType
 	};
 	public archive: boolean;
@@ -38,7 +38,8 @@ export class AssetCommentColumnModel {
 				property: 'comment',
 				type: 'text',
 				width: 574,
-				locked: true
+				locked: true,
+				class: 'column-cursor-pointer'
 			},
 			{
 				label: 'Asset',

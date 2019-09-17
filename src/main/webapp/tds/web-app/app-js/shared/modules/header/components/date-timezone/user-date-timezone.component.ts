@@ -2,7 +2,7 @@
 import {Component, HostListener, OnInit} from '@angular/core';
 // Services
 import {HeaderService} from '../../services/header.service';
-import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
+import {UIActiveDialogService, UIExtraDialog} from '../../../../services/ui-dialog.service';
 import {PreferenceService} from '../../../../services/preference.service';
 import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 // Models
@@ -12,6 +12,7 @@ import {DateUtils} from '../../../../utils/date.utils';
 import {SortUtils} from '../../../../utils/sort.utils';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 import {Observable} from 'rxjs';
+import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 declare var jQuery: any;
 
@@ -19,7 +20,7 @@ declare var jQuery: any;
 	selector: 'date-timezone-modal',
 	templateUrl: 'user-date-timezone.component.html'
 })
-export class UserDateTimezoneComponent implements OnInit {
+export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	public currentUserName;
 	// List of elements to show on the Map
 	public mapAreaList = [];
@@ -35,10 +36,12 @@ export class UserDateTimezoneComponent implements OnInit {
 	private dateTimezoneData = '';
 
 	constructor(
+		public shouldReturnData: Boolean,
 		private headerService: HeaderService,
-		public activeDialog: UIActiveDialogService,
 		private preferenceService: PreferenceService,
+		private translatePipe: TranslatePipe,
 		private promptService: UIPromptService) {
+		super('#datetime-modal');
 	}
 
 	private getUserData(): void {
@@ -110,17 +113,19 @@ export class UserDateTimezoneComponent implements OnInit {
 			datetimeFormat: this.selectedTimeFormat
 		})) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM')	,
+				this.translatePipe.transform('GLOBAL.CANCEL')	,
+			)
 				.then(confirm => {
 					if (confirm) {
-						this.activeDialog.dismiss();
+						this.dismiss();
 					}
 				})
 				.catch((error) => console.log(error));
 		} else {
-			this.activeDialog.dismiss();
+			this.dismiss();
 		}
 	}
 
@@ -192,11 +197,15 @@ export class UserDateTimezoneComponent implements OnInit {
 			datetimeFormat: this.selectedTimeFormat
 		};
 
-		this.headerService.saveDateAndTimePreferences(params).subscribe(
-			(result: any) => {
-				this.cancelCloseDialog();
-				location.reload();
-			},
-			(err) => console.log(err));
+		if (this.shouldReturnData) {
+			this.close(params);
+		} else {
+			this.headerService.saveDateAndTimePreferences(params).subscribe(
+				(result: any) => {
+					this.cancelCloseDialog();
+					location.reload();
+				},
+				(err) => console.log(err));
+		}
 	}
 }

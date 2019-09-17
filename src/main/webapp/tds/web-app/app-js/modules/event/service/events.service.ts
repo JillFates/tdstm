@@ -258,17 +258,7 @@ export class EventsService {
 	deleteEvent(id): Observable<any> {
 		return this.http.delete(`../ws/moveEvent/deleteEvent/${id}`)
 			.map((response: any) => {
-				let eventModels = response && response.status === 'success' && response.data;
-				return eventModels;
-			})
-			.catch((error: any) => error);
-	}
-
-	markAssetsMoved(id): Observable<any> {
-		return this.http.put(`../ws/moveEvent/markAssetsMoved/${id}`, null)
-			.map((response: any) => {
-				let eventModels = response && response.status === 'success' && response.data;
-				return eventModels;
+				return response;
 			})
 			.catch((error: any) => error);
 	}

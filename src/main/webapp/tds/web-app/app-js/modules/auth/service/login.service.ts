@@ -8,6 +8,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import {NoticeModel} from '../../noticeManager/model/notice.model';
 import {StringUtils} from '../../../shared/utils/string.utils';
+import {SortUtils} from '../../../shared/utils/sort.utils';
 
 /**
  * @name LoginService
@@ -17,6 +18,7 @@ export class LoginService {
 
 	// private instance variable to hold base url
 	private authUrl = '../auth/';
+	private internalPath = '../ws/';
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -30,9 +32,12 @@ export class LoginService {
 		return this.http.get(this.authUrl + 'loginInfo')
 			.map((response: any) => {
 				if (response.data && response.data.notices) {
-					response.data.notices = response.data.notices.map((notice: any) => {
+					// Filter not active notices
+					response.data.notices = response.data.notices.filter((notice: any) => notice.active).map((notice: any) => {
+						notice.sequence = notice.sequence || 0;
 						return this.cleanNotice(notice);
 					});
+					response.data.notices = response.data.notices.sort((a, b) => SortUtils.compareByProperty(a, b, 'sequence'));
 				}
 				return response && response.data;
 			})
@@ -47,6 +52,21 @@ export class LoginService {
 		return this.http.get(`${this.authUrl}sendResetPasswordEmail?email=${userEmail}`)
 			.map((response: any) => {
 				return response && response.data;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Request to Update Password
+	 * @returns {Observable<R>}
+	 */
+	public updatePassword(password: string, confirmPassword: string): Observable<any> {
+		return this.http.post(`${this.internalPath}user/updatePassword`, JSON.stringify({
+			password: password,
+			confirmPassword: confirmPassword
+		}))
+			.map((response: any) => {
+				return response;
 			})
 			.catch((error: any) => error);
 	}

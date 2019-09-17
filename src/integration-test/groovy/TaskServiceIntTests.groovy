@@ -1,5 +1,7 @@
+import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
@@ -11,14 +13,18 @@ import net.transitionmanager.action.ApiCatalog
 import net.transitionmanager.action.Provider
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.RandomStringUtils
 import org.hibernate.SessionFactory
@@ -29,7 +35,7 @@ import test.helper.ApiCatalogTestHelper
 @Integration
 @Rollback
 class TaskServiceIntTests extends Specification{
-
+    CustomDomainService customDomainService
     TaskService taskService
     SecurityService securityService
 
@@ -42,6 +48,11 @@ class TaskServiceIntTests extends Specification{
 
     SessionFactory    sessionFactory
     GrailsApplication grailsApplication
+
+    private Person    adminPerson
+    private Person    untrustedPerson
+    private UserLogin adminUser
+    private UserLogin untrustedUser
 
     /* Test SetUp */
     void setup() {
@@ -114,16 +125,28 @@ class TaskServiceIntTests extends Specification{
         AssetEntity.list()
     }
 
+    /**
+     * Used to create the persons and users needed for some of the tests
+     */
+    private void createPersonAndUsers() {
+        Project project = projectTestHelper.createProject()
+		adminPerson = personTestHelper.createStaff(project)
+		untrustedPerson =personTestHelper.createStaff(project)
+
+        adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+        untrustedUser = personTestHelper.createUserLoginWithRoles(untrustedPerson, ["${SecurityRole.ROLE_USER}"])
+    }
+
+
     void 'test can find tasks by AssetEntity instance'() {
         setup:
             Project project = projectTestHelper.getProject()
 
             AssetEntity assetEntity = assetTestHelper.createDevice(project, 'Server', [name: RandomStringUtils.randomAlphabetic(10), description: 'Red'])
 
-            AssetComment task = new AssetComment(
+            Task task = new Task(
                     project: project,
                     comment: "Sample for " + assetEntity.toString(),
-                    commentType: AssetCommentType.TASK,
                     assetEntity: assetEntity
             ).save()
 
@@ -148,32 +171,53 @@ class TaskServiceIntTests extends Specification{
     }
 
     void 'invocation of an api action show return status as started'() {
-        setup: 'giving an api action'
-            Person whom = taskService.getAutomaticPerson()
+        setup: 'giving a local api action'
+            Person whom = securityService.getAutomaticPerson()
             Project project = projectTestHelper.getProject()
+            createPersonAndUsers()
             Provider provider = providerTestHelper.createProvider(project)
             ApiCatalog apiCatalog = apiCatalogTestHelper.createApiCatalog(project, provider)
 
-            ApiAction apiAction = new ApiAction(project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
-            description: RandomStringUtils.randomAlphanumeric(10), apiCatalog: apiCatalog, connectorMethod: 'executeCall',
-            methodParams: '[]', reactionScripts: '{"SUCCESS": "success","STATUS": "status","ERROR": "error"}', reactionScriptsValid: 1,
-            callbackMode: null, endpointUrl: 'http://www.google.com', endpointPath: '/').save()
-
-            AssetComment task = new AssetComment(
+            ApiAction apiAction = new ApiAction(
+                project: project, provider: provider, name: RandomStringUtils.randomAlphanumeric(10),
+                description: RandomStringUtils.randomAlphanumeric(10),
+                apiCatalog: apiCatalog,
+                connectorMethod: 'callEndpoint',
+                methodParams: '[]',
+                reactionScripts: '{"SUCCESS": "task.done()","STATUS": "if (response.status == SC.OK) {  return SUCCESS } else { return ERROR }","ERROR": "task.error( response.error )"}',
+                reactionScriptsValid: 1,
+                callbackMode: null,
+                endpointUrl: 'http://www.yahoo.com', endpointPath: '/', isRemote:false)
+            .save(failOnError: true)
+        and: 'a test setup to automatically execute'
+            Task task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     apiAction: apiAction,
-                    status: 'Ready'
-            ).save()
+                    status: AssetCommentStatus.READY
+            ).save(failOnError: true)
             sessionFactory.getCurrentSession().flush()
 
-        when: 'invoking the api action'
-            def status = taskService.invokeAction(task, whom)
+        when: 'the action is invoked without proper permission'
+            task = taskService.invokeLocalAction(task.id, untrustedPerson)
+        then: 'an exception should be thrown due to permissions'
+            InvalidParamException ex = thrown()
+            ex.message == 'You do not have permission to invoke the action'
 
-        then: 'status should show task as started'
-            null != status
-            'Started'
+        when: 'invoking the api action with an admin user'
+            task = taskService.invokeLocalAction(task.id, adminPerson)
+        then: 'an exception should be thrown because the task status is not correct'
+            ex = thrown()
+            ex.message == 'The task must be in the Ready or Started state in order to invoke action'
+
+        when: 'the task status is READY'
+            task.status = AssetCommentStatus.READY
+        and: 'invoking the api action'
+            task = taskService.invokeLocalAction(task.id, adminPerson)
+        then: 'then the task should returned'
+            null != task
+        and: 'the task status should be Started'
+            AssetCommentStatus.COMPLETED == task.status
     }
 
 //    void 'simultaneous invocations of an api action should throw error'() {
@@ -226,10 +270,9 @@ class TaskServiceIntTests extends Specification{
                     getCurrentUsername: { return 'someone' }
             ] as SecurityService
 
-            AssetComment task = new AssetComment(
+            Task task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
@@ -246,10 +289,9 @@ class TaskServiceIntTests extends Specification{
             task.assignedTo == personAssignedTo
 
         when: 'assign to me is call but task status is not the expected'
-            task = new AssetComment(
+            task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING,
@@ -277,10 +319,9 @@ class TaskServiceIntTests extends Specification{
             Date expectedStart2 = TimeUtil.nowGMT().plus(2)
             Date expectedFinish2 = expectedStart2.plus(1)
 
-            AssetComment task = new AssetComment(
+            Task task = new Task (
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     duration: 1,
                     durationScale: TimeScale.D,
                     status: AssetCommentStatus.PENDING
@@ -296,10 +337,9 @@ class TaskServiceIntTests extends Specification{
             TimeUtil.formatDate(assetComment.estFinish) == TimeUtil.formatDate(expectedFinish)
 
         when: 'having a task without duration and duration scale and change estimation time is called with 2 days'
-            task = new AssetComment(
+            task = new Task(
                     project: project,
                     comment: RandomStringUtils.randomAlphanumeric(10),
-                    commentType: AssetCommentType.TASK,
                     status: AssetCommentStatus.PENDING
             ).save()
             final assetCommentId2 = task.id
@@ -318,4 +358,72 @@ class TaskServiceIntTests extends Specification{
         then: 'exception is thrown'
             thrown(EmptyResultException)
     }
+
+
+    void 'addWhereConditionsForFieldSpecs'() {
+        setup: 'create a project and load the fieldspecs'
+            Project project = Project.read(Project.DEFAULT_PROJECT_ID)
+            List<Map> fieldSpecs = customDomainService.fieldSpecs(project, AssetClass.DEVICE.toString(), CustomDomainService.ALL_FIELDS, ['field', 'label'])
+            Map whereParams = [:]
+            String whereSql = ''
+            Map filter = [
+			    class: 'device',
+                asset: [
+                    os: '%win%'
+                ]
+		    ]
+
+        when: 'calling addWhereConditionsForFieldSpecs for a field name'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'a LIKE statement should be generated'
+            'a.os LIKE :os' == whereSql
+        and: 'the OS query parameter should be added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+
+
+        when: 'filter has the asset virtual criteria'
+            filter.asset.put('virtual', true)
+            whereSql = ''
+            whereParams = [:]
+        and: 'calling with no previous where'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the query will not have virtual'
+            'a.os LIKE :os' == whereSql
+        and: 'the os parameter was added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+
+        when: 'filter has the field and label based criteria'
+            filter.asset = [
+                os: '%win%',
+                Name: '%prod'
+            ]
+            whereSql = ''
+            whereParams = [:]
+        and: 'calling with no previous where'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the query should have both criteria'
+            'a.assetName LIKE :assetName and a.os LIKE :os' == whereSql
+        and: 'the parameters should have both parameters added'
+            whereParams.containsKey('os')
+            whereParams.get('os') == '%win%'
+            whereParams.containsKey('assetName')
+            whereParams.get('assetName') == '%prod'
+
+        when: 'a filter is applied after other where logic was performed'
+            filter.asset = [
+                Description: 'abc'
+            ]
+        and: 'addWhereConditionsForFieldSpecs is called'
+            whereSql = taskService.addWhereConditionsForFieldSpecs(fieldSpecs, filter, whereSql, whereParams)
+        then: 'the where statement should have the Description criteria added'
+            'a.assetName LIKE :assetName and a.os LIKE :os and a.description = :description' == whereSql
+        and: 'the whereParams map has the 3rd parameter'
+            whereParams.get('os') == '%win%'
+            whereParams.get('assetName') == '%prod'
+            whereParams.get('description') == 'abc'
+
+    }
+
 }

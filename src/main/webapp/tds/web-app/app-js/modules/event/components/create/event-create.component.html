@@ -1,4 +1,4 @@
-<div tds-handle-escape (escPressed)="cancelCloseDialog()" class="event-create-component modal-content" id="event-create-component">
+<div tds-autofocus class="event-create-component modal-content" id="event-create-component">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
             <span aria-hidden="true">×</span>
@@ -14,7 +14,7 @@
                     </tr>
                     <tr class="prop">
                         <td class="name">
-                            <label for="name">Name: <span class="requiredProp">*</span> </label>
+                            <label for="name">Name: <span class="requiredProp" style="color: red">*</span> </label>
                         </td>
                         <td class="value">
                             <input type="text" id="name" [(ngModel)]="eventModel.name"/>
@@ -110,7 +110,7 @@
             </table>
         </div>
         <div class="buttons modal-footer">
-            <tds-button-save class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
+            <tds-button-save [disabled]="!validateRequiredFields(eventModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
             <tds-button-cancel class="btn-secondary pull-right" (click)="cancelCloseDialog()"></tds-button-cancel>
         </div>
     </div>

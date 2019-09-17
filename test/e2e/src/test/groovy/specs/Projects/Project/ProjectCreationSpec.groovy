@@ -10,6 +10,8 @@ import pages.Login.MenuPage
 import spock.lang.Stepwise
 import geb.error.RequiredPageContentNotPresent
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ProjectCreationSpec extends GebReportingSpec {
     def testKey
@@ -25,6 +27,8 @@ class ProjectCreationSpec extends GebReportingSpec {
     static licensedProjectName = "TM-Demo"
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login(4,5) // test needs to be done by e2e_projects_user

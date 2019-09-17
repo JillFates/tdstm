@@ -8,6 +8,8 @@ import pages.Login.LoginPage
 import pages.Login.MenuPage
 import spock.lang.Stepwise
 
+import geb.driver.CachingDriverFactory
+
 /**
  * @author ingrid
  */
@@ -31,6 +33,8 @@ class StaffSearchAndFilteringSpec extends GebReportingSpec {
     static userEmail = baseName + randStr + "testuser@transitionaldata.com"
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()
@@ -108,4 +112,3 @@ class StaffSearchAndFilteringSpec extends GebReportingSpec {
             isExpectedUser(firstName,middleName,lastName,userEmail,userCompany)
     }
 }
-

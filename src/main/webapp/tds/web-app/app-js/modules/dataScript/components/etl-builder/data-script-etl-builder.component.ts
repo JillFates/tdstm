@@ -17,6 +17,8 @@ import {CHECK_ACTION, OperationStatusModel} from '../../../../shared/components/
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {ImportAssetsService} from '../../../importBatch/service/import-assets.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {OBJECT_OR_LIST_PIPE} from '../../../../shared/pipes/utils.pipe';
 import { isNullOrEmptyString } from '@progress/kendo-angular-grid/dist/es2015/utils';
@@ -72,7 +74,8 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		private importAssetsService: ImportAssetsService,
 		private preferenceService: PreferenceService,
 		private notifierService: NotifierService,
-		private promptService: UIPromptService) {
+		private promptService: UIPromptService,
+		private permissionService: PermissionService) {
 			super('#etlBuilder');
 			this.script = '';
 			this.modalOptions = { isFullScreen: true, isResizable: true, sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE };
@@ -219,9 +222,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		}
 		if (this.isScriptDirty()) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel').then(result => {
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			).then(result => {
 					if (result) {
 						this.dismiss();
 					}
@@ -401,7 +406,7 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 	 * if value is present return value otherwise returns init
 	 */
 	protected getInitOrValue(dataItem): string {
-		if (dataItem.value) {
+		if (dataItem.value !== undefined && dataItem.value !== null) {
 			return dataItem.value;
 		} else {
 			return (dataItem.init || '');
@@ -427,5 +432,13 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog implements Afte
 		if (this.codeMirrorComponent) {
 			this.codeMirrorComponent.addSyntaxErrors(lineNumbers);
 		}
+	}
+
+	protected canLoadSampleData(): boolean {
+		return this.permissionService.hasPermission(Permission.ETLScriptLoadSampleData);
+	}
+
+	protected isUpdateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ETLScriptUpdate);
 	}
 }

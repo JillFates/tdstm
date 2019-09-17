@@ -1,16 +1,5 @@
 package net.transitionmanager.action
 
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidConfigurationException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.security.CredentialService
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.imports.DataScriptService
-import net.transitionmanager.project.ProviderService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ActionType
 import com.tdssrc.grails.ApiCatalogUtil
@@ -20,19 +9,25 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.ThreadLocalUtil
 import com.tdssrc.grails.ThreadLocalVariable
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.command.ApiActionCommand
+import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.DictionaryItem
 import net.transitionmanager.connector.GenericHttpConnector
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.project.Project
+import net.transitionmanager.exception.ApiActionException
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidConfigurationException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.i18n.Message
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.imports.DataScriptService
 import net.transitionmanager.integration.ActionRequest
 import net.transitionmanager.integration.ActionRequestParameter
 import net.transitionmanager.integration.ActionThreadLocalVariable
-import net.transitionmanager.exception.ApiActionException
 import net.transitionmanager.integration.ApiActionJob
 import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.integration.ApiActionScriptBinding
@@ -40,6 +35,12 @@ import net.transitionmanager.integration.ApiActionScriptBindingBuilder
 import net.transitionmanager.integration.ApiActionScriptCommand
 import net.transitionmanager.integration.ApiActionScriptEvaluator
 import net.transitionmanager.integration.ReactionScriptCode
+import net.transitionmanager.person.Person
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProviderService
+import net.transitionmanager.security.CredentialService
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskFacade
 import org.grails.web.json.JSONObject
 
@@ -51,11 +52,13 @@ class ApiActionService implements ServiceMethods {
 			ActionThreadLocalVariable.ASSET_FACADE,
 			ActionThreadLocalVariable.REACTION_SCRIPTS
 	]
-						CredentialService     credentialService
-						DataScriptService     dataScriptService
-						CustomDomainService   customDomainService
-						ProviderService       providerService
-						ApiCatalogService     apiCatalogService
+
+	CredentialService   credentialService
+	DataScriptService   dataScriptService
+	CustomDomainService customDomainService
+	ProviderService     providerService
+	ApiCatalogService   apiCatalogService
+	TaskActionService   taskActionService
 
 	/**
 	 * Find an ApiAction by id
@@ -105,7 +108,7 @@ class ApiActionService implements ServiceMethods {
 	 * @param action - the ApiAction to be invoked
 	 * @param context - the context from which the method parameter values will be derivied
 	 */
-	void invoke(ApiAction action, Object context) {
+	void invoke(ApiAction action, AssetComment context, Person whom) {
 		// methodParams will hold the parameters to pass to the remote method
 		Map remoteMethodParams = [:]
 
@@ -153,7 +156,7 @@ class ApiActionService implements ServiceMethods {
 				def connector = connectorInstanceForAction(action)
 
 				ActionRequest actionRequest
-				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context)
+				TaskFacade taskFacade = grailsApplication.mainContext.getBean(TaskFacade.class, context, whom)
 
 				// try to construct action request object and execute preScript if there is any
 				try {
@@ -556,15 +559,17 @@ class ApiActionService implements ServiceMethods {
 			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(
-				ApiActionScriptBindingBuilder.class)
-			.with(request)
-			.with(response)
-			.with(asset)
-			.with(task)
-			.with(job)
-			.build(code)
+		ApiActionScriptBindingBuilder scriptBuilder = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder.class)
+					.with(request)
+					.with(response)
+					.with(task)
+					.with(job)
 
+		if (asset) {
+			scriptBuilder = scriptBuilder.with(asset)
+		}
+
+		ApiActionScriptBinding scriptBinding = scriptBuilder.build(code)
 		def result = new ApiActionScriptEvaluator(scriptBinding).evaluate(script)
 
 		checkEvaluationScriptResult(code, result)
@@ -597,14 +602,17 @@ class ApiActionService implements ServiceMethods {
 			AssetFacade asset,
 			ApiActionJob job) {
 
-		ApiActionScriptBinding scriptBinding = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder)
-				.with(request)
-				.with(response)
-				.with(asset)
-				.with(task)
-				.with(job)
-				.build(code)
+		ApiActionScriptBindingBuilder scriptBuilder = grailsApplication.mainContext.getBean(ApiActionScriptBindingBuilder.class)
+					.with(request)
+					.with(response)
+					.with(task)
+					.with(job)
 
+		if (asset) {
+			scriptBuilder = scriptBuilder.with(asset)
+		}
+
+		ApiActionScriptBinding scriptBinding = scriptBuilder.build(code)
 		List errors = new ApiActionScriptEvaluator(scriptBinding).checkSyntax(script)
 
 		return [
@@ -625,13 +633,14 @@ class ApiActionService implements ServiceMethods {
 		return scripts.collect { ApiActionScriptCommand scriptBindingCommand ->
 
 			return compileReactionScript(
-						scriptBindingCommand.code,
-						scriptBindingCommand.script,
-						new ActionRequest(),
-						new ApiActionResponse(),
-						new TaskFacade(),
-						new AssetFacade(new AssetEntity(), [:], true),
-						new ApiActionJob())
+				scriptBindingCommand.code,
+				scriptBindingCommand.script,
+				new ActionRequest(),
+				new ApiActionResponse(),
+				// TODO : JPM 6/2019 : Perhaps we should be passing in the person?
+				new TaskFacade(new AssetComment(), new Person()),
+				new AssetFacade(new AssetEntity(), [:], true),
+				new ApiActionJob())
 		}
 	}
 
@@ -665,7 +674,7 @@ class ApiActionService implements ServiceMethods {
 			if (ActionType.WEB_API == apiAction.actionType) {
 				properties << ['connectorMethod', 'timeout', 'httpMethod', 'endpointUrl', 'isPolling', 'pollingInterval', 'pollingLapsedAfter', 'pollingStalledAfter']
 			} else {
-				properties << ['commandLine', 'script', 'remoteCredentialMethod']
+				properties << ['commandLine', 'script', 'remoteCredentialMethod', 'debugEnabled']
 			}
 		}
 

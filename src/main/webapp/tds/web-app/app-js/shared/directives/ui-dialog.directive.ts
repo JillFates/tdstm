@@ -9,8 +9,9 @@ import {
 } from '@angular/core';
 
 import { NotifierService } from '../services/notifier.service';
-import { UIActiveDialogService } from '../services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../services/ui-dialog.service';
 import { ComponentCreatorService } from '../services/component-creator.service';
+import {ModalType} from '../model/constants';
 
 declare var jQuery: any;
 
@@ -48,7 +49,11 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	replaceNotifier: any;
 	extraNotifier: any;
 
-	constructor(private notifierService: NotifierService, private activeDialog: UIActiveDialogService, private compCreator: ComponentCreatorService) {
+	constructor(
+		private notifierService: NotifierService,
+		private activeDialog: UIActiveDialogService,
+		private compCreator: ComponentCreatorService,
+		private dialogService: UIDialogService) {
 		this.registerListeners();
 	}
 
@@ -95,6 +100,11 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 			this.reject = event.reject;
 			this.resolve = event.resolve;
 			this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
+			if (event.modalType === ModalType.EDIT) {
+				this.cmpRef['_component'].editMode = true;
+			} else {
+				this.cmpRef['_component'].editMode = false;
+			}
 			this.keyboard = event.escape;
 			this.activeDialog.componentInstance = this.cmpRef;
 			this.tdsUiDialog.data('bs.modal').options.keyboard = this.keyboard;
@@ -159,13 +169,29 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 		 * @type {() => void}
 		 */
 		this.replaceNotifier = this.notifierService.on('dialog.replace', event => {
+			let componentExist = false;
+			// Before to replace a dialog, we need to ensure it exist on the UI
 			if (this.cmpRef) {
+				if (this.cmpRef.location && this.cmpRef.location.nativeElement.localName) {
+					componentExist = jQuery(this.cmpRef.location.nativeElement.localName).length > 0;
+				}
+			}
+
+			if (componentExist) {
 				this.cmpRef.destroy();
 				// Pass params to override the current opened dialog behavior
 				this.size = event.size;
 
 				this.cmpRef = this.compCreator.insert(event.component, event.params, this.view);
 				this.activeDialog.componentInstance = this.cmpRef;
+			} else {
+				this.dialogService.open(event.component, event.params, event.size).finally(() => {
+					// We destroy completely the instance and restore to the original layout
+					this.cmpRef = undefined;
+					setTimeout(() => {
+						jQuery('.layout-top-nav').css('padding-right', 0);
+					}, 400);
+				});
 			}
 		});
 

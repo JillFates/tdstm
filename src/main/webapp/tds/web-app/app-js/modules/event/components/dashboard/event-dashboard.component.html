@@ -7,7 +7,7 @@
                             <div class="event-selector">
                                 <span class="event-title">{{'EVENT.EVENT' | translate}}:</span>
                                 <kendo-dropdownlist [data]="eventList" [(ngModel)]="selectedEvent"
-                                    (ngModelChange)="onSelectedEvent($event.id)" textField="name" valueField="id">
+                                    (ngModelChange)="onSelectedEvent($event.id, $event.name)" textField="name" valueField="id">
                                 </kendo-dropdownlist>
                                 <label for="agreement" class="aligned-label dontshow-again">
                                     <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
@@ -29,14 +29,15 @@
                         #planVersusStatus
                         [hasBundleSteps]="hasBundleSteps"
                         (changeProgress)="onChangeStatus($event)"
-                        [currentProgress]="eventPlanStatus.dialIndicator">
+                        [currentProgress]="eventPlanStatus.dialIndicator"
+                        [isDisabled]="!isEventSelected()">
                     </tds-plan-versus-status>
                 </div>
                 <div class="col-md-4">
                     <tds-event-resume *ngIf="hasBundleSteps" [event]="eventPlanStatus"></tds-event-resume>
                 </div>
                 <div class="col-md-4">
-                    <tds-news [news]="newsList" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
+                    <tds-news [news]="newsList" [isDisabled]="!isEventSelected()" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
                 </div>
                 <div class="col-md-2"></div>
             </div>
@@ -72,24 +73,39 @@
                             </div>
                             <div class="fixed-tasks">
                                 <div class="task-done fixed-status">
-                                    <div>Done</div>
-                                    <div>{{eventDetails.countDone}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Completed'}">
+                                          <div>Done</div>
+                                          <div>{{eventDetails.countDone}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-started fixed-status">
-                                    <div>Started</div>
-                                    <div>{{eventDetails.countStarted}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Started'}">
+                                        <div>Started</div>
+                                        <div>{{eventDetails.countStarted}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-ready fixed-status">
-                                    <div>Ready</div>
-                                    <div>{{eventDetails.countReady}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Ready'}">
+                                        <div>Ready</div>
+                                        <div>{{eventDetails.countReady}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-hold fixed-status">
-                                    <div>Hold</div>
-                                    <div>{{eventDetails.countHold}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Hold'}">
+                                        <div>Hold</div>
+                                        <div>{{eventDetails.countHold}}</div>
+                                    </a>
                                 </div>
                                 <div class="task-pending fixed-status">
-                                    <div>Pending</div>
-                                    <div>{{eventDetails.countPending}}</div>
+                                    <a [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{status: 'Pending'}">
+                                        <div>Pending</div>
+                                        <div>{{eventDetails.countPending}}</div>
+                                    </a>
                                 </div>
                             </div>
                         </div>

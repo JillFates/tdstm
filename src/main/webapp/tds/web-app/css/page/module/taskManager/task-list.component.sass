@@ -1,12 +1,126 @@
 task-list
+  .button-toolbar
+    padding-top: 5px
+    padding-left: 8px
+
   .top-filters
     .tds-action-button
-      margin-right: 10px
+      margin-right:  10px
+    .event-dropdown
+      .k-input
+        height: inherit
+    .refresh-control
+      display: inline-block
+
+      .pie-countdown-container
+        .k-dropdown
+          width: 80px
+          background-color: white
+        .pie-countdown-timer
+          background-color: white
 
   .task-grid
-    margin-top: 10px
-    height: 80vh
+    margin-top:  10px
+    height:  80vh
+    .k-grid-content
+      .k-hierarchy-cell
+        > .k-icon
+          height: unset
+          padding: 0
+          &.k-plus:before
+            content: '\e014'
+          &.k-minus:before
+            content: '\e015'
+
+      tr td
+        padding-top: 0px
+        padding-bottom: 0px
+        text-overflow: ellipsis
+        white-space: nowrap
+        line-height: 3px
+
+      tr.k-grid-norecords td
+        line-height: 22px
+        text-align: center
 
     .k-grid-toolbar
       button
-        margin-right: 5px
+        margin-right:  5px
+
+    .task-updated
+      padding-left: 0px
+      padding-top: 0px !important
+      padding-right: 0px
+      padding-bottom: 0px !important
+
+    .task-updated-cell
+      display: block
+      padding-left: 3px
+      margin: 0 auto
+      padding-top: 12px
+      padding-bottom: 10px
+      padding-left: 3px
+
+    .task-status
+      padding-left: 0px
+      padding-right: 100%
+      text-overflow: unset !important
+      span
+        padding: 50px 100vw 50px 3px
+        font-weight: bold
+    .task_hold
+      background-color: #FFFF33 !important
+      color: black
+    .task_hold_overtime
+      background-color: #FF0000
+      color: black
+    .task_planned
+      background-color:  #FFFFFF
+      color:  gray
+    .task_pending
+      background-color:  #FFFFFF
+      color:  black
+    .task_ready
+      background-color:  green !important
+      color:  white
+    .task_started
+      background-color:  darkturquoise!important
+      color:  white
+    .task_completed2
+      background-color:  #5478BA
+    .task_completed5
+      background-color:  #4468AA
+    .task_completed
+      background-color:  #24488A
+      color:  white
+    .task_done2
+      background-color:  #5478BA
+    .task_done5
+      background-color:  #4468AA
+    .task_done
+      background-color:  #24488A
+      color:  white
+    .task_na
+      background-color:  lightgray
+    .task_term
+      background-color:  black
+    .task_tardy
+      background-color:  #FFC266
+    .task_late
+      background-color:  #FF9900
+    .task_overdue
+      color:  red
+
+    .task-action-buttons-wrapper
+      margin: 2px 1px
+      .btn:first-child
+        margin-left: 15px
+      .btn
+        font-size: 11px
+        padding: 1px 10px
+        margin-right: 15px
+        i
+          font-size: inherit
+          padding-right: 5px
+      .task-action-buttons
+        display: inline

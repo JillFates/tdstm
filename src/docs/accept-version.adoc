@@ -1,0 +1,8 @@
+WARNING: You will have to add the Accept-Version header to your request, setting it to the appropriate version 1.0
+
+[source,bash]
+----
+-H 'Accept-Version: 1.0'
+----
+
+

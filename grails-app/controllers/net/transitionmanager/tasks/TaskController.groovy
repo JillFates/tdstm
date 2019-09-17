@@ -10,20 +10,17 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
-import grails.validation.ValidationException
 import groovy.time.TimeDuration
-import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.asset.CommentService
-import net.transitionmanager.command.task.AssignToMeCommand
 import net.transitionmanager.command.task.SetLabelQuantityPrefCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.GraphvizService
-import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
@@ -34,7 +31,6 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
@@ -58,6 +54,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static net.transitionmanager.security.Permissions.Roles.ROLE_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_ADMIN
 import static net.transitionmanager.security.Permissions.Roles.ROLE_CLIENT_MGR
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class TaskController implements ControllerMethods {
@@ -86,12 +83,38 @@ class TaskController implements ControllerMethods {
 	ReportsService reportsService
 	RunbookService runbookService
 	TaskService taskService
+	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
 	GraphvizService graphvizService
 	MessageSource messageSource
 
 	@HasPermission(Permission.TaskView)
 	def index() { }
+
+	/**
+	 * Used to get the task information by ID
+	 * @param id - the ID of the task to retrieve
+	 * @return JSON map of the Task object
+	 */
+	def task(Long id) {
+		AssetComment task = taskService.fetchTaskById(id, currentPerson())
+		renderAsJson(task:task.taskToMap())
+	}
+
+	/**
+	 * Used to change the state of a task between Started, Done and Hold.
+	 * This will take the task ID and check to make sure that the user has access vs using the
+	 * User CurrentProject.
+	 * @param id - the ID of the task
+	 * @param currentStatus - the current status that we are expecting the task to be in
+	 * @param status - the status to set the task to
+	 * @param message - optional message when setting the task on HOLD
+	 * @return The task as an JSON object is updated
+	 */
+	def changeTaskState(Long id) {
+		AssetComment task = taskService.updateTaskState(currentPerson(), id, request.JSON.currentStatus, request.JSON.status, request.JSON.message)
+		renderAsJson(task:task.taskToMap())
+	}
 
 	/**
 	 * Used by the myTasks and Task Manager to update tasks appropriately.
@@ -123,8 +146,13 @@ class TaskController implements ControllerMethods {
 				flash.message = map.error
 			}
 
-			def redirParams = []
-
+			def redirParams = [view: requestParams.view]
+			if (requestParams.containsKey('tab') && requestParams.tab) {
+				redirParams.tab = requestParams.tab
+			}
+			if (requestParams.containsKey('sort') && requestParams.sort) {
+				redirParams.sort = requestParams.sort
+			}
 			if (requestParams.status == COMPLETED) {
 				redirParams.sync = 1
 			}
@@ -142,13 +170,19 @@ class TaskController implements ControllerMethods {
 	 * @return : user full name and errorMessage if status changed by accident.
 	 */
 	@HasPermission(Permission.TaskEdit)
-	def assignToMe(AssignToMeCommand params) {
+	def assignToMe() {
+		Map requestParams
+		if (request.format == 'json') {
+			requestParams = request.JSON
+		} else {
+			requestParams = params
+		}
 
 		String errorMsg = ''
 		String assignedToName = ''
 
 		try {
-			Person assignedTo = taskService.assignToMe(params.id as Long, params.status)
+			Person assignedTo = taskService.assignToMe(requestParams.id as Long, requestParams.status)
 			assignedToName = assignedTo.toString()
 		} catch (EmptyResultException | ServiceException e) {
 			errorMsg = e.message
@@ -468,7 +502,7 @@ digraph runbook {
 					//def url = createLink(controller:'task', action:'neighborhoodGraph', id:task.id, absolute:false)
 
 					// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-					if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+					if (task.isAutomatic()) {
 						fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 						color = taskStatusColorMap['AUTO_TASK'][1]
 						fontsize = '8'
@@ -630,7 +664,9 @@ digraph runbook {
 					t.status,
 					IFNULL(CONCAT(first_name,' ', last_name),'') AS hard_assign,
 					t.is_published AS isPublished,
-					t.duration
+					t.duration,
+					first_name,
+					last_name
 				FROM asset_comment t
 				LEFT OUTER JOIN task_dependency d ON d.predecessor_id=t.asset_comment_id
 				LEFT OUTER JOIN asset_comment s ON s.asset_comment_id=d.asset_comment_id
@@ -695,9 +731,8 @@ digraph runbook {
 
 				fillcolor = taskStatusColorMap[colorKey][1]
 
-				// log.info "task $it.task: role $it.role, $AssetComment.AUTOMATIC_ROLE, (${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'})"
-				// if ("$it.roll" == "$AssetComment.AUTOMATIC_ROLE") {
-				if ("${it.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+				if(it.role == AUTOMATIC_ROLE ||
+				   (Person.SYSTEM_USER_AT.firstName == it.firstName && Person.SYSTEM_USER_AT.lastName == it.lastName)){
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
@@ -732,19 +767,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-				// String svgType = grailsApplication.config.graph.graphViz.graphType ?: 'svg'
-
-//				def uri = reportsService.generateDotGraph("runbook-$moveEventId", dotText.toString())
-//				// convert the URI into a web-safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				String filename = grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1]
-//				def svgFile = new File(filename)
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:tasks]
-//				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("runbook-${moveEventId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:tasks, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
@@ -908,7 +930,7 @@ digraph runbook {
 			AssetComment comment = taskService.changeEstTime(commentId, day)
 			retMap['estStart'] = TimeUtil.formatDateTime(comment?.estStart)
 			retMap['estFinish'] = TimeUtil.formatDateTime(comment?.estFinish)
-		} catch (EmptyResultException | ValidationException e) {
+		} catch (EmptyResultException | InvalidParamException e) {
 			retMap['etext'] = e.message
 		}
 		render retMap as JSON
@@ -1063,33 +1085,10 @@ digraph runbook {
 		render(view: "_editTask", model: [apiActionList: apiActionList])
 	}
 
-    // TODO: <SL> Need @HasPermission annotation
+	@HasPermission(Permission.TaskView)
 	def actionLookUp(Long apiActionId, Long commentId) {
 		Project project = securityService.userCurrentProject
-		AssetComment assetComment = AssetComment.findByIdAndProject(commentId, project)
-		if (!assetComment) {
-			sendNotFound()
-			return
-		}
-
-		if (assetComment.apiAction && assetComment.apiAction.id == apiActionId) {
-			ApiAction apiAction = assetComment.apiAction
-			AbstractConnector connector = apiActionService.connectorInstanceForAction(assetComment.apiAction)
-
-			List<Map> methodParamsList = apiAction.methodParamsList
-			methodParamsList = taskService.fillLabels(project, methodParamsList)
-
-			Map apiActionPayload = [
-				connector         : connector.name,
-				method            : apiAction.connectorMethod,
-				description       : apiAction?.description,
-				methodParams      : methodParamsList,
-				methodParamsValues: apiActionService.buildMethodParamsWithContext(apiAction, assetComment)
-			]
-			render(view: "_actionLookUp", model: [apiAction: apiActionPayload])
-		} else {
-			sendForbidden()
-		}
+		render(view: "_actionLookUp", model: [apiAction: taskActionService.actionLookup(commentId, project)])
 	}
 
 	@HasPermission(Permission.TaskView)
@@ -1111,12 +1110,9 @@ digraph runbook {
 	 */
 	@HasPermission(Permission.TaskView)
 	def list() {
-		// The projectId parameter is mandatory. If not present (or invalid), an exception is thrown.
-		Long projectId = NumberUtil.toPositiveLong(params.projectId)
-		if (!projectId) {
-			throw new InvalidParamException('Missing project id parameter for retrieving tasks.')
-		}
-		Project project = getProjectForWs(projectId)
+		// This will contain a reference to, either the user's project, or the project specified as
+		// a parameter (given that they have access to it)
+		Project project = getProjectForWs()
 
 		// If the params map has an event, validate that it exists and belongs to the project.
 		String eventIdParam = 'eventId'

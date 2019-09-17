@@ -1,6 +1,10 @@
 import {Component, Input, ViewChild, OnInit, Inject} from '@angular/core';
 import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {NgForm} from '@angular/forms';
 
 @Component({
 	selector: 'min-max-configuration-popup',
@@ -8,17 +12,19 @@ import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.servi
 	exportAs: 'minmaxConfig'
 })
 
-export class MinMaxConfigurationPopupComponent implements OnInit {
-
+export class MinMaxConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
+	@ViewChild('templateForm') protected templateForm: NgForm;
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;
-	private hasChanges: boolean;
 
 	constructor(
 		public field: FieldSettingsModel,
 		@Inject('domain') public domain: string,
-		private activeDialog: UIActiveDialogService) {
+		public prompt: UIPromptService,
+		public translate: TranslatePipe,
+		public activeDialog: UIActiveDialogService) {
+		super(activeDialog, prompt, translate);
 	}
 
 	ngOnInit(): void {
@@ -34,7 +40,6 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	 */
 	public validateModel(): void {
 		this.minIsValid = true;
-		this.hasChanges = true;
 		if (this.model.minSize > this.model.maxSize || this.model.minSize < 0) {
 			this.minIsValid = false;
 		}
@@ -44,14 +49,19 @@ export class MinMaxConfigurationPopupComponent implements OnInit {
 	 * On button save click
 	 */
 	public onSave(): void {
-		this.field.constraints = { ...this.model };
-		this.activeDialog.close(this.hasChanges);
+		this.displayWarningMessage()
+			.then((confirm: boolean) => {
+				if (confirm) {
+					this.field.constraints = { ...this.model };
+					this.activeDialog.close(this.isDirty());
+				}
+			});
 	}
 
 	/**
-	 * Close the Dialog but first it verify is not Dirty
+	 * Determine if the form has a dirty state
 	 */
-	public cancelCloseDialog(): void {
-		this.activeDialog.dismiss();
+	isDirty(): boolean {
+		return this.templateForm.dirty;
 	}
 }

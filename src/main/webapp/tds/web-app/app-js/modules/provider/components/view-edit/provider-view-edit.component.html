@@ -46,11 +46,11 @@
 			(click)="onSaveProvider()" class="btn-primary pull-left" [disabled]="!providerForm.form.valid || !isUnique ||  isEmptyValue()">
 		</tds-button-save>
 
-		<tds-button-edit *ngIf="modalType === actionTypes.VIEW" (click)="changeToEditProvider()" 
+		<tds-button-edit *ngIf="modalType === actionTypes.VIEW" [disabled]="!isUpdateAvailable()" (click)="changeToEditProvider()" 
 			class="btn-primary pull-left">
 		</tds-button-edit>
 
-		<tds-button-delete *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteProvider()" class="btn-danger">
+		<tds-button-delete *ngIf="modalType !== actionTypes.CREATE" [disabled]="!isDeleteAvailable()" (click)="onDeleteProvider()" class="btn-danger">
 		</tds-button-delete>
 
 		<tds-button-close *ngIf="modalType === actionTypes.VIEW" class="pull-right" (click)="cancelCloseDialog()">

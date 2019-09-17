@@ -37,7 +37,6 @@ class TagServiceSpec extends Specification implements ServiceUnitTest<TagService
 			completionDate: (new Date() + 5).clearTime(),
 			description: 'projectDescription',
 			client: partyGroup,
-			workflowCode: '12345',
 			guid: StringUtil.generateGuid()
 		).save(flush: true)
 

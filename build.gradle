@@ -8,14 +8,16 @@ buildscript {
 		classpath "org.grails.plugins:hibernate5:${gormVersion - ".RELEASE"}"
 		classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.8"
 		classpath 'org.grails.plugins:database-migration:3.0.4'
+		classpath 'org.grails.plugins:views-gradle:1.3.0'
 	}
 }
 
 plugins {
   id "com.gorylenko.gradle-git-properties" version "2.0.0"
+	id "org.asciidoctor.convert" version "1.5.3"
 }
 
-version "4.7.1-alpha"
+version "4.7.1-RC1"
 group "tdstm"
 
 apply plugin: "eclipse"
@@ -24,6 +26,7 @@ apply plugin: "war"
 apply plugin: "org.grails.grails-web"
 apply plugin: "asset-pipeline"
 apply plugin: "org.grails.grails-gsp"
+apply plugin: "org.grails.plugins.views-json"
 
 war {
     archiveName = "tdstm-${version}.war"
@@ -70,16 +73,17 @@ dependencies {
 	compile "org.hibernate:hibernate-core:5.1.5.Final"
 	compile "org.hibernate:hibernate-ehcache"
 	compile "org.grails.plugins:gsp"
+	compile "org.grails.plugins:views-json:1.3.0"
 	compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
 	compile 'org.apache.httpcomponents:httpclient:4.5.5'
 
 	compile 'org.apache.commons:commons-lang3:3.8.1'
 	compile 'com.google.guava:guava:19.0'
 	compile 'net.sf.jasperreports:jasperreports:4.5.1'
-	compile 'org.apache.poi:poi-ooxml:3.14'
-	compile 'org.apache.poi:ooxml-schemas:1.1'
+	compile 'org.apache.poi:poi-ooxml:3.17'
+	compile 'org.apache.poi:poi-ooxml-schemas:3.17'
 	compile 'org.apache.xmlbeans:xmlbeans:2.6.0'
-	compile 'org.apache.poi:poi:3.14'
+	compile 'org.apache.poi:poi:3.17'
 	compile 'xml-apis:xml-apis:1.4.01'
 
 	// LIB JARS
@@ -146,7 +150,8 @@ dependencies {
 	//TODO broken in Grails 3.3, asked the author to relase a new version.
 	//compile 'org.grails.plugins:xss-sanitizer:1.0.0'
 
-
+	// https://github.com/monitorjbl/excel-streaming-reader
+	compile 'com.monitorjbl:xlsx-streamer:2.1.0'
 
 	console "org.grails:grails-console"
 
@@ -228,3 +233,4 @@ integrationTest.reports.html.destination = file("target/test-integration/test-re
 integrationTest.reports.junitXml.destination = file("target/test-reports/")
 
 
+apply from: 'gradle/restdocs.gradle'

@@ -13,33 +13,28 @@ import grails.validation.ValidationException
 import net.transitionmanager.asset.Room
 import net.transitionmanager.command.ApplicationMigrationCommand
 import net.transitionmanager.command.MoveBundleCommand
-import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.command.reports.ActivityMetricsCommand
+import net.transitionmanager.command.reports.ApplicationConflictsCommand
+import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.StepSnapshot
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.reporting.ReportsService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.command.reports.ApplicationConflictsCommand
-
 
 @Secured("isAuthenticated()")
 class WsReportsController implements ControllerMethods {
@@ -47,10 +42,10 @@ class WsReportsController implements ControllerMethods {
     ReportsService reportsService
     UserPreferenceService userPreferenceService
     MoveBundleService moveBundleService
+    MoveEventService moveEventService
     CustomDomainService customDomainService
     ControllerService controllerService
     PartyRelationshipService partyRelationshipService
-    StateEngineService stateEngineService
 
     /**
      * This endpoint receives the moveEvent and return the corresponding data for the
@@ -114,7 +109,7 @@ class WsReportsController implements ControllerMethods {
     def modelForBundleCreate() {
         Project project = securityService.userCurrentProject
         renderSuccessJson([managers: partyRelationshipService.getProjectStaff(project.id),
-         projectInstance: project, workflowCodes: stateEngineService.getWorkflowCode(), rooms: Room.findAllByProject(project)])
+         projectInstance: project, rooms: Room.findAllByProject(project)])
     }
 
     @HasPermission(Permission.BundleEdit)
@@ -125,24 +120,20 @@ class WsReportsController implements ControllerMethods {
             renderErrorJson()
         }
 
-        stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
         Project project = securityService.userCurrentProject
+        def availableMoveEvents = moveEventService.listMoveEvents(project)
         def managers = partyRelationshipService.getProjectStaff(project.id)
-        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_PROJ_MGR")
-        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, "ROLE_MOVE_BUNDLE", "ROLE_MOVE_MGR")
-
-        //get the all Dashboard Steps that are associated to moveBundle.project
-        def allDashboardSteps = moveBundleService.getAllDashboardSteps(moveBundle)
+        def projectManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_PROJ_MGR)
+        def moveManager = partyRelationshipService.getPartyToRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE, RoleType.CODE_TEAM_MOVE_MGR)
 
         renderSuccessJson([
                 moveBundleInstance: moveBundle,
+                moveEvent: [id: moveBundle.moveEvent?.id, name: moveBundle.moveEvent?.toString()],
+                availableMoveEvents: availableMoveEvents,
                 projectId: project.id,
                 managers: managers,
                 projectManager: projectManager?.partyIdToId,
                 moveManager: moveManager?.partyIdToId,
-                dashboardSteps: allDashboardSteps.dashboardSteps?.sort{it["step"].id},
-                remainingSteps: allDashboardSteps.remainingSteps,
-                workflowCodes: stateEngineService.getWorkflowCode(),
                 rooms: Room.findAllByProject(project)
         ])
     }
@@ -176,14 +167,13 @@ class WsReportsController implements ControllerMethods {
                 MoveBundle moveBundle
                 if(moveBundleId) {
                     moveBundle = moveBundleService.update(moveBundleId, command)
-                    stateEngineService.loadWorkflowTransitionsIntoMap(moveBundle.workflowCode, 'project')
                 } else {
                     moveBundle = moveBundleService.save(command)
                 }
 
                 if (projectManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
-                            Party.findById(projectManagerId), "ROLE_PROJ_MGR")
+                            Party.findById(projectManagerId), RoleType.CODE_TEAM_PROJ_MGR)
                 }
                 if (moveManagerId) {
                     partyRelationshipService.savePartyRelationship("PROJ_BUNDLE_STAFF", moveBundle, RoleType.CODE_PROJECT_MOVE_BUNDLE,
@@ -280,15 +270,12 @@ class WsReportsController implements ControllerMethods {
         }
         Project project = getProjectForWs()
         def smeList = reportsService.getSmeList(moveBundleId, true)
-        def testingList = WorkflowTransition.findAll(
-                'FROM WorkflowTransition where workflow=? order by transId',
-                [Workflow.findByProcess(project.workflowCode)])
         List outageList = customDomainService.fieldSpecs(project, AssetClass.APPLICATION.toString(), CustomDomainService.ALL_FIELDS, ["field", "label"])
         def categories = GormUtil.getConstrainedProperties(AssetComment).category.inList.collect { entry -> [
                 id: entry,
                 text: entry
         ]}
-        renderSuccessJson([smeList: smeList.sort{it.lastName}, testingList: testingList, outageList: outageList,  categories: categories ])
+        renderSuccessJson([smeList: smeList.sort{it.lastName}, outageList: outageList,  categories: categories ])
     }
 
     /**
@@ -345,7 +332,6 @@ class WsReportsController implements ControllerMethods {
      * @param sme: The id of the SME selected value.
      * @param startCategory: string.
      * @param stopCategory: string.
-     * @param testing: integer - The id of the Workflow.
      * @param outageWindow: string - The custom field.
      * @returns The rendered gsp view.
      */

@@ -16,6 +16,7 @@ class StringUtil {
 	private static final List<String> trueList = ['y', 'yes', 't', 'true', '1'].asImmutable()
 	private static final List<String> falseList = ['n', 'no', 'f', 'false', '0'].asImmutable()
 	static final String PLACEHOLDER_REGEXP = /\{([^\}]*)\}/
+	static final String DOUBLE_PLACEHOLDER_REGEXP = /\{\{([^\}\}]*)\}\}/
 
 	/**
 	 * Truncates a string to a specified length and adds ellipsis (...) if the string was longer
@@ -310,14 +311,16 @@ class StringUtil {
 	 * -- CLOSE --
 	 */
 	static openEnvelop(String openTag, String closeTag, String message){
-		def idxB = message.indexOf(openTag)
+		message = message ?: ''
+		int idxB = message.indexOf(openTag)
 		if(idxB >= 0){
-			def idxE = message.indexOf(closeTag)
+			int idxE = message.indexOf(closeTag)
 			if(idxE < 0){
-				throw new RuntimeException("Malformed Message", "Missing ${closeTag} tag for request")
+				throw new RuntimeException("Malformed Message, Missing ${closeTag} tag for request")
 			}
 			message = message.substring(idxB + openTag.length(), idxE)
 		}
+
 		message.trim()
 	}
 
@@ -406,19 +409,19 @@ class StringUtil {
 	 * 'My favorite color is Red' == StringUtil.replacePlaceholders('My favorite color is {COLOR}', [COLOR:'Red'] )
 	 * </pre>
 	 */
-	static String replacePlaceholders(String text, Map params) throws InvalidParamException {
+	static String replacePlaceholders(String text, Map params, String placeholderRegex = PLACEHOLDER_REGEXP) throws InvalidParamException {
 		if (params == null) {
 			throw new InvalidParamException('Parameters map for placeholder replacement is null')
 		}
 
 		StringBuffer sb = new StringBuffer()
-		Matcher m = text =~ PLACEHOLDER_REGEXP
+		Matcher m = text =~ placeholderRegex
 		Set<String> missing = []
 
 		while (m.find()) {
 			String paramName = m.group(1).trim()
 			if (params.containsKey(paramName)) {
-				m.appendReplacement(sb, params[paramName])
+				m.appendReplacement(sb, params[paramName] ?: '[Null]')
 			} else {
 				missing << paramName
 			}

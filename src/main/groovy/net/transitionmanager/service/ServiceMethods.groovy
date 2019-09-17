@@ -1,8 +1,11 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
@@ -74,7 +77,7 @@ trait ServiceMethods {
 
 		checkProject(t, currentProject)
 
-		return t
+		return (T)t
 	}
 
 	/**
@@ -210,7 +213,7 @@ trait ServiceMethods {
 	 * @param locale - message locale, ENGLISH, FRENCH, US, UK (optional)
 	 */
 	void throwException(Class exception, String messageCode, String defaultMessage, Locale locale = LocaleContextHolder.locale) {
-		throwException(exception, messageCode, [] as Object[], defaultMessage, locale)
+		throwException(exception, messageCode, [] as List, defaultMessage, locale)
 	}
 
 	/**
@@ -224,6 +227,24 @@ trait ServiceMethods {
 		String i18nMsg = i18nMessage(messageCode, args as Object[], defaultMessage, locale)
 		Exception ex = exception.newInstance(i18nMsg)
 		throw ex
+	}
+
+	/**
+	 * Retrieve the timezone object corresponding to the given code or the default otherwise.
+	 * @param timezoneValue
+	 * @param defaultTimeZoneCode
+	 * @return
+	 */
+	Timezone getTimezone(String timezoneValue, String defaultTimeZoneCode = TimeUtil.defaultTimeZone) {
+		Timezone timezone
+		if (!StringUtil.isBlank(timezoneValue)) {
+			timezone = Timezone.findByCode(timezoneValue)
+		}
+		if (!timezone) {
+			timezone = Timezone.findByCode(TimeUtil.defaultTimeZone)
+		}
+
+		return timezone
 	}
 
 }

@@ -19,6 +19,5 @@ export const COMMON_SHRUNK_COLUMNS = [
 	'Last Updated',
 	'Method'
 ];
-
 // standard width for mentioned columns
 export const COMMON_SHRUNK_COLUMNS_WIDTH = 103;

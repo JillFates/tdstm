@@ -1,0 +1,317 @@
+<div tds-handle-escape (escPressed)="cancelCloseDialog()" style="width:600px" class="modal-content project-view-edit-component" id="project-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
+     <div class="modal-header">
+         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+             <span aria-hidden="true">×</span>
+         </button>
+         <h4 class="modal-title">Project {{editing ? "Edit" : "Detail"}}</h4>
+     </div>
+    <div class="modal-body">
+        <div class="modal-body-container">
+            <div *ngIf="!editing" class="body" style="width: 95%">
+                <div class="steps_table">
+                    <table>
+                        <tbody>
+                            <tr class="prop">
+                                <td valign="top" class="name">Client:</td>
+
+                                <td valign="top" class="value">
+                                    {{client?.name}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Code:</td>
+
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectCode}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Name:</td>
+
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectName}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Type:</td>
+
+                                <td valign="top" class="value">
+                                    {{savedModel?.projectType}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Description:</td>
+
+                                <td valign="top" class="value">{{savedModel?.description}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Comment:</td>
+
+                                <td valign="top" class="value">{{savedModel?.comment}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Start Date:</td>
+
+                                <td valign="top" class="value">{{savedModel?.startDate | tdsDateTime: userTimeZone}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Completion Date:</td>
+
+                                <td valign="top" class="value">{{savedModel?.completionDate | tdsDateTime: userTimeZone}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Associated Partners:</td>
+
+                                <td valign="top" class="value"><ul><li *ngFor="let partner of savedModel?.partnerIds">{{partnerKey[partner]}}</li></ul></td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Logo:</td>
+
+                                <td valign="top" class="value">
+                                    <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId + '?' + retrieveImageTimestamp"/>
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Default Bundle:</td>
+
+                                <td valign="top" class="value">{{savedModel?.defaultBundleName}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Project Managers:</td>
+
+                                <td valign="top" class="value">
+                                    <ul>
+                                        <li *ngFor="let manager of projectManagers">{{manager}}</li>
+                                    </ul>
+                                </td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Timezone:</td>
+
+                                <td valign="top" class="value">{{savedModel?.timeZone}}</td>
+
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Collect Reporting Metrics:</td>
+                                <td> <input id="collectMetrics" type="checkbox" style="margin-top:0px" [disabled]="true" [ngModel]="savedModel?.collectMetrics"/></td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Date Created:</td>
+
+                                <td valign="top" class="value">
+                                    {{dateCreated | tdsDateTime: userTimeZone}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Last Updated:</td>
+
+                                <td valign="top" class="value">
+                                    {{lastUpdated | tdsDateTime: userTimeZone}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">GUID:</td>
+
+                                <td valign="top" class="value">
+                                    {{projectGUID}}
+                                </td>
+                            </tr>
+
+                            <tr class="prop">
+                                <td valign="top" class="name">Plan Methodology:</td>
+
+                                <td valign="top" class="value">{{savedModel?.planMethodology}}</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="modal-footer form-group-center">
+                    <tds-button-edit *ngIf="canEditProject" class="btn-primary pull-left" (click)="switchToEdit()"></tds-button-edit>
+                    <tds-button-delete *ngIf="canEditProject" class="btn-danger" (click)="confirmDeleteProject()"></tds-button-delete>
+                    <a routerLink="/fieldsettings/list">
+                        <button style="color:black" class="btn btn-action tds-action-button btn-secondary tds-generic-button" (click)="cancelCloseDialog()">
+                            Field Settings
+                        </button>
+                    </a>
+                    <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
+                </div>
+            </div>
+            <div *ngIf="editing">
+                <table style="border:0">
+                    <tbody>
+                    <tr>
+                        <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
+                    </tr>
+                    <tr class="prop">
+                        <td valign="top" class="name"><b>Client:&nbsp;<span style="color: red">*</span></b></td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" [valuePrimitive]="true" id="client" name="client"></kendo-dropdownlist>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Code:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <input type="text" id="projectCode" name="projectCode" [(ngModel)]="projectModel.projectCode"/>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Name:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <input type="text" [(ngModel)]="projectModel.projectName"  id="projectName" name="projectName"/>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Type:</td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="projectType" name="projectType" [data]="projectTypes" [(ngModel)]="projectModel.projectType" ></kendo-dropdownlist>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Description:</td>
+                        <td valign="top" class="value">
+                            <textarea type="text" [(ngModel)]="projectModel.description"  id="description" name="description"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Comment:</b></td>
+                        <td valign="top" class="value">
+                            <textarea id="comment" name="comment" [(ngModel)]="projectModel.comment"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Start Date:</td>
+                        <td valign="top" class="value">
+                            <kendo-datepicker [(ngModel)]="projectModel.startDate"></kendo-datepicker>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
+                        <td valign="top" class="value">
+                            <kendo-datepicker [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Associated Partners:</td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist style="display: block; margin-bottom: 2px" *ngFor="let partnerId of projectModel.partnerIds;" [data]="possiblePartners" [ngModel]="partnerId" (selectionChange)="partnerId = $event" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
+                            <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Project Logo:</b></td>
+                        <td valign="top" class="value">
+                            <kendo-upload
+                                    #kendoUploadInstance="kendoUpload"
+                                    [restrictions]="file.uploadRestrictions"
+                                    [autoUpload]="file.autoUpload"
+                                    [saveUrl]="file.uploadSaveUrl"
+                                    [removeUrl]="file.uploadDeleteUrl"
+                                    [saveField]="file.saveField"
+                                    [removeField]="file.removeField"
+                                    [multiple]="file.multiple"
+                                    [disabled]="false"
+                                    (select)="onSelectFile($event)"
+                                    (upload)="onUploadFile($event)"
+                                    (remove)="onRemoveFile($event)"
+                                    (success)="completeEventHandler($event)"
+                                    style="margin-bottom:2px">
+                                <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
+                            </kendo-upload>
+                            <span style="font-style: italic;">Select a jpg or gif file smaller than 50KB to appear in header</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Default Bundle:</b></td>
+                        <td valign="top" class="value">
+                            <input type="text" id="defaultBundleName" name="defaultBundleName" [(ngModel)]="projectModel.defaultBundleName"/>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Project Managers:</td>
+
+                        <td valign="top" class="value">
+                            <ul>
+                                <li *ngFor="let manager of projectManagers">{{manager}}</li>
+                            </ul>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Time Zone:</b></td>
+                        <td valign="top" class="value">
+                            <input type="text" id="timeZone" name="timeZone" [(ngModel)]="projectModel.timeZone"/> <button style="margin-left:2px" class="btn btn-secondary" (click)="openTimezoneModal()">Change</button>
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Date Created:</td>
+
+                        <td valign="top" class="value">
+                            {{dateCreated | tdsDateTime: userTimeZone}}
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Last Updated:</td>
+
+                        <td valign="top" class="value">
+                            {{lastUpdated | tdsDateTime: userTimeZone}}
+                        </td>
+                    </tr>
+
+                    <tr class="prop">
+                        <td valign="top" class="name">Collect Reporting Metrics:</td>
+                        <td> <input type="checkbox" name="collectMetrics" id="collectMetrics" value="true" checked="checked" style="margin-top:0px" [(ngModel)]="projectModel.collectMetrics"/></td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" class="name"><b>Plan Methodology:</b></td>
+                        <td valign="top" class="value">
+                            <kendo-dropdownlist id="planMethodology" name="planMethodology" [(ngModel)]="projectModel.planMethodology" [data]="planMethodologies" [valuePrimitive]="true"></kendo-dropdownlist>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer form-group-center">
+                    <tds-button-save class="btn-primary pull-left" [disabled]="!validateRequiredFields(projectModel)" (click)="saveForm()"></tds-button-save>
+                    <tds-button-cancel class="btn-secondary pull-right" (click)="cancelEdit()"></tds-button-cancel>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

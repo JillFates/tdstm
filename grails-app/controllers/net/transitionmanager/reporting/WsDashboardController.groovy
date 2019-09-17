@@ -96,8 +96,6 @@ class WsDashboardController implements ControllerMethods {
 
 				def taskStatsSql = """
 					SELECT
-						t.workflow_transition_id AS wfTranId,
-						wft.trans_id AS tid,
 						0 AS snapshotId,
 						mbs.label,
 						mbs.calc_method AS calcMethod,
@@ -114,11 +112,10 @@ class WsDashboardController implements ControllerMethods {
 						MAX(t.date_resolved) AS actComp
 					FROM asset_entity a
 					JOIN asset_comment t ON t.asset_entity_id = a.asset_entity_id
-					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
-					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
+					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id
 					WHERE a.move_bundle_id = $moveBundleId AND t.move_event_id = $moveEventId ${viewUnpublished ? '' : 'AND t.is_published = 1'}
-					GROUP BY t.workflow_transition_id;
+					Group by t.category
 				"""
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 				// log.info "bundleData() SQL = $taskStatsSql"
@@ -130,7 +127,7 @@ class WsDashboardController implements ControllerMethods {
 
 				/* Get the latest step_snapshot record for each step that has started */
 				def latestStepsRecordsQuery = """
-					SELECT mbs.transition_id as tid,
+					SELECT
 						ss.id as snapshotId,
 						mbs.label as label,
 						mbs.calc_method as calcMethod,
@@ -150,7 +147,10 @@ class WsDashboardController implements ControllerMethods {
 
 				/*	Get the steps that have not started / don't have step_snapshot records	*/
 				def stepsNotUpdatedQuery = """
-					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
+					SELECT
+						ss.id as snapshotId, 
+						mbs.label as label, 
+						mbs.calc_method as calcMethod,
 						mbs.plan_start_time as planStart,
 						mbs.plan_completion_time as planComp,
 						mbs.actual_start_time as actStart,
@@ -160,7 +160,7 @@ class WsDashboardController implements ControllerMethods {
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
-					WHERE mb.move_bundle_id = $moveBundle.id AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL
+					WHERE mb.move_bundle_id = $moveBundle.id AND ss.date_created IS NULL
 				"""
 
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery )
@@ -570,7 +570,7 @@ class WsDashboardController implements ControllerMethods {
 
 		def groupPlanMethodologyCount = groupValues.inject([:]) { groups, it ->
 			def key = it.key
-			if(!key) key = Application.UNKNOWN
+			if(!key) key = Application.PLAN_METHODOLOGY_UNKNOWN
 
 			if(!groups[key]) groups[key] = 0
 
@@ -587,7 +587,7 @@ class WsDashboardController implements ControllerMethods {
 		if (customFieldSetting?.constraints?.values) {
 			def sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 				if ( ! it ) {
-					result[Application.UNKNOWN] = 0
+					result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 				} else if (groupPlanMethodologyCount[it]) {
 					result[it] = 0
 				}
@@ -640,17 +640,18 @@ class WsDashboardController implements ControllerMethods {
 				AssetDependency.countByAssetInListAndStatusInList(serversOfPlanningBundle,['Unknown','Questioned']) : 0
 
 		String time
-		def date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated", order:"desc"])?.lastUpdated
+		Date date = AssetDependencyBundle.findByProject(project,[sort:"lastUpdated", order:"desc"])?.lastUpdated
 
-		def today = new Date()
-		def issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status != :status and a.commentType =:type AND a.isPublished = true"
-		def issueArgs = [project:project, status:AssetCommentStatus.COMPLETED, type:AssetCommentType.TASK.toString()]
+		Date today = new Date()
+		Date todayClearedTime = today.clearTime()
+		String issueQuery = "from AssetComment a  where a.project =:project and a.category in (:category) and a.status not in (:status) and a.commentType =:type AND a.isPublished = true"
+		Map issueArgs = [project:project, status: [AssetCommentStatus.COMPLETED, AssetCommentStatus.TERMINATED], type:AssetCommentType.TASK.toString()]
 
-		def openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
-		def dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate:today]).size()
-		def issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
+		Integer openIssue =  AssetComment.findAll(issueQuery,issueArgs + [category : AssetComment.discoveryCategories]).size()
+		Integer dueOpenIssue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category : AssetComment.discoveryCategories, dueDate: todayClearedTime]).size()
+		List<AssetComment> issues = AssetComment.findAll("FROM AssetComment a where a.project = :project and a.commentType = :type and a.status =:status  \
 			and a.category in (:category) AND a.isPublished = true",[project:project, type:AssetCommentType.TASK, status: AssetCommentStatus.READY , category: AssetComment.planningCategories])
-		def generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category: AssetComment.planningCategories, dueDate:today]).size()
+		Integer generalOverDue = AssetComment.findAll(issueQuery +' and a.dueDate < :dueDate ',issueArgs + [category: AssetComment.planningCategories, dueDate:today]).size()
 
 		// Remove the param 'type' that was used for a while above
 		countArgs.remove('type')

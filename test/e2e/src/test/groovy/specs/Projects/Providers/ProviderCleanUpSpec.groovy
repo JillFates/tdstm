@@ -9,6 +9,8 @@ import spock.lang.Stepwise
 import pages.Login.LoginPage
 import pages.Login.MenuPage
 
+import geb.driver.CachingDriverFactory
+
 /**
  * This Spec cleans up the providers list.
  * If there are more than 11 providers (all we really need) then it will delete 8 of them (if possible).
@@ -24,6 +26,8 @@ class ProviderCleanUpSpec extends GebReportingSpec{
     static provName = "E2E Provider"
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+        
         testCount = 0
         to LoginPage
         login()

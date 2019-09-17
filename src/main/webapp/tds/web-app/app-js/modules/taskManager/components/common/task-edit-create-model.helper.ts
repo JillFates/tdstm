@@ -77,8 +77,6 @@ export class TaskEditCreateModelHelper {
 
 		this.model = {
 			title: detailModel.modal.title ,
-			workflow: '' ,
-			workflowTransitionName: '' ,
 			durationDelta: '' ,
 			recipe: '' ,
 			id: detailModel.id,
@@ -112,6 +110,7 @@ export class TaskEditCreateModelHelper {
 			assetClasses: [{id: '', text: ''}],
 			status: this.STATUS.READY,
 			statusList: [],
+			percentageComplete: 0,
 			personList: [],
 			teamList: [],
 			originalPredecessorList: [],
@@ -154,11 +153,10 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
-			apiActionInvokedAt: assetComment.apiActionInvokedAt,
+			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
+			percentageComplete: detail.percentageComplete,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
 			title: task.modal.title,
-			workflow: detail.workflow || '',
-			workflowTransitionName: assetComment.workflowTransition && assetComment.workflowTransition.name || '',
 			durationDelta: detail.durationDelta || '',
 			recipe: detail.recipe || null,
 			id: assetComment.id,
@@ -275,17 +273,15 @@ export class TaskEditCreateModelHelper {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
 			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
-			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+			priority, assignedTeam, status, assignedTo, durationScale, apiActionInvokedAt, percentageComplete} = this.model;
 
 		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
-		const deletedItems = this.model.deletedPredecessorList
-			.concat(this.model.deletedSuccessorList)
-			.join(',');
+		const deletedItems = this.model.deletedPredecessorList.concat(this.model.deletedSuccessorList);
 
-		return  {
+		const payload =  {
 			assetClass: assetClass.id,
 			assetEntity: this.getEmptyStringIfNull(asset && asset.id).toString(),
 			assetType: assetClass.text,
@@ -320,13 +316,13 @@ export class TaskEditCreateModelHelper {
 			resolution: '',
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
+			percentageComplete: percentageComplete,
 			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
 				.concat(this.getTaskEdited(predecessorTasks, originalPredecessorList)),
 			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
 				.concat(this.getTaskEdited(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
-			workflowTransition: '',
 			canEdit: true, /* ? */
 			durationLocked: locked ? '1' : '0',
 			durationText: `${durationParts.days} days ${durationParts.hours} hrs ${durationParts.minutes} mins`,
@@ -334,6 +330,8 @@ export class TaskEditCreateModelHelper {
 			note: note,
 			id: id
 		};
+
+		return payload;
 	}
 
 	/**
@@ -360,15 +358,13 @@ export class TaskEditCreateModelHelper {
 			id, assetClass, predecessorList, successorList, originalPredecessorList, originalSuccessorList,
 			asset, dueDate, durationParts, estimatedFinish, estimatedStart, taskNumber, note, locked,
 			hardAssigned, sendNotification, instructionLink, event, category, apiAction, comment,
-			priority, assignedTeam, status, assignedTo, durationScale} = this.model;
+			priority, assignedTeam, status, assignedTo, durationScale, percentageComplete} = this.model;
 
 		// ignore blank tasks
 		const predecessorTasks = predecessorList.filter((task) => task.id);
 		const successorTasks = successorList.filter((task) => task.id);
 
-		const deletedItems = this.model.deletedPredecessorList
-			.concat(this.model.deletedSuccessorList)
-			.join(',');
+		const deletedItems = this.model.deletedPredecessorList.concat(this.model.deletedSuccessorList);
 
 		return  {
 			assetClass: assetClass.id,
@@ -405,13 +401,13 @@ export class TaskEditCreateModelHelper {
 			resolution: '',
 			role: this.getEmptyStringIfNull(assignedTeam && assignedTeam.id),
 			status: status,
+			percentageComplete: percentageComplete,
 			manageDependency: '1',
 			taskDependency: this.getTaskAdded(predecessorTasks, originalPredecessorList)
 				.concat(this.getTaskPrevious(predecessorTasks, originalPredecessorList)),
 			taskSuccessor: this.getTaskAdded(successorTasks, originalSuccessorList)
 				.concat(this.getTaskPrevious(successorTasks, originalSuccessorList)),
 			deletedPreds: deletedItems,
-			workflowTransition: '',
 			canEdit: true, /* ? */
 			durationLocked: locked ? '1' : '0',
 			id: ''

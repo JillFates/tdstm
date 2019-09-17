@@ -1,6 +1,6 @@
 package net.transitionmanager.asset
 
-
+import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
@@ -19,13 +19,20 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
-import org.apache.commons.lang3.BooleanUtils
+import net.transitionmanager.utils.Profiler
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.impl.triggers.SimpleTriggerImpl
 
 /**
  * Created by @oluna on 4/5/17.
@@ -42,7 +49,10 @@ class WsAssetController implements ControllerMethods {
 	ControllerService controllerService
 	DatabaseService databaseService
 	DeviceService deviceService
+	MoveBundleService moveBundleService
 	PageRenderer groovyPageRenderer
+	ProgressService progressService
+	Scheduler quartzScheduler
 	StorageService storageService
 	UserPreferenceService userPreferenceService
 
@@ -303,7 +313,25 @@ class WsAssetController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.AssetView)
-	def getModel(Long id, String mode) {
+	def showModel(Long id) {
+		getModel(id, 'show')
+	}
+
+	/**
+	 * Used to retrieve the model data for the edit view of an asset
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	@HasPermission(Permission.AssetEdit)
+	def editModel(Long id) {
+		getModel(id, 'edit')
+	}
+
+	/**
+	 * @param id - the id of the asset to retrieve the model for
+	 * @return JSON map
+	 */
+	private def getModel(Long id, String mode) {
 		final List modes = ['edit','show']
 		if (! modes.contains(mode) || id == null) {
 			sendBadRequest()
@@ -484,15 +512,6 @@ class WsAssetController implements ControllerMethods {
 		renderSuccessJson(assetEntityService.listDependencies(project, jsonParams, sortingParams, paginationParams))
 	}
 
-
-	/**
-	 * Return a list with all the AssetCommentCategory values.
-	 */
-	@HasPermission(Permission.TaskBatchView)
-	def assetCommentCategories() {
-		renderSuccessJson(AssetCommentCategory.list)
-	}
-
 	/**
 	 * Delete a comment given its id.
 	 */
@@ -564,4 +583,56 @@ class WsAssetController implements ControllerMethods {
 		Boolean justPlanning = StringUtil.toBoolean(justPlanningPref)
 		renderSuccessJson(assetEntityService.getAssetSummary(project, justPlanning))
 	}
+
+	@HasPermission(Permission.AssetExport)
+	def bundlesAndPreferencesForAssetExport() {
+		Project project = getProjectForWs()
+		renderSuccessJson([bundles:moveBundleService.lookupList(project),
+		                   userPreferences: userPreferenceService.getExportPreferences()])
+	}
+
+	/**
+	 * Update the asset export related preferences based on parameters and then trigger the asset export job.
+	 *
+	 * @return job key
+	 */
+	@HasPermission(Permission.AssetExport)
+	def exportAssets() {
+		Map paramsMap = request.JSON
+		paramsMap.bundle = CollectionUtils.asList(paramsMap.bundle)
+		UserLogin currentUser = securityService.userLogin
+		userPreferenceService.getExportPreferences().each { String preferenceName, String preferenceValue ->
+			if (!paramsMap.containsKey(preferenceName)) {
+				throw new InvalidParamException("Missing parameter '${preferenceName}' for asset export.")
+			}
+			String parameterValue = paramsMap[preferenceName].toString()
+			if (parameterValue != preferenceValue) {
+				userPreferenceService.setPreference(currentUser, preferenceName, parameterValue)
+			}
+		}
+
+		String key = "AssetExport-" + UUID.randomUUID()
+		progressService.create(key)
+
+		log.info "Initiate Export"
+
+		// Delay 2 seconds to allow this current transaction to commit before firing off the job
+		Trigger trigger = new SimpleTriggerImpl("TM-" + key, null, new Date(System.currentTimeMillis() + 2000))
+		trigger.jobDataMap.putAll(paramsMap)
+		trigger.jobDataMap.key = key
+		trigger.jobDataMap.username = securityService.currentUsername
+		trigger.jobDataMap.projectId = securityService.userCurrentProjectId
+		trigger.jobDataMap.tzId = userPreferenceService.timeZone
+		trigger.jobDataMap.userDTFormat = userPreferenceService.dateFormat
+		trigger.jobDataMap[Profiler.KEY_NAME] = session[Profiler.KEY_NAME]
+
+		trigger.setJobName('ExportAssetEntityJob')
+		trigger.setJobGroup('tdstm-export-asset')
+		quartzScheduler.scheduleJob(trigger)
+
+		progressService.update(key, 1, 'In progress')
+
+		renderSuccessJson(key: key)
+	}
+
 }

@@ -4,7 +4,7 @@
  *
  *  Use angular/views/TheAssetType as reference
  */
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, AfterViewInit} from '@angular/core';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import * as R from 'ramda';
 import {AssetExplorerService} from '../../../assetManager/service/asset-explorer.service';
@@ -18,6 +18,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 const pleaseSelectMessage = 'Please Select';
 
@@ -29,7 +30,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			{ provide: 'model', useValue: model }
 		]
 	})
-	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit {
+	class ApplicationCreateComponent extends AssetCommonEdit implements OnInit, AfterViewInit {
 		defaultItem = {fullName: pleaseSelectMessage, personId: null};
 		addPersonItem = {fullName: 'Add person', personId: -1};
 		moveBundleList = [];
@@ -50,15 +51,20 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe
 			) {
-				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+				super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {
 			this.initModel();
 			this.focusControlByName('assetName');
 			this.model.asset.validation = this.defaultValidation;
+		}
+
+		ngAfterViewInit() {
+			this.onFocusOutOfCancel();
 		}
 
 		/**

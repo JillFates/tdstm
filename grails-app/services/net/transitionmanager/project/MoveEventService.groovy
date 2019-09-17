@@ -25,6 +25,7 @@ import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
 import net.transitionmanager.security.RoleType
 import org.apache.poi.ss.usermodel.CellStyle
+import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
@@ -36,15 +37,15 @@ class MoveEventService implements ServiceMethods {
 
 	private static final List<String> preMoveCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'assignedTo',
 													 'status', 'estStart', '', '', 'notes', 'duration', 'estStart',
-													 'estFinish', 'actStart', 'actFinish', 'workflow']
+													 'estFinish', 'actStart', 'actFinish']
 	private static final List<String> serverCols = ['id', 'application', 'assetName', '','serialNumber', 'assetTag',
 													'manufacturer', 'model', 'assetType', '', '', '']
 	private static final List<String> scheduleCols = ['taskNumber', 'taskDependencies', 'assetEntity', 'comment', 'role',
 													  'assignedTo', 'instructionsLink' , '', 'duration', 'estStart',
-													  'estFinish', 'actStart', 'actFinish', 'workflow']
+													  'estFinish', 'actStart', 'actFinish']
 	private static final List<String> postMoveCols = ['taskNumber', 'assetEntity', 'comment','assignedTo', 'status',
 													  'estFinish', 'dateResolved' , 'notes', 'taskDependencies', 'duration',
-													  'estStart', 'estFinish', 'actStart', 'actFinish', 'workflow']
+													  'estStart', 'estFinish', 'actStart', 'actFinish']
 	private static final List<String> impactedCols = ['id', 'assetName', '', 'startupProc', 'description',
 													  'sme', '' ,'' ,'' ,'' ,'' ,'' ]
 	private static final List<String> dbCols = ['id', 'assetName', 'dbFormat', 'size', 'description', 'supportType',
@@ -69,7 +70,7 @@ class MoveEventService implements ServiceMethods {
 														'resolution', 'resolvedBy', 'createdBy', 'dueDate', 'assignedTo',
 														'category', 'dateCreated', 'dateResolved', 'assignedTo', 'status',
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
-														'actStart', 'actFinish', 'workflow']
+														'actStart', 'actFinish']
 
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
@@ -428,12 +429,12 @@ class MoveEventService implements ServiceMethods {
 			Font projectNameFont = book.createFont()
 			projectNameFont.fontHeightInPoints = (short)14
 			projectNameFont.fontName = 'Arial'
-			projectNameFont.boldweight = Font.BOLDWEIGHT_BOLD
+			projectNameFont.setBold(true)
 
 			CellStyle projectNameCellStyle = book.createCellStyle()
 			projectNameCellStyle.font = projectNameFont
 			projectNameCellStyle.fillBackgroundColor = IndexedColors.SEA_GREEN.index
-			projectNameCellStyle.fillPattern = CellStyle.SOLID_FOREGROUND
+			projectNameCellStyle.fillPattern = FillPatternType.SOLID_FOREGROUND
 
 			WorkbookUtil.addCell(summarySheet, 1, 1, currentProject.name)
 			WorkbookUtil.applyStyleToCell(summarySheet, 1, 1, projectNameCellStyle)
@@ -533,7 +534,7 @@ class MoveEventService implements ServiceMethods {
 		List<MoveBundleStep> moveBundleSteps = []
 
 		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle} ORDER BY mbs.transitionId")
+			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
 
 			if (step) {
 				moveBundleSteps.addAll(step)

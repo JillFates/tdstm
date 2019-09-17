@@ -35,26 +35,22 @@
 						<td valign="top" class="name" id="eventTdId"><label for="moveEvent">Event:</label></td>
 						<td valign="top" class="value" id="eventName" colspan="3">{{acData.eventName}}</td>
 					</tr>
-					<tr id="actionShowId">
-						<td valign="top" class="name"  style="vertical-align: middle;" id="actionTdId"><label for="vmAction">Action:</label></td>
+					<tr id="actionShowId" class="api-action-section">
+						<td valign="top" class="name"  id="actionTdId"><label for="vmAction">Action:</label></td>
 						<td valign="top" class="value" id="vmAction" colspan="2">
-              <a href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping" ng-click="lookUpAction();">{{acData.apiAction.name}}</a>
-            </td>
+              				<a class="label-section" href="#" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="" data-content="View Action Parameter Mapping"
+							  ng-click="lookUpAction();">{{acData.apiAction.name}}
+							  </a>
+            			</td>
 					</tr>
+
 					<tr id="categoryTrId">
 						<td valign="top" class="name"><label for="category">Category:</label></td>
 						<td valign="top" class="value" id="categoryTdId" style="width:15%">{{ac.category}}</td>
 						<td>
 						</td>
 					</tr>
-					<tr id="workFlowShow" ng-show="(acData.workflow)">
-						<td valign="top" class="name" nowrap="nowrap"><label for="workFlowShowId">WorkFlow Step:</label></td>
-						<td valign="top" class="value" id="workFlowShowId">{{acData.workflow}}</td>
-						<td valign="top" class="name" colspan="2"><input type="checkbox" id="overrideShow" name="overrideShow" value="0"
-							ng-true-value="1" ng-false-value="0" ng-disabled="true" ng-model="ac.override" />
-							<label for="override" >Overridden</label>
-						</td>
-					</tr>
+
 					<tr id="assetShowId" class="prop">
 						<td valign="top" class="name" id="assetTdId"><label for="asset">Asset:</label></td>
 						<td valign="top" class="value" id="assetShowValueId" colspan="3">
@@ -69,28 +65,7 @@
 							<span ng-hide="acData.instructionsLinkURL.length > 0">{{ac.instructionsLink}}</span>
 						</td>
 					</tr>
-					<tr id="workFlowShow1">
-						<td valign="top" class="name"><label for="priorityShowId">Priority:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="priorityShowId"><b ng-show="ac.priority == 1 || ac.priority == 2">{{ac.priority}}</b><span ng-show="!(ac.priority == 1 || ac.priority == 2)">{{ac.priority}}</span></span>
-						</td>
-					</tr>
-					<tr id="workFlowShow2">
-						<td valign="top" class="name"><label for="dueDateShowId">Due Date:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="dueDateShowId">{{ac.dueDate}}</span>
-						</td>
-					</tr>
-					<tr id="workFlowShow3">
-						<td valign="top" class="name"><label for="durationShowId">Estimated Duration:</label></td>
-						<td valign="top" class="value"colspan="3" nowrap="nowrap">
-							<span id="durationShowId" >{{ac.durationText}}</span>
-							<div class="daterangepicker_action daterangepicker_lock_show">
-								<i ng-if="!acData.durationLocked" class="fa fa-fw fa-unlock"></i>
-								<i ng-if="acData.durationLocked" class="fa fa-fw fa-lock"></i>
-							</div>
-						</td>
-					</tr>
+
 					<tr id="estStartShow">
 						<td valign="top" class="name" nowrap="nowrap"><label for="estStartShowId">Estimated Start:</label></td>
 						<td valign="top" class="value" id="estStartShowId" nowrap="nowrap">{{acData.etStart}}</td>
@@ -106,6 +81,18 @@
 					<tr class="prop">
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td valign="top" ng-class="acData.cssForCommentStatus" id="statusShowId" colspan="1" style="width: 20%">{{ac.status}}&nbsp;</td>
+					</tr>
+					<tr id="completitionPercent">
+						<td valign="top" class="name" ><label>Completion %:</label></td>
+						<td colspan="1" class="progress-container">
+							<div class="progress">
+								<div class="progress-bar" role="progressbar"
+									style="width: {{acData.percentageComplete}}%;"
+									aria-valuenow="{{acData.percentageComplete}}"
+									aria-valuemin="0"
+									aria-valuemax="100">{{acData.percentageComplete}}%</div>
+							</div>
+						</td>
 					</tr>
 					<tr class="prop">
 						<td valign="top" class="name"><label for="taskSpecId">TaskSpec ID:</label></td>

@@ -1,5 +1,6 @@
 package net.transitionmanager.service
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.tm.enums.domain.ApiActionHttpMethod
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
@@ -7,9 +8,11 @@ import com.tdssrc.grails.ThreadLocalUtil
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import grails.testing.web.GrailsWebUnitTest
+import grails.util.Holders
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalog
+import net.transitionmanager.action.HttpProducerService
 import net.transitionmanager.action.Provider
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntity
@@ -19,6 +22,7 @@ import net.transitionmanager.command.task.ActionCommand
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
+import net.transitionmanager.connector.AbstractConnector
 import net.transitionmanager.connector.CallbackMode
 import net.transitionmanager.connector.ContextType
 import net.transitionmanager.integration.ActionRequest
@@ -35,6 +39,7 @@ import net.transitionmanager.task.TaskService
 import org.springframework.web.multipart.MultipartFile
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 import test.helper.ApiCatalogTestHelper
 import test.helper.mock.ProjectMock
 
@@ -71,7 +76,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 	private static final String paramsJson = """
 		[
 			{
-				"param": "param1",
+				"paramName": "param1",
 				"context": "${ContextType.USER_DEF.name()}",
 				"value": "xk324-kj1i2-23ks-9sdl"
 			}
@@ -82,11 +87,14 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		mockDomains Project, Provider, ApiCatalog, ApiAction, AssetComment
 
 		service.taskService = [
-					addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+					addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+						notes << note
 						return true
 					}
 				] as TaskService
-
+		TaskFacade taskFacade2 = new TaskFacade(new AssetComment(), new Person())
+		taskFacade2.taskService = service.taskService
+		Holders.grailsApplication.mainContext.beanFactory.registerSingleton("taskFacade", taskFacade2)
 		defineBeans {
 			coreService(CoreService) {
 				grailsApplication = ref('grailsApplication')
@@ -97,11 +105,23 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			}
 			settingService(SettingService)
 
+			httpProducerService(HttpProducerService)
+			// A custom context holder to allow us to gain access to the application context and other components of the runtime environment
+			applicationContextHolder(ApplicationContextHolder) { bean ->
+				bean.factoryMethod = 'getInstance'
+			}
+
 			taskFacade(TaskFacade) { bean ->
 				bean.scope = 'prototype'
+
 				taskService = [
-					addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+					addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+						notes << note
 						return true
+					},
+					setTaskStatus: {AssetComment task, String status, Person whom, boolean isPM=false->
+						notes << "Placed task on HOLD, previous state was 'Ready'"
+						return null
 					}
 				] as TaskService
 			}
@@ -144,7 +164,8 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		assetComment.save(failOnError: true, flush: true)
 
 		service.taskService = [
-			addNote: { AssetComment task, Person person, String note, int isAudit = 1 -> notes << note
+			addNote: { AssetComment task, Person person, String note, int isAudit = 1 ->
+				notes << note
 				return true
 			}
 		] as TaskService
@@ -194,7 +215,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			)
 		when: 'updating the action status'
 			service.actionStarted(action, assetComment.id, whom)
-		then: 'task notes are added and the apiActionPercentDone is updated'
+		then: 'task notes are added and the percentageComplete is updated'
 			notes.size() ==2
 			notes.contains('some message')
 			notes[1].startsWith('testAction started at')
@@ -216,7 +237,7 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 		then:
 			notes.size() == 1
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 5
+			assetComment.percentageComplete == 5
 	}
 
 	void 'Test updateRemoteActionStatus error'() {
@@ -251,10 +272,10 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			)
 		when: 'updating the action status'
 			service.actionDone(action, assetComment.id, whom)
-		then: 'task node are added, and the apiActionPercentDone is set to 100'
+		then: 'task node are added, and the percentageComplete is set to 100'
 			notes.size() == 2
 			notes.contains('some message')
-			assetComment.apiActionPercentDone == 100
+			assetComment.percentageComplete == 100
 			notes[1] == 'Invoked Task with status: SUCCESS'
 	}
 
@@ -371,5 +392,65 @@ class TaskActionServiceSpec extends Specification implements ServiceUnitTest<Tas
 			notes.size() == 2
 			notes.contains('some message')
 			notes[1] == 'Invoked Task with status: ERROR'
+	}
+
+	@ConfineMetaClassChanges([ApplicationContextHolder])
+	void 'Test renderScript without username/password'() {
+		when: 'rendering a script without username/password'
+			String renderedScript = service.renderScript('echo {{param1}}',assetComment)
+		then: 'The script is rendered to a string'
+			renderedScript == 'echo xk324-kj1i2-23ks-9sdl'
+	}
+
+	@ConfineMetaClassChanges([ApplicationContextHolder])
+	void 'Test renderScript with username/password'() {
+		when: 'rendering a script with username/password'
+			String renderedScript = service.renderScript('echo {{param1}} \necho {{username}} \necho {{password}}',assetComment)
+		then: 'The script is rendered to a string'
+			renderedScript == 'echo xk324-kj1i2-23ks-9sdl \necho {{username}} \necho {{password}}'
+	}
+
+	@ConfineMetaClassChanges([TaskActionService])
+	void "Test ActionLookUp"(){
+		setup: 'Given mocks for external services'
+			service.apiActionService = [
+				connectorInstanceForAction: { ApiAction action ->
+					[
+						buildMethodParamsWithContext: { ApiAction action2, AssetComment task ->
+							[param1: 'test param']
+						}
+					] as AbstractConnector
+				}
+			] as ApiActionService
+
+			service.metaClass.renderScript = {String script,  AssetComment task-> script}
+
+			service.taskService  = [
+				fillLabels: {Project project, List<Map> methodParams-> methodParams}
+			] as TaskService
+		when: 'calling actionLookUp'
+			Map action = service.actionLookup(action.id, project)
+		then: 'a map of API action details is returned'
+
+			action == [
+				name              : 'testAction',
+				script            : null,
+				isRemote          : true,
+				type              : 'WebAPI',
+				connector         : null,
+				method            : 'invokeHttpRequest',
+				description       : 'This is an action for testing',
+				methodParams      : [
+					[
+						paramName: 'param1',
+						context  : 'USER_DEF',
+						value    : 'xk324-kj1i2-23ks-9sdl'
+					]
+				],
+				methodParamsValues: [
+					param1: 'test param'
+				]
+			]
+
 	}
 }

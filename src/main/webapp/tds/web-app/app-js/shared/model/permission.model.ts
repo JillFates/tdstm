@@ -198,9 +198,16 @@ export class Permission {
 	static UserUpdateOwnAccount = 'UserUpdateOwnAccount';
 	static UserView = 'UserView';
 	static ViewPacingMeters = 'ViewPacingMeters';
-	static WorkflowCreate = 'WorkflowCreate';
-	static WorkflowDelete = 'WorkflowDelete';
-	static WorkflowEdit = 'WorkflowEdit';
-	static WorkflowList = 'WorkflowList';
-	static WorkflowView = 'WorkflowView';
+	static ProviderCreate = 'ProviderCreate';
+	static ProviderDelete = 'ProviderDelete';
+	static ProviderUpdate = 'ProviderUpdate';
+	static ETLScriptCreate = 'ETLScriptCreate';
+	static ETLScriptDelete = 'ETLScriptDelete';
+	static ETLScriptUpdate = 'ETLScriptUpdate';
+	static ETLScriptLoadSampleData = 'ETLScriptLoadSampleData';
+	static CredentialView = 'CredentialView';
+	static AssetDependenciesBulkSelect = 'AssetDependenciesBulkSelect';
+	static AssetBulkSelect = 'AssetBulkSelect'
+	static AssetDependencyEdit = 'AssetDependencyEdit';
+	static AssetDependencyDelete = 'AssetDependencyDelete';
 }

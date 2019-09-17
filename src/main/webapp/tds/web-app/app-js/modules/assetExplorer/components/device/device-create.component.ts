@@ -16,6 +16,7 @@ import {ASSET_ENTITY_DIALOG_TYPES} from '../../model/asset-entity.model';
 import {DeviceCommonComponent} from './model-device/device-common.component';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 export function DeviceCreateComponent(template, model: any, metadata: any) {
 
@@ -35,14 +36,16 @@ export function DeviceCreateComponent(template, model: any, metadata: any) {
 			dialogService: UIDialogService,
 			notifierService: NotifierService,
 			tagService: TagService,
-			promptService: UIPromptService) {
-			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService);
+			promptService: UIPromptService,
+			translatePipe: TranslatePipe) {
+			super(model, activeDialog, userContextService, permissionService, assetExplorerService, dialogService, notifierService, tagService, metadata, promptService, translatePipe);
 		}
 
 		ngOnInit() {
 			this.initModel();
 			this.toggleAssetTypeFields();
 			this.focusControlByName('assetName');
+			this.onFocusOutOfCancel();
 		}
 
 		/**

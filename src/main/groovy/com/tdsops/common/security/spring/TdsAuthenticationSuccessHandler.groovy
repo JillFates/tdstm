@@ -82,7 +82,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
 				} else if (userLogin.forcePasswordChange == 'Y') {
-					redirectUri = "/userLogin/changePassword?userLoginInstance=${userLogin.username}"
+					redirectUri = "/module/auth/changePassword"
 				} else {
 					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
 				}
@@ -102,7 +102,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 				signInInfoMap.notices = [
 					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
-					redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
+					redirectUrl: redirectUri
 				]
 			}
 

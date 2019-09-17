@@ -40,7 +40,7 @@ class AssetDependency {
 		dependent validator: { val, obj ->
 			// Validate that the asset and dependent are not the same
 			if (val && obj && obj.asset?.id == obj.dependent?.id) {
-				return ['invalid.dependent']
+				return ['assetDependency.dependent.invalid.dependent']
 			}
 		}
 		c1 nullable: true, blank: true, size:0..255

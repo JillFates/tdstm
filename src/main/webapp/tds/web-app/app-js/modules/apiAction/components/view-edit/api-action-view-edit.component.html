@@ -55,9 +55,21 @@
 							</span>
 						</a>
 					</li>
+					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
+						[ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
+						<a href="#tab_reactions" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API) || isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateReactions"
+						(click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab">
+							<span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span>
+						</a>
+						<ng-template #labelTemplateReactions>
+							<a class="tab-disabled"><span>Reaction</span></a>
+						</ng-template>
+					</li>
+					<!--
 					<li role="presentation" [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
 						<a href="#tab_reactions" (click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab"><span [ngClass]="{ 'invalid-form': invalidScriptSyntax }">Reaction</span></a>
 					</li>
+					-->
 				</ul>
 				<div class="tab-content" [ngClass]="{'no-padding':isCurrentTab(tabsEnum.Parameters)}">
 					<div [ngClass]="!hasEarlyAccessTMRPermission && isCurrentTab(tabsEnum.Info) ? 'is-displayed': 'is-hidden'"
@@ -89,13 +101,15 @@
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
 												<kendo-dropdownlist #apiActionProvider
-                                                                    tabindex="2"
-																	id="apiActionProvider" name="apiActionProvider"
-                                                                    (valueChange)="onProviderValueChange($event, false)"
+                                  tabindex="2"
+																	id="apiActionProvider"
+																	name="apiActionProvider"
+                                  (valueChange)="onProviderValueChange($event, false)"
 																	[data]="providerList"
 																	[textField]="'name'"
-                                                                    [valueField]="'id'"
-                                                                    requiredComplexValue propertyName="id"
+																	[valueField]="'id'"
+																	requiredComplexValue
+																	propertyName="id"
 																	[(ngModel)]="apiActionModel.provider"
 																	required
 																	class="form-control">
@@ -305,7 +319,7 @@
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+                                                <label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
 											</div>
 										</div>
 									</div>
@@ -453,12 +467,12 @@
 										<div class="form-group">
 											<label for="simpleApiActionRemote" class="col-sm-3 control-label">Remote Invocation:
 											</label>
-											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
+											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
 												<input type="checkbox"
 												       id="simpleApiActionRemote"
 												       name="simpleApiActionRemote"
 												       tabindex="5"
-												       [checked]="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'"
+													   [(ngModel)]="apiActionModel.isRemote"
 												       [disabled]="true"
 												       class="form-check-input aligned-checkbox" />
 
@@ -466,6 +480,22 @@
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">
 													{{apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API' ? 'Yes' : 'No'}}
+												</label>
+											</div>
+										</div>
+										<div class="form-group" *ngIf="apiActionModel.actionType && apiActionModel.actionType.id !== 'WEB_API'">
+											<label for="simpleApiActionDebug" class="col-sm-3 control-label">Debug: </label>
+											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
+												<input type="checkbox"
+													   id="debugEnabled"
+													   name="debugEnabled"
+													   tabindex="6"
+													   [(ngModel)]="apiActionModel.debugEnabled"
+													   class="form-check-input aligned-checkbox debug" />
+											</div>
+											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
+												<label class="control-label label-detail">
+													{{apiActionModel.debugEnabled ? 'Yes' : 'No'}}
 												</label>
 											</div>
 										</div>
@@ -701,7 +731,7 @@
 												                    [disabled]="!apiActionModel.producesData || apiActionModel.provider.id === 0"></kendo-dropdownlist>
 											</div>
 											<div class="col-sm-7" *ngIf="modalType === actionTypes.VIEW">
-												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{apiActionModel.defaultDataScript.name}}</label>
+												<label class="control-label label-detail" *ngIf="apiActionModel.defaultDataScript?.id !== 0">{{getDataScriptName()}}</label>
 											</div>
 										</div>
 									</div>
@@ -754,7 +784,7 @@
 								</div>
 								<div class="row">
 									<div class="form-group">
-										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials:</label>
+										<label for="scriptCredentials" class="col-sm-2 control-label required-field">Credentials Type:</label>
 										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 											<kendo-dropdownlist id="scriptCredentials"
 											                    name="scriptCredentials"
@@ -771,6 +801,28 @@
 										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
 											<label class="control-label label-detail">
 												{{apiActionModel.remoteCredentialMethod && (apiActionModel.remoteCredentialMethod.name || apiActionModel.remoteCredentialMethod.value)}}
+											</label>
+										</div>
+									</div>
+								</div>
+								<div class="row" *ngIf="isSuppliedCredential()">
+									<div class="form-group">
+										<label for="scriptCredentialsProvided" class="col-sm-2 control-label required-field">Credentials:</label>
+										<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
+											<kendo-dropdownlist id="scriptCredentialsProvided"
+											                    name="scriptCredentialsProvided"
+											                    class="form-control"
+											                    [data]="providerCredentialList"
+											                    required
+											                    requiredComplexValue propertyName="id"
+											                    [textField]="'name'"
+											                    [valueField]="'id'"
+											                    [(ngModel)]="apiActionModel.credential">
+											</kendo-dropdownlist>
+										</div>
+										<div class="col-sm-9" *ngIf="modalType === actionTypes.VIEW">
+											<label class="control-label label-detail">
+												{{apiActionModel.credential && (apiActionModel.credential.name || '')}}
 											</label>
 										</div>
 									</div>
@@ -804,119 +856,26 @@
 							</div>
 						</form>
 					</div>
+					<!-- Parameters tab content -->
 					<div [ngClass]="isCurrentTab(tabsEnum.Parameters) ? 'is-displayed' : 'is-hidden'"
 					     class="tab-pane no-padding api-action-parameters-form"
 					     [ngClass]="{'active':isCurrentTab(tabsEnum.Parameters)}" id="tab_parameters">
-						<form name="apiActionParametersForm" role="form" data-toggle="validator" #apiActionParametersForm='ngForm' class="form-horizontal left-alignment">
-							<div class="box-body no-padding ">
-								<kendo-grid
-										[data]="parameterList"
-										[pageSize]="25"
-										[height]="430">
-									<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
-										<tds-button-add class="float-right mar-right-15" 
-											[id]="'btnAddParameter'" 
-											[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
-											(click)="onAddParameter()">
-										</tds-button-add>
-									</ng-template>
-									<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
-													   field="{{column.property}}"
-													   [locked]="column.locked"
-													   format="{{column.format}}"
-                                                       title="{{column.label}}"
-													   [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
-										<ng-template kendoGridHeaderTemplate *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-											<span title="Parameter is required" *ngIf="column.property === 'required'"><i class="fa fa-fw fa-asterisk api-boolean-icon"></i></span>
-											<span title="Parameter value read-only" *ngIf="column.property === 'readonly'"><i class="fa fa-fw fa-eye api-boolean-icon"></i></span>
-											<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i class="fa fa-fw fa-code api-boolean-icon"></i></span>
-										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem>
-											<div class="tds-action-button-set">
-												<tds-button-delete *ngIf="dataItem.required === 0  || dataItem.required === false" 
-													(click)="onDeleteParameter($event, dataItem)">
-												</tds-button-delete>
-											</div>
-										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-                                            <div *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-                                                <input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem[column.property]" />
-                                            </div>
-											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-param" (change)="verifyIsValidForm()" [(ngModel)]="dataItem.paramName" required [ngClass]="{'has-error': dataItem.paramName?.length <= 0}" />
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
-												<kendo-dropdownlist
-														name="{{column.property + columnIndex + rowIndex}}" class="form-control" style="width: 100%;"
-														[data]="assetClassesForParameters"
-														[textField]="'value'"
-														[valueField]="'assetClass'"
-														(valueChange)="onContextValueChange(dataItem)"
-														[(ngModel)]="dataItem.context"
-														[valuePrimitive]="true"
-														required
-														[ngClass]="{'has-error': !dataItem.context || dataItem.context.value === ''}" >
-												</kendo-dropdownlist>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<input (keypress)="getOnInputKey($event)" *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'" type="text" class="param-text-input"
-													   name="{{column.property + columnIndex + rowIndex}}-user-defined"
-													   (change)="verifyIsValidForm()"
-													   [(ngModel)]="dataItem.value"
-													   [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"/>
-												<kendo-combobox *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'"
-																name="{{column.property + columnIndex + rowIndex}}" style="width: 100%;"
-																[data]="dataItem.currentFieldList"
-																[filterable]="true"
-																(filterChange)="filterChange($event, dataItem)"
-																[textField]="'label'"
-																[valueField]="'field'"
-																[(ngModel)]="dataItem.fieldName"
-																(keypress)="getOnInputKey($event)"
-																(valueChange)="verifyIsValidForm()"
-                                                                [disabled]="dataItem.readonly === 1  || dataItem.readonly === true"
-																required
-																[ngClass]="{'has-error': !dataItem.fieldName}" >
-												</kendo-combobox>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input" name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.description"/>
-											</div>
-										</ng-template>
-										<ng-template kendoGridCellTemplate *ngIf="modalType == actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
-											<div class="group-boolean-fields" *ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-												<span *ngIf="column.property === 'required'"><span *ngIf="dataItem.required === 1  || dataItem.required === true"><i class="fa fa-fw fa-check"></i></span></span>
-												<span *ngIf="column.property === 'readonly'"><span *ngIf="dataItem.readonly === 1  || dataItem.readonly === true"><i class="fa fa-fw fa-check"></i></span></span>
-												<span *ngIf="column.property === 'encoded'"><span *ngIf="dataItem.encoded === 1  || dataItem.encoded === true"><i class="fa fa-fw fa-check"></i></span></span>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'paramName'">
-												<span>{{dataItem.paramName}}</span>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'context.value'">
-												<span>{{getAssetClassValue(dataItem.context)}}</span>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'value'">
-												<span *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'">{{dataItem.value}}</span>
-												<span *ngIf="dataItem.context !== 'USER_DEF' && dataItem.context?.assetClass !== 'USER_DEF'">{{dataItem.fieldName.label}}</span>
-											</div>
-											<div *ngIf="column.type === 'text' && column.property === 'desc'">
-												<span>{{dataItem.description}}</span>
-											</div>
-										</ng-template>
-									</kendo-grid-column>
-								</kendo-grid>
-							</div>
-						</form>
+								<api-action-view-edit-parameters
+									[parameterList]="parameterList"
+									[modalType]="modalType"
+									[commonFieldSpecs]="commonFieldSpecs"
+									(onValuesChange)="onParametersFormChange($event)">
+								</api-action-view-edit-parameters>
 					</div>
 					<div *ngIf="isCurrentTab(tabsEnum.Reactions)"
-					     class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}" id="tab_reactions">
+					     class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions), 'is-remote-section': isRemote()}" id="tab_reactions">
 						<form name="apiActionReactionForm" role="form" data-toggle="validator" #apiActionReactionForm='ngForm' class="form-horizontal left-alignment">
 							<div class="box-body">
 								<div class="row">
 									<div class="col-md-12 event-wrapper">
 										<div class="row">
 											<div class="col-md-1 event-title"><label>Events:</label></div>
-											<div class="col-md-2" style="width: 70px !important;">
+											<div class="col-md-2 hide-if-remote-section" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="apiActionModel.eventReactions[0].selected" [disabled]="apiActionModel.eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"> Status
@@ -930,7 +889,7 @@
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2">
+											<div class="col-md-2 hide-if-remote-section">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionDefault" [(ngModel)]="apiActionModel.eventReactions[2].selected" [disabled]="apiActionModel.eventReactions[2].value.length > 0 || modalType === actionTypes.VIEW"> Default
@@ -940,11 +899,11 @@
 											<div class="col-md-2" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
-														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="apiActionModel.eventReactions[3].value.length > 0 || modalType === actionTypes.VIEW"> Error
+														<input type="checkbox" name="apiActionError" [(ngModel)]="apiActionModel.eventReactions[3].selected" [disabled]="isRemote() || modalType === actionTypes.VIEW"> Error
 													</label>
 												</div>
 											</div>
-											<div class="col-md-2" style="width: 70px !important;">
+											<div class="col-md-2  hide-if-remote-section" style="width: 70px !important;">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionFailed" [(ngModel)]="apiActionModel.eventReactions[4].selected" [disabled]="apiActionModel.eventReactions[4].value.length > 0 || modalType === actionTypes.VIEW"> Failed
@@ -952,14 +911,14 @@
 												</div>
 											</div>
 											<div *ngIf="apiActionModel.isPolling">
-												<div class="col-md-2" style="width: 70px !important;">
+												<div class="col-md-2 hide-if-remote-section" style="width: 70px !important;">
 													<div class="checkbox">
 														<label>
 															<input type="checkbox" name="apiActionLapsed" [(ngModel)]="apiActionModel.eventReactions[5].selected" [disabled]="apiActionModel.eventReactions[5].value.length > 0 || modalType === actionTypes.VIEW"> Lapsed
 														</label>
 													</div>
 												</div>
-												<div class="col-md-2">
+												<div class="col-md-2  hide-if-remote-section">
 													<div class="checkbox">
 														<label>
 															<input  type="checkbox" name="apiActionStalled" [(ngModel)]="apiActionModel.eventReactions[6].selected" [disabled]="apiActionModel.eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"> Stalled
@@ -967,8 +926,8 @@
 													</div>
 												</div>
 											</div>
-											<div class="col-md-2 customize event-title"><label>Customize:</label></div>
-											<div class="col-md-3">
+											<div class="col-md-2 customize event-title hide-if-remote-section"><label>Customize:</label></div>
+											<div class="col-md-3  hide-if-remote-section">
 												<div class="checkbox">
 													<label>
 														<input  type="checkbox" name="apiActionBeforeCall"
@@ -978,7 +937,7 @@
 													</label>
 												</div>
 											</div>
-											<div class="col-md-3">
+											<div class="col-md-3  hide-if-remote-section">
 												<div class="checkbox">
 													<label>
 														<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="apiActionModel.eventReactions[8].selected" [disabled]="apiActionModel.eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"> Post Invocation
@@ -988,7 +947,7 @@
 										</div>
 									</div>
 									<div class="all-codemirrors">
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[0].selected">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[0].selected">
 											<div class="form-group">
 												<label for="apiActionStatusDetermination" class="col-sm-8 control-label">Status Determination <span class="font-normal">- logic to determine the Success or other status based on API response.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1033,7 +992,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[2].selected">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[2].selected">
 											<div class="form-group">
 												<label for="apiActionDefault" class="col-sm-8 control-label">Default <span class="font-normal">- logic to be performed for events not explicitly defined.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1073,7 +1032,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[4].selected">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[4].selected">
 											<div class="form-group">
 												<label for="apiActionFailed" class="col-sm-8 control-label">Failed <span class="font-normal">-logic to perform when API call receives 400 or 500 series HTTP error code.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1093,7 +1052,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[5].selected && apiActionModel.isPolling">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[5].selected && apiActionModel.isPolling">
 											<div class="form-group">
 												<label for="apiActionLapsed" class="col-sm-8 control-label">Lapsed <span class="font-normal">-logic to perform if a polling action did not complete in anticipated time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1113,7 +1072,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[6].selected && apiActionModel.isPolling">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[6].selected && apiActionModel.isPolling">
 											<div class="form-group">
 												<label for="apiActionStalled" class="col-sm-8 control-label">Stalled <span class="font-normal">-logic to perform if a polling action has not detected any progress for a period of time.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1133,8 +1092,8 @@
 												</div>
 											</div>
 										</div>
-										<label class="col-md-12 reaction-section-event" *ngIf="showsCustomizeLabel()">Customize:</label>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[7].selected">
+										<label class="col-md-12 reaction-section-event hide-if-remote-section" *ngIf="showsCustomizeLabel()">Customize:</label>
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[7].selected">
 											<div class="form-group">
 												<label for="apiActionBeforeCall" class="col-sm-8 control-label">Before Invocation <span class="font-normal">-logic to perform before the API call is invoked to customize the request.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">
@@ -1154,7 +1113,7 @@
 												</div>
 											</div>
 										</div>
-										<div class="col-md-12 codemirror-wrapper" *ngIf="apiActionModel.eventReactions[8].selected">
+										<div class="col-md-12 codemirror-wrapper hide-if-remote-section" *ngIf="apiActionModel.eventReactions[8].selected">
 											<div class="form-group">
 												<label for="apiActionAfterCall" class="col-sm-8 control-label">Post Invocation <span class="font-normal">-logic to perform after API call completes or erred and the appropriate event has been processed.</span></label>
 												<div class="col-sm-4 collapse-icon-wrapper">

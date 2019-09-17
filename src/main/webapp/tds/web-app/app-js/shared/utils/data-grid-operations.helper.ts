@@ -1,4 +1,4 @@
-import {DefaultBooleanFilterData, Flatten, GridColumnModel} from '../model/data-list-grid.model';
+import { DefaultBooleanFilterData, Flatten, GridColumnModel } from '../model/data-list-grid.model';
 import {
 	CompositeFilterDescriptor, DataResult, filterBy, FilterDescriptor, orderBy, process, SortDescriptor,
 	State
@@ -7,14 +7,13 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../model/constants';
-import {DateUtils} from './date.utils';
+import { GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS } from '../model/constants';
+import { DateUtils } from './date.utils';
 import { NotifierService } from '../services/notifier.service';
 
 declare var jQuery: any;
 
 export class DataGridOperationsHelper {
-
 	public gridData: GridDataResult = {
 		data: [],
 		total: 0
@@ -63,9 +62,7 @@ export class DataGridOperationsHelper {
 	 */
 	public onFilter(column: GridColumnModel, operator?: string): void {
 		let root = this.state.filter || { logic: 'and', filters: [] };
-
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
-
 		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
 			column.filter = '';
 		}
@@ -74,7 +71,6 @@ export class DataGridOperationsHelper {
 			this.clearValue(column);
 			return; // exit
 		}
-
 		if (column.type === 'number') {
 			if (!filter) {
 				root.filters.push({
@@ -89,7 +85,6 @@ export class DataGridOperationsHelper {
 				filter.value = Number(column.filter);
 			}
 		}
-
 		if (column.type === 'text') {
 			if (!filter) {
 				root.filters.push({
@@ -105,17 +100,14 @@ export class DataGridOperationsHelper {
 				filter.value = column.filter;
 			}
 		}
-
 		if (column.type === 'date') {
-			const {init, end} = DateUtils.getInitEndFromDate(column.filter);
-
+			const { init, end } = DateUtils.getInitEndFromDate(column.filter);
 			if (filter) {
 				this.state.filter.filters = this.getFiltersExcluding(column.property);
 			}
 			root.filters.push({ field: column.property, operator: 'gte', value: init, });
 			root.filters.push({ field: column.property, operator: 'lte', value: end });
 		}
-
 		if (column.type === 'boolean') {
 			if (!filter) {
 				root.filters.push({
@@ -134,7 +126,6 @@ export class DataGridOperationsHelper {
 				}
 			}
 		}
-
 		this.filterChange(root);
 	}
 
@@ -151,6 +142,18 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
+	 * Clears all filters of all filterable columns.
+	 * @param columns
+	 */
+	public clearAllFilters(columns: Array<GridColumnModel>): void {
+		columns
+			.filter(column => column.filterable)
+			.forEach(column => {
+				this.clearFilter(column);
+			});
+	}
+
+	/**
 	 * Get the filters state structure excluding the column filter name provided
 	 * @param {string} excludeFilterName:  Name of the filter column to exclude
 	 * @param {any} state: Current filters state
@@ -158,7 +161,7 @@ export class DataGridOperationsHelper {
 	 */
 	private getFiltersExcluding(excludeFilterName: string): any {
 		const filters = (this.state.filter && this.state.filter.filters) || [];
-		return  filters.filter((r) => r['field'] !== excludeFilterName);
+		return filters.filter((r) => r['field'] !== excludeFilterName);
 	}
 
 	/**
@@ -212,7 +215,7 @@ export class DataGridOperationsHelper {
 	 */
 	public onSelectAllCheckboxes(): void {
 		let currentPageItems: DataResult = process(this.resultSet, this.state);
-		currentPageItems.data.forEach( item => {
+		currentPageItems.data.forEach(item => {
 			// map-key-reference inception here
 			this.bulkItems[item[this.checkboxSelectionConfig.useColumn]] = this.selectAllCheckboxes;
 		});
@@ -233,7 +236,7 @@ export class DataGridOperationsHelper {
 	 * @returns {Array<any>}
 	 */
 	public getCheckboxSelectedItems(): Array<any> {
-		return Object.keys(this.bulkItems).filter(key =>  this.bulkItems[key] === true );
+		return Object.keys(this.bulkItems).filter(key => this.bulkItems[key] === true);
 	}
 
 	/**
@@ -241,7 +244,7 @@ export class DataGridOperationsHelper {
 	 * @returns {Array<number>}
 	 */
 	public getCheckboxSelectedItemsAsNumbers(): Array<number> {
-		return this.getCheckboxSelectedItems().map( item => parseInt(item, 10));
+		return this.getCheckboxSelectedItems().map(item => parseInt(item, 10));
 	}
 
 	/**
@@ -271,14 +274,13 @@ export class DataGridOperationsHelper {
 	public pageChange(event: PageChangeEvent): void {
 		this.state.skip = event.skip;
 		this.state.take = event.take;
-
 		if (this.checkboxSelectionConfig && this.checkboxSelectionConfig.useColumn) {
 			// reset the select all checkbox to un-selected.
 			this.selectAllCheckboxes = false;
 			// If current page items all are checked then Select All box should be true, otherwise false.
 			let allSelectedOnCurrentPage = true;
 			let currentPageItems: DataResult = process(this.resultSet, this.state);
-			currentPageItems.data.forEach( item => {
+			currentPageItems.data.forEach(item => {
 				// map-key-reference inception here
 				if (!this.bulkItems[item[this.checkboxSelectionConfig.useColumn]]) {
 					allSelectedOnCurrentPage = false;
@@ -287,7 +289,6 @@ export class DataGridOperationsHelper {
 			});
 			this.selectAllCheckboxes = allSelectedOnCurrentPage;
 		}
-
 		this.loadPageData();
 	}
 
@@ -327,7 +328,7 @@ export class DataGridOperationsHelper {
 	/**
 	 * Notify the event to update the grid height
 	 */
-	private notifyUpdateGridHeight(): void {
+	public notifyUpdateGridHeight(): void {
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});

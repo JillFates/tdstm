@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {EventsService} from '../../service/events.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -6,6 +6,8 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UIActiveDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
 import {EventModel} from '../../model/event.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {KEYSTROKE} from '../../../../shared/model/constants';
 
 @Component({
 	selector: `event-view-edit-component`,
@@ -21,6 +23,7 @@ export class EventViewEditComponent implements OnInit {
 	public eventId;
 	public editing = false;
 	protected userTimeZone: string;
+	private requiredFields = ['name'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
@@ -29,7 +32,8 @@ export class EventViewEditComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
-		@Inject('id') private id) {
+		private translatePipe: TranslatePipe,
+		@Inject('id') private id: any) {
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 		this.eventId = this.id;
 	}
@@ -54,6 +58,16 @@ export class EventViewEditComponent implements OnInit {
 		this.getModel(this.eventId);
 	}
 
+	/**
+	 * Detect if the use has pressed the on Escape to close the dialog and popup if there are pending changes.
+	 * @param {KeyboardEvent} event
+	 */
+	@HostListener('keydown', ['$event']) handleKeyboardEvent(event: KeyboardEvent) {
+		if (event && event.code === KEYSTROKE.ESCAPE) {
+			this.cancelCloseDialog();
+		}
+	}
+
 	public confirmDeleteEvent() {
 		this.promptService.open(
 			'Confirmation Required',
@@ -71,7 +85,7 @@ export class EventViewEditComponent implements OnInit {
 		this.eventsService.deleteEvent(this.eventId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
-					this.activeDialog.close(result);
+					this.activeDialog.close();
 				}
 			});
 	}
@@ -126,7 +140,7 @@ export class EventViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateTimes(this.eventModel.estStartTime, this.eventModel.estCompletionTime)) {
+		if (DateUtils.validateDateRange(this.eventModel.estStartTime, this.eventModel.estCompletionTime) && this.validateRequiredFields(this.eventModel)) {
 			this.eventsService.saveEvent(this.eventModel, this.eventId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
@@ -136,36 +150,26 @@ export class EventViewEditComponent implements OnInit {
 		}
 	}
 
-	private validateTimes(startTime: Date, completionTime: Date): boolean {
-		if (!startTime || !completionTime) {
-			return true;
-		} else if (startTime > completionTime) {
-			alert('The completion time must be later than the start time.');
-			return false;
-		} else {
-			return true;
-		}
+	public isDirty() {
+		return JSON.stringify(this.savedModel) !== JSON.stringify(this.eventModel);
 	}
 
-	public confirmMarkAssetsMoved() {
-		this.promptService.open(
-			'Confirmation Required',
-			'Change asset locations to targets? (No undo, please backup prior)',
-			'Confirm', 'Cancel')
-			.then(confirm => {
-				if (confirm) {
-					this.markAssetsMoved();
-				}
-			})
-			.catch((error) => console.log(error));
-	}
-
-	public markAssetsMoved() {
-		this.eventsService.markAssetsMoved(this.eventId).subscribe((result: any) => {
-			if (result.status === 'success') {
-				alert('Assets successfully marked as moved.');
+	/**
+	 * Validate required fields before saving model
+	 * @param model - The model to be saved
+	 */
+	public validateRequiredFields(model: EventModel): boolean {
+		let returnVal = true;
+		this.requiredFields.forEach((field) => {
+			if (!model[field]) {
+				returnVal = false;
+				return false;
+			} else if (typeof model[field] === 'string' && !model[field].replace(/\s/g, '').length) {
+				returnVal = false;
+				return false;
 			}
 		});
+		return returnVal;
 	}
 
 	/**
@@ -182,9 +186,11 @@ export class EventViewEditComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.activeDialog.close();
@@ -199,9 +205,11 @@ export class EventViewEditComponent implements OnInit {
 	public cancelEdit(): void {
 		if (JSON.stringify(this.eventModel) !== JSON.stringify(this.savedModel)) {
 			this.promptService.open(
-				'Abandon Changes?',
-				'You have unsaved changes. Click Confirm to abandon your changes.',
-				'Confirm', 'Cancel')
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
+				this.translatePipe.transform('GLOBAL.CONFIRM'),
+				this.translatePipe.transform('GLOBAL.CANCEL'),
+			)
 				.then(confirm => {
 					if (confirm) {
 						this.editing = false;

@@ -64,11 +64,11 @@
                 </a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-child-item menu-projects-active-projects">
-                        <a href="/tdstm/project/list?active=active" class="mmlink">List Projects</a>
+                        <a [routerLink]="['/project','list']" [queryParams]="{active:'active'}" class="mmlink">List Projects</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-projects-current-project">
-                        <a href="/tdstm/projectUtil/index" class="mmlink">
+                        <a [routerLink]="['/project','list']" [queryParams]="{show:userContext.project.id}" class="mmlink">
                             <span class="menu-link-project-name">Project Details</span>
                         </a>
                     </li>
@@ -78,7 +78,7 @@
                     <li *ngIf="hasPermission(permission.UserSendActivations)" class="menu-child-item menu-projects-user-activation">
                         <a href="/tdstm/project/userActivationEmailsForm" class="mmlink">User Activation Emails</a>
                     </li>
-                    <li class="menu-child-item menu-projects-field-settings">
+                    <li *ngIf="hasPermission(permission.ProjectFieldSettingsView)" class="menu-child-item menu-projects-field-settings">
                         <a [routerLink]="['/fieldsettings','list']">Asset Field Settings</a>
                     </li>
                     <li class="menu-child-item menu-projects-tags">
@@ -89,13 +89,13 @@
                     <li class="menu-child-item ">
                         <a [routerLink]="['/provider','list']">Providers</a>
                     </li>
-                    <li class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.CredentialView)" class="menu-child-item ">
                         <a [routerLink]="['/credential','list']">Credentials</a>
                     </li>
                     <li class="menu-child-item ">
                         <a [routerLink]="['/datascript','list']">ETL Scripts</a>
                     </li>
-                    <li class="menu-child-item ">
+                    <li *ngIf="hasPermission(permission.ActionEdit)" class="menu-child-item ">
                         <a [routerLink]="['/action','list']">Actions</a>
                     </li>
                 </ul>
@@ -155,11 +155,6 @@
                             <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/database_menu.svg"></image></svg> Databases
                         </a>
                     </li>
-                    <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',5,'show']" id="5">
-                            <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storagePhysical_menu.svg"></image></svg> Physical Storage
-                        </a>
-                    </li>
                     <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',6,'show']" id="6">
                             <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storageLogical_menu.svg"></image></svg> Logical Storage
@@ -189,7 +184,7 @@
                     </li>
                     <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
-                        <a href="/tdstm/assetEntity/exportAssets">Export Assets</a>
+                        <a [routerLink]="['/assetExport','export']">Export Assets</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets-etl">
                         <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>
@@ -214,7 +209,7 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Events</li>
                     <li class="menu-child-item menu-parent-planning-event-list">
-                        <a href="/tdstm/module/event/list">List Events</a>
+                        <a [routerLink]="['/event','list']" >List Events</a>
                     </li>
                     <li *ngIf="userContext.event" class="menu-child-item menu-parent-planning-event-detail-list">
                         <a href="/tdstm/module/event/list?show={{userContext.event.id}}">{{userContext.event.name}} Event Details</a>
@@ -231,7 +226,7 @@
                     <li class="divider"></li>
                     <li class="menu-parent-item">Bundles</li>
                     <li class="menu-child-item menu-parent-planning-list-bundles">
-                        <a href="/tdstm/module/bundle/list">List Bundles</a>
+                            <a [routerLink]="['/bundle','list']">List Bundles</a>
                     </li>
                     <li *ngIf="userContext.bundle" class="menu-child-item menu-parent-planning-selected-bundle">
                         <a href="/tdstm/module/bundle/list/?show={{userContext.bundle.id}}">{{userContext.bundle.name}} Bundle Details</a>
@@ -245,11 +240,11 @@
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Tasks</li>
                     <li class="menu-child-item menu-parent-tasks-my-tasks">
-                        <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId">&nbsp;</span>)</a>
+                        <a href="/tdstm/task/listUserTasks">{{'TASK_MANAGER.MY_TASKS' | translate}} ({{taskTodoCount}})</a>
                     </li>
-                    <li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
-                        <a href="/tdstm/assetEntity/listTasks?initSession=true">Task Manager</a>
-                    </li>
+										<li *ngIf="hasPermission(permission.TaskManagerView)" class="menu-child-item menu-parent-tasks-task-manager">
+											<a [routerLink]="['/taskManager','list']">Task Manager</a>
+										</li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-graph">
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>
                     </li>
@@ -280,7 +275,7 @@
                         <a [routerLink]="['/planning','dashboard']">Planning Dashboard</a>
                     </li>
                     <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                        <a href="/tdstm/module/event/dashboard">Event Dashboard</a>
+                        <a [routerLink]="['/event','dashboard']">Event Dashboard</a>
                     </li>
                 </ul>
             </li>

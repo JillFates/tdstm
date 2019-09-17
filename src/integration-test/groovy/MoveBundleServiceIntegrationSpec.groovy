@@ -1,9 +1,3 @@
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetType
-import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdssrc.grails.TimeUtil
@@ -11,16 +5,22 @@ import grails.gorm.transactions.Transactional
 import grails.test.mixin.integration.Integration
 import grails.validation.ValidationException
 import grails.web.servlet.mvc.GrailsHttpSession
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.MoveBundleCommand
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.person.Person
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.tag.Tag
 import net.transitionmanager.tag.TagAsset
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.See
 import spock.lang.Shared
@@ -300,11 +300,11 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 	}
 
 	void '02. Test lookupList for specific fields and sorting criteria'() {
-		when: 'requesting the id and workflowCode where the results are sorted by id'
-			List result = moveBundleService.lookupList(project, ['id', 'workflowCode'], 'id')
-		then: 'the results include fields id and workflowCode'
+		when: 'requesting the id and guid where the results are sorted by id'
+			List result = moveBundleService.lookupList(project, ['id', 'description'], 'id')
+		then: 'the results include fields id and guid'
 			result[0].containsKey('id')
-			result[0].containsKey('workflowCode')
+			result[0].containsKey('description')
 			result[0].keySet().size() == 2
 		and: 'the results are sorted correctly'
 			result[0].id < result[1].id
@@ -334,8 +334,8 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 		and: 'an asset not assigned to the Bundle (associated with the Default Bundle by default) is created'
 			AssetEntity asset3 = assetHelper.createDevice(project, AssetType.SERVER)
 		and: 'some tasks are generated for the Event'
-			def task1 = new AssetComment(taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
-			def task2 = new AssetComment(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, commentType: AssetCommentType.TASK, project: project).save(flush: true)
+			def task1 = new Task (taskNumber: 1000, duration: 5, comment: 'Test task 1', moveEvent: event, project: project).save(flush: true)
+			def task2 = new Task(taskNumber: 1001, duration: 5, comment: 'Test task 2', moveEvent: event, project: project).save(flush: true)
 		and: 'the deleteBundleAndAssets method is called'
 			moveBundleService.deleteBundleAndAssets(bundle)
 		then: 'the Bundle should be deleted'
@@ -485,35 +485,11 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 			dependencyConsole.dependencyBundleCount == 4
 	}
 
-	void '11. Create move bundle'() {
-		when: 'creating a move bundle with blank workflowCode'
-			MoveBundleCommand command = new MoveBundleCommand(
-					name: RandomStringUtils.randomAscii(10),
-					description: RandomStringUtils.randomAscii(10)
-			)
-			moveBundleService.save(command)
-		then: 'exception is thrown'
-			thrown(ValidationException)
-		when: 'fixing failing constraint'
-			command.workflowCode = 'STD'
-			MoveBundle moveBundle = moveBundleService.save(command)
-		then: 'move bundle is saved to db'
-			moveBundle
-			moveBundle.id
-			moveBundle.workflowCode == 'STD'
-		when: 'saving a second move bundle with same name and project'
-			moveBundleService.save(command)
-		then: 'exception is thrown'
-			thrown(ValidationException)
-
-	}
-
 	void '12. Update move bundle'() {
 		given: 'a move bundle'
 			MoveBundleCommand command = new MoveBundleCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
-					workflowCode: 'STD'
 			)
 			MoveBundle moveBundle = moveBundleService.save(command)
 		when: 'updating a move bundle'
@@ -525,11 +501,11 @@ class MoveBundleServiceIntegrationSpec extends Specification{
 		then: 'move bundle is updated in db'
 			moveBundleUpdated
 			moveBundleUpdated.id
-			moveBundleUpdated.name == 'Test update MoveBundle'
 			moveBundleUpdated.startTime == TimeUtil.parseDateTime('2018-11-13')
+			moveBundleUpdated.name == 'Test update MoveBundle'
 			moveBundleUpdated.completionTime == TimeUtil.parseDateTime('2018-11-30')
 		when: 'updating a move bundle with errors'
-			command.workflowCode = null
+			command.name = null
 			moveBundleService.update(moveBundle.id, command)
 		then: 'exception is thrown'
 			thrown(ValidationException)

@@ -6,13 +6,15 @@ import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.GormUtil
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
+import getl.data.Dataset
 import getl.data.Field
 import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
 import getl.json.JSONDataset
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.Provider
+import net.transitionmanager.command.DataScriptNameValidationCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
@@ -22,7 +24,6 @@ import net.transitionmanager.imports.DataScriptMode
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.action.Provider
 import net.transitionmanager.project.ProviderService
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.io.FilenameUtils
@@ -353,20 +354,18 @@ class DataScriptService implements ServiceMethods{
 				saveSampleFile(id, originalFileName, fileName)
 			}
 
-			String extension = FilenameUtils.getExtension(fileName)?.toUpperCase()
-			switch (extension) {
-				case 'JSON':
-					return parseDataFromJSON(fileName, maxRows, rootNode)
+			Dataset dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
+			DataSetFacade dataSetFacade = new DataSetFacade(dataset)
 
-				case 'CSV':
-					return parseDataFromCSV(fileName, 0, maxRows)
-
-				case ['XLS', 'XLSX'] :
-					return parseDataFromXLS(fileName, 0, 0, maxRows)
-
-				default :
-					message = "File format ($extension) is not supported"
-			}
+			return [
+				config: dataSetFacade.fields().collect {
+					[
+						property: it.name,
+						type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+					]
+				},
+				rows  : dataSetFacade.rows().take(maxRows.intValue())
+			]
 
 		} catch (ex) {
 			log.info(ex.message)
@@ -446,112 +445,6 @@ class DataScriptService implements ServiceMethods{
 			},
 			rows  : dataSetFacade.rows().take(maxRows.intValue())
 		]
-	}
-
-	/**
-	 * Parse CSV file to get the
-	 * @param csvFile
-	 * @param pagination : page (starts on zero)
-	 * @param maxRows : max number of results requested
-	 * @return Map with the description of the CSV File Data
-	 * @throws RuntimeException
-	 */
-	Map parseDataFromCSV (String csvFile, Long page, Long maxRows) throws RuntimeException {
-		tempFile(csvFile)
-
-		CSVConnection con = new CSVConnection(extension: 'csv', codePage: 'utf-8', config: "csv", path: fileSystemService.temporaryDirectory)
-		def csv = new CSVDataset(connection: con, fileName: csvFile, header: true)
-
-		List<Field> fields = csv.connection.driver.fields(csv)
-
-		List<Map<String, String>> config = fields.collect {
-			def type = (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
-			[
-				property : it.name,
-				type     : type
-			]
-		}
-
-		List<Map> rows = csv.rows()
-		Integer start = page * maxRows
-		Integer end = Math.min(rows.size(), start + (Integer)maxRows)
-		List<Map> filteredRows = []
-		for (Integer i = start; i < end; i++) {
-			filteredRows << rows[i]
-		}
-
-		return [
-				  config: config,
-				  rows  : filteredRows
-		]
-	}
-
-	/**
-	 * Parse Excel file to generate the JSON datafile
-	 * @param xlsFile - the filename to use to retrieve data from filesystem
-	 * @param sheetNumber - the workbook sheet number to pull data from
-	 * @param headerRowIndex - the header row index
-	 * @param maxRows - the maximum number of rows to retrieve
-	 * @return Map with the description of the Excel File Data
-	 * @throws RuntimeException
-	 */
-	Map parseDataFromXLS (String xlsFile, int sheetNumber=0, int headerRowIndex=0, Long maxRows) throws RuntimeException {
-
-		DecimalFormat df = new DecimalFormat('#.#########')
-
-		List<Map<String, String>> config = []
-		Map<Integer, String> headerMap = [:]
-
-		Workbook workbook = WorkbookFactory.create( tempFile(xlsFile) )
-		Sheet sheet = workbook.getSheetAt(sheetNumber)
-		Row header = sheet.getRow(headerRowIndex)
-
-		if (header) {
-			Iterator<Cell> headerCells = header.cellIterator()
-
-			while (headerCells.hasNext()) {
-				Cell cell = headerCells.next()
-				String type = 'text'
-				String value = cell.toString()
-
-				headerMap[cell.columnIndex] = value
-
-				config << [
-						  property: value,
-						  type    : type
-				]
-			}
-		}
-
-		List<Map> data = []
-		int lastRowNum = sheet.getLastRowNum()
-
-		for( int r = headerRowIndex + 1; (r <= lastRowNum && r <= maxRows); r++ ) {
-			Row row = sheet.getRow(r)
-
-			Map object = [:]
-			data << object
-			Iterator<Row>cellIterator = row.cellIterator()
-
-			while (cellIterator.hasNext()) {
-				Cell cell = cellIterator.next()
-				String key = headerMap[cell.columnIndex]
-				String value
-				if (cell.cellType == Cell.CELL_TYPE_NUMERIC) {
-					value = df.format(cell.numericCellValue)
-				} else {
-					value = cell.toString()
-				}
-
-				object[key] = value
-			}
-		}
-
-		return [
-				  config: config,
-				  rows  : data
-		]
-
 	}
 
 	/**

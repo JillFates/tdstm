@@ -22,7 +22,6 @@ import net.transitionmanager.party.PartyRole
 import net.transitionmanager.project.MoveEventNews
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.Workflow
 import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -105,7 +104,6 @@ class Person extends Party {
 	static transients = [
 		'assignedProjects',
 		'assignedTeams',
-		'automaticPerson',
 		'company',
 		'domainReferences',
 		'enabled',
@@ -143,8 +141,7 @@ class Person extends Party {
 			[domain: PasswordReset, 		onDelete: 'null',   properties: ['createdBy'] ],
 			[domain: RecipeVersion, 		onDelete: 'null',   properties: ['createdBy'] ],
 			[domain: TaskBatch, 			onDelete: 'null',   properties: ['createdBy'] ],
-			[domain: UserLogin, 			onDelete: 'delete', properties: ['person'] ],
-			[domain: Workflow, 				onDelete: 'null',   properties: ['updatedBy'] ]
+			[domain: UserLogin, 			onDelete: 'delete', properties: ['person'] ]
 	]
 	/**
 	 * This method was incorrectly implemented but not sure where it may be used so an exception has been
@@ -265,11 +262,12 @@ class Person extends Party {
 	}
 
 	/**
-	 * The Person that completes automated tasks
-	 * This method should not have been implemented here as it is in the TaskService
+	 * Whether person is automatic user used to execute tasks
+	 *
+	 * @return boolean
 	 */
-	Person getAutomaticPerson() {
-		throw new RuntimeException('Person.getAutomaticPerson() deprecated - use TaskService.getAutomaticPerson()')
+	boolean isAutomatic() {
+		return SYSTEM_USER_AT.firstName == firstName && SYSTEM_USER_AT.lastName == lastName
 	}
 
 	/**

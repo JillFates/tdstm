@@ -78,23 +78,12 @@
 								id="category" name="category"
 								required="true"
 								ng-model="ac.category" datasource="ds.categories"
-								from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}"
+								from="${com.tdsops.tm.enums.domain.AssetCommentCategory.list}"
 								noSelection="['':'Please select']"
 							/>
 						</td>
 					</tr>
-					<tr class="prop" id="workFlowTransitionEditTrId" ng-show="ds.workflows.length > 0">
-						<td valign="top" class="name"><label for="workFlowTransitionEditId">Workflow Step:</label></td>
-						<td valign="top" class="value">
-							<span id="workFlowTransitionEditId">
-							<workflow-transition-select ng-if="ds.workflows.length > 0" workflows="ds.workflows" comment-id='ac.commentId' category='ac.category'
-							 asset-id='ac.assetEntity' ng-model='ac.workflowTransition'></workflow-transition-select>
-							</span>
-							<input type="checkbox" ng-model="ac.override" id="override" name="override" value="0"
-						ng-true-value="1" ng-false-value="0" />
-							<label for="override">Overridden</label>
-						</td>
-					</tr>
+
 					<tr>
 						<td valign="top" class="name"><label for="asset">Asset:</label></td>
 						<td valign="top">
@@ -154,6 +143,12 @@
 						<td valign="top" class="name"><label for="status">Status:</label></td>
 						<td>
 							<status-select comment-id='ac.commentId' ng-model='ac.status'></status-select>
+						</td>
+					</tr>
+					<tr class="prop">
+						<td valign="top" class="name"><label for="status">Completion %:</label></td>
+						<td>
+							<input	type="number" min="0" max="100" name="percentageComplete" ng-model="acData.percentageComplete">
 						</td>
 					</tr>
 					<tr class="prop">

@@ -4,6 +4,7 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 import {UserContextModel} from '../model/user-context.model';
 // Actions
 import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
+import {SetEvent} from '../../event/action/event.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
@@ -12,6 +13,8 @@ import {LoginService} from '../service/login.service';
 // Others
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
+import {SetBundle} from '../../bundle/action/bundle.actions';
+import {SetProject} from '../../project/actions/project.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -60,10 +63,13 @@ export class UserContextState {
 
 	@Action(Logout)
 	logout(ctx: StateContext<UserContextModel>) {
-		ctx.setState({});
-		return this.authService.logout().pipe(
-			tap()
-		);
+		const state = ctx.getState();
+		if (state.user) {
+			ctx.setState({});
+			return this.authService.logout().pipe(
+				tap()
+			);
+		}
 	}
 
 	@Action(SessionExpired)
@@ -95,6 +101,36 @@ export class UserContextState {
 				});
 			}),
 		);
+	}
+
+	@Action(SetEvent)
+	setEvent(ctx: StateContext<UserContextModel>, {payload}: SetEvent) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			event: payload,
+			bundle: null
+		});
+	}
+
+	@Action(SetBundle)
+	setBundle(ctx: StateContext<UserContextModel>, {payload}: SetBundle) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			bundle: payload,
+		});
+	}
+
+	@Action(SetProject)
+	setProject(ctx: StateContext<UserContextModel>, {payload}: SetProject) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			project: payload,
+			event: null,
+			bundle: null,
+		});
 	}
 
 }

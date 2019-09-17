@@ -169,6 +169,16 @@ button.alert-close {
 .comment-dialog-content {
 	position: relative;
 }
+
+.comment-dialog-content .progress {
+	margin-bottom: 5px
+}
+
+.comment-dialog-content .progress-container {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 #actionLookupModal {
     width: 1000px;
     top: 40px;

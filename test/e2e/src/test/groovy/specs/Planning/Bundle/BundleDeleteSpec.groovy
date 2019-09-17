@@ -14,6 +14,8 @@ import geb.spock.GebReportingSpec
 import spock.lang.Stepwise
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class BundleDeleteSpec extends GebReportingSpec {
 
@@ -30,6 +32,8 @@ class BundleDeleteSpec extends GebReportingSpec {
     static maxNumberOfBundles = 2
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+
         testCount = 0
         to LoginPage
         login()

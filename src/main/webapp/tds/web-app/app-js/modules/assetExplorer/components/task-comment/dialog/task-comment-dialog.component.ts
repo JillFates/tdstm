@@ -43,7 +43,7 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
             <div class="modal-footer form-group-center">
                 <button (click)="cancelCloseDialog()"
                         type="button" class="btn btn-default pull-right">
-                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CANCEL' | translate }}
+                    <span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
                 </button>
             </div>
         </div>

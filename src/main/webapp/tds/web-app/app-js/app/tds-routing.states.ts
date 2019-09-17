@@ -18,6 +18,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'fieldsettings', loadChildren: '../modules/fieldSettings/field-settings.module#FieldSettingsModule'},
 	{path: 'importbatch', loadChildren: '../modules/importBatch/import-batch.module#ImportBatchModule'},
 	{path: 'planning', loadChildren: '../modules/planning/planning.module#PlanningModule'},
+	{path: 'project', loadChildren: '../modules/project/project.module#ProjectModule'},
 	{path: 'provider', loadChildren: '../modules/provider/provider.module#ProviderModule'},
 	{path: 'credential', loadChildren: '../modules/credential/credential.module#CredentialModule'},
 	{path: 'action', loadChildren: '../modules/apiAction/api-action.module#APIActionModule'},
@@ -29,6 +30,7 @@ export const TDSAppRoute: Routes = [
 	{path: Paths.notice, loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'},
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
 	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
+	{path: 'assetExport', loadChildren: '../modules/assetExport/asset-export.module#AssetExportModule'},
 ];
 
 @NgModule({

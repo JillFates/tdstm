@@ -1,16 +1,6 @@
 package net.transitionmanager.asset
 
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.SecurityService
-import net.transitionmanager.common.SequenceService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.CommentNote
-import net.transitionmanager.task.TaskDependency
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeScale
@@ -20,20 +10,31 @@ import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
-import net.transitionmanager.command.AssetCommentSaveUpdateCommand
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.command.AssetCommentSaveUpdateCommand
+import net.transitionmanager.common.SequenceService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.search.AssetCommentQueryBuilder
 import net.transitionmanager.security.Permission
-import com.tdsops.tm.enums.domain.AssetCommentCategory
+import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.CommentNote
+import net.transitionmanager.task.TaskDependency
+import net.transitionmanager.task.TaskService
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
 import org.springframework.jdbc.core.JdbcTemplate
+
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_PERSON_CODE
 
 /**
  * Methods to manage comments/tasks.
@@ -268,33 +269,25 @@ class CommentService implements ServiceMethods {
 				assetComment.setDateResolved(null)
 			}
 
-			// Actual Start/Finish are handled by the statusUpdate function
-			// if(params.actStart) assetComment.actStart = estformatter.parse(params.actStart)
-			if (params.containsKey('workflowTransition')) {
-				if (params.workflowTransition?.isNumber()) {
-					// TODO : should validate that this workflow is associated with that of the workflow for the move bundle
-					def wft = WorkflowTransition.get(params.workflowTransition)
-					if (wft) {
-						assetComment.workflowTransition = wft
-					} else {
-						log.warn "saveUpdateCommentAndNotes: Invalid workflowTransition id ($params.workflowTransition)"
-					}
-				} else {
-					assetComment.workflowTransition = null
-				}
-			}
 			if (params.hardAssigned?.isNumber()) assetComment.hardAssigned = Integer.parseInt(params.hardAssigned)
 
 			// TM-4765: @tavo_luna: assign the new Notification Value with a NULL safe operation that defaults to 'true'
 			assetComment.sendNotification = (params.sendNotification ?: true).toBoolean()
 
 			if (params.priority?.isNumber()) assetComment.priority = Integer.parseInt(params.priority)
-			if (params.override?.isNumber()) assetComment.workflowOverride = Integer.parseInt(params.override)
 			if (params.duration?.isInteger()) assetComment.duration = Integer.parseInt(params.duration)
 			if(params.durationLocked) assetComment.durationLocked = params.durationLocked.toBoolean()
 			if (params.durationScale) {
 				assetComment.durationScale = TimeScale.asEnum(params.durationScale.toUpperCase())
 				log.debug "saveUpdateCommentAndNotes - task(id:${assetComment.id}, num:${assetComment.taskNumber}) TimeScale=$assetComment.durationScale"
+			}
+
+			if (params.percentageComplete) {
+				if (NumberUtil.isaNumber(params.percentageComplete)) {
+					assetComment.percentageComplete = params.percentageComplete
+				} else {
+					assetComment.percentageComplete = Integer.parseInt(params.percentageComplete)
+				}
 			}
 
 			// Issues (aka tasks) have a number of additional properties to be managed
@@ -343,6 +336,8 @@ class CommentService implements ServiceMethods {
 								}
 							}
 						}
+					} else if (params.assignedTo && AUTOMATIC_PERSON_CODE == params.assignedTo) {
+						assetComment.assignedTo = securityService.getAutomaticPerson()
 					}
 				}
 
@@ -369,7 +364,7 @@ class CommentService implements ServiceMethods {
 			if (isNew) {
 				userPreferenceService.setPreference(PREF.TASK_CREATE_STATUS, params.status)
 			}
-			taskService.setTaskStatus(assetComment, params.status)
+			taskService.setTaskStatus(assetComment, params.status, currentPerson)
 
 			// Only send email if the originator of the change is not the assignedTo as one doesn't need email to one's self.
 			boolean addingNote = assetComment.commentType == AssetCommentType.TASK && params.note
@@ -395,11 +390,11 @@ class CommentService implements ServiceMethods {
 				if (params.manageDependency) {
 					def taskDependencies = params['taskDependency']
 					def taskSuccessors = params['taskSuccessor']
-					def deletedPreds = params.deletedPreds
+					def deletedPreds = params.deletedPreds.collect { NumberUtil.toLong(it) }
 
 					// If we're updating, we'll delete the existing dependencies and then readd them following
 					if (!isNew && deletedPreds) {
-						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( $deletedPreds ) ")
+						TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( :deletedPreds ) ", [deletedPreds:deletedPreds])
 					}
 					// Iterate over the predecessor ids and validate that the exist and are associated with the project
 					taskDependencies.each { preds ->
@@ -685,9 +680,6 @@ class CommentService implements ServiceMethods {
 			def atStart = TimeUtil.formatDateTime(assetComment.actStart)
 			def dueDate = TimeUtil.formatDate(assetComment.dueDate)
 
-			def workflowTransition = assetComment?.workflowTransition
-			def workflow = workflowTransition?.name
-
 			def notes = []
 			assetComment.notes.sort { it.dateCreated }.each {
 				def dateCreated = TimeUtil.formatDateTime(it.dateCreated, TimeUtil.FORMAT_DATE_TIME_3)
@@ -729,17 +721,39 @@ class CommentService implements ServiceMethods {
 			def moveBundleList = MoveBundle.findAllByProject(project, [sort: 'name'])
 			// TODO : Security : Should reduce the person objects (create,resolved,assignedTo) to JUST the necessary properties using a closure
 			commentList = [
-				assetComment: assetComment, personCreateObj: personCreateObj, personResolvedObj: personResolvedObj,
-				dtCreated: dtCreated ?: '', dtResolved: dtResolved ?: '', assignedTo: assetComment.assignedTo?.toString() ?: '',
-				assetName: assetComment.assetEntity?.assetName ?: '', eventName: assetComment.moveEvent?.name ?: '',
-				dueDate: dueDate, etStart: etStart, etFinish: etFinish, atStart: atStart, notes: notes, workflow: workflow,
-				roles: roles, predecessorTable: predecessorTable ?: '', successorTable: successorTable ?: '',
-				cssForCommentStatus: cssForCommentStatus, statusWarn: taskService.canChangeStatus(assetComment) ? 0: 1,
-				successorsCount: successorsCount, predecessorsCount: predecessorsCount, applications: entities.applications,
-				assetId: assetComment.assetEntity?.id ?: '', assetType: assetComment.assetEntity?.assetType,
-				staffRoles: taskService.getRolesForStaff(), networks: entities.networks, moveBundleList: moveBundleList,
-				dbs: entities.dbs, files: entities.files, assetDependency: new AssetDependency(), servers: entities.servers,
-				dependencyType: entities.dependencyType, dependencyStatus: entities.dependencyStatus]
+				assetComment       : assetComment,
+				personCreateObj    : personCreateObj,
+				personResolvedObj  : personResolvedObj,
+				dtCreated          : dtCreated ?: '',
+				dtResolved         : dtResolved ?: '',
+				assignedTo         : assetComment.assignedTo?.toString() ?: '',
+				assetName          : assetComment.assetEntity?.assetName ?: '',
+				eventName          : assetComment.moveEvent?.name ?: '',
+				dueDate            : dueDate,
+				etStart            : etStart,
+				etFinish           : etFinish,
+				atStart            : atStart,
+				notes              : notes,
+				roles              : roles,
+				predecessorTable   : predecessorTable ?: '',
+				successorTable     : successorTable ?: '',
+				cssForCommentStatus: cssForCommentStatus,
+				statusWarn         : taskService.canChangeStatus(assetComment) ? 0 : 1,
+				successorsCount    : successorsCount,
+				predecessorsCount  : predecessorsCount,
+				applications       : entities.applications,
+				assetId            : assetComment.assetEntity?.id ?: '',
+				assetType          : assetComment.assetEntity?.assetType,
+				staffRoles         : taskService.getRolesForStaff(),
+				networks           : entities.networks,
+				moveBundleList     : moveBundleList,
+				dbs                : entities.dbs,
+				files              : entities.files,
+				assetDependency    : new AssetDependency(),
+				servers            : entities.servers,
+				dependencyType     : entities.dependencyType,
+				dependencyStatus   : entities.dependencyStatus
+			]
 		}
 		else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "

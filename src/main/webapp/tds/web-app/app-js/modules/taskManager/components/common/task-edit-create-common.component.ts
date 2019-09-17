@@ -26,10 +26,7 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
-import {SingleCommentComponent} from '../../../assetExplorer/components/single-comment/single-comment.component';
-import {SingleCommentModel} from '../../../assetExplorer/components/single-comment/model/single-comment.model';
-import {SingleNoteModel} from '../../../assetExplorer/components/single-note/model/single-note.model';
-import {SingleNoteComponent} from '../../../assetExplorer/components/single-note/single-note.component';
+import { SortUtils } from '../../../../shared/utils/sort.utils';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
@@ -106,7 +103,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 
 		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
 			commonCalls.push(this.taskManagerService.getAssetClasses());
-			commonCalls.push(this.taskManagerService.getCategories());
+			commonCalls.push(this.taskManagerService.getAssetCommentCategories());
 			commonCalls.push(this.taskManagerService.getEvents());
 			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
 			commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
@@ -118,34 +115,51 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
 
 				this.model.statusList = status;
-				this.model.personList = personList.map((item) => ({id: item.id, text: item.nameRole}));
-				this.model.teamList = staffRoles.map((item) => ({id: item.id, text: item.description }));
+				// Add Unassigned and Auto options to staff list
+				personList.push({ id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic' });
+				this.model.personList = personList
+					.sort((a, b) => SortUtils.compareByProperty(a, b, 'sortOn'))
+					.map((item) => ({id: item.id, text: item.nameRole}));
+				this.model.personList.unshift({ id: 0, text: 'Unassigned'});
+				// Add Unassigned and Auto options to roles list
+				staffRoles.push({ id: 'AUTO', description: 'Automatic'});
+				this.model.teamList = staffRoles
+					.sort((a, b) => SortUtils.compareByProperty(a, b, 'description'))
+					.map((item) => ({id: item.id, text: item.description }));
+				this.model.teamList.unshift({ id: null, text: 'Unassigned'});
+				// set defaults
+				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+					this.model.assignedTo = this.model.personList[0];
+					this.model.assignedTeam = this.model.teamList[0];
+				}
 				this.dateFormat = dateFormat;
 				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
-
-				if (assetClasses) {
-					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
-				}
 				if (categories) {
 					this.model.categoriesList = [''].concat(categories);
 				}
-
 				if (events) {
 					this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
 				}
-
 				if (taskDefaults && taskDefaults.preferences) {
 					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT']  || '', text: '' };
 					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 					this.metaParam = this.getMetaParam();
 				}
-
-				if (classForAsset) {
-					this.model.assetClass = {id: classForAsset.assetClass, text: ''};
+				if (assetClasses) {
+					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
 				}
-
+				// on CREATE mode
+				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+					this.model.assetClass = (classForAsset && classForAsset.assetClass)
+						? {id: classForAsset.assetClass, text: ''}
+						: {id: this.model.assetClasses[0].id, text: ''};
+					// on EDIT mode and empty assetClass
+				} else if (!this.model.assetClass || !this.model.assetClass.id) {
+					this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
+				}
 				jQuery('[data-toggle="popover"]').popover();
+				this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
 			});
 
 		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);

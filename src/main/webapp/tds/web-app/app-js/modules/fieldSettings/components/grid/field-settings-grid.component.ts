@@ -73,16 +73,7 @@ export class FieldSettingsGridComponent implements OnInit {
 	private fieldsToDelete = [];
 	protected resettingChanges = false;
 	protected lastEditedControl = null;
-
-	private readonly availableControls = [
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.List, value: CUSTOM_FIELD_CONTROL_TYPE.List},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.String, value: CUSTOM_FIELD_CONTROL_TYPE.String},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.YesNo, value: CUSTOM_FIELD_CONTROL_TYPE.YesNo},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.Date, value: CUSTOM_FIELD_CONTROL_TYPE.Date},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.DateTime, value: CUSTOM_FIELD_CONTROL_TYPE.DateTime},
-		{ text: CUSTOM_FIELD_CONTROL_TYPE.Number, value: CUSTOM_FIELD_CONTROL_TYPE.Number}
-	];
-	private availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
+	public availableFieldTypes = ['All', 'Custom Fields', 'Standard Fields'];
 
 	constructor(
 		private loaderService: UILoaderService,
@@ -145,9 +136,17 @@ export class FieldSettingsGridComponent implements OnInit {
 		});
 	}
 
+	/**
+	 * On save all prevent to the user that underlaying data could be deleted
+	 * just whenever there is a delete action pending to be saved
+	 */
 	protected onSaveAll(): void {
 		this.askForDeleteUnderlayingData()
-			.then((deleteUnderLaying: boolean) => this.notifySaveAll(deleteUnderLaying));
+			.then((deleteUnderLaying: boolean) => {
+				if (deleteUnderLaying) {
+					this.notifySaveAll(deleteUnderLaying)
+				}
+			});
 	}
 
 	/**
@@ -155,16 +154,18 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * if those fields should be deleted in the back end as well
 	 */
 	private askForDeleteUnderlayingData(): Promise<boolean> {
-		if (this.fieldsToDelete.length) {
+		const countFieldsToDelete = this.fieldsToDelete.length;
+
+		if (countFieldsToDelete) {
 			return this.prompt.open(
 				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA'),
+				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA', [countFieldsToDelete > 1 ? 'fields' : 'field'] ),
 				this.translate.transform('GLOBAL.YES'),
 				this.translate.transform('GLOBAL.NO'),
 				true);
 		}
 
-		return Promise.resolve(false);
+		return Promise.resolve(true);
 	}
 
 	/**
@@ -203,6 +204,7 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * Delete button action, adds field to the pending to delete queue.
+	 * if field is shared delete for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected onDelete(dataItem: FieldSettingsModel): void {
@@ -214,24 +216,51 @@ export class FieldSettingsGridComponent implements OnInit {
 		dataItem.toBeDeleted = true;
 		this.setIsDirty(true);
 		this.fieldsToDelete.push(dataItem.field);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: true
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete,
+				isSharedField: false,
+				addToDeleteCollection: true
+			});
+		}
 	}
 
 	/**
 	 * Undo Delete button action, removes field from pending to delete queue.
+	 * if field is shared undo for every domain
 	 * @param {FieldSettingsModel} dataItem
 	 */
 	protected undoDelete(dataItem: FieldSettingsModel): void {
 		dataItem.toBeDeleted = false;
 		let index = this.fieldsToDelete.indexOf(dataItem.field, 0);
 		this.fieldsToDelete.splice(index, 1);
-		this.deleteEmitter.emit({
-			domain: this.data.domain,
-			fieldsToDelete: this.fieldsToDelete
-		});
+
+		if (dataItem.shared) {
+			this.domains.forEach((domain) => {
+				this.deleteEmitter.emit({
+					domain: domain.domain,
+					fieldsToDelete: [dataItem.field],
+					isSharedField: true,
+					addToDeleteCollection: false
+				});
+			});
+		} else {
+			this.deleteEmitter.emit({
+				domain: this.data.domain,
+				fieldsToDelete: this.fieldsToDelete
+			});
+		}
+
 	}
 
 	/**
@@ -378,6 +407,41 @@ export class FieldSettingsGridComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Event to update the control of the dataItem after the user has confirmed the change action
+	 * @param dataItem  Current grid cell item
+	 * @param conversion Contains the information of this conversion
+	 */
+	protected  onFieldTypeChangeSave(dataItem: any, conversion: any): void {
+		dataItem.control = conversion.to;
+		this.onControlChange(conversion.from, dataItem);
+	}
+
+	/**
+	 * Handle a change of custom control type event
+	 * @param dataItem Current grid cell item
+	 * @param fieldTypeChange contains the info about the conversion, save and reset events
+	 */
+	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
+		if (fieldTypeChange) {
+			this.prompt.open(
+				'Confirmation Required',
+				fieldTypeChange.conversion.getWarningMessage(),
+				'Ok', 'Cancel').then(result => {
+				if (result) {
+					this.setIsDirty(true);
+					fieldTypeChange.save();
+				} else {
+					fieldTypeChange.reset();
+				}
+			});
+
+			return;
+		}
+
+		console.error('Cannot find custom field transition');
+	}
+
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
 		this.setIsDirty(true);
 		const previousControl = dataItem.control;
@@ -511,7 +575,7 @@ export class FieldSettingsGridComponent implements OnInit {
 			}
 				// when popup closes ..
 		}).catch(error => {
-			console.error(error);
+			console.log(error);
 				// when popup is Cancelled.
 			});
 		}

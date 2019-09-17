@@ -19,6 +19,9 @@ import {PermissionService} from '../../shared/services/permission.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
+import {ChangePasswordComponent} from './components/change-password/change-password.component';
+import {StandardNoticesComponent} from '../noticeManager/components/standard-notices/standard-notices.component';
+import {MandatoryNoticesComponent} from '../noticeManager/components/mandatory-notices/mandatory-notices.component';
 
 @NgModule({
 	imports: [
@@ -42,7 +45,14 @@ import {ForgotPasswordComponent} from './components/forgot-password/forgot-passw
 	],
 	declarations: [
 		LoginComponent,
-		ForgotPasswordComponent
+		ForgotPasswordComponent,
+		ChangePasswordComponent,
+		StandardNoticesComponent,
+		MandatoryNoticesComponent
+	],
+	entryComponents: [
+		StandardNoticesComponent,
+		MandatoryNoticesComponent
 	]
 })
 export class AuthModule {

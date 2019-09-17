@@ -646,7 +646,7 @@ class AssetEntityService implements ServiceMethods {
 		}
 	}
 
-	private void updateAssetDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
+	void updateAssetDependencyOrException(Project project, AssetEntity assetEntity, Long dependencyId, Map params) {
 
 		validateAssetsAssocToProject([assetEntity.id], project)
 
@@ -681,7 +681,7 @@ class AssetEntityService implements ServiceMethods {
 		assetDependency.updatedBy = securityService.loadCurrentPerson()
 
 		log.debug "updateAssetDependency() Attempting to UPDATE dependency ($assetDependency.id) $assetDependency.asset.id/$assetDependency.dependent.id : changed fields=$assetDependency.dirtyPropertyNames"
-		if (!assetDependency.save(failOnError: false, flush:true)) {
+		if (!assetDependency.save(failOnError: false, flush:true, deepValidate: false)) {
 			throw new DomainUpdateException("Unable to save dependency for $assetDependency.asset / $assetDependency.dependent", assetDependency)
 		}
 
@@ -1210,7 +1210,7 @@ class AssetEntityService implements ServiceMethods {
 	List<Map> getMoveBundles(Project project) {
 		List<String> properties = [
 			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
-			'operationalOrder', 'operationalOrder', 'useForPlanning', 'workflowCode', 'project'
+			'operationalOrder', 'operationalOrder', 'useForPlanning', 'project'
 		]
 		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])
 	}

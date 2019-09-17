@@ -9,6 +9,8 @@ import pages.Assets.AssetViewManager.SaveViewPage
 import pages.Assets.AssetViews.ViewPage
 import utils.CommonActions
 
+import geb.driver.CachingDriverFactory
+
 @Stepwise
 class ViewManagerEditionSpec extends GebReportingSpec {
 
@@ -23,6 +25,8 @@ class ViewManagerEditionSpec extends GebReportingSpec {
 
 
     def setupSpec() {
+        CachingDriverFactory.clearCacheAndQuitDriver()
+
         testCount = 0
         to LoginPage
         login()
