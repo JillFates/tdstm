@@ -25,9 +25,9 @@ import {
 // Kendo
 import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {ReplaySubject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
-import {COMMON_SHRUNK_COLUMNS_WIDTH, COMMON_SHRUNK_COLUMNS} from "../../../../shared/constants/common-shrunk-columns";
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS_WIDTH, COMMON_SHRUNK_COLUMNS} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'credential-list',

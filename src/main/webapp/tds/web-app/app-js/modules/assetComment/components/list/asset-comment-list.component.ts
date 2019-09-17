@@ -11,9 +11,9 @@ import {PreferenceService} from '../../../../shared/services/preference.service'
 import {ActivatedRoute} from '@angular/router';
 import {AssetCommentColumnModel, AssetCommentModel} from '../../model/asset-comment.model';
 import {AssetCommentViewEditComponent} from '../view-edit/asset-comment-view-edit.component';
-import {ReplaySubject} from "rxjs";
-import {takeUntil} from "rxjs/operators";
-import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from "../../../../shared/constants/common-shrunk-columns";
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 declare var jQuery: any;
 

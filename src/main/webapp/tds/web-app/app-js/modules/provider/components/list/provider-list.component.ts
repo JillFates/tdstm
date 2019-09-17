@@ -31,8 +31,8 @@ import {
 	GridDataResult,
 	PageChangeEvent
 } from '@progress/kendo-angular-grid';
-import { ReplaySubject } from "rxjs";
-import {takeUntil} from "rxjs/operators";
+import { ReplaySubject } from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 
 declare var jQuery: any;
 
