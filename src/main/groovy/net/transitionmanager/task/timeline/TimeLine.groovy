@@ -1,5 +1,6 @@
 package net.transitionmanager.task.timeline
 
+import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 
@@ -31,7 +32,7 @@ class TimeLine {
 	 * It makes it doing first walking forward {@code TimeLine#doDijkstraForEarliestTimes}
 	 * from sources to sinks and then backwards {@code TimeLine#doDijkstraForLatestTimes}
 	 * from sinks to sources</p>
-	 * <p></p>
+	 * <p>It also calculates elapsed time and saves it in {@code #TimeLine}</p>
 	 *
 	 * @param windowStartTime a {@code Date} instance defining window range start time
 	 * @param windowEndTime a {@code Date} instance defining window range end time
@@ -42,16 +43,23 @@ class TimeLine {
 	 * @see TimelineSummary
 	 */
 	TimelineSummary calculate(Date windowStartTime, Date windowEndTime, Date currentTime = TimeUtil.nowGMT()) {
+
+		StopWatch stopWatch = new StopWatch()
+
 		// Initialize object for results.
 		timelineSummary = new TimelineSummary(windowStartTime, windowEndTime, currentTime)
 
 		// Initialize the table that will contain the information of the graph traversal.
 		timelineTable = new TimelineTable(graph, windowStartTime, windowEndTime, currentTime)
+
+		String tag = UUID.randomUUID()
+		stopWatch.begin(tag)
 		// Executes the Critical Path Analysis.
 		executeCriticalPathAnalysis()
 		// Build all the paths results.
 		timelineTable.calculateAllPaths(graph, timelineSummary)
 
+		timelineSummary.elapsedTime = TimeUtil.ago(stopWatch.lap(tag))
 		return timelineSummary
 	}
 
