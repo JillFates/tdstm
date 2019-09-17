@@ -50,7 +50,6 @@ class ProjectUtilController implements ControllerMethods {
 		MoveBundleStep.findAllByMoveBundle(oldBundle).each { step ->
 			def moveBundleStep = new MoveBundleStep(
 					moveBundle: moveBundle,
-					transitionId: step.transitionId,
 					label: step.label,
 					planStartTime: new Date(step.planStartTime?.time + timeDelta),
 					planCompletionTime: new Date(step.planCompletionTime?.time + timeDelta),

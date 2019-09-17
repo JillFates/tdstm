@@ -96,8 +96,6 @@ class WsDashboardController implements ControllerMethods {
 
 				def taskStatsSql = """
 					SELECT
-						t.workflow_transition_id AS wfTranId,
-						wft.trans_id AS tid,
 						0 AS snapshotId,
 						mbs.label,
 						mbs.calc_method AS calcMethod,
@@ -114,11 +112,10 @@ class WsDashboardController implements ControllerMethods {
 						MAX(t.date_resolved) AS actComp
 					FROM asset_entity a
 					JOIN asset_comment t ON t.asset_entity_id = a.asset_entity_id
-					JOIN workflow_transition wft ON wft.workflow_transition_id=t.workflow_transition_id
 					JOIN move_bundle mb ON mb.move_bundle_id=a.move_bundle_id
-					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id AND mbs.transition_id=wft.trans_id
+					JOIN move_bundle_step mbs ON mbs.move_bundle_id=a.move_bundle_id
 					WHERE a.move_bundle_id = $moveBundleId AND t.move_event_id = $moveEventId ${viewUnpublished ? '' : 'AND t.is_published = 1'}
-					GROUP BY t.workflow_transition_id;
+					Group by t.category
 				"""
 				dataPointsForEachStep = jdbcTemplate.queryForList(taskStatsSql)
 				// log.info "bundleData() SQL = $taskStatsSql"
@@ -150,7 +147,10 @@ class WsDashboardController implements ControllerMethods {
 
 				/*	Get the steps that have not started / don't have step_snapshot records	*/
 				def stepsNotUpdatedQuery = """
-					SELECT mbs.transition_id as tid, ss.id as snapshotId, mbs.label as label, mbs.calc_method as calcMethod,
+					SELECT mbs.transition_id as tid, 
+						ss.id as snapshotId, 
+						mbs.label as label, 
+						mbs.calc_method as calcMethod,
 						mbs.plan_start_time as planStart,
 						mbs.plan_completion_time as planComp,
 						mbs.actual_start_time as actStart,

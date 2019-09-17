@@ -1,12 +1,5 @@
 package net.transitionmanager.project
 
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.asset.AssetOptions
-import net.transitionmanager.asset.AssetOptionsService
-import net.transitionmanager.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
@@ -22,22 +15,22 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.asset.AssetType
+import net.transitionmanager.asset.Room
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveBundleStep
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyType
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.StepSnapshot
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagService
@@ -56,7 +49,6 @@ class MoveBundleService implements ServiceMethods {
 	JdbcTemplate             jdbcTemplate
 	PartyRelationshipService partyRelationshipService
 	ProgressService          progressService
-	StateEngineService       stateEngineService
 	TaskService              taskService
 	UserPreferenceService    userPreferenceService
 	TagService               tagService
@@ -77,32 +69,6 @@ class MoveBundleService implements ServiceMethods {
 				NumberUtil.toLong(moveBundleId), Integer)
 	}
 
-	/**
-	* Return all of the Transitions from the XML based on the workflow_code of the project that the move_bundle is associated with.
-	 * @param moveBundleId
-	 * @return Map[step,movebundleStep,snapshot]
-	 */
-	def getAllDashboardSteps(MoveBundle moveBundle) {
-		List<MoveBundleStep> moveBundleSteps = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'transitionId'])
-		def dashboardSteps = []
-		try{
-			stateEngineService.getDashboardSteps(moveBundle.workflowCode).each {
-				MoveBundleStep moveBundleStep
-				StepSnapshot stepSnapshot
-				int stepIndex = moveBundleSteps.transitionId.indexOf(it.id)
-				if(stepIndex != -1){
-					moveBundleStep = moveBundleSteps[stepIndex]
-					stepSnapshot = StepSnapshot.findByMoveBundleStep(moveBundleStep, [sort: 'dateCreated', order: 'DESC'])
-					moveBundleSteps.remove(stepIndex)
-				}
-				dashboardSteps << [step :it, moveBundleStep: moveBundleStep, stepSnapshot: stepSnapshot]
-			}
-		} catch(NullPointerException e) {
-			log.error e.message, e
-		}
-
-		[dashboardSteps: dashboardSteps, remainingSteps: moveBundleSteps?.transitionId]
-	}
 
 	/**
 	 * Updates the moveBundles with moveEvent
@@ -147,16 +113,13 @@ class MoveBundleService implements ServiceMethods {
 	def getMoveEventDetailedResults(moveEventId) {
 		jdbcTemplate.queryForList('''
 			SELECT mb.move_bundle_id, mb.name AS bundle_name, ae.asset_entity_id AS asset_id, ae.asset_name,
-			       IF(atr.voided=1, "Y", "") AS voided, wtFrom.name AS from_name, wtTo.name AS to_name,
+			       IF(atr.voided=1, "Y", "") AS voided,
 				atr.date_created AS transition_time, username, IF(team_code IS NULL, '', team_code) AS team_name
 			FROM move_event me
 			JOIN project p ON p.project_id = me.project_id
 			JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 			JOIN asset_entity ae ON ae.move_bundle_id = mb.move_bundle_id
 			JOIN asset_transition atr ON atr.asset_entity_id = ae.asset_entity_id
-			JOIN workflow w on w.process = p.workflow_code
-			JOIN workflow_transition wtFrom ON wtFrom.trans_id = CAST(atr.state_from AS UNSIGNED INTEGER) AND wtFrom.workflow_id = w.workflow_id
-			JOIN workflow_transition wtTo ON wtTo.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wtTo.workflow_id = w.workflow_id
 			JOIN user_login ul ON ul.user_login_id = atr.user_login_id
 			LEFT OUTER JOIN project_team pt ON pt.project_team_id = atr.project_team_id
 			WHERE me.move_event_id = ?
@@ -177,8 +140,6 @@ class MoveBundleService implements ServiceMethods {
 				JOIN project p ON p.project_id = me.project_id
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0
-				JOIN workflow w on w.process = p.workflow_code
-				JOIN workflow_transition wt ON wt.trans_id = CAST(atr.state_to AS UNSIGNED INTEGER) AND wt.workflow_id = w.workflow_id
 			WHERE me.move_event_id=? AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 			ORDER BY mb.move_bundle_id,started asc''', NumberUtil.toLong(moveEventId))
@@ -577,9 +538,6 @@ class MoveBundleService implements ServiceMethods {
 					case "instructionsLink":
 						cellValue = exportList[r-startRow].instructionsLink ?  String.valueOf(exportList[r-startRow].instructionsLink) : ''
 						break
-					case "workflow":
-						cellValue = currentTask.workflowTransition ? String.valueOf(currentTask.workflowTransition?.name) : ''
-						 break
 
 					case "assetClass":
 						cellValue = currentTask["assetEntity"]? String.valueOf(currentTask["assetEntity"]?.assetType) : ''
@@ -871,7 +829,7 @@ class MoveBundleService implements ServiceMethods {
 		def moveBundle = MoveBundle.findByNameAndProject(bundleName, project)
 
 		if (!moveBundle) {
-			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, workflowCode: project.workflowCode, project: project).save()
+			moveBundle = new MoveBundle(name:bundleName, operationalOrder:1, project: project).save()
 		}
 		return moveBundle
 	}
@@ -914,32 +872,22 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 * Update a move bundle
-	 * @param id - move bundle id to update
-	 * @param command - move bundle command object
-	 * @return
+	 * Create or Update a MoveBundle instance based on the information provided in the Command Object.
+	 * @param moveBundleCommand
+	 * @param project
+	 * @param moveBundleId
+	 * @return the MoveBundle created or updated.
 	 */
-	MoveBundle update(Long id, MoveBundleCommand command) {
-		MoveBundle moveBundle = findById(id, true)
-		command.populateDomain(moveBundle, false, ['constraintsMap'])
-
+	MoveBundle saveOrUpdate(MoveBundleCommand moveBundleCommand, Project project, Long moveBundleId = null) {
+		MoveBundle moveBundle = getOrCreate(MoveBundle, moveBundleId, project)
+		moveBundleCommand.populateDomain(moveBundle, false, ['constraintsMap', 'sourceRoomId', 'targetRoomId'])
+		if (moveBundleCommand.sourceRoomId) {
+			moveBundle.sourceRoom = get(Room, moveBundleCommand.sourceRoomId, project, true)
+		}
+		if (moveBundleCommand.targetRoomId) {
+			moveBundle.targetRoom = get(Room, moveBundleCommand.targetRoomId, project, true)
+		}
 		moveBundle.save()
-
-		return moveBundle
-	}
-
-	/**
-	 * Save a new move bundle
-	 * @param command - move bundle command object
-	 * @return
-	 */
-	MoveBundle save(MoveBundleCommand command) {
-		MoveBundle moveBundle = new MoveBundle()
-		command.populateDomain(moveBundle, false, ['constraintsMap'])
-		moveBundle.project = securityService.getUserCurrentProject()
-
-		moveBundle.save()
-
 		return moveBundle
 	}
 

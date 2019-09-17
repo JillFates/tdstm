@@ -18,14 +18,10 @@ export class BundleViewEditComponent implements OnInit {
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public moveEvents;
-	public managers;
 	public rooms;
-	public workflowCodes;
 	public isDefaultBundle;
 	public sourceRoom;
 	public targetRoom;
-	public projectManager;
-	public moveManager;
 	public projectId;
 	public canEditBundle;
 	public bundleId;
@@ -63,11 +59,8 @@ export class BundleViewEditComponent implements OnInit {
 			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: null,
 			moveEvent: {},
-			moveManagerId: null,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -162,22 +155,12 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : null;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : null;
 				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
 				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
 				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
 
 				this.moveEvents = data.availableMoveEvents;
-				this.managers = data.managers;
-				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				this.managers.forEach((manager, index) => {
-					manager.staff.name = manager.name;
-					this.managers[index] = manager.staff // Limit managers down to just staff
-				});
-				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
-
 				this.updateSavedFields();
 			});
 	}
@@ -190,14 +173,6 @@ export class BundleViewEditComponent implements OnInit {
 			}
 			if (room.id === this.savedModel.toId) {
 				this.targetRoom = room.roomName;
-			}
-		});
-		this.managers.forEach((manager) => {
-			if (manager.id === this.savedModel.projectManagerId) {
-				this.projectManager = manager.name;
-			}
-			if (manager.id === this.savedModel.moveManagerId) {
-				this.moveManager = manager.name;
 			}
 		});
 	}

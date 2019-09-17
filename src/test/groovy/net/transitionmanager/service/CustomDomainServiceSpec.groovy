@@ -48,7 +48,6 @@ class CustomDomainServiceSpec extends Specification implements ServiceUnitTest<C
 			startDate = new Date()
 			completionDate = startDate + 30
 			guid = StringUtil.generateGuid()
-			workflowCode = 'STD_PROCESS'
 			timezone = Timezone.findByCode('GMT')
 			guid = StringUtil.generateGuid()
 		}
