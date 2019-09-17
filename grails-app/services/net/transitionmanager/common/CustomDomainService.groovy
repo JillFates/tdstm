@@ -287,7 +287,7 @@ class CustomDomainService implements ServiceMethods {
      * @return True is the fields was a yes/no and it now being changed to a list.
      */
     boolean isYesNoToList(Map oldFieldSpec, Map newFieldSpec) {
-        oldFieldSpec.control == ControlType.YES_NO.value && newFieldSpec.control == ControlType.LIST.value
+        oldFieldSpec && oldFieldSpec.control == ControlType.YES_NO.value && newFieldSpec.control == ControlType.LIST.value
     }
 
     /**
