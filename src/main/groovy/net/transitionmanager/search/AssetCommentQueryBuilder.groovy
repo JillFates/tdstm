@@ -234,6 +234,20 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
+	 * Construct an expression 'role like %someValue%.
+	 */
+	Closure roleLikeBuilder = { String field, Map fieldMap ->
+		String value
+		if (requestParams[field] == "NO_ROLE") {
+			value = "" // special case where we want to show all tasks without a role
+		} else {
+			value = "%${requestParams[field]}%"
+		}
+		processField(field, fieldMap, 'LIKE', ":${field}",  value)
+
+	}
+
+	/**
 	 * Create the where clause for handling time scale values.
 	 */
 	Closure timeScaleBuilder = { String field, Map fieldMap ->
@@ -465,7 +479,7 @@ class AssetCommentQueryBuilder {
 		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
 		'resolvedBy':           [property: SqlUtil.personFullName('resolvedBy', 'ac'), builder: likeBuilder],
-		'role':                 [property: 'ac.role', builder: likeBuilder],
+		'role':                 [property: 'ac.role', builder: roleLikeBuilder],
 		'sendNotification':     [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status':               [property: 'ac.status', builder: likeBuilder],
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
