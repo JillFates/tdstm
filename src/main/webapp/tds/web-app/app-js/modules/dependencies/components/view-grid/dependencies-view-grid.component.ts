@@ -72,8 +72,8 @@ interface ComponentState {
 	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DependenciesViewGridComponent implements OnInit, OnDestroy {
-	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
-	@ViewChild('grid') grid: GridComponent;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
+	@ViewChild('grid', {static: false}) grid: GridComponent;
 	public dependenciesColumnModel: DependenciesColumnModel;
 	protected bulkChangeType: BulkChangeType = BulkChangeType.Dependencies;
 	public readonly GRID_PAGE_SIZES = GRID_DEFAULT_PAGINATION_OPTIONS;

@@ -52,7 +52,7 @@ export class UserDashboardComponent implements OnInit {
 		text: 'Sample Box'
 	}];
 	public userContext: UserContextModel;
-	@ViewChild('taskGrid') taskGrid: GridComponent;
+	@ViewChild('taskGrid', {static: false}) taskGrid: GridComponent;
 
 	constructor(
 		private userService: UserService,

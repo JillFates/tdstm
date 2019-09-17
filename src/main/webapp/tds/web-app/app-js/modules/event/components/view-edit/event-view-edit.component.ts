@@ -24,8 +24,8 @@ export class EventViewEditComponent implements OnInit {
 	public editing = false;
 	protected userTimeZone: string;
 	private requiredFields = ['name'];
-	@ViewChild('startTimePicker') startTimePicker;
-	@ViewChild('completionTimePicker') completionTimePicker;
+	@ViewChild('startTimePicker', {static: false}) startTimePicker;
+	@ViewChild('completionTimePicker', {static: false}) completionTimePicker;
 	constructor(
 		private eventsService: EventsService,
 		private permissionService: PermissionService,

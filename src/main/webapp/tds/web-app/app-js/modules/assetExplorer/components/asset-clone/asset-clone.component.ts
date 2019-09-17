@@ -90,7 +90,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	public assetName: string;
 	public uniqueAssetName: boolean;
 	public existAsset: any;
-	@ViewChild('includeDependencies') includeDependencies: ElementRef;
+	@ViewChild('includeDependencies', {static: false}) includeDependencies: ElementRef;
 
 	constructor(
 		public cloneModalModel: AssetModalModel,

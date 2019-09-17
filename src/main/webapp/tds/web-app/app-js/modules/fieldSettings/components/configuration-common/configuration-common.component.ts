@@ -5,7 +5,7 @@ import {ViewChild} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 
 export abstract class ConfigurationCommonComponent {
-	@ViewChild('templateForm') protected templateForm: NgForm;
+	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 
 	constructor(
 		public activeDialog: UIActiveDialogService,

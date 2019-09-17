@@ -7,7 +7,7 @@ import * as CodeMirror from 'codemirror/lib/codemirror';
 	exportAs: 'codeMirror'
 })
 export class CodeMirrorComponent implements OnInit {
-	@ViewChild('codeMirror') el: ElementRef;
+	@ViewChild('codeMirror', {static: false}) el: ElementRef;
 	@Output() change = new EventEmitter<{ newValue: string, oldValue: string }>();
 	@Input() model: string;
 	@Input() mode;

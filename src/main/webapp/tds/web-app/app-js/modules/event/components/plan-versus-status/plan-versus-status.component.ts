@@ -7,7 +7,7 @@ import {NgForm, Form} from '@angular/forms';
 	templateUrl: 'plan-versus-status.component.html'
 })
 export class PlanVersusStatusComponent implements OnChanges {
-	@ViewChild('form') form: NgForm ;
+	@ViewChild('form', {static: false}) form: NgForm ;
 	@Input() currentProgress = 0;
 	@Input() hasBundleSteps: boolean;
 	@Input() isDisabled: Boolean = false;

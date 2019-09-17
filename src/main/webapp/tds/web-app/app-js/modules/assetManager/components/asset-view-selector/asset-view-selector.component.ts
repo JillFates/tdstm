@@ -93,8 +93,8 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	@Input() showCreate ? = true;
 	@Input() isDisabled ? = false;
 	@Output() onSelectView = new EventEmitter<any>();
-	@ViewChild('kendoDropDown') dropdown: DropDownListComponent;
-	@ViewChild('viewSelectorFilter') viewSelectorFilter: ElementRef;
+	@ViewChild('kendoDropDown', {static: false}) dropdown: DropDownListComponent;
+	@ViewChild('viewSelectorFilter', {static: false}) viewSelectorFilter: ElementRef;
 	private reports: ViewGroupModel[];
 	public data: ViewGroupModel[];
 	private searchFilterSelector = '';

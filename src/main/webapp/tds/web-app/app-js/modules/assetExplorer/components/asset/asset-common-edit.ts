@@ -22,7 +22,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 declare var jQuery: any;
 
 export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
-	@ViewChild('form') protected form: NgForm;
+	@ViewChild('form', {static: false}) protected form: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 	private destroySubject: Subject<any> = new Subject<any>();
 

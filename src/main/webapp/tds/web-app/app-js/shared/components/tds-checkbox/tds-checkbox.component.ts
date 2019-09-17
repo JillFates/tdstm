@@ -18,7 +18,7 @@ export class TDSCheckboxComponent implements OnInit {
 	@Input() disabled = false;
 	@Input() setStateSubject: Subject<CheckboxState>;
 	@Output() changeState: EventEmitter<CheckboxState> = new EventEmitter();
-	@ViewChild('tdsCheckbox') tdsCheckbox: ElementRef;
+	@ViewChild('tdsCheckbox', {static: false}) tdsCheckbox: ElementRef;
 	private currentState: CheckboxStates;
 	private transitionHandler: Function;
 

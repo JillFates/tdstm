@@ -25,7 +25,7 @@ import {DataScriptModel} from '../../model/data-script.model';
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
-	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	protected originalFileName: any = { temporary: null, fileUploaded: null};
 	public OPTIONS: any = {

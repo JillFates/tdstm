@@ -54,8 +54,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
 
-	@ViewChild('select') select: AssetViewSelectorComponent;
-	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
+	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
+	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent
 
 	constructor(
 		private route: ActivatedRoute,

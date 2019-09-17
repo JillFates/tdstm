@@ -48,8 +48,8 @@ declare var jQuery: any;
 
 export class TDSComboBoxComponent implements OnChanges {
 	// References
-	@ViewChild('dropdownFooter') dropdownFooter: ElementRef;
-	@ViewChild('innerComboBox') innerComboBox: ComboBoxComponent;
+	@ViewChild('dropdownFooter', {static: false}) dropdownFooter: ElementRef;
+	@ViewChild('innerComboBox', {static: false}) innerComboBox: ComboBoxComponent;
 	// Output method handlers
 	@Output('valueChange') valueChange: EventEmitter<any> = new EventEmitter();
 	@Output('selectionChange') selectionChange: EventEmitter<any> = new EventEmitter();

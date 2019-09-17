@@ -13,7 +13,7 @@ import {NgForm} from '@angular/forms';
 })
 
 export class MinMaxConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
-	@ViewChild('templateForm') protected templateForm: NgForm;
+	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;

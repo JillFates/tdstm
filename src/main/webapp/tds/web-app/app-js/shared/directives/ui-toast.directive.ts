@@ -38,7 +38,7 @@ import {KEYSTROKE} from '../model/constants';
 
 export class UIToastDirective {
 
-	@ViewChild('closePopUpDialog') closePopUpDialog: ElementRef;
+	@ViewChild('closePopUpDialog', {static: false}) closePopUpDialog: ElementRef;
 	private alertModel = AlertModel;
 	private alertType = AlertType;
 

@@ -27,8 +27,8 @@ import {ActionType} from '../../../../shared/model/action-type.enum';
 	templateUrl: 'notice-view-edit.component.html'
 })
 export class NoticeViewEditComponent implements OnInit, AfterViewInit {
-	@ViewChild('htmlTextField') htmlText: RichTextEditorComponent;
-	@ViewChild('typeIdField') typeId: DropDownListComponent;
+	@ViewChild('htmlTextField', {static: false}) htmlText: RichTextEditorComponent;
+	@ViewChild('typeIdField', {static: false}) typeId: DropDownListComponent;
 
 	public EnumActionType = ActionType;
 	private dataSignature: string;

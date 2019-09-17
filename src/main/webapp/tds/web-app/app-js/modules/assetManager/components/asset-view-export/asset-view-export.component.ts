@@ -48,7 +48,7 @@ export class AssetViewExportComponent {
 	public dataToExport: any[] = [];
 	private allProperties = false;
 	private fieldImportance = new FieldImportance();
-	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
+	@ViewChild('excelexport', {static: false}) public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 

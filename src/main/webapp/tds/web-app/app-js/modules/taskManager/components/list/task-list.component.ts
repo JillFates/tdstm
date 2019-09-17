@@ -38,7 +38,7 @@ import { TaskStatus } from '../../model/task-edit-create.model';
 	templateUrl: './task-list.component.html'
 })
 export class TaskListComponent {
-	@ViewChild('gridComponent') gridComponent: GridComponent;
+	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };

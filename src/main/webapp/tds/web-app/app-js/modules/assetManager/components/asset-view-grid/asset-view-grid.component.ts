@@ -90,8 +90,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
 
-	@ViewChild('tagSelector') tagSelector: AssetTagSelectorComponent;
-	@ViewChild('tdsBulkChangeButton') tdsBulkChangeButton: BulkChangeButtonComponent;
+	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
 	@Input()
 	set viewId(viewId: number) {

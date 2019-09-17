@@ -46,7 +46,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	@Input() placeholder = '';
 	@Input() value = ' ';
 	@Output() filter: EventEmitter<string> = new EventEmitter<string>();
-	@ViewChild('filterInput') filterInput: ElementRef;
+	@ViewChild('filterInput', {static: false}) filterInput: ElementRef;
 
 	private previousSearch = '';
 	private typingTimeout = null;
