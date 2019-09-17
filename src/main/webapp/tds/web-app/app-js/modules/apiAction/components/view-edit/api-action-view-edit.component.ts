@@ -574,7 +574,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			});
 		});
 	}
-
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
