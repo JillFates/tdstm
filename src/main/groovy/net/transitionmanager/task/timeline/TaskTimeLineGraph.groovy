@@ -309,17 +309,13 @@ class TaskTimeLineGraph {
 			edgesByTaskNumber.each { Tuple2<Integer, Integer> tuple ->
 				TaskVertex predecessor = taskVertexMapByTaskNumber[tuple.first]
 				TaskVertex sucessor = taskVertexMapByTaskNumber[tuple.second]
-				if (predecessor && sucessor) {
-					predecessor.addSuccessor(sucessor)
-				}
+				predecessor.addSuccessor(sucessor)
 			}
 
 			edgesByTaskComment.each { Tuple2<String, String> tuple ->
 				TaskVertex predecessor = taskVertexMapByTaskComment[tuple.first]
 				TaskVertex sucessor = taskVertexMapByTaskComment[tuple.second]
-				if (predecessor && sucessor) {
-					predecessor.addSuccessor(sucessor)
-				}
+				predecessor.addSuccessor(sucessor)
 			}
 
 			return new TaskTimeLineGraph(taskVertexMapByTaskNumber.values().toSet())
