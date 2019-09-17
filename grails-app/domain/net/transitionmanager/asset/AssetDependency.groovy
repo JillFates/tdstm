@@ -86,14 +86,14 @@ class AssetDependency {
 	/** Helper Fetchers ************************/
 	static List<AssetDependency> fetchSupportedDependenciesOf(AssetEntity assetEntity){
 		return AssetDependency.findAll(
-			'from AssetDependency where dependent=? order by asset.assetType, asset.assetName asc',
+			'from AssetDependency where dependent=?0 order by asset.assetType, asset.assetName asc',
 			[assetEntity]
 		)
 	}
 
 	static List<AssetDependency> fetchRequiredDependenciesOf(AssetEntity assetEntity){
 		return AssetDependency.findAll(
-			'from AssetDependency where asset=? order by dependent.assetType, dependent.assetName asc',
+			'from AssetDependency where asset=?0 order by dependent.assetType, dependent.assetName asc',
 			[assetEntity]
 		)
 	}

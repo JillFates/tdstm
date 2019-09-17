@@ -479,7 +479,7 @@ class PersonService implements ServiceMethods {
 					map.suffix = s
 					// Split the rest to be mapped out below
 					//println "b) splitting ${split[0]}"
-					split = split[0].split("\\s+").collect { it.trim() }
+					split = split[0].split(/\s+/).collect { it.trim() }
 					//println "b) split ($split) isa ${split.getClass()}"
 				}
 				else {
@@ -490,10 +490,9 @@ class PersonService implements ServiceMethods {
 				log.error 'parseName("{}") encountered multiple commas that is not handled', name
 				return null
 			}
-		}
-		else {
+		} else {
 			// Must be first [middle] last so parse and handle below
-			split = name.split("\\s+").collect { it.trim() }
+			split = name.split(/\s+/).collect { it.trim() }
 			//println "0) split ($split) isa ${split.getClass()}"
 		}
 
@@ -540,7 +539,7 @@ class PersonService implements ServiceMethods {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			List<String> last = split[0].split("\\s+").collect { it.trim() }
+			List<String> last = split[0].split(/\s+/).collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -550,7 +549,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			List<String> first = split[1].split("\\s+").collect { it.trim() }
+			List<String> first = split[1].split(/\s+/).collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {

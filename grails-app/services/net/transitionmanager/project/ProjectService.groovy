@@ -1129,7 +1129,7 @@ class ProjectService implements ServiceMethods {
 			partyRelationshipType.id == 'PROJ_STAFF'
 			roleTypeCodeFrom.id == RoleType.CODE_PARTY_PROJECT
 			roleTypeCodeTo.id == RoleType.CODE_PARTY_STAFF
-			partyIdFrom.id == project.id
+			partyIdFrom.id == Project.get(project.id)
 			partyIdTo.id in nonClientStaffIds
 		}
 		.projections { property 'partyIdTo.id' }

@@ -1,12 +1,5 @@
 package net.transitionmanager.project
 
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.asset.AssetOptions
-import net.transitionmanager.asset.AssetOptionsService
-import net.transitionmanager.asset.AssetType
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.asset.graph.AssetGraph
 import com.tdsops.tm.enums.domain.AssetClass
@@ -22,18 +15,25 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.spreadsheet.SheetWrapper
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.AssetOptions
+import net.transitionmanager.asset.AssetOptionsService
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.bulk.change.BulkChangeTag
 import net.transitionmanager.command.MoveBundleCommand
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.party.PartyType
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventSnapshot
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.party.PartyType
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.StateEngineService
@@ -250,7 +250,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		try {
-			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
+			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ?0 WHERE moveBundle = ?1",
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
 			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
@@ -436,7 +436,7 @@ class MoveBundleService implements ServiceMethods {
 		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
 		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def assetDependencyList = AssetDependencyBundle.executeQuery(
-				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?', [project])
+				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?0', [project])
 
 		// JPM - don't think that this is required
 		// def personList = partyRelationshipService.getCompanyStaff(project.client?.id)

@@ -22,6 +22,8 @@ import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.joda.time.DateMidnight
 import spock.lang.See
 import spock.lang.Shared
+import spock.lang.Unroll
+
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -1403,20 +1405,21 @@ class ETLTransformSpec extends ETLBaseSpec implements DataTest {
 	}
 
 	@See('TM-10726')
+	@Unroll
 	void 'test ETLTransformation concat'() {
 		expect: 'concatenation build correctly'
 
-			ETLTransformation.concat(separator, values) == result
+			ETLTransformation.concat(separator, values) == results
 
 		where:
-			separator | values                                  | result
-			''        | ['one', 'two', 'three']                 | 'onetwothree'
-			','       | ['one', 'two', 'three']                 | 'one,two,three'
-			','       | ['one', '', 'three']                    | 'one,three'
-			','       | ['one', '', 'three', true]              | 'one,,three'
-			','       | ['one', null, 'three', true]            | 'one,,three'
-			','       | ['one', 'two', ['three', 'four']]       | 'one,two,three,four'
-			','       | ['one', 'two', ['three', 'four', null]] | 'one,two,three,four'
+			separator | values                                  || results
+			''        | ['one', 'two', 'three']                 || 'onetwothree'
+			','       | ['one', 'two', 'three']                 || 'one,two,three'
+			','       | ['one', '', 'three']                    || 'one,three'
+			','       | ['one', '', 'three', true]              || 'one,,three'
+			','       | ['one', null, 'three', true]            || 'one,,three'
+			','       | ['one', 'two', ['three', 'four']]       || 'one,two,three,four'
+			','       | ['one', 'two', ['three', 'four', null]] || 'one,two,three,four'
 
 	}
 
