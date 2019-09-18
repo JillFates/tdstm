@@ -49,7 +49,7 @@
   </div>
 
   <div class="row task-manager-sub-header">
-    <div class="col-md-4">
+    <div class="col-md-4  k-align-self-center">
       <label class="neighborhood-control-label">Event:</label>
       <kendo-dropdownlist
         textField="name"
@@ -67,22 +67,22 @@
       <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
       <label class="d-inline-block task-chk-container">
         My Tasks
-        <input  type="checkbox" checked="checked" />
+        <input  type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
         <span class="checkmark"></span>
       </label>
       <button class="btn">
         <fa-icon [icon]="icons.faSignal" size="lg" [rotate]="270"></fa-icon>
       </button>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 k-align-self-center">
       <label class="d-inline-block task-chk-container">
-        <input  type="checkbox" checked="checked" />
+        <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
         <span class="checkmark"></span>
         Minimize Auto Tasks
       </label>
 
       <label class="d-inline-block task-chk-container">
-        <input  type="checkbox"/>
+        <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
         <span class="checkmark"></span>
         View Unpublished
       </label>

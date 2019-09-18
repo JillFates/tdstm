@@ -4,9 +4,10 @@ import { Observable } from 'rxjs';
 import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import { catchError, map } from 'rxjs/operators';
+
 import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
-import { catchError, map } from 'rxjs/operators';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
 import {IGraphTask} from '../model/graph-task.model';
@@ -503,22 +504,29 @@ export class TaskService {
 	/**
 	 * GET - Find task for neighborhood component
 	 * @param taskId: number | string
+	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string): Observable<IGraphTask[]> {
-		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`, { observe: 'response' })
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphTask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
+			{ params, observe: 'response' })
+			.map(res => res.body.data);
+	}
+
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<ITask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+			{ params, observe: 'response' })
 			.map(res => res.body.data);
 	}
 
 	/**
-	 * GET - moveEvents for neighborhood component
+	 * create http params object to be passed onto requests
 	 */
-	findMoveEvents(): Observable<IMoveEvent[]> {
-		return this.http.get<IMoveEventResponseBody>(`${this.MOVE_EVENT_URL}`, { observe: 'response' })
-			.map(res => res.body.data);
-	}
-
-	findTasksByMoveEventId(id: number): Observable<ITask[]> {
-		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`, { observe: 'response' })
-			.map(res => res.body.data);
+	createHttpParams(params: any): HttpParams {
+		return new HttpParams()
+		.set('myTasks', params.myTasks)
+		.set('minimizeAutoTasks', params.minimizeAutoTasks)
+		.set('viewUnpublished', params.viewUnpublished);
 	}
 }

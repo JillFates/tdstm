@@ -9,7 +9,7 @@ import {IGraphTask} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
-import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ReportsService} from '../../../reports/service/reports.service';
@@ -49,14 +49,23 @@ export class NeighborhoodComponent implements OnInit {
 	isEventDropdownOpen: boolean;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	userContext: UserContextModel;
+	viewUnpublished: boolean;
+	myTasks: boolean;
+	minimizeAutoTasks: boolean;
+	urlParams: any;
 
 	constructor(
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
 			private renderer: Renderer2,
 			private userContextService: UserContextService,
-			private reportService: ReportsService
-		) {}
+			private reportService: ReportsService,
+			private userPreferenceService: PreferenceService
+		) {
+				this.activatedRoute.queryParams.subscribe(params => {
+					if (params) { this.urlParams = params; }
+				});
+	}
 
 	ngOnInit() {
 		this.loadAll();
@@ -64,13 +73,26 @@ export class NeighborhoodComponent implements OnInit {
 
 	loadAll(): void {
 		this.subscribeToHighlightFilter();
-		this.activatedRoute.queryParams.subscribe(params => {
-			if (params && params.id) { this.loadTasks(params.id); }
-		});
 		this.loadUserContext();
-		this.loadEventList();
+		this.loadFilters();
 		this.eventsDropdownOpened();
 		this.eventsDropdownClosed();
+	}
+
+	/**
+	 * Load user preferences to filter taks
+ 	**/
+	loadFilters(): void {
+		this.userPreferenceService.getPreferences('myTasks', 'minimizeAutoTasks', PREFERENCES_LIST.VIEW_UNPUBLISHED)
+			.subscribe(res => {
+				const {myTasks, minimizeAutoTasks, VIEW_UNPUBLISHED} = res;
+				this.myTasks = (myTasks && myTasks === 'true' || myTasks === '1');
+				this.minimizeAutoTasks = (minimizeAutoTasks && (minimizeAutoTasks === 'true' || minimizeAutoTasks === '1'));
+				this.viewUnpublished = (VIEW_UNPUBLISHED && (VIEW_UNPUBLISHED === 'true' || VIEW_UNPUBLISHED === '1'));
+				console.log(this.myTasks, this.minimizeAutoTasks, this.viewUnpublished);
+				if (this.urlParams && this.urlParams.id) { this.loadTasks(this.urlParams.id); }
+				this.loadEventList();
+			});
 	}
 
 	/**
@@ -88,7 +110,14 @@ export class NeighborhoodComponent implements OnInit {
 		* @param {number} taskNumber to load tasks from
 	 **/
 	loadTasks(taskNumber: number): void {
-		this.taskService.findTask(taskNumber)
+
+		const filters = {
+			myTasks: this.myTasks ? '1' : '0',
+			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+			viewUnpublished: this.viewUnpublished ? '1' : '0'
+		};
+		console.log('filters: ', filters);
+		this.taskService.findTask(taskNumber, filters)
 			.subscribe((res: IGraphTask[]) => {
 				if (res && res.length > 0) {
 					this.tasks = res;
@@ -105,7 +134,7 @@ export class NeighborhoodComponent implements OnInit {
 				.getEventList()
 				.pipe(map(res => res.data));
 
-			if ((!this.tasks || this.tasks.length < 1) && this.selectedEvent) {
+			if ((!this.tasks || this.tasks.length < 1) && (!this.urlParams || !this.urlParams.id) && this.selectedEvent) {
 				this.loadFromSelectedEvent(this.selectedEvent.id);
 			}
 	}
@@ -116,7 +145,14 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	loadFromSelectedEvent(moveEventId?: number): void {
 		if (this.tasks) { return; }
-		this.taskService.findTasksByMoveEventId(this.selectedEvent.id)
+
+		const filters = {
+			myTasks: this.myTasks ? '1' : '0',
+			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+			viewUnpublished: this.viewUnpublished ? '1' : '0'
+		};
+		console.log('filters: ', filters);
+		this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
 		.subscribe(res => {
 			this.tasks = res;
 			this.generateModel();
@@ -124,9 +160,33 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	/**
+	 * load tasks with new filter criteria
+	 **/
+	onMyTasksFilterChange(): void {
+		// TODO
+	}
+
+	/**
+	 * load tasks with new filter criteria
+	 **/
+	onMinimizeAutoTasksFilterChange(): void {
+		// TODO
+	}
+
+	/**
+	 * load tasks with new filter criteria
+	 **/
+	onViewUnpublishedFilterChange(): void {
+		if (this.urlParams && this.urlParams.id && !!this.tasks.find(t => t.taskNumber === this.urlParams.id)) {
+			this.loadTasks(this.urlParams.id);
+		}	else { this.loadFromSelectedEvent(this.selectedEvent.id) }
+	}
+
+	/**
 	 * generate model to be used by diagram with task specific data
 	 **/
 	generateModel(): void {
+		if (!this.tasks) { return; }
 		const nodeDataArr = [];
 		const linksPath = [];
 
