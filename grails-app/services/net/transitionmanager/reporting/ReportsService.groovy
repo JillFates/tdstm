@@ -574,7 +574,7 @@ class ReportsService implements ServiceMethods {
         List<String> dashBoardOk = []
         moveBundles.each { moveBundle ->
             List<String> labels = []
-            def moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'transitionId'])
+            def moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'moveBundle'])
             if (!moveBundleStep) {
                 steps[moveBundle.name] = "No steps created"
                 eventErrorList << 'EventsBundle'
