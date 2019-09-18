@@ -24,13 +24,12 @@ import {SetProject} from '../../actions/project.actions';
 export class ProjectViewEditComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
-	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
+	private requiredFields = ['clientId', 'projectCode', 'projectName', 'completionDate'];
 	public managers;
 	public client;
 	public clients;
 	public planMethodologies;
 	public projectTypes;
-	public workflowCodes;
 	public projectManagers;
 	public possiblePartners;
 	public possibleManagers;
@@ -76,7 +75,6 @@ export class ProjectViewEditComponent implements OnInit {
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
-			workflowCode: 'STD_PROCESS',
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
@@ -164,7 +162,6 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
-				this.workflowCodes = data.workflowCodes;
 				this.projectTypes = data.projectTypes;
 
 				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId}));

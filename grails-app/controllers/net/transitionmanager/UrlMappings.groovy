@@ -221,6 +221,44 @@ class UrlMappings {
 		}
 		/******************************************************/
 
+		"/ws/moveBundle/list" {
+			controller = "wsMoveBundle"
+			action = [
+				GET: 'list'
+			]
+		}
+
+		"/ws/moveBundle/modelForEdit/$moveBundleId" {
+			controller = "wsMoveBundle"
+			action = [
+				GET: "modelForEdit"
+			]
+		}
+
+		"/ws/moveBundle/modelForCreate" {
+			controller = "wsMoveBundle"
+			action = [
+				GET: "modelForCreate"
+			]
+		}
+
+		"/ws/moveBundle/$moveBundleId?" {
+			controller = "wsMoveBundle"
+			action = [
+				POST: "save",
+				DELETE: "delete"
+			]
+		}
+
+		"/ws/moveBundle/deleteBundleAndAssets/$moveBundleId" {
+			controller = "wsMoveBundle"
+			action = [
+				DELETE: "deleteBundleAndAssets"
+			]
+		}
+
+		/******************************************************/
+
 		"/ws/event/updateEventSummary" {
 			controller = "wsEvent"
 			action = [
@@ -434,6 +472,16 @@ class UrlMappings {
 				GET: "listComments",
 			    POST: 'saveComment'
 			]
+		}
+
+		"/ws/model" {
+			controller = "wsModel"
+			action = [POST: "save"]
+		}
+
+		"/ws/model/$id" {
+			controller = "wsModel"
+			action = [DELETE: "delete"]
 		}
 
 		"/ws/task/listTasks" {
@@ -1446,41 +1494,6 @@ class UrlMappings {
                     GET: "moveBundles"
             ]
         }
-
-		"/ws/reports/viewEditBundle/$moveBundleId" {
-			controller = "wsReports"
-			action = [
-					GET: "modelForBundleViewEdit"
-			]
-		}
-
-		"/ws/reports/createBundleModel" {
-			controller = "wsReports"
-			action = [
-					GET: "modelForBundleCreate"
-			]
-		}
-
-		"/ws/reports/saveBundle/$moveBundleId?" {
-			controller = "wsReports"
-			action = [
-					POST: "saveBundle"
-			]
-		}
-
-		"/ws/reports/deleteBundle/$moveBundleId" {
-			controller = "wsReports"
-			action = [
-					DELETE: "deleteBundle"
-			]
-		}
-
-		"/ws/reports/deleteBundleAndAssets/$moveBundleId" {
-			controller = "wsReports"
-			action = [
-					DELETE: "deleteBundleAndAssets"
-			]
-		}
 
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"

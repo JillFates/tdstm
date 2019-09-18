@@ -17,6 +17,12 @@ class TaskFacade {
 	private AssetComment task
 	private Person whom
 
+	/**
+	 * Default constructor
+	 */
+	TaskFacade() {
+	}
+
 	@Autowired
 	/**
 	 * Constructor

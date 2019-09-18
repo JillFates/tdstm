@@ -135,12 +135,12 @@ class WsAssetController implements ControllerMethods {
 			)
 			errors << "You don't have the correct permission to Clone Assets Dependencies"
 		}
-		// cloning asset
-		Long clonedAssetId = assetEntityService.clone(project, command, errors)
+		// Clone the asset.
+		AssetEntity clonedAsset = assetEntityService.clone(project, command, errors)
 		if(errors){
-			renderFailureJson(errors)
+			renderErrorJson(errors)
 		}else{
-			renderSuccessJson([assetId : clonedAssetId])
+			renderSuccessJson([assetId : clonedAsset.id])
 		}
 	}
 

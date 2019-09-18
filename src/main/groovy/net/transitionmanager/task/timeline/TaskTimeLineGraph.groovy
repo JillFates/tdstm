@@ -107,10 +107,11 @@ class TaskTimeLineGraph {
 		 * @param duration
 		 * @return
 		 */
-		Builder withVertex(Integer taskNumber, String taskComment, String description, Integer duration) {
+		Builder withVertex(Long taskId, Integer taskNumber, String taskComment, String description, Integer duration) {
 
 			checkAndAddCurrentVertex()
 			currentVertex = new TaskVertex(
+				taskId,
 				taskNumber,
 				taskComment,
 				duration
@@ -129,6 +130,7 @@ class TaskTimeLineGraph {
 
 			checkAndAddCurrentVertex()
 			currentVertex = new TaskVertex(
+				task.id,
 				task.taskNumber,
 				task.comment,
 				task.duration,
@@ -200,12 +202,13 @@ class TaskTimeLineGraph {
 
 		/**
 		 * Adds a new vertex with parameters: taskComment and duration
+		 * @param taskId
 		 * @param taskComment
 		 * @param duration
 		 * @return current instance of {@code TaskTimeLineGraph.Builder}
 		 */
-		Builder withVertex(Integer taskNumber, String taskComment, Integer duration) {
-			withVertex(taskNumber, taskComment, '', duration)
+		Builder withVertex(Long taskId, Integer taskNumber, String taskComment, Integer duration) {
+			withVertex(taskId, taskNumber, taskComment, '', duration)
 		}
 
 		/**

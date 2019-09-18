@@ -112,7 +112,6 @@
 			var role = '${role}'
 			var category = '${category}'
 			var sizePref = '${sizePref}'
-			<g:if test="${workflowTransition}">var workflowTransition = ${workflowTransition}</g:if><g:else>var workflowTransition = null</g:else>
 			var bundle = "${bundleName}"
 			var windowWidth = $(window).width() - $(window).width()*5/100 ;
 			var taskManagerUrl = "/assetEntity/listTasks";
@@ -151,7 +150,7 @@
 				scrollOffset="0"
 				gridComplete="function(){ processTaskSafariColumns(); bindResize('taskListId'); gridLoadComplete(); }"
 				postData="{moveEvent:event, justRemaining:justRemaining, justMyTasks:justMyTasks, filter:filter, comment:comment, taskNumber:taskNumber,
-					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, workflowTransition:workflowTransition, bundle:bundle }"
+					assetEntity:assetEntity, assetType:assetType, dueDate:dueDate, status:status, assignedTo:assignedTo, role:role, category:category, viewUnpublished : viewUnpublished, bundle:bundle }"
 				showPager="true">
 				<jqgrid:navigation id="taskListId" add="false" edit="false" del="false" search="false" refresh="false" />
 				<jqgrid:refreshButton id="taskListId" />

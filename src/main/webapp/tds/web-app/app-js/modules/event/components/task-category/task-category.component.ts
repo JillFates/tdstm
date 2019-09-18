@@ -7,7 +7,6 @@ import {EventRowType, TaskCategoryCell} from './../../model/event.model';
 	templateUrl: 'task-category.component.html'
 })
 export class TaskCategoryComponent {
-	@Input() bundleSteps: any;
 	@Input() taskCategories: any;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 
@@ -17,6 +16,8 @@ export class TaskCategoryComponent {
 	public RowType = EventRowType;
 	public categories = [
 		'Category',
+		'Percent completed',
+		'Task completed',
 		'Estimated Start',
 		'Estimated Completion',
 		'Actual Start',
@@ -68,15 +69,6 @@ export class TaskCategoryComponent {
 		return row.slice(this.showFrom, this.showFrom + this.elementsToShow);
 	}
 
-	/**
-	 * Reset the initial configuration and notify to the host component
-	 * about a change tabe event
- 	 * @param {any} selectedEvent Change event info
-	*/
-	public onChangeTab(selecteEvent: any): void {
-		this.setInitialConfiguration();
-		this.changeTab.emit(this.bundleSteps.moveBundleList[selecteEvent.index].id);
-	}
 	/**
 	 * Return a boolean indicating if there are task present
 	*/

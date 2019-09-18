@@ -76,7 +76,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 
 		let authReq = request.clone({
 			setHeaders: {'Content-Type': contentType}
-		})
+		});
 
 		this.notifierService.broadcast({
 			name: 'httpRequestInitial'

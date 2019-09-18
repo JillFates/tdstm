@@ -18,7 +18,7 @@ export class BundleService {
 	}
 
 	getBundles(): Observable<BundleModel[]> {
-		return this.http.get(`../ws/reports/moveBundles`)
+		return this.http.get(`../ws/moveBundle/list`)
 			.map((response: any) => {
 				response.data.forEach((item: any) => {
 					item.completion = item.completion ?
@@ -33,7 +33,7 @@ export class BundleService {
 	}
 
 	getModelForBundleViewEdit(id) {
-		return this.http.get(`../ws/reports/viewEditBundle/${id}`)
+		return this.http.get(`../ws/moveBundle/modelForEdit/${id}`)
 			.map((response: any) => {
 				return response;
 			})
@@ -41,7 +41,7 @@ export class BundleService {
 	}
 
 	getModelForBundleCreate() {
-		return this.http.get(`../ws/reports/createBundleModel`)
+		return this.http.get(`../ws/moveBundle/modelForCreate`)
 			.map((response: any) => {
 				return response;
 			})
@@ -50,7 +50,7 @@ export class BundleService {
 	}
 
 	deleteBundle(id) {
-		return this.http.delete(`../ws/reports/deleteBundle/${id}`)
+		return this.http.delete(`../ws/moveBundle/${id}`)
 			.map((response: any) => {
 				return response;
 			})
@@ -62,18 +62,15 @@ export class BundleService {
 			id: id,
 			name: model.name,
 			description: model.description,
-			sourceRoom: model.fromId,
-			targetRoom: model.toId,
+			sourceRoomId: model.fromId,
+			targetRoomId: model.toId,
 			startTime: model.startTime,
 			completionTime: model.completionTime,
-			projectManager: model.projectManagerId,
-			moveManager: model.moveManagerId,
 			moveEvent: model.moveEvent,
 			operationalOrder: model.operationalOrder,
-			workflowCode: model.workflowCode,
 			useForPlanning: model.useForPlanning
 		};
-		return this.http.post(`../ws/reports/saveBundle/${id}`, JSON.stringify(postRequest))
+		return this.http.post(`../ws/moveBundle/${id}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response;
 				})
@@ -81,7 +78,7 @@ export class BundleService {
 	}
 
 	deleteBundleAndAssets(id) {
-		return this.http.delete(`../ws/reports/deleteBundleAndAssets/${id}`)
+		return this.http.delete(`../ws/moveBundle/deleteBundleAndAssets/${id}`)
 			.map((response: any) => {
 				return response;
 			})

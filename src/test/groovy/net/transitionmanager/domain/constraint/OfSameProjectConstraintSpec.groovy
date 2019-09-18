@@ -30,7 +30,6 @@ class OfSameProjectConstraintSpec extends Specification {
 			startDate     : new Date(),
 			completionDate: new Date() + 30,
 			guid          : StringUtil.generateGuid(),
-			workflowCode  : 'STD_PROCESS',
 			timezone      : Timezone.findByCode('GMT'),
 			guid          : StringUtil.generateGuid(),
 			client        : [name: 'something'] as PartyGroup
@@ -46,7 +45,6 @@ class OfSameProjectConstraintSpec extends Specification {
 			startDate     : new Date(),
 			completionDate: new Date() + 30,
 			guid          : StringUtil.generateGuid(),
-			workflowCode  : 'STD_PROCESS',
 			timezone      : Timezone.findByCode('GMT'),
 			guid          : StringUtil.generateGuid(),
 			client        : [name: 'something else'] as PartyGroup

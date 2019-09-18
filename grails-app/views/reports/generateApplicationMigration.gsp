@@ -14,7 +14,6 @@
             <th>Name</th>
             <th>SME</th>
             <th>Start</th>
-            <th>Test</th>
             <th>Finish</th>
             <th>Duration (hh:mm)</th>
             <th>Window</th>
@@ -30,7 +29,6 @@
                 </td>
                 <td>${application.app.sme}</td>
                 <td>${application.startTime}</td>
-                <td>${application.workflow }</td>
                 <td>${application.finishTime}</td>
                 <td>${application.duration}</td>
                 <td>

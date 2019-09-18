@@ -198,11 +198,6 @@ export class Permission {
 	static UserUpdateOwnAccount = 'UserUpdateOwnAccount';
 	static UserView = 'UserView';
 	static ViewPacingMeters = 'ViewPacingMeters';
-	static WorkflowCreate = 'WorkflowCreate';
-	static WorkflowDelete = 'WorkflowDelete';
-	static WorkflowEdit = 'WorkflowEdit';
-	static WorkflowList = 'WorkflowList';
-	static WorkflowView = 'WorkflowView';
 	static ProviderCreate = 'ProviderCreate';
 	static ProviderDelete = 'ProviderDelete';
 	static ProviderUpdate = 'ProviderUpdate';
