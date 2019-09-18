@@ -248,6 +248,9 @@
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-graph">
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>
                     </li>
+                    <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-gojs-task-graph">
+                        <a [routerLink]="['/neighborhood']">GoJS Graph</a>
+                    </li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-timeline">
                         <a href="/tdstm/task/taskTimeline">Task Timeline</a>
                     </li>
