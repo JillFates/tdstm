@@ -56,22 +56,32 @@ class WsTimeLineController implements ControllerMethods {
 
 		} else {
 
-			render(tasks.collect { Task task ->
-				[
-					id           : task.id,
-					number       : task.taskNumber,
-					comment      : task.comment,
-					criticalPath : task.isCriticalPath,
-					duration     : task.duration,
-					durationScale: task.durationScale.name(),
-					slack        : task.slack,
-					actualStart  : task.actStart,
-					status       : task.status,
-					actFinish    : task.actFinish,
-					estStart     : task.estStart,
-					estFinish    : task.estFinish
+			render([
+				data: [
+					items: tasks.collect { Task task ->
+						[
+							id            : task.id,
+							number        : task.taskNumber,
+							assetName     : task.assetName,
+							comment       : task.comment,
+							criticalPath  : task.isCriticalPath,
+							duration      : task.duration,
+							durationScale : task.durationScale?.name(),
+							slack         : task.slack,
+							actualStart   : task.actStart,
+							status        : task.status,
+							actFinish     : task.actFinish,
+							estStart      : task.estStart,
+							estFinish     : task.estFinish,
+							assignedTo    : task.assignedTo?.toString(),
+							role          : task.role,
+							predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
+								it.successor.id
+							}
+						]
+					}
 				]
-			} as JSON)
+			] as JSON)
 		}
 
 	}
