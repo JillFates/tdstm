@@ -8,6 +8,7 @@ import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TaskService} from '../../../taskManager/service/task.service';
 
 @Component({
 	selector: `bundle-view-edit-component`,
@@ -32,6 +33,7 @@ export class BundleViewEditComponent implements OnInit {
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
 		private bundleService: BundleService,
+		private taskService: TaskService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
@@ -157,11 +159,24 @@ export class BundleViewEditComponent implements OnInit {
 
 				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
 				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: null, name: ''};
+				this.bundleModel.moveEvent = data && data.moveBundleInstance.moveEvent ? data.moveBundleInstance.moveEvent : {id: null, name: ''};
 
-				this.moveEvents = data.availableMoveEvents;
 				this.rooms = data.rooms;
-				this.updateSavedFields();
+				this.taskService.getEvents()
+				.subscribe((results: any) => {
+					console.log('Results are:');
+					console.log(results);
+					this.moveEvents = results;
+					if (this.bundleModel.moveEvent) {
+						const currentEvent = results.find((result: any) => {
+							return result.id === this.bundleModel.moveEvent.id;
+						});
+						if (currentEvent) {
+							this.bundleModel.moveEvent.name = currentEvent.name;
+						}
+					}
+					this.updateSavedFields();
+				});
 			});
 	}
 
