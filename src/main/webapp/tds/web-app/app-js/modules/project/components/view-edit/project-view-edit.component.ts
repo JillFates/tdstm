@@ -191,11 +191,6 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
-					this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-						if (userContext) {
-							userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp};
-						}
-					});
 					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp}));
 				}
 			});
