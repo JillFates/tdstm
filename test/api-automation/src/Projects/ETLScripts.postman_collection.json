@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b6f8d504-28ab-4f48-bf19-20082f30dded",
+		"_postman_id": "27f63ed4-a826-4c3e-ba6d-a3f5ff41868f",
 		"name": "ETL Script",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -488,7 +488,7 @@
 							"*/",
 							"var counter = 0;",
 							"pm.test(\"Check the status of the progress key until it's completed\", function () {",
-							"    if (jsonObject.data.status == \"RUNNING\" && counter!=20){",
+							"    if (jsonObject.data.status != \"COMPLETED\" && counter!=20){",
 							"        postman.setNextRequest(\"Check Progress Completed\");",
 							"        counter++;",
 							"    } ",
