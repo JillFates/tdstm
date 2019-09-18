@@ -21,7 +21,21 @@ class TimeLineService implements ServiceMethods {
 	JdbcTemplate jdbcTemplate
 
 	/**
-	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
+	 * Creates an instance of {@code TaskTimeLineGraph} using a List of {@code Task} and a List of {@code TaskDependency}
+	 *
+	 * @param tasks a List of {@code Task}
+	 * @param taskDependencies a List of {@code TaskDependency}
+	 * @return
+	 */
+	TaskTimeLineGraph createTaskTimeLineGraph(List<Task> tasks, List<TaskDependency> taskDependencies) {
+		return new TaskTimeLineGraph.Builder()
+			.withVertices(tasks)
+			.withEdges(taskDependencies)
+			.build()
+	}
+
+	/**
+	 * Execute critical path analysis using  using a List of {@code Task} and a List of {@code TaskDependency}
 	 * and returning an instance of {@code TimelineSummary} with results
 	 * and instance of {@code TaskTimeLineGraph}.
 	 *
@@ -34,15 +48,23 @@ class TimeLineService implements ServiceMethods {
 	 */
 	List calculateCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
 
-		TaskTimeLineGraph graph = new TaskTimeLineGraph.Builder()
-			.withVertices(tasks)
-			.withEdges(taskDependencies)
-			.build()
-
-		TimelineSummary summary = new TimeLine(graph)
-			.calculate(event.estStartTime, event.estCompletionTime)
+		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)
+		TimelineSummary summary = calculateCPA(event, graph)
 
 		return [graph, summary]
+	}
+
+	/**
+	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
+	 * and returning an instance of {@code TimelineSummary} with results
+	 * and instance of {@code TaskTimeLineGraph}.
+	 *
+	 * @param event an instance of {@code MoveEvent}
+	 * @param graph an instance of {@code TaskTimeLineGraph}
+	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
+	 */
+	TimelineSummary calculateCPA(MoveEvent event, TaskTimeLineGraph graph) {
+		return new TimeLine(graph).calculate(event.estStartTime, event.estCompletionTime)
 	}
 
 	/**

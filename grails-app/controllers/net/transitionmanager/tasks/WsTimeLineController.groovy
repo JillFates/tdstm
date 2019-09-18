@@ -32,57 +32,64 @@ class WsTimeLineController implements ControllerMethods {
 		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
 
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
+		List<TaskDependency> taskDependencies = runbookService.getTaskDependencies(tasks)
+
+		TaskTimeLineGraph graph = timeLineService.createTaskTimeLineGraph(tasks, taskDependencies)
+		TimelineSummary summary
 
 		if (recalculate) {
-			List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
-			def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
-
-			render(tasks.collect { Task task ->
-				[
-					id           : task.id,
-					number       : task.taskNumber,
-					comment      : task.comment,
-					criticalPath : graph.getVertex(task.taskNumber).isCriticalPath(),
-					duration     : task.duration,
-					durationScale: task.durationScale.name(),
-					slack        : graph.getVertex(task.taskNumber).slack,
-					actualStart  : task.actStart,
-					status       : task.status,
-					actFinish    : task.actFinish,
-					estStart     : graph.getVertex(task.taskNumber).earliestStartDate,
-					estFinish    : graph.getVertex(task.taskNumber).earliestFinishDate
-				]
-			} as JSON)
-
-		} else {
-
-			render([
-				data: [
-					items: tasks.collect { Task task ->
-						[
-							id            : task.id,
-							number        : task.taskNumber,
-							assetName     : task.assetName,
-							comment       : task.comment,
-							criticalPath  : task.isCriticalPath,
-							duration      : task.duration,
-							durationScale : task.durationScale?.name(),
-							slack         : task.slack,
-							actualStart   : task.actStart,
-							status        : task.status,
-							actFinish     : task.actFinish,
-							estStart      : task.estStart,
-							estFinish     : task.estFinish,
-							assignedTo    : task.assignedTo?.toString(),
-							role          : task.role,
-							predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
-								it.successor.id
-							}
-						]
-					}
-				]
-			] as JSON)
+			summary = timeLineService.calculateCPA(moveEvent, graph)
 		}
+
+
+//			render(tasks.collect { Task task ->
+//				[
+//					id           : task.id,
+//					number       : task.taskNumber,
+//					comment      : task.comment,
+//					criticalPath : graph.getVertex(task.taskNumber).isCriticalPath(),
+//					duration     : task.duration,
+//					durationScale: task.durationScale.name(),
+//					slack        : graph.getVertex(task.taskNumber).slack,
+//					actualStart  : task.actStart,
+//					status       : task.status,
+//					actFinish    : task.actFinish,
+//					estStart     : graph.getVertex(task.taskNumber).earliestStartDate,
+//					estFinish    : graph.getVertex(task.taskNumber).earliestFinishDate
+//				]
+//			} as JSON)
+
+
+		render([
+			data: [
+				sinks    : graph.sinks.collect { it.taskId },
+				starts   : graph.starts.collect { it.taskId },
+				startDate: moveEvent.actualStartTime,
+				cycles   : [],
+				items    : tasks.collect { Task task ->
+					[
+						id            : task.id,
+						number        : task.taskNumber,
+						assetName     : task.assetName,
+						comment       : task.comment,
+						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
+						duration      : task.duration,
+						durationScale : task.durationScale?.name(),
+						slack         : recalculate ? graph.getVertex(task.taskNumber).slack : task.slack,
+						actualStart   : task.actStart,
+						status        : task.status,
+						actFinish     : task.actFinish,
+						estStart      : task.estStart,
+						estFinish     : task.estFinish,
+						assignedTo    : task.assignedTo?.toString(),
+						role          : task.role,
+						predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
+							it.successor.id
+						}
+					]
+				}
+			]
+		] as JSON)
 
 	}
 
