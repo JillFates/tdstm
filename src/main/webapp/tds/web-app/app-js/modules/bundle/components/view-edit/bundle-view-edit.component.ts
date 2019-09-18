@@ -27,7 +27,7 @@ export class BundleViewEditComponent implements OnInit {
 	public bundleId;
 	public editing = false;
 	protected userTimeZone: string;
-	private requiredFields = ['name', 'workflowCode'];
+	private requiredFields = ['name'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(

@@ -32,11 +32,9 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
@@ -62,35 +60,6 @@ class MoveBundleController implements ControllerMethods {
 	UserPreferenceService userPreferenceService
     CustomDomainService customDomainService
 	MoveEventService moveEventService
-
-	/*-----------------------------------------------------
-	 * remote function to verify stepSnapshot records for a list of steps.
-	 * if there are more than one snapshots associated with any of the step in list
-	 * then return failure otherwise success.
-	 * @param  : moveBundleId, list of unchecked steps
-	 * @return : success / failure
-	 *---------------------------------------------------*/
-	@HasPermission(Permission.BundleView)
-	def checkStepSnapshotRecord() {
-		def steps = params.steps
-		MoveBundle moveBundle = MoveBundle.get(params.moveBundleId)
-		def transitionIds
-		def message = "success"
-		if (steps){
-			transitionIds = steps.split(",")
-		}
-		for (transitionId in transitionIds) {
-			def moveBundleStep = MoveBundleStep.findByMoveBundleAndTransitionId(moveBundle, transitionId)
-			if (moveBundleStep) {
-				int stepSnapshotCount = StepSnapshot.countByMoveBundleStep(moveBundleStep)
-				if (stepSnapshotCount > 1) {
-					message = "failure"
-					break
-				}
-			}
-		}
-		render message
-	}
 
 	@HasPermission(Permission.BundleView)
 	def projectMoveBundles() {

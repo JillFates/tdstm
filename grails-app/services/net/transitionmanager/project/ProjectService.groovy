@@ -8,7 +8,6 @@ import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
-import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -1917,7 +1916,6 @@ class ProjectService implements ServiceMethods {
 			runbookOn = projectCommand.runbookOn
 			startDate = projectCommand.startDate
 			timezone = getTimezone(projectCommand.timeZone)
-			workflowCode = projectCommand.workflowCode
 		}
 
 		project.save(failOnError: true, flush: true)

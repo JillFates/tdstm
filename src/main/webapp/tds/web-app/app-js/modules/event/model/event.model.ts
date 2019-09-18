@@ -67,6 +67,8 @@ export enum EventRowType {
 
 export enum CatagoryRowType {
 	Header,
+	Percent,
+	TaskCompleted,
 	PlannedStart,
 	PlannedCompletion,
 	ActualStart,
@@ -74,6 +76,9 @@ export enum CatagoryRowType {
 }
 
 export interface CategoryTask {
+	percComp: string;
+	tskTot: string;
+	tskComp: string;
 	category: string;
 	actStart: string;
 	actFinish: string;
@@ -116,4 +121,5 @@ export class TaskSummaryStep {
 export interface TaskCategoryCell {
 	text: string;
 	classes: string;
+	compose?: any;
 }
