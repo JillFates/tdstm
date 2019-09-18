@@ -164,8 +164,6 @@ export class BundleViewEditComponent implements OnInit {
 				this.rooms = data.rooms;
 				this.taskService.getEvents()
 				.subscribe((results: any) => {
-					console.log('Results are:');
-					console.log(results);
 					this.moveEvents = results;
 					if (this.bundleModel.moveEvent) {
 						const currentEvent = results.find((result: any) => {
