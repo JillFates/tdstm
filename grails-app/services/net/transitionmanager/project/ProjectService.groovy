@@ -1139,11 +1139,10 @@ class ProjectService implements ServiceMethods {
 			partyRelationshipType.id == 'PROJ_STAFF'
 			roleTypeCodeFrom.id == RoleType.CODE_PARTY_PROJECT
 			roleTypeCodeTo.id == RoleType.CODE_PARTY_STAFF
-			partyIdFrom.id == Project.get(project.id)
+			partyIdFrom.id == project.id
 			partyIdTo.id in nonClientStaffIds
 		}
-		.projections { property 'partyIdTo.id' }
-				.list()
+		.projections { property 'partyIdTo.id' }.list()
 
 		// Add to the staffIds list all of the staff of the project client as they're all fair game
 		PartyGroup client = project.client

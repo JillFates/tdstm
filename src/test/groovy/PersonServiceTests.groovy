@@ -6,7 +6,7 @@ import spock.lang.Unroll
 class PersonServiceTests extends Specification implements ServiceUnitTest<PersonService> {
 
 	@Unroll
-	void testParseName() {
+	void "testParseName #name parses to first: #first, midle: #middle, last: #last, and suffix: #suffix"() {
 		expect:
 			Map map = service.parseName(name)
 
