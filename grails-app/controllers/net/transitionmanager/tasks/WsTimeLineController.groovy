@@ -25,6 +25,57 @@ class WsTimeLineController implements ControllerMethods {
 	TimeLineService timeLineService
 	RunbookService runbookService
 
+	@HasPermission(Permission.TaskViewCriticalPath)
+	def timeline() {
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
+
+		List<Task> tasks = runbookService.getEventTasks(moveEvent)
+
+		if (recalculate) {
+			List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
+			def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
+
+			render(tasks.collect { Task task ->
+				[
+					id           : task.id,
+					number       : task.taskNumber,
+					comment      : task.comment,
+					criticalPath : graph.getVertex(task.taskNumber).isCriticalPath(),
+					duration     : task.duration,
+					durationScale: task.durationScale.name(),
+					slack        : graph.getVertex(task.taskNumber).slack,
+					actualStart  : task.actStart,
+					status       : task.status,
+					actFinish    : task.actFinish,
+					estStart     : graph.getVertex(task.taskNumber).earliestStartDate,
+					estFinish    : graph.getVertex(task.taskNumber).earliestFinishDate
+				]
+			} as JSON)
+
+		} else {
+
+			render(tasks.collect { Task task ->
+				[
+					id           : task.id,
+					number       : task.taskNumber,
+					comment      : task.comment,
+					criticalPath : task.isCriticalPath,
+					duration     : task.duration,
+					durationScale: task.durationScale.name(),
+					slack        : task.slack,
+					actualStart  : task.actStart,
+					status       : task.status,
+					actFinish    : task.actFinish,
+					estStart     : task.estStart,
+					estFinish    : task.estFinish
+				]
+			} as JSON)
+		}
+
+	}
+
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
@@ -47,7 +98,7 @@ class WsTimeLineController implements ControllerMethods {
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
 
 		if (!summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
