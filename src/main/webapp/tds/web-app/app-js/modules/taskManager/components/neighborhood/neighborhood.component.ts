@@ -1,6 +1,6 @@
 import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {of, Observable, BehaviorSubject} from 'rxjs';
-import {distinct, skip} from 'rxjs/operators';
+import {distinct, map, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 
 import {TaskService} from '../../service/task.service';
@@ -10,6 +10,9 @@ import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
 import {PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {ReportsService} from '../../../reports/service/reports.service';
 
 export interface ILinkPath {
 	from: number | string;
@@ -45,11 +48,14 @@ export class NeighborhoodComponent implements OnInit {
 	eventList$: Observable<IMoveEvent[]>;
 	isEventDropdownOpen: boolean;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
+	userContext: UserContextModel;
 
 	constructor(
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
-			private renderer: Renderer2
+			private renderer: Renderer2,
+			private userContextService: UserContextService,
+			private reportService: ReportsService
 		) {}
 
 	ngOnInit() {
@@ -61,9 +67,20 @@ export class NeighborhoodComponent implements OnInit {
 		this.activatedRoute.queryParams.subscribe(params => {
 			if (params && params.id) { this.loadTasks(params.id); }
 		});
+		this.loadUserContext();
 		this.loadEventList();
 		this.eventsDropdownOpened();
 		this.eventsDropdownClosed();
+	}
+
+	/**
+	 * Load user context
+	 **/
+	loadUserContext(): void {
+		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+			this.selectedEvent = userContext.event;
+		});
 	}
 
 	/**
@@ -84,10 +101,13 @@ export class NeighborhoodComponent implements OnInit {
 	 * Load events to fill events dropdown
 	 **/
 	loadEventList() {
-		this.taskService.findMoveEvents().subscribe(res => {
-			this.eventList$ = of(res);
-			this.selectedEvent = res[0];
-		});
+			this.eventList$ = this.reportService
+				.getEventList()
+				.pipe(map(res => res.data));
+
+			if ((!this.tasks || this.tasks.length < 1) && this.selectedEvent) {
+				this.loadFromSelectedEvent(this.selectedEvent.id);
+			}
 	}
 
 	/**
