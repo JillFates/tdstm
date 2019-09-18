@@ -247,4 +247,27 @@ trait ServiceMethods {
 		return timezone
 	}
 
+	/**
+	 * Fetch the corresponding instance from the database (if the id is given). Otherwise, create a new one
+	 * and set the project field (if needed).
+	 *
+	 * @param type - domain class.
+	 * @param id - id of the instance (if null a new one will be created).
+	 * @param currentProject - the user's current project.
+	 * @param throwException - whether or not an exception should be thrown on error.
+	 * @return
+	 */
+	@CompileStatic
+	<T> T getOrCreate(Class<T> type, Object id, Project currentProject, boolean throwException = true) {
+		T instance
+		if (id != null) {
+			instance = get(type, id, currentProject, throwException)
+		} else {
+			instance = type.newInstance()
+			if (instance.hasProperty('project')) {
+				instance['project'] = currentProject
+			}
+		}
+		return instance
+	}
 }

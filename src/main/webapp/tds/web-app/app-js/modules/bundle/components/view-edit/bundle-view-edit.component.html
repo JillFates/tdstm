@@ -54,23 +54,6 @@
                         </tr>
 
                         <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
-
-                            <td valign="top" class="value">
-                                <span *ngIf="projectManager">{{projectManager}}</span>
-                            </td>
-
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Event Manager:</td>
-
-                            <td valign="top" class="value">
-                                <span *ngIf="moveManager">{{moveManager}}</span>
-                            </td>
-
-                        </tr>
-                        <tr class="prop">
                             <td valign="top" class="name">Event:</td>
 
                             <td valign="top" class="value">
@@ -82,13 +65,6 @@
                             <td valign="top" class="name">Order:</td>
 
                             <td valign="top" class="value">{{savedModel?.operationalOrder}}</td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">WorkFlow Code</td>
-
-                            <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
-
                         </tr>
 
                         <tr class="prop">
@@ -165,20 +141,6 @@
                         </tr>
 
                         <tr class="prop">
-                            <td valign="top" class="name">Project Manager:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="projectManagerId" name="projectManager" [(ngModel)]="bundleModel.projectManagerId"  [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'" [data]="managers"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
-                            <td valign="top" class="name">Event Manager:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="moveManagerId" name="moveManager" [(ngModel)]="bundleModel.moveManagerId"  [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'" [data]="managers"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-
-                        <tr class="prop">
                             <td valign="top" class="name">Event:</td>
                             <td valign="top" class="value">
                                 <kendo-dropdownlist id="moveEventId" name="moveEvent" [(ngModel)]="bundleModel.moveEvent" [textField]="'name'" [valueField]="'id'" [data]="moveEvents"></kendo-dropdownlist>
@@ -189,12 +151,6 @@
                             <td valign="top" class="name">Order:</td>
                             <td valign="top" class="value">
                                 <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="bundleModel.workflowCode" [data]="workflowCodes"></kendo-dropdownlist>
                             </td>
                         </tr>
 

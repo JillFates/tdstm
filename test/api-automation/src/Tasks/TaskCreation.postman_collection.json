@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6059ee24-0040-4553-932a-8f98caf63f5e",
+		"_postman_id": "37e8cf25-452d-4657-bb39-c5ba179da7f9",
 		"name": "Task Creation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

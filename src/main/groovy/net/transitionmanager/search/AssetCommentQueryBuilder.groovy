@@ -218,13 +218,27 @@ class AssetCommentQueryBuilder {
 	Closure likeBuilder = { String field, Map fieldMap ->
 		boolean needsCasting = fieldMap['type'] != String
 		String property = fieldMap['property']
-		String value = "%${requestParams[field]}%"
+		String value
 		if (needsCasting) {
 			whereClauses << "str(${property}) LIKE :${field}"
 			whereParams[field] = value
 		} else {
 			processField(field, fieldMap, 'LIKE', ":${field}",  value)
 		}
+	}
+
+	/**
+	 * Construct an expression 'role like %someValue%.
+	 */
+	Closure roleLikeBuilder = { String field, Map fieldMap ->
+		String value
+		if (requestParams[field] == "NO_ROLE") {
+			value = "" // special case where we want to show all tasks without a role
+		} else {
+			value = "%${requestParams[field]}%"
+		}
+		processField(field, fieldMap, 'LIKE', ":${field}",  value)
+
 	}
 
 	/**
@@ -459,15 +473,14 @@ class AssetCommentQueryBuilder {
 		'priority':             [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution':           [property: 'ac.resolution', builder: likeBuilder],
 		'resolvedBy':           [property: SqlUtil.personFullName('resolvedBy', 'ac'), builder: likeBuilder],
-		'role':                 [property: 'ac.role', builder: likeBuilder],
+		'role':                 [property: 'ac.role', builder: roleLikeBuilder],
 		'sendNotification':     [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status':               [property: 'ac.status', builder: likeBuilder],
 		'statusUpdated':        [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
 		'percentageComplete':	[property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec':             [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber':           [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished':      [builder: viewUnpublishedBuilder],
-		'workflowTransition':   [property: 'ac.workflowTransition.id', builder: eqBuilder, joinTable: 'ac.workflowTransition'],
+		'viewUnpublished':      [builder: viewUnpublishedBuilder]
 	]
 
 }

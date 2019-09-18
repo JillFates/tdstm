@@ -1,0 +1,23 @@
+<div class="power-component">
+    <div class="max">
+        <input type="number" [tabindex]="tabindex" name="namePlate" [(ngModel)]="model.powerNameplate" (blur)="setStandardPower()">
+    </div>
+    <div class="arrows">
+        <div (click)="setStandardPower()">>></div>
+    </div>
+    <div class="design">
+        <input type="number" [tabindex]="tabindex" name="design" [(ngModel)]="model.design" (blur)="reportChanges()">
+    </div>
+    <div class="average">
+        <input type="number" [tabindex]="tabindex" name="use" [(ngModel)]="model.use"  (blur)="reportChanges()">
+    </div>
+    <div class="unit">
+        <kendo-dropdownlist
+                [tabindex]="tabindex"
+                name="powerUnit"
+                [data]="units"
+                (selectionChange)="onUnitsChange($event)"
+                [(ngModel)]="model.unit">
+        </kendo-dropdownlist>
+    </div>
+</div>

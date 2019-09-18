@@ -1,0 +1,809 @@
+{
+	"info": {
+		"_postman_id": "9ddcfa58-1e34-4497-814f-950839e1ab39",
+		"name": "Notices CRUD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login - Notices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c02e6dfe-35be-48c6-8b6d-51148f167fe5",
+						"exec": [
+							"pm.test(\"Response returns User Context\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"userContext\");",
+							"    pm.expect(pm.response.text()).to.include(\"username\");     ",
+							"    pm.expect(pm.response.text()).to.include(\"firstName\");",
+							"    pm.expect(pm.response.text()).to.include(\"fullName\");",
+							"    pm.expect(pm.response.text()).to.include(\"project\");",
+							"    pm.expect(pm.response.text()).to.include(\"timezone\");",
+							"    pm.expect(pm.response.text()).to.include(\"dateFormat\");",
+							"    pm.expect(pm.response.text()).to.include(\"notices\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				},
+				"description": "Login"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Notices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "99d9c4b0-4d4c-4337-84c9-79c1ede4acc0",
+						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var preLoginNoticeName = \"API Pre Login Notice \" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"pm.environment.set(\"preLoginNoticeName\", preLoginNoticeName);",
+							"",
+							"var postLoginNoticeName = \"API Post Login Notice \" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"pm.environment.set(\"postLoginNoticeName\", postLoginNoticeName);",
+							"",
+							"var mandatoryNotice = \"API Mandatory Notice \" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"pm.environment.set(\"mandatoryNotice\", mandatoryNotice);",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create PreLogin Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f16e5bdf-495d-4dbe-ad07-b6d2fa28cc5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Notice Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"API Pre Login Notice\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var preLoginNoticeId = jsonObject.model.id ;",
+							"pm.environment.set(\"preLoginNoticeId\", preLoginNoticeId);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"typeId\":\"PRE_LOGIN\",\"active\":false,\"title\":\"{{preLoginNoticeName}}\",\"htmlText\":\"<p>Automated Message</p>\",\"rawText\":\"Automated Message\",\"needAcknowledgement\":false,\"locked\":false,\"sequence\":0}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://tmqa12.transitionmanager.net/tdstm/ws/notices",
+					"protocol": "https",
+					"host": [
+						"tmqa12",
+						"transitionmanager",
+						"net"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create PostLogin Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f16e5bdf-495d-4dbe-ad07-b6d2fa28cc5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Notice Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"API Post Login Notice\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var postLoginNoticeId = jsonObject.model.id ;",
+							"pm.environment.set(\"postLoginNoticeId\", postLoginNoticeId);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"typeId\":\"POST_LOGIN\",\"active\":false,\"title\":\"{{postLoginNoticeName}}\",\"htmlText\":\"<p>Automated Message</p>\",\"rawText\":\"Automated Message\",\"needAcknowledgement\":false,\"locked\":false,\"sequence\":0}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Mandatory Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f16e5bdf-495d-4dbe-ad07-b6d2fa28cc5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Notice Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"API Mandatory Notice\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"var mandatoryNoticeId = jsonObject.model.id ;",
+							"pm.environment.set(\"mandatoryNoticeId\", mandatoryNoticeId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"typeId\":\"POST_LOGIN\",\"active\":false,\"title\":\"{{mandatoryNotice}}\", \"acknowledgeLabel\":\"Automated Message\",\"htmlText\":\"<p>Automated Message</p>\",\"rawText\":\"Automated Message\",\"needAcknowledgement\":true,\"locked\":false,\"sequence\":0}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db60a63b-4fde-407f-9e05-85f6544b0856",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Notice Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Edited\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"active\":false,\"createdBy\":{\"id\":6434,\"fullname\":\"api_test_user\"},\"dateCreated\":\"2019-09-16T19:11:24Z\",\"htmlText\":\"<p>Automated message</p>\",\"id\":2,\"lastModified\":\"2019-09-16T00:00:00Z\",\"locked\":false,\"needAcknowledgement\":false,\"rawText\":\"Automated message\",\"sequence\":0,\"title\":\"{{preLoginNoticeName}} Edited\",\"typeId\":\"PRE_LOGIN\",\"activationDate\":null,\"expirationDate\":null}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices/{{preLoginNoticeId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices",
+						"{{preLoginNoticeId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete PreLogin Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3b8b6afb-a224-44c5-a674-befe53163628",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices/{{preLoginNoticeId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices",
+						"{{preLoginNoticeId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete PostLogin Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b67f820f-3179-4ba2-b09a-efc4214f2dec",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices/{{postLoginNoticeId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices",
+						"{{postLoginNoticeId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Mandatory Notice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b67f820f-3179-4ba2-b09a-efc4214f2dec",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"pm.environment.unset(\"preLoginNoticeName\");",
+							"pm.environment.unset(\"postLoginNoticeName\");",
+							"pm.environment.unset(\"mandatoryNotice\");",
+							"pm.environment.unset(\"preLoginNoticeId\");",
+							"pm.environment.unset(\"mandatoryNoticeId\");",
+							"pm.environment.unset(\"postLoginNoticeId\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.75 Safari/537.36"
+					},
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa12.transitionmanager.net/tdstm/module/notice/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa12.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=40963DFCE237B054471BE3CB4B32426F"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/notices/{{mandatoryNoticeId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"notices",
+						"{{mandatoryNoticeId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

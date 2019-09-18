@@ -8,7 +8,6 @@ import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
-import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -84,7 +83,6 @@ class ProjectService implements ServiceMethods {
 	JdbcTemplate               jdbcTemplate
 	PartyRelationshipService   partyRelationshipService
 	SequenceService            sequenceService
-	StateEngineService         stateEngineService
 	UserPreferenceService      userPreferenceService
 	CustomDomainService        customDomainService
 	LicenseAdminService        licenseAdminService
@@ -384,7 +382,7 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers and workflowcodes.
+	 * Get all clients, partners, managers.
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
@@ -397,14 +395,15 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
-		[clients: getAllClients(),
-		 partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-		 managers: managers.sort { it.partyIdTo?.lastName },
-		 workflowCodes: stateEngineService.getWorkflowCode()]
+		[
+			clients : getAllClients(),
+			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
+			managers: managers.sort { it.partyIdTo?.lastName }
+		]
 	}
 
 	/**
-	 * This method used to get all clients,patners,managers and workflowcodes for action edit.
+	 * This method used to get all clients,patners,managers for action edit.
 	 */
 	def getprojectEditDetails(Project projectInstance){
 		def userCompany = securityService.userLoginPerson.company
@@ -456,9 +455,16 @@ class ProjectService implements ServiceMethods {
 			partnerStaff.sort{it.partyIdTo?.lastName}
 		}
 
-		return [projectPartners:projectPartners, projectManagers:projectManagers, moveManager:moveManager,
-			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
-			projectLogoForProject:projectLogoForProject, workflowCodes: stateEngineService.getWorkflowCode()]
+		return [
+			projectPartners      : projectPartners,
+			projectManagers      : projectManagers,
+			moveManager          : moveManager,
+			companyStaff         : companyStaff,
+			clientStaff          : clientStaff,
+			partnerStaff         : partnerStaff,
+			companyPartners      : companyPartners,
+			projectLogoForProject: projectLogoForProject
+		]
 	}
 
 	/**
@@ -746,7 +752,6 @@ class ProjectService implements ServiceMethods {
 					name: bundleName,
 					project: project,
 					useForPlanning: true,
-					workflowCode: project.workflowCode,
 					startTime: project.startDate,
 					completionTime: project.completionDate
 				)
@@ -1911,7 +1916,6 @@ class ProjectService implements ServiceMethods {
 			runbookOn = projectCommand.runbookOn
 			startDate = projectCommand.startDate
 			timezone = getTimezone(projectCommand.timeZone)
-			workflowCode = projectCommand.workflowCode
 		}
 
 		project.save(failOnError: true, flush: true)

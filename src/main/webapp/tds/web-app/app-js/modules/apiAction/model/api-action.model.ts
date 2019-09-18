@@ -39,7 +39,7 @@ export class APIActionColumnModel {
 			},
 			{
 				label: 'Method',
-				property: 'connectorMethod',
+				property: 'dictionaryMethodName',
 				type: 'text',
 				width: 125
 			}, {

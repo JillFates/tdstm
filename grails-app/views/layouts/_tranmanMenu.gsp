@@ -58,11 +58,6 @@
                                 </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Workflows</li>
-                            <li class="menu-child-item menu-list-workflows">
-                                <g:link controller="workflow" action="home">List Workflows </g:link>
-                            </li>
-                            <li class="divider"></li>
                             <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
                                 <g:link controller="manufacturer">List Manufacturers</g:link>
