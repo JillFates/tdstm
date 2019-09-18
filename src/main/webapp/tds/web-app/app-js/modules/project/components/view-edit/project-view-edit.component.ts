@@ -34,6 +34,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public projectManagers;
 	public possiblePartners;
 	public possibleManagers;
+	public availableBundles;
 	public partnerKey = {};
 	public projectId;
 	public projectLogoId;
@@ -158,7 +159,8 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
-				this.projectModel.defaultBundleName = data.defaultBundle ? data.defaultBundle.name : '';
+				this.availableBundles = data.availableBundles;
+				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle : {};
 				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
@@ -182,6 +184,9 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
+			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
+				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
+			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename, this.projectId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
@@ -277,6 +282,11 @@ export class ProjectViewEditComponent implements OnInit {
 
 	private clearFilename(e?: any) {
 		this.fetchResult = null;
+	}
+
+	onDeleteLogo() {
+		this.projectLogoId = 0;
+		this.projectModel.projectLogo = null;
 	}
 
 	/**

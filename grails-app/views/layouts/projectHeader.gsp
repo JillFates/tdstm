@@ -171,7 +171,7 @@ int minPasswordLength = tds.minPasswordLength()
 					<table class="mmtable"><tr>
 						<td style="vertical-align:top">
 							<ul>
-								<li><g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
+								<li><g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Projects</g:link></li>
 							</ul>
 					<g:if test="${currProject}">
 						<span class="megamenuSection"> </span>

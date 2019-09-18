@@ -249,9 +249,7 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
-	'PROJECTS': {
-		'LIST': 'Project List'
-	},
+	'PROJECTS': 'Projects',
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
 		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if

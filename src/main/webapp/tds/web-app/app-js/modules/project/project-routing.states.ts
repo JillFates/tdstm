@@ -26,7 +26,7 @@ export const ProjectRoute: Routes = [
 		path: ProjectStates.PROJECT_LIST.url,
 		data: {
 			page: {
-				title: 'PROJECTS.LIST',
+				title: 'Projects',
 				instruction: '',
 				menu: ['GLOBAL.PROJECTS', 'GLOBAL.LIST'],
 			},
