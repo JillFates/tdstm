@@ -264,7 +264,7 @@
                         tabindex="40"
                         class="btn-primary pull-left"
                         title="Save"
-                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission || (akas && akas.hasError)"
+                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission || (akas && akas.hasError) || (connectors && connectors.hasErrors)"
                         (click)="onSave()">
                 </tds-button-save>
 
