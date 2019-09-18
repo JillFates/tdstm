@@ -219,12 +219,6 @@ class AssetCommentQueryBuilder {
 		boolean needsCasting = fieldMap['type'] != String
 		String property = fieldMap['property']
 		String value
-		if (field == "role" && requestParams[field] == "NO_ROLE") {
-			value = "" // special case where we want to show all tasks without a role
-		} else {
-			value = "%${requestParams[field]}%"
-		}
-
 		if (needsCasting) {
 			whereClauses << "str(${property}) LIKE :${field}"
 			whereParams[field] = value
