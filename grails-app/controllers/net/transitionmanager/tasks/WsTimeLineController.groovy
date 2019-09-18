@@ -34,38 +34,14 @@ class WsTimeLineController implements ControllerMethods {
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> taskDependencies = runbookService.getTaskDependencies(tasks)
 
-		TaskTimeLineGraph graph = timeLineService.createTaskTimeLineGraph(tasks, taskDependencies)
-		TimelineSummary summary
-
-		if (recalculate) {
-			summary = timeLineService.calculateCPA(moveEvent, graph)
-		}
-
-
-//			render(tasks.collect { Task task ->
-//				[
-//					id           : task.id,
-//					number       : task.taskNumber,
-//					comment      : task.comment,
-//					criticalPath : graph.getVertex(task.taskNumber).isCriticalPath(),
-//					duration     : task.duration,
-//					durationScale: task.durationScale.name(),
-//					slack        : graph.getVertex(task.taskNumber).slack,
-//					actualStart  : task.actStart,
-//					status       : task.status,
-//					actFinish    : task.actFinish,
-//					estStart     : graph.getVertex(task.taskNumber).earliestStartDate,
-//					estFinish    : graph.getVertex(task.taskNumber).earliestFinishDate
-//				]
-//			} as JSON)
-
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, taskDependencies)
 
 		render([
 			data: [
 				sinks    : graph.sinks.collect { it.taskId },
 				starts   : graph.starts.collect { it.taskId },
-				startDate: moveEvent.actualStartTime,
-				cycles   : [],
+				startDate: moveEvent.estStartTime,
+				cycles   : summary.cycles.collect { it.collect { it.taskId } },
 				items    : tasks.collect { Task task ->
 					[
 						id            : task.id,
@@ -75,6 +51,8 @@ class WsTimeLineController implements ControllerMethods {
 						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
 						durationScale : task.durationScale?.name(),
+						startInitial  : TimeUtil.elapsed(moveEvent.estStartTime, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart)).minutes,
+						endInitial    : TimeUtil.elapsed(moveEvent.estStartTime, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish)).minutes,
 						slack         : recalculate ? graph.getVertex(task.taskNumber).slack : task.slack,
 						actualStart   : task.actStart,
 						status        : task.status,
@@ -90,7 +68,6 @@ class WsTimeLineController implements ControllerMethods {
 				}
 			]
 		] as JSON)
-
 	}
 
 	@HasPermission(Permission.TaskTimelineView)

@@ -85,7 +85,6 @@ class TimeLineService implements ServiceMethods {
 	List updateTaskFromCPA(MoveEvent event, List<Task> tasks, List<TaskDependency> taskDependencies) {
 
 		def (TaskTimeLineGraph graph, TimelineSummary summary) = calculateCPA(event, tasks, taskDependencies)
-
 		updateVertexListInDatabase(graph.vertices.toList())
 
 		return [graph, summary]
