@@ -2,9 +2,7 @@
 <div class="tranman-menu-component collapse navbar-collapse pull-left navbar-ul-container navbar-ul-container-full-menu" id="navbar-collapse">
     <ul class="nav navbar-nav" *ngIf="userContext.project">
         <li *ngIf="hasPermission(permission.AdminMenuView)" class="dropdown menu-parent-admin">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin
-				<clr-icon shape="caret down"></clr-icon>
-            </a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin</a>
             <ul class="dropdown-menu menu-item-expand" role="menu">
                 <li class="menu-parent-item">Administration</li>
                 <li class="menu-child-item menu-admin-portal">
@@ -64,9 +62,7 @@
         </li>
         <ng-container *ngIf="!userContext.licenseInfo.license.isManager">
             <li class="dropdown menu-parent-projects">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-child-item menu-projects-active-projects">
                         <a href="/tdstm/project/list?active=active" class="mmlink">List Projects</a>
@@ -106,9 +102,7 @@
                 </ul>
             </li>
             <li class="dropdown menu-parent-data-centers">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Locations
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Locations</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-child-item menu-parent-data-centers-list-rooms">
                         <a href="/tdstm/room/list?viewType=list">List Locations</a>
@@ -119,9 +113,7 @@
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.AssetMenuView)" class="dropdown menu-parent-assets">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Assets</li>
                     <li class="menu-child-item menu-parent-assets-summary-table">
@@ -213,9 +205,7 @@
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.EventMenuView)" class="dropdown menu-parent-planning">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Events</li>
                     <li class="menu-child-item menu-parent-planning-event-list">
@@ -244,9 +234,7 @@
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.TaskView)" class="dropdown menu-parent-tasks">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Tasks</li>
                     <li class="menu-child-item menu-parent-tasks-my-tasks">
@@ -273,9 +261,7 @@
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.DashboardMenuView)" class="dropdown menu-parent-dashboard">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Live Dashboards</li>
                     <li class="menu-child-item menu-parent-dashboard-user-dashboard">
@@ -290,9 +276,7 @@
                 </ul>
             </li>
             <li *ngIf="hasPermission(permission.ReportMenuView)" class="dropdown menu-parent-reports">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports
-                    <clr-icon shape="caret down"></clr-icon>
-                </a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-parent-item">Planning</li>
                     <li class="menu-child-item menu-reports-application-profiles">
