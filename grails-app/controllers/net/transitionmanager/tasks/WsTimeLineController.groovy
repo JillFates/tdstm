@@ -110,6 +110,7 @@ class WsTimeLineController implements ControllerMethods {
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
+		List<Task> tasks = cpaResults.tasks
 
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
