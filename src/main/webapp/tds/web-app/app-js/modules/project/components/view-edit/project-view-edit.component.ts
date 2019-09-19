@@ -1,4 +1,9 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {
+	Component,
+	Inject,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
@@ -21,7 +26,7 @@ import {SetProject} from '../../actions/project.actions';
 	selector: `project-view-edit-component`,
 	templateUrl: 'project-view-edit.component.html',
 })
-export class ProjectViewEditComponent implements OnInit {
+export class ProjectViewEditComponent implements OnInit{
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
 	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
@@ -50,8 +55,8 @@ export class ProjectViewEditComponent implements OnInit {
 	private logoOriginalFilename;
 	public retrieveImageTimestamp = (new Date()).getTime(); // Update this to refresh the project logo
 
-	@ViewChild('startTimePicker') startTimePicker;
-	@ViewChild('completionTimePicker') completionTimePicker;
+	@ViewChild('startDatePicker') startDatePicker;
+	@ViewChild('completionDatePicker') completionDatePicker;
 	constructor(
 		private dialogService: UIDialogService,
 		private projectService: ProjectService,
@@ -93,6 +98,17 @@ export class ProjectViewEditComponent implements OnInit {
 		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 		this.getModel(this.projectId);
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+	}
+
+	// This is a work-around for firefox users
+	onOpenStartDatePicker (event) {
+		event.preventDefault();
+		this.startDatePicker.toggle();
+	}
+
+	onOpenCompletionDatePicker (event) {
+		event.preventDefault();
+		this.completionDatePicker.toggle();
 	}
 
 	public confirmDeleteProject() {

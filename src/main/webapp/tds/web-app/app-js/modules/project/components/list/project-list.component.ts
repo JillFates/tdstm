@@ -72,11 +72,13 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngAfterContentInit() {
-		if (this.route.snapshot.queryParams['show']) {
-			setTimeout(() => {
-				this.showProject(this.route.snapshot.queryParams['show']);
-			});
-		}
+		this.route.params.subscribe((params) => {
+			if (params['show']) {
+				setTimeout(() => {
+					this.showProject(params['show']);
+				});
+			}
+		});
 	}
 
 	protected toggleShowActive(): void {
