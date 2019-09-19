@@ -9,6 +9,7 @@ import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.Task
+import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.CriticalPathRoute
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
@@ -111,6 +112,7 @@ class WsTimeLineController implements ControllerMethods {
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
 		List<Task> tasks = cpaResults.tasks
+		List<TaskDependency> deps = cpaResults.taskDependencies
 
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
