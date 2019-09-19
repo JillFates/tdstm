@@ -13,6 +13,11 @@ export class ModelService {
 	constructor(private http: HttpClient) {
 	}
 
+	/**
+	 * Get the model needed to display the model view
+	 * @param {string} id
+	 * @returns {Observable<DeviceModel>}
+	 */
 	getModelAsJSON(id: string): Observable<DeviceModel> {
 		const url = `${this.modelUrl}/retrieveModelAsJSON?id=${id}`;
 
@@ -21,15 +26,67 @@ export class ModelService {
 			.catch((error: any) => error);
 	}
 
-	editModel(id: string): Observable<String> {
-		// 'redirect'To': 'modelDialog'
-		const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
+	/**
+	 * Call the endpoint to set the model power type
+	 * @param {string} unit
+	 * @returns {Observable<any>}
+	 */
+	setPower(unit: string): Observable<any> {
+		const url = `${this.modelUrl}/../project/setPower?p=${unit}`;
 
-		const url = `${this.modelUrl}/edit?id=${id}`;
-		return this.http.post(url, JSON.stringify({
-			id: id,
-			redirectTo: 'modelDialog'
-		}), {headers, responseType: 'text'})
+		return this.http.post(url, '', {responseType: 'text'})
 		.map((response: any) => response)
+		.catch((error: any) => error);
+	}
+
+	/**
+	 * Call the endpoint in charge of determing if the alias is valid
+	 * @param {string} alias
+	 * @param {number} id
+	 * @param {string} parentName
+	 * @returns {Observable<boolean>}
+	 */
+	isValidAlias(alias: string, id: number, parentName: string): Observable<boolean> {
+		const url = `/tdstm/manufacturer/validateAliasForForm?alias=${alias}&id=${id}&parentName=${parentName}` ;
+
+		return this.http.get(url)
+		.map((res: any) => res === 'valid')
+	}
+
+	/**
+	 * Get the manufacturer information searching by id
+	 * @param {string} id
+	 * @returns {Observable<any>}
+	 */
+	getDeviceManufacturer(id: string): Observable<any> {
+		const url = '/tdstm/manufacturer/retrieveManufacturerAsJSON?id=' + id;
+		return this.http.post(url, '')
+		.map((res: Response) => res.json())
+		.map((res: any) => res && Object.assign({aka: res.aliases || ''}, res.manufacturer) || {})
+		.catch((error: any) => error.json());
+	}
+
+	/**
+	 * Delete a model
+	 * @param {string} id Model id to delete
+	 * @returns {Observable<any>}
+	 */
+	deleteModel(id: string): Observable<any> {
+		const url = `${this.modelUrl}/../ws/model/${id}`;
+
+		return this.http.delete(url)
+		.catch((error: any) => error);
+	}
+
+	/**
+	 * Update the model information
+	 * @param payload
+	 * @returns {Observable<any>}
+	 */
+	updateModel(payload: any): Observable<any> {
+		const url = `${this.modelUrl}/../ws/model`;
+
+		return this.http.post(url, payload)
+			.catch((error: any) => error);
 	}
 }

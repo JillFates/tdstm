@@ -90,11 +90,12 @@
 					</tds-button-custom>
 				</ng-template>
 				<tds-button-custom
-				            icon="refresh"
-				            title="Refresh"
-				            isIconButton="true"
-				            class="component-action-reload pull-righ"
-				            (click)="onReload()"></tds-button-custom>
+					icon="refresh"
+					title="Refresh"
+					isIconButton="true"
+					class="component-action-reload pull-righ"
+					(click)="onReload()">
+				</tds-button-custom>
 			</div>
 		</ng-template>
 
@@ -195,6 +196,11 @@
 						<label> {{getPropertyLabel(column)}} <i class="fa fa-fw fa-warning" style="display: none;" attr.data-content="{{ 'FIELD_SETTINGS.FIELD_NO_LONGER_EXISTS_ON_DOMAIN' | translate}} {{column.domain}} ({{column.property}})" data-toggle="popover" data-trigger="hover"></i> </label>
 					</div>
 				</div>
+				<i *ngIf="column.property === 'tagAssets'"
+				   class="fa"
+				   [ngClass]="showFullTags ? 'fa-angle-double-down' : 'fa-angle-double-right'"
+				   style="margin-top: 3px;"
+				   (click)="onToggleTagsView($event)" title="Toggle Tags View"></i>
 			</ng-template>
 
 			<!-- Default Generic Filter Template -->
@@ -245,9 +251,13 @@
             </ng-template>
 			<!-- Asset Tags Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
-				<div>
-               <span *ngFor="let tag of dataItem[column.domain+'_'+column.property]" class="label tag" style="display: inline-block"
-                     [ngClass]="tag.css">{{tag.name}}</span>
+				<div class="single-line-tags" [ngClass]="showFullTags ? 'show-full-tags': ''">
+					<ng-template ngFor let-tag [ngForOf]="dataItem[column.domain+'_'+column.property]" let-i="index">
+						<ng-template [ngIf]="i === 2">
+							<span class="dots-for-tags">...</span>
+						</ng-template>
+						<span class="label tag" [ngClass]="tag.css">{{i}} {{tag.name}}</span>
+					</ng-template>
 				</div>
 			</ng-template>
 		</kendo-grid-column>

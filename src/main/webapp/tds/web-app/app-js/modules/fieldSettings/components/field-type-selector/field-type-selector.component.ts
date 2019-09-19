@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges} from '@angular/core';
 import {FieldConverterService} from '../../service/field-converter.service';
 import {CUSTOM_FIELD_CONTROL_TYPE} from '../../model/field-settings.model';
 
@@ -7,7 +7,7 @@ import {CUSTOM_FIELD_CONTROL_TYPE} from '../../model/field-settings.model';
 	templateUrl: 'field-type-selector.component.html'
 })
 
-export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
+export class FieldTypeSelectorComponent implements OnInit , OnChanges  {
 	private value: string;
 	@Input() fieldType: string;
 	@Input() disabled: boolean;
@@ -63,6 +63,16 @@ export class FieldTypeSelectorComponent implements OnInit /*, OnChanges */ {
 	onSave(conversion: any): void {
 		this.value = conversion.to;
 		this.save.emit(conversion);
+	}
+
+	/**
+	 * Detect any change on the control type
+	 * @param changes
+	 */
+	ngOnChanges(changes: SimpleChanges): void {
+		if (changes && changes.fieldType && changes.fieldType.currentValue) {
+			this.value = changes.fieldType.currentValue;
+		}
 	}
 
 }

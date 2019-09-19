@@ -66,6 +66,8 @@ services:
     image: tm-registry.transitionmanager.net/tds-ci/chrome:latest
     environment:
       - CHROMEDRIVER_WHITELISTED_IPS=''
+    ports:
+      - 4444:4444
 
   test:
     <<: *base

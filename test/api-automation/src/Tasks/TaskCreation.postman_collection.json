@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "969e44aa-c9a8-46b7-961f-15256cef4cb6",
+		"_postman_id": "37e8cf25-452d-4657-bb39-c5ba179da7f9",
 		"name": "Task Creation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",
@@ -226,7 +226,12 @@
 							"",
 							"var responseObject = JSON.parse(responseBody);",
 							"var apiID = responseObject.data.id;",
-							"pm.environment.set(\"apiID\", apiID);"
+							"pm.environment.set(\"apiID\", apiID);",
+							"",
+							"var apiActionId = responseObject.data.id; ",
+							"console.log(apiActionId);",
+							"",
+							"pm.environment.set(\"apiActionId\", apiActionId);"
 						],
 						"type": "text/javascript"
 					}
@@ -246,48 +251,6 @@
 					"mode": "raw",
 					"raw": "{\r\n\"name\":\"{{apiActionName}}\",\r\n\"description\":\"\",\r\n\"provider\":{\"id\":\"{{providerId}}\"},\r\n\"apiCatalog\":{\"id\":\"{{dictionaryID}}\"},\r\n\"connectorMethod\":\"{{dictionaryMethod}}\",\r\n\"httpMethod\":\"GET\",\r\n\"endpointUrl\":\"{{dictionaryEndpointUrld}}\",\r\n\"docUrl\":\"{{dictionaryDocUrl}}\",\r\n\"producesData\":1,\"isPolling\":0,\r\n\"pollingInterval\":0,\"pollingLapsedAfter\":0,\r\n\"pollingStalledAfter\":0,\r\n\"reactionScripts\":\"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.done()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.error )\\\",\\\"ERROR\\\":\\\"\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\"defaultDataScript\":{\"id\":null},\"methodParams\":\"[{\\\"context\\\":\\\"USER_DEF\\\",\\\"description\\\":\\\"Destination hostname\\\",\\\"encoded\\\":0,\\\"fieldName\\\":null,\\\"paramName\\\":\\\"HOSTNAME\\\",\\\"readonly\\\":0,\\\"required\\\":1,\\\"type\\\":\\\"String\\\",\\\"value\\\":\\\"Enter your FQDN to Cloudscape\\\"}]\"}"
 				},
-				"url": {
-					"raw": "{{host}}/tdstm/ws/apiAction",
-					"host": [
-						"{{host}}"
-					],
-					"path": [
-						"tdstm",
-						"ws",
-						"apiAction"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List API Actions",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Success\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"success\");",
-							"});",
-							"",
-							"var jsonObject = JSON.parse(responseBody);",
-							"var apiActionId = jsonObject.data[0].id; ",
-							"",
-							"pm.environment.set(\"apiActionId\", apiActionId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
 				"url": {
 					"raw": "{{host}}/tdstm/ws/apiAction",
 					"host": [

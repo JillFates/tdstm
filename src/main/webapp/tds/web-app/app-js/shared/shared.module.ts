@@ -100,6 +100,7 @@ import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-edit
 import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
 import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/modal-page-wrapper.component';
+import {PowerComponent} from './components/power/power.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
@@ -187,6 +188,7 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
+		PowerComponent,
 		DiagramLayoutComponent,
 		CircleCountdownComponent
 	],
@@ -253,6 +255,7 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
+		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
 		CircleCountdownComponent
