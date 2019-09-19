@@ -13,13 +13,11 @@ import {EventModel} from '../../../event/model/event.model';
 	templateUrl: 'bundle-create.component.html',
 })
 export class BundleCreateComponent implements OnInit {
-	public managers;
-	public workflowCodes;
 	public rooms;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public bundleModel: BundleModel = null;
 	private defaultModel = null;
-	private requiredFields = ['name', 'workflowCode'];
+	private requiredFields = ['name'];
 
 	constructor(
 		private bundleService: BundleService,
@@ -38,10 +36,7 @@ export class BundleCreateComponent implements OnInit {
 			toId: 0,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
-			moveManagerId: 0,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.bundleModel = Object.assign({}, this.defaultModel, this.bundleModel);
@@ -61,9 +56,6 @@ export class BundleCreateComponent implements OnInit {
 		this.bundleService.getModelForBundleCreate().subscribe((result: any) => {
 			let data = result.data;
 			this.bundleModel.operationalOrder = 1;
-			this.managers = data.managers;
-			this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-			this.workflowCodes = data.workflowCodes;
 			this.rooms = data.rooms;
 		});
 	}

@@ -103,7 +103,17 @@
 										</span>
 									</td>
 								</tr>
-
+								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
+									<tr title="Execute critical path analysis">
+										<td colspan="3" style="padding-left :0px">
+											<span>
+												<label id="baselinePlanButton" class="pointer" onclick="baselinePlan()">
+													&nbsp;Baseline Plan
+												</label>
+											</span>
+										</td>
+									</tr>
+								</tds:hasPermission>
 								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
@@ -115,7 +125,6 @@
 									</td>
 								</tr>
 								</tds:hasPermission>
-
 							</table>
 						</form>
 					</div>

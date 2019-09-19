@@ -1,0 +1,286 @@
+<div class="modal fade in model-device-edit-component" tds-handle-escape (escPressed)="cancelCloseDialog()"
+     id="model-device-edit-component"
+     data-backdrop="static"
+     tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Edit Model</h4>
+            </div>
+            <div class="modal-body">
+                <form name="form" role="form" class="form-horizontal left-alignment" #form="ngForm">
+                    <div class="modal-body-container">
+                        <div class="box-body" *ngIf="form">
+                            <div class="form-group">
+                                <div class="col-md-2"><span class="required-field">Manufacturer:</span></div>
+                                <div class="col-md-4">
+                                    <tds-combobox
+                                            tabindex="1"
+                                            [(model)]="manufacturer"
+                                            [serviceRequest]="searchManufacturers"
+                                            [searchOnScroll]="false"
+                                            [reloadOnOpen]="true"
+                                            (valueChange)="onManufacturerValueChange($event)" >
+                                    </tds-combobox>
+                                    <span class="missing-field" *ngIf="!isValidControl('manufacturerName')">Manufacturer is required</span>
+                                </div>
+                                <div class="col-md-2"><span class="required-field">Model Name:</span></div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="20" name="modelName" required [(ngModel)]="model.modelName">
+                                    <span class="missing-field" *ngIf="!isValidControl('modelName')">Model name is required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">AKA:</div>
+                                <div class="col-md-4">
+                                    <tds-aka #akas [aka]="model.akaCollection || []"
+                                             [tabindex]="2"
+                                             name="aka"
+                                             [akaParent]="{id: deviceManufacturer.id, name: deviceManufacturer.text}"
+                                             (validationErrors)="onAkaValidationErrors($event)"
+                                             (modelChange)="onAkaChange($event)"></tds-aka>
+                                </div>
+                                <div class="col-md-2">Asset Type:</div>
+                                <div class="col-md-4">
+                                    <tds-combobox
+                                            [tabindex]="21"
+                                            [(model)]="assetType"
+                                            [serviceRequest]="searchAssetTypes"
+                                            [searchOnScroll]="false"
+                                            [reloadOnOpen]="true"
+                                            (valueChange)="onAssetTypeValueChange($event)">
+                                    </tds-combobox>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">USize:</div>
+                                <div class="col-md-4">
+                                    <kendo-dropdownlist
+                                            tabindex="3"
+                                            class="select"
+                                            name="usize"
+                                            [data]="usize"
+                                            [(ngModel)]="model.usize">
+                                    </kendo-dropdownlist>
+                                </div>
+                                <div class="col-md-2">Dimensions (inches):</div>
+                                <div class="col-md-4">
+                                    <div class="dimensions">
+                                        <div>H</div>
+                                        <div><input type="number" name="modelHeight" tabindex="22" [(ngModel)]="model.modelHeight"></div>
+                                        <div>W</div>
+                                        <div><input type="number" name="modelWidth" tabindex="23" [(ngModel)]="model.modelWidth"></div>
+                                        <div>D</div>
+                                        <div><input type="number" name="modelDepth" tabindex="24" [(ngModel)]="model.modelDepth"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Weight (pounds):</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="4" name="modelWeight" [(ngModel)]="model.modelWeight">
+                                </div>
+                                <div class="col-md-2">Layout Style:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="25" name="layoutStyle" [(ngModel)]="model.layoutStyle">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Product Line:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="5" name="productLine" [(ngModel)]="model.productLine">
+                                </div>
+                                <div class="col-md-2">Model Family:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="26" name="modelFamily" [(ngModel)]="model.modelFamily">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">End of Life Date:</div>
+                                <div class="col-md-4">
+                                    <kendo-datepicker name="endOfLifeDate"
+                                                      [popupSettings]="{ appendTo: 'component' }"
+                                                      tabindex="7"
+                                                      [value]="model.endOfLifeDate"
+                                                      [(ngModel)]="model.endOfLifeDate"> </kendo-datepicker>
+                                 </div>
+                                <div class="col-md-2">End of Life Status:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="27" name="endOfLifeStatus" [(ngModel)]="model.endOfLifeStatus">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Power (Max/Design/Avg):</div>
+                                <div class="col-md-4">
+                                    <tds-power [model]="powerModel" [tabindex]="8" (change)="onPowerChange($event)"></tds-power>
+                                 </div>
+                                <div class="col-md-2">
+                                    CPU Type
+                                </div>
+                                <div class="col-md-4">
+                                     <input type="text" tabindex="28" name="cpuType" [(ngModel)]="model.cpuType">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Room Object:</div>
+                                <div class="col-md-4">
+                                    <input class="checkbox"
+                                           tabindex="9"
+                                           name="roomObject"
+                                           type="checkbox"
+                                           [(ngModel)]="model.roomObject">
+                                </div>
+                                <div class="col-md-2">CPU Count:</div>
+                                <div class="col-md-4">
+                                    <input type="number" min="0" tabindex="29"
+                                           name="cpuCount" [(ngModel)]="model.cpuCount">
+                                </div>
+                            </div>
+                            <div class="form-group" *ngIf="assetType && assetType.id === 'Blade'">
+                                <div class="col-md-2">Blade Height:</div>
+                                <div class="col-md-4">
+                                     <kendo-dropdownlist
+                                            tabindex="9"
+                                            class="select"
+                                            name="bladeHeight"
+                                            [valuePrimitive]="true"
+                                            [data]="bladeHeight"
+                                            [(ngModel)]="model.bladeHeight">
+                                    </kendo-dropdownlist>
+                                </div>
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4"></div>
+                            </div>
+
+                            <div *ngIf="assetType && assetType.id === 'Blade Chassis'">
+                                <div class="form-group">
+                                    <div class="col-md-2">Blade Rows:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="9" type="text" name="bladeRows" [(ngModel)]="model.bladeRows">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-2">Blade Count:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="9" type="text" name="bladeCount" [(ngModel)]="model.bladeCount">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-2">Blade Label Count:</div>
+                                    <div class="col-md-4">
+                                        <input tabindex="9" type="text" name="bladeLabelCount" [(ngModel)]="model.bladeLabelCount">
+                                    </div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Created by:</div>
+                                <div class="col-md-4">{{model.createdBy}}</div>
+                                <div class="col-md-2">
+                                    Memory Size:
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" min="0" tabindex="30" name="memorySize" [(ngModel)]="model.memorySize">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Updated by:</div>
+                                <div class="col-md-4">{{model.updatedBy}}</div>
+                                <div class="col-md-2">Storage Size:</div>
+                                <div class="col-md-4">
+                                    <input type="number" min="0" tabindex="31" name="storageSize" [(ngModel)]="model.storageSize">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2">Validated by:</div>
+                                <div class="col-md-4">{{model.validatedBy}}</div>
+                                <div class="col-md-2">Notes:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="32" name="notes" [(ngModel)]="model.description">
+                                </div>
+                            </div>
+                             <div class="form-group">
+                                <div class="col-md-2">Source TDS:</div>
+                                <div class="col-md-4">
+                                    <input class="checkbox"
+                                           tabindex="9"
+                                           name="sourceTDS"
+                                           type="checkbox"
+                                           [(ngModel)]="model.sourceTDS">
+                                </div>
+                                <div class="col-md-2">Source URL:</div>
+                                <div class="col-md-4">
+                                    <input type="text" tabindex="33" name="sourceURL" [(ngModel)]="model.sourceURL">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4">
+                                </div>
+                                <div class="col-md-2">Model Status:</div>
+                                <div class="col-md-4">
+                                    <kendo-dropdownlist
+                                            class="select"
+                                            name="modelStatus"
+                                            tabindex="34"
+                                            [valuePrimitive]="true"
+                                            [data]="modelStatus"
+                                            [(ngModel)]="model.modelStatus">
+                                    </kendo-dropdownlist>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="col-md-2">Connectors:
+                                    <input type="text" class="custom-controls" name="customControls" [(ngModel)]="model.customControls">
+                                    <input type="text" class="custom-controls" name="manufacturerName" required [(ngModel)]="model.manufacturerName" >
+                                </div>
+                                <div class="col-md-10">
+                                    <tds-connector
+                                            #connectors
+                                            [tabindex]="40"
+                                            [connectors]="model.connectorsCollection"
+                                            (modelChange)="onConnectorsChange($event)"></tds-connector>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer form-group-center">
+                <tds-button-save
+                        tabindex="40"
+                        class="btn-primary pull-left"
+                        title="Save"
+                        [disabled]="!form.valid || !form.dirty || !hasEditModelPermission || (akas && akas.hasError)"
+                        (click)="onSave()">
+                </tds-button-save>
+
+                <tds-button-delete
+                        tabindex="41"
+                        (click)="deleteModel()"
+                        class="btn-danger component-action-delete"
+                        [disabled]="!hasDeleteModelPermission">
+                </tds-button-delete>
+
+                <tds-button-cancel
+                        tabindex="42"
+                        class="component-action-cancel pull-right"
+                        (click)="cancelCloseDialog()">
+                </tds-button-cancel>
+            </div>
+        </div>
+    </div>
+</div>
