@@ -218,7 +218,7 @@ class AssetCommentQueryBuilder {
 	Closure likeBuilder = { String field, Map fieldMap ->
 		boolean needsCasting = fieldMap['type'] != String
 		String property = fieldMap['property']
-		String value
+		String value = "%${requestParams[field]}%"
 		if (needsCasting) {
 			whereClauses << "str(${property}) LIKE :${field}"
 			whereParams[field] = value
