@@ -7,6 +7,10 @@ tds-tranman-menu {
 }
 
 .main-header.header-component {
+	display: block;
+	height: auto;
+	white-space: normal;
+
 	.menu-top-container {
 		margin: 0;
 		padding: 0;
@@ -27,6 +31,11 @@ tds-tranman-menu {
 			padding: 0;
 			border: 0;
 		}
+	}
+	.nav {
+		display: block;
+		box-shadow: none;
+		-webkit-box-shadow: 0;
 	}
 	.nav-icon-text {
 		font-size: 14px;
