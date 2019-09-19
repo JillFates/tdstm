@@ -31,6 +31,7 @@ apply plugin: "org.grails.grails-gsp"
 apply plugin:"com.bertramlabs.asset-pipeline"
 
 war {
+	enabled = true
     archiveName = "tdstm-${version}.war"
 	exclude '*/node_modules/*'
 }
