@@ -36,11 +36,18 @@ class WsTimeLineController implements ControllerMethods {
 
 		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, taskDependencies)
 
+		Date startDate
+		if (recalculate) {
+			startDate = graph.vertices.min { it.earliestStartDate }.earliestStartDate
+		} else {
+			startDate = tasks.min { it.estStart }.estStart
+		}
+
 		render([
 			data: [
 				sinks    : graph.sinks.collect { it.taskId },
 				starts   : graph.starts.collect { it.taskId },
-				startDate: moveEvent.estStartTime,
+				startDate: startDate,
 				cycles   : summary.cycles.collect { it.collect { it.taskId } },
 				items    : tasks.collect { Task task ->
 					[
@@ -51,14 +58,14 @@ class WsTimeLineController implements ControllerMethods {
 						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
 						durationScale : task.durationScale?.name(),
-						startInitial  : TimeUtil.elapsed(moveEvent.estStartTime, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart)).minutes,
-						endInitial    : TimeUtil.elapsed(moveEvent.estStartTime, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish)).minutes,
+						startInitial  : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart), TimeUtil.GRANULARITY_MINUTES),
+						endInitial    : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish), TimeUtil.GRANULARITY_MINUTES),
 						slack         : recalculate ? graph.getVertex(task.taskNumber).slack : task.slack,
 						actualStart   : task.actStart,
 						status        : task.status,
 						actFinish     : task.actFinish,
-						estStart      : task.estStart,
-						estFinish     : task.estFinish,
+						estStart      : recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart,
+						estFinish     : recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish,
 						assignedTo    : task.assignedTo?.toString(),
 						role          : task.role,
 						predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
@@ -92,7 +99,7 @@ class WsTimeLineController implements ControllerMethods {
 		List<Task> tasks = runbookService.getEventTasks(moveEvent)
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
+		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
 
 		if (!summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
