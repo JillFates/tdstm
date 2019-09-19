@@ -60,7 +60,7 @@ export class NeighborhoodComponent implements OnInit {
 			private renderer: Renderer2,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
-			private userPreferenceService: PreferenceService
+			private preferenceService: PreferenceService
 		) {
 				this.activatedRoute.queryParams.subscribe(params => {
 					if (params) { this.urlParams = params; }
@@ -75,23 +75,32 @@ export class NeighborhoodComponent implements OnInit {
 		this.subscribeToHighlightFilter();
 		this.loadUserContext();
 		this.loadFilters();
+		this.loadEventList();
 		this.eventsDropdownOpened();
 		this.eventsDropdownClosed();
 	}
 
 	/**
-	 * Load user preferences to filter taks
+	 * Load user preferences to filter tasks and then load tasks
  	**/
 	loadFilters(): void {
-		this.userPreferenceService.getPreferences('myTasks', 'minimizeAutoTasks', PREFERENCES_LIST.VIEW_UNPUBLISHED)
-			.subscribe(res => {
+		this.preferenceService.getPreferences(
+			PREFERENCES_LIST.MY_TASKS,
+			PREFERENCES_LIST.MINIMIZE_AUTO_TASKS,
+			PREFERENCES_LIST.VIEW_UNPUBLISHED
+		).subscribe(res => {
 				const {myTasks, minimizeAutoTasks, VIEW_UNPUBLISHED} = res;
 				this.myTasks = (myTasks && myTasks === 'true' || myTasks === '1');
 				this.minimizeAutoTasks = (minimizeAutoTasks && (minimizeAutoTasks === 'true' || minimizeAutoTasks === '1'));
 				this.viewUnpublished = (VIEW_UNPUBLISHED && (VIEW_UNPUBLISHED === 'true' || VIEW_UNPUBLISHED === '1'));
-				console.log(this.myTasks, this.minimizeAutoTasks, this.viewUnpublished);
-				if (this.urlParams && this.urlParams.id) { this.loadTasks(this.urlParams.id); }
-				this.loadEventList();
+
+				// If this a neighborhood view from the task manager, then load tasks from task service, otherwise load tasks
+				// from selected event
+				if (this.urlParams && this.urlParams.taskId) {
+					this.loadTasks(this.urlParams.taskId);
+				} else {
+					this.loadFromSelectedEvent(this.selectedEvent.id);
+				}
 			});
 	}
 
@@ -116,7 +125,6 @@ export class NeighborhoodComponent implements OnInit {
 			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
 			viewUnpublished: this.viewUnpublished ? '1' : '0'
 		};
-		console.log('filters: ', filters);
 		this.taskService.findTask(taskNumber, filters)
 			.subscribe((res: IGraphTask[]) => {
 				if (res && res.length > 0) {
@@ -133,10 +141,6 @@ export class NeighborhoodComponent implements OnInit {
 			this.eventList$ = this.reportService
 				.getEventList()
 				.pipe(map(res => res.data));
-
-			if ((!this.tasks || this.tasks.length < 1) && (!this.urlParams || !this.urlParams.id) && this.selectedEvent) {
-				this.loadFromSelectedEvent(this.selectedEvent.id);
-			}
 	}
 
 	/**
@@ -151,7 +155,6 @@ export class NeighborhoodComponent implements OnInit {
 			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
 			viewUnpublished: this.viewUnpublished ? '1' : '0'
 		};
-		console.log('filters: ', filters);
 		this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
 		.subscribe(res => {
 			this.tasks = res;
@@ -177,9 +180,14 @@ export class NeighborhoodComponent implements OnInit {
 	 * load tasks with new filter criteria
 	 **/
 	onViewUnpublishedFilterChange(): void {
-		if (this.urlParams && this.urlParams.id && !!this.tasks.find(t => t.taskNumber === this.urlParams.id)) {
-			this.loadTasks(this.urlParams.id);
-		}	else { this.loadFromSelectedEvent(this.selectedEvent.id) }
+		// If actual task used by diagram comes from task manager neighborhood button, then reload
+		// from tasks endpoint, else load tasks from the actual selected event
+		if (this.urlParams && this.urlParams.taskId
+			&& !!this.tasks.find(t => t.taskNumber === this.urlParams.taskId)) {
+			this.loadTasks(this.urlParams.taskId);
+		}	else {
+			this.loadFromSelectedEvent(this.selectedEvent.id)
+		}
 	}
 
 	/**
@@ -195,7 +203,6 @@ export class NeighborhoodComponent implements OnInit {
 		const copySize = tasksCopy.length - 1;
 		tasksCopy.map((t: IGraphTask) => {
 			t.key = t.taskNumber;
-			console.log('determined icon: ', t.status, t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending);
 			t.icon = t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending;
 			nodeDataArr.push(t);
 		});
@@ -280,19 +287,16 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	showTaskDetails(id: number): void {
-		console.log('show details for task: ', id);
 		this.selectedTask = { id };
 		this.open();
 	}
 
 	editTask(id: number): void {
-		console.log('edit task: ', id);
 		this.selectedTask = { id };
 		this.open();
 	}
 
 	public close(status) {
-		console.log(`Dialog result: ${status}`);
 		this.opened = false;
 	}
 
@@ -305,7 +309,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	eventsDropdownOpened(): void {
 		this.eventsDropdown.open.subscribe(() => {
-			console.log('events dropdown opened ');
 			this.isEventDropdownOpen = false;
 			this.graph.resetOverviewIndex();
 		})
@@ -316,7 +319,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	eventsDropdownClosed(): void {
 		this.eventsDropdown.close.subscribe(() => {
-			console.log('events dropdown closed ');
 			this.isEventDropdownOpen = false;
 			this.graph.restoreOverviewIndex();
 		})
@@ -338,7 +340,6 @@ export class NeighborhoodComponent implements OnInit {
 				skip(2),
 				distinct()
 			).subscribe(text => {
-				console.log('text: ', text);
 				this.graph.highlightNodesByText(text);
 		});
 	}
