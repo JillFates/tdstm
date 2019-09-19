@@ -185,7 +185,7 @@ export class NeighborhoodComponent implements OnInit {
 		if (this.urlParams && this.urlParams.taskId
 			&& !!this.tasks.find(t => t.taskNumber === this.urlParams.taskId)) {
 			this.loadTasks(this.urlParams.taskId);
-		}	else {
+		} else {
 			this.loadFromSelectedEvent(this.selectedEvent.id)
 		}
 	}
@@ -200,7 +200,6 @@ export class NeighborhoodComponent implements OnInit {
 
 		const tasksCopy = this.tasks.slice();
 
-		const copySize = tasksCopy.length - 1;
 		tasksCopy.map((t: IGraphTask) => {
 			t.key = t.taskNumber;
 			t.icon = t.status ? this.statusTypes[t.status.toLowerCase()] : this.statusTypes.pending;
@@ -296,7 +295,7 @@ export class NeighborhoodComponent implements OnInit {
 		this.open();
 	}
 
-	public close(status) {
+	public close(status?: any) {
 		this.opened = false;
 	}
 
