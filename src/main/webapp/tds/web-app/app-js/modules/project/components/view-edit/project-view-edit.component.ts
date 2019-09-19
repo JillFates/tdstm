@@ -8,25 +8,22 @@ import {ProjectService} from '../../service/project.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ProjectModel} from '../../model/project.model';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {DialogService} from '@progress/kendo-angular-dialog';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {SetProject} from '../../actions/project.actions';
 
 @Component({
 	selector: `project-view-edit-component`,
 	templateUrl: 'project-view-edit.component.html',
 })
-export class ProjectViewEditComponent implements OnInit{
+export class ProjectViewEditComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
 	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
