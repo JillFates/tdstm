@@ -79,7 +79,6 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-
 		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -93,7 +92,6 @@ class WsTimeLineController implements ControllerMethods {
 	def baseline() {
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-
 		CPAResults cpaResults = timeLineService.updateTaskFromCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -108,12 +106,11 @@ class WsTimeLineController implements ControllerMethods {
 
 		boolean showAll = params.showAll == 'true'
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-
 		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
-		
+
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
 		try {
@@ -283,8 +280,8 @@ class WsTimeLineController implements ControllerMethods {
 	 * @param taskVertexList list of {@code TaskVertex}
 	 * @return lowest earliestStartDate from a list of {@code TaskVertex}
 	 */
-	private Date findEarliestStartVertex(List<TaskVertex> taskVertexList) {
-		return taskVertexList.vertices.min { it.earliestStartDate }.earliestStartDate
+	private Date findEarliestStartVertex(Collection<TaskVertex> taskVertexList) {
+		return taskVertexList.min { it.earliestStartDate }.earliestStartDate
 	}
 
 	/**
