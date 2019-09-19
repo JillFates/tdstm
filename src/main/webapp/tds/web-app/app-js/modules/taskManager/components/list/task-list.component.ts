@@ -61,6 +61,7 @@ export class TaskListComponent {
 	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private urlParams: any;
 	private pageSize: number;
+	private currentPage: number;
 	private currentCustomColumns: any;
 	private allAvailableCustomColumns: Array<any>;
 	private userContext: UserContextModel;
@@ -90,6 +91,7 @@ export class TaskListComponent {
 		this.currentCustomColumns = {};
 		this.rowsExpanded = false;
 		this.rowsExpandedMap = {};
+		this.currentPage = 1;
 		this.onLoad();
 	}
 
@@ -201,7 +203,6 @@ export class TaskListComponent {
 	private search(taskId ?: number): void {
 		this.loading = true;
 		// Prepare sort, pagination & column filters for search.
-		const pageNumber = (this.grid.state.skip / this.grid.state.take) + 1;
 		let applySort = false;
 		let sortColumn = this.grid.state.sort[0].field;
 		let sortOrder = 'ASC';
@@ -219,7 +220,7 @@ export class TaskListComponent {
 			viewUnpublished: this.viewUnpublished ? 1 : 0,
 			sortOrder: applySort ? sortOrder : '',
 			sortColumn: applySort ? sortColumn : '',
-			page: pageNumber,
+			page: this.currentPage,
 			rows: this.pageSize
 		};
 
@@ -493,6 +494,7 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			taskRows.forEach((taskRow: any, index: number) => {
+				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
 				if (taskRow.status === 'Ready' || taskRow.status === 'Started') {
@@ -503,6 +505,7 @@ export class TaskListComponent {
 			this.rowsExpanded = true;
 		} else {
 			taskRows.forEach((taskRow, index) => {
+				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
 				this.onRowDetailCollapseHandler(expandedEvent);
@@ -545,6 +548,7 @@ export class TaskListComponent {
 				.subscribe(() => {/* at this point preference should be saved */ });
 		}
 		this.pageSize = take;
+		this.currentPage = this.grid.getCurrentPage();
 		this.search();
 	}
 

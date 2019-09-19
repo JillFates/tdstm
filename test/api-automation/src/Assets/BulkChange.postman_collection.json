@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9ffb9ec7-96cc-41a1-bcbf-c4fb8df7c64d",
+		"_postman_id": "12ee0f9f-efac-4032-8f7e-0e43334de115",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

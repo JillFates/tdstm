@@ -2,6 +2,7 @@ import com.tdsops.tm.enums.domain.Color
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.command.CloneAssetCommand
@@ -233,13 +234,13 @@ class AssetEntityServiceTests extends Specification{
 			tagAssetService.applyTags(project, [tag2.id, tag3.id, tag1.id], app.id)
 			app.refresh() // needed to refresh because of Grails test transaction caching entities
 		and: 'the clone method is called'
-			Long newAssetId = assetEntityService.clone(project, new CloneAssetCommand(assetId: app.id, name: assetName, cloneDependencies: cloneDependencies), errors)
+			AssetEntity clonedAsset = assetEntityService.clone(project, new CloneAssetCommand(assetId: app.id, name: assetName, cloneDependencies: cloneDependencies), errors)
 		then: 'a new asset id should be returned'
-			newAssetId
+			clonedAsset.id
 		and: 'there should be no errors reported'
 			!errors
 		and: 'the cloned asset should be able to be retrieved'
-			Application clone = Application.read(newAssetId)
+			Application clone = Application.read(clonedAsset.id)
 			clone.refresh()
 		and: 'the cloned asset name should be set'
 			assetName == clone.assetName

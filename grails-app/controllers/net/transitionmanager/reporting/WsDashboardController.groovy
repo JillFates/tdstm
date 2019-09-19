@@ -127,7 +127,7 @@ class WsDashboardController implements ControllerMethods {
 
 				/* Get the latest step_snapshot record for each step that has started */
 				def latestStepsRecordsQuery = """
-					SELECT mbs.transition_id as tid,
+					SELECT
 						ss.id as snapshotId,
 						mbs.label as label,
 						mbs.calc_method as calcMethod,
@@ -147,7 +147,7 @@ class WsDashboardController implements ControllerMethods {
 
 				/*	Get the steps that have not started / don't have step_snapshot records	*/
 				def stepsNotUpdatedQuery = """
-					SELECT mbs.transition_id as tid, 
+					SELECT
 						ss.id as snapshotId, 
 						mbs.label as label, 
 						mbs.calc_method as calcMethod,
@@ -160,7 +160,7 @@ class WsDashboardController implements ControllerMethods {
 					FROM move_bundle mb
 					LEFT JOIN move_bundle_step mbs ON mbs.move_bundle_id = mb.move_bundle_id
 					LEFT JOIN step_snapshot ss ON ss.move_bundle_step_id = mbs.id
-					WHERE mb.move_bundle_id = $moveBundle.id AND ss.date_created IS NULL AND mbs.transition_id IS NOT NULL
+					WHERE mb.move_bundle_id = $moveBundle.id AND ss.date_created IS NULL
 				"""
 
 				dataPointsForEachStep = jdbcTemplate.queryForList( latestStepsRecordsQuery + " UNION " + stepsNotUpdatedQuery )

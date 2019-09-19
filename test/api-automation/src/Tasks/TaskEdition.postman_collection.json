@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "84411482-6511-42aa-beb3-ffc89d800187",
+		"_postman_id": "f8e0562f-d1cb-4a27-82f9-dee316541c04",
 		"name": "TM-15951 - Task Edition EP",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

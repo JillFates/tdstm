@@ -14,7 +14,7 @@ import {KEYSTROKE} from '../model/constants';
 	selector: 'tds-ui-toast',
 	template: `
         <div class="message-wrapper">
-            <div class="message-wrapper-container" *ngIf="showsPopUp">
+            <div class="message-wrapper-container" *ngIf="showsPopUp && !disabledPopUp">
                 <div class="alert alert-danger alert-dismissable fadeIn" *ngIf="alertModel.alertType === alertType.DANGER">
                     <button #closePopUpDialog type="button" class="close" (click)="onCloseDialog()" aria-hidden="true">&times;</button>
                     <h5><i class="icon fa fa-ban"></i>{{alertModel.message}}</h5>
@@ -43,6 +43,7 @@ export class UIToastDirective {
 	private alertType = AlertType;
 
 	public showsPopUp = false;
+	public disabledPopUp = false;
 
 	constructor(private notifierService: NotifierService) {
 		this.eventListeners();
@@ -58,11 +59,20 @@ export class UIToastDirective {
 		this.alertModel.alertType = alertType;
 		this.alertModel.message = message;
 		setTimeout(() => {
-			this.closePopUpDialog.nativeElement.focus();
+			if (this.closePopUpDialog) {
+				this.closePopUpDialog.nativeElement.focus();
+			}
 		}, 300);
 	}
 
 	eventListeners() {
+		// TODO: Use state management for this
+		this.notifierService.on('alertTypeDisable', (event: any) => {
+			this.disabledPopUp = event.disable;
+		});
+		this.notifierService.on(AlertType.DANGER, (event) => {
+			this.showPopUp(AlertType.DANGER, event.message);
+		});
 		this.notifierService.on(AlertType.DANGER, (event) => {
 			this.showPopUp(AlertType.DANGER, event.message);
 		});
