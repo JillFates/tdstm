@@ -85,7 +85,7 @@ dependencies {
 	compile "org.hibernate:hibernate-ehcache"
 	compile "org.grails.plugins:gsp"
 	compileOnly "io.micronaut:micronaut-inject-groovy"
-	compile 'org.codehaus.groovy:groovy-dateutil'
+	compile 'org.codehaus.groovy:groovy-dateutil:2.5.6'
 
 	compile("org.quartz-scheduler:quartz:2.2.3") {
 		exclude group: 'slf4j-api', module: 'c3p0'
@@ -136,7 +136,9 @@ dependencies {
 	runtime 'commons-httpclient:commons-httpclient:3.1'
 
 	// CSV Parser - https://github.com/xlson/groovycsv
-	compile 'com.xlson.groovycsv:groovycsv:1.2'
+	compile ('com.xlson.groovycsv:groovycsv:1.2'){
+		exclude group: 'org.codehaus.groovy', module:'groovy-all'
+	}
 
 	/*
 	 * GETL Groovy ETL - https://github.com/ascrus/getl/
@@ -146,6 +148,7 @@ dependencies {
 	compile('net.sourceforge.getl:getl:1.2.11') {
 		exclude group: 'org.apache.hadoop:hadoop-hdfs'
 		exclude group: 'org.apache.hadoop:hadoop-common'
+		exclude group: 'org.codehaus.groovy', module:'groovy-all'
 	}
 
 	testCompile 'com.stehno.ersatz:ersatz:1.9.0:safe@jar'
