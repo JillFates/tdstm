@@ -182,25 +182,23 @@ export class EventsService {
 
 	/**
 	 * Get the event status details for an specific bundle
+	 * @param {string} userTimeZone
  	 * @param {number} bundleId Bundle id
 	 * @returns {Observable<any>} Event status details
 	*/
-	getEventStatusDetails(bundleId: number, eventId: number): Observable<any> {
+	getEventStatusDetails(userTimeZone: string, bundleId: number, eventId: number): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
 			.map((response: any) => {
 				const result = pathOr(null, ['snapshot'], response);
 				if (result) {
-					result.eventStartDate = result.eventStartDate
-						? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.eventStartDate), DateUtils.SERVER_FORMAT_DATE) : '';
+					result.eventStartDate = DateUtils.formatUserDateTime(userTimeZone, result.eventStartDate);
 
 					if (result.planSum) {
-						result.planSum.compTime = result.planSum.compTime
-							? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.planSum.compTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						result.planSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.planSum.compTime);
 					}
 
 					if (result.revSum) {
-						result.revSum.compTime = result.revSum.compTime
-							? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.revSum.compTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						result.revSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.revSum.compTime);
 					}
 				}
 

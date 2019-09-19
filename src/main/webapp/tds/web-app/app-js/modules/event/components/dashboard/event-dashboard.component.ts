@@ -121,7 +121,7 @@ export class EventDashboardComponent implements OnInit {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 
-					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
+					this.eventsService.getEventStatusDetails(this.userTimeZone, this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						this.hasBundleSteps = true;
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
