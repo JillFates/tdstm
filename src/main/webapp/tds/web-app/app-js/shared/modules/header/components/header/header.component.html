@@ -1,10 +1,14 @@
-<header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav">
+<header
+	class="main-header header-component"
+	*ngIf="!pageMetaData.hideTopNav || !userContext"
+>
 	<nav class="navbar navbar-static-top">
 		<div
 			class="container menu-top-container"
 			[ngClass]="{
-				'menu-top-container-full-menu': !userContext.licenseInfo.license
-					.isManager
+				'menu-top-container-full-menu':
+					userContext.licenseInfo &&
+					!userContext.licenseInfo.license.isManager
 			}"
 		>
 			<div class="navbar-header branding">
@@ -42,8 +46,36 @@
 			<tds-tranman-menu></tds-tranman-menu>
 
 			<!-- Navbar Right Menu -->
-			<div class="navbar-custom-menu">
+			<div class="navbar-custom-menu user-navarea">
 				<ul class="nav navbar-nav">
+					<li class="dropdown search-menu">
+						<a
+							href="#"
+							class="nav-link nav-icon dropdown-toggle"
+							data-toggle="dropdown"
+						>
+							<clr-icon shape="search"></clr-icon>
+						</a>
+						<ul class="dropdown-menu search-dialog-dropdown-menu">
+							<li class="search-body">
+								<form
+									clrForm
+									[formGroup]="searchForm"
+									clrLayout="vertical"
+									class="is-fullwidth"
+								>
+									<clr-input-container class="clr-col-12">
+										<input
+											clrInput
+											type="text"
+											formControlName="search"
+											placeholder="Search"
+										/>
+									</clr-input-container>
+								</form>
+							</li>
+						</ul>
+					</li>
 					<!-- Notifications Menu -->
 					<li class="dropdown notifications-menu">
 						<!-- Menu toggle button -->
@@ -79,16 +111,10 @@
 							href="#"
 							class="dropdown-toggle"
 							data-toggle="dropdown"
+							[title]="userContext.person.fullName"
 						>
-							<!-- The user image in the navbar-->
-							<img
-								src="/tdstm/assets/images/personIcon.png"
-								class="user-image"
-								alt="TDS"
-							/>
-							<!-- hidden-xs hides the username on small devices so only the image appears. -->
-							<span class="hidden-xs user-name">{{
-								userContext.person.firstName
+							<span class="user-name">{{
+								getUserIconText()
 							}}</span>
 						</a>
 						<ul class="dropdown-menu user-dialog-dropdown-menu">

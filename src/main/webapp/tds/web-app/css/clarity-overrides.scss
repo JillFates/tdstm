@@ -4,3 +4,31 @@
 .modal-open .modal {
 	display: block;
 }
+
+// Clarity Overrides App Wide
+.clr-form.is-fullwidth {
+	width: 100%;
+
+	.clr-control-container,
+	.clr-input-wrapper,
+	.clr-input-group,
+	.clr-input {
+		width: 100%;
+	}
+	.clr-form-control.row .clr-input-wrapper,
+	.clr-input-group {
+		max-width: 100%;
+	}
+	clr-password-container .clr-error {
+		.clr-form-control.row .clr-input-wrapper,
+		.clr-input-group {
+			max-width: calc(100% - 1rem);
+		}
+		.clr-validate-icon {
+			margin-left: 20px;
+		}
+	}
+	.btn {
+		width: 100%;
+	}
+}

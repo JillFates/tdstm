@@ -2,7 +2,7 @@ import { NgModule, ModuleWithProviders } from '@angular/core'
 import { HTTP_INTERCEPTORS } from '@angular/common/http'
 import { Router, RouterModule } from '@angular/router'
 import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { PopupModule } from '@progress/kendo-angular-popup'
 import { DropDownsModule } from '@progress/kendo-angular-dropdowns'
 import { InputsModule } from '@progress/kendo-angular-inputs'
@@ -123,6 +123,7 @@ import { PreferencesResolveService } from './resolves/preferences-resolve.servic
 	imports: [
 		CommonModule,
 		FormsModule,
+		ReactiveFormsModule,
 		PopupModule,
 		DropDownsModule,
 		GridModule,

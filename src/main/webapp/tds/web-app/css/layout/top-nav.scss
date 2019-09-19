@@ -63,15 +63,47 @@
 			line-height: 45px;
 			display: inline-block;
 		}
-		.nav > li > a:hover:after {
-			content: '';
-			height: 3px;
-			display: block;
-			background-color: #fff;
-			position: absolute;
-			bottom: 5px;
-			left: 10px;
-			right: 10px;
+		tds-tranman-menu {
+			.nav > li > a:hover:after {
+				content: '';
+				height: 3px;
+				display: block;
+				background-color: #fff;
+				position: absolute;
+				bottom: 5px;
+				left: 10px;
+				right: 10px;
+			}
+		}
+
+		.user-menu > a {
+			display: inline-block;
+			overflow: hidden;
+			text-align: center;
+			padding: inherit 10px;
+
+			.user-name {
+				display: inline-block;
+				border-radius: 50%;
+				height: 30px;
+				width: 30px;
+				line-height: 32px;
+				white-space: nowrap;
+				background: #fff;
+				color: $color-active !important;
+				text-align: center;
+			}
+		}
+		.user-menu > a:hover {
+			.user-name {
+				color: $color-active-dark1 !important;
+			}
+		}
+		.notifications-menu > a {
+			padding: inherit 10px;
+		}
+		.search-dialog-dropdown-menu {
+			width: 400px;
 		}
 		.navbar-collapse {
 			li.dropdown {
@@ -159,6 +191,7 @@
 				color: white !important;
 				cursor: default;
 				font-weight: initial;
+				font-size: 80%;
 			}
 		}
 
