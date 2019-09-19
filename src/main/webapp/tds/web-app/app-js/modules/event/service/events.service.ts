@@ -187,7 +187,25 @@ export class EventsService {
 	*/
 	getEventStatusDetails(bundleId: number, eventId: number): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
-			.map((response: any) => pathOr(null, ['snapshot'], response))
+			.map((response: any) => {
+				const result = pathOr(null, ['snapshot'], response);
+				if (result) {
+					result.eventStartDate = result.eventStartDate
+						? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.eventStartDate), DateUtils.SERVER_FORMAT_DATE) : '';
+
+					if (result.planSum) {
+						result.planSum.compTime = result.planSum.compTime
+							? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.planSum.compTime), DateUtils.SERVER_FORMAT_DATE) : '';
+					}
+
+					if (result.revSum) {
+						result.revSum.compTime = result.revSum.compTime
+							? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(result.revSum.compTime), DateUtils.SERVER_FORMAT_DATE) : '';
+					}
+				}
+
+				return result;
+			})
 			.catch((error: any) => error);
 	}
 
@@ -213,8 +231,10 @@ export class EventsService {
 			.map((response: any) => {
 				let eventModels = response && response.status === 'success' && response.data;
 				eventModels.forEach((r) => {
-					r.estStartTime = ((r.estStartTime) ? new Date(r.estStartTime) : '');
-					r.estCompletionTime = ((r.estCompletionTime) ? new Date(r.estCompletionTime) : '');
+					r.estStartTime =  r.estStartTime ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estStartTime), DateUtils.SERVER_FORMAT_DATE) : '';
+					r.estCompletionTime =  r.estCompletionTime ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estCompletionTime), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return eventModels;
 			})
