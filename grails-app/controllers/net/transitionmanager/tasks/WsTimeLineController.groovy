@@ -8,9 +8,8 @@ import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
-import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
-import net.transitionmanager.task.TaskDependency
+import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.CriticalPathRoute
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
@@ -23,7 +22,6 @@ import java.text.DateFormat
 class WsTimeLineController implements ControllerMethods {
 
 	TimeLineService timeLineService
-	RunbookService runbookService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
@@ -31,16 +29,17 @@ class WsTimeLineController implements ControllerMethods {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
 
-		List<Task> tasks = runbookService.getEventTasks(moveEvent)
-		List<TaskDependency> taskDependencies = runbookService.getTaskDependencies(tasks)
+		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, taskDependencies)
+		TaskTimeLineGraph graph = cpaResults.graph
+		TimelineSummary summary = cpaResults.summary
+		List<Task> tasks = cpaResults.tasks
 
 		Date startDate
 		if (recalculate) {
-			startDate = graph.vertices.min { it.earliestStartDate }.earliestStartDate
+			startDate = findEarliestStartVertex(graph.vertices)
 		} else {
-			startDate = tasks.min { it.estStart }.estStart
+			startDate = findEarliestStartTask(tasks)
 		}
 
 		render([
@@ -80,32 +79,28 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		List<Task> tasks = runbookService.getEventTasks(moveEvent)
-		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
+		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
 
-		if (!summary.cycles.isEmpty()) {
+		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
 		}
 
-		render(buildResponse(graph, summary) as JSON)
+		render(buildResponse(cpaResults) as JSON)
 	}
 
 	@HasPermission(Permission.TaskTimelineView)
 	def baseline() {
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		List<Task> tasks = runbookService.getEventTasks(moveEvent)
-		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.updateTaskFromCPA(moveEvent, tasks, deps)
+		CPAResults cpaResults = timeLineService.updateTaskFromCPA(moveEvent)
 
-		if (!summary.cycles.isEmpty()) {
+		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
 		}
 
-		render(buildResponse(graph, summary) as JSON)
+		render(buildResponse(cpaResults) as JSON)
 	}
 
 	@HasPermission(Permission.TaskViewCriticalPath)
@@ -113,11 +108,12 @@ class WsTimeLineController implements ControllerMethods {
 
 		boolean showAll = params.showAll == 'true'
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		List<Task> tasks = runbookService.getEventTasks(moveEvent)
-		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
-		def (TaskTimeLineGraph graph, TimelineSummary summary) = timeLineService.calculateCPA(moveEvent, tasks, deps)
+		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
 
+		TaskTimeLineGraph graph = cpaResults.graph
+		TimelineSummary summary = cpaResults.summary
+		
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
 		try {
@@ -246,11 +242,13 @@ class WsTimeLineController implements ControllerMethods {
 	/**
 	 * Builds a Map structure to be used in controller method response
 	 *
-	 * @param graph an instance of {@code TaskTimeLineGraph}
-	 * @param summary an instance of {@code TimelineSummary}
+	 * @param cpaResults an instance of {@code CPAResults}
 	 * @return a{@code Map} used to build a respons in JSON format
 	 */
-	private Map<String, ?> buildResponse(TaskTimeLineGraph graph, TimelineSummary summary) {
+	private Map<String, ?> buildResponse(CPAResults cpaResults) {
+
+		TaskTimeLineGraph graph = cpaResults.graph
+		TimelineSummary summary = cpaResults.summary
 
 		return [
 			windowStartTime   : summary.windowStartTime,
@@ -278,5 +276,24 @@ class WsTimeLineController implements ControllerMethods {
 				]
 			}
 		]
+	}
+	/**
+	 * Given a list of {@code TaskVertex} it calculate the lowest earliestStartDate
+	 *
+	 * @param taskVertexList list of {@code TaskVertex}
+	 * @return lowest earliestStartDate from a list of {@code TaskVertex}
+	 */
+	private Date findEarliestStartVertex(List<TaskVertex> taskVertexList) {
+		return taskVertexList.vertices.min { it.earliestStartDate }.earliestStartDate
+	}
+
+	/**
+	 * Given a list of {@code Task} it calculate the lowest estStart
+	 *
+	 * @param taskList list of {@code Task}
+	 * @return lowest estStart from a list of {@code Task}
+	 */
+	private Date findEarliestStartTask(List<Task> taskList) {
+		return taskList.min { it.estStart }.estStart
 	}
 }
