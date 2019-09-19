@@ -147,7 +147,7 @@ class TaskVertex {
 			Integer elapsedTime = 0
 			use(TimeCategory) {
 				// statusUpdated
-				elapsedTime = (statusUpdated - actualStart).minutes
+				elapsedTime = (actualStart != null) ? (statusUpdated - actualStart).minutes : 0
 			}
 			return this.duration - elapsedTime
 		} else {
