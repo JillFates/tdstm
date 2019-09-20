@@ -64,7 +64,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
-import {TagWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -150,7 +150,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
 		private userContextService: UserContextService,
-		private assetTagUIWrapperService: TagWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {

@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 
 @Injectable()
-export class TagWrapperService {
+export class AssetTagUIWrapperService {
 
 	/**
 	 * Receive a selector that wrap up the tags for calculating

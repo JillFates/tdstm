@@ -24,7 +24,7 @@ import {AssetViewExportComponent} from '../../../assetManager/components/asset-v
 import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TagWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 declare var jQuery: any;
 
@@ -67,7 +67,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private assetTagUIWrapperService: TagWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
