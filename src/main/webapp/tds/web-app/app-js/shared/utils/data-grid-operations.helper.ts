@@ -61,6 +61,11 @@ export class DataGridOperationsHelper {
 	 * @param column
 	 */
 	public onFilter(column: GridColumnModel, operator?: string): void {
+		let root = this.getFilter(column, operator);
+		this.filterChange(root);
+	}
+
+	public getFilter(column: GridColumnModel, operator?: string): CompositeFilterDescriptor {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
@@ -126,7 +131,7 @@ export class DataGridOperationsHelper {
 				}
 			}
 		}
-		this.filterChange(root);
+		return root;
 	}
 
 	/**

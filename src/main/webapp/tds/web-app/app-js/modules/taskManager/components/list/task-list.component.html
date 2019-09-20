@@ -78,9 +78,7 @@
 				[skip]="grid.state.skip"
 				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 				(pageChange)="onPageChangeHandler($event)"
-				[filter]="grid.state.filter"
 				[filterable]="true"
-				(filterChange)="grid.filterChange($event)"
 				[resizable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
@@ -193,9 +191,9 @@
 						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
-								<input [(ngModel)]="column.filter" (keyup)="grid.onFilter(column)"
+								<input [(ngModel)]="column.filter" (keyup)="onFilterChangeHandler(column)"
 											 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="grid.clearValue(column)"
+								<span *ngIf="column.filter" (click)="onFilterChangeHandler(column, true)"
 											style="cursor:pointer;color:#656565;pointer-events:all"
 											class="fa fa-times form-control-feedback"></span>
 							</ng-template>
