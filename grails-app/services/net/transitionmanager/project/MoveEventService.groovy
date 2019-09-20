@@ -619,6 +619,8 @@ class MoveEventService implements ServiceMethods {
 		Date estimatedStart = categoryStats[3] ?: moveEvent.estStartTime
 		Date estimatedFinish = categoryStats[4] ?: moveEvent.estCompletionTime
 
+		Date now = new Date()
+
 		Long totalTasks = categoryStats[7]
 		Long completedTasks = categoryStats[8]
 		Long percentCompleted = categoryStats[9]
@@ -630,10 +632,10 @@ class MoveEventService implements ServiceMethods {
 		if (completedTasks == totalTasks && actualFinish < estimatedFinish) {
 			color = "#24488a" // completed-blue
 		} else {
-			if (estimatedFinish < new Date() && percentCompleted < 100) {
+			if (estimatedFinish < now && percentCompleted < 100) {
 				color = "red" // past completed time and tasks remain
 			} else {
-				if (longestRemainingInMinutes && estimatedFinish.minutes < new Date().minutes + longestRemainingInMinutes) {
+				if (longestRemainingInMinutes && estimatedFinish < now + longestRemainingInMinutes) {
 					color = "FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
 				}
 			}
