@@ -480,7 +480,19 @@ export class TaskListComponent {
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
-		this.grid.clearAllFilters(this.columnsModel);
+		this.columnsModel
+			.filter(column => column.filterable)
+			.forEach((column: GridColumnModel) => {
+				column.filter = '';
+			});
+		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
+			this.grid.state.filter.filters
+				.forEach((filter: FilterDescriptor) => {
+					filter.value = '';
+				});
+			// reset pagination to be on page 1
+			this.onPageChangeHandler({skip: 0, take: this.pageSize});
+		}
 	}
 
 	/**
@@ -571,7 +583,7 @@ export class TaskListComponent {
 	 * @param column
 	 * @param clearFilter
 	 */
-	public onFilterChangeHandler(column: GridColumnModel, clearFilter = false): void {
+	onFilterChangeHandler(column: GridColumnModel, clearFilter = false): void {
 		if (clearFilter) {
 			column.filter = '';
 		}
@@ -581,7 +593,8 @@ export class TaskListComponent {
 		}
 		const filters = this.grid.getFilter(filterColumn);
 		this.grid.state.filter = filters;
-		this.search();
+		// reset pagination to be on page 1
+		this.onPageChangeHandler({skip: 0, take: this.pageSize});
 	}
 
 	/**
