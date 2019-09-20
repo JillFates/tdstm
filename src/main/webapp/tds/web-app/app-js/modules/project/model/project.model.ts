@@ -1,6 +1,3 @@
-import {ModalType} from '../../../shared/model/constants';
-import {KendoFileUploadBasicConfig} from '../../../shared/providers/kendo-file-upload.interceptor';
-
 export class ProjectModel {
 	public clientId: number;
 	public projectName: string;
@@ -8,12 +5,12 @@ export class ProjectModel {
 	public startDate: Date;
 	public completionDate: Date;
 	public partnerIds: number[];
-	public projectLogo: File;
+	public projectLogo: any;
 	public projectManagerId: number;
-	public workflowCode: string;
 	public projectCode: string;
 	public projectType: string;
 	public comment: string;
+	public defaultBundle: any;
 	public defaultBundleName: string;
 	public timeZone: string;
 	public collectMetrics: boolean;

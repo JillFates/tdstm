@@ -66,7 +66,7 @@ export class BundleService {
 			targetRoomId: model.toId,
 			startTime: model.startTime,
 			completionTime: model.completionTime,
-			moveEvent: model.moveEvent,
+			moveEvent: model.moveEvent && model.moveEvent.id || null,
 			operationalOrder: model.operationalOrder,
 			useForPlanning: model.useForPlanning
 		};

@@ -204,7 +204,7 @@ export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, A
 			bladeRows: this.model.bladeRows || 0,
 			connectors: this.model.connectors || [],
 			connectorsCount: 0,
-			cpuCount: this.model.cpuCount || 0,
+			cpuCount: this.model.cpuCount,
 			cpuType: this.model.cpuType,
 			description: this.model.description,
 			endOfLifeDate: this.model.endOfLifeDate,

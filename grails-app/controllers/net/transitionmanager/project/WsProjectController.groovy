@@ -6,29 +6,19 @@ import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdssrc.grails.NumberUtil
-import com.tdssrc.grails.StringUtil
-import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.common.Timezone
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.party.PartyGroupService
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.Person
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.security.RoleType
-import net.transitionmanager.security.UserLogin
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import org.apache.tomcat.util.descriptor.web.ContextService
-
 /**
  * Handles WS calls of the ProjectsService
  */
@@ -43,6 +33,7 @@ class WsProjectController implements ControllerMethods {
 	ControllerService controllerService
 	UserPreferenceService userPreferenceService
 	ContextService contextService
+    MoveBundleService moveBundleService
 
 	/**
 	 * Gets the projects associated to a user
@@ -112,7 +103,6 @@ class WsProjectController implements ControllerMethods {
 				managers: managers,
 		 		partners: projectDetails.partners,
 				projectInstance: new Project(params),
-		 		workflowCodes: projectDetails.workflowCodes,
 				projectTypes: projectTypes,
 				planMethodologies:planMethodologies ])
 	}
@@ -159,6 +149,7 @@ class WsProjectController implements ControllerMethods {
 		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
+		List availableBundles = moveBundleService.lookupList(project)
 
 		renderSuccessJson([
 				clients				 : projectDetails.clients,
@@ -166,6 +157,7 @@ class WsProjectController implements ControllerMethods {
 				timezone             : project.timezone?.label ?: '',
 				client               : project.client,
 				defaultBundle        : project.defaultBundle,
+				availableBundles	 : availableBundles,
 				possiblePartners	 : projectDetails.partners,
 				possibleManagers	 : possibleManagers,
 				projectPartners      : partyRelationshipService.getProjectPartners(project),
@@ -173,7 +165,6 @@ class WsProjectController implements ControllerMethods {
 				projectLogoForProject: projectLogo,
 				isDeleteable         : isDeleteable,
 				planMethodology      : planMethodology,
-				workflowCodes: projectDetails.workflowCodes,
 				projectTypes: projectTypes,
 				planMethodologies: planMethodologies
 		])

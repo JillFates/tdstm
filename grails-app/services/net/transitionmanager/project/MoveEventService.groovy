@@ -1,5 +1,6 @@
 package net.transitionmanager.project
 
+import com.tdsops.tm.enums.domain.TimeScale
 import net.transitionmanager.asset.Application
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -30,6 +31,9 @@ import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.springframework.jdbc.core.JdbcTemplate
+import com.tdsops.tm.enums.domain.AssetCommentCategory
+
+import java.sql.Timestamp
 
 @Slf4j
 @Transactional
@@ -549,38 +553,107 @@ class MoveEventService implements ServiceMethods {
 	 * Find different stats for the given event, grouped by category.
 	 * @param project
 	 * @param moveEventId
-	 * @return a list with the cor
+	 * @return a list with the task category stats
 	 */
 	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
 		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
 		// Query the database for the min/max dates for tasks in the event grouped by category.
-		List taskCategoriesStatsList = AssetComment.createCriteria().list {
-			eq('moveEvent', moveEvent)
-			projections {
-				groupProperty('category')
-				min('actStart')
-				max('dateResolved')
-				min('estStart')
-				max('estFinish')
-			}
-		}
+		String hql = """
+				select 
+					ac.category,
+					min(ac.actStart),
+					max(ac.dateResolved),
+					min(ac.estStart),
+					max(ac.estFinish),
+					max(ac.duration),
+					ac.durationScale,
+					count(*),
+					sum(case when ac.status = 'Completed' then 1 else 0 end),
+					case when (count(*) > 0) then (sum(case when ac.status = 'Completed' then 1 else 0 end)/count(*)*100) else 100 end
+				from AssetComment ac
+					where moveEvent =:moveEvent
+				group by ac.category
+			"""
+
+		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
 		List<Map> stats = []
 		taskCategoriesStatsList.each { categoryStats ->
-			// Only add to the results if any of the dates has values
-			if (categoryStats[1] || categoryStats[2] || categoryStats[3] || categoryStats[4]) {
+			// Only add to the results if there are any tasks for the category
+			if (categoryStats[7] ) {
 				stats << [
-					"category": categoryStats[0],
-					"actStart": categoryStats[1],
-					"actFinish": categoryStats[2],
-					"estStart": categoryStats[3],
-					"estFinish": categoryStats[4],
+					"category": 	categoryStats[0],
+					"actStart": 	categoryStats[1],
+					"actFinish": 	categoryStats[2],
+					"estStart": 	categoryStats[3],
+					"estFinish": 	categoryStats[4],
+					"maxRemaining":	categoryStats[5],
+					"maxRScale":	categoryStats[6],
+					"tskTot": 		categoryStats[7],
+					"tskComp": 		categoryStats[8],
+					"percComp": 	categoryStats[9],
+					"color":		calculateColumnColor(categoryStats, moveEvent)
 				]
 			}
+			// Sort by the category "natural" sort order
+			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
 		}
 
 		return stats
+	}
+
+	/**
+	 * Returns the color that the column should have for the given category in the Event Dashboard.
+	 * @See TM-15896
+	 * @param categoryStats  The category properties
+	 * @param moveEvent  The event to which the category properties belong
+	 * @return  The calculated color for the category column.
+	 */
+	private String calculateColumnColor(categoryStats, MoveEvent moveEvent) {
+
+		Date actualStart = categoryStats[1]
+		Date actualFinish = categoryStats[2]
+
+		// If tasks estimated start or completion are blank, use the Event estimated start and completion
+		Date estimatedStart = categoryStats[3] ?: moveEvent.estStartTime
+		Date estimatedFinish = categoryStats[4] ?: moveEvent.estCompletionTime
+
+		Long totalTasks = categoryStats[7]
+		Long completedTasks = categoryStats[8]
+		Long percentCompleted = categoryStats[9]
+
+		int longestRemainingInMinutes = getLongestRemainingInMinutes(categoryStats[5], categoryStats[6])
+
+		// default is green
+		String color = "green"
+		if (completedTasks == totalTasks && actualFinish < estimatedFinish) {
+			color = "#24488a" // completed-blue
+		} else {
+			if (estimatedFinish < new Date() && percentCompleted < 100) {
+				color = "red" // past completed time and tasks remain
+			} else {
+				if (longestRemainingInMinutes && estimatedFinish < new Date().minutes + longestRemainingInMinutes) {
+					color = "FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
+				}
+			}
+		}
+		return color
+	}
+
+	/**
+	 * Calculates the longest remaining time for a task in minutes, or returns 0 if parameters are empty or null.
+	 * @param maxRemaining
+	 * @param maxRScale
+	 * @return  The max remaining time in minutes, or zero if anything is empty or null.
+	 */
+	private int getLongestRemainingInMinutes(maxRemaining, TimeScale maxRScale) {
+
+		if (!maxRemaining || !maxRScale) {
+			return 0
+		} else {
+			return maxRScale.toMinutes(maxRemaining)
+		}
 	}
 
 }

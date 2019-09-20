@@ -24,7 +24,7 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 		public prompt: UIPromptService,
 		public translate: TranslatePipe,
 		public activeDialog: UIActiveDialogService) {
-		super(activeDialog, prompt, translate);
+		super(field, activeDialog, prompt, translate);
 	}
 
 	ngOnInit(): void {

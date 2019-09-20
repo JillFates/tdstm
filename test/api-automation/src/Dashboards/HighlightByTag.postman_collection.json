@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f6fc1969-4db2-418e-bc87-eb554da09102",
+		"_postman_id": "656236d3-b398-47c9-8e51-322bf556fe58",
 		"name": "Highliht by Tag",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

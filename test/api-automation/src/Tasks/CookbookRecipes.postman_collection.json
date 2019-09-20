@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3f4b0fb2-4749-43bb-bb89-922ae04e1eb8",
+		"_postman_id": "a4dcc8a4-e299-493b-a790-022f4fb3db0f",
 		"name": "Cookbook-Recipe Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

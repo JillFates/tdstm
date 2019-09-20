@@ -17,6 +17,7 @@ export class FieldSettingsModel {
 	style?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	errorMessage?: string;
 	toBeDeleted?: boolean;
+	isNew?: boolean;
 
 	constructor() {
 		this.udf = true;
