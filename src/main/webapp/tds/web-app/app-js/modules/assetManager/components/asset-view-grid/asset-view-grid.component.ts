@@ -64,6 +64,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {TagWrapperService} from '../../../../shared/services/ui-tag-wrapper.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -98,7 +99,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
-		this.displayCreateButton = this.getDisplayCreateButton(),
+		this.displayCreateButton = this.getDisplayCreateButton();
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
@@ -148,7 +149,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private tagWrapperService: TagWrapperService) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -396,6 +398,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		).forEach((c: ViewColumn) => {
 			c.width = data[0].newWidth;
 		});
+		// this.updateTagsWidth();
+		this.tagWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
@@ -766,6 +770,14 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe(() => {
 				// nothing to do here
 			});
+	}
+
+	/**
+	 * Changes the height of the table row when the user
+	 * moves the mouse out of the tags cell
+	 * */
+	public refreshTableSize(event): void {
+		event.target.parentElement.parentElement.style.height = '28px';
 	}
 
 	/**
