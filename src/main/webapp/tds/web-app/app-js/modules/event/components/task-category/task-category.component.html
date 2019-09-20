@@ -17,7 +17,7 @@
                             [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
                             <a *ngIf="rowIndex === RowType.Header; else categoryValue"
                                [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{category: column.text}">
+                               [queryParams]="{category: column.text, justRemaining: 0}">
                                 <span [innerHtml]="column.text"></span>
                             </a>
 
