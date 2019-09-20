@@ -42,6 +42,11 @@
 
     <script type="text/javascript">
 	$(document).ready(function() {
+			$(".user-menu .user-name").each(function() {
+				$(this).text($(this).text().split(" ").map(function(a){
+					return a.substr(0,1).toUpperCase();
+				}).join(""))
+			})
             $("#personDialog").dialog({ autoOpen: false });
             $("#userPrefDivId").dialog({ autoOpen: false });
             $("#userTimezoneDivId").dialog({ autoOpen: false });
@@ -88,7 +93,7 @@
 <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
 <body class="hold-transition skin-blue layout-top-nav">
 <div class="wrapper">
-    <header class="main-header">
+    <header class="main-header header-component">
         <input id="contextPath" type="hidden" value="${request.contextPath}"/>
         <input id="tzId" type="hidden" value="${tds.timeZone()}"/>
         <input id="userDTFormat" type="hidden" value="${tds.dateFormat()}"/>
@@ -97,7 +102,7 @@
 		<g:else>
             <nav class="navbar navbar-static-top">
                 <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
-                    <div class="navbar-header">
+                    <div class="navbar-header branding">
                         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                             <i class="fa fa-bars"></i>
                         </button>
@@ -123,16 +128,16 @@
 
 
                     <!-- Navbar Right Menu -->
-                    <div class="navbar-custom-menu">
+                    <div class="navbar-custom-menu user-navarea">
                         <ul class="nav navbar-nav">
                             <!-- Notifications Menu -->
                             <li class="dropdown notifications-menu">
                                 <!-- Menu toggle button -->
-                                <a href="#" id="nav-project-name" class="dropdown-toggle" data-toggle="dropdown">
+								<span class="tds-nav-item" id="nav-project-name">
                                     <g:if test="${currProject}"> ${currProject.name} </g:if>
                                     <g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
                                     <g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
-                                </a>
+						</span>
                             </li>
                             <li>
                                 <g:if test="${!isLicenseManagerEnabled}">
@@ -143,12 +148,20 @@
                                 <!-- User Account Menu -->
                                 <li class="dropdown user user-menu">
                                     <!-- Menu Toggle Button -->
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<a
+							href="#"
+							class="dropdown-toggle"
+							data-toggle="dropdown"
+							title="${tds.currentPerson()}"
+						>
+							<span class="user-name">${tds.currentPerson()}</span>
+						</a>
+                                    <%-- <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                         <!-- The user image in the navbar-->
                                         <asset:image src="images/personIcon.png" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }" />
                                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                         <span class="hidden-xs user-name">${tds.currentPersonName()}</span>
-                                    </a>
+                                    </a> --%>
                                     <ul class="dropdown-menu user-dialog-dropdown-menu">
                                         <!-- Menu Body -->
                                         <li class="user-body">
