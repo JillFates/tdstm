@@ -24,6 +24,8 @@ import {TaskListComponent} from './components/list/task-list.component';
 import {ReportsService} from '../reports/service/reports.service';
 import {NeighborhoodComponent} from './components/neighborhood/neighborhood.component';
 import {DialogsModule} from '@progress/kendo-angular-dialog';
+import {TaskViewToggleComponent} from './components/common/task-view-toggle.component';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -41,12 +43,14 @@ import {DialogsModule} from '@progress/kendo-angular-dialog';
 		InputsModule,
 		DateInputsModule,
 		DialogsModule,
+		TooltipModule,
 		// Route
 		TaskManagerRouteModule,
 	],
 	declarations: [
 		TaskListComponent,
-		NeighborhoodComponent
+		NeighborhoodComponent,
+		TaskViewToggleComponent
 	],
 	providers: [
 		// Resolve

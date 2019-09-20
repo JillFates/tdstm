@@ -3,19 +3,11 @@
     <div class="col-md-4 k-align-self-center">
       <p class="task-graph-title">Task Graph</p>
     </div>
-    <div class="col-md-3 text-center k-align-self-center">
-      <button class="neighborhood-btn btn" (click)="layeredDigraphLayout()">
-        <fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
-      </button>
-      <button class="neighborhood-btn btn" (click)="treeLayout()">
-        <fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
-      </button>
-      <button class="neighborhood-btn btn" (click)="forceDirectedLayout()">
-        <fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
-      </button>
+    <div class="col-md-4 text-center k-align-self-center">
+      <tds-task-view-toggle></tds-task-view-toggle>
     </div>
     
-    <div class="col-md-3 k-align-self-center">
+    <div class="col-md-2 k-align-self-center">
 <!--      <label class="d-inline-block task-chk-container">-->
 <!--        My Task-->
 <!--        <input  type="checkbox" checked="checked" />-->
