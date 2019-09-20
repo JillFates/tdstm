@@ -398,7 +398,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		).forEach((c: ViewColumn) => {
 			c.width = data[0].newWidth;
 		});
-		// this.updateTagsWidth();
 		this.tagWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
