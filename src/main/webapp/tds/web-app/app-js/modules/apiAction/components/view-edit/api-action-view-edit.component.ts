@@ -574,7 +574,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			});
 		});
 	}
-
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
@@ -685,7 +684,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private loadAgentMethodModel(changeMethod: boolean): void {
 		if (changeMethod) {
 			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
-			this.apiActionModel.agentMethod.dictionaryMethodName = this.apiActionModel.agentMethod.name;
+			this.apiActionModel.agentMethod.dictionaryMethodName = this.apiActionModel.agentMethod.name || this.apiActionModel.agentMethod.dictionaryMethodName;
 			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
 			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
