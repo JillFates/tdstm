@@ -415,14 +415,19 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].text =   item.percComp + '%';
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
-			results[CatagoryRowType.PlannedStart][index].text =
-				item.estStart ? DateUtils.formatUserDateTime(userTimeZone, item.estStart) : plannedStart;
-			results[CatagoryRowType.PlannedCompletion][index].text =
-				item.estFinish ? DateUtils.formatUserDateTime(userTimeZone, item.estFinish) : plannedCompletion;
+
+			item.estStart = item.estStart ? item.estStart : plannedStart;
+			item.estFinish = item.estFinish ? item.estFinish : plannedCompletion;
+
+			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
 
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
-			if (item.actFinish > item.estFinish) {
+
+			if (item.estFinish && (DateUtils.stringDateToDate(item.actFinish) > DateUtils.stringDateToDate(item.estFinish))) {
 				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
 				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
 			}
@@ -430,7 +435,7 @@ export class EventsService {
 
 		const hasInfo = data.find((item: CategoryTask) => {
 			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
-		})
+		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};
 	}
