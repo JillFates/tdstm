@@ -216,14 +216,14 @@
                     <tr class="prop">
                         <td valign="top" class="name">Start Date:</td>
                         <td valign="top" class="value">
-                            <kendo-datepicker [(ngModel)]="projectModel.startDate"></kendo-datepicker>
+                            <kendo-datepicker #startDatePicker (open)="onOpenStartDatePicker($event)" [(ngModel)]="projectModel.startDate"></kendo-datepicker>
                         </td>
                     </tr>
 
                     <tr class="prop">
                         <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
                         <td valign="top" class="value">
-                            <kendo-datepicker [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
+                            <kendo-datepicker #completionDatePicker (open)="onOpenCompletionDatePicker($event)" [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
                         </td>
                     </tr>
 
