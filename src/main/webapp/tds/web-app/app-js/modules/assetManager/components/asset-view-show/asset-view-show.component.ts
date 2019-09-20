@@ -24,7 +24,7 @@ import {AssetViewExportComponent} from '../../../assetManager/components/asset-v
 import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
-import {TagWrapperService} from '../../../../shared/services/ui-tag-wrapper.service';
+import {TagWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 declare var jQuery: any;
 
@@ -67,7 +67,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private tagWrapperService: TagWrapperService) {
+		private assetTagUIWrapperService: TagWrapperService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -362,7 +362,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public onGridStateChange(state: State): void {
 		this.gridState = state;
 		setTimeout(() => {
-			this.tagWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 		}, 500);
 	}
 

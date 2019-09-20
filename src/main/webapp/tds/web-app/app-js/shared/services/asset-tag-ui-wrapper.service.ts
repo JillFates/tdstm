@@ -25,7 +25,7 @@ export class TagWrapperService {
 					allTagsWidth += tag.offsetWidth;
 				});
 				if (allTagsWidth > castedEl.offsetWidth) {
-					bestFit = TagWrapperService.testBestFit(castedEl.offsetWidth, tags);
+					bestFit = this.testBestFit(castedEl.offsetWidth, tags);
 					let span = document.createElement('span');
 					span.innerHTML = '...';
 					span.className = 'dots-for-tags';
@@ -39,7 +39,7 @@ export class TagWrapperService {
 	 * Calculates how many tags fit in a given width
 	 * @returns max number of tags that fit
 	 * */
-	static testBestFit(maxWidth, tags): number {
+	testBestFit(maxWidth, tags): number {
 		let tagWidth = (tags.length * 5);
 		let retVal = 0;
 		let arr = Array.from(tags);
