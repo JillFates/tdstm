@@ -1,8 +1,9 @@
 package net.transitionmanager.command
 
-import com.tdssrc.grails.TimeUtil
-import grails.databinding.BindUsing
+import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.asset.Room
+import net.transitionmanager.project.Project
 
 
 class MoveBundleCommand implements CommandObject {
@@ -10,13 +11,7 @@ class MoveBundleCommand implements CommandObject {
  	Long id
 	String name
 	String description
-	@BindUsing({ obj, source ->
-		return TimeUtil.parseISO8601DateTime(source['startTime'])
-	})
 	Date startTime                   // Time that the MoveBundle Tasks will begin
-	@BindUsing({ obj, source ->
-		return TimeUtil.parseISO8601DateTime(source['completionTime'])
-	})
 	Date completionTime              // Planned Completion Time of the MoveBundle
 	Integer operationalOrder = 1     // Order that the bundles are performed in (NOT BEING USED)
 	MoveEvent moveEvent
