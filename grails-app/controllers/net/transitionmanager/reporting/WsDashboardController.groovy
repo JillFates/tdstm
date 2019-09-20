@@ -282,7 +282,7 @@ class WsDashboardController implements ControllerMethods {
 			/*
 			* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
 			*/
-			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ?0 AND mes.type = ?1 ORDER BY mes.dateCreated DESC"
 			// moveEventPlannedSnapshot = MoveEventSnapshot.find( query , [moveEvent , MoveEventSnapshot.TYPE_PLANNED] )[0]
 			// moveEventRevisedSnapshot = MoveEventSnapshot.find( query , [moveEvent, MoveEventSnapshot.TYPE_REVISED] )[0]
 			moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "P"] )[0]

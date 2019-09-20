@@ -67,8 +67,8 @@ class Room {
 	int getAssetCount() {
 		executeQuery('''
 				SELECT COUNT(*) FROM AssetEntity
-				where (roomSource=? and rackSource is not null)
-				   or (roomTarget=? and rackTarget is not null)
+				where (roomSource=?0 and rackSource is not null)
+				   or (roomTarget=?1 and rackTarget is not null)
 		''', [this, this])[0]
 	}
 
