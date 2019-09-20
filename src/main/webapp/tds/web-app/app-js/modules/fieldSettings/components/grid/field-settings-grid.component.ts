@@ -419,11 +419,12 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * Handle a change of custom control type event
+	 * just for already created fields display a warning about changing the control type
 	 * @param dataItem Current grid cell item
 	 * @param fieldTypeChange contains the info about the conversion, save and reset events
 	 */
 	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
-		if (fieldTypeChange) {
+		if (dataItem && !dataItem.isNew && fieldTypeChange) {
 			this.prompt.open(
 				'Confirmation Required',
 				fieldTypeChange.conversion.getWarningMessage(),
@@ -435,11 +436,10 @@ export class FieldSettingsGridComponent implements OnInit {
 					fieldTypeChange.reset();
 				}
 			});
-
-			return;
+		} else {
+			this.setIsDirty(true);
+			fieldTypeChange.save();
 		}
-
-		console.error('Cannot find custom field transition');
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {
