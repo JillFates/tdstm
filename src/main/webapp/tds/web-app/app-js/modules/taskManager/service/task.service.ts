@@ -387,13 +387,6 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
-				if (response.rows) {
-					response.rows = response.rows.map(item => {
-						let newItem = { ...item };
-						newItem.taskNumber = newItem.taskNumber.toString();
-						return newItem;
-					})
-				}
 				return response;
 			}),
 			catchError(error => {
