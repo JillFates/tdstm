@@ -122,6 +122,10 @@ export class BreadcrumbNavigationComponent {
 			this.titleService.setTitle(event.title);
 			this.pageMetaData.title = event.title;
 		});
+		this.notifierService.on('notificationHeaderBreadcrumbChange', event => {
+			// Set Breadcrumb
+			this.pageMetaData.menu = event.menu;
+		});
 	}
 
 	/**
