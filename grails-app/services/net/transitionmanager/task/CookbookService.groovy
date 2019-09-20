@@ -912,6 +912,7 @@ class CookbookService implements ServiceMethods {
 			id: 0,
 			title:0,
 			description:0,
+			note: 0,
 			filter: groupProps.filter,
 			type:['asset','action','milestone','gateway','general'],
 			action: ['rollcall','location','room','rack','truck','set', 'cart'],
