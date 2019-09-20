@@ -26,29 +26,12 @@
 				/>
 			</div>
 
-			<!-- <div class="navbar-header">
-				<button
-					type="button"
-					class="navbar-toggle collapsed"
-					data-toggle="collapse"
-					data-target="#navbar-collapse"
-				>
-					<i class="fa fa-bars"></i>
-				</button>
-				<img
-					
-					[src]="userContext.project.logoUrl"
-					alt="Transition Manager"
-					border="0"
-				/>
-			</div>
- -->
 			<tds-tranman-menu></tds-tranman-menu>
 
 			<!-- Navbar Right Menu -->
 			<div class="navbar-custom-menu user-navarea">
 				<ul class="nav navbar-nav">
-					<li class="dropdown search-menu">
+					<!-- <li class="dropdown search-menu">
 						<a
 							href="#"
 							class="nav-link nav-icon dropdown-toggle"
@@ -75,16 +58,10 @@
 								</form>
 							</li>
 						</ul>
-					</li>
+					</li> -->
 					<!-- Notifications Menu -->
-					<li class="dropdown notifications-menu">
-						<!-- Menu toggle button -->
-						<a
-							href="#"
-							id="nav-project-name"
-							class="dropdown-toggle"
-							data-toggle="dropdown"
-						>
+					<li class="notifications-menu">
+						<span class="tds-nav-item" id="nav-project-name">
 							<span *ngIf="userContext.project">{{
 								userContext.project.name
 							}}</span>
@@ -94,7 +71,7 @@
 							<span *ngIf="userContext.bundle">
 								: {{ userContext.bundle.name }}</span
 							>
-						</a>
+						</span>
 					</li>
 					<li
 						*ngIf="
@@ -117,54 +94,33 @@
 								getUserIconText()
 							}}</span>
 						</a>
-						<ul class="dropdown-menu user-dialog-dropdown-menu">
-							<!-- Menu Body -->
-							<li class="user-body">
-								<ul class="list-group">
-									<li class="list-group-item">
-										<a
-											(click)="openEditPersonModal()"
-											style="cursor: pointer;"
-											><span
-												class="glyphicon glyphicon-user user-menu-icon-badge"
-											></span>
-											Account Details</a
-										>
-									</li>
-									<li class="list-group-item">
-										<a
-											(click)="openDateTimezoneModal()"
-											style="cursor: pointer;"
-											><span
-												class="glyphicon glyphicon-time user-menu-icon-badge"
-											></span>
-											Date and Timezone</a
-										>
-									</li>
-									<li class="list-group-item">
-										<a
-											(click)="openPrefModal()"
-											style="cursor: pointer;"
-											><span
-												class="glyphicon glyphicon-pencil user-menu-icon-badge"
-											></span>
-											Edit Preferences</a
-										>
-									</li>
-								</ul>
+						<ul class="dropdown-menu">
+							<li class="menu-child-item">
+								<a
+									(click)="openEditPersonModal()"
+									style="cursor: pointer;"
+									>Account Details</a
+								>
 							</li>
-							<!-- Menu Footer-->
-							<li class="user-footer">
-								<div class="pull-right">
-									<a
-										(click)="logOut()"
-										class="btn btn-default btn-flat"
-										><span
-											class="glyphicon glyphicon-log-out user-menu-icon-badge"
-										></span>
-										Sign Out</a
-									>
-								</div>
+							<li class="menu-child-item">
+								<a
+									(click)="openDateTimezoneModal()"
+									style="cursor: pointer;"
+									>Date and Timezone</a
+								>
+							</li>
+							<li class="menu-child-item">
+								<a
+									(click)="openPrefModal()"
+									style="cursor: pointer;"
+									>Edit Preferences</a
+								>
+							</li>
+							<li class="divider"></li>
+							<li class="menu-child-item">
+								<a (click)="logOut()" style="cursor: pointer;"
+									>Sign Out</a
+								>
 							</li>
 						</ul>
 					</li>

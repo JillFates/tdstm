@@ -1,11 +1,23 @@
+// Clarity Overrides App Wide
 .modal {
 	display: none;
 }
-.modal-open .modal {
-	display: block;
+.modal-dialog .modal-content {
+	padding: 0;
+	.modal-header,
+	.modal-body {
+		padding: 16px;
+	}
+	.modal-footer {
+		padding: 15px;
+		margin: 0;
+
+		.btn {
+			margin: 0.25rem 0.5rem 0.25rem 0;
+		}
+	}
 }
 
-// Clarity Overrides App Wide
 .clr-form.is-fullwidth {
 	width: 100%;
 

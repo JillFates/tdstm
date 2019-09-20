@@ -18,9 +18,9 @@
     <link rel="stylesheet" href="${resource(dir: 'tds/web-app/css', file: 'managerStyle.css')}">
 </g:if>
 
-<!-- Blue Skin -->
+<%-- <!-- Blue Skin -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
-
+ --%>
 <!-- jQuery -->
 <!-- LEGACY AND SUPPORT LEGACY CODE START -->
 <%-- What is this for?  --%>
