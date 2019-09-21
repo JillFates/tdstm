@@ -33,6 +33,7 @@ class WsProjectController implements ControllerMethods {
 	ControllerService controllerService
 	UserPreferenceService userPreferenceService
 	ContextService contextService
+    MoveBundleService moveBundleService
 
 	/**
 	 * Gets the projects associated to a user
@@ -148,6 +149,7 @@ class WsProjectController implements ControllerMethods {
 		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
+		List availableBundles = moveBundleService.lookupList(project)
 
 		renderSuccessJson([
 				clients				 : projectDetails.clients,
@@ -155,6 +157,7 @@ class WsProjectController implements ControllerMethods {
 				timezone             : project.timezone?.label ?: '',
 				client               : project.client,
 				defaultBundle        : project.defaultBundle,
+				availableBundles	 : availableBundles,
 				possiblePartners	 : projectDetails.partners,
 				possibleManagers	 : possibleManagers,
 				projectPartners      : partyRelationshipService.getProjectPartners(project),
