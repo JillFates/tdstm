@@ -1,0 +1,106 @@
+<div class="neighborhood-container content body">
+  <div class="row task-manager-header">
+    <div class="col-md-4 k-align-self-center">
+      <p class="task-graph-title">Task Graph</p>
+    </div>
+    <div class="col-md-3 text-center k-align-self-center">
+      <button class="neighborhood-btn btn" (click)="layeredDigraphLayout()">
+        <fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
+      </button>
+      <button class="neighborhood-btn btn" (click)="treeLayout()">
+        <fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
+      </button>
+      <button class="neighborhood-btn btn" (click)="forceDirectedLayout()">
+        <fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
+      </button>
+    </div>
+    
+    <div class="col-md-3 k-align-self-center">
+<!--      <label class="d-inline-block task-chk-container">-->
+<!--        My Task-->
+<!--        <input  type="checkbox" checked="checked" />-->
+<!--        <span class="checkmark"></span>-->
+<!--      </label>-->
+<!--      <div ngbDropdown class="d-inline-block float-right">-->
+<!--        <button class="btn" id="dropdownBasic1" ngbDropdownToggle>Choose Task</button>-->
+<!--        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="task-dropdown-items-container">-->
+<!--          <button class="btn" ngbDropdownItem *ngFor="let task of tasks" (click)="loadFromSelectedTask(task.id)">{{task.label}}</button>-->
+<!--        </div>-->
+<!--      </div>-->
+    </div>
+
+    <div class="col-md-2 task-options k-align-self-center">
+      <button class="refresh-container-btn btn" (click)="refreshDiagram()">
+        <fa-icon [icon]="icons.faSyncAlt" size="lg"></fa-icon>
+      </button>
+      <div class="neighborhood-pie-countdown-container">
+        <tds-pie-countdown
+          [refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+          (timeout)="refreshDiagram()"
+          [hideRefresh]="true"
+          [customOptions]="[{seconds: 0, description: 'Manual'},
+																		{seconds: 60, description: '1 Min'},
+																		{seconds: 180, description: '3 Min'},
+																		{seconds: 300, description: '5 Min'},
+																		{seconds: 600, description: '10 Min'}]">
+        </tds-pie-countdown>
+      </div>
+    </div>
+  </div>
+
+  <div class="row task-manager-sub-header">
+    <div class="col-md-4">
+      <label class="neighborhood-control-label">Event:</label>
+      <kendo-dropdownlist
+        textField="name"
+        valueField="id"
+        [data]="eventList$ | async"
+        (selectionChange)="loadFromSelectedEvent($event)"
+        [(ngModel)]="selectedEvent"
+        (open)="eventsDropdownOpened()"
+        (close)="eventsDropdownClosed()"
+        [value]="selectedEvent"
+        #eventsDropdown>
+      </kendo-dropdownlist>
+    </div>
+    <div class="col-md-4 highlight-filter-container">
+      <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
+      <label class="d-inline-block task-chk-container">
+        My Tasks
+        <input  type="checkbox" checked="checked" />
+        <span class="checkmark"></span>
+      </label>
+      <button class="btn">
+        <fa-icon [icon]="icons.faSignal" size="lg" [rotate]="270"></fa-icon>
+      </button>
+    </div>
+    <div class="col-md-4">
+      <label class="d-inline-block task-chk-container">
+        <input  type="checkbox" checked="checked" />
+        <span class="checkmark"></span>
+        Minimize Auto Tasks
+      </label>
+
+      <label class="d-inline-block task-chk-container">
+        <input  type="checkbox"/>
+        <span class="checkmark"></span>
+        View Unpublished
+      </label>
+    </div>
+  </div>
+  <div class="row diagram-container">
+    <tds-diagram-layout
+    [nodeDataArray]="nodeData$ | async"
+    [linksPath]="links$ | async"
+    [containerWidth]="'100%'"
+    [containerHeight]="'100%'"
+    (nodeClicked)="loadTasks($event)"
+    (showTaskDetailsClicked)="showTaskDetails($event)"
+    (editClicked)="editTask($event)"
+    (contextmenu)="avoidDefault()"
+    #graph></tds-diagram-layout>
+  </div>
+    <kendo-dialog title="Task" *ngIf="opened" (close)="close('cancel')" [minWidth]="250" [width]="450">
+      <p style="margin: 30px; text-align: center; color: #7a7a7a;">Show/Edit task details for <span style="font-weight: bold;">{{selectedTask.id}}</span></p>
+    </kendo-dialog>
+</div>
