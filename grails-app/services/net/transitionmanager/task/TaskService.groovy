@@ -3568,7 +3568,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		}
 
 		// If the spec for the task defines a note, create it and add it to the task.
-		if (taskSpec.containsKey('note')) {
+		if (taskSpec.containsKey('note') && taskSpec['note']) {
 			addNote(task, whom, taskSpec['note'], 0)
 		}
 
