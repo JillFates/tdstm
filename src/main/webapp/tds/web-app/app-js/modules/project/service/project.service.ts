@@ -8,25 +8,30 @@ import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {ProjectModel} from '../model/project.model';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 
 @Injectable()
 export class ProjectService {
 
 	private jobProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(()=> {
+			console.log('test');
+		});
 	}
 
 	getProjects(): Observable<any> {
 		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
+				let userTimeZone = this.preferenceService.getUserTimeZone();
 				response.data.activeProjects.forEach((r) => {
-					r.completion = ((r.completion) ? new Date(r.completion) : '');
-					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
+					r.completionDate = r.completionDate ? new Date(DateUtils.convertToGMT(r.completionDate, userTimeZone)) : null;
+					r.startDate = r.startDate ? new Date(DateUtils.convertToGMT(r.startDate, userTimeZone)) : null;
 				});
 				response.data.completedProjects.forEach((r) => {
-					r.completion = ((r.completion) ? new Date(r.completion) : '');
-					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
+					r.completionDate = r.completionDate ? new Date(DateUtils.convertToGMT(r.completionDate, userTimeZone)) : null;
+					r.startDate = r.startDate ? new Date(DateUtils.convertToGMT(r.startDate, userTimeZone)) : null;
 				});
 				return response.data;
 			})

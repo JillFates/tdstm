@@ -70,6 +70,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
@@ -77,7 +78,6 @@ export class EventListComponent implements OnInit, AfterContentInit {
 				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
 			})
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
-		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ);
 	}
 
 	ngAfterContentInit() {

@@ -6,7 +6,7 @@ import {GridDataResult} from '@progress/kendo-angular-grid';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {ProjectService} from '../../service/project.service';
 import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
