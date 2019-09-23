@@ -189,7 +189,7 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
 		DiagramLayoutComponent,
-		CircleCountdownComponent
+		CircleCountdownComponent,
 		TDSModalPageWrapperComponent,
 		PowerComponent
 	],
