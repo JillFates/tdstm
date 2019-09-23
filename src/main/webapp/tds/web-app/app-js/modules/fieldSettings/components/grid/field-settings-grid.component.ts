@@ -141,12 +141,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * just whenever there is a delete action pending to be saved
 	 */
 	protected onSaveAll(): void {
-		this.askForDeleteUnderlayingData()
-			.then((deleteUnderLaying: boolean) => {
-				if (deleteUnderLaying) {
-					this.notifySaveAll(deleteUnderLaying)
-				}
-			});
+		if (!(!this.isEditable || !this.isDirty || this.formHasError)) {
+			this.askForDeleteUnderlayingData()
+				.then((deleteUnderLaying: boolean) => {
+					if (deleteUnderLaying) {
+						this.notifySaveAll(deleteUnderLaying)
+					}
+				});
+			}
 	}
 
 	/**
