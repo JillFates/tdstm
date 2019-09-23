@@ -13,6 +13,7 @@ import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 import {ProjectCreateComponent} from '../create/project-create.component';
 import {ProjectViewEditComponent} from '../view-edit/project-view-edit.component';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
@@ -51,6 +52,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private projectService: ProjectService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
+		private notifierService: NotifierService,
 		private router: Router,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
@@ -68,21 +70,25 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				this.dateFormat = dateFormat;
 				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
 			});
+		this.updateBreadcrumb();
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
 
 	ngAfterContentInit() {
-		if (this.route.snapshot.queryParams['show']) {
-			setTimeout(() => {
-				this.showProject(this.route.snapshot.queryParams['show']);
-			});
-		}
+		this.route.params.subscribe((params) => {
+			if (params['show']) {
+				setTimeout(() => {
+					this.showProject(params['show']);
+				});
+			}
+		});
 	}
 
 	protected toggleShowActive(): void {
 		this.showActive = !this.showActive;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
+		this.updateBreadcrumb();
 		this.reloadData();
 	}
 
@@ -104,6 +110,13 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	protected clearValue(column: any): void {
 		this.projectService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
+	}
+
+	protected updateBreadcrumb(): void {
+		this.notifierService.broadcast({
+			name: 'notificationHeaderBreadcrumbChange',
+			menu: ['Projects', this.showActive ? 'Active' : 'Completed']
+		});
 	}
 
 	protected showProject(id): void {

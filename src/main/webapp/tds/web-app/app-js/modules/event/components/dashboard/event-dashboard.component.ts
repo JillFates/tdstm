@@ -21,6 +21,7 @@ import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-statu
 // Model
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
+import {takeWhile} from 'rxjs/operators';
 
 @Component({
 	selector: 'event-dashboard',
@@ -40,6 +41,7 @@ export class EventDashboardComponent implements OnInit {
 	public teamTaskMatrix = [];
 	public taskCategories = null;
 	public hasBundleSteps = false;
+	readonly defaultTime = '00:00:00';
 
 	constructor(
 		private route: ActivatedRoute,
@@ -47,13 +49,7 @@ export class EventDashboardComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private store: Store) {
-
-		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-			this.userTimeZone = userContext.timezone;
-		});
-
-	}
+		private store: Store) {}
 
 	ngOnInit() {
 		this.populateData();
@@ -63,23 +59,28 @@ export class EventDashboardComponent implements OnInit {
 	 * Call the endpoints required to populate the initial data
 	*/
 	private populateData(): void {
-		const services = [
-			this.eventsService.getEvents(),
-			this.preferenceService.getPreference(PREFERENCES_LIST.MOVE_EVENT)
-		];
+		this.store.select(state => state.TDSApp.userContext)
+			.subscribe((userContext: UserContextModel) => {
+			this.userTimeZone = userContext.timezone;
+		});
+		this.eventsService.getEvents()
+			.subscribe((events: any) => {
+				this.eventList = events;
 
-		forkJoin(services)
-			.subscribe((results: any[]) => {
-				const [eventList, preference] = results;
-				this.eventList = eventList;
+				this.store.select(state => state.TDSApp.userContext)
+					.pipe(takeWhile((event: any) => !this.selectedEvent))
+					.subscribe((userContext: UserContextModel) => {
+						let selectedEventId = null;
+						if (userContext && userContext.event) {
+							selectedEventId = userContext.event.id;
+						}
 
-				let eventId = this.route.snapshot.queryParams['moveEvent'];
-				this.selectedEvent = this.getDefaultEvent(eventId ? eventId : (preference && preference[PREFERENCES_LIST.MOVE_EVENT] || ''));
-				if (this.selectedEvent) {
-					this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
-				}
-
-			});
+						this.selectedEvent = this.getDefaultEvent(this.route.snapshot.queryParams['moveEvent'] || selectedEventId);
+						if (this.selectedEvent) {
+							this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
+						}
+					});
+		});
 	}
 
 	/**
@@ -99,15 +100,20 @@ export class EventDashboardComponent implements OnInit {
 		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
 
-		this.eventsService.getTaskCategoriesStats(id, this.userTimeZone)
-			.subscribe((data: any[]) => {
-				console.log(data);
-				this.taskCategories = data;
-			});
-
+		this.eventDetails = null;
 		this.eventsService.getEventDetails(id, true)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
+
+				this.eventsService.getTaskCategoriesStats(
+					id,
+					this.userTimeZone,
+					this.eventDetails.moveEvent.estStartTime,
+					this.eventDetails.moveEvent.estCompletionTime)
+				.subscribe((data: any[]) => {
+					this.taskCategories = data;
+				});
+
 				this.teamTaskMatrix = R.flatten(eventDetails && eventDetails.teamTaskMatrix || []);
 				const bundles = pathOr([], ['moveEvent', 'moveBundles'], this.eventDetails);
 				this.hasBundleSteps = false;
@@ -115,7 +121,7 @@ export class EventDashboardComponent implements OnInit {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 
-					this.eventsService.getEventStatusDetails(this.selectedEventBundle.id, this.selectedEvent.id)
+					this.eventsService.getEventStatusDetails(this.userTimeZone, this.selectedEventBundle.id, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						this.hasBundleSteps = true;
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
@@ -128,6 +134,10 @@ export class EventDashboardComponent implements OnInit {
 					});
 				} else {
 					this.eventPlanStatus = new EventPlanStatus();
+					this.eventPlanStatus.startDate = this.eventDetails.moveEvent.estStartTime;
+					this.eventPlanStatus.status = this.eventDetails.moveEvent.runbookStatus;
+					this.eventPlanStatus.description = this.eventDetails.moveEvent.description;
+					this.eventPlanStatus.dayTime = this.defaultTime;
 				}
 			});
 	}
@@ -158,9 +168,9 @@ export class EventDashboardComponent implements OnInit {
  	 * @param {number} id  Event id
 	 * @returns {any} Event found otherwhise null
 	*/
-	private getDefaultEvent(id: string): any {
+	private getDefaultEvent(id: number): any {
 		if (id) {
-			return this.eventList.find((event) => event.id.toString() === id) || null;
+			return this.eventList.find((event) => event.id === id) || null;
 		} else if (this.eventList.length)  {
 			return this.eventList[0];
 		}

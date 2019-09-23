@@ -130,7 +130,6 @@ class WsDashboardController implements ControllerMethods {
 		}
 
 		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
-		String eventStartDate = moveEvent.estStartTime ? TimeUtil.formatDateTime(moveEvent.estStartTime, TimeUtil.FORMAT_DATE_TIME) : ''
 
 		renderAsJson(snapshot: [
 			revisedComp: moveEvent?.revisedCompletionTime,
@@ -151,7 +150,7 @@ class WsDashboardController implements ControllerMethods {
 			revSum: [dialInd: moveEventRevisedSnapshot?.dialIndicator,
 			         compTime: TimeUtil.formatDateTime(revisedComp, TimeUtil.FORMAT_DATE_TIME_11)],
 			runbookOn: project.runbookOn,
-			eventStartDate: eventStartDate
+			eventStartDate: moveEvent.estStartTime
 		])
 	}
 
