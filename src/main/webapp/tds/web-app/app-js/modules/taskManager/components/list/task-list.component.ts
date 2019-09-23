@@ -37,7 +37,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
 import { TaskStatus } from '../../model/task-edit-create.model';
-import { SortDescriptor } from '@progress/kendo-data-query';
+import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
 
 @Component({
 	selector: 'task-list',
@@ -213,7 +213,7 @@ export class TaskListComponent {
 				sortColumn = this.currentCustomColumns[sortColumn];
 			}
 		}
-		const searchRequest = {
+		const searchParams = {
 			moveEvent: this.selectedEvent.id,
 			justRemaining: this.justRemaining ? 1 : 0,
 			justMyTasks: this.justMyTasks ? 1 : 0,
@@ -223,12 +223,17 @@ export class TaskListComponent {
 			page: this.currentPage,
 			rows: this.pageSize
 		};
-
 		// Append url filters, in case they were not present in the default filters
-		const filters: any = Object.assign({}, searchRequest, this.urlParams);
+		const request: any = Object.assign({}, searchParams, this.urlParams);
 		// moveEvent should be string for all events
-		filters['moveEvent'] = filters.moveEvent === 0 ? '0' : filters.moveEvent;
-		this.taskService.getTaskList(filters)
+		request['moveEvent'] = request.moveEvent === 0 ? '0' : request.moveEvent;
+		// Add field filters
+		if (this.grid.state.filter && this.grid.state.filter.filters.length > 0) {
+			this.grid.state.filter.filters.forEach( (filter: FilterDescriptor) => {
+				request[filter.field as string] = filter.value;
+			});
+		}
+		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.rowsExpandedMap = {};
@@ -475,7 +480,19 @@ export class TaskListComponent {
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
-		this.grid.clearAllFilters(this.columnsModel);
+		this.columnsModel
+			.filter(column => column.filterable)
+			.forEach((column: GridColumnModel) => {
+				column.filter = '';
+			});
+		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
+			this.grid.state.filter.filters
+				.forEach((filter: FilterDescriptor) => {
+					filter.value = '';
+				});
+			// reset pagination to be on page 1
+			this.onPageChangeHandler({skip: 0, take: this.pageSize});
+		}
 	}
 
 	/**
@@ -562,10 +579,29 @@ export class TaskListComponent {
 	}
 
 	/**
+	 * On filter changes do the search().
+	 * @param column
+	 * @param clearFilter
+	 */
+	onFilterChangeHandler(column: GridColumnModel, clearFilter = false): void {
+		if (clearFilter) {
+			column.filter = '';
+		}
+		const filterColumn = {...column};
+		if (filterColumn.property.startsWith('userSelectedCol')) {
+			filterColumn.property = this.currentCustomColumns[filterColumn.property];
+		}
+		const filters = this.grid.getFilter(filterColumn);
+		this.grid.state.filter = filters;
+		// reset pagination to be on page 1
+		this.onPageChangeHandler({skip: 0, take: this.pageSize});
+	}
+
+	/**
 	 * Reloads data for current grid.
 	 * @param result
 	 */
-	public reloadGridData(result: any, totalCount: number): void {
+	private reloadGridData(result: any, totalCount: number): void {
 		this.grid.resultSet = result;
 		this.grid.gridData = {data: result, total: totalCount};
 		this.grid.notifyUpdateGridHeight();

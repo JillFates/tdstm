@@ -20,7 +20,7 @@
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
                         <a *ngIf="canEditProject" (click)="openCreateProject()"><button type="button" class="btn btn-default action-toolbar-btn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create</button></a>
-                        <button class="btn btn-default action-toolbar-btn" (click)="toggleShowActive()">{{showActive ? 'Show Completed' : 'Show Active'}}</button>
+                        <button class="btn btn-default action-toolbar-btn" (click)="toggleShowActive()">{{showActive ? 'Show Completed Projects' : 'Show Active Projects'}}</button>
                         <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
                     <kendo-grid-column *ngFor="let column of projectColumnModel.columns" field="{{column.property}}" format="{{column.format}}" [locked]="column.locked" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">

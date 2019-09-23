@@ -858,31 +858,36 @@ class CommentService implements ServiceMethods {
 	 * @param rowOffset - used for paginating results.
 	 * @return A map with the tasks found plus the total number of tasks.
 	 */
-	Map  filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
+	Map filterTasks(Project project, Map params, String sortIndex = null, String sortOrder = null, Integer maxRows = null, Integer rowOffset = null) {
 		List<AssetComment> tasksList = []
 		Map resultMap = [:]
+		params['commentType'] = AssetCommentType.ISSUE
+
 		if (!params.containsKey('viewUnpublished')) {
 			params['viewUnpublished'] = false
 		}
+
 		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder)
 		Map queryInfo = queryBuilder.buildQueries()
+
 		if (!queryInfo.invalidCriterion) {
 			Map metaParams = [readOnly: true]
+
 			if (maxRows >= 0 && rowOffset >= 0) {
 				metaParams['max'] = maxRows
 				metaParams['offset'] = rowOffset
 				Integer totalCount = AssetComment.executeQuery(queryInfo.countQuery, queryInfo.queryParams)[0]
 				resultMap['totalCount'] = totalCount
 			}
+
 			tasksList = AssetComment.executeQuery(queryInfo['query'], queryInfo['queryParams'], metaParams)
 			resultMap['tasks'] = tasksList
 		}
 
 		return resultMap
-
 	}
 
-  	/**
+	/**
 	 * Find and return the comments for this project.
 	 * @param project - user's project
 	 * @param viewUnpublished - whether or not unpublished commments should be included in the list.

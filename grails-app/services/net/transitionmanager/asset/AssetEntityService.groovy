@@ -2956,53 +2956,60 @@ class AssetEntityService implements ServiceMethods {
 	 * Used to clone an asset and optionally the dependencies associated with the asset
 	 * @param command - command object with the parameters for the clone operation (id, name and dependencies flag).
 	 * @param errors - an initialize List object that will be populated with one or more error messages if the method fails
-	 * @return the id number of the newly created asset
+	 * @return the asset created as a result of the cloning process.
 	 */
-	Long clone(Project project, CloneAssetCommand command, List<String> errors) {
-		AssetEntity clonedAsset
-		if(!errors) {
-			//  params son assetId
-			AssetEntity assetToClone = GormUtil.findInProject(project, AssetEntity, command.assetId)
-			if (!assetToClone) {
-				errors << "The asset specified to clone was not found"
-			} else{
-				Map defaultValues = [
-					assetName : command.name,
-					validation: ValidationType.UNKNOWN,
-					environment: ''
-				]
-				if (assetToClone.isaDevice()) {
-					defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
-				}
-				clonedAsset = assetToClone.clone(defaultValues)
+	AssetEntity clone(Project project, CloneAssetCommand command, List<String> errors) {
+		// Stop the process if there are errors already detected.
+		if (errors) {
+			return null
+		}
+		// Find the asset to clone. Fail if not found.
+		AssetEntity assetToClone = get(AssetEntity, command.assetId, project)
+		if (!assetToClone.validate()) {
+			throw new DomainUpdateException('Unable to clone asset: ' + GormUtil.allErrorsString(assetToClone))
+		}
+		// Create a map with default values for the cloning.
+		Map defaultValues = [
+			assetName : command.name,
+			validation: ValidationType.UNKNOWN,
+			environment: ''
+		]
+		// If the asset being cloned is a device, generate a new asset tag and add it to the default values map.
+		if (assetToClone.isaDevice()) {
+			defaultValues.assetTag = projectService.getNextAssetTag(assetToClone.project)
+		}
+		// Ask the source asset to clone itself using the default values.
+		AssetEntity clonedAsset = assetToClone.clone(defaultValues)
 
-				// Cloning assets dependencies if requested
-				if (clonedAsset.save() && command.cloneDependencies) {
-					for (dependency in assetToClone.supportedDependencies()) {
-						AssetDependency clonedDependency = dependency.clone([
-								dependent: clonedAsset,
-								status   : AssetDependencyStatus.QUESTIONED
-						])
+		// Throw an error if the clone can't be persisted
+		if (!clonedAsset.save(deepValidate:false)) {
+			throw new DomainUpdateException('Unable to clone asset: ' + GormUtil.allErrorsString(clonedAsset))
+		}
 
-						clonedDependency.save()
-					}
-					for (dependency in assetToClone.requiredDependencies()) {
-						AssetDependency clonedDependency = dependency.clone([
-								asset : clonedAsset,
-								status: AssetDependencyStatus.QUESTIONED
-						])
-						clonedDependency.save()
-					}
-				}
-				// copy asset Tags
-				List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
-				if (sourceTagIds) {
-					tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
-				}
-
-				return clonedAsset.id
+		// Clone the dependencies if the user chose to do so.
+		if (command.cloneDependencies) {
+			for (dependency in assetToClone.supportedDependencies()) {
+				AssetDependency clonedDependency = dependency.clone([
+					dependent: clonedAsset,
+					status   : AssetDependencyStatus.QUESTIONED
+				])
+				clonedDependency.save(validate: false, deepValidate:false)
+			}
+			for (dependency in assetToClone.requiredDependencies()) {
+				AssetDependency clonedDependency = dependency.clone([
+					asset : clonedAsset,
+					status: AssetDependencyStatus.QUESTIONED
+				])
+				clonedDependency.save(validate: false, deepValidate:false)
 			}
 		}
+
+		// Assign the same tags to the cloned asset.
+		List<Long> sourceTagIds = assetToClone?.tagAssets.collect{it.tag.id}
+		if (sourceTagIds) {
+			tagAssetService.applyTags(assetToClone.project, sourceTagIds, clonedAsset.id)
+		}
+		return clonedAsset
 	}
 
 	/**
