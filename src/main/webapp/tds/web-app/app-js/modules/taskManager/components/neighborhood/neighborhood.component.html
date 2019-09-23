@@ -56,7 +56,7 @@
       </kendo-dropdownlist>
     </div>
     <div class="col-md-4 highlight-filter-container">
-      <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
+      <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="highlightFilterChange()" />
       <label class="d-inline-block task-chk-container">
         My Tasks
         <input  type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />

@@ -73,7 +73,7 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the task manager view on a new tab
 	 **/
 	taskManagerView(): void {
-		let url = 'taskManager/list';
+		const url = 'taskManager/list';
 		window.open(url, '_blank');
 	}
 
@@ -81,7 +81,7 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the neighborhood view on a new tab
 	 **/
 	neighborhoodView(): void {
-		let url = 'neighborhood';
+		const url = 'neighborhood';
 		window.open(url, '_blank');
 	}
 
