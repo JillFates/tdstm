@@ -4,6 +4,7 @@ import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.person.Person
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.FUTURE
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
@@ -107,7 +108,7 @@ class AssetDependency {
 			id: id,
 			asset: [
 				id: asset.id,
-				assetClass: AssetClass.getClassOptionValueForAsset(asset),
+				assetClass: AssetClass.getClassOptionValueForAsset(GrailsHibernateUtil.unwrapIfProxy(asset)),
 				moveBundle: asset.moveBundleName,
 				name: asset.assetName
 			],
@@ -120,7 +121,7 @@ class AssetDependency {
 			dataFlowFreq: dataFlowFreq,
 			dependent: [
 				id: dependent.id,
-				assetClass: AssetClass.getClassOptionValueForAsset(dependent),
+				assetClass: AssetClass.getClassOptionValueForAsset(GrailsHibernateUtil.unwrapIfProxy(dependent)),
 				moveBundle: dependent.moveBundleName,
 				name: dependent.assetName
 			],

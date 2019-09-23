@@ -1601,24 +1601,26 @@ class ReportsService implements ServiceMethods {
             def tagAssetList = tagAssetService.list(project, app.id)*.toMap()
 
 			// TODO: we'd like to flush the session
-			// GormUtil.flushAndClearSession(idx)
-			appList.add([
-				app: application, supportAssets: supportAssets, dependentAssets: dependentAssets,
-				assetComment: assetComment, assetCommentList: assetCommentList,
-				appMoveEvent: appMoveEvent,
-				moveEventList: moveEventList,
-				appMoveEvent: appMoveEventlist,
-				dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
-				project: project, prefValue: prefValue,
-				shutdownById: shutdownById,
-				startupById: startupById,
-				testingById: testingById,
-				shutdownBy: shutdownBy,
-				startupBy: startupBy,
-				testingBy: testingBy,
-                tagAssetList: tagAssetList ? tagAssetList : []
+            // GormUtil.flushAndClearSession(idx)
+            appList.add([
+                app                   : application, supportAssets: supportAssets,
+                dependentAssets       : dependentAssets,
+                assetComment          : assetComment,
+                assetCommentList      : assetCommentList,
+                appMoveEvent          : appMoveEvent,
+                moveEventList         : moveEventList,
+                appMoveEvent          : appMoveEventlist,
+                dependencyBundleNumber: AssetDependencyBundle.findByAsset(application)?.dependencyBundle,
+                project               : project, prefValue: prefValue,
+                shutdownById          : shutdownById,
+                startupById           : startupById,
+                testingById           : testingById,
+                shutdownBy            : shutdownBy,
+                startupBy             : startupBy,
+                testingBy             : testingBy,
+                tagAssetList          : tagAssetList ? tagAssetList : []
             ])
-		}
+        }
 
 		Map standardFieldSpecs = customDomainService.standardFieldSpecsByField(project, AssetClass.APPLICATION)
 		List customFields = assetEntityService.getCustomFieldsSettings(project, "Application", true)
