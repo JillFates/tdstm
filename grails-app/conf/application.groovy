@@ -1,3 +1,4 @@
+import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.security.Permission
 
 
@@ -457,7 +458,11 @@ xssSanitizer.enabled = true
 
 // JPM 5/2018 : TM-10317 - Tried using both formats but the 2nd would not work correctly
 // grails.databinding.dateFormats = ['yyyyMMdd', 'yyyy-MM-dd']
-grails.databinding.dateFormats = ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd']
+grails.databinding.dateFormats = [
+	TimeUtil.FORMAT_DATE_TIME_STANDARD_ISO8601,
+	"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+	'yyyy-MM-dd'
+]
 
 grails.resources.pattern = '/**'
 
