@@ -166,20 +166,24 @@ export class NeighborhoodComponent implements OnInit {
 	 * load tasks with new filter criteria
 	 **/
 	onMyTasksFilterChange(): void {
-		// TODO
+		this.checkboxFilterChange();
 	}
 
 	/**
 	 * load tasks with new filter criteria
 	 **/
 	onMinimizeAutoTasksFilterChange(): void {
-		// TODO
+		this.checkboxFilterChange();
 	}
 
 	/**
 	 * load tasks with new filter criteria
 	 **/
 	onViewUnpublishedFilterChange(): void {
+		this.checkboxFilterChange();
+	}
+
+	checkboxFilterChange(): void {
 		// If actual task used by diagram comes from task manager neighborhood button, then reload
 		// from tasks endpoint, else load tasks from the actual selected event
 		if (this.urlParams && this.urlParams.taskId
@@ -326,7 +330,7 @@ export class NeighborhoodComponent implements OnInit {
 	/**
 	 * When highlight filter change update search
 	 **/
-	filterChange(): void {
+	highlightFilterChange(): void {
 		this.textFilter.next(this.filterText);
 	}
 
