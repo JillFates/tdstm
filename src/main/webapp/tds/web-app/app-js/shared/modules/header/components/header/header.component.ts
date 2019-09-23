@@ -1,37 +1,37 @@
 // Angular
-import { Component } from '@angular/core'
-import { FormGroup, FormControl } from '@angular/forms'
+import { Component } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 // NGXS
-import { Store } from '@ngxs/store'
+import { Store } from '@ngxs/store';
 // Component
-import { UserPreferencesComponent } from '../preferences/user-preferences.component'
-import { UserEditPersonComponent } from '../edit-person/user-edit-person.component'
-import { UserDateTimezoneComponent } from '../date-timezone/user-date-timezone.component'
+import { UserPreferencesComponent } from '../preferences/user-preferences.component';
+import { UserEditPersonComponent } from '../edit-person/user-edit-person.component';
+import { UserDateTimezoneComponent } from '../date-timezone/user-date-timezone.component';
 // Service
-import { UserContextService } from '../../../../../modules/auth/service/user-context.service'
-import { UIDialogService } from '../../../../services/ui-dialog.service'
-import { NotifierService } from '../../../../services/notifier.service'
+import { UserContextService } from '../../../../../modules/auth/service/user-context.service';
+import { UIDialogService } from '../../../../services/ui-dialog.service';
+import { NotifierService } from '../../../../services/notifier.service';
 // Model
-import { UserContextModel } from '../../../../../modules/auth/model/user-context.model'
-import { PersonModel } from '../../../../components/add-person/model/person.model'
-import { PasswordChangeModel } from '../../model/password-change.model'
-import { DIALOG_SIZE } from '../../../../model/constants'
-import { PageMetadataModel } from '../../model/page-metadata.model'
-import { Logout } from '../../../../../modules/auth/action/login.actions'
-import { APP_STATE_KEY } from '../../../../providers/localstorage.provider'
+import { UserContextModel } from '../../../../../modules/auth/model/user-context.model';
+import { PersonModel } from '../../../../components/add-person/model/person.model';
+import { PasswordChangeModel } from '../../model/password-change.model';
+import { DIALOG_SIZE } from '../../../../model/constants';
+import { PageMetadataModel } from '../../model/page-metadata.model';
+import { Logout } from '../../../../../modules/auth/action/login.actions';
+import { APP_STATE_KEY } from '../../../../providers/localstorage.provider';
 
-declare var jQuery: any
+declare var jQuery: any;
 
 @Component({
 	selector: 'tds-header',
 	templateUrl: 'header.component.html',
 })
 export class HeaderComponent {
-	public userContext: UserContextModel
-	public pageMetaData: PageMetadataModel = new PageMetadataModel()
+	public userContext: UserContextModel;
+	public pageMetaData: PageMetadataModel = new PageMetadataModel();
 	public searchForm = new FormGroup({
 		search: new FormControl(''),
-	})
+	});
 
 	constructor(
 		private userContextService: UserContextService,
@@ -39,9 +39,9 @@ export class HeaderComponent {
 		private notifierService: NotifierService,
 		private store: Store
 	) {
-		this.pageMetaData.hideTopNav = true
-		this.getUserContext()
-		this.headerListeners()
+		this.pageMetaData.hideTopNav = true;
+		this.getUserContext();
+		this.headerListeners();
 	}
 
 	/**
@@ -51,15 +51,15 @@ export class HeaderComponent {
 	private headerListeners(): void {
 		this.notifierService.on('notificationRouteChange', event => {
 			if (event.event.url.indexOf('/auth/') >= 0) {
-				this.pageMetaData.hideTopNav = true
-				jQuery('div.content-wrapper').addClass('content-login-wrapper')
+				this.pageMetaData.hideTopNav = true;
+				jQuery('div.content-wrapper').addClass('content-login-wrapper');
 			} else {
-				this.pageMetaData.hideTopNav = false
+				this.pageMetaData.hideTopNav = false;
 				jQuery('div.content-wrapper').removeClass(
 					'content-login-wrapper'
-				)
+				);
 			}
-		})
+		});
 	}
 
 	protected getUserContext(): void {
@@ -67,22 +67,22 @@ export class HeaderComponent {
 			.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
 				if (!userContext.user) {
-					this.pageMetaData.hideTopNav = true
+					this.pageMetaData.hideTopNav = true;
 				}
-				this.userContext = userContext
-			})
+				this.userContext = userContext;
+			});
 	}
 
 	public getUserIconText(): string {
-		const [first, last] = this.userContext.person.fullName.split(' ')
+		const [first, last] = this.userContext.person.fullName.split(' ');
 		return `${first.substr(0, 1).toUpperCase()}${last
 			.substr(0, 1)
-			.toUpperCase()}`
+			.toUpperCase()}`;
 	}
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			//
-		})
+		});
 	}
 
 	public openEditPersonModal(): void {
@@ -93,7 +93,7 @@ export class HeaderComponent {
 			])
 			.catch(result => {
 				//
-			})
+			});
 	}
 
 	public openDateTimezoneModal(): void {
@@ -101,14 +101,14 @@ export class HeaderComponent {
 			.open(UserDateTimezoneComponent, [], DIALOG_SIZE.LG)
 			.catch(result => {
 				//
-			})
+			});
 	}
 
 	/**
 	 * Destroy the Storage and redirect the user
 	 */
 	public logOut(): void {
-		localStorage.removeItem(APP_STATE_KEY)
-		this.store.dispatch(new Logout())
+		localStorage.removeItem(APP_STATE_KEY);
+		this.store.dispatch(new Logout());
 	}
 }
