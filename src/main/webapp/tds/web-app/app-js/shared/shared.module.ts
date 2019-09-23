@@ -258,7 +258,7 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSModalPageWrapperComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
-		CircleCountdownComponent
+		CircleCountdownComponent,
 		TDSModalPageWrapperComponent,
 		PowerComponent
 	],
