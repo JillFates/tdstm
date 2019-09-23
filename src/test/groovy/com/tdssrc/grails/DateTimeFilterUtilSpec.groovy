@@ -2,30 +2,44 @@ package com.tdssrc.grails
 
 import grails.util.Pair
 import net.transitionmanager.exception.InvalidParamException
+import org.joda.time.DateTime
 import org.joda.time.DateTimeUtils
-import spock.lang.Ignore
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.text.SimpleDateFormat
+
 class DateTimeFilterUtilSpec extends Specification {
+
+	@Shared
+	SimpleDateFormat formatter = new SimpleDateFormat("MMM dd hh:mm:ss 'CST' yyyy")
+
 
 	def setupSpec() {
 		println 'Setup'
 		// setting clock to 2019-05-31
-		DateTimeUtils.setCurrentMillisFixed(1559282400000)
-		Pair<Date, Date> result
+		//DateTimeUtils.setCurrentMillisFixed(1559282400000)
+		DateTimeUtils.setCurrentMillisFixed(new DateTime(2019, 5, 31, 0, 0).getMillis())
+		println DateTime.now()
 	}
 
 	def cleanupSpec() {
 		println 'Clean up'
 		// back to normal
-		DateTimeUtils.setCurrentMillisOffset(1559282400000)
+		//DateTimeUtils.setCurrentMillisOffset(1559282400000)
+		DateTimeUtils.setCurrentMillisSystem()
+	}
+
+	private Date toDate(String date) {
+		return formatter.parse(date)
 	}
 
 	@Unroll
 	def 'Test DateTime filter logic for full year'() {
 		given:
 			Pair<Date, Date> result = DateTimeFilterUtil.parseUserEntry(entry)
+
 		when:
 			DateTimeFilterUtil.parseUserEntry('20019')
 		then:
@@ -38,12 +52,15 @@ class DateTimeFilterUtilSpec extends Specification {
 			DateTimeFilterUtil.parseUserEntry('=19')
 		then:
 			thrown(InvalidParamException)
+
 		expect:
-			[result.getaValue(), result.getbValue()] == [a, b]
+			result.getaValue() == a
+			result.getbValue() == b
+
 		where:
-			entry 	| a 										| b
-			'2019'	| new Date('Jan 01 00:00:00 CST 2019') 	| new Date('Dec 31 23:59:59 CST 2019')
-			'=2018'	| new Date('Jan 01 00:00:00 CST 2018') 	| new Date('Dec 31 23:59:59 CST 2018')
+			entry   | a                                  | b
+			'2019'  | toDate('Jan 01 00:00:00 CST 2019') | toDate('Dec 31 23:59:59 CST 2019')
+			'=2018' | toDate('Jan 01 00:00:00 CST 2018') | toDate('Dec 31 23:59:59 CST 2018')
 	}
 
 	@Unroll
@@ -65,10 +82,10 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry 		| a 										| b
-			'2019-07'	| new Date('Jul 01 00:00:00 CST 2019') 	| new Date('Jul 31 23:59:59 CST 2019')
-			'=2018-07'	| new Date('Jul 01 00:00:00 CST 2018') 	| new Date('Jul 31 23:59:59 CST 2018')
-			'=2016-02'	| new Date('Feb 01 00:00:00 CST 2016') 	| new Date('Feb 29 23:59:59 CST 2016')
+			entry      | a                                    | b
+			'2019-07'  | toDate('Jul 01 00:00:00 CST 2019') | toDate('Jul 31 23:59:59 CST 2019')
+			'=2018-07' | toDate('Jul 01 00:00:00 CST 2018') | toDate('Jul 31 23:59:59 CST 2018')
+			'=2016-02' | toDate('Feb 01 00:00:00 CST 2016') | toDate('Feb 29 23:59:59 CST 2016')
 	}
 
 	@Unroll
@@ -98,10 +115,10 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry 			| a 										| b
-			'2019-07-01'	| new Date('Jul 01 00:00:00 CST 2019') 	| new Date('Jul 01 23:59:59 CST 2019')
-			'=2018-07-01'	| new Date('Jul 01 00:00:00 CST 2018') 	| new Date('Jul 01 23:59:59 CST 2018')
-			'=2016-02-29'	| new Date('Feb 29 00:00:00 CST 2016') 	| new Date('Feb 29 23:59:59 CST 2016')
+			entry         | a                                    | b
+			'2019-07-01'  | toDate('Jul 01 00:00:00 CST 2019') | toDate('Jul 01 23:59:59 CST 2019')
+			'=2018-07-01' | toDate('Jul 01 00:00:00 CST 2018') | toDate('Jul 01 23:59:59 CST 2018')
+			'=2016-02-29' | toDate('Feb 29 00:00:00 CST 2016') | toDate('Feb 29 23:59:59 CST 2016')
 	}
 
 	@Unroll
@@ -135,16 +152,16 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry 						| a											| b
-			'2019<>2020'				| new Date('Jan 01 00:00:00 CST 2019') 	| new Date('Dec 31 23:59:59 CST 2020')
-			'=2018<>2020'				| new Date('Jan 01 00:00:00 CST 2018') 	| new Date('Dec 31 23:59:59 CST 2020')
-			'2019-07<>2019-08'			| new Date('Jul 01 00:00:00 CST 2019') 	| new Date('Aug 31 23:59:59 CST 2019')
-			'2019-07-17<>2019-08-17'	| new Date('Jul 17 00:00:00 CST 2019') 	| new Date('Aug 17 23:59:59 CST 2019')
-			'=2019-07-17<>2019-08'		| new Date('Jul 17 00:00:00 CST 2019') 	| new Date('Aug 31 23:59:59 CST 2019')
-			'-2<>3'						| new Date('May 29 00:00:00 CST 2019') 	| new Date('Jun 03 23:59:59 CST 2019')
-			'-2d<>+3d'					| new Date('May 29 00:00:00 CST 2019') 	| new Date('Jun 03 23:59:59 CST 2019')
-			'-3M<>2w'					| new Date('Feb 28 00:00:00 CST 2019') 	| new Date('Jun 14 23:59:59 CST 2019')
-			'-3M<>+2w'					| new Date('Feb 28 00:00:00 CST 2019') 	| new Date('Jun 14 23:59:59 CST 2019')
+			entry                    | a                                    | b
+			'2019<>2020'             | toDate('Jan 01 00:00:00 CST 2019') | toDate('Dec 31 23:59:59 CST 2020')
+			'=2018<>2020'            | toDate('Jan 01 00:00:00 CST 2018') | toDate('Dec 31 23:59:59 CST 2020')
+			'2019-07<>2019-08'       | toDate('Jul 01 00:00:00 CST 2019') | toDate('Aug 31 23:59:59 CST 2019')
+			'2019-07-17<>2019-08-17' | toDate('Jul 17 00:00:00 CST 2019') | toDate('Aug 17 23:59:59 CST 2019')
+			'=2019-07-17<>2019-08'   | toDate('Jul 17 00:00:00 CST 2019') | toDate('Aug 31 23:59:59 CST 2019')
+			'-2<>3'                  | toDate('May 29 00:00:00 CST 2019') | toDate('Jun 03 23:59:59 CST 2019')
+			'-2d<>+3d'               | toDate('May 29 00:00:00 CST 2019') | toDate('Jun 03 23:59:59 CST 2019')
+			'-3M<>2w'                | toDate('Feb 28 00:00:00 CST 2019') | toDate('Jun 14 23:59:59 CST 2019')
+			'-3M<>+2w'               | toDate('Feb 28 00:00:00 CST 2019') | toDate('Jun 14 23:59:59 CST 2019')
 	}
 
 	@Unroll
@@ -166,9 +183,9 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry 		| a 										| b
-			'0'			|new Date('May 31 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
-			't'			|new Date('May 31 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
+			entry | a                                    | b
+			'0'   | toDate('May 31 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
+			't'   | toDate('May 31 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
 	}
 
 	@Unroll
@@ -194,13 +211,13 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry	 	| a 										| b
-			'-2' 		|new Date('May 29 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
-			'-2d'		|new Date('May 29 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
-			'2'			|new Date('May 31 00:00:00 CST 2019') 	| new Date('Jun 02 23:59:59 CST 2019')
-			'+2d'		|new Date('May 31 00:00:00 CST 2019') 	| new Date('Jun 02 23:59:59 CST 2019')
-			'-90d'		|new Date('Mar 02 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
-			'-90'		|new Date('Mar 02 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
+			entry  | a                                    | b
+			'-2'   | toDate('May 29 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
+			'-2d'  | toDate('May 29 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
+			'2'    | toDate('May 31 00:00:00 CST 2019') | toDate('Jun 02 23:59:59 CST 2019')
+			'+2d'  | toDate('May 31 00:00:00 CST 2019') | toDate('Jun 02 23:59:59 CST 2019')
+			'-90d' | toDate('Mar 02 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
+			'-90'  | toDate('Mar 02 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
 	}
 
 	@Unroll
@@ -218,10 +235,10 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry	 	| a 										| b
-			'3w' 		|new Date('May 31 00:00:00 CST 2019') 	| new Date('Jun 21 23:59:59 CST 2019')
-			'+3w'		|new Date('May 31 00:00:00 CST 2019') 	| new Date('Jun 21 23:59:59 CST 2019')
-			'-3w' 		|new Date('May 10 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
+			entry | a                                    | b
+			'3w'  | toDate('May 31 00:00:00 CST 2019') | toDate('Jun 21 23:59:59 CST 2019')
+			'+3w' | toDate('May 31 00:00:00 CST 2019') | toDate('Jun 21 23:59:59 CST 2019')
+			'-3w' | toDate('May 10 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
 	}
 
 	@Unroll
@@ -239,11 +256,11 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry	 	| a 										| b
-			'3M' 		|new Date('May 31 00:00:00 CST 2019') 	| new Date('Aug 31 23:59:59 CST 2019')
-			'+3M'		|new Date('May 31 00:00:00 CST 2019') 	| new Date('Aug 31 23:59:59 CST 2019')
-			'-3M' 		|new Date('Feb 28 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2019')
-			'12M' 		|new Date('May 31 00:00:00 CST 2019') 	| new Date('May 31 23:59:59 CST 2020')
+			entry | a                                    | b
+			'3M'  | toDate('May 31 00:00:00 CST 2019') | toDate('Aug 31 23:59:59 CST 2019')
+			'+3M' | toDate('May 31 00:00:00 CST 2019') | toDate('Aug 31 23:59:59 CST 2019')
+			'-3M' | toDate('Feb 28 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2019')
+			'12M' | toDate('May 31 00:00:00 CST 2019') | toDate('May 31 23:59:59 CST 2020')
 	}
 
 }
