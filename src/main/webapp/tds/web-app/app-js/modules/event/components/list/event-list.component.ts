@@ -8,6 +8,8 @@ import {SetEvent} from '../../action/event.actions';
 // Services
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {EventsService} from '../../service/events.service';
+import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
 // Components
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Models
@@ -17,8 +19,6 @@ import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../
 import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
 import {EventColumnModel, EventModel} from '../../model/event.model';
-import {EventsService} from '../../service/events.service';
-import {PreferenceService} from '../../../../shared/services/preference.service';
 import {EventCreateComponent} from '../create/event-create.component';
 import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
 
@@ -77,6 +77,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
 			})
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ);
 	}
 
 	ngAfterContentInit() {

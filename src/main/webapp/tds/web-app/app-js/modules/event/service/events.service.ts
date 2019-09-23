@@ -13,6 +13,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
+import {PreferenceService} from '../../../shared/services/preference.service';
 
 /**
  * @name EventsService
@@ -44,7 +45,7 @@ export class EventsService {
 	];
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
 	}
 
 	/**
@@ -212,9 +213,10 @@ export class EventsService {
 		return this.http.get(`../ws/moveEvent/list`)
 			.map((response: any) => {
 				let eventModels = response && response.status === 'success' && response.data;
+				let userTimeZone = this.preferenceService.getUserTimeZone();
 				eventModels.forEach((r) => {
-					r.estStartTime = ((r.estStartTime) ? new Date(r.estStartTime) : '');
-					r.estCompletionTime = ((r.estCompletionTime) ? new Date(r.estCompletionTime) : '');
+					r.estCompletionTime = r.estCompletionTime ? new Date(DateUtils.convertFromGMT(r.estCompletionTime, userTimeZone)) : null;
+					r.estStartTime = r.estStartTime ? new Date(DateUtils.convertFromGMT(r.estStartTime, userTimeZone)) : null;
 				});
 				return eventModels;
 			})
@@ -248,6 +250,7 @@ export class EventsService {
 		for (i = 0; i < postObject.tagIds.length; i++) {
 			postObject.tagIds[i] = postObject.tagIds[i].id;
 		}
+
 		return this.http.post(`../ws/moveEvent/saveEvent/${id}`, JSON.stringify(postObject))
 			.map((response: any) => {
 				return response;
