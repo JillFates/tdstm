@@ -1,7 +1,6 @@
 package net.transitionmanager.service
 
 import com.tdsops.common.security.SecurityUtil
-import com.tdssrc.grails.TimeUtil
 import grails.transaction.Transactional
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.NoticeCommand
@@ -14,7 +13,6 @@ import org.hibernate.criterion.Restrictions
 import org.hibernate.sql.JoinType
 
 import javax.servlet.http.HttpSession
-
 /**
  * @author octavio
  */
