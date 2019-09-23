@@ -28,7 +28,7 @@
 	</g:else>
 
 	<!-- Blue Skin -->
-	<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
+	<%-- <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}"> --%>
 
 	<!-- jQuery -->
 	<script src="${resource(dir: 'dist/js/vendors/jquery/dist', file: 'jquery.min.js')}"></script>

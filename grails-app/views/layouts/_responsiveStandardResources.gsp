@@ -23,7 +23,7 @@
 
 
 <!-- Blue Skin -->
-<link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}">
+<%-- <link rel="stylesheet" href="${resource(dir: 'dist/css/skins', file: 'skin-blue.min.css')}"> --%>
 
 <!-- Kendo UI Material Theme -->
 <link rel="stylesheet" href="${resource(dir: 'dist/css/kendo', file: 'kendo.common-material.min.css')}">

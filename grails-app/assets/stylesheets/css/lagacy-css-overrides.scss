@@ -1,0 +1,12 @@
+.layout-top-nav {
+  .main-header > .navbar {
+    margin: 0;
+    width: 100%;
+  }
+}
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:focus,
+.dropdown-menu > .active > a:hover {
+  color: $color-text-inverse;
+  background-color: $color-active;
+}

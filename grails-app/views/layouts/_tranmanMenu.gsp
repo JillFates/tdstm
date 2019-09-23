@@ -5,11 +5,8 @@
             <ul class="nav navbar-nav">
                 <tds:hasPermission permission="${Permission.AdminMenuView}">
                     <li class="dropdown menu-parent-admin">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin
-                            <span class="caret"></span>
-                        </a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Administration</li>
                             <li class="menu-child-item menu-admin-portal">
                                 <g:link controller="admin" action="home">Admin Portal</g:link>
                             </li>
@@ -35,7 +32,6 @@
                                 <g:link controller="assetEntity" action="assetOptions">Asset Options</g:link>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Clients</li>
                             <li class="menu-child-item menu-list-companies">
                                 <g:link controller="partyGroup" action="list">List Companies</g:link>
                             </li>
@@ -58,12 +54,10 @@
                                 </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Workflows</li>
                             <li class="menu-child-item menu-list-workflows">
                                 <g:link controller="workflow" action="home">List Workflows </g:link>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
                                 <g:link controller="manufacturer">List Manufacturers</g:link>
                             </li>
@@ -77,9 +71,7 @@
                     </li>
                 </tds:hasPermission>
                 <li class="dropdown menu-parent-projects">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects
-                        <span class="caret"></span>
-                    </a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects</a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
                             <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
@@ -112,7 +104,6 @@
                             <li class="menu-child-warn">No Project Selected</li>
                         </g:else>
                         <li class="divider"></li>
-                        <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
                                 Providers
@@ -140,9 +131,7 @@
                     </ul>
                 </li>
                 <li class="dropdown menu-parent-data-centers">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Locations
-                        <span class="caret"></span>
-                    </a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Locations</a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-parent-data-centers-list-rooms">
                             <g:link params="[viewType:'list']" controller="room">List Locations</g:link>
@@ -156,80 +145,55 @@
                 </li>
                 <tds:hasPermission permission="${Permission.AssetMenuView}">
                     <li class="dropdown menu-parent-assets">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets
-                            <span class="caret"></span>
-                        </a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Assets</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Assets</li>
-                            <li class="menu-child-item menu-parent-assets-summary-table">
-                                <a href="/tdstm/module/assetsummary/list">
-                                    <asset:image src="icons/application_view_columns.png" width="16" height="16" alt="Summary Table" /> Summary Table
-                                </a>
+                           <li class="menu-child-item menu-parent-assets-summary-table">
+                                <a href="/tdstm/module/assetsummary/list">Summary</a>
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
-                                <g:link class="mmlink" controller="module" action="asset" id="views">
-                                    <i class="fa fa-cog" style="font-size:20px; margin-right: 0px;"></i> View Manager
-                                </g:link>
+                                <g:link class="mmlink" controller="module" action="asset" id="views">Manage</g:link>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">
-	                                <asset:image src="icons/magnifier.png" width="16" height="16" /> All Assets
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="1" elementId="1">All Assets</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">
-                                    <tds:svgIcon name="application_menu" width="16" height="16" /> Applications
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="7" elementId="7">Applications</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-all-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="3" elementId="3">
-                                    <tds:svgIcon name="other_menu" width="16" height="16" /> Devices
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="3" elementId="3">Devices</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-server-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="4" elementId="4">
-                                    <tds:svgIcon name="serverPhysical_menu" width="16" height="16" /> Servers
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="4" elementId="4">Servers</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">
-                                    <tds:svgIcon name="database_menu" width="16" height="16" /> Databases
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">Databases</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Physical Storage
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">Physical Storage</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">
-                                    <tds:svgIcon name="storageLogical_menu" width="16" height="16" /> Logical Storage
-                                </g:link>
+                                <g:link class="mmlink" mapping="assetViewShow" id="6" elementId="6">Logical Storage</g:link>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-dependencies-list">
-                                <g:link class="mmlink" controller="module" action="dependencies" id="list"  elementId="list">
-	                                <asset:image src="icons/bricks.png" width="16" height="16" alt="Dependencies" /> Dependencies
-                                </g:link>
+                                <g:link class="mmlink" controller="module" action="dependencies" id="list"  elementId="list">Dependencies</g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-comments-list" onclick="hideMegaMenu('assetMegaMenu')">
-                                <g:link class="mmlink" controller="module" action="assetcomment" id="list">
-	                                <asset:image src="icons/comments.png" width="16" height="16" alt="Comments" /> Comments
-                                </g:link>
+                                <g:link class="mmlink" controller="module" action="assetcomment" id="list">Comments</g:link>
                             </li>
                             <li class="divider"></li>
                             <tds:hasPermission permission="${Permission.DepAnalyzerView}">
                                 <li class="menu-child-item menu-parent-assets-dependency-analyzer">
                                     <g:link class="mmlink" controller="moveBundle" action="dependencyConsole" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <asset:image src="icons/brick_magnify.png" width="16" height="16" alt="Dependency Analyzer" /> Dependency Analyzer
+									Dependency Analyzer
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ArchitectureView}">
                                 <li class="menu-child-item menu-parent-assets-architecture-graph">
                                     <g:link class="mmlink" controller="assetEntity" action="architectureViewer" onclick="hideMegaMenu('assetMegaMenu')">
-                                        <asset:image src="icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph" /> Architecture Graph
+                                        Architecture Graph
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
@@ -244,24 +208,24 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                                    <g:link controller="module" action="importbatch" id="assets">Import Assets (ETL)</g:link>
+                                    <g:link controller="module" action="importbatch" id="assets">Import ETL</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-import-assets">
-                                    <g:link controller="assetEntity" action="assetImport">Import Assets (TM Excel)</g:link>
+                                    <g:link controller="assetEntity" action="assetImport">Import PMXL</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                 <li class="menu-child-item menu-parent-assets-manage-dep-batches">
                                     <g:link class="mmlink" controller="module" action="importbatch" id="list">
-                                        Manage Import Batches (ETL)
+                                        Manage ETL Batch Import
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetImport}">
                                 <li class="menu-child-item menu-parent-assets-manage-batches">
-                                    <g:link controller="dataTransferBatch" action="list">Manage Import Batches (Excel)</g:link>
+                                    <g:link controller="dataTransferBatch" action="list">Manage PMXL Batch Import</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>
@@ -269,11 +233,8 @@
                 </tds:hasPermission>
                 <tds:hasPermission permission="${Permission.EventMenuView}">
                     <li class="dropdown menu-parent-planning">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning
-                            <span class="caret"></span>
-                        </a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Events</li>
                             <li class="menu-child-item menu-parent-planning-event-list">
                                 <g:link controller="module" action="event" id="list">List Events</g:link>
                             </li>
@@ -296,7 +257,6 @@
                                 <g:link controller="moveEvent" action="exportRunbook">Export Runbook</g:link>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Bundles</li>
                             <li class="menu-child-item menu-parent-planning-list-bundles">
                                 <g:link class="mmlink" controller="module" action="bundle" id="list">List Bundles</g:link>
                             </li>
@@ -305,11 +265,8 @@
                 </tds:hasPermission>
                 <tds:hasPermission permission="${Permission.TaskView}">
                     <li class="dropdown menu-parent-tasks">
-                        <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks
-                            <span class="caret"></span>
-                        </a>
+                        <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Tasks</li>
                             <li class="menu-child-item menu-parent-tasks-my-tasks">
                                 <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
                             </li>
@@ -349,11 +306,8 @@
                 </tds:hasPermission>
                 <tds:hasPermission permission="${Permission.DashboardMenuView}">
                     <li class="dropdown menu-parent-dashboard">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards
-                            <span class="caret"></span>
-                        </a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Live Dashboards</li>
                             <li class="menu-child-item menu-parent-dashboard-user-dashboard">
                                 <g:link class="mmlink" controller="module" action="user" id="dashboard">User Dashboard</g:link>
                             </li>
@@ -375,11 +329,8 @@
                 </tds:hasPermission>
                 <tds:hasPermission permission="${Permission.ReportMenuView}">
                     <li class="dropdown menu-parent-reports">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports
-                            <span class="caret"></span>
-                        </a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-parent-item">Planning</li>
                             <li class="menu-child-item menu-reports-application-profiles">
                                 <g:link controller="module" action="reports" id="applicationProfiles" elementId="applicationProfiles">Application Profiles</g:link>
                             </li>
@@ -404,7 +355,6 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">
                                 <li class="divider"></li>
-                                <li class="menu-parent-item">Event Day</li>
                                 <li class="menu-child-item menu-reports-application-migration">
                                     <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
                                 </li>

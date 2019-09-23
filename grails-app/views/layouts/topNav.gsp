@@ -42,6 +42,7 @@
 
     <script type="text/javascript">
 	$(document).ready(function() {
+			// Format User Name in Icon
 			$(".user-menu .user-name").each(function() {
 				$(this).text($(this).text().split(" ").map(function(a){
 					return a.substr(0,1).toUpperCase();
@@ -107,14 +108,14 @@
                             <i class="fa fa-bars"></i>
                         </button>
                         <g:if test="${isLicenseManagerEnabled}">
-                            <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
+                            <asset:image src="images/TMHeaderLogo_v4.7.png" alt="Transition Manager" border="0" />
                         </g:if>
                         <g:else>
                             <g:if test="${setImage}">
-                                <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" style="height: 30px;  margin-top: 8px;"/>
+                                <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" />
                             </g:if>
                             <g:else>
-                                <asset:image id="logo-header" src="images/TMHeaderLogo_v4.7.png" alt="TransitionManager" border="0" />
+                                <asset:image src="images/TMHeaderLogo_v4.7.png" alt="Transition Manager" border="0" />
                             </g:else>
                         </g:else>
                     </div>
@@ -156,34 +157,36 @@
 						>
 							<span class="user-name">${tds.currentPerson()}</span>
 						</a>
-                                    <%-- <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <!-- The user image in the navbar-->
-                                        <asset:image src="images/personIcon.png" class="user-image" alt="${session.getAttribute("LOGIN_PERSON").name }" />
-                                        <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                                        <span class="hidden-xs user-name">${tds.currentPersonName()}</span>
-                                    </a> --%>
-                                    <ul class="dropdown-menu user-dialog-dropdown-menu">
-                                        <!-- Menu Body -->
-                                        <li class="user-body">
-                                            <ul class="list-group">
-                                                <tds:hasPermission permission="${Permission.PersonView}">
-                                                    <li class="list-group-item">
-                                                        <a href="#" style="cursor: pointer;" id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"><span class="glyphicon glyphicon-user user-menu-icon-badge"></span> Account Details</a>
-                                                    </li>
-                                                </tds:hasPermission>
-                                                <li class="list-group-item"><a href="#" style="cursor: pointer;" id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"><span class="glyphicon glyphicon-time user-menu-icon-badge"></span> Date and Timezone</a></li>
-                                                <li class="list-group-item"><a href="#" style="cursor: pointer;" id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"><span class="glyphicon glyphicon-pencil user-menu-icon-badge"></span> Edit Preferences</a></li>
-                                            <!-- <li class="list-group-item"><g:link class="home mmlink" controller="task" action="listUserTasks" params="[viewMode:'mobile',tab:tab]">Use Mobile Site</g:link></li> -->
-                                            </ul>
-                                        </li>
-                                        <!-- Menu Footer-->
-                                        <li class="user-footer">
-                                            <div class="pull-right">
-                                                <g:link controller="auth" action="signOut" class="btn btn-default btn-flat" onclick="clearStorage()"><span class="glyphicon glyphicon-log-out user-menu-icon-badge"></span> Sign Out</g:link>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </li>
+						<ul class="dropdown-menu">
+							<li class="menu-child-item">
+								<a
+									 id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"
+									style="cursor: pointer;"
+									>Account Details</a
+								>
+							</li>
+							<li class="menu-child-item">
+								<a
+									id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"
+									style="cursor: pointer;"
+									>Date and Timezone</a
+								>
+							</li>
+							<li class="menu-child-item">
+								<a
+									id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"
+									style="cursor: pointer;"
+									>Edit Preferences</a
+								>
+							</li>
+							<li class="divider"></li>
+							<li class="menu-child-item">
+								<g:link controller="auth" action="signOut" onclick="clearStorage()"
+									>Sign Out</g:link
+								>
+							</li>
+						</ul>
+							</li>
                             </sec:ifLoggedIn>
                         </ul>
                     </div><!-- /.navbar-custom-menu -->
