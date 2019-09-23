@@ -102,7 +102,7 @@ class MoveBundleService implements ServiceMethods {
 	 * @param  moveBundleStep to be deleted
 	 */
 	def deleteMoveBundleStep(MoveBundleStep moveBundleStep) {
-		StepSnapshot.executeUpdate 'DELETE StepSnapshot where moveBundleStep=?', [moveBundleStep]
+		StepSnapshot.executeUpdate 'DELETE StepSnapshot where moveBundleStep=?0', [moveBundleStep]
 		moveBundleStep.delete()
 	}
 
@@ -140,7 +140,7 @@ class MoveBundleService implements ServiceMethods {
 				JOIN project p ON p.project_id = me.project_id
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0
-			WHERE me.move_event_id=? AND atr.is_non_applicable = 0
+			WHERE me.move_event_id=?0 AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 			ORDER BY mb.move_bundle_id,started asc''', NumberUtil.toLong(moveEventId))
 

@@ -1,19 +1,8 @@
 package net.transitionmanager.project
 
-import com.tdsops.tm.enums.domain.TimeScale
-import net.transitionmanager.asset.Application
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.reporting.ReportsService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.tag.TagEventService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
-import net.transitionmanager.exception.ServiceException
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
@@ -21,19 +10,28 @@ import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.event.CreateEventCommand
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.RoleType
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.task.AssetComment
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.Font
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.Sheet
 import org.springframework.jdbc.core.JdbcTemplate
-import com.tdsops.tm.enums.domain.AssetCommentCategory
-
-import java.sql.Timestamp
 
 @Slf4j
 @Transactional
@@ -286,7 +284,7 @@ class MoveEventService implements ServiceMethods {
 			// Deletes all AppMoveEvent related to this event.
 			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?', [moveEvent.id])
 			// Nulls out references to this event in comments and tasks.
-			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?", [moveEvent.id])
+			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?0", [moveEvent.id])
 			// Deletes the event.
 			moveEvent.delete()
 		}

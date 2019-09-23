@@ -206,7 +206,7 @@ class CookbookService implements ServiceMethods {
 		assertProject(recipe, project)
 
 		// Update all TaskBatch to null the reference to the recipe
-		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?', [recipe])
+		TaskBatch.executeUpdate('update TaskBatch set recipe=null where recipe=?0', [recipe])
 
 		def rvList = RecipeVersion.findAllByRecipe(recipe)
 		log.debug 'Found {} recipe versions to be deleted', rvList.size()

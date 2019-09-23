@@ -82,10 +82,10 @@ class Room {
 	}
 
 	private static final String[] BEFORE_DELETE_HQL = [
-			'update AssetEntity set roomSource=null, sourceRoom=null, sourceLocation=null where roomSource=?',
-			'update AssetEntity set roomTarget=null, targetRoom=null, targetLocation=null where roomTarget=?',
-			'update MoveBundle set sourceRoom=null where sourceRoom=?',
-			'update MoveBundle set targetRoom=null where targetRoom=?']
+			'update AssetEntity set roomSource=null, sourceRoom=null, sourceLocation=null where roomSource=?0',
+			'update AssetEntity set roomTarget=null, targetRoom=null, targetLocation=null where roomTarget=?0',
+			'update MoveBundle set sourceRoom=null where sourceRoom=?0',
+			'update MoveBundle set targetRoom=null where targetRoom=?0']
 
 	def beforeInsert = {
 		dateCreated = lastUpdated = TimeUtil.nowGMT()

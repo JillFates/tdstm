@@ -71,7 +71,6 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -80,7 +79,6 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
-
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -1512,7 +1510,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		neighbors = { tId, depth ->
 			// log.info "In the hood $depth for $tId"
 			if (depth > 0 && (viewUnpublished || AssetComment.read(tId)?.isPublished)) {
-				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?', [tId])
+				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?0', [tId])
 				// log.info "Found ${td.size()} going to $predOrSucc"
 				if (td.size() > 0) {
 					if (depth > 0) {
