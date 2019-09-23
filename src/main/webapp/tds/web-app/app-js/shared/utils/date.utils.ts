@@ -21,7 +21,7 @@ export class DateUtils {
 	public static readonly PREFERENCE_LITTLE_ENDIAN = 'DD/MM/YYYY';
 
 	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
-	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
+	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm A';
 	public static readonly OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
 	public static readonly SERVER_FORMAT_DATETIME = 'YYYY-MM-DDT' + DateUtils.OUTPUT_PIPE_TIME_FORMAT;
 	public static readonly SERVER_FORMAT_DATE = 'YYYY-MM-DD';
@@ -39,12 +39,17 @@ export class DateUtils {
 	 *
 	 * @param userTimeZone the user's timezone to format the value as
 	 * @param iso8601Value a datetime value in the ISO 8601 format (yyyy-mm-DDThh:MM:ssZ)
+	 * @param timeFormat Optional, used only to overwrite the default time format value
 	 * @return the the dateTimeValue converted to perferred user datetime format (e.g. 12/25/2018 02:10pm)
 	 */
-	public static formatUserDateTime(userTimeZone: string, iso8601Value: string) {
+	public static formatUserDateTime(userTimeZone: string, iso8601Value: string, timeFormat = '') {
 		if (iso8601Value === undefined || !iso8601Value) {
 			return '';
 		}
+		if (timeFormat) {
+			return moment.tz(iso8601Value, userTimeZone).format(timeFormat);
+		}
+
 		return moment.tz(iso8601Value, userTimeZone).format(`YYYY-MM-DD ${this.OUTPUT_PIPE_TIME_FORMAT}`);
 	}
 

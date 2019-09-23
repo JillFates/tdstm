@@ -66,12 +66,12 @@ class TagAssetService implements ServiceMethods {
 			Tag tag = get(Tag, tagId, currentProject)
 
 			TagAsset tagAsset = new TagAsset(tag: tag, asset: asset)
-			return tagAsset.save()
+			return tagAsset.save(deepValidate:false)
 		}
 
-		// Bump the last updated date for the given asset.
+		// Bump the last updated date for the given asset. don't need to validate for this
 		asset.lastUpdated = TimeUtil.nowGMT()
-		asset.save()
+		asset.save(validate: false, deepValidate:false)
 
 		return tagAssets
 	}

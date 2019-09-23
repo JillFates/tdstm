@@ -52,9 +52,6 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectAssetMap
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.tag.TagAsset
 import net.transitionmanager.task.AssetComment
@@ -126,7 +123,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	ProgressService progressService
 	ProjectService projectService
 	Scheduler quartzScheduler
-	StateEngineService stateEngineService
 	TaskImportExportService taskImportExportService
 	TaskService taskService
 	UserPreferenceService userPreferenceService
@@ -482,9 +478,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			String dueDate = TimeUtil.formatDate(assetComment.dueDate)
 			String lastUpdated = TimeUtil.formatDateTime(assetComment.lastUpdated)
 
-			def workflowTransition = assetComment?.workflowTransition
-			String workflow = workflowTransition?.name
-
 			// Get a list of the Notes associated with the task/comment
 			def notes = []
 			def notesList = CommentNote.createCriteria().list(max: 50) {
@@ -591,57 +584,56 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 					name: recipe.name
 				]
 			}
-				commentList << [
-					action: assetComment.apiAction?.name,
-					actionInvocable: assetComment.isActionInvocableLocally(),
-					actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
-					actionMode: actionMode,
-					actualDuration: TimeUtil.formatDuration(actualDuration),
-					apiAction:apiActionMap,
-					apiActionId: assetComment.apiAction?.id,
-					apiActionInvokedAt: assetComment.apiActionInvokedAt,
-					apiActionList:apiActionList,
-					assetClass: assetComment.assetEntity?.assetClass?.toString(),
-					assetClasses: assetEntityService.getAssetClasses(),
-					assetComment:assetComment,
-					assetId: assetComment.assetEntity?.id ?: "",
-					assetName:assetComment.assetEntity?.assetName ?: "",
-					assetType: assetComment.assetEntity?.assetType,
-					assignedTo:assetComment.assignedTo?.toString() ?:'Unassigned',
-					atStart:atStart,
-					canEdit: canEdit,
-					categories: AssetCommentCategory.list,
-					cssForCommentStatus: cssForCommentStatus,
-					dtCreated:dtCreated ?: "",
-					dtResolved:dtResolved ?: "",
-					dueDate:dueDate,
-					durationDelta: TimeUtil.formatDuration(durationDelta),
-					durationLocked: assetComment.durationLocked,
-					durationScale:assetComment.durationScale.value(),
-					etFinish:etFinish,
-					etStart:etStart,
-					eventList: eventList,
-					eventName:assetComment.moveEvent?.name ?: "",
-					instructionsLinkLabel: instructionsLinkLabel ?: "",
-					instructionsLinkURL: instructionsLinkURL ?: "",
-					lastUpdated: lastUpdated,
-					notes:notes,
-					personCreateObj:personCreateObj,
-					personResolvedObj:personResolvedObj,
-					predecessorList: predecessorList,
-					predecessorsCount: predecessorsCount,
-					predecessorTable:predecessorTable ?: '',
-					priorityList: assetEntityService.getAssetPriorityOptions(),
-					recipe: recipeMap,
-					roles:roles?:'Unassigned',
-					statusWarn: taskService.canChangeStatus (assetComment) ? 0 : 1,
-					successorList: successorList,
-					successorsCount: successorsCount,
-					successorTable:successorTable ?: '',
-					percentageComplete: assetComment.percentageComplete,
-					taskSpecId: assetComment.taskSpec,
-					workflow:workflow
-				]
+			commentList << [
+				action                 : assetComment.apiAction?.name,
+				actionInvocable        : assetComment.isActionInvocableLocally(),
+				actionInvocableRemotely: assetComment.isActionInvocableRemotely(),
+				actionMode             : actionMode,
+				actualDuration         : TimeUtil.formatDuration(actualDuration),
+				apiAction              : apiActionMap,
+				apiActionId            : assetComment.apiAction?.id,
+				apiActionInvokedAt     : assetComment.apiActionInvokedAt,
+				apiActionList          : apiActionList,
+				assetClass             : assetComment.assetEntity?.assetClass?.toString(),
+				assetClasses           : assetEntityService.getAssetClasses(),
+				assetComment           : assetComment,
+				assetId                : assetComment.assetEntity?.id ?: "",
+				assetName              : assetComment.assetEntity?.assetName ?: "",
+				assetType              : assetComment.assetEntity?.assetType,
+				assignedTo             : assetComment.assignedTo?.toString() ?: 'Unassigned',
+				atStart                : atStart,
+				canEdit                : canEdit,
+				categories             : AssetCommentCategory.list,
+				cssForCommentStatus    : cssForCommentStatus,
+				dtCreated              : dtCreated ?: "",
+				dtResolved             : dtResolved ?: "",
+				dueDate                : dueDate,
+				durationDelta          : TimeUtil.formatDuration(durationDelta),
+				durationLocked         : assetComment.durationLocked,
+				durationScale          : assetComment.durationScale.value(),
+				etFinish               : etFinish,
+				etStart                : etStart,
+				eventList              : eventList,
+				eventName              : assetComment.moveEvent?.name ?: "",
+				instructionsLinkLabel  : instructionsLinkLabel ?: "",
+				instructionsLinkURL    : instructionsLinkURL ?: "",
+				lastUpdated            : lastUpdated,
+				notes                  : notes,
+				personCreateObj        : personCreateObj,
+				personResolvedObj      : personResolvedObj,
+				predecessorList        : predecessorList,
+				predecessorsCount      : predecessorsCount,
+				predecessorTable       : predecessorTable ?: '',
+				priorityList           : assetEntityService.getAssetPriorityOptions(),
+				recipe                 : recipeMap,
+				roles                  : roles ?: 'Unassigned',
+				statusWarn             : taskService.canChangeStatus(assetComment) ? 0 : 1,
+				successorList          : successorList,
+				successorsCount        : successorsCount,
+				successorTable         : successorTable ?: '',
+				percentageComplete     : assetComment.percentageComplete,
+				taskSpecId             : assetComment.taskSpec,
+			]
 		} else {
 			def errorMsg = " Task Not Found : Was unable to find the Task for the specified id - $params.id "
 			log.error "showComment: show comment view - $errorMsg"
@@ -716,44 +708,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 		}
 		renderAsJson assetCommentsList
-	}
-
-	/*----------------------------------
-	 * @author: Lokanath Redy
-	 * @param : fromState and toState
-	 * @return: boolean value to validate comment field
-	 *---------------------------------*/
-	@HasPermission(Permission.WorkflowView)
-	def retrieveFlag() {
-		def moveBundleInstance = MoveBundle.get(params.moveBundle)
-		def toState = params.toState
-		def fromState = params.fromState
-		def status = []
-		def flag = stateEngineService.getFlags(moveBundleInstance.workflowCode,"SUPERVISOR", fromState, toState)
-		if (flag?.contains("comment") || flag?.contains("issue")) {
-			status << ['status':'true']
-		}
-		renderAsJson status
-	}
-
-	/*-----------------------------------------
-	 *@param : state value
-	 *@return: List of valid stated for param state
-	 *----------------------------------------*/
-	@HasPermission(Permission.WorkflowView)
-	def retrieveStates(def state,def assetEntity) {
-		def stateIdList = []
-		def validStates
-		if (state) {
-			validStates = stateEngineService.getTasks(assetEntity.moveBundle.workflowCode,"SUPERVISOR", state)
-		} else {
-			validStates = ["Ready"]
-			//stateEngineService.getTasks("STD_PROCESS","TASK_NAME")
-		}
-		validStates.each {
-			stateIdList<<stateEngineService.getStateIdAsInt(assetEntity.moveBundle.workflowCode,it)
-		}
-		return stateIdList
 	}
 
 	@HasPermission(Permission.AssetImport)
@@ -1088,7 +1042,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				sizePref          : userPreferenceService.getPreference(PREF.TASK_LIST_SIZE) ?: Pagination.MAX_DEFAULT,
 				partyGroupList    : companiesList,
 				company           : project.client,
-				workflowTransition: NumberUtil.toLong(params.step),
 				filteredRequest   : filteredRequest
 			]
 		} catch (RuntimeException e) {
@@ -1230,10 +1183,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		boolean viewUnpublished = securityService.viewUnpublished()
 
 		params['viewUnpublished'] = viewUnpublished
-
-		if(params['workflowTransition']){
-			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
-		}
 
 		// Fetch the tasks and the total count.
 		Map filterResults = commentService.filterTasks(project, params, sortIndex, sortOrder, maxRows, rowOffset)
@@ -1993,58 +1942,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def deleteBulkAsset() {
 		Project project = projectForWs
 		renderAsJson(resp: assetEntityService.deleteBulkAssets(project, params.type, params.list("assetLists[]")))
-	}
-
-	/**
-	 * Get workflowTransition select for comment id
-	 * @param assetCommentId : id of assetComment
-	 * @param format - if format is equals to "json" then the methods returns a JSON array instead of a SELECT
-	 * @return select or a JSON array
-	 */
-	@HasPermission(Permission.WorkflowView)
-	def retrieveWorkflowTransition() {
-		Project project = securityService.userCurrentProject
-		def assetCommentId = params.assetCommentId
-		AssetComment assetComment = AssetComment.read(assetCommentId)
-		AssetEntity assetEntity = AssetEntity.get(params.assetId)
-		String workflowCode = assetEntity?.moveBundle?.workflowCode ?: project.workflowCode
-		Workflow workFlow = Workflow.findByProcess(workflowCode)
-		List<WorkflowTransition> workFlowTransitions = WorkflowTransition.findAllByWorkflowAndCategory(workFlow, params.category)
-
-		//def workFlowTransitions = WorkflowTransition.findAllByWorkflow(workFlow) TODO : should be removed after completion of this new feature
-		if (assetEntity) {
-			def existingWorkflows
-			if (assetCommentId) {
-				existingWorkflows = AssetComment.findAllByAssetEntityAndIdNotEqual(assetEntity, assetCommentId).workflowTransition
-			} else {
-				existingWorkflows = AssetComment.findAllByAssetEntity(assetEntity).workflowTransition
-			}
-			workFlowTransitions.removeAll(existingWorkflows)
-		}
-
-		withFormat {
-			js {
-				renderSuccessJson(workFlowTransitions.collect { [id: it.id, name: it.name] })
-			}
-
-			html {
-				String result = ''
-
-				if (workFlowTransitions) {
-					result = HtmlUtil.generateSelect(
-						selectId: 'workFlowId',
-						selectName: 'workFlow',
-						options: workFlowTransitions,
-						firstOption: [value: '', display: ''],
-						optionKey: 'id',
-						optionValue: 'name',
-						optionSelected: assetComment?.workflowTransitionId
-					)
-				}
-
-				render result
-			}
-		}
 	}
 
 	/**

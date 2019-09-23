@@ -8,11 +8,16 @@ import {
 	DetailCollapseEvent,
 	DetailExpandEvent,
 	GridComponent,
-	GridDataResult
+	GridDataResult, PageChangeEvent
 } from '@progress/kendo-angular-grid';
 import { ReportsService } from '../../../reports/service/reports.service';
 import { TaskService } from '../../service/task.service';
-import { DIALOG_SIZE, GRID_DEFAULT_PAGE_SIZE, ModalType } from '../../../../shared/model/constants';
+import {
+	DIALOG_SIZE,
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	ModalType
+} from '../../../../shared/model/constants';
 import { forkJoin } from 'rxjs';
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { ColumnMenuService } from '@progress/kendo-angular-grid/dist/es2015/column-menu/column-menu.service';
@@ -32,6 +37,7 @@ import { UserContextService } from '../../../auth/service/user-context.service';
 import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
 import { TaskStatus } from '../../model/task-edit-create.model';
+import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
 
 @Component({
 	selector: 'task-list',
@@ -52,13 +58,16 @@ export class TaskListComponent {
 	hideGrid: boolean;
 	selectedCustomColumn: any;
 	selectedEvent: any;
+	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private urlParams: any;
 	private pageSize: number;
+	private currentPage: number;
 	private currentCustomColumns: any;
 	private allAvailableCustomColumns: Array<any>;
 	private userContext: UserContextModel;
 	private rowsExpanded: boolean;
 	private rowsExpandedMap: any;
+	private gridDefaultSort: Array<SortDescriptor>;
 
 	constructor(
 		private taskService: TaskService,
@@ -69,11 +78,12 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
+		this.gridDefaultSort = [{field: 'taskNumber', dir: 'asc'}];
 		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;
-		this.grid = new DataGridOperationsHelper([], null, null, null, this.pageSize);
+		this.grid = new DataGridOperationsHelper([], this.gridDefaultSort, null, null, null);
 		this.columnsModel = taskListColumnsModel;
 		this.selectedCustomColumn = {};
 		this.selectedEvent = this.allEventsOption;
@@ -81,6 +91,7 @@ export class TaskListComponent {
 		this.currentCustomColumns = {};
 		this.rowsExpanded = false;
 		this.rowsExpandedMap = {};
+		this.currentPage = 1;
 		this.onLoad();
 	}
 
@@ -125,19 +136,19 @@ export class TaskListComponent {
 
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
-					// Current event
-					this.loadEventListAndSearch(currentEventId);
 					// Task list size
 					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
 					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
 					// Just Remaining
 					this.justRemaining = justRemaining ? justRemaining === '1' : false;
-
 					// params were transferred to local properties,
 					// we can remove them from the parameters object
 					// and leave only the parameters which are not handled by local properties
 					this.urlParams = ObjectUtils.excludeProperties(this.urlParams, ['moveEvent', 'justRemaining', 'viewUnpublished']);
+					// Current event
+					this.loadEventListAndSearch(currentEventId);
 				},
 				complete: () => {
 					this.hideGrid = false;
@@ -191,24 +202,40 @@ export class TaskListComponent {
 	 */
 	private search(taskId ?: number): void {
 		this.loading = true;
-
-		// Set the default filter values
-		const defaultFilters = {
+		// Prepare sort, pagination & column filters for search.
+		let applySort = false;
+		let sortColumn = this.grid.state.sort[0].field;
+		let sortOrder = 'ASC';
+		if (this.grid.state.sort[0].dir) {
+			applySort = true;
+			sortOrder = this.grid.state.sort[0].dir.toUpperCase();
+			if (sortColumn.startsWith('userSelectedCol')) {
+				sortColumn = this.currentCustomColumns[sortColumn];
+			}
+		}
+		const searchParams = {
 			moveEvent: this.selectedEvent.id,
 			justRemaining: this.justRemaining ? 1 : 0,
 			justMyTasks: this.justMyTasks ? 1 : 0,
 			viewUnpublished: this.viewUnpublished ? 1 : 0,
-			sord: 'asc',
+			sortOrder: applySort ? sortOrder : '',
+			sortColumn: applySort ? sortColumn : '',
+			page: this.currentPage,
+			rows: this.pageSize
 		};
-
 		// Append url filters, in case they were not present in the default filters
-		const filters: any = Object.assign({}, defaultFilters, this.urlParams);
+		const request: any = Object.assign({}, searchParams, this.urlParams);
 		// moveEvent should be string for all events
-		filters['moveEvent'] = filters.moveEvent === 0 ? '0' : filters.moveEvent;
-
-		this.taskService.getTaskList(filters)
+		request['moveEvent'] = request.moveEvent === 0 ? '0' : request.moveEvent;
+		// Add field filters
+		if (this.grid.state.filter && this.grid.state.filter.filters.length > 0) {
+			this.grid.state.filter.filters.forEach( (filter: FilterDescriptor) => {
+				request[filter.field as string] = filter.value;
+			});
+		}
+		this.taskService.getTaskList(request)
 			.subscribe(result => {
-				this.grid.reloadData(result.rows);
+				this.reloadGridData(result.rows, result.totalCount);
 				this.rowsExpandedMap = {};
 				this.rowsExpanded = false;
 				this.loading = false;
@@ -311,6 +338,8 @@ export class TaskListComponent {
 					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
 						this.search();
 					});
+				} else if (result.shouldOpenTask) {
+					this.onOpenTaskDetailHandler(result.commentInstance);
 				} else {
 					this.search();
 				}
@@ -451,7 +480,19 @@ export class TaskListComponent {
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
-		this.grid.clearAllFilters(this.columnsModel);
+		this.columnsModel
+			.filter(column => column.filterable)
+			.forEach((column: GridColumnModel) => {
+				column.filter = '';
+			});
+		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
+			this.grid.state.filter.filters
+				.forEach((filter: FilterDescriptor) => {
+					filter.value = '';
+				});
+			// reset pagination to be on page 1
+			this.onPageChangeHandler({skip: 0, take: this.pageSize});
+		}
 	}
 
 	/**
@@ -470,6 +511,7 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			taskRows.forEach((taskRow: any, index: number) => {
+				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
 				if (taskRow.status === 'Ready' || taskRow.status === 'Started') {
@@ -480,6 +522,7 @@ export class TaskListComponent {
 			this.rowsExpanded = true;
 		} else {
 			taskRows.forEach((taskRow, index) => {
+				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
 				this.onRowDetailCollapseHandler(expandedEvent);
@@ -509,5 +552,58 @@ export class TaskListComponent {
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	/**
+	 * On Page Change, update grid state & handle pagination on server side.
+	 */
+	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
+		this.grid.state.skip = skip;
+		this.grid.state.take = take;
+		if (take !== this.pageSize) {
+			this.userPreferenceService.setPreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE, this.pageSize.toString())
+				.subscribe(() => {/* at this point preference should be saved */ });
+		}
+		this.pageSize = take;
+		this.currentPage = this.grid.getCurrentPage();
+		this.search();
+	}
+
+	/**
+	 * On Sort Change, update grid state and search().
+	 * @param sort
+	 */
+	onSortChangeHandler(sort: Array<SortDescriptor>): void {
+		this.grid.state.sort = sort;
+		this.search();
+	}
+
+	/**
+	 * On filter changes do the search().
+	 * @param column
+	 * @param clearFilter
+	 */
+	onFilterChangeHandler(column: GridColumnModel, clearFilter = false): void {
+		if (clearFilter) {
+			column.filter = '';
+		}
+		const filterColumn = {...column};
+		if (filterColumn.property.startsWith('userSelectedCol')) {
+			filterColumn.property = this.currentCustomColumns[filterColumn.property];
+		}
+		const filters = this.grid.getFilter(filterColumn);
+		this.grid.state.filter = filters;
+		// reset pagination to be on page 1
+		this.onPageChangeHandler({skip: 0, take: this.pageSize});
+	}
+
+	/**
+	 * Reloads data for current grid.
+	 * @param result
+	 */
+	private reloadGridData(result: any, totalCount: number): void {
+		this.grid.resultSet = result;
+		this.grid.gridData = {data: result, total: totalCount};
+		this.grid.notifyUpdateGridHeight();
 	}
 }

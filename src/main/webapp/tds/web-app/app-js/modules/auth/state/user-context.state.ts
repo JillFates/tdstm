@@ -14,6 +14,7 @@ import {LoginService} from '../service/login.service';
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
 import {SetBundle} from '../../bundle/action/bundle.actions';
+import {SetProject} from '../../project/actions/project.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -118,6 +119,17 @@ export class UserContextState {
 		ctx.setState({
 			...state,
 			bundle: payload,
+		});
+	}
+
+	@Action(SetProject)
+	setProject(ctx: StateContext<UserContextModel>, {payload}: SetProject) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			project: payload,
+			event: null,
+			bundle: null,
 		});
 	}
 

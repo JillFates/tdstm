@@ -58,11 +58,6 @@
                                 </tds:hasPermission>
                             </li>
                             <li class="divider"></li>
-                            <li class="menu-parent-item">Manage Workflows</li>
-                            <li class="menu-child-item menu-list-workflows">
-                                <g:link controller="workflow" action="home">List Workflows </g:link>
-                            </li>
-                            <li class="divider"></li>
                             <li class="menu-parent-item">Manage Model Library</li>
                             <li class="menu-child-item menu-list-manufacturers">
                                 <g:link controller="manufacturer">List Manufacturers</g:link>
@@ -82,12 +77,12 @@
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
-                            <g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
+                            <g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Projects</g:link>
                         </li>
                         <li class="divider"></li>
                         <g:if test="${currProject}">
                             <li class="menu-child-item menu-projects-current-project">
-                                <g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')">Project Details</g:link>
+                                <g:link class="mmlink" controller="module" action="project" id="list" params="[show:currProject.id]" onclick="hideMegaMenu('projectMegaMenu')">Project Details</g:link>
                             </li>
                             <li class="menu-child-item menu-projects-project-staff">
                                 <g:link class="mmlink" controller="person" action="manageProjectStaff" onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link>
@@ -115,7 +110,7 @@
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
-                                Providers
+                                moduProviders
                             </g:link>
                         </li>
                          <tds:hasPermission permission="${Permission.CredentialView}">
@@ -195,11 +190,6 @@
                             <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
                                 <g:link class="mmlink" mapping="assetViewShow" id="2" elementId="2">
                                     <tds:svgIcon name="database_menu" width="16" height="16" /> Databases
-                                </g:link>
-                            </li>
-                            <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                                <g:link class="mmlink" mapping="assetViewShow" id="5" elementId="5">
-                                    <tds:svgIcon name="storagePhysical_menu" width="16" height="16" /> Physical Storage
                                 </g:link>
                             </li>
                             <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">

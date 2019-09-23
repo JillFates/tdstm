@@ -174,6 +174,7 @@ export class APIActionService {
 						agentMethodModel.push({
 							id: response[property].apiMethod,
 							name: response[property].name,
+							dictionaryMethodName: response[property].dictionaryMethodName ? response[property].dictionaryMethodName : response[property].name,
 							description: response[property].description,
 							endpointUrl: response[property].endpointUrl,
 							docUrl: response[property].docUrl,
@@ -219,6 +220,7 @@ export class APIActionService {
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,
+			dictionaryMethodName: model.dictionaryMethodName ? model.dictionaryMethodName : model.agentMethod.dictionaryMethodName,
 			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },

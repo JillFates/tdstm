@@ -8,6 +8,13 @@ import groovy.transform.TypeCheckingMode
 @CompileStatic
 class TaskVertex {
 
+	/**
+	 * Saves {@code Task#id}
+	 */
+	Long taskId
+	/**
+	 * Saves {@code Task#taskNumber}
+	 */
 	Integer taskNumber
 	/**
 	 * Task comment name
@@ -55,13 +62,15 @@ class TaskVertex {
 	/* The following fields are only needed if start/finish times must be presented as dates. */
 	private Integer slack = 0
 
-	TaskVertex(Integer taskNumber,
+	TaskVertex(Long taskId,
+			   Integer taskNumber,
 			   String taskComment,
 			   int duration = 0,
 			   String status = AssetCommentStatus.PLANNED,
 			   Date actualStart = null,
 			   Date statusUpdated = null) {
 
+		this.taskId = taskId
 		this.taskNumber = taskNumber
 		this.taskComment = taskComment
 		this.status = status
@@ -138,7 +147,7 @@ class TaskVertex {
 			Integer elapsedTime = 0
 			use(TimeCategory) {
 				// statusUpdated
-				elapsedTime = (statusUpdated - actualStart).minutes
+				elapsedTime = (actualStart != null) ? (statusUpdated - actualStart).minutes : 0
 			}
 			return this.duration - elapsedTime
 		} else {

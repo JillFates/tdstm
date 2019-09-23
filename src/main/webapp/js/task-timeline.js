@@ -2517,10 +2517,17 @@ function parseStartDate(startDate) {
 }
 
 function exportCriticalPath() {
-	var eventId = $('#moveEventId').val();
-	if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
-		window.open(tdsCommon.createAppURL("/task/eventTimelineResults?showAll=true&eventId=" + eventId), '_blank');
-	}
+    var eventId = $('#moveEventId').val();
+    if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
+        window.open(tdsCommon.createAppURL("/wsTimeLine/exportCPA?showAll=true&id=" + eventId), '_blank');
+    }
+}
+
+function baselinePlan() {
+    var eventId = $('#moveEventId').val();
+    if (eventId && (eventId != 0) && (!$('#baselinePlanButton').hasClass('disabledLabel'))) {
+        window.open(tdsCommon.createAppURL("/wsTimeLine/baseline?id=" + eventId), '_blank');
+    }
 }
 
 var _MS_PER_MIN = 60000,

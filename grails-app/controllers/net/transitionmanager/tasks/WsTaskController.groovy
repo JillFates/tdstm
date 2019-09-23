@@ -14,6 +14,7 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.TaskActionService
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.CommentService
+import net.transitionmanager.command.task.ListTaskCommand
 import net.transitionmanager.command.task.RecordRemoteActionStartedCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.controller.ControllerMethods
@@ -275,43 +276,38 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	 *@return  The list of tasks as JSON
 	 */
 	@HasPermission(Permission.TaskManagerView)
-	def listTasks() {
-		Map params = request.JSON
-        if (params.containsKey("justRemaining") && params.justRemaining in [0, 1]) {
-            userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
-        }
-        if (params.containsKey('viewUnpublished') && params.viewUnpublished in [0, 1]) {
-            userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
-        }
-        if (params.containsKey('moveEvent') && params.moveEvent > 0) {
-            userPreferenceService.setMoveEventId params.moveEvent
-        }
-
+	def listTasks(ListTaskCommand params) {
+		validateCommandObject(params)
 		Map<String, String> definedSortableFields = [
-				'taskNumber': 'taskNumber',
-				'comment': 'comment',
-				'assetName': 'assetName',
-				'dueDate': 'dueDate',
-				'status': 'status',
-				'assignedTo': 'assignedTo',
-				'instructionsLink': 'instructionsLink',
-				'category': 'category',
-				'score': 'score'
-		].withDefault { key -> params.sidx }
-
-		String sortIndex =  definedSortableFields[params.sidx]
-		String sortOrder =  paginationSortOrder('sord')
+			'taskNumber'      : 'taskNumber',
+			'comment'         : 'comment',
+			'assetName'       : 'assetName',
+			'dueDate'         : 'dueDate',
+			'status'          : 'status',
+			'assignedTo'      : 'assignedTo',
+			'instructionsLink': 'instructionsLink',
+			'category'        : 'category',
+			'score'           : 'score'
+		].withDefault { key -> '' }
 
 		Project project = getProjectForWs()
-		// Determine if only unpublished tasks need to be fetched.
-		params['viewUnpublished'] = securityService.viewUnpublished()
+		String sortIndex = definedSortableFields[params.sortColumn]
+		String sortOrder = params.sortOrder
 
-		if(params['workflowTransition']){
-			params['workflowTransition'] = NumberUtil.toLong(params['workflowTransition'])
-		}
+		// Get the pagination and set the user preference appropriately
+		Integer maxRows = paginationMaxRowValue(params.rows, UserPreferenceEnum.TASK_LIST_SIZE)
+		Integer currentPage = params.page
+		Integer offset = paginationRowOffset(currentPage, maxRows)
+
+		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
+		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
+		userPreferenceService.setMoveEventId params.moveEvent
+
+		// Determine if only unpublished tasks need to be fetched.
+		params.viewUnpublished = securityService.viewUnpublished() ? 1 : 0
 
 		// Fetch the tasks, the total count and the number of pages.
-		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder)
+		Map taskRows = taskService.getTaskRows(project, params, sortIndex, sortOrder, maxRows, offset)
 		renderAsJson(rows: taskRows.rows, totalCount: taskRows.totalCount)
 	}
 

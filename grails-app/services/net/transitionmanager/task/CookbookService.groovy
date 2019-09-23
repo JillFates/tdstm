@@ -918,7 +918,6 @@ class CookbookService implements ServiceMethods {
 			disposition: ['source', 'target'],
 			setOn:0,
 			disabled:false,
-			workflow:0,
 			duration:'',
 			team:0,
 			category:0,

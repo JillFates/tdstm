@@ -182,12 +182,28 @@ export class EventsService {
 
 	/**
 	 * Get the event status details for an specific bundle
+	 * @param {string} userTimeZone
  	 * @param {number} bundleId Bundle id
 	 * @returns {Observable<any>} Event status details
 	*/
-	getEventStatusDetails(bundleId: number, eventId: number): Observable<any> {
+	getEventStatusDetails(userTimeZone: string, bundleId: number, eventId: number): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
-			.map((response: any) => pathOr(null, ['snapshot'], response))
+			.map((response: any) => {
+				const result = pathOr(null, ['snapshot'], response);
+				if (result) {
+					result.eventStartDate = DateUtils.formatUserDateTime(userTimeZone, result.eventStartDate);
+
+					if (result.planSum) {
+						result.planSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.planSum.compTime);
+					}
+
+					if (result.revSum) {
+						result.revSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.revSum.compTime);
+					}
+				}
+
+				return result;
+			})
 			.catch((error: any) => error);
 	}
 
@@ -213,8 +229,10 @@ export class EventsService {
 			.map((response: any) => {
 				let eventModels = response && response.status === 'success' && response.data;
 				eventModels.forEach((r) => {
-					r.estStartTime = ((r.estStartTime) ? new Date(r.estStartTime) : '');
-					r.estCompletionTime = ((r.estCompletionTime) ? new Date(r.estCompletionTime) : '');
+					r.estStartTime =  r.estStartTime ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estStartTime), DateUtils.SERVER_FORMAT_DATE) : '';
+					r.estCompletionTime =  r.estCompletionTime ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estCompletionTime), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return eventModels;
 			})
@@ -364,9 +382,9 @@ export class EventsService {
  	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Category status details
 	*/
-	getTaskCategoriesStats(eventId: number, userTimeZone: string): Observable<any> {
+	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any): Observable<any> {
 		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
-			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone))
+			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}
 
@@ -376,7 +394,7 @@ export class EventsService {
  	 * @param {CategoryTask[]} data  Raw task category results
 	 * @returns {any} Array of task category cells
 	*/
-	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string): any {
+	formatTaskCategoryResults(data: CategoryTask[], userTimeZone: string, plannedStart: any, plannedCompletion: any): any {
 		const results: Array<Array<TaskCategoryCell>> = [];
 
 		const headerRow: TaskCategoryCell[] = [];
@@ -386,21 +404,38 @@ export class EventsService {
 		results.push(headerRow);
 
 		const columnsLength = headerRow.length;
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'column-percents'));
 		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
-		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary estimated-start'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'primary estimated-completion'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary actual-start'));
+		results.push(this.getInitialTaskCategoriesCells(columnsLength, 'secondary actual-completion'));
 
 		data.forEach((item: CategoryTask, index: number) => {
-			results[CatagoryRowType.PlannedStart][index].text =   DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+			results[CatagoryRowType.Percent][index].text =   item.percComp + '%';
+			results[CatagoryRowType.Percent][index].compose =   item;
+			results[CatagoryRowType.TaskCompleted][index].compose =   item;
+
+			item.estStart = item.estStart ? item.estStart : plannedStart;
+			item.estFinish = item.estFinish ? item.estFinish : plannedCompletion;
+
+			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+
 			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+
 			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+
 			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
+
+			if (item.estFinish && (DateUtils.stringDateToDate(item.actFinish) > DateUtils.stringDateToDate(item.estFinish))) {
+				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
+				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
+			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
 			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
-		})
+		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};
 	}

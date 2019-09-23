@@ -32,13 +32,6 @@
 						<td><g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" id="startCateory" name="startCateory" value='shutdown'/></td>
 					</tr>
 					<tr>
-						<td><label for="workflowTransId">Testing:</label></td>
-						<td>
-							<g:select id="workflowTransId.id" name="workflowTransId" from="${workflowTransitions}" optionKey="id" optionValue="name"
-								noSelection="['':'Please Select']"></g:select>
-						</td>
-					</tr>
-					<tr>
 						<td><label for="stopCateory">end with:</label></td>
 						<td><g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(AssetComment).category.inList}" id="stopCateory" name="stopCateory" value='startup'/></td>
 					</tr>

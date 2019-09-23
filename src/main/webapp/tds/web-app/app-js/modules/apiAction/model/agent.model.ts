@@ -17,6 +17,7 @@ export class CredentialModel {
 export class AgentMethodModel {
 	id?: string | number;
 	name?: string;
+	dictionaryMethodName?: string;
 	description?: string;
 	method?: string;
 	params?: {};
@@ -46,6 +47,7 @@ export class AgentMethodModel {
 
 	constructor() {
 		this.name = '';
+		this.dictionaryMethodName = '';
 		this.description = '';
 		this.isPolling = false;
 		this.producesData = false;

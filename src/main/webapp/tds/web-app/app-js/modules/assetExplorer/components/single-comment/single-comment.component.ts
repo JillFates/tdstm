@@ -43,6 +43,8 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 			.subscribe((userContext: UserContextModel) => {
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 			});
+
+		this.loadCommentCategories();
 	}
 
 	/**

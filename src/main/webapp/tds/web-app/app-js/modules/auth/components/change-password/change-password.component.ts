@@ -5,8 +5,7 @@ import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider'
 import {Logout} from '../../action/login.actions';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../model/user-context.model';
-import {RouterUtils} from '../../../../shared/utils/router.utils';
-import {WindowService} from '../../../../shared/services/window.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 @Component({
 	selector: 'tds-change-password',
@@ -35,24 +34,28 @@ export class ChangePasswordComponent implements OnInit {
 		private loginService: LoginService,
 		private router: Router,
 		private store: Store,
-		private windowService: WindowService) {
+		private notifierService: NotifierService) {
 	}
 
 	ngOnInit(): void {
 		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
+		this.disableGlobalNotification(true);
 	}
 
 	/**
-	 * Request Password Recovery by sending email
+	 * Change Password
 	 */
 	public onPasswordChange(): void {
 		this.loginService.updatePassword(this.passwordChangeModel.newPassword, this.passwordChangeModel.confirmPassword).subscribe((res: any) => {
 			if (!res && !res.data.success) {
 				this.error = 'An error occurred, please try again later.';
+			} else if (res.errors && res.errors.length > 0) {
+				this.error = res.errors[0];
 			} else {
-				this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute('/project/show');
+				this.disableGlobalNotification(false);
+				this.router.navigate(['project', 'list'], { queryParams: { show: this.userContext.project.id }});
 			}
 		});
 	}
@@ -87,4 +90,14 @@ export class ChangePasswordComponent implements OnInit {
 		this.router.navigate(['/auth/login']);
 	}
 
+	/**
+	 * Disable global notification
+	 * @param disable
+	 */
+	private disableGlobalNotification(disable: boolean): void {
+		this.notifierService.broadcast({
+			name: 'alertTypeDisable',
+			disable: disable
+		});
+	}
 }
