@@ -16,9 +16,7 @@ export class ProjectService {
 	private jobProgressUrl = '../ws/progress';
 
 	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
-		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(()=> {
-			console.log('test');
-		});
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
 	getProjects(): Observable<any> {
