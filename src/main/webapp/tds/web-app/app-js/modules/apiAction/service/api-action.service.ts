@@ -220,7 +220,7 @@ export class APIActionService {
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,
-			dictionaryMethodName: model.agentMethod.dictionaryMethodName ? model.agentMethod.dictionaryMethodName : '',
+			dictionaryMethodName: model.dictionaryMethodName ? model.dictionaryMethodName : model.agentMethod.dictionaryMethodName,
 			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },
