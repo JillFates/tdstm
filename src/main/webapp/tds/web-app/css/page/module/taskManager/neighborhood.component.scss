@@ -1,0 +1,143 @@
+.neighborhood-container {
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+}
+
+.diagram-container {
+  width: 100%;
+  height: 100%;
+}
+
+.task-manager-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.task-graph-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3c8dbc;
+}
+
+.views-btn-group {
+  min-height: 44px;
+}
+
+.task-graph-subheader {
+  min-height: 37px;
+}
+
+.dropdown-z-index {
+  z-index: 5000;
+}
+
+.neighborhood-btn {
+  background-color: #fff !important;
+  border: 1px solid #ddd !important;
+  font-size: 1.2em !important;
+  color: #908f8f !important;
+}
+
+.refresh-container-btn {
+  background-color: #fff !important;
+  border: none;
+  font-size: 1.2em !important;
+  color: #3c8dbc !important;
+}
+
+.highlight-filter-container {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.highlight-filter-container > .btn {
+  background-color: transparent !important;
+  color: #908f8f !important;
+}
+
+.highlight-filter-control {
+  width: 60%;
+  border: none;
+  display: inline !important;
+}
+
+.task-chk-container {
+  display: inline;
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.task-chk-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.task-chk-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.task-chk-container input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.task-chk-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.task-chk-container .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.v-align-center {
+  vertical-align: middle;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.neighborhood-pie-countdown-container {
+  display: inline-block;
+}
+
+.neighborhood-control-label {
+  margin-right: 3px;
+}
