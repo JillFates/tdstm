@@ -18,7 +18,7 @@ export class CircleCountdownComponent implements OnInit {
 	refreshCountdownTime = 30;
 	refreshCount: number;
 	refreshAnimation = `countdown ${this.refreshCountdownTime}s linear infinite forwards`;
-	@ViewChild('refreshCircle') refreshCircle: ElementRef;
+	@ViewChild('refreshCircle', {static: false}) refreshCircle: ElementRef;
 
 	constructor() {
 		// constructor

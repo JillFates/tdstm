@@ -145,7 +145,7 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	actualNodeTemplate: number;
 	diagramOverview: Overview;
 	resetOvIndex: boolean;
-	@ViewChild('ctxMenu') ctxMenu: ElementRef;
+	@ViewChild('ctxMenu', {static: false}) ctxMenu: ElementRef;
 	shouldShowCtxMenu = false;
 
 	constructor(private renderer: Renderer2) { /* Constructor */ }

@@ -28,8 +28,8 @@ export class NeighborhoodComponent implements OnInit {
 	tasks: IGraphTask[];
 	nodeData$: Observable<any[]>;
 	links$: Observable<any[]>;
-	@ViewChild('graph') graph: DiagramLayoutComponent;
-	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
+	@ViewChild('graph', {static: false}) graph: DiagramLayoutComponent;
+	@ViewChild('eventsDropdown', {static: false}) eventsDropdown: DropDownListComponent;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
