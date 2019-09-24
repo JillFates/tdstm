@@ -1,9 +1,11 @@
 package com.tdsops.common.sql
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.If
+
+import com.tdssrc.grails.DateTimeFilterUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import grails.util.Pair
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
@@ -13,6 +15,7 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 import java.sql.Timestamp
 
 class SqlUtil {
+
 	public static final String COMMA = ","
 	public static final String STRING_QUOTE = "'"
 	public static final String LEFT_PARENTHESIS = "("
@@ -26,7 +29,7 @@ class SqlUtil {
 	 * @param andOr - the boolean identifier (default 'and')
 	 * @return String concatenated string
 	 */
-	static String appendToWhere(String query, String additional, String andOr='and') {
+	static String appendToWhere(String query, String additional, String andOr = 'and') {
 		return query + (query ? ' ' + andOr + ' ' : '') + additional
 	}
 
@@ -477,52 +480,18 @@ class SqlUtil {
 	}
 
 	/**
+	 * Handle DateTime filters using {@code DateTimeFilterUtil}.
 	 *
-	 * @param fieldSearchData
+	 * @param fieldSearchData an instance {@code FieldSearchData}
+	 * @see DateTimeFilterUtil
 	 */
 	private static void handleDateOrDatetimeField(FieldSearchData fieldSearchData) {
 
-		String operator = 'BETWEEN'
-		fieldSearchData.useWildcards = true
+		Pair<Date, Date> result = DateTimeFilterUtil.parseUserEntry(fieldSearchData.filter)
+		fieldSearchData.sqlSearchExpression = " (${fieldSearchData.whereProperty} BETWEEN :${fieldSearchData.columnAlias}_start AND :${fieldSearchData.columnAlias}_end) "
 
-		switch (fieldSearchData.filter) {
-		/* Scenario 1: Starts with '!=' */
-			case ~/^(!=).*/:
-				fieldSearchData.filter = fieldSearchData.filter.substring(2)
-				fieldSearchData.useWildcards = false
-				operator = 'NOT IN'
-				break
-
-		/* Scenario 2: Starts with '=' */
-			case ~/^(=).*/:
-				fieldSearchData.filter = fieldSearchData.filter.substring(1)
-				fieldSearchData.useWildcards = false
-				operator = 'IN'
-				break
-
-		/* Scenario 3: Starts with '-' or '!' */
-			case ~/^(-|!).*/:
-				fieldSearchData.filter = fieldSearchData.filter.substring(1)
-				operator = 'NOT IN'
-				break
-		}
-
-		Object paramValue = parseEnumParameter(fieldSearchData)
-		if (paramValue) {
-			String expression = getSingleValueExpression(fieldSearchData.whereProperty, fieldSearchData.columnAlias, operator)
-			if (operator == 'NOT IN') {
-				fieldSearchData.sqlSearchExpression = '( ' + expression + ' OR ' + fieldSearchData.whereProperty + ' IS NULL )'
-			} else {
-				fieldSearchData.sqlSearchExpression = expression
-			}
-
-			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias, paramValue)
-		} else {
-			// Particular Scenario. Because we are filtering here and not in the SQL sentence directly,
-			// we need to solve those cases where filter does not match with any of the enumeration values.
-			// Then, to manage this case, we simply add a false where clause, expecting an empty list of results.
-			fieldSearchData.sqlSearchExpression = " 1 = 0"
-		}
+		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_start', result.getaValue())
+		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_end', result.getbValue())
 	}
 
 	/**
