@@ -49,7 +49,8 @@ spring {
 }
 
 management {
-    endpoints['enabled-by-default'] = false
+	endpoints.web.exposure.include= "*"
+    endpoints['enabled-by-default'] = true
 }
 
 management {
@@ -439,8 +440,8 @@ if (System.getProperty("tdstm.gconsole")) {
 		plugin {
 			console.enabled = true
 			springsecurity {
-				staticSecurityRules << [pattern: '/health/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-				staticSecurityRules << [pattern: '/info/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/h2-console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/actuator/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
