@@ -160,7 +160,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	lastSelectedAgentMethodModel: AgentMethodModel = {
-		id: '0',
+		uId: '0',
 		dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	private savedApiAction = false;
@@ -288,7 +288,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.agentMethodList.push({ uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -631,7 +631,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+						this.agentMethodList.push({uId: 0, dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 						if (this.apiActionModel.agentMethod) {
 							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
 						}
@@ -646,7 +646,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+				this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {

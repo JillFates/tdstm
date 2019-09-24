@@ -173,6 +173,7 @@ export class APIActionService {
 					if (response.hasOwnProperty(property)) {
 						agentMethodModel.push({
 							id: response[property].apiMethod,
+							uId: response[property].apiMethod + response[property].name,
 							name: response[property].name,
 							dictionaryMethodName: response[property].dictionaryMethodName ? response[property].dictionaryMethodName : response[property].name,
 							description: response[property].description,
