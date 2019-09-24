@@ -1,6 +1,6 @@
 <%@page import="net.transitionmanager.security.Permission"%>
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse pull-left navbar-ul-container navbar-ul-container-full-menu" id="navbar-collapse">
+    <div class="tranman-menu-component navbar-ul-container navbar-ul-container-full-menu">
         <g:if test="${currProject}">
             <ul class="nav navbar-nav">
                 <tds:hasPermission permission="${Permission.AdminMenuView}">

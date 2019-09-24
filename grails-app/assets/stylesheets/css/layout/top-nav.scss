@@ -1,3 +1,6 @@
+body > .wrapper {
+  padding-top: 45px;
+}
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
@@ -6,26 +9,14 @@
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 
-  /* CLEAR AND ADAPT CSS TEMPLATE TO TDS */
   .navbar {
     background-color: $color-active-dark3 !important;
     min-height: 45px;
-  }
-
-  .navbar-custom-menu {
-    i.licensing-error-warning {
-      color: $color-warning-license--yellow;
-      font-size: 18px;
-    }
-  }
-
-  .navbar-ul-container {
-    .navbar-nav {
-      a.dropdown-toggle {
-        font-weight: 400 !important;
-      }
-    }
   }
 
   .navbar-header {
@@ -33,6 +24,32 @@
 
     .navbar-toggle {
       float: left !important;
+    }
+  }
+
+  .dropdown-menu {
+    left: -1px;
+  }
+  .dropdown-menu .active {
+    > a,
+    > a:focus,
+    > a:hover {
+      position: relative;
+      color: $color-text;
+      background-color: transparent;
+    }
+    > a:after {
+      content: "";
+      background-color: $color-active;
+      display: block;
+      position: absolute;
+      bottom: 5px;
+      left: 15px;
+      right: 15px;
+      height: 3px;
+    }
+    > a:hover:after {
+      background-color: $color-text-inverse;
     }
   }
 
@@ -52,11 +69,6 @@
       padding: 0px !important;
     }
 
-    #logo-header {
-      height: 34px;
-      margin-top: 9px;
-      margin-right: 14px;
-    }
     #nav-project-name {
       font-size: 75%;
       padding: 0 10px;
@@ -73,7 +85,25 @@
     .nav > li > a:hover {
       background: mix(black, $color-active-dark3, 10%);
     }
-    #navbar-collapse {
+
+    .navbar-toggle {
+      padding: 0 10px;
+      line-height: 45px;
+    }
+
+    .user-navarea {
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      i.licensing-error-warning {
+        color: $color-warning-license--yellow;
+        font-size: 18px;
+      }
+    }
+
+    .tranman-menu-component {
+      display: inline-block;
       .nav > li > a:hover:after {
         content: "";
         height: 3px;
@@ -85,17 +115,17 @@
         right: 10px;
       }
     }
-    .menu-parent-item {
-      color: $color-text;
+    .user-menu .user-menu-text {
+      display: none;
     }
 
     .dropdown-menu > li > a:hover {
       color: $color-text-inverse;
       background: $color-active-light1;
     }
-    .nav > li.user-menu {
+    li.user-menu {
       height: 45px;
-      > a {
+      a {
         display: inline-block;
         overflow: hidden;
         text-align: center;
@@ -113,14 +143,14 @@
           text-align: center;
         }
       }
-      > a:hover {
+      a:hover {
         .user-name {
           color: $color-active-dark1;
         }
       }
     }
 
-    .nav > li.open > a {
+    li.open > a {
       // override blue-skin css theme
       background: $color-active;
       color: $color-text-inverse;
@@ -140,6 +170,9 @@
         }
       }
     }
+    #mobile-nav {
+      display: block;
+    }
 
     @media (max-width: 1150px) {
       .nav > li > a {
@@ -149,6 +182,110 @@
     @media (max-width: 1020px) {
       .nav > li > a {
         font-size: 90%;
+      }
+    }
+
+    // mobile nav active
+    @media (max-width: 991px) {
+      .navbar-toggle {
+        display: block;
+      }
+      #mobile-nav {
+        display: none;
+        position: fixed;
+        width: 30%;
+        min-width: 300px;
+        bottom: 0;
+        top: 43px;
+        right: 0;
+        text-align: right;
+        overflow: auto;
+        background-color: $color-active-dark3;
+        font-weight: 400;
+
+        .dropdown-menu {
+          width: 100%;
+          font-size: 85%;
+          border: 0;
+          border-radius: 0;
+          padding: 0 0 10px 0;
+          margin: 0;
+          left: 0;
+          right: 0;
+          background: #fff;
+
+          .divider {
+            height: 1px;
+            margin: 4px 0;
+            background-color: #eee;
+          }
+        }
+        .navbar-nav {
+          margin: 0;
+        }
+        .user-navarea,
+        .navbar-ul-container {
+          position: relative;
+          float: none;
+          display: block;
+        }
+
+        .user-navarea {
+          > ul {
+            height: auto;
+            text-align: right;
+            padding: 0;
+            float: none;
+
+            li {
+              height: auto;
+              display: block;
+              float: none;
+              a {
+                text-align: right;
+                .user-menu-text {
+                  display: inline;
+                }
+                .user-name {
+                  display: none;
+                }
+              }
+            }
+            li.notifications-menu {
+              display: none;
+            }
+            .dropdown-menu {
+              position: relative;
+            }
+          }
+        }
+
+        li.dropdown {
+          float: none;
+          a {
+            display: block;
+            padding: 0 30px;
+            line-height: 35px;
+          }
+          > .dropdown-menu {
+            display: none;
+            position: relative;
+            float: none;
+            text-align: right;
+            a {
+              line-height: 30px;
+            }
+          }
+        }
+        li.dropdown.open {
+          > .dropdown-menu {
+            display: block;
+          }
+        }
+      }
+
+      #mobile-nav.collapse.in {
+        display: block;
       }
     }
   }

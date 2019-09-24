@@ -104,9 +104,6 @@
             <nav class="navbar navbar-static-top">
                 <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
                     <div class="navbar-header branding">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
-                            <i class="fa fa-bars"></i>
-                        </button>
                         <g:if test="${isLicenseManagerEnabled}">
                             <asset:image src="images/TMHeaderLogo_v4.7.png" alt="Transition Manager" border="0" />
                         </g:if>
@@ -120,77 +117,91 @@
                         </g:else>
                     </div>
 
-                    <g:if test="${isLicenseManagerEnabled}">
-                        <g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
-                    </g:if>
-                    <g:else>
-                        <g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
-                    </g:else>
+					<button
+						type="button"
+						class="navbar-toggle collapsed"
+						data-toggle="collapse"
+						data-target="#mobile-nav"
+					>
+						<i class="fa fa-bars"></i>
+					</button>
+					<div id="mobile-nav" class="navbar-item-group">
+
+						<div class="navbar-custom-menu user-navarea">
+							<ul class="nav navbar-nav">
+								<!-- Notifications Menu -->
+								<li class="dropdown notifications-menu">
+									<!-- Menu toggle button -->
+									<span class="tds-nav-item" id="nav-project-name">
+										<g:if test="${currProject}"> ${currProject.name} </g:if>
+										<g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
+										<g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
+									</span>
+								</li>
+								<li>
+									<g:if test="${!isLicenseManagerEnabled}">
+										<tds:licenseWarning />
+									</g:if>
+								</li>
+								<sec:ifLoggedIn>
+									<!-- User Account Menu -->
+									<li class="dropdown user user-menu">
+										<!-- Menu Toggle Button -->
+							<a
+								href="#"
+								class="dropdown-toggle"
+								data-toggle="dropdown"
+								title="${tds.currentPerson()}"
+							>
+								<span class="user-name">${tds.currentPerson()}</span>
+								<span class="user-menu-text"
+									>Account Options</span
+								>
+							</a>
+							<ul class="dropdown-menu">
+								<li class="menu-child-item">
+									<a
+										id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"
+										style="cursor: pointer;"
+										>Account Details</a
+									>
+								</li>
+								<li class="menu-child-item">
+									<a
+										id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"
+										style="cursor: pointer;"
+										>Date and Timezone</a
+									>
+								</li>
+								<li class="menu-child-item">
+									<a
+										id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"
+										style="cursor: pointer;"
+										>Edit Preferences</a
+									>
+								</li>
+								<li class="divider"></li>
+								<li class="menu-child-item">
+									<g:link controller="auth" action="signOut" onclick="clearStorage()"
+										>Sign Out</g:link
+									>
+								</li>
+							</ul>
+								</li>
+								</sec:ifLoggedIn>
+							</ul>
+						</div>
+						
+						<g:if test="${isLicenseManagerEnabled}">
+							<g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+						</g:if>
+						<g:else>
+							<g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
+						</g:else>
 
 
-                    <!-- Navbar Right Menu -->
-                    <div class="navbar-custom-menu user-navarea">
-                        <ul class="nav navbar-nav">
-                            <!-- Notifications Menu -->
-                            <li class="dropdown notifications-menu">
-                                <!-- Menu toggle button -->
-								<span class="tds-nav-item" id="nav-project-name">
-                                    <g:if test="${currProject}"> ${currProject.name} </g:if>
-                                    <g:if test="${moveEvent}"> : ${moveEvent.name}</g:if>
-                                    <g:if test="${moveBundle}"> : ${moveBundle.name}</g:if>
-						</span>
-                            </li>
-                            <li>
-                                <g:if test="${!isLicenseManagerEnabled}">
-                                    <tds:licenseWarning />
-                                </g:if>
-                            </li>
-                            <sec:ifLoggedIn>
-                                <!-- User Account Menu -->
-                                <li class="dropdown user user-menu">
-                                    <!-- Menu Toggle Button -->
-						<a
-							href="#"
-							class="dropdown-toggle"
-							data-toggle="dropdown"
-							title="${tds.currentPerson()}"
-						>
-							<span class="user-name">${tds.currentPerson()}</span>
-						</a>
-						<ul class="dropdown-menu">
-							<li class="menu-child-item">
-								<a
-									 id="editPersonId" name="${userLogin.username}" onclick="UserPreference.editPerson();return false;"
-									style="cursor: pointer;"
-									>Account Details</a
-								>
-							</li>
-							<li class="menu-child-item">
-								<a
-									id="editTimezoneId" name="${userLogin.username}" onclick="UserPreference.editDateAndTimezone();return false;"
-									style="cursor: pointer;"
-									>Date and Timezone</a
-								>
-							</li>
-							<li class="menu-child-item">
-								<a
-									id="resetPreferenceId" name="${userLogin.username}" onclick="UserPreference.editPreference();return false;"
-									style="cursor: pointer;"
-									>Edit Preferences</a
-								>
-							</li>
-							<li class="divider"></li>
-							<li class="menu-child-item">
-								<g:link controller="auth" action="signOut" onclick="clearStorage()"
-									>Sign Out</g:link
-								>
-							</li>
-						</ul>
-							</li>
-                            </sec:ifLoggedIn>
-                        </ul>
-                    </div><!-- /.navbar-custom-menu -->
-                </div><!-- /.container-fluid -->
+					</div>
+				</div>
             </nav> 
 		</g:else>
     </header>

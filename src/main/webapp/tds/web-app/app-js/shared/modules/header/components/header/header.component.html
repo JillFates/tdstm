@@ -12,122 +12,100 @@
 			}"
 		>
 			<div class="navbar-header branding">
-				<button
-					type="button"
-					class="navbar-toggle collapsed"
-					data-toggle="collapse"
-					data-target="#navbar-collapse"
-				>
-					<i class="fa fa-bars"></i>
-				</button>
 				<img
 					[src]="userContext.project.logoUrl"
 					alt="Transition Manager Logo"
 				/>
 			</div>
 
-			<tds-tranman-menu></tds-tranman-menu>
+			<button
+				type="button"
+				class="navbar-toggle collapsed"
+				data-toggle="collapse"
+				data-target="#mobile-nav"
+			>
+				<i class="fa fa-bars"></i>
+			</button>
 
-			<!-- Navbar Right Menu -->
-			<div class="navbar-custom-menu user-navarea">
-				<ul class="nav navbar-nav">
-					<!-- <li class="dropdown search-menu">
-						<a
-							href="#"
-							class="nav-link nav-icon dropdown-toggle"
-							data-toggle="dropdown"
+			<div id="mobile-nav" class="navbar-item-group">
+				<!-- User Menu -->
+				<div class="navbar-custom-menu user-navarea">
+					<ul class="nav navbar-nav">
+						<!-- Notifications Menu -->
+						<li class="notifications-menu">
+							<span class="tds-nav-item" id="nav-project-name">
+								<span *ngIf="userContext.project">{{
+									userContext.project.name
+								}}</span>
+								<span *ngIf="userContext.event">
+									: {{ userContext.event.name }}</span
+								>
+								<span *ngIf="userContext.bundle">
+									: {{ userContext.bundle.name }}</span
+								>
+							</span>
+						</li>
+						<li
+							*ngIf="
+								!userContext.licenseInfo.license.isManager &&
+								!userContext.licenseInfo.license.isValid
+							"
 						>
-							<clr-icon shape="search"></clr-icon>
-						</a>
-						<ul class="dropdown-menu search-dialog-dropdown-menu">
-							<li class="search-body">
-								<form
-									clrForm
-									[formGroup]="searchForm"
-									clrLayout="vertical"
-									class="is-fullwidth"
-								>
-									<clr-input-container class="clr-col-12">
-										<input
-											clrInput
-											type="text"
-											formControlName="search"
-											placeholder="Search"
-										/>
-									</clr-input-container>
-								</form>
-							</li>
-						</ul>
-					</li> -->
-					<!-- Notifications Menu -->
-					<li class="notifications-menu">
-						<span class="tds-nav-item" id="nav-project-name">
-							<span *ngIf="userContext.project">{{
-								userContext.project.name
-							}}</span>
-							<span *ngIf="userContext.event">
-								: {{ userContext.event.name }}</span
+							<tds-license-warning></tds-license-warning>
+						</li>
+						<!-- User Account Menu -->
+						<li class="dropdown user user-menu">
+							<!-- Menu Toggle Button -->
+							<a
+								href="#"
+								class="dropdown-toggle"
+								data-toggle="dropdown"
+								[title]="userContext.person.fullName"
 							>
-							<span *ngIf="userContext.bundle">
-								: {{ userContext.bundle.name }}</span
-							>
-						</span>
-					</li>
-					<li
-						*ngIf="
-							!userContext.licenseInfo.license.isManager &&
-							!userContext.licenseInfo.license.isValid
-						"
-					>
-						<tds-license-warning></tds-license-warning>
-					</li>
-					<!-- User Account Menu -->
-					<li class="dropdown user user-menu">
-						<!-- Menu Toggle Button -->
-						<a
-							href="#"
-							class="dropdown-toggle"
-							data-toggle="dropdown"
-							[title]="userContext.person.fullName"
-						>
-							<span class="user-name">{{
-								getUserIconText()
-							}}</span>
-						</a>
-						<ul class="dropdown-menu">
-							<li class="menu-child-item">
-								<a
-									(click)="openEditPersonModal()"
-									style="cursor: pointer;"
-									>Account Details</a
+								<span class="user-name">{{
+									getUserIconText()
+								}}</span>
+								<span class="user-menu-text"
+									>Account Options</span
 								>
-							</li>
-							<li class="menu-child-item">
-								<a
-									(click)="openDateTimezoneModal()"
-									style="cursor: pointer;"
-									>Date and Timezone</a
-								>
-							</li>
-							<li class="menu-child-item">
-								<a
-									(click)="openPrefModal()"
-									style="cursor: pointer;"
-									>Edit Preferences</a
-								>
-							</li>
-							<li class="divider"></li>
-							<li class="menu-child-item">
-								<a (click)="logOut()" style="cursor: pointer;"
-									>Sign Out</a
-								>
-							</li>
-						</ul>
-					</li>
-				</ul>
+							</a>
+							<ul class="dropdown-menu">
+								<li class="menu-child-item">
+									<a
+										(click)="openEditPersonModal()"
+										style="cursor: pointer;"
+										>Account Details</a
+									>
+								</li>
+								<li class="menu-child-item">
+									<a
+										(click)="openDateTimezoneModal()"
+										style="cursor: pointer;"
+										>Date and Timezone</a
+									>
+								</li>
+								<li class="menu-child-item">
+									<a
+										(click)="openPrefModal()"
+										style="cursor: pointer;"
+										>Edit Preferences</a
+									>
+								</li>
+								<li class="divider"></li>
+								<li class="menu-child-item">
+									<a
+										(click)="logOut()"
+										style="cursor: pointer;"
+										>Sign Out</a
+									>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+
+				<tds-tranman-menu></tds-tranman-menu>
 			</div>
-			<!-- /.navbar-custom-menu -->
 		</div>
-		<!-- /.container-fluid -->
 	</nav>
 </header>
