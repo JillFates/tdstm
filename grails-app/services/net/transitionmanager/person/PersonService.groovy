@@ -21,30 +21,38 @@ import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationship
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.party.PartyRelationshipType
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.StringUtils
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.security.crypto.password.PasswordEncoder
+
 /**
  * Provides a number of functions to help in the management and access of Person objects.
  */
 @Slf4j
 class PersonService implements ServiceMethods {
 
-	def auditService
-	def jdbcTemplate
-	def moveEventService
+	AuditService               auditService
+	JdbcTemplate               jdbcTemplate
+	MoveEventService           moveEventService
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
-	def partyRelationshipService
-	def projectService
-	def userPreferenceService
+	PartyRelationshipService   partyRelationshipService
+	ProjectService             projectService
+	UserPreferenceService      userPreferenceService
+	PasswordEncoder            passwordEncoder
 
 	private static final List<String> SUFFIXES = [
 			"jr.", "jr", "junior", "ii", "iii", "iv", "senior", "sr.", "sr", //family
@@ -1652,7 +1660,7 @@ class PersonService implements ServiceMethods {
 						throw new InvalidParamException('The old password is required')
 					}
 
-					if (!userLogin.comparePassword(params.oldPassword, true)) {
+					if (!passwordEncoder.matches(params.oldPassword, userLogin.password)) {
 						throw new InvalidParamException('Old password entered does not match the existing password')
 					}
 
@@ -1674,10 +1682,7 @@ class PersonService implements ServiceMethods {
 				userLogin.active = 'N'
 			}
 
-			save userLogin
-			if (userLogin.hasErrors()) {
-				throw new DomainUpdateException('An error occurred while attempting to update the user changes')
-			}
+			userLogin.save()
 
 			if (params.newPassword) {
 				auditService.saveUserAudit(UserAuditBuilder.userLoginPasswordChanged(userLogin))

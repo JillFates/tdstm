@@ -1249,10 +1249,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new InvalidParamException("The $dateField field has invalid format")
 		}
 
-		// Try to save the user changes
-		if (!userLogin.save(flush: true, failOnError: false)) {
-			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
-		}
+
 
 		// When enabling user - enable Person
 		// When disable user - do NOT change Person
@@ -1301,6 +1298,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		if (params.projectId) {
 			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
+		}
+
+		// Try to save the user changes
+		if (!userLogin.save(flush: true, failOnError: false)) {
+			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
 		}
 
 		return userLogin

@@ -171,7 +171,8 @@ class UserLogin {
 		if (!isLocal) {
 			throw new DomainUpdateException('The user password is not managed in the application')
 		}
-		password = encryptPassword(unhashedPassword)
+
+		password = unhashedPassword
 		failedLoginAttempts = 0
 		lockedOutUntil = null
 		//We remove the forcePassword Change Flag After the password was set
@@ -196,23 +197,6 @@ class UserLogin {
 			//TM-5601: Don't use flush:true is not needed for the transaction and we can end in a Saving loop ConcurrentModificationException due to the afterUpdate Event
 			ph.save()
 		}
-	}
-
-	/**
-	 * Compare new cleartext password to the existing hashed password that will optionally check legacy hash method(s)
-	 * @param unhashedPassword - the new password to compare to hashed password
-	 * @param saltPrefix - the salt String to use as the prefix for hashing the user's password
-	 * @param tryLegacy - a flag to control if legacy hash methods should be tried (default true)
-	 * @return true if the passwords match otherwise false
-	 */
-	boolean comparePassword(String unhashedPassword, boolean tryLegacy = true) {
-		String newPassword = encryptPassword(unhashedPassword)
-		boolean matched = newPassword == password
-		if (!matched && tryLegacy) {
-			newPassword = SecurityUtil.encryptLegacy(unhashedPassword)
-			matched = newPassword == password
-		}
-		return matched
 	}
 
 	List<String> getSecurityRoleCodes() {
