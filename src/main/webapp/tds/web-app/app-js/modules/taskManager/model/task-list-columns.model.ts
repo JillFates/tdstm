@@ -21,7 +21,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol0',
 		property: 'userSelectedCol0',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -30,7 +30,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol1',
 		property: 'userSelectedCol1',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -63,7 +63,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol2',
 		property: 'userSelectedCol2',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -72,7 +72,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol3',
 		property: 'userSelectedCol3',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -81,7 +81,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol4',
 		property: 'userSelectedCol4',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
