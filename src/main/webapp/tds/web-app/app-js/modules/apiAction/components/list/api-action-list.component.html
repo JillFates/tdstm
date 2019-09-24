@@ -53,6 +53,9 @@
 							</div>
 						</ng-template>
 
+						<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.label === 'Type'">
+								{{dataItem['actionType'].id ? dataItem['actionType'].id : dataItem['actionType']}}
+						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 						</ng-template>

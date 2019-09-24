@@ -35,6 +35,7 @@ import {PostNoticesManagerService} from '../modules/auth/service/post-notices-ma
 import {PostNoticesService} from '../modules/auth/service/post-notices.service';
 import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
 import {LocalStorageProvider} from './providers/localstorage.provider';
+import {AssetTagUIWrapperService} from './services/asset-tag-ui-wrapper.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -188,10 +189,9 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
+		PowerComponent,
 		DiagramLayoutComponent,
-		CircleCountdownComponent,
-		TDSModalPageWrapperComponent,
-		PowerComponent
+		CircleCountdownComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -256,11 +256,10 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
+		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
-		CircleCountdownComponent,
-		TDSModalPageWrapperComponent,
-		PowerComponent
+		CircleCountdownComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -291,6 +290,7 @@ export class SharedModule {
 				ComponentCreatorService,
 				UILoaderService,
 				UIDialogService,
+				AssetTagUIWrapperService,
 				UIActiveDialogService,
 				// Services
 				HeaderService,

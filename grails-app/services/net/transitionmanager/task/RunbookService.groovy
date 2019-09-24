@@ -39,13 +39,10 @@ class RunbookService implements ServiceMethods {
 	 * @return List<TaskDependency> a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<AssetComment> tasks) {
-		List<TaskDependency> dependencies = []
-		tasks.each { t ->
-			t.taskDependencies.each { d ->
-				dependencies << d
-			}
-		}
-		return dependencies
+		return TaskDependency.where {
+			assetComment in tasks
+			predecessor in tasks
+		}.list()
 	}
 
 	/**

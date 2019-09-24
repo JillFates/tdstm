@@ -18,15 +18,20 @@
                            {{team.teamTaskCount}} 
                         </a>
                     </td>
-                    <td class="teambarcolumn" nowrap="">
+                    <td class="teambarcolumn" nowrap="" *ngIf="team.teamTaskCount !== team.teamDoneCount; else okTemplate" >
                         <div class="team_bar_base_small">
                             <div class="team_bar_graph_small" 
                                 id="team_{{team.role.id}}" 
                                 [style.width.%]="team.percDone">
                             </div>
                         </div>
-                        <span class="small_text"><b>{{team.teamTaskCount}} to go</b></span>
+                        <span class="small_text"><b>{{team.teamTaskCount - team.teamDoneCount}} to go</b></span>
                     </td>
+                    <ng-template #okTemplate>
+                        <td class="teambarcolumn">
+                            <img src="/tdstm/assets/images/checked-icon.png">
+                        </td>
+                    </ng-template>
                 </tr>
             </tbody>
         </table>

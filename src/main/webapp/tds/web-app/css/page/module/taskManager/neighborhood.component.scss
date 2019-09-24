@@ -15,6 +15,12 @@
   align-items: center;
 }
 
+.task-manager-sub-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .task-graph-title {
   font-size: 24px;
   font-weight: bold;
@@ -136,4 +142,8 @@
 
 .neighborhood-pie-countdown-container {
   display: inline-block;
+}
+
+.neighborhood-control-label {
+  margin-right: 3px;
 }

@@ -80,32 +80,6 @@ class MoveBundleService implements ServiceMethods {
 		}
 	}
 
-	MoveBundleStep createMoveBundleStep(MoveBundle moveBundle, transitionId, Map params) {
-
-		def beGreen = params["beGreen_"+transitionId]
-		MoveBundleStep moveBundleStep = MoveBundleStep.findOrCreateByMoveBundleAndTransitionId(moveBundle, transitionId)
-		if(params["calcMethod_"+transitionId]){
-			moveBundleStep.calcMethod = params["calcMethod_"+transitionId]
-		}
-		moveBundleStep.label = params["dashboardLabel_"+transitionId]
-		moveBundleStep.planStartTime = TimeUtil.parseISO8601DateTime((String) params['startTime_' + transitionId])
-		moveBundleStep.planCompletionTime = TimeUtil.parseISO8601DateTime((String) params['completionTime_' + transitionId])
-
-		//show the step progress in green when user select the beGreen option
-		moveBundleStep.showInGreen = beGreen == 'on' ? 1 : 0
-
-		save(moveBundleStep)
-	}
-
-	/**
-	 * Delete a MoveBundleStep and associated records.
-	 * @param  moveBundleStep to be deleted
-	 */
-	def deleteMoveBundleStep(MoveBundleStep moveBundleStep) {
-		StepSnapshot.executeUpdate 'DELETE StepSnapshot where moveBundleStep=?0', [moveBundleStep]
-		moveBundleStep.delete()
-	}
-
 	/**
 	 * Return MoveEvent Detailed Results for given event.
 	 * @return : MoveEvent Detailed Results
