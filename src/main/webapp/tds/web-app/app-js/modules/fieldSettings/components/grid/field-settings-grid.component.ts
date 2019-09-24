@@ -141,12 +141,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * just whenever there is a delete action pending to be saved
 	 */
 	protected onSaveAll(): void {
-		this.askForDeleteUnderlayingData()
-			.then((deleteUnderLaying: boolean) => {
-				if (deleteUnderLaying) {
-					this.notifySaveAll(deleteUnderLaying)
-				}
-			});
+		if (!(!this.isEditable || !this.isDirty || this.formHasError)) {
+			this.askForDeleteUnderlayingData()
+				.then((deleteUnderLaying: boolean) => {
+					if (deleteUnderLaying) {
+						this.notifySaveAll(deleteUnderLaying)
+					}
+				});
+			}
 	}
 
 	/**
@@ -158,8 +160,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 		if (countFieldsToDelete) {
 			return this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA', [countFieldsToDelete > 1 ? 'fields' : 'field'] ),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'),
 				this.translate.transform('GLOBAL.YES'),
 				this.translate.transform('GLOBAL.NO'),
 				true);
