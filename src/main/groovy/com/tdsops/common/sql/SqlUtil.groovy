@@ -317,7 +317,8 @@ class SqlUtil {
 
 		if (isDateOrDatetimeField(fieldSearchData)) {
 			// call new method to add date/datetime filter logic
-			handleDateOrDatetimeField(fieldSearchData);
+			handleDateOrDatetimeField(fieldSearchData)
+			return
 		}
 
 		String originalFilter = fieldSearchData.filter.trim()
