@@ -39,17 +39,7 @@ function changeStatus(id, status, currentStatus, from){
 						$('#done_button_'+id).remove();
 					}
                     if (data.lastUpdatedTimePassed) {
-                        var timePassed = "";
-                        var timePassedObject = data.lastUpdatedTimePassed;
-                        timePassed = 	timePassedObject.years ? timePassedObject.years + "y" :
-                            timePassedObject.months ? timePassedObject.months + "M" :
-                                timePassedObject.days ? timePassedObject.days + "d" :
-                                    timePassedObject.hours ? timePassedObject.hours + "h" :
-                                        timePassedObject.minutes ? timePassedObject.minutes + "m" :
-                                            timePassedObject.seconds ? timePassedObject.seconds + "s" :
-                                                timePassedObject.millis ? timePassedObject.millis + "ms" :
-                                                    "Just Now";
-                        $('#lastUpdated_' + id).html(timePassed);
+                        $('#lastUpdated_' + id).html('Just now');
                     }
 				} else {
 					$('#myTaskList').html(data)
