@@ -619,21 +619,23 @@ class MoveEventService implements ServiceMethods {
 		Date estimatedStart = categoryStats[3] ?: moveEvent.estStartTime
 		Date estimatedFinish = categoryStats[4] ?: moveEvent.estCompletionTime
 
+		Date now = new Date()
+
 		Long totalTasks = categoryStats[7]
 		Long completedTasks = categoryStats[8]
 		Long percentCompleted = categoryStats[9]
 
-		int longestRemainingInMinutes = getLongestRemainingInMinutes(categoryStats[5], categoryStats[6])
+		long longestRemainingInMillis = getLongestRemainingInMillis(categoryStats[5], categoryStats[6])
 
 		// default is green
 		String color = "green"
 		if (completedTasks == totalTasks && actualFinish < estimatedFinish) {
 			color = "#24488a" // completed-blue
 		} else {
-			if (estimatedFinish < new Date() && percentCompleted < 100) {
+			if (estimatedFinish < now && percentCompleted < 100) {
 				color = "red" // past completed time and tasks remain
 			} else {
-				if (longestRemainingInMinutes && estimatedFinish < new Date().minutes + longestRemainingInMinutes) {
+				if (longestRemainingInMillis && estimatedFinish < new Date(now.getTime() + longestRemainingInMillis)) {
 					color = "#FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
 				}
 			}
@@ -642,17 +644,17 @@ class MoveEventService implements ServiceMethods {
 	}
 
 	/**
-	 * Calculates the longest remaining time for a task in minutes, or returns 0 if parameters are empty or null.
+	 * Calculates the longest remaining time for a task in milliseconds, or returns 0 if parameters are empty or null.
 	 * @param maxRemaining
 	 * @param maxRScale
-	 * @return  The max remaining time in minutes, or zero if anything is empty or null.
+	 * @return  The max remaining time in milliseconds, or zero if anything is empty or null.
 	 */
-	private int getLongestRemainingInMinutes(maxRemaining, TimeScale maxRScale) {
+	private long getLongestRemainingInMillis(maxRemaining, TimeScale maxRScale) {
 
 		if (!maxRemaining || !maxRScale) {
 			return 0
 		} else {
-			return maxRScale.toMinutes(maxRemaining)
+			return maxRScale.toMinutes(maxRemaining) * 60000
 		}
 	}
 

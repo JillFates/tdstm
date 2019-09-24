@@ -7,7 +7,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, Event, Params, Router, NavigationEnd} from '@angular/router';
 import {ProjectService} from '../../service/project.service';
 import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
@@ -45,6 +45,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showActive: boolean;
+	private projectToOpen: number;
+	private projectOpen = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -75,12 +77,20 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngAfterContentInit() {
-		this.route.params.subscribe((params) => {
+		this.route.queryParams.subscribe((params) => {
 			if (params['show']) {
 				setTimeout(() => {
-					this.showProject(params['show']);
+					this.projectToOpen = +params['show'];
+					this.showProject(this.projectToOpen);
 				});
 			}
+		});
+		this.router.events.subscribe((event: Event) => {
+				if (event instanceof NavigationEnd && event.url.includes('show=') && this.projectToOpen) {
+					setTimeout(() => {
+						this.showProject(this.projectToOpen);
+					});
+				}
 		});
 	}
 
@@ -120,12 +130,17 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	protected showProject(id): void {
-		this.dialogService.open(ProjectViewEditComponent,
-			[{provide: 'id', useValue: id}]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
+		if (!this.projectOpen) {
+			this.projectOpen = true;
+			this.dialogService.open(ProjectViewEditComponent,
+				[{provide: 'id', useValue: id}]).then(result => {
+					this.projectOpen = false;
+					this.reloadData();
+			}).catch(result => {
+				this.projectOpen = false;
+				this.reloadData();
+			});
+		}
 	}
 
 	protected openCreateProject(): void {
