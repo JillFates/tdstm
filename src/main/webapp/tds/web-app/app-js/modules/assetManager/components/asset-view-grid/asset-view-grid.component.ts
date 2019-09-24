@@ -252,6 +252,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		if (this.tagSelector) {
 			this.tagSelector.reset();
 		}
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -271,6 +272,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	onReload(): void {
 		this.modelChange.emit();
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -372,6 +374,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				console.log('Error:', error);
 				this.onReload();
 			});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -435,6 +438,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}).catch(result => {
 			console.log(result);
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 
 	}
 
@@ -469,6 +473,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}).catch(result => {
 			console.log('Cancel:', result);
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 
 	}
 
@@ -531,7 +536,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
 			.then(() => this.onReload())
-			.catch((err) => this.onReload() )
+			.catch((err) => this.onReload() );
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
