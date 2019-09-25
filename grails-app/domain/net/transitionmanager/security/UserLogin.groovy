@@ -160,11 +160,6 @@ class UserLogin {
 		saltPrefix
 	}
 
-	// Hash the password for the user. If the user doesn't have a salt then one will be assigned to the user
-	String encryptPassword(String password) {
-		SecurityUtil.encrypt(password, getSaltPrefix())
-	}
-
 	// Set a cleartext password on the UserLogin that will be hash. Note that the domain will
 	// create a password history record automatically in the post insert/update events
 	String applyPassword(String unhashedPassword) {

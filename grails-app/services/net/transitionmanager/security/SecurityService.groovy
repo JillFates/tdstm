@@ -50,6 +50,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserCache
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.util.Assert
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -79,6 +80,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	SpringSecurityService    springSecurityService
 	UserPreferenceService    userPreferenceService
 	JdbcTemplate             jdbcTemplate
+	PasswordEncoder          passwordEncoder
 
 	private Map ldapConfigMap
 	private Map loginConfigMap
@@ -918,17 +920,31 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * @return true if the period of time between password changes has been met
 	 */
 	boolean verifyPasswordHistory(UserLogin userLogin, String newPassword) {
-		// Check to see if minimum period is a requirement first
+		int passwordHistoryRetentionCount = userLocalConfig.passwordHistoryRetentionCount
+		int passwordHistoryRetentionDays = userLocalConfig.passwordHistoryRetentionDays
+		List<String> passwords
 
-		if (userLocalConfig.passwordHistoryRetentionCount > 0) {
+
+		if (passwordHistoryRetentionCount > 0) {
 			// Check to see if the password was used in the past # passwords
-			return 0 == PasswordHistory.countByUserLoginAndPassword(userLogin, newPassword,  [max: 10, sort: 'createdDate', order: 'desc'])
+			passwords = PasswordHistory.findAllByUserLogin(userLogin, [max: passwordHistoryRetentionCount, sort: 'createdDate', order: 'desc'])*.password
+
+			for (String password : passwords) {
+				if (passwordEncoder.matches(newPassword, password)) {
+					return false
+				}
+			}
 		}
 
-		if (userLocalConfig.passwordHistoryRetentionDays > 0) {
+		if (passwordHistoryRetentionDays > 0) {
 			// Check to see if the password was used in the past # of days
-			Date dateSince = new Date() - userLocalConfig.passwordHistoryRetentionDays.intValue()
-			return 0 == PasswordHistory.countByUserLoginAndPasswordAndCreatedDateGreaterThan(userLogin, newPassword, dateSince, [max: 10])
+			Date dateSince = new Date() - passwordHistoryRetentionDays.intValue()
+			passwords = PasswordHistory.findAllByUserLoginAndCreatedDateGreaterThan(userLogin, dateSince, [max: passwordHistoryRetentionCount])*.password
+			for (String password : passwords) {
+				if (passwordEncoder.matches(newPassword, password)) {
+					return false
+				}
+			}
 		}
 
 		return true
@@ -954,13 +970,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		}
 
 		String currentPassword = userLogin.password
-		String hashedPassword = userLogin.applyPassword(unhashedPassword)
+		userLogin.applyPassword(unhashedPassword)
 
-		if (currentPassword == hashedPassword) {
+		if (passwordEncoder.matches(unhashedPassword, currentPassword)) {
 			throw new InvalidParamException('New password must be different from the existing one')
 		}
 
-		if (!isNewUser && !verifyPasswordHistory(userLogin, hashedPassword)) {
+		if (!isNewUser && !verifyPasswordHistory(userLogin, unhashedPassword)) {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
 
