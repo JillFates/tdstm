@@ -62,6 +62,30 @@ class TaskTimeLineGraph {
 		return this.getVertex(taskVertex.taskNumber)
 	}
 
+	Boolean hasNotStarts(){
+		return starts.isEmpty()
+	}
+
+	Boolean hasNotSinks(){
+		return sinks.isEmpty()
+	}
+
+	Boolean hasMultipleStarts(){
+		return starts.size() > 1
+	}
+
+	Boolean hasOneStart(){
+		return starts.size() == 1
+	}
+
+	Boolean hasMultipleSinks(){
+		return sinks.size() > 1
+	}
+
+	Boolean hasOneSink(){
+		return sinks.size() == 1
+	}
+
 	/**
 	 * Adds a new edge with successor and predecessor
 	 * @param from an instance of {@code TaskVertex}
