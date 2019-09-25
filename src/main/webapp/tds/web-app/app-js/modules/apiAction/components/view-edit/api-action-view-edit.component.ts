@@ -285,7 +285,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.modifySignatureByProperty('dictionary');
 		}
 		this.dictionaryList.push(...result.data.agentNames);
-		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.uId) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
 			this.agentMethodList.push({ uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
@@ -631,9 +631,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({uId: 0, dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+						this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 						if (this.apiActionModel.agentMethod) {
-							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
+							this.apiActionModel.agentMethod = result.find((agent) => {
+								return (agent.id + agent.name) === this.apiActionModel.agentMethod.uId;
+							});
 						}
 
 						if (!this.apiActionModel.agentMethod) {
@@ -704,7 +706,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
 			let agentMethod = this.agentMethodList.find((method) => {
-				return method.id === this.lastSelectedAgentMethodModel.id;
+				return (method.id + method.name) === this.lastSelectedAgentMethodModel.uId;
 			});
 			if (agentMethod) {
 				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgentMethodModel);
@@ -820,7 +822,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
-		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== '0') {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.uId !== '0') {
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
 		}
 		setTimeout(() => {
