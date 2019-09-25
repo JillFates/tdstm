@@ -48,7 +48,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		property: 'dueDate',
 		type: 'text',
 		width: 100,
-		locked: false
+		locked: false,
+		filterable: true
 	},
 	{
 		label: 'Status',

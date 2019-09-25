@@ -387,6 +387,9 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
+				if (!response.rows || response.rows === null) {
+					return {rows: [], totalCount: 0};
+				}
 				return response;
 			}),
 			catchError(error => {
