@@ -177,7 +177,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.timeZone = data.timezone;
 				this.projectTypes = data.projectTypes;
 
-				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId}));
+				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
 				this.updateSavedFields();
 			});
 	}
@@ -204,7 +204,7 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
-					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp}));
+					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl:  this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''}));
 				}
 			});
 		}

@@ -17,28 +17,28 @@
                             [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
                             <a *ngIf="rowIndex === RowType.Header; else categoryValue"
                                [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{category: column.text}">
+                               [queryParams]="{category: column.text, justRemaining: 0}">
                                 <span [innerHtml]="column.text"></span>
                             </a>
 
                             <ng-template #categoryValue>
                                 <div *ngIf="rowIndex === RowType.Tasks && column.compose; else simpleValue">
                                     <a [routerLink]="['/taskManager', 'list']"
-                                        [queryParams]="{category: column.compose.category, status: 'completed', justRemaining: 0}">
-                                        <span [innerHtml]="column.compose.tskComp"></span>
-                                    </a>
-                                    of (
-                                        <a [routerLink]="['/taskManager', 'list']"
                                         [queryParams]="{category: column.compose.category, justRemaining: 0}">
-                                            <span [innerHtml]="column.compose.tskTot"></span>
-                                        </a>
-                                    )
+                                        <span [innerHtml]="column.compose.tskComp + ' of (' + column.compose.tskTot + ')'"></span>
+                                    </a>
                                 </div>
                             </ng-template>
 
                             <ng-template #simpleValue>
-                                <span [innerHtml]="column.text"></span>
+                                <div *ngIf="rowIndex  <= RowType.Tasks; else dateValue">
+                                    <span [innerHtml]="column.text"></span>
+                                </div>
                            </ng-template>
+
+                            <ng-template #dateValue>
+                                <span>{{column.text | tdsDateTime: userTimeZone: dateTimeFormat}}</span>
+                            </ng-template>
                     </div>
                 </div>
             </div>

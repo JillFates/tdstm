@@ -4,6 +4,8 @@ import {NewsModel} from './../../model/news.model';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 
 @Component({
 	selector: 'tds-news',
@@ -13,7 +15,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 				<kendo-tabstrip-tab [title]="'Event News'" [selected]="true" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of eventNews" class="row event-news">
-						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone: dateTimeFormat}}</div>
 						<div  [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
@@ -21,7 +23,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 				<kendo-tabstrip-tab [title]="'Archive'" [disabled]="isDisabled">
 				<ng-template kendoTabContent>
 					<div *ngFor="let item of archivedNews" class="row event-news">
-						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone}}</div>
+						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-5 date" (click)="onSelectedNews(item)">{{item.created | tdsDateTime: userTimeZone: dateTimeFormat}}</div>
 						<div [ngStyle]="{'cursor': config.isEditAvailable ? 'pointer' : 'text' }" class="col-sm-7 description pull-left" (click)="onSelectedNews(item)">{{item.text}}</div>
 					</div>
 				</ng-template>
@@ -39,15 +41,21 @@ export class NewsComponent implements OnChanges {
 	public archivedNews: Array<NewsModel> = [];
 	public eventNews: Array<NewsModel> = [];
 	public userTimeZone: string;
+	public dateTimeFormat: string;
+	public dateFormat: string;
 
 	constructor(
+		private preferenceService: PreferenceService,
 		private userContextService: UserContextService,
 		private permissionService: PermissionService) {
 
-		this.userContextService.getUserContext()
-			.subscribe((userContext: UserContextModel) => {
-				this.userTimeZone = userContext.timezone;
-			})
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.subscribe((preferences) => {
+				this.userTimeZone =  preferences.CURR_TZ;
+				this.dateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
+				this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+			});
+
 	}
 
 	/**

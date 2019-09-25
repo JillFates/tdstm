@@ -91,15 +91,8 @@ export class TDSDateTimeControlComponent extends TDSCustomControl implements OnI
 	onDateChange(value): void {
 		if (value && value !== null) {
 			this.selectedDate = DateUtils.convertToGMT(value, this.userPreferenceService.getUserTimeZone()).substr(0, 10); // Get the date from the given value
-			if (!this.selectedTime) {
-				this.dateValue = value;
-				this.value = DateUtils.convertToGMT(value, this.userPreferenceService.getUserTimeZone());
-			} else {
-				this.dateValue.setFullYear(value.getFullYear());
-				this.dateValue.setMonth(value.getMonth());
-				this.dateValue.setDate(value.getDate());
-				this.setValueDateTime();
-			}
+			this.dateValue = value;
+			this.value = DateUtils.convertToGMT(value, this.userPreferenceService.getUserTimeZone());
 		} else {
 			this.resetValue();
 		}

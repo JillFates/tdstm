@@ -36,6 +36,7 @@ import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
@@ -1108,7 +1109,7 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		List<AssetComment> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<Task> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
 		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
