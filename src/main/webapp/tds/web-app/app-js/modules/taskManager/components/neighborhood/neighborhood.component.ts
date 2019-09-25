@@ -30,6 +30,7 @@ export class NeighborhoodComponent implements OnInit {
 	links$: Observable<any[]>;
 	@ViewChild('graph') graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
+	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownListComponent;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -242,7 +243,7 @@ export class NeighborhoodComponent implements OnInit {
 	 * LayeredDigraphLayout to use (if selected) by the diagram
 	 **/
 	layeredDigraphLayout(): void {
-		this.graph.layeredDigraphLayout();
+		this.graph.setLayeredDigraphLayout();
 	}
 
 	/**
@@ -273,6 +274,14 @@ export class NeighborhoodComponent implements OnInit {
 	highlightByStatus(status: string): void {
 		const matches = [status];
 		this.graph.highlightNodesByStatus(matches);
+	}
+
+	/**
+	 * highlight nodes by team on the diagram
+	 **/
+	highlightByTeam(team: string): void {
+		const matches = [team];
+		this.graph.highlightNodesByTeam(matches);
 	}
 
 	/**

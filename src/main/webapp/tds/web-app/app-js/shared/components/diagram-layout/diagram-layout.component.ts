@@ -191,14 +191,18 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		}
 	}
 
+	/**
+	 * Load data model used by the diagram
+	 **/
 	loadModel(): void {
-		// console.log('loadModel');
 		if (this.nodeDataArray && this.linksPath) {
-			// console.log('load model: ', this.nodeDataArray, this.linksPath);
 			this.myModel = new go.GraphLinksModel(this.nodeDataArray, this.linksPath);
 		}
 	}
 
+	/**
+	 * Generate Diagram canvas
+	 **/
 	generateDiagram(): void {
 		// console.log('generate');
 		this.diagram.startTransaction('generateDiagram');
@@ -219,13 +223,20 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.diagram.commandHandler.zoomToFit();
 	}
 
+	/**
+	 * Diagram overview (Minimap)
+	 **/
 	overviewTemplate() {
 		this.diagramOverview = new Overview('overview-container');
 		this.diagramOverview.observed = this.diagram;
 		this.diagramOverview.contentAlignment = go.Spot.Center;
 	}
 
-	layeredDigraphLayout(opts?: any): void {
+	/**
+	 * Sets the Layered Digraph Layout to the Diagram
+	 * @param {any} opts > optional configuration to use for the layout
+	 **/
+	setLayeredDigraphLayout(opts?: any): void {
 		// console.log('direction: ', this.direction);
 		const ldl = new go.LayeredDigraphLayout();
 		ldl.direction = 0;
@@ -236,6 +247,10 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.diagram.commit(d => d.layout = ldl);
 	}
 
+	/**
+	 * Sets the Tree Layout to the Diagram
+	 * @param {any} opts > optional configuration to use for the layout
+	 **/
 	setTreeLayout(opts?: any): void {
 		const treeLayout = new go.TreeLayout();
 		treeLayout.angle = 0;
@@ -243,22 +258,38 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.diagram.commit(d => d.layout = treeLayout);
 	}
 
+	/**
+	 * Sets the Force Directed Layout to the Diagram
+	 * @param {any} opts > optional configuration to use for the layout
+	 **/
 	setForceDirectedLayout(opts?: any): void {
 		const forceDirectedLayout = new go.ForceDirectedLayout();
 		forceDirectedLayout.arrangementSpacing = new go.Size(100, 105);
 		this.diagram.commit(d => d.layout = forceDirectedLayout);
 	}
 
+	/**
+	 * Sets the template for each node in the Diagram
+	 **/
 	setDiagramNodeTemplate(): void {
 		this.diagram.nodeTemplate = this.setNodeTemplate();
 	}
 
+	/**
+	 * Sets the template for each node link in the Diagram
+	 **/
 	setDiagramLinksTemplate(): void {
 		this.diagram.linkTemplate = this.linkTemplate();
 	}
 
+	/**
+	 * Links template configuration
+	 * @param {go.Link} templateOpts > optional configuration to use for the template
+	 * @param {go.Shape} linkShapeOpts > optional shape for links
+	 **/
 	linkTemplate(templateOpts?: go.Link, linkShapeOpts?: go.Shape): go.Link {
 
+		// If template configuration is provided, return it as the template to use
 		if (templateOpts) {
 			if (linkShapeOpts) { templateOpts.add(linkShapeOpts); }
 			return templateOpts;
@@ -277,19 +308,28 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return linkTemplate;
 	}
 
+	/**
+	 * Links template configuration
+	 **/
 	setDirection(dir: any): void {
 		// console.log('Direction: ', dir.target.value);
 		this.direction = dir.target.value;
 	}
 
-	setNodeTemplate(): go.Node {
-		console.log('default template');
+	/**
+	 * Node template configuration
+	 * @param {any} templateOpts > optional configuration to use for the template
+	 **/
+	setNodeTemplate(templateOpts?: go.Node): go.Node {
+
+		// If template configuration is provided, return it as the template to use
+		if (templateOpts) {
+			return templateOpts;
+		}
+
 		this.actualNodeTemplate = NodeTemplateEnum.HIGH_SCALE;
 		const node = new go.Node(go.Panel.Horizontal);
-		// node.background = '#ddd'; // '#3c8dbc';
-		// // node.background = 'lightblue';
 		node.selectionAdorned = true;
-		// node.add(this.containerShape());
 		node.add(this.containerPanel());
 		node.contextMenu = this.contextMenu();
 
@@ -419,6 +459,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return icon.background;
 	}
 
+	/**
+	 * Zoom in on the diagram
+	 **/
 	zoomIn(): void {
 		this.diagram.commandHandler.increaseZoom(1.2);
 		const input = new go.InputEvent();
@@ -426,6 +469,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.setNodeTemplateByScale(this.diagram.scale, input);
 	}
 
+	/**
+	 * Zoom out on the diagram
+	 **/
 	zoomOut(): void {
 		this.diagram.commandHandler.decreaseZoom(0.8);
 		const input = new go.InputEvent();
@@ -433,12 +479,18 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.setNodeTemplateByScale(this.diagram.scale, input);
 	}
 
+	/**
+	 * highlight all nodes on the diagram
+	 **/
 	highlightAllNodes(): void {
 		this.diagram.commit(d => {
 			d.selectCollection(d.nodes);
 		});
 	}
 
+	/**
+	 * highlight nodes by category name on the diagram
+	 **/
 	highlightNodesByCategory(matches: any[]): void {
 		this.diagram.commit(d => {
 			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.category));
@@ -449,9 +501,25 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		});
 	}
 
+	/**
+	 * highlight nodes by status type on the diagram
+	 **/
 	highlightNodesByStatus(matches: any[]): void {
 		this.diagram.commit(d => {
 			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.status));
+			d.selectCollection(highlightCollection);
+			if (highlightCollection.count > 0 && highlightCollection.first()) {
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		});
+	}
+
+	/**
+	 * highlight nodes by team on the diagram
+	 **/
+	highlightNodesByTeam(matches: any[]): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.userSelectedCol3));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
