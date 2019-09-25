@@ -39,8 +39,13 @@ $tds-action-button-icon-flat-color: #666
 .tds-action-button.not-has-all-permissions
   cursor: not-allowed
 
-.tds-action-button--disabled
+button.tds-action-button--disabled, .tds-action-button--disabled
   pointer-events: none
+  cursor: auto !important
+button[disabled].tds-action-button--disabled, button.tds-action-button--disabled:disabled, button[hover].tds-action-button--disabled, button.tds-action-button--disabled:hover
+  border: 1px solid #999999 !important
+  background-color: #cccccc !important
+  color: #666666 !important
 
 .tds-action-button--just-icon
   border: 0

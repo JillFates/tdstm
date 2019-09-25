@@ -2,6 +2,16 @@ import { GridColumnModel } from '../../../shared/model/data-list-grid.model';
 
 export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
+		label: '',
+		property: 'actionColumn',
+		type: 'action',
+		width: 30,
+		locked: false,
+		resizable: false,
+		sortable: false,
+		headerClass: ['no-sort-header']
+	},
+	{
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
