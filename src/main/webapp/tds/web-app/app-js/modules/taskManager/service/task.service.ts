@@ -390,6 +390,12 @@ export class TaskService {
 				if (!response.rows || response.rows === null) {
 					return {rows: [], totalCount: 0};
 				}
+				response.rows.forEach(item => {
+					for (let i = 0; i <= 4; i++) {
+						const property = `userSelectedCol${i}`;
+						item[property] = item[property] === 'null' ? '' : item[property];
+					}
+				});
 				return response;
 			}),
 			catchError(error => {
