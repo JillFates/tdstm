@@ -52,6 +52,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
@@ -1204,6 +1205,7 @@ class ReportsService implements ServiceMethods {
 
         TaskTimeLineGraph graph = cpaResults.graph
         TimelineSummary summary = cpaResults.summary
+        List<Task> tasks = cpaResults.tasks
 
         if (cpaResults) {
 
@@ -1216,7 +1218,8 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        cyclicalsRef.append("<li>$cyclicalTask.taskId $cyclicalTask.taskComment [TaskNumber $task.taskNumber]")
+                        Task task = tasks.find { it.id == cyclicalTask.taskId }
+                        cyclicalsRef.append("<li>${cyclicalTask.taskId} ${cyclicalTask.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
                     }
                     cyclicalsRef.append('</ul>')
                 }
@@ -1224,7 +1227,7 @@ class ReportsService implements ServiceMethods {
             }
 
             // check for multiple starts
-            if (graph.hasNotStarts()) {
+            if (graph.hasNoStarts()) {
 				eventErrorList << 'Tasks'
 				startsError = redSpan('Start Vertices: <br> No start task was found.')
             } else if (graph.hasOneStart()) {
@@ -1235,12 +1238,16 @@ class ReportsService implements ServiceMethods {
 					Warning - More than one task has no predecessors. Typical events will have just one starting task
 					(e.g. Prep for Move Event). This is an indicator that some task wiring may be incorrect.''')
                 startsRef.append('<ul>')
-				graph.starts.each { startsRef.append("<li>$it.taskId $it.taskComment [TaskNumber $it.taskNumber]") }
+
+                graph.starts.each { TaskVertex taskVertex ->
+                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    startsRef.append("<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
+                }
                 startsRef.append('</ul>')
             }
 
             // check for multiple sinks
-            if (graph.hasNotSinks()) {
+            if (graph.hasNoSinks()) {
                 eventErrorList << 'Tasks'
                 sinksError = redSpan('Sink Vertices: <br> No end task was found, which is typically the result of cyclical references.')
             } else if (graph.hasOneSink()) {
@@ -1251,7 +1258,10 @@ class ReportsService implements ServiceMethods {
 					Warning - More than one task has no successors. Typical events will have just one ending task
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
-				graph.sinks.each { sinksRef.append("<li>$it.taskId $it.taskComment [TaskNumber $it.taskNumber]") }
+                graph.sinks.each { TaskVertex taskVertex ->
+                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    sinksRef.append("<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
+                }
                 sinksRef.append('</ul>')
             }
 
