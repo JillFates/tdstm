@@ -1,7 +1,26 @@
+form {
+	input:-webkit-autofill,
+	input:-internal-autofill-selected {
+		background-color: #fff !important;
+	}
+}
 .dropdown-menu > li > a {
 	padding: 0 20px;
 	line-height: 35px;
 	color: $color-text;
+}
+.alert.alert-info {
+	background-color: $color-info-screen !important;
+	padding: 0;
+	margin: 6px 0 0 0;
+	line-height: 18px;
+	font-size: 13px;
+	p {
+		line-height: 18px;
+		font-size: 13px;
+		margin: 0;
+		padding: 0;
+	}
 }
 // nav collapse at 991px
 @media (max-width: 991px) {

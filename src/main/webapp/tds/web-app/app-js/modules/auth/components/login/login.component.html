@@ -1,4 +1,151 @@
-<div class="login-component" *ngIf="!redirectUser">
+<div class="login-component clr-row" *ngIf="!redirectUser">
+	<div class="clr-col-5 login-wrap">
+		<div class="clr-row clr-justify-content-center">
+			<section class="login-formarea clr-col-8 clr-align-self-center">
+				<h1>
+					<img
+						src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg"
+						alt="Transition Manager Logo"
+					/>
+				</h1>
+				<form
+					clrForm
+					action="signIn"
+					name="loginForm"
+					class="login-form is-fullwidth"
+					#loginForm="ngForm"
+					clrLayout="vertical"
+				>
+					<clr-select-container
+						class="clr-col-12 has-authority"
+						*ngIf="
+							loginInfo.config?.authorityPrompt ===
+							authorityOptions.SELECT
+						"
+					>
+						<label>{{ loginInfo.config?.authorityLabel }}</label>
+						<select
+							clrSelect
+							name="authority"
+							[(ngModel)]="loginModel.authority"
+							required
+						>
+							<option
+								*ngFor="
+									let authority of loginInfo.config
+										.authorityList
+								"
+								[value]="authority"
+								[attr.selected]="
+									authority === defaultAuthorityItem
+								"
+								>{{ authority }}</option
+							>
+						</select>
+					</clr-select-container>
+					<clr-input-container
+						class="clr-col-12 has-authority"
+						*ngIf="
+							loginInfo.config?.authorityPrompt ===
+							authorityOptions.PROMPT
+						"
+					>
+						<input
+							clrInput
+							type="text"
+							name="authority"
+							[ngClass]="{
+								'ng-invalid-not-touched': !loginForm.form
+									.touched
+							}"
+							[(ngModel)]="loginModel.authority"
+							placeholder="Enter {{
+								loginInfo.config?.authorityLabel
+							}}"
+							required
+						/>
+					</clr-input-container>
+					<clr-input-container class="clr-col-12">
+						<input
+							clrInput
+							type="text"
+							[ngClass]="{
+								'ng-invalid-not-touched': !loginForm.form
+									.touched
+							}"
+							name="username"
+							id="usernameid"
+							placeholder="User Name"
+							required
+						/>
+						<clr-control-error>
+							Incorrect Login Information
+						</clr-control-error>
+					</clr-input-container>
+					<clr-password-container class="clr-col-12">
+						<input
+							clrPassword
+							placeholder="Password"
+							name="password"
+							id="password"
+							[(ngModel)]="loginModel.password"
+							required
+						/>
+						<clr-control-error>
+							Incorrect Login Information
+						</clr-control-error>
+					</clr-password-container>
+					<div class="clr-col-12">
+						<a
+							[routerLink]="['/auth', 'forgot']"
+							id="forgot-your-password"
+							>{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</a
+						>
+					</div>
+					<div
+						class="clr-col-12"
+						*ngIf="loginInfo.notices.length > 0"
+					>
+						<div
+							class="alert alert-info"
+							role="alert"
+							*ngFor="let notice of loginInfo.notices"
+						>
+							<div class="alert-items">
+								<div class="alert-item static">
+									<div class="alert-icon-wrapper">
+										<clr-icon
+											class="alert-icon"
+											shape="info-circle"
+										></clr-icon>
+									</div>
+									<span
+										class="alert-text"
+										[innerHTML]="
+											notice['htmlText'] | safeHtml
+										"
+									></span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="clr-col-12">
+						<button
+							type="submit"
+							class="btn btn-primary"
+							(click)="onLogin()"
+						>
+							Log In
+						</button>
+					</div>
+				</form>
+			</section>
+		</div>
+	</div>
+</div>
+
+<!-- <div class="login-component" *ngIf="!redirectUser">
     <div class="login-box" [ngClass]="{'login-notice': loginInfo && loginInfo.notices.length > 0 }">
         <div class="login-box-body">
             <div class="login-logo">
@@ -72,11 +219,9 @@
                 <div class="row">
                     <div class="col-xs-8">
                     </div>
-                    <!-- /.col -->
                     <div class="col-xs-4">
                         <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
                     </div>
-                    <!-- /.col -->
                 </div>
             </form>
 
@@ -86,4 +231,4 @@
             <div class="build-info">{{loginInfo.buildVersion}}</div>
         </div>
     </div>
-</div>
+</div> -->
