@@ -59,6 +59,14 @@ configurations {
 
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+
 dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 	compile "org.springframework.boot:spring-boot-starter-logging"
@@ -248,14 +256,6 @@ assets {
 	configure(runTask) {
 		systemProperties System.properties
 	}
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDir 'grails-app/migrations'
-        }
-    }
 }
 
 // Customize Git properties plugin.
