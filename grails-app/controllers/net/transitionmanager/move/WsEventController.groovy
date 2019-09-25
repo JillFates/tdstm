@@ -154,13 +154,13 @@ class WsEventController implements ControllerMethods {
 
 	@HasPermission(Permission.EventCreate)
 	def saveEvent(String id) {
+		// populate create event command from request
+		Project project = getProjectForWs()
+		CreateEventCommand command = populateCommandObject(CreateEventCommand)
+		command.estCompletionTime = TimeUtil.parseISO8601DateTime(request.JSON.estCompletionTime)
+		command.estStartTime = TimeUtil.parseISO8601DateTime(request.JSON.estStartTime)
 		if (id == null || id == 'null') {
-			CreateEventCommand event = populateCommandObject(CreateEventCommand)
-			command.estCompletionTime = TimeUtil.parseISO8601DateTime(request.JSON.estCompletionTime)
-			command.estStartTime = TimeUtil.parseISO8601DateTime(request.JSON.estStartTime)
-			Project currentProject = securityService.userCurrentProject
-
-			MoveEvent moveEvent = moveEventService.save(event, currentProject)
+			MoveEvent moveEvent = moveEventService.save(command, project)
 
 			if (!moveEvent.hasErrors()) {
 				flash.message = "MoveEvent $moveEvent.name created"
@@ -172,12 +172,6 @@ class WsEventController implements ControllerMethods {
 			}
 		}
 		else {
-			// populate create event command from request
-			CreateEventCommand command = populateCommandObject(CreateEventCommand)
-			command.estCompletionTime = TimeUtil.parseISO8601DateTime(request.JSON.estCompletionTime)
-			command.estStartTime = TimeUtil.parseISO8601DateTime(request.JSON.estStartTime)
-			Project project = getProjectForWs()
-
 			try {
 				MoveEvent moveEvent = moveEventService.update(id.toLong(), command)
 				moveBundleService.assignMoveEvent(moveEvent, command.moveBundle)
