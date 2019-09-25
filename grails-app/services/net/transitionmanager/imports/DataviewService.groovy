@@ -735,7 +735,6 @@ class DataviewService implements ServiceMethods {
 		String filter = filterFor(column)
 
 		if (StringUtil.isNotBlank(filter)) {
-			// TODO: dcorrea: TM-13471 Turn off filter by date and datetime.
 
 			String property = propertyFor(column)
 
