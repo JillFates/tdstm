@@ -8,6 +8,7 @@ import {BundleModel} from '../../model/bundle.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {TaskService} from '../../../taskManager/service/task.service';
 
 @Component({
 	selector: `bundle-view-edit-component`,
@@ -18,24 +19,21 @@ export class BundleViewEditComponent implements OnInit {
 	public savedModel: BundleModel = null;
 	public orderNums = Array(25).fill(0).map((x, i) => i + 1);
 	public moveEvents;
-	public managers;
 	public rooms;
-	public workflowCodes;
 	public isDefaultBundle;
 	public sourceRoom;
 	public targetRoom;
-	public projectManager;
-	public moveManager;
 	public projectId;
 	public canEditBundle;
 	public bundleId;
 	public editing = false;
 	protected userTimeZone: string;
-	private requiredFields = ['name', 'workflowCode'];
+	private requiredFields = ['name'];
 	@ViewChild('startTimePicker') startTimePicker;
 	@ViewChild('completionTimePicker') completionTimePicker;
 	constructor(
 		private bundleService: BundleService,
+		private taskService: TaskService,
 		private permissionService: PermissionService,
 		private preferenceService: PreferenceService,
 		private promptService: UIPromptService,
@@ -47,19 +45,24 @@ export class BundleViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.loadModel();
+	}
+
+	/**
+	 * Set up the initial default values for the model
+	 * @returns {any}
+	 */
+	loadModel(): any {
 		this.bundleModel = new BundleModel();
 		const defaultBundle = {
 			name: '',
 			description: '',
-			fromId: 0,
-			toId: 0,
+			fromId: null,
+			toId: null,
 			startTime: '',
 			completionTime: '',
-			projectManagerId: 0,
 			moveEvent: {},
-			moveManagerId: 0,
 			operationalOrder: 1,
-			workflowCode: 'STD_PROCESS',
 			useForPlanning: false,
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -137,6 +140,10 @@ export class BundleViewEditComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * Get ghe models for the specific bundle
+	 * @param id  bundle id
+	 */
 	private getModel(id) {
 		this.bundleService.getModelForBundleViewEdit(id)
 			.subscribe((result) => {
@@ -150,23 +157,24 @@ export class BundleViewEditComponent implements OnInit {
 				});
 				this.bundleModel = bundleModel;
 
-				this.bundleModel.projectManagerId = data.projectManager ? data.projectManager : 0;
-				this.bundleModel.moveManagerId = data.moveManager ? data.moveManager : 0;
-				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : 0;
-				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : 0;
-				this.bundleModel.moveEvent = data.moveEvent ? data.moveEvent : {id: 0, name: ''};
+				this.bundleModel.fromId = data.moveBundleInstance.sourceRoom ? data.moveBundleInstance.sourceRoom.id : null;
+				this.bundleModel.toId = data.moveBundleInstance.targetRoom ? data.moveBundleInstance.targetRoom.id : null;
+				this.bundleModel.moveEvent = data && data.moveBundleInstance.moveEvent ? data.moveBundleInstance.moveEvent : {id: null, name: ''};
 
-				this.moveEvents = data.availableMoveEvents;
-				this.managers = data.managers;
-				this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-				this.managers.forEach((manager, index) => {
-					manager.staff.name = manager.name;
-					this.managers[index] = manager.staff // Limit managers down to just staff
-				});
-				this.workflowCodes = data.workflowCodes;
 				this.rooms = data.rooms;
-
-				this.updateSavedFields();
+				this.taskService.getEvents()
+				.subscribe((results: any) => {
+					this.moveEvents = results;
+					if (this.bundleModel.moveEvent) {
+						const currentEvent = results.find((result: any) => {
+							return result.id === this.bundleModel.moveEvent.id;
+						});
+						if (currentEvent) {
+							this.bundleModel.moveEvent.name = currentEvent.name;
+						}
+					}
+					this.updateSavedFields();
+				});
 			});
 	}
 
@@ -180,20 +188,15 @@ export class BundleViewEditComponent implements OnInit {
 				this.targetRoom = room.roomName;
 			}
 		});
-		this.managers.forEach((manager) => {
-			if (manager.id === this.savedModel.projectManagerId) {
-				this.projectManager = manager.name;
-			}
-			if (manager.id === this.savedModel.moveManagerId) {
-				this.moveManager = manager.name;
-			}
-		});
 	}
 
 	public saveForm() {
 		if (DateUtils.validateDateRange(this.bundleModel.startTime, this.bundleModel.completionTime)) {
 			this.bundleService.saveBundle(this.bundleModel, this.bundleId).subscribe((result: any) => {
 				if (result.status === 'success') {
+					this.bundleModel.startTime = this.bundleModel.startTime || '';
+					this.bundleModel.completionTime = this.bundleModel.completionTime || '';
+
 					this.updateSavedFields();
 					this.editing = false;
 				}

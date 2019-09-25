@@ -29,7 +29,6 @@ class Project extends PartyGroup {
 	Date       startDate   // Date that the project will start
 	Date       completionDate   // Date that the project will finish
 	PartyGroup client
-	String     workflowCode
 	String     projectType = 'Standard'
 	Integer    lastAssetId
 	Integer    runbookOn = 1 // Flag that indicates that the project should use the runbook mode for various screens
@@ -59,7 +58,6 @@ class Project extends PartyGroup {
 		runbookOn nullable: true
 		startDate nullable: true
 		timezone nullable: true
-		workflowCode blank: false
 		planMethodology nullable: true
 		lastAssetId nullable: true
 		runbookOn nullable: true
@@ -141,4 +139,31 @@ class Project extends PartyGroup {
 			throw new UnsupportedOperationException(msg)
 		}
 	}
+
+	/**
+	 * Create a map representation of this Project instance.
+	 * @return a map containing a project's most relevant fields.
+	 */
+	Map toMap() {
+		ProjectLogo logo = ProjectLogo.findByProject(this)
+		Map projectLogoMap = null
+		if(logo) {
+			projectLogoMap = [
+			    id: logo.id,
+				name: logo.name,
+				partnerImage: logo.partnerImage
+			]
+		}
+		return [
+		    id: id,
+			projectCode: projectCode,
+			defaultBundle: [
+			    id: defaultBundle.id,
+				name: defaultBundle.name
+			],
+			timezone: timezone.label,
+		    projectLogoForProject: projectLogoMap
+		]
+	}
+
 }

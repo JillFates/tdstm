@@ -1,4 +1,5 @@
 <%@ page import="net.transitionmanager.security.Permission" %>
+<%@ page import="com.tdssrc.grails.StringUtil" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -143,14 +144,6 @@ int minPasswordLength = tds.minPasswordLength()
 							</tds:hasPermission>
 						</ul>
 					</td>
-					<td style="vertical-align:top"><span class="megamenuSection">Manage Workflows</span><br />
-						<ul >
-							<li><g:link class="mmlink" controller="workflow" action="home" onclick="hideMegaMenu('adminMegaMenu')">List Workflows </g:link> </li>
-							<tds:hasPermission permission="${Permission.HelpMenuView}">
-							<li><a class="mmlink" href="javascript:window.open('https://ops.tdsops.com/twiki/bin/view/Main/DataCenterMoves/TMManageWorkflows?cover=print','help');" onclick="hideMegaMenu('adminMegaMenu')">help</a></li>
-							</tds:hasPermission>
-						</ul>
-					</td>
 					<td style="vertical-align:top"><span class="megamenuSection">Manage Model Library</span><br />
 						<ul >
 							<li><g:link class="mmlink" controller="manufacturer" id="${partyGroup}" onclick="hideMegaMenu('adminMegaMenu')">List Manufacturers</g:link></li>
@@ -171,12 +164,16 @@ int minPasswordLength = tds.minPasswordLength()
 					<table class="mmtable"><tr>
 						<td style="vertical-align:top">
 							<ul>
-								<li><g:link class="mmlink" controller="project" action="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link></li>
+								<li><g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Projects</g:link></li>
 							</ul>
 					<g:if test="${currProject}">
 						<span class="megamenuSection"> </span>
 							<ul >
-								<li><g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')"><g:if test="${currProject.name.size()>20}">${currProject.name.substring(0,20)+'...'}</g:if><g:else>${currProject.name}</g:else> Details</g:link></li>
+								<li>
+									<g:link class="mmlink" controller="projectUtil" onclick="hideMegaMenu('projectMegaMenu')">
+										${StringUtil.ellipsis(currProject.name, 20)} Details
+									</g:link>
+								</li>
 								<li><g:link class="mmlink" controller="person" action="manageProjectStaff"  onclick="hideMegaMenu('projectMegaMenu')">Project Staff</g:link></li>
 								<tds:hasPermission permission="${Permission.UserSendActivations}">
 									<li><g:link class="mmlink" controller="project" action="userActivationEmailsForm" onclick="hideMegaMenu('projectMegaMenu')">User Activation Emails</g:link> </li>

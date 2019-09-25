@@ -1,8 +1,11 @@
 package net.transitionmanager.service
 
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.StringUtil
+import com.tdssrc.grails.TimeUtil
 import groovy.transform.CompileStatic
 import net.transitionmanager.common.MessageSourceService
+import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
@@ -226,4 +229,45 @@ trait ServiceMethods {
 		throw ex
 	}
 
+	/**
+	 * Retrieve the timezone object corresponding to the given code or the default otherwise.
+	 * @param timezoneValue
+	 * @param defaultTimeZoneCode
+	 * @return
+	 */
+	Timezone getTimezone(String timezoneValue, String defaultTimeZoneCode = TimeUtil.defaultTimeZone) {
+		Timezone timezone
+		if (!StringUtil.isBlank(timezoneValue)) {
+			timezone = Timezone.findByCode(timezoneValue)
+		}
+		if (!timezone) {
+			timezone = Timezone.findByCode(TimeUtil.defaultTimeZone)
+		}
+
+		return timezone
+	}
+
+	/**
+	 * Fetch the corresponding instance from the database (if the id is given). Otherwise, create a new one
+	 * and set the project field (if needed).
+	 *
+	 * @param type - domain class.
+	 * @param id - id of the instance (if null a new one will be created).
+	 * @param currentProject - the user's current project.
+	 * @param throwException - whether or not an exception should be thrown on error.
+	 * @return
+	 */
+	@CompileStatic
+	<T> T getOrCreate(Class<T> type, Object id, Project currentProject, boolean throwException = true) {
+		T instance
+		if (id != null) {
+			instance = get(type, id, currentProject, throwException)
+		} else {
+			instance = type.newInstance()
+			if (instance.hasProperty('project')) {
+				instance['project'] = currentProject
+			}
+		}
+		return instance
+	}
 }

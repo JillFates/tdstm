@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "65e39e15-244e-475a-b47a-486d044d8c69",
+		"_postman_id": "1701fae2-b18c-460c-ada7-976cdcea531e",
 		"name": "DataBaseEdit UPDATE",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

@@ -19,19 +19,12 @@ ENV JAVA_HOME="/usr/java/latest"
 ## ================================================================================
 # The following statement will setup all the required tools that is consider core
 # base of the TransitionManager build and Development environment.
-RUN echo "[google-chrome]" >> /etc/yum.repos.d/google-chrome.repo && \
-    echo "name=google-chrome" >> /etc/yum.repos.d/google-chrome.repo && \
-    echo "baseurl=http://dl.google.com/linux/chrome/rpm/stable/x86_64" >> /etc/yum.repos.d/google-chrome.repo && \
-    echo "enabled=1" >> /etc/yum.repos.d/google-chrome.repo && \
-    echo "gpgcheck=1" >> /etc/yum.repos.d/google-chrome.repo && \
-    echo "gpgkey=https://dl-ssl.google.com/linux/linux_signing_key.pub" >> /etc/yum.repos.d/google-chrome.repo
-
 RUN echo ">>> Installing packages" && \
         yum install -y epel-release sudo
 RUN yum install -y curl vim wget mysql-client bash unzip zip tar \
         git openssh shadow less file tcpdump \
         wget cronie which gcc-c++ make \
-        bzip2 gzip mysql mysql-utilities postfix google-chrome-stable-76.0.3809.132-1
+        bzip2 gzip mysql mysql-utilities postfix
 RUN echo ">>> Installing Java JDK" && \
         mkdir -p /usr/java
 RUN yum install -y java-1.8.0-openjdk-devel && \
@@ -64,8 +57,6 @@ RUN echo ">>> Setting up Postfix Settings" && \
     echo ">>> Housecleaning" && \
         rm -rf /var/cache/yum/* && \
     echo ">>> That's all folks"
-RUN chown root:root /opt/google/chrome/chrome-sandbox && \
-    chmod 4755 /opt/google/chrome/chrome-sandbox
 
 ## ================================================================================
 #  Switching to tmuser

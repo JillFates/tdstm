@@ -1,8 +1,21 @@
 .neighborhood-container {
   background-color: #fff;
+  width: 100%;
+  height: 100%;
+}
+
+.diagram-container {
+  width: 100%;
+  height: 100%;
 }
 
 .task-manager-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.task-manager-sub-header {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -125,4 +138,12 @@
   vertical-align: middle;
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.neighborhood-pie-countdown-container {
+  display: inline-block;
+}
+
+.neighborhood-control-label {
+  margin-right: 3px;
 }

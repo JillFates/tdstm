@@ -33,7 +33,6 @@
 	<field name="estFinish" class="java.lang.String"/>
 	<field name="actStart" class="java.lang.String"/>
 	<field name="actFinish" class="java.lang.String"/>
-	<field name="workflow" class="java.lang.String"/>
 	<field name="projectName" class="java.lang.String"/>
 	<field name="clientName" class="java.lang.String"/>
 	<field name="timezone" class="java.lang.String"/>
@@ -192,13 +191,6 @@
 					<font size="12"/>
 				</textElement>
 				<text><![CDATA[Est Finish]]></text>
-			</staticText>
-			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="919" y="0" width="52" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[Workflow]]></text>
 			</staticText>
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" mode="Opaque" x="531" y="0" width="80" height="18" forecolor="#FFFFFF" backcolor="#000000"/>
@@ -370,13 +362,6 @@
 					<font size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{moveEvent}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="border" stretchType="RelativeToTallestObject" x="934" y="0" width="37" height="20"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{workflow}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="border" stretchType="RelativeToTallestObject" x="1160" y="0" width="100" height="20"/>

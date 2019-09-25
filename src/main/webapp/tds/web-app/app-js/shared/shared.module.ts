@@ -35,6 +35,7 @@ import {PostNoticesManagerService} from '../modules/auth/service/post-notices-ma
 import {PostNoticesService} from '../modules/auth/service/post-notices.service';
 import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
 import {LocalStorageProvider} from './providers/localstorage.provider';
+import {AssetTagUIWrapperService} from './services/asset-tag-ui-wrapper.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -100,12 +101,14 @@ import {RichTextEditorComponent} from './modules/rich-text-editor/rich-text-edit
 import {PieCountdownComponent} from './components/pie-countdown/pie-countdown.component';
 import {TDSFilterInputComponent} from './components/filter-input/filter-input.component';
 import {TDSModalPageWrapperComponent} from './components/modal-page-wrapper/modal-page-wrapper.component';
+import {PowerComponent} from './components/power/power.component';
 // Dictionary
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
 import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
 
 @NgModule({
 	imports: [
@@ -186,7 +189,9 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
-		DiagramLayoutComponent
+		PowerComponent,
+		DiagramLayoutComponent,
+		CircleCountdownComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -251,8 +256,10 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
+		PowerComponent,
 		DiagramLayoutComponent,
-		FontAwesomeModule
+		FontAwesomeModule,
+		CircleCountdownComponent
 	],
 	entryComponents: [
 		DynamicComponent,
@@ -283,6 +290,7 @@ export class SharedModule {
 				ComponentCreatorService,
 				UILoaderService,
 				UIDialogService,
+				AssetTagUIWrapperService,
 				UIActiveDialogService,
 				// Services
 				HeaderService,

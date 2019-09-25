@@ -2,6 +2,7 @@
 import {Component, OnInit} from '@angular/core';
 // Services
 import {ExportAssetService} from '../../service/export-asset.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 // Models
 import {ExportAssetModel} from '../../model/export-asset.model';
 import {UserContextModel} from '../../../auth/model/user-context.model';
@@ -33,7 +34,8 @@ export class ExportComponent implements OnInit {
 		private exportService: ExportAssetService,
 		private translatePipe: TranslatePipe,
 		private store: Store,
-		protected dialogService: UIDialogService) {
+		protected dialogService: UIDialogService,
+		private notifierService: NotifierService) {
 	}
 
 	/**
@@ -120,6 +122,7 @@ export class ExportComponent implements OnInit {
 			} else {
 				data['bundle'] = this.selectedBundles;
 			}
+			this.disableGlobalAnimation(true);
 			this.exportService.downloadBundleFile(data).subscribe( res => {
 				this.opened = true;
 				if (res['key']) {
@@ -143,9 +146,11 @@ export class ExportComponent implements OnInit {
 			} else {
 				saveAs(this.exportService.getBundleFile(taskId), progress['data'].header.split('=')[1]);
 				this.opened = false;
+				this.disableGlobalAnimation(false);
 			}
 		}, error => {
 			console.log(error);
+			this.disableGlobalAnimation(false);
 		});
 	}
 
@@ -154,5 +159,16 @@ export class ExportComponent implements OnInit {
 	 * */
 	updateError(): void {
 		this.errorMessage = '';
+	}
+
+	/**
+	 * To disable Global animation that is being manually represent by the Progress bar
+	 * @param disabled
+	 */
+	private disableGlobalAnimation(disabled: boolean): void {
+		this.notifierService.broadcast({
+			name: 'notificationDisableProgress',
+			disabled: disabled
+		});
 	}
 }

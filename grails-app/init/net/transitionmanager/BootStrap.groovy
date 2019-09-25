@@ -9,8 +9,6 @@ import net.transitionmanager.asset.AssetEntityAttributeLoaderService
 import net.transitionmanager.domain.constraint.OfSameProjectConstraint
 import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.notice.Notice
-import net.transitionmanager.project.StateEngineService
-import net.transitionmanager.project.Workflow
 import net.transitionmanager.task.QzSignService
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.ExceptionLoggerFilter
@@ -23,7 +21,6 @@ import java.security.Security
 
 class BootStrap {
 	AssetEntityAttributeLoaderService assetEntityAttributeLoaderService
-	StateEngineService stateEngineService
 	TaskService taskService
 	QzSignService qzSignService
 	LicenseAdminService licenseAdminService
@@ -41,11 +38,6 @@ class BootStrap {
 		initializeExceptionLoggerFilter()
 
 		CustomMethods.initialize()
-
-		// Load all of the Workflow definitions into the StateEngine service
-		Workflow.list().each { wf ->
-			stateEngineService.loadWorkflowTransitionsIntoMap(wf.process, 'workflow')
-		}
 
 		// Enable the ability to do Rollback to Savepoints
 		ApplicationContextHolder.getBean('transactionManager').setNestedTransactionAllowed(true)

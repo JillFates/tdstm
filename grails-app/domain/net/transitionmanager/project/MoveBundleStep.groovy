@@ -13,7 +13,6 @@ class MoveBundleStep {
 	public static final String METHOD_MANUAL = 'M'
 
 	MoveBundle moveBundle           // The bundle that the step is associated with
-	Integer transitionId            // Maps to the id # of the transition in the workflow XML definition
 	String label                    // Value to display in UI
 	Date planStartTime              // The date/time of when the step will start, entered by the project manager enters while planning to move
 	Date planCompletionTime         // The date/time of when the step will complete, entered by the project manager enters while planning to move
@@ -114,7 +113,7 @@ class MoveBundleStep {
 	}
 
 	String toString() {
-		"MoveBundleStep(label: ${label}, tranId=${transitionId}, method=${calcMethod}, planStart=${planStartTime}, planCompletionTime=${planCompletionTime}, " +
+		"MoveBundleStep(label: ${label}, method=${calcMethod}, planStart=${planStartTime}, planCompletionTime=${planCompletionTime}, " +
 				"actualStartTime=${actualStartTime}, actualCompletionTime=${actualCompletionTime} )"
 	}
 }

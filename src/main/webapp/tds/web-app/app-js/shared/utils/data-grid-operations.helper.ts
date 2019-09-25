@@ -61,6 +61,11 @@ export class DataGridOperationsHelper {
 	 * @param column
 	 */
 	public onFilter(column: GridColumnModel, operator?: string): void {
+		let root = this.getFilter(column, operator);
+		this.filterChange(root);
+	}
+
+	public getFilter(column: GridColumnModel, operator?: string): CompositeFilterDescriptor {
 		let root = this.state.filter || { logic: 'and', filters: [] };
 		let [filter] = Flatten(root).filter(x => x.field === column.property);
 		if (!column.filter && column.type !== 'number' && column.filter !== 0) {
@@ -126,7 +131,7 @@ export class DataGridOperationsHelper {
 				}
 			}
 		}
-		this.filterChange(root);
+		return root;
 	}
 
 	/**
@@ -328,11 +333,32 @@ export class DataGridOperationsHelper {
 	/**
 	 * Notify the event to update the grid height
 	 */
-	private notifyUpdateGridHeight(): void {
+	public notifyUpdateGridHeight(): void {
 		this.notifier.broadcast({
 			name: 'grid.header.position.change'
 		});
 		// when dealing with locked columns Kendo grid fails to update the height, leaving a lot of empty space
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	/**
+	 * Calculates and returns the current page number based on the current grid state & skip states.
+	 */
+	public getCurrentPage(): number {
+		return (this.state.skip / this.state.take) + 1;
+	}
+
+	/**
+	 * Calculates and returns the real row index based on the current pagination state.
+	 */
+	getRowPaginatedIndex(rowIndex: number): number {
+		return ( rowIndex + (this.getCurrentPage() - 1) * this.getPageSize());
+	}
+
+	/**
+	 * Returns grid take, since is the equivalent to page size number.
+	 */
+	public getPageSize(): number {
+		return this.state.take;
 	}
 }

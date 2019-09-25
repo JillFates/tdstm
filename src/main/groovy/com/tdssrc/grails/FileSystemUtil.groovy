@@ -1,6 +1,7 @@
 package com.tdssrc.grails
 
 import groovy.util.logging.Slf4j
+import org.springframework.web.multipart.MultipartFile
 
 import java.util.regex.Matcher
 
@@ -81,6 +82,24 @@ class FileSystemUtil {
         }
 
         return file
+    }
+
+    /**
+     * Return the original filename for a Multipart file.
+     * @param file - multipart file
+     * @param stripSlashes - if true, strip slashes from the name
+     * @return the string corresponding to the filename
+     */
+    static String getOriginalFilename(MultipartFile file, boolean stripSlashes = true) {
+        String originalFilename = file.getOriginalFilename()
+        if (stripSlashes) {
+            int slashIndex = Math.max(originalFilename.lastIndexOf('/'), originalFilename.lastIndexOf('\\'))
+
+            if (slashIndex > -1) {
+                originalFilename = originalFilename.substring(slashIndex + 1)
+            }
+        }
+        return originalFilename
     }
 
 }

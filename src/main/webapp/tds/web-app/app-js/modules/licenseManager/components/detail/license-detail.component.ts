@@ -40,6 +40,7 @@ export class LicenseDetailComponent implements OnInit {
 
 	constructor(
 		public licenseModel: LicenseModel,
+		protected savedModel: LicenseModel,
 		public promptService: UIPromptService,
 		public activeDialog: UIActiveDialogService,
 		private prompt: UIPromptService,
@@ -59,6 +60,7 @@ export class LicenseDetailComponent implements OnInit {
 
 		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: any) => {
 			this.licenseModel = licenseModel;
+			this.savedModel = { ... licenseModel };
 			this.licenseModel.activationDate = DateUtils.toDateUsingFormat(licenseModel.activationDate, DateUtils.SERVER_FORMAT_DATE);
 			this.licenseModel.expirationDate = DateUtils.toDateUsingFormat(licenseModel.expirationDate, DateUtils.SERVER_FORMAT_DATE);
 			this.dataSignature = JSON.stringify(this.licenseModel);
@@ -97,9 +99,13 @@ export class LicenseDetailComponent implements OnInit {
 	protected saveLicense(): void {
 		if (DateUtils.validateDateRange(this.licenseModel.activationDate, this.licenseModel.expirationDate, 'The expiration date must be later than the activation date.')) {
 			this.licenseManagerService.saveLicense(this.licenseModel).subscribe((license: any) => {
+				this.savedModel = { ... this.licenseModel };
 				this.editMode = false;
 				this.prepareControlActionButtons();
 			});
+		} else {
+			this.licenseModel.activationDate = this.savedModel.activationDate;
+			this.licenseModel.expirationDate = this.savedModel.expirationDate;
 		}
 	}
 

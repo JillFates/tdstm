@@ -46,7 +46,7 @@ export class SelectListConfigurationPopupComponent extends ConfigurationCommonCo
 		public activeDialog: UIActiveDialogService,
 		public translate: TranslatePipe,
 		public prompt: UIPromptService) {
-		super(activeDialog, prompt, translate);
+		super(field, activeDialog, prompt, translate);
 	}
 
 	ngOnInit() {

@@ -8,6 +8,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
 import spock.lang.Issue
+import spock.lang.Unroll
 import test.AbstractUnitSpec
 
 import java.sql.Timestamp
@@ -463,5 +464,53 @@ class TimeUtilTests extends AbstractUnitSpec {
 			"1979-08-02T10:00:00Z" | true
 			"1979-08-02T10:00Z"    | true
 			"1979/08/02T10:00:00Z" | false
+	}
+
+	@Unroll
+	void 'Test #timeZone has #timeZoneOffset offset'(){
+		expect:'getTimeZoneOffset for a given time zone will qeual the offset'
+			TimeUtil.getTimeZoneOffset(timeZone) == timeZoneOffset || TimeUtil.getTimeZoneOffset(timeZone) == dstTimeZoneOffset
+		where:
+			timeZone                 | timeZoneOffset      | dstTimeZoneOffset
+			TimeUtil.defaultTimeZone | TimeUtil.GMT_OFFSET | TimeUtil.GMT_OFFSET
+			'US/Hawaii'              | '-10:00'            | '-10:00'
+			'US/Alaska'              | '-08:00'            | '-09:00'
+			'US/Arizona'             | '-07:00'            | '-07:00'
+			'US/Pacific'             | '-07:00'            | '-08:00'
+			'GMT'                    | '+00:00'            | '+00:00'
+			'Etc/GMT-0'              | '+00:00'            | '+00:00'
+			'Atlantic/St_Helena'     | '+00:00'            | '+00:00'
+			'Etc/GMT+0'              | '+00:00'            | '+00:00'
+			'Africa/Banjul'          | '+00:00'            | '+00:00'
+			'Etc/GMT'                | '+00:00'            | '+00:00'
+			'Africa/Freetown'        | '+00:00'            | '+00:00'
+			'Africa/Bamako'          | '+00:00'            | '+00:00'
+			'Africa/Conakry'         | '+00:00'            | '+00:00'
+			'Universal'              | '+00:00'            | '+00:00'
+			'Africa/Nouakchott'      | '+00:00'            | '+00:00'
+			'UTC'                    | '+00:00'            | '+00:00'
+			'Etc/Universal'          | '+00:00'            | '+00:00'
+			'Atlantic/Azores'        | '+00:00'            | '+00:00'
+			'Africa/Abidjan'         | '+00:00'            | '+00:00'
+			'Africa/Accra'           | '+00:00'            | '+00:00'
+			'Etc/UCT'                | '+00:00'            | '+00:00'
+			'GMT0'                   | '+00:00'            | '+00:00'
+			'Zulu'                   | '+00:00'            | '+00:00'
+			'Africa/Ouagadougou'     | '+00:00'            | '+00:00'
+			'Atlantic/Reykjavik'     | '+00:00'            | '+00:00'
+			'Etc/Zulu'               | '+00:00'            | '+00:00'
+			'Iceland'                | '+00:00'            | '+00:00'
+			'Africa/Lome'            | '+00:00'            | '+00:00'
+			'Greenwich'              | '+00:00'            | '+00:00'
+			'Etc/GMT0'               | '+00:00'            | '+00:00'
+			'America/Danmarkshavn'   | '+00:00'            | '+00:00'
+			'Africa/Dakar'           | '+00:00'            | '+00:00'
+			'America/Scoresbysund'   | '+00:00'            | '+00:00'
+			'Africa/Bissau'          | '+00:00'            | '+00:00'
+			'Etc/Greenwich'          | '+00:00'            | '+00:00'
+			'Africa/Timbuktu'        | '+00:00'            | '+00:00'
+			'UCT'                    | '+00:00'            | '+00:00'
+			'Africa/Monrovia'        | '+00:00'            | '+00:00'
+			'Etc/UTC'                | '+00:00'            | '+00:00'
 	}
 }
