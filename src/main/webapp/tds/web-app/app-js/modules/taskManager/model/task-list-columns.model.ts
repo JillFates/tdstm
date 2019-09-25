@@ -39,7 +39,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 80,
+		width: 100,
 		locked: false,
 		cellClass: 'task-updated'
 	},
@@ -90,7 +90,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Suc.',
 		property: 'assetName',
 		type: 'number',
-		width: 50,
+		width: 80,
 		locked: false
 	},
 	{
