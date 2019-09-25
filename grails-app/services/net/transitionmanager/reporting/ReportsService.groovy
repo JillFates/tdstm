@@ -52,8 +52,6 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
-import net.transitionmanager.task.Task
-import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
@@ -1215,16 +1213,13 @@ class ReportsService implements ServiceMethods {
                 eventErrorList << 'Tasks'
                 cyclicalsError = redSpan('Cyclical References:')
                 cyclicalsRef.append('<ol>')
-
                 summary.cycles.each { List<TaskVertex> c ->
-                    TaskVertex task = c.first()
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
-                    c.each { TaskVertex cycTaskId ->
-                        cyclicalsRef.append("<li>$task.taskNumber $task.taskComment [TaskSpec $task.taskId]")
+                    c.each { TaskVertex cyclicalTask ->
+                        cyclicalsRef.append("<li>$cyclicalTask.taskId $cyclicalTask.taskComment [TaskNumber $task.taskNumber]")
                     }
                     cyclicalsRef.append('</ul>')
                 }
-
                 cyclicalsRef.append('</ol>')
             }
 
