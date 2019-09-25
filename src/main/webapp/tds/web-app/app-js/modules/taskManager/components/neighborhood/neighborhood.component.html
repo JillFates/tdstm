@@ -42,8 +42,9 @@
 
   <div class="row task-manager-sub-header">
     <div class="col-md-4  k-align-self-center">
-      <label class="neighborhood-control-label">Event:</label>
+      <label class="neighborhood-control-label" for="neighborhood-events-dropdown">Event:</label>
       <kendo-dropdownlist
+        id="neighborhood-events-dropdown"
         textField="name"
         valueField="id"
         [data]="eventList$ | async"
@@ -53,6 +54,19 @@
         (close)="eventsDropdownClosed()"
         [value]="selectedEvent"
         #eventsDropdown>
+      </kendo-dropdownlist>
+      <label class="neighborhood-control-label" for="neighborhood-team-highlight-dropdown">Team Highlight:</label>
+      <kendo-dropdownlist
+        id="neighborhood-team-highlight-dropdown"
+        textField="name"
+        valueField="id"
+        [data]="eventList$ | async"
+        (selectionChange)="highlightByTeam($event)"
+        [(ngModel)]="selectedEvent"
+        (open)="eventsDropdownOpened()"
+        (close)="eventsDropdownClosed()"
+        [value]="selectedEvent"
+        #teamHighlightDropdown>
       </kendo-dropdownlist>
     </div>
     <div class="col-md-4 highlight-filter-container">
