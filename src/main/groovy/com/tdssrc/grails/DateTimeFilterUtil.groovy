@@ -30,7 +30,7 @@ class DateTimeFilterUtil {
 				return getFullYearMonthDay(entry)
 			case ~/^=?[0-9\-]*<>=?[0-9\-]*$/:
 				return getDateRange(entry)
-			case ~/^[-+]?[0-9]*[dwM]<>[-+]?[0-9]*[dwM]$/:
+			case ~/^[-+]?[0-9]*[dwM]?<>[-+]?[0-9]*[dwM]?$/:
 				return getDateRange(entry)
 			case ~/^0|t$/:
 				return getToday()

@@ -152,7 +152,7 @@ class DateTimeFilterUtilSpec extends Specification {
 		expect:
 			[result.getaValue(), result.getbValue()] == [a, b]
 		where:
-			entry                    | a                                    | b
+			entry                    | a                                  | b
 			'2019<>2020'             | toDate('Jan 01 00:00:00 CST 2019') | toDate('Dec 31 23:59:59 CST 2020')
 			'=2018<>2020'            | toDate('Jan 01 00:00:00 CST 2018') | toDate('Dec 31 23:59:59 CST 2020')
 			'2019-07<>2019-08'       | toDate('Jul 01 00:00:00 CST 2019') | toDate('Aug 31 23:59:59 CST 2019')
@@ -162,6 +162,8 @@ class DateTimeFilterUtilSpec extends Specification {
 			'-2d<>+3d'               | toDate('May 29 00:00:00 CST 2019') | toDate('Jun 03 23:59:59 CST 2019')
 			'-3M<>2w'                | toDate('Feb 28 00:00:00 CST 2019') | toDate('Jun 14 23:59:59 CST 2019')
 			'-3M<>+2w'               | toDate('Feb 28 00:00:00 CST 2019') | toDate('Jun 14 23:59:59 CST 2019')
+			'-3M<>3'                 | toDate('Feb 28 00:00:00 CST 2019') | toDate('Jun 03 23:59:59 CST 2019')
+			'-2<>3d'                 | toDate('May 29 00:00:00 CST 2019') | toDate('Jun 03 23:59:59 CST 2019')
 	}
 
 	@Unroll
