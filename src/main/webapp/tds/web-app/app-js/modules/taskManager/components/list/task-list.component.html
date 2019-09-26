@@ -187,7 +187,7 @@
 					</ng-template>
 					<!-- updated -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
-						<span class="task-updated-cell {{dataItem.updatedClass}}">{{dataItem.updatedTime}}</span>
+						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
 					</ng-template>
 					<!-- status -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
