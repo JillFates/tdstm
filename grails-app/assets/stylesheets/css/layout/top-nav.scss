@@ -126,9 +126,9 @@ body > .wrapper {
     li.user-menu {
       height: 45px;
       a {
-        display: inline-block;
+        display: block;
         overflow: hidden;
-        text-align: center;
+        text-align: left;
         padding: 0 10px;
 
         .user-name {

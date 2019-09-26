@@ -77,22 +77,6 @@ div.body div.alert.animateShow {
 div.body div.alert-message-icon {
   float: left; }
 
-div.body div.alert.alert-success {
-  min-width: 450px;
-  z-index: 1060;
-  padding: 13px;
-  background-color: #dff0d8 !important;
-  color: #3c763d !important;
-  text-align: left; }
-
-div.body div.alert.alert-danger {
-  min-width: 450px;
-  z-index: 1060;
-  padding: 13px;
-  background-color: #f2dede !important;
-  color: #a94442 !important;
-  text-align: left; }
-
 .tooltip .tooltip-inner {
   background-color: #ebebeb;
   color: #000;
@@ -1288,9 +1272,9 @@ body > .wrapper {
     .main-header .menu-top-container li.user-menu {
       height: 45px; }
       .main-header .menu-top-container li.user-menu a {
-        display: inline-block;
+        display: block;
         overflow: hidden;
-        text-align: center;
+        text-align: left;
         padding: 0 10px; }
         .main-header .menu-top-container li.user-menu a .user-name {
           display: inline-block;
