@@ -1207,6 +1207,14 @@ class ReportsService implements ServiceMethods {
         TimelineSummary summary = cpaResults.summary
         List<Task> tasks = cpaResults.tasks
 
+        Closure<String> htmlConverter = { TaskVertex taskVertex, Task task ->
+            String content = "<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()}"
+            if (task.taskSpec) {
+                content += " [TaskSpec ${task.taskSpec}]"
+            }
+            return content
+        }
+
         if (cpaResults) {
 
             if (!summary.hasCycles()) {
@@ -1219,7 +1227,7 @@ class ReportsService implements ServiceMethods {
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
                         Task task = tasks.find { it.id == cyclicalTask.taskId }
-                        cyclicalsRef.append("<li>${cyclicalTask.taskId} ${cyclicalTask.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
+                        cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
                 }
@@ -1241,7 +1249,7 @@ class ReportsService implements ServiceMethods {
 
                 graph.starts.each { TaskVertex taskVertex ->
                     Task task = tasks.find { it.id == taskVertex.taskId }
-                    startsRef.append("<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
+                    startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
             }
@@ -1260,7 +1268,7 @@ class ReportsService implements ServiceMethods {
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
                     Task task = tasks.find { it.id == taskVertex.taskId }
-                    sinksRef.append("<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()} [TaskSpec ${task.taskSpec}]")
+                    sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')
             }
