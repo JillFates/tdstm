@@ -225,7 +225,6 @@ export class ReportsService {
 		sme: number,
 		startCategory: string,
 		stopCategory: string,
-		testing: number,
 		outageWindow: string): Observable<any> {
 		const request = {
 			moveBundle: moveBundle,
@@ -233,7 +232,6 @@ export class ReportsService {
 			startCategory: startCategory,
 			stopCategory: stopCategory,
 			outageWindow: outageWindow,
-			testing: testing
 		};
 		return this.http.post(
 			this.APP_EVENT_RESULTS_REPORT_URL.replace('{id}', moveBundle.toString()),

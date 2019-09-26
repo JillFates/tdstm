@@ -66,7 +66,8 @@
                 border-style: solid
     .k-grid-content,
     .k-grid-content-locked
-	    tr:last-child
+        white-space: nowrap !important
+        tr:last-child
             td
                 border-bottom-width: 1px
 .k-grid-lockedcolumns
@@ -82,3 +83,8 @@
 .k-custom-command-column
     width: -moz-fit-content !important
     width: fit-content !important
+
+.overflow-ellipsis
+    text-overflow: ellipsis
+    overflow: hidden
+

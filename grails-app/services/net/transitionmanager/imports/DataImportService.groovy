@@ -1710,7 +1710,7 @@ class DataImportService implements ServiceMethods {
 				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
 
 				if (!dataScript.etlSourceCode) {
-					errorMsg = 'DataScript has no source specified'
+					errorMsg = 'ETL Script has no source specified'
 				}
 			}
 		}
@@ -1776,7 +1776,7 @@ class DataImportService implements ServiceMethods {
 				dataScript = GormUtil.findInProject(project, DataScript, dataScriptId, true)
 
 				if (!dataScript.etlSourceCode) {
-					errorMsg = 'DataScript has no source specified'
+					errorMsg = 'ETL Script has no source specified'
 				}
 			}
 		}
