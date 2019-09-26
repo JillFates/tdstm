@@ -72,11 +72,11 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					} else {
 						redirectUri = '/task/listUserTasks?viewMode=mobile'
 					}
+				} else if (userLogin.forcePasswordChange == 'Y') {
+					redirectUri = "/module/auth/changePassword"
 				} else {
 					redirectUri = authentication.savedUrlForwardURI ?:
-							authentication.targetUri ?:
-									requestCache.getRequest(request, response)?.redirectUrl ?:
-											redirectToPrefPage()
+							authentication.targetUri ?: requestCache.getRequest(request, response)?.redirectUrl ?: redirectToPrefPage()
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page
@@ -96,7 +96,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				Map signInInfoMap = [
 					userContext: userService.getUserContext().toMap(),
 					notices    : [
-						redirectUrl: hasUnacknowledgedNotices ? unacknowledgedNoticesUri : redirectUri
+						redirectUrl: redirectUri
 					]
 				]
 				response.setHeader('content-type', 'application/json')
