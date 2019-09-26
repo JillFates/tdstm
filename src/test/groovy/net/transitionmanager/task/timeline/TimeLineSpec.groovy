@@ -1,6 +1,5 @@
 package net.transitionmanager.task.timeline
 
-
 import net.transitionmanager.project.Project
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
@@ -75,7 +74,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	void 'test can calculate critical path for a graph with only one TaskVertex with status=#status, actual start=#actStart, status updated=#statusUpdated and window end time=#endTime'() {
 
 		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartDate = hourInDay('06:00')
+			Date windowStartDate = hourInDay(startTime)
 			Date windowEndTime = hourInDay(endTime)
 			Date currentTime = hourInDay(now)
 
@@ -103,20 +102,22 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 
 		where:
-			endTime | now     | actStart | status     | statusUpdated || dur | rem | elap | sla | es      | ef      | ls      | lf
-			'06:30' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			null    | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'07:00' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
-			'06:30' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			null    | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'06:30' | '06:20' | '06:00'  | STARTED    | '06:00'       || 30  | 10  | 20   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'06:30' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'07:00' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			null    | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'07:00' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'06:30' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			'06:70' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
-			null    | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			startTime | endTime | now     | actStart | status     | statusUpdated || dur | rem | elap | sla | es      | ef      | ls      | lf
+			'06:00'   | '06:30' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | null    | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '07:00' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
+			'06:00'   | '06:30' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | null    | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '06:30' | '06:20' | '06:00'  | STARTED    | '06:00'       || 30  | 10  | 20   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '06:30' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '07:00' | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | null    | '06:20' | '06:00'  | HOLD       | '06:10'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '07:00' | '06:10' | '06:00'  | STARTED    | '06:00'       || 30  | 20  | 10   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '06:30' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | '06:70' | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'06:00'   | null    | '06:30' | '06:00'  | TERMINATED | '06:30'       || 30  | 0   | 30   | 0   | '06:00' | '06:30' | '06:00' | '06:30'
+			'10:00'   | null    | '06:00' | null     | PLANNED    | null          || 30  | 30  | 0    | 0   | '10:00' | '10:30' | '10:00' | '10:30'
+			'10:00'   | '11:00' | '06:00' | null     | PLANNED    | null          || 30  | 30  | 0    | 30  | '10:00' | '10:30' | '10:30' | '11:00'
 	}
 
 	void 'test can calculate critical path for a graph with only one TaskVertex and a larger window end time'() {
@@ -133,8 +134,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.build()
 
 		when: 'TimeLine calculates its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
-				.calculate(windowStartDate, windowEndTime, currentTime)
+			new TimeLine(taskTimeLineGraph).calculate(windowStartDate, windowEndTime, currentTime)
 
 		then:
 			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
@@ -149,6 +149,38 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				earliestFinishDate == hourInDay('06:30')
 				latestStartDate == hourInDay('06:30')
 				latestFinishDate == hourInDay('07:00')
+			}
+	}
+
+	void 'test can calculate critical path for a graph with only one TaskVertex and a larger window end time in the future'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartDate = hourInDay('10:00')
+			Date windowEndTime = hourInDay('11:00')
+			Date currentTime = hourInDay('06:00')
+
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30)
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertex(taskA)
+				.build()
+
+		when: 'TimeLine calculates its critical path'
+			new TimeLine(taskTimeLineGraph).calculate(windowStartDate, windowEndTime, currentTime)
+
+		then:
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				criticalPath
+				taskNumber == 1
+				taskComment == A
+				duration == 30
+				remaining == 30
+				elapsed == 0
+				slack == 30
+				earliestStartDate == hourInDay('10:00')
+				earliestFinishDate == hourInDay('10:30')
+				latestStartDate == hourInDay('10:30')
+				latestFinishDate == hourInDay('11:00')
 			}
 	}
 
@@ -167,8 +199,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.build()
 
 		when: 'TimeLine calculates its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
-				.calculate(windowStartDate, windowEndTime, currentTime)
+			new TimeLine(taskTimeLineGraph).calculate(windowStartDate, windowEndTime, currentTime)
 
 		then:
 			with(taskTimeLineGraph.getVertex(1), TaskVertex) {

@@ -6,7 +6,7 @@
                     <i class="fa fa-bars"></i>
                 </button>
                 <!-- LOGO -->
-                <img id="logo-header" [src]="userContext.project.logoUrl" alt="TransitionManager" border="0" />
+                <img id="logo-header" [src]="userContext.project.logoUrl ? userContext.project.logoUrl : '/tdstm/assets/images/TMHeaderLogo_v4.7.png'" alt="TransitionManager" border="0" />
             </div>
 
             <tds-tranman-menu></tds-tranman-menu>

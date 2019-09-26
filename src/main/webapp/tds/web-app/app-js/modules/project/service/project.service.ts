@@ -21,11 +21,11 @@ export class ProjectService {
 		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
 				response.data.activeProjects.forEach((r) => {
-					r.completion = ((r.completion) ? new Date(r.completion) : '');
+					r.completionDate = ((r.completionDate) ? new Date(r.completionDate) : '');
 					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
 				});
 				response.data.completedProjects.forEach((r) => {
-					r.completion = ((r.completion) ? new Date(r.completion) : '');
+					r.completionDate = ((r.completionDate) ? new Date(r.completionDate) : '');
 					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
 				});
 				return response.data;

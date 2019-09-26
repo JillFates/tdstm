@@ -1,9 +1,6 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.asset.Room
-import net.transitionmanager.project.Project
 
 
 class MoveBundleCommand implements CommandObject {

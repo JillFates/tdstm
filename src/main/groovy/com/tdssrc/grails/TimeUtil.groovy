@@ -66,6 +66,8 @@ class TimeUtil {
 	static final String FORMAT_DATE_TIME_26 = "yyyyMMdd_HHmm"
 
 	// These formats are use for parsing
+	// The following is the recommended format for parsing dates sent by JavaScript using JSON.
+	static final String FORMAT_DATE_TIME_STANDARD_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssX"
 	static final String FORMAT_DATE_ISO8601  = "yyyy-MM-dd"
 	static final String FORMAT_DATE_TIME_ISO8601   = "yyyy-MM-dd'T'HH:mm'Z'"    // Quoted "Z" to indicate UTC, no timezone offset
 	static final String FORMAT_DATE_TIME_ISO8601_2 = "yyyy-MM-dd'T'HH:mm:ss'Z'" // Quoted "Z" to indicate UTC, no timezone offset (with seconds)
