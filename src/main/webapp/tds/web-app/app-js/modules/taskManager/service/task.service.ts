@@ -20,6 +20,7 @@ export class TaskService {
 	private readonly CUSTOM_COLUMNS_URL = `${ this.baseURL }/ws/task/customColumns`;
 	private readonly TASK_ACTION_INFO_URL = `${ this.baseURL }/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${ this.baseURL }/ws/task/{taskId}/resetAction`;
+	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -462,6 +463,21 @@ export class TaskService {
 	 */
 	resetTaskAction(taskId: number): Observable<any> {
 		return this.http.post(this.RESET_TASK_URL.replace('{taskId}', taskId.toString()), null)
+			.pipe(
+				map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
+	}
+
+	/**
+	 * GET - Returns the task api action summary.
+	 * @param taskId
+	 */
+	getTaskActionSummary(taskId: string): Observable<any> {
+		return this.http.get(this.TASK_ACTION_SUMMARY.replace('{taskId}', taskId.toString()))
 			.pipe(
 				map(response => response),
 				catchError(error => {

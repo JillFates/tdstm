@@ -583,7 +583,7 @@ export class TaskListComponent {
 	 * @param $event: CellClickEvent
 	 */
 	onCellClickHandler($event: CellClickEvent): void {
-		if ($event.columnIndex !== 0
+		if ($event.columnIndex !== 0 && $event.columnIndex !== 1
 			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
 			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 			expandedEvent.index = $event.rowIndex;
