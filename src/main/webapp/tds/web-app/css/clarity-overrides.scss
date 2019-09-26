@@ -26,6 +26,8 @@ html {
 	width: 100%;
 
 	.clr-control-container,
+	.clr-select-wrapper,
+	.clr-select-wrapper select,
 	.clr-input-wrapper,
 	.clr-input-group,
 	.clr-input {
@@ -35,6 +37,11 @@ html {
 	.clr-input-group {
 		max-width: 100%;
 	}
+
+	.clr-error .clr-select-wrapper::after {
+		right: 0.25rem;
+	}
+
 	clr-password-container .clr-error {
 		.clr-form-control.row .clr-input-wrapper,
 		.clr-input-group {
@@ -46,5 +53,6 @@ html {
 	}
 	.btn {
 		width: 100%;
+		max-width: 100%;
 	}
 }

@@ -1,20 +1,18 @@
-form {
-	input:-webkit-autofill,
-	input:-internal-autofill-selected {
-		background-color: #fff !important;
-	}
-}
 .dropdown-menu > li > a {
 	padding: 0 20px;
 	line-height: 35px;
 	color: $color-text;
 }
-.alert.alert-info {
-	background-color: $color-info-screen !important;
+
+.alert.alert-info,
+.alert.alert-danger,
+.alert.alert-warning,
+.alert.alert-success {
 	padding: 0;
 	margin: 6px 0 0 0;
 	line-height: 18px;
 	font-size: 13px;
+	color: $color-text !important;
 	p {
 		line-height: 18px;
 		font-size: 13px;
@@ -22,6 +20,20 @@ form {
 		padding: 0;
 	}
 }
+
+.alert.alert-info {
+	background-color: $color-info-screen !important;
+}
+.alert.alert-danger {
+	background-color: $color-danger-screen !important;
+}
+.alert.alert-warning {
+	background-color: $color-warning-screen !important;
+}
+.alert.alert-success {
+	background-color: $color-success-screen !important;
+}
+
 // nav collapse at 991px
 @media (max-width: 991px) {
 	.navbar-header {
