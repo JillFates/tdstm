@@ -387,6 +387,14 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
+				response.rows.forEach((row) => {
+					const keys = Object.keys(row)
+					for (const key of keys) {
+						if (row[key] === 'null') {
+							row[key] = '';
+						}
+					}
+				});
 				return response;
 			}),
 			catchError(error => {
