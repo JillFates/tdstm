@@ -20,7 +20,7 @@ export class NumericPipe implements PipeTransform {
 	transform(value: string, args?: any): any {
 		const format = (args || '').replace(/'/g, '');
 
-		if (!value) {
+		if (isNaN(+value) || value === '' || value === null || value === undefined) {
 			return '';
 		}
 		let number = +value;
