@@ -5719,6 +5719,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			List userSelectedCols = []
 			(1..5).each { colId ->
 				String value = getColumnValue(taskPref[colId.toString()], it)
+				value = value != 'null' ? value : ''
 				userSelectedCols << (value?.getClass()?.isEnum() ? value?.value() : value)
 			}
 
@@ -5735,14 +5736,14 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				id:it.id,
 				taskNumber:  it.taskNumber,
 				comment:  it.comment,
-				userSelectedCol0: userSelectedCols[0], // getColumnValue(taskPref["1"],it),
-				userSelectedCol1: userSelectedCols[1], // getColumnValue(taskPref["2"],it),
+				userSelectedCol0: userSelectedCols[0] ?: '', // getColumnValue(taskPref["1"],it),
+				userSelectedCol1: userSelectedCols[1] ?: '', // getColumnValue(taskPref["2"],it),
 				updatedTime: updatedTime ? TimeUtil.ago(updatedTime, TimeUtil.nowGMT()) : '',
 				dueDate: dueDate,
 				status:  status ?: '',
-				userSelectedCol2: userSelectedCols[2], // getColumnValue(taskPref["3"],it),
-				userSelectedCol3: userSelectedCols[3], // getColumnValue(taskPref["4"],it),
-				userSelectedCol4: userSelectedCols[4], // getColumnValue(taskPref["5"],it),
+				userSelectedCol2: userSelectedCols[2] ?: '', // getColumnValue(taskPref["3"],it),
+				userSelectedCol3: userSelectedCols[3] ?: '', // getColumnValue(taskPref["4"],it),
+				userSelectedCol4: userSelectedCols[4] ?: '', // getColumnValue(taskPref["5"],it),
 				nGraphUrl: nGraphUrl,
 				score: it.score ?: 0,
 				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
@@ -5750,7 +5751,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				assetEntityId: it.assetEntity?.id,
 				assetEntityAssetType: it.assetEntity?.assetType ,
 				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
-				instructionsLinkURL: instructionsLinkURL,
+				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,
