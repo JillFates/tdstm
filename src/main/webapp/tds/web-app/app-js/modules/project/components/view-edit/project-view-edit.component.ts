@@ -18,6 +18,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {SetProject} from '../../actions/project.actions';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -193,7 +194,7 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateRequiredFields(this.projectModel)) {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}

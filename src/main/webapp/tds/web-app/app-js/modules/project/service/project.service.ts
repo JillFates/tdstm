@@ -22,15 +22,6 @@ export class ProjectService {
 	getProjects(): Observable<any> {
 		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
-				let userTimeZone = this.preferenceService.getUserTimeZone();
-				response.data.activeProjects.forEach((r) => {
-					r.completionDate = r.completionDate ? new Date(DateUtils.convertToGMT(r.completionDate, userTimeZone)) : null;
-					r.startDate = r.startDate ? new Date(DateUtils.convertToGMT(r.startDate, userTimeZone)) : null;
-				});
-				response.data.completedProjects.forEach((r) => {
-					r.completionDate = r.completionDate ? new Date(DateUtils.convertToGMT(r.completionDate, userTimeZone)) : null;
-					r.startDate = r.startDate ? new Date(DateUtils.convertToGMT(r.startDate, userTimeZone)) : null;
-				});
 				return response.data;
 			})
 			.catch((error: any) => error);
