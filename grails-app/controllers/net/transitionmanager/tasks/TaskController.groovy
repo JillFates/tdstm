@@ -651,7 +651,7 @@ class TaskController implements ControllerMethods {
 		def tasks = []
 
 		// helper closure that creates the definition of a node
-		def outputTaskNode = { task, rootId ->
+		def outputTaskNode = { AssetComment task, rootId ->
 
 			def style
 			def fontcolor
@@ -671,7 +671,7 @@ class TaskController implements ControllerMethods {
 				def fillcolor = taskStatusColorMap[colorKey][1]
 
 				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-				if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+				if (task.isAutomatic()) {
 					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
 					color = taskStatusColorMap['AUTO_TASK'][1]
 					fontsize = '8'
@@ -689,6 +689,12 @@ class TaskController implements ControllerMethods {
 				}
 
 				nodesMap[task.taskNumber] = [
+						  task: task,
+						  successors: []
+				]
+
+/*
+				nodesMap[task.taskNumber] = [
 					label     : label,
 					style     : style,
 					id        : task.id,
@@ -702,6 +708,7 @@ class TaskController implements ControllerMethods {
 					status    : task.status,
 					successors: []
 				]
+*/
 			}
 		}
 
