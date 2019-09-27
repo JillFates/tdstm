@@ -4,7 +4,6 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
@@ -24,11 +23,6 @@ class TimeLineService implements ServiceMethods {
 	JdbcTemplate jdbcTemplate
 
 	/**
-	 * Service used to retrieve {@code Task} and {@code Depdendency}
-	 */
-	RunbookService runbookService
-
-	/**
 	 * Execute critical path analysis using  using a List of {@code Task} and a List of {@code TaskDependency}
 	 * and returning an instance of {@code TimelineSummary} with results
 	 * and instance of {@code TaskTimeLineGraph}.
@@ -40,8 +34,8 @@ class TimeLineService implements ServiceMethods {
 	 */
 	CPAResults calculateCPA(MoveEvent event) {
 
-		List<Task> tasks = runbookService.getEventTasks(event)
-		List<TaskDependency> taskDependencies = runbookService.getTaskDependencies(tasks)
+		List<Task> tasks = getEventTasks(event)
+		List<TaskDependency> taskDependencies = getTaskDependencies(tasks)
 
 		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)
 		TimelineSummary summary = calculateTimeline(event.estStartTime, event.estCompletionTime, graph)
@@ -49,6 +43,33 @@ class TimeLineService implements ServiceMethods {
 		return new CPAResults(graph, summary, tasks, taskDependencies)
 	}
 
+	/**
+	 * Used to load all related tasks associated with an event
+	 *
+	 * @param moveEvent the event to retrieve tasks for
+	 * @return List<Task>  a list of tasks
+	 */
+	List<Task> getEventTasks(MoveEvent moveEvent) {
+		def tasks = []
+		if (moveEvent) {
+			tasks = Task.findAllByMoveEvent(moveEvent)
+		}
+
+		return tasks
+	}
+
+	/**
+	 * Used to get the list of task dependencies for a given list of tasks
+	 *
+	 * @param List <AssetComment>  a list of tasks
+	 * @return List<TaskDependency>  a list of the dependencies associated to the tasks
+	 */
+	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
+		return TaskDependency.where {
+			assetComment in tasks
+			predecessor in tasks
+		}.list()
+	}
 	/**
 	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}
 	 * and returning an instance of {@code TimelineSummary} with results
@@ -64,8 +85,8 @@ class TimeLineService implements ServiceMethods {
 	 */
 	CPAResults updateTaskFromCPA(MoveEvent event) {
 
-		List<Task> tasks = runbookService.getEventTasks(event)
-		List<TaskDependency> taskDependencies = runbookService.getTaskDependencies(tasks)
+		List<Task> tasks = getEventTasks(event)
+		List<TaskDependency> taskDependencies = getTaskDependencies(tasks)
 
 		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)
 		TimelineSummary summary = calculateTimeline(event.estStartTime, event.estCompletionTime, graph)

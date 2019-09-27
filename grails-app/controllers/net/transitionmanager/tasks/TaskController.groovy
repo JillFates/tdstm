@@ -87,6 +87,7 @@ class TaskController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ReportsService reportsService
 	RunbookService runbookService
+	TimeLineService timeLineService
 	TaskService taskService
 	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
@@ -1002,8 +1003,8 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		List<Task> tasks = runbookService.getEventTasks(me).findAll{it.isPublished in publishedValues}
-		List<TaskDependency> deps = runbookService.getTaskDependencies(tasks)
+		List<Task> tasks = timeLineService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<TaskDependency> deps = timeLineService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1170,8 +1171,8 @@ digraph runbook {
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
 
 		try {
-			tasks = runbookService.getEventTasks(me)
-			deps = runbookService.getTaskDependencies(tasks)
+			tasks = timeLineService.getEventTasks(me)
+			deps = timeLineService.getTaskDependencies(tasks)
 			def tmp = runbookService.createTempObject(tasks, deps)
 
 			dfsMap = runbookService.processDFS(tasks, deps, tmp)
