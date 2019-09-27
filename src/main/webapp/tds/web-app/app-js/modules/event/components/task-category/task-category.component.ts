@@ -1,6 +1,8 @@
 // Angular
 import {Component, Input, Output, EventEmitter} from '@angular/core';
-import {EventRowType, TaskCategoryCell} from './../../model/event.model';
+import {EventRowType} from './../../model/event.model';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'tds-task-category',
@@ -10,10 +12,14 @@ export class TaskCategoryComponent {
 	@Input() taskCategories: any;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 
+	public userTimeZone = '';
+	public dateFormat = '';
+	public dateTimeFormat = '';
 	public colSize: number;
 	public showFrom: number;
 	public elementsToShow: number;
 	public RowType = EventRowType;
+	public DateUtils = DateUtils;
 	public categories = [
 		'Category',
 		'Percent completed',
@@ -24,7 +30,7 @@ export class TaskCategoryComponent {
 		'Actual Completion',
 	];
 
-	constructor() {
+	constructor(private preferenceService: PreferenceService) {
 		this.setInitialConfiguration();
 	}
 
@@ -44,6 +50,13 @@ export class TaskCategoryComponent {
 		this.colSize = 2;
 		this.showFrom = 0;
 		this.elementsToShow = 6;
+
+		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+		.subscribe((preferences) => {
+			this.userTimeZone =  preferences.CURR_TZ;
+			this.dateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
+			this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
+		});
 	}
 
 	/**

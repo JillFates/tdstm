@@ -139,6 +139,7 @@
         </div>
     </div>
     <div class="buttons modal-footer">
-        <tds-button-save class="btn-primary" [disabled]="!validateRequiredFields(projectModel)" (click)="saveForm()"></tds-button-save>
+        <tds-button-save class="btn-primary pull-left" [disabled]="!validateRequiredFields(projectModel)" (click)="saveForm()"></tds-button-save>
+        <tds-button-cancel class="btn-secondary pull-right" (click)="cancelCloseDialog()"></tds-button-cancel>
     </div>
 </div>

@@ -157,6 +157,7 @@ export enum APIActionType {
 export class APIActionModel {
 	id?: number;
 	name: string;
+	dictionaryMethodName?: string;
 	tabActionType?: APIActionType;
 	actionType?: any;
 	commandLine?: string;
