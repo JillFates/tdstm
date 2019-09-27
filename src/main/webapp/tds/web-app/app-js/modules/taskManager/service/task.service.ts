@@ -524,11 +524,11 @@ export class TaskService {
 			.map(res => res.body.data);
 	}
 
-	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<ITask[]> {
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<any> {
 		const params = this.createHttpParams(filters);
-		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+		return this.http.get<any>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
 			{ params, observe: 'response' })
-			.map(res => res.body.data);
+			.map(res => res.body);
 	}
 
 	/**
