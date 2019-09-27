@@ -1215,6 +1215,10 @@ class ReportsService implements ServiceMethods {
             return content
         }
 
+        Closure<Task> findInTasks = { TaskVertex taskVertex, List<Task> taskList ->
+            return taskList.find { it.id == taskVertex.taskId }
+        }
+
         if (cpaResults) {
 
             if (!summary.hasCycles()) {
@@ -1226,7 +1230,7 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        Task task = tasks.find { it.id == cyclicalTask.taskId }
+                        Task task = findInTasks(cyclicalTask, tasks)
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
@@ -1248,7 +1252,7 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    Task task = findInTasks(taskVertex, tasks)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1267,7 +1271,7 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    Task task = findInTasks(taskVertex, tasks)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')
