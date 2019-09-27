@@ -12,15 +12,16 @@ class ListBundlesPage extends Page {
         listBundlesPageBreadcrumbs[0].text()   == "Planning"
         listBundlesPageBreadcrumbs[1].text()   == "Bundles"
         listBundlesPageBreadcrumbs[2].text()   == "List"
+
     }
 
     static content = {
         listBundlesPageTitle { $("section", class:"content-header").find("h1")}
         planningModule { module PlanningMenuModule}
-        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         createButton {$("button",class:"action-toolbar-btn")}
-        rows {$("[role='rowgroup']")}
-        individualRows {$("tbody>tr")}
+        rows (required:false) {$("[role='rowgroup']")}
+        individualRows (required:false) {$('table.k-grid-table').find('tr',role:'row')}
         individualBundles (required: false) {$("a.cell-url-element")}
         commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
@@ -31,14 +32,15 @@ class ListBundlesPage extends Page {
         filterRow {$("tr.k-filter-row")}
         nameFilterKind {$("span.k-select")[2]}
         descFilterKind {$("span.k-select")[3]}
-        nameFilter {filterRow.find("[data-text-field='name']")}
-        descriptionFilter {filterRow.find("[data-text-field='description']")}
+        nameFilter {filterRow.find("[placeholder='Filter Name']")}
+        descriptionFilter {filterRow.find("[placeholder='Filter Description']")}
         planningFilterWrapper {$(".k-operator-hidden")}
-        isPlanningRadio {filterRow.find("label", text: contains("is true"))}
-        isNonPlanningRadio {filterRow.find("label", text: contains("is false"))}
-        clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
+        isPlanningOptionsContainer (required:false) {$("kendo-popup")}
+        planSelect (required:false)  {$("span", role:"listbox")}
+        isPlanningSelector {filterRow.find("kendo-dropdownlist")}
+        clearPlanningFilter {$("span.form-control-feedback")[1]}
         nameFilterWrapper {$("span.k-filtercell")[1]}
-        clearName {nameFilterWrapper.find("button.k-button")}
+        clearName {$('input.form-control.ng-touched').next()}
         descFilterWrapper {$("span.k-filtercell")[2]}
         clearDesc {descFilterWrapper.find("button.k-button")}
         clearAssetQtty {filterRow.find("[title='Clear']")[4]}
@@ -49,6 +51,7 @@ class ListBundlesPage extends Page {
         editedQty {filterRow.find("span.k-state-focused")}
         startDate {$("[data-role='datepicker']")[0]}
         completionDate {$("[data-role='datepicker']")[1]}
+        noRecordsMsg (required:false) {$('tr.k-grid-norecords')}
     }
 
     def filterByQuantity(qtty){
@@ -111,28 +114,43 @@ class ListBundlesPage extends Page {
 
     def validateBundleIsListed(bName){
         filterByName(bName)
+        sleep(1000)
         numberOfRows()==1
+    }
+
+    def validateBundleIsNotListed(bName){
+        filterByName(bName)
+        sleep(1000)
+        noRecordsMsg.displayed
     }
 
     def verifyRowsDisplayed(){
         selectFilter()
         numberOfRows()>0
     }
+    /**
+     * Selects planning or non-planing option according to parameter received
+     * @param plan
+     */
+    def selectPlanningOption(plan){
+        isPlanningSelector.click()
+        if(plan == true){
+            planSelect<< Keys.chord(Keys.DOWN)
 
-    def clickNonPlanningFilter(){
-       isNonPlanningRadio.click()
+        }else{
+            planSelect<< Keys.chord(Keys.DOWN)
+            planSelect<< Keys.chord(Keys.DOWN)
+        }
+        planSelect<< Keys.chord(Keys.ENTER)
     }
 
-    def clickPlanningFilter(){
-        isPlanningRadio.click()
-    }
 
     def clearPlanningFilter(){
         clearPlanningFilter.click()
     }
 
     def clearNameFilter(){
-        clearName.click()
+       waitFor{ clearName.click()}
     }
 
     def clearDescription(){
@@ -152,18 +170,16 @@ class ListBundlesPage extends Page {
     }
 
     def clickCreate(){
-        createButton.click()
+        waitFor{createButton.click()}
     }
 
     def numberOfRows(){
-        individualBundles.size()
+        individualRows.size()
     }
 
     def filterByName(name){
         nameFilter=name
-        //This tab is necessary for the filter will not be applied until the focus is moved away
-        //from the field
-        nameFilter<< Keys.chord(Keys.TAB)
+        sleep(1000)
     }
 
     /**
@@ -179,10 +195,7 @@ class ListBundlesPage extends Page {
         descriptionFilter<< Keys.chord(Keys.TAB)
     }
 
-    def selectFilter(){
-        nameFilterKind.click()
-        waitFor{$("li.k-item", text:"Contains").click()}
-    }
+
 
     /**
      * selecta the filter type for description
@@ -195,8 +208,8 @@ class ListBundlesPage extends Page {
     }
 
     def clickOnBundle(){
-        def bundleLocator = "('tbody.tr')"
-        $(".cell-url-element")[0].click()
+        $('kendo-grid-list').find('a')[0].click()
+        sleep(1500)
     }
 
     /**
@@ -210,12 +223,13 @@ class ListBundlesPage extends Page {
     }
 
     def validateFilteredDescription(desc){
-        rows.find("[role='gridcell']")[2].text()==desc
+        individualRows.find("[role='gridcell']")[1].text()==desc
     }
 
     def selectByName(name){
         filterByName(name)
         $("a.cell-url-element", text:name).click()
+        sleep(1000)
     }
 
     /**
@@ -226,7 +240,7 @@ class ListBundlesPage extends Page {
      */
 
     def validateBundleRowData(data){
-        validateFilteredDescription(data[1])&& validatePlanningTick(data[3])
+        validateFilteredDescription(data[1])
     }
 
     /**

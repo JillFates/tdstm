@@ -33,6 +33,7 @@ class CreateNonPlanningBundlesSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(1000)
         planningModule.goToListBundles()
     }
 
@@ -57,55 +58,33 @@ class CreateNonPlanningBundlesSpec extends GebReportingSpec {
     def "2. The user has reached the bundle Creation Page and all the expected fields are displayed"(){
         when: 'The user is at Bundle creation Page'
             at CreateBundlePage
-        then: 'All expected fields are displayed'
+        then: 'The Planning bundle checkbox is unchecked'
+            !isPlanning()
+        and: 'The Save button is disabled'
+            validateSaveIsDisabled()
+        and: 'All fields are present'
             validatePresentFields()
-        and: 'The Planning bundle checkbox is checked'
-            isPlanning()
+
     }
 
-    def "3. The user is unable to save a bundle without a name"(){
-        when: 'The user clicks on save without having entered a name'
-            clickSave()
-        then: 'Saving is not allowed and the corresponding message is displayed'
-            validateNameMessage()
-    }
-
-    def "4. the user adds a name and is unable to save without Workflow"(){
-        given: 'The user has enterd a name for the bundle'
-            enterName(bundleData[0])
-        when: 'The user clicks on Save'
-            clickSave()
-        then:'The bundle is not saved and a message stating Move bundle cannot be blank is displayed'
-            validateWorkFlowMessage()
-    }
-
-    def "5. The user is led to Bundle detail landing once the bundle is created"(){
+    def "3. The user is led to Bundle detail landing once the bundle is created"(){
         given: 'The user has entered all mandatory data and unchecked the planning checkbox'
             clearName()
             enterBundleData bundleData
-            clickPlanning()
         when: 'The user clicks save'
             clickSave()
-        then: 'The Bundle detail Landing page is displayed'
-            at BundleDetailPage
+        then: 'The Bundle List Page is displayed'
+            at ListBundlesPage
         and: 'The data displayed is the data entered by the user'
+            filterByName(bundleData[0])
+            clickOnBundle()
+            at BundleDetailPage
             validateDataDisplayed bundleData
-        and: 'The bundle creation message is displayed'
-            bundleCreatedMsgIsDisplayed bundleData
-        and: 'The bundle name is displayed in the page header'
-            menuModule.assertBundleName bundleData[0]
     }
 
-    def "6. The recently created Bundle's name is displayed in the Planning menu"(){
-        when: 'The user clicks on the planning menu'
-            planningModule.goToPlanningMenu()
-        then: 'The name of the just created bundle is displayed'
-            planningModule.vaildateDisplayedBundleName bundleData[0]
-    }
-
-    def "7. The User is able to filter the newly created bundle in Bundle list page"(){
+    def "4. The User is able to filter the newly created bundle in Bundle list page"(){
         given: 'The user goes to Bundle List'
-            planningModule.goToListBundles()
+            closeModal()
             at ListBundlesPage
         when: 'The user filters the newly created bundle'
             filterByName bundleData[0]

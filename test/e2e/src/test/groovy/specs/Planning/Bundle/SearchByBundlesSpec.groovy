@@ -34,6 +34,7 @@ class SearchBundlesSpec extends GebReportingSpec {
         login()
         at MenuPage
         planningModule.goToListBundles()
+        sleep(3000)
     }
 
     def setup() {
@@ -50,7 +51,6 @@ class SearchBundlesSpec extends GebReportingSpec {
             at ListBundlesPage
         when: 'The user filter Bundles by name'
             filterByName baseName
-            selectFilter()
         then: 'The Bundles Listed contain the specified text'
             validateFilteredByName(baseName)
     }
@@ -60,26 +60,11 @@ class SearchBundlesSpec extends GebReportingSpec {
             clearNameFilter()
         when: 'The user filter Bundles by name'
             filterByDesc baseName
-            selectDescFilter()
         then: 'The Bundles Listed contain the specified text'
             validateFilteredByDesc(baseName)
     }
 
-    def "3. Filter by Planning"(){
-        given: 'The user is in Bundle List'
-            clearDescription()
-        when: 'The user filters by Planning bundles'
-            clickPlanningFilter()
-        then: 'All the bundles listed (if any )are planning bundles'
-            validateFilteredByPlanning(true) || validatePagerInfo("No items to display")
-    }
 
-    def "4. Filter by non Planning"(){
-        when: 'The user filters by Planning bundles'
-            clickNonPlanningFilter()
-        then: 'All the bundles listed (if any )are planning bundles'
-             validateFilteredByPlanning(false) || validatePagerInfo("No items to display")
-    }
 
     def "5. Filter by asset quantity"(){
         when: 'The user filters by Asset quantity'

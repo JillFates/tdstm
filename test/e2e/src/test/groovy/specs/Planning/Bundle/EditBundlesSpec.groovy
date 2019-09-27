@@ -25,7 +25,7 @@ class EditBundlesSpec extends GebReportingSpec {
     static baseName = "QAE2E"
     static randStr = CommonActions.getRandomString()
     static bundleData = [baseName+" "+randStr+" Planning", baseName+" bundle created by automated test",
-                         "STD_PROCESS","on"]
+                         "STD_PROCESS","false"]
     static  originalBundleData =[]
 
     def setupSpec() {
@@ -34,16 +34,16 @@ class EditBundlesSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
+        sleep(3000)
         at MenuPage
         planningModule.goToListBundles()
         at ListBundlesPage
         clickCreate()
         at CreateBundlePage
         enterBundleData bundleData
+
         clickSave()
-        at BundleDetailPage
-        at MenuPage
-        planningModule.goToListBundles()
+
     }
 
     def setup() {
@@ -59,24 +59,24 @@ class EditBundlesSpec extends GebReportingSpec {
         given: 'The User has clickes on Bundle detail'
             at ListBundlesPage
             filterByName bundleData[0]
-            selectFilter()
-        when: 'The user clciks on Bundle list'
+        when: 'The user clicks on Bundle list'
             clickOnBundle()
-        then: 'The User is led to the Create Bundle Page'
+
+        then: 'The User is led to the Bundle Detail Page'
             at BundleDetailPage
     }
 
     def "2. The user has reached the bundle Creation Page and all the expected fields are displayed"(){
         given: 'The user goes back to list bundles and clicks ona bundle'
-            goToListbundles()
+            closeModal()
             at ListBundlesPage
             filterByName bundleData[0]
-            selectFilter()
             clickOnBundle()
             at BundleDetailPage
             originalBundleData = getDataDisplayed()
         when: 'The user clicks on Edit'
             clickEdit()
+
         then: 'The Bundle edition page is displayed'
             at EditBundlePage
     }
@@ -87,11 +87,15 @@ class EditBundlesSpec extends GebReportingSpec {
             editDescription("Edited")
             changeIsPlanningValue()
         when: 'The user cancels the edition'
-            clickCancel()
-        then: 'The user is led to Bundle detail page'
+            cancelEdition()
+            clickClose()
+            at ListBundlesPage
+            filterByName(bundleData[0])
+            clickOnBundle()
             at BundleDetailPage
-        and: 'The changes have not been applied to the bundle'
-            validateDataDisplayed(originalBundleData)
+            sleep(2000)
+        then: 'The changes have not been applied to the bundle'
+            validateNameDescription(bundleData)
     }
 
     def "4. The user Edits the  bundle"(){
@@ -100,18 +104,18 @@ class EditBundlesSpec extends GebReportingSpec {
             at EditBundlePage
             editName("Edited")
             editDescription("Edited")
-            changeIsPlanningValue()
-            def newDates = editDates()
-            originalBundleData.add(newDates[0])
-            originalBundleData.add(newDates[1])
         when: 'The user saves changes'
             clickSave()
-        then: 'The user is led to Bundle detail page'
             at BundleDetailPage
-        and: 'The changes have been saved'
-            dataIsEdited(originalBundleData)
-        and: 'The corresponding message is displayed'
-            validateUpdateMesage(originalBundleData[0]+" Edited")
+            closeModal()
+            at ListBundlesPage
+            filterByName(bundleData[0])
+            clickOnBundle()
+            at BundleDetailPage
+
+        then: 'The changes have been saved'
+            nameDescriptionEdited(originalBundleData)
+
     }
 
 }
