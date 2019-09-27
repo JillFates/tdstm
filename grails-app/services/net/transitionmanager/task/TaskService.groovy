@@ -3565,6 +3565,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
+		// If the spec for the task defines a note, create it and add it to the task.
+		if (taskSpec.containsKey('note') && taskSpec['note']) {
+			addNote(task, whom, taskSpec['note'], 0)
+		}
+
 		// Perform the assignment logic
 		errMsg = assignWhomAndTeamToTask(task, taskSpec, projectStaff, settings)
 		if (errMsg) {

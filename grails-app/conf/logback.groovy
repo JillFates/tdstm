@@ -98,7 +98,7 @@ logger 'org.springframework', WARN, appenderList, false
 logger 'org.hibernate.hql.internal.ast.HqlSqlWalker', ERROR, appenderList, false
 logger 'grails.plugin.hibernate', ERROR, appenderList, false
 logger 'org.apache.tomcat', ERROR, appenderList, false
-logger 'liquibase', ERROR, appenderList, false
+logger 'liquibase', INFO, appenderList, false
 logger 'net.bull.javamelody', ERROR, appenderList, false
 
 // SQL Logging

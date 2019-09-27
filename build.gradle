@@ -59,6 +59,14 @@ configurations {
 
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+
 dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 	compile "org.springframework.boot:spring-boot-starter-logging"
@@ -105,7 +113,10 @@ dependencies {
 		 'spring-core', 'spring-data-commons', 'spring-test', 'spring-tx'].each { exclude module: it }
 	}
 
-	compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
+	compile('org.grails:grails-datastore-rest-client:6.1.9.RELEASE'){
+		exclude group:'org.grails', module:'grails-plugin-converters'
+	}
+
 	compile 'org.apache.httpcomponents:httpclient:4.5.5'
 
 	compile 'org.apache.commons:commons-lang3:3.8.1'
@@ -154,7 +165,7 @@ dependencies {
 	testCompile 'com.stehno.ersatz:ersatz:1.9.0:safe@jar'
 
 	compile 'org.grails.plugins:ajax-tags:1.0.0.RC1' //TODO remove once we remove the GSP UI 2018-12-1
-	compile "org.grails.plugins:converters"
+	compile 'org.grails.plugins:converters:4.0.0'
 	compile 'org.grails.plugins:external-config:2.0.0'
 
 	compile 'org.grails.plugins:jasper:2.1.0.RC1'
@@ -248,14 +259,6 @@ assets {
 	configure(runTask) {
 		systemProperties System.properties
 	}
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDir 'grails-app/migrations'
-        }
-    }
 }
 
 // Customize Git properties plugin.
