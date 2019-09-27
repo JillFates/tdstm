@@ -1,6 +1,5 @@
 import {
 	Component,
-	OnInit,
 	Input,
 	Output,
 	AfterViewInit,
@@ -45,9 +44,10 @@ const categoryColors = {
 	template: `
 		<div class="diagram-layout-container">
 			<div
-					id="diagram-layout-container"
+					id="diagram-layout"
 					[style.width]="containerWidth"
-					[style.height]="containerHeight"></div>
+					[style.height]="containerHeight"
+					#diagramLayout></div>
 			<div id="graph-control-btn-group">
 				<button class="btn btn-block">
 					<fa-icon [icon]="faIcons.faCog" size="lg"></fa-icon>
@@ -59,68 +59,69 @@ const categoryColors = {
 					<fa-icon [icon]="faIcons.faSearchMinus" size="lg"></fa-icon>
 				</button>
 			</div>
-				<div id="ctx-menu" #ctxMenu>
-					<ul>
-						<li id="start">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.start.icon" [styles]="{ color: ctxMenuIcons.start.color }">
-								</fa-icon>
-								Start
-							</button>
-						</li>
-						<li id="done">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.done.icon" [styles]="{ color: ctxMenuIcons.done.color }">
-								</fa-icon>
-								Done
-							</button>
-						</li>
-						<li id="hold">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.hold.icon" [styles]="{ color: ctxMenuIcons.hold.color }">
-								</fa-icon>
-								Hold
-							</button>
-						</li>
-						<li id="invoke">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.invoke.icon" [styles]="{ color: ctxMenuIcons.invoke.color }">
-								</fa-icon>
-								Invoke
-							</button>
-						</li>
-						<li id="edit">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.edit.icon" [styles]="{ color: ctxMenuIcons.edit.color }">
-								</fa-icon>
-								Edit
-							</button>
-						</li>
-						<li id="view">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.view.icon" [styles]="{ color: ctxMenuIcons.view.color }">
-								</fa-icon>
-								View
-							</button>
-						</li>
-						<li id="assign-to-me">
-							<button class="btn">
-								<fa-icon [icon]="ctxMenuIcons.assignToMe.icon" [styles]="{ color: ctxMenuIcons.assignToMe.color }">
-								</fa-icon>
-								Assign to me
-							</button>
-						</li>
-					</ul>
-				</div>
-				<div
-					id="overview-container"
-					class="overview-container"
-					[class.reset-overview-index]="resetOvIndex"></div>
+			<div id="ctx-menu" #ctxMenu>
+				<ul>
+					<li id="start">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.start.icon" [styles]="{ color: ctxMenuIcons.start.color }">
+							</fa-icon>
+							Start
+						</button>
+					</li>
+					<li id="done">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.done.icon" [styles]="{ color: ctxMenuIcons.done.color }">
+							</fa-icon>
+							Done
+						</button>
+					</li>
+					<li id="hold">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.hold.icon" [styles]="{ color: ctxMenuIcons.hold.color }">
+							</fa-icon>
+							Hold
+						</button>
+					</li>
+					<li id="invoke">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.invoke.icon" [styles]="{ color: ctxMenuIcons.invoke.color }">
+							</fa-icon>
+							Invoke
+						</button>
+					</li>
+					<li id="edit">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.edit.icon" [styles]="{ color: ctxMenuIcons.edit.color }">
+							</fa-icon>
+							Edit
+						</button>
+					</li>
+					<li id="view">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.view.icon" [styles]="{ color: ctxMenuIcons.view.color }">
+							</fa-icon>
+							View
+						</button>
+					</li>
+					<li id="assign-to-me">
+						<button class="btn">
+							<fa-icon [icon]="ctxMenuIcons.assignToMe.icon" [styles]="{ color: ctxMenuIcons.assignToMe.color }">
+							</fa-icon>
+							Assign to me
+						</button>
+					</li>
+				</ul>
+			</div>
+			<div
+				id="overview-container"
+				class="overview-container"
+				[class.reset-overview-index]="resetOvIndex"
+				#overviewContainer></div>
 		</div>
 	`,
 	// styleUrls: ['../../../../../css/shared/components/diagram-layout.component.scss']
 })
-export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges {
+export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@Input() name: string;
 	@Input() model: any;
 	@Input() nodeDataArray = [];
@@ -133,6 +134,8 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() editClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() showTaskDetailsClicked: EventEmitter<number> = new EventEmitter<number>();
+	@ViewChild('diagramLayout') diagramLayout: ElementRef;
+	@ViewChild('overviewContainer') overviewContainer: ElementRef;
 	stateIcons = STATE_ICONS_PATH;
 	categoryIcons = CATEGORY_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
@@ -150,42 +153,46 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 
 	constructor(private renderer: Renderer2) { /* Constructor */ }
 
-	ngOnInit() {
-		// document.addEventListener('contextmenu', (e) => {
-		// 		e.preventDefault();
-		// 		return false;
-		// 	});
-	}
-
+	/**
+	 * Detect changes to update nodeDataArray and linksPath accordingly
+	 **/
 	ngOnChanges(simpleChanges: SimpleChanges): void {
 		if (simpleChanges && (simpleChanges.nodeDataArray && simpleChanges.linksPath)
 				&& !(simpleChanges.nodeDataArray.firstChange && simpleChanges.linksPath.firstChange)
 		) {
-			// console.log('simpleChange: ', simpleChanges);
-			this.loadModel();
-			this.initialiseDiagramContainer();
-			this.generateDiagram();
+			this.loadAll();
 		}
 	}
 
 	ngAfterViewInit() {
 		if (this.nodeDataArray && this.linksPath) {
-			this.loadModel();
-			// console.log('diagram', this.nodeDataArray, this.linksPath);
-			this.initialiseDiagramContainer();
-			this.generateDiagram();
+			this.loadAll();
 		}
 	}
 
+	/**
+	 * Load all data related to the diagram
+	 **/
+	loadAll(): void {
+		this.loadModel();
+		this.initialiseDiagramContainer();
+		this.generateDiagram();
+
+	}
+
+	/**
+	 * set the element used as container to hold the diagram
+	 **/
 	initialiseDiagramContainer(): void {
 		if (!this.diagram) {
-			this.diagram = new Diagram('digraph-layout-container');
+			this.diagram = new Diagram(this.diagramLayout.nativeElement);
 		}
 	}
 
+	/**
+	 * Node click handler to set the adornments or any other operation on nodes when clicked
+	 **/
 	onNodeClick(inputEvent: InputEvent, obj: any): void {
-		console.log('node clicked', obj.selectionAdornmentTemplate);
-		// if (obj && obj.part && obj.part.data) { this.nodeClicked.emit(obj.part.data.id); }
 		if (obj && obj.part && obj.part.data) {
 			obj.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 		}
@@ -204,13 +211,11 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	 * Generate Diagram canvas
 	 **/
 	generateDiagram(): void {
-		// console.log('generate');
 		this.diagram.startTransaction('generateDiagram');
 		this.diagram.initialDocumentSpot = Spot.TopLeft;
 		this.diagram.initialViewportSpot = Spot.TopLeft;
 		this.diagram.undoManager.isEnabled = true;
 		this.diagram.allowZoom = true;
-		// this.diagram.initialAutoScale = go.Diagram.UniformToFill;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
 		this.diagram.allowSelect = true;
@@ -227,9 +232,11 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 	 * Diagram overview (Minimap)
 	 **/
 	overviewTemplate() {
-		this.diagramOverview = new Overview('overview-container');
-		this.diagramOverview.observed = this.diagram;
-		this.diagramOverview.contentAlignment = go.Spot.Center;
+		if (!this.diagramOverview) {
+			this.diagramOverview = new Overview(this.overviewContainer.nativeElement);
+			this.diagramOverview.observed = this.diagram;
+			this.diagramOverview.contentAlignment = go.Spot.Center;
+		}
 	}
 
 	/**
@@ -331,7 +338,7 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		const node = new go.Node(go.Panel.Horizontal);
 		node.selectionAdorned = true;
 		node.add(this.containerPanel());
-		node.contextMenu = this.contextMenu();
+		// node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -343,6 +350,10 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return node;
 	}
 
+	/**
+	 * Node Adornment template configuration
+	 * @param {go.Node} node > optional node to add the adornment to
+	 **/
 	selectionAdornmentTemplate(node?: go.Node): Adornment {
 		const selAdornmentTemplate = new Adornment(Panel.Auto);
 		selAdornmentTemplate.selectionAdorned = true;
@@ -364,6 +375,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return selAdornmentTemplate;
 	}
 
+	/**
+	 * Node inner container to draw borders to the panel
+	 **/
 	containerShape(): go.Shape {
 		const container = new go.Shape();
 		container.figure = 'RoundedRectangle';
@@ -374,6 +388,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return container;
 	}
 
+	/**
+	 * Node outer panel container to hold individual shapes related to the node
+	 **/
 	containerPanel(): go.Panel {
 		const panel = new go.Panel(go.Panel.Auto);
 		panel.background = '#fff';
@@ -384,6 +401,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return panel;
 	}
 
+	/**
+	 * Node panel body holding the node content
+	 **/
 	panelBody(): go.Panel {
 		const panel = new go.Panel(go.Panel.Horizontal);
 
@@ -394,6 +414,10 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		return panel;
 	}
 
+	/**
+	 * Icon shape configuration
+	 * @param {any} options > optional configuration to use for the icon shape
+	 **/
 	iconShape(options?: any): Shape {
 		if (options) { return options; }
 
@@ -411,11 +435,13 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		iconShape.bind(new Binding('geometry', 'icon',
 			(val: any) => this.getIcon(this.stateIcons[val])));
 
-		console.log('icon position: ', iconShape.isGeometryPositioned);
-
 		return iconShape;
 	}
 
+	/**
+	 * Icon shape configuration for 'category' property
+	 * @param {any} options > optional configuration to use for the icon shape
+	 **/
 	categoryIconShape(options?: any): Shape {
 		if (options) { return options; }
 
@@ -429,10 +455,13 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		categoryIconShape.bind(new Binding('geometry', 'category',
 			(val: any) => this.getIcon(this.categoryIcons[val])));
 
-		console.log('category icon shape position: ', categoryIconShape.position);
 		return categoryIconShape;
 	}
 
+	/**
+	 * Text block configuration
+	 * @param {any} options > optional configuration to use for the text block
+	 **/
 	textBlockShape(options?: any): TextBlock {
 		if (options) { return options; }
 
@@ -441,13 +470,16 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		textBlock.stroke = 'black';
 		textBlock.font = 'bold 16px sans-serif';
 		// textBlock.wrap = TextBlock.WrapBreakAll;
-		textBlock.bind(new Binding('text', 'label'));
+		textBlock.bind(new Binding('text', 'comment'));
 		return textBlock;
 	}
 
+	/**
+	 * Icons handler to parse to geometry object to be used for the nodes
+	 * @param {ITaskGraphIcon} icon > icon to use as the icon shape
+	 **/
 	getIcon(icon: ITaskGraphIcon): any {
 		if (!icon) {
-			console.log('notFound: ', icon);
 			return go.Geometry.parse(this.categoryIcons.unknown.icon);
 			// return this.stateIcons.unknown;
 		}
@@ -455,6 +487,10 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		// return this.stateIcons[name];
 	}
 
+	/**
+	 * Status background handler to get background color for an icon by status
+	 * @param {ITaskGraphIcon} icon > icon from which to get background color
+	 **/
 	getStatusBackground(icon: ITaskGraphIcon): string {
 		return icon.background;
 	}
@@ -527,10 +563,14 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		});
 	}
 
+	/**
+	 * highlight filter, every node that has a description matching the text received will be highlighted
+	 * @param {string} match > optional configuration to use for the template
+	 **/
 	highlightNodesByText(match: string): void {
 		this.diagram.commit(d => {
 			if (match.length <= 0) { return d.clearSelection(); }
-			const highlightCollection = d.nodes.filter(f => f.data.label.toLowerCase().includes(match.toLowerCase()));
+			const highlightCollection = d.nodes.filter(f => f.data.comment.toLowerCase().includes(match.toLowerCase()));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
@@ -538,6 +578,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		});
 	}
 
+	/**
+	 * Override mousewheel handler to add the zooming scales
+	 **/
 	overrideMouseWheel(): void {
 		// console.log('overriding mouse wheel event');
 		const tool = this.diagram.currentTool;
@@ -547,6 +590,11 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		};
 	}
 
+	/**
+	 * update node templates depending on the actual scale
+	 * @param {number} scale > actual zooming scale
+	 * @param {InputEvent} inputEvent > triggered event object
+	 **/
 	setNodeTemplateByScale(scale?: number, inputEvent?: go.InputEvent): void {
 		if (inputEvent.control) {
 			if (scale >= 0.6446089162177968
@@ -570,10 +618,16 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		}
 	}
 
+	/**
+	 * High scale node template, this is where nodes are most visible and provide more visual feedback
+	 **/
 	highScaleNodeTemplate(): void {
 		this.diagram.commit(() => this.diagram.nodeTemplate = this.setNodeTemplate());
 	}
 
+	/**
+	 * Medium scale node template, this is where nodes are visible but don't provide a lot of visual feedback
+	 **/
 	mediumScaleNodeTemplate(): void {
 		const node = new go.Node(go.Panel.Horizontal);
 
@@ -584,10 +638,11 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		iconShape.alignment = go.Spot.LeftCenter;
 		iconShape.stroke = 'white';
 		iconShape.desiredSize = new go.Size(25, 25);
-		iconShape.bind(new go.Binding('background', 'color'));
-		iconShape.bind(new go.Binding('geometry', 'icon',
-			(val: any) => this.getIcon(val)));
-		node.add(iconShape);
+		iconShape.bind(new Binding('background', 'icon',
+			(val: any) => this.getStatusBackground(this.stateIcons[val])));
+		iconShape.bind(new Binding('geometry', 'icon',
+			(val: any) => this.getIcon(this.stateIcons[val])));
+		node.add(this.iconShape());
 
 		const  categoryIconShape = new go.Shape();
 		categoryIconShape.figure = 'RoundedRectangle';
@@ -596,9 +651,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		categoryIconShape.alignment = go.Spot.LeftCenter;
 		categoryIconShape.desiredSize = new go.Size(25, 25);
 		categoryIconShape.stroke = '#7a7a7a';
-		categoryIconShape.bind(new go.Binding('geometry', 'category',
-			(val: any) => this.getIcon(val)));
-		node.add(categoryIconShape);
+		categoryIconShape.bind(new Binding('geometry', 'category',
+			(val: any) => this.getIcon(this.categoryIcons[val])));
+		node.add(this.categoryIconShape());
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -607,6 +662,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.diagram.commit(() => this.diagram.nodeTemplate = node);
 	}
 
+	/**
+	 * Low scale node template, this is where nodes are least visible and provide only color visual feedback
+	 **/
 	lowScaleNodeTemplate(): void {
 		const node = new go.Node(go.Panel.Horizontal);
 
@@ -625,11 +683,17 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.diagram.commit(() => this.diagram.nodeTemplate = node);
 	}
 
+	/**
+	 * Node bubble color based on category
+	 **/
 	getCategoryColor(name: string): string {
 		const color = categoryColors[name];
 		return color ? color : '#3c8dbc';
 	}
 
+	/**
+	 * Node Context menu containing a variety of operations like 'edit task', 'show task detail', 'ready', etc
+	 **/
 	contextMenu(): any {
 		const $ = go.GraphObject.make;
 		return $(go.HTMLInfo,  // that has one button
@@ -647,6 +711,9 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 					); // end Adornment
 	}
 
+	/**
+	 * handler to decide whether or not context menu should be shown
+	 **/
 	showCtxMenu(obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool): void {
 		this.renderer.setStyle(this.ctxMenu.nativeElement, 'display', 'block');
 
@@ -657,17 +724,33 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 		this.renderer.setStyle(this.ctxMenu.nativeElement, 'top', `${mousePt.y}px`);
 	}
 
+	/**
+	 * Show task detail context menu option
+	 * @param {GraphObject} obj > diagram node object
+	 * @param {Diagram} diagram > diagram reference
+	 **/
 	showTaskDetails(obj: go.GraphObject, diagram: go.Diagram): void {
 		const nodeData = obj.part.data;
 		this.showTaskDetailsClicked.emit(nodeData.id);
 	}
 
+	/**
+	 * Edit task context menu option
+	 * @param {GraphObject} obj > diagram node object
+	 * @param {Diagram} diagram > diagram reference
+	 **/
 	editTask(obj: go.GraphObject, diagram: go.Diagram): void {
 		const nodeData = obj.part.data;
 		this.editClicked.emit(nodeData.id);
 	}
 
-	changeColor(e: go.InputEvent, obj: go.GraphObject, diagram) {
+	/**
+	 * Change Color context menu option
+	 * @param {InputEvent} e > input event
+	 * @param {GraphObject} obj > diagram node object
+	 * @param {Diagram} diagram > diagram reference
+	 **/
+	changeColor(e: go.InputEvent, obj: go.GraphObject, diagram: Diagram) {
 		diagram.commit(d => {
 			// get the context menu that holds the button that was clicked
 			const contextmenu = obj.part;
@@ -689,10 +772,16 @@ export class DiagramLayoutComponent implements OnInit, AfterViewInit, OnChanges 
 
 	}
 
+	/**
+	 * handle to reset the overview index value to 0 so that it's not on top of all elements
+	 **/
 	resetOverviewIndex(): void {
 		this.resetOvIndex = true;
 	}
 
+	/**
+	 * handle to restore the overview index value so that it's on top of all elements
+	 **/
 	restoreOverviewIndex(): void {
 		this.resetOvIndex = false;
 	}

@@ -55,19 +55,19 @@
         [value]="selectedEvent"
         #eventsDropdown>
       </kendo-dropdownlist>
-      <label class="neighborhood-control-label" for="neighborhood-team-highlight-dropdown">Team Highlight:</label>
-      <kendo-dropdownlist
-        id="neighborhood-team-highlight-dropdown"
-        textField="name"
-        valueField="id"
-        [data]="eventList$ | async"
-        (selectionChange)="highlightByTeam($event)"
-        [(ngModel)]="selectedEvent"
-        (open)="eventsDropdownOpened()"
-        (close)="eventsDropdownClosed()"
-        [value]="selectedEvent"
-        #teamHighlightDropdown>
-      </kendo-dropdownlist>
+
+<!--      <label class="neighborhood-control-label" for="neighborhood-team-highlight-dropdown" style="margin-left: 2px;">Team:</label>-->
+<!--      <kendo-dropdownlist-->
+<!--        id="neighborhood-team-highlight-dropdown"-->
+<!--        [style.width]="'10.4em'"-->
+<!--        [data]="teamHighlights$ | async"-->
+<!--        (selectionChange)="highlightByTeam($event)"-->
+<!--        [(ngModel)]="selectedEvent"-->
+<!--        (open)="teamHighlightDropdownOpened()"-->
+<!--        (close)="teamHighlightDropdownClosed()"-->
+<!--        [value]="selectedTeamHighlight"-->
+<!--        #teamHighlightDropdown>-->
+<!--      </kendo-dropdownlist>-->
     </div>
     <div class="col-md-4 highlight-filter-container">
       <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="highlightFilterChange()" />
@@ -80,26 +80,30 @@
         <fa-icon [icon]="icons.faSignal" size="lg" [rotate]="270"></fa-icon>
       </button>
     </div>
-    <div class="col-md-4 k-align-self-center">
+
+    <div class="col-md-2 k-align-self-center">
       <label class="d-inline-block task-chk-container">
         <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
         <span class="checkmark"></span>
         Minimize Auto Tasks
       </label>
+    </div>
 
+    <div class="col-md-2 k-align-self-center">
       <label class="d-inline-block task-chk-container">
         <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
         <span class="checkmark"></span>
         View Unpublished
       </label>
     </div>
+
   </div>
   <div class="row diagram-container">
     <tds-diagram-layout
     [nodeDataArray]="nodeData$ | async"
     [linksPath]="links$ | async"
     [containerWidth]="'100%'"
-    [containerHeight]="'100%'"
+    [containerHeight]="'550px'"
     (nodeClicked)="loadTasks($event)"
     (showTaskDetailsClicked)="showTaskDetails($event)"
     (editClicked)="editTask($event)"
