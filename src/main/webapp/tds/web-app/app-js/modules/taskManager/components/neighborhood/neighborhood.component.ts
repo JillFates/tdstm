@@ -38,7 +38,8 @@ export class NeighborhoodComponent implements OnInit {
 		unknown: 'unknown',
 		pending: 'pending',
 		ready: 'ready',
-		forward: 'forward'
+		forward: 'forward',
+		completed: 'completed'
 	};
 	opened: boolean;
 	selectedTask: any;
@@ -217,16 +218,12 @@ export class NeighborhoodComponent implements OnInit {
 		const tasksCopy = this.tasks.slice();
 
 		// Add tasks to nodeDataArray constant
+		// and create linksPath object from taskNumber and successors
 		tasksCopy.map((t: IGraphTask | any) => {
-			t.task.key = t.task.taskNumber || t['task_number'];
-			t.task.icon = t.task.status ? this.statusTypes[t.task.status.toLowerCase()] : this.statusTypes.pending;
+			t.task.key = t.task.taskNumber;
 			nodeDataArr.push(t.task);
+			linksPath.push(...this.getLinksPath(t.task.taskNumber, t.successors))
 		});
-
-		// create linksPath object from taskNumber and successors
-		tasksCopy
-		.forEach((data: IGraphTask | any) =>
-			linksPath.push(...this.getLinksPath(data.task.taskNumber || data['task_number'], data.successors)));
 
 		this.nodeData$.next(nodeDataArr);
 		this.links$.next(linksPath);
