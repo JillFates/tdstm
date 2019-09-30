@@ -68,7 +68,7 @@ class SearchBundlesSpec extends GebReportingSpec {
 
     def "5. Filter by asset quantity"(){
         when: 'The user filters by Asset quantity'
-            clearPlanningFilter()
+            clearDescription()
             filterByQuantity("0"+qty)
         then: 'Either no results are returned or every listed bundle has the given number of assets'
             validateAssetQtyFilter(qty) || validatePagerInfo("No items to display")
@@ -96,7 +96,7 @@ class SearchBundlesSpec extends GebReportingSpec {
             filterByName(nonExName)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
        }
 
     def "9. Filter by non-existent description"(){
@@ -105,7 +105,7 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDesc(nonExName)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
     }
 
     def "10. Negative start date scenario"(){

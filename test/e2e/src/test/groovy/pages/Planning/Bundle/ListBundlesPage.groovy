@@ -20,13 +20,13 @@ class ListBundlesPage extends Page {
         planningModule { module PlanningMenuModule}
         listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         createButton {$("button",class:"action-toolbar-btn")}
-        rows (required:false) {$("[role='rowgroup']")}
+        rows (required:false) {$('tdoby',role="presentation")}
         individualRows (required:false) {$('table.k-grid-table').find('tr',role:'row')}
         individualBundles (required: false) {$("a.cell-url-element")}
         commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
-        pagerInfo {$(".k-pager-info")}
+        pagerInfo {$(".k-grid-norecords")}
 
         //filters section
         filterRow {$("tr.k-filter-row")}
@@ -40,26 +40,24 @@ class ListBundlesPage extends Page {
         isPlanningSelector {filterRow.find("kendo-dropdownlist")}
         clearPlanningFilter {$("span.form-control-feedback")[1]}
         nameFilterWrapper {$("span.k-filtercell")[1]}
-        clearName {$('input.form-control.ng-touched').next()}
+        clearName {$("span.form-control-feedback")[0]}
         descFilterWrapper {$("span.k-filtercell")[2]}
-        clearDesc {descFilterWrapper.find("button.k-button")}
-        clearAssetQtty {filterRow.find("[title='Clear']")[4]}
+        clearDesc {$("span.form-control-feedback")[0]}
+        clearAssetQtty {filterRow.find("span.form-control-feedback")[0]}
         clearStarting {filterRow.find("[title='Clear']")[5]}
         clearCompletion {filterRow.find("[title='Clear']")[6]}
-        qttyFilter {filterRow.find("input.k-formatted-value.k-input")[1]}
+        qttyFilter {filterRow.find("input.k-input", placeholder:"Filter Asset Quantity")}
         qttyFilterFocused{filterRow.find("[data-role='numerictextbox']")[1]}
         editedQty {filterRow.find("span.k-state-focused")}
-        startDate {$("[data-role='datepicker']")[0]}
-        completionDate {$("[data-role='datepicker']")[1]}
+        startDate {$('input.k-input')[1]}
+        completionDate {$('input.k-input')[2]}
         noRecordsMsg (required:false) {$('tr.k-grid-norecords')}
     }
 
     def filterByQuantity(qtty){
         qttyFilter.click()
-        qttyFilterFocused=qtty
-        //This is necessary for the filter will not be applied until the focus is moved away
-        //from the field. Tabbing does not work in this case, so just clicking elsewhere
-        nameFilter.click()
+        qttyFilter = qtty
+
     }
 
     /**
@@ -105,7 +103,7 @@ class ListBundlesPage extends Page {
     def validateFilteredByDesc(name){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!individualRows[i].find("td")[2].text().contains("QAE2E")){
+            if(!individualRows[i].find("td")[1].text().contains("QAE2E")){
                 validation=false
             }
         }
@@ -263,7 +261,7 @@ class ListBundlesPage extends Page {
     def validateAssetQtyFilter(qty){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find(("[role='gridcell']")[3]).contains(qty)) {
+            if(!individualRows[i].find(("[role='gridcell']")[3]).contains(qty)) {
                 validation=false
                 break;
             }
@@ -294,9 +292,9 @@ class ListBundlesPage extends Page {
     def validateStartDate(dte){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find("[role='gridcell']")[5].text().contains(dte)) {
+            if(!individualRows[i].find("[role='gridcell']")[5].text().contains(dte)) {
                 validation=false
-                break;
+                break
             }
         }
         return validation
