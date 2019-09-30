@@ -3567,6 +3567,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
+		// If the spec for the task defines a note, create it and add it to the task.
+		if (taskSpec.containsKey('note') && taskSpec['note']) {
+			addNote(task, whom, taskSpec['note'], 0)
+		}
+
 		// Perform the assignment logic
 		errMsg = assignWhomAndTeamToTask(task, taskSpec, projectStaff, settings)
 		if (errMsg) {
@@ -5227,12 +5232,33 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 		Map teamTaskMap =[:]
 		List publishedValues = viewUnpublished ? [true,false] : [true]
 		if (moveEvent) {
-			getTeamRolesForTasks().each { role ->
-				def teamTask = AssetComment.findAllByMoveEventAndRoleAndIsPublishedInList(moveEvent, role.id, publishedValues)
-				def teamDoneTask = teamTask.findAll { it.status == 'Completed' }
-				if (teamTask) {
-					teamTaskMap[role.id] = [teamTaskCount:teamTask.size(), teamDoneCount:teamDoneTask.size(), role:role]
+		String hql = """
+					select 
+						ac.role,
+						count(*),
+						sum(case when ac.status = 'Completed' then 1 else 0 end)
+						from AssetComment ac
+						where ac.moveEvent =:moveEvent
+						and ac.isPublished in (${publishedValues.join(",")})
+					group by ac.role
+				"""
+
+			def results = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
+
+			List roles = getTeamRolesForTasks()
+
+			results.each { field ->
+				if (field[0] == null || field[0] == '') {
+					if (teamTaskMap[RoleType.NO_ROLE] == null) {
+						teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount: 0, teamDoneCount: 0, role: [id: RoleType.NO_ROLE, description: 'Not Assigned']]
+					}
+					teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] = teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] + field[1]
+					teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] = teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] + field[2]
+				} else {
+					Map role = roles.find { it.id == field[0]}
+					teamTaskMap[field[0]] = [teamTaskCount: field[1], teamDoneCount: field[2], role: role]
 				}
+
 			}
 		}
 		return teamTaskMap

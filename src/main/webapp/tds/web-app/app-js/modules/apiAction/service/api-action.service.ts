@@ -83,7 +83,10 @@ export class APIActionService {
 			model.debugEnabled = model.debugEnabled || false;
 		}
 		model.dictionary = model.apiCatalog;
-		model.agentMethod = {id: model.connectorMethod};
+		model.agentMethod = {
+			id: model.connectorMethod,
+			uId: model.connectorMethod + model.dictionaryMethodName
+		};
 		model.dateCreated = ((model.dateCreated) ? new Date(model.dateCreated) : '');
 		model.lastUpdated = ((model.lastUpdated) ? new Date(model.lastUpdated) : '');
 		model.producesData = (model.producesData === 1);
@@ -173,6 +176,7 @@ export class APIActionService {
 					if (response.hasOwnProperty(property)) {
 						agentMethodModel.push({
 							id: response[property].apiMethod,
+							uId: response[property].apiMethod + response[property].name,
 							name: response[property].name,
 							dictionaryMethodName: response[property].dictionaryMethodName ? response[property].dictionaryMethodName : response[property].name,
 							description: response[property].description,
@@ -220,7 +224,7 @@ export class APIActionService {
 	saveAPIAction(model: APIActionModel, parameterList: any): Observable<DataScriptModel> {
 		let postRequest: any = {
 			name: model.name,
-			dictionaryMethodName: model.agentMethod.dictionaryMethodName ? model.agentMethod.dictionaryMethodName : '',
+			dictionaryMethodName: model.dictionaryMethodName ? model.dictionaryMethodName : model.agentMethod.dictionaryMethodName,
 			remoteCredentialMethod: model.remoteCredentialMethod && model.remoteCredentialMethod.id,
 			description: model.description,
 			provider: { id: model.provider.id },

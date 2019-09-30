@@ -55,7 +55,9 @@ export const en_DICTIONARY: Object = {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
-			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?'
+			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
+			'CONFIRMATION_TITLE': 'Confirmation Required',
+			'CONFIRMATION_MESSAGE': 'You are about to delete the selected custom field for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel'
 		},
 		'SELECT_PLACEHOLDER': 'Select...',
 		'ARTIFACTS': {
@@ -255,9 +257,7 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
-	'PROJECTS': {
-		'LIST': 'Project List'
-	},
+	'PROJECTS': 'Projects',
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
 		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if

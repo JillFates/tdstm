@@ -64,6 +64,7 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -98,7 +99,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
-		this.displayCreateButton = this.getDisplayCreateButton(),
+		this.displayCreateButton = this.getDisplayCreateButton();
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
@@ -148,7 +149,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -250,6 +252,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		if (this.tagSelector) {
 			this.tagSelector.reset();
 		}
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -269,6 +272,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	onReload(): void {
 		this.modelChange.emit();
+		setTimeout(() => {
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		}, 500);
 	}
 
 	/**
@@ -396,6 +402,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		).forEach((c: ViewColumn) => {
 			c.width = data[0].newWidth;
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
@@ -466,6 +473,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}).catch(result => {
 			console.log('Cancel:', result);
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 
 	}
 
@@ -527,8 +535,11 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		];
 
 		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
-			.then(() => this.onReload())
-			.catch((err) => this.onReload() )
+			.then(() => {
+				this.onReload();
+				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+			})
+			.catch((err) => this.onReload() );
 	}
 
 	/**
@@ -558,8 +569,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 					common_assetClass: dataItem.common_assetClass
 				};
 				this.onShow(data);
-
 			}
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 		}).catch( error => console.log('error', error));
 	}
 
@@ -766,6 +777,14 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe(() => {
 				// nothing to do here
 			});
+	}
+
+	/**
+	 * Changes the height of the table row when the user
+	 * moves the mouse out of the tags cell
+	 * */
+	public refreshTableSize(event): void {
+		event.target.parentElement.parentElement.style.height = '28px';
 	}
 
 	/**

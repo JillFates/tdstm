@@ -29,7 +29,7 @@
                                        field="{{column.property}}"
                                        format="{{column.format}}"
                                        [width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
-                                       [minResizableWidth]="100">
+                                       >
                         <ng-template kendoGridHeaderTemplate>
                             <div class="sortable-column" (click)="onClickTemplate($event)">
                                 <label> {{column.label}}</label>

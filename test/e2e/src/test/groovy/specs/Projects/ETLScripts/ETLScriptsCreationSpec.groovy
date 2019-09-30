@@ -59,7 +59,6 @@ class ETLScriptsCreationSpec extends GebReportingSpec{
         then: 'The pop up loads with no problem and it is closed again'
             at CreateETLScriptsPage
             waitFor{datascriptXIcon.click()}
-            commonsModule.waitForDialogModalHidden()
     }
 
     def "3. Create a ETLScripts"() {

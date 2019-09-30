@@ -7,12 +7,13 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {ActivatedRoute, Event, Params, Router, NavigationEnd} from '@angular/router';
 import {ProjectService} from '../../service/project.service';
 import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 import {ProjectCreateComponent} from '../create/project-create.component';
 import {ProjectViewEditComponent} from '../view-edit/project-view-edit.component';
+import {NotifierService} from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
@@ -44,6 +45,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showActive: boolean;
+	private projectToOpen: number;
+	private projectOpen = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -51,6 +54,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private projectService: ProjectService,
 		private prompt: UIPromptService,
 		private preferenceService: PreferenceService,
+		private notifierService: NotifierService,
 		private router: Router,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
@@ -68,21 +72,33 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				this.dateFormat = dateFormat;
 				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
 			});
+		this.updateBreadcrumb();
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
 
 	ngAfterContentInit() {
-		if (this.route.snapshot.queryParams['show']) {
-			setTimeout(() => {
-				this.showProject(this.route.snapshot.queryParams['show']);
-			});
-		}
+		this.route.queryParams.subscribe((params) => {
+			if (params['show']) {
+				setTimeout(() => {
+					this.projectToOpen = +params['show'];
+					this.showProject(this.projectToOpen);
+				});
+			}
+		});
+		this.router.events.subscribe((event: Event) => {
+				if (event instanceof NavigationEnd && event.url.includes('show=') && this.projectToOpen) {
+					setTimeout(() => {
+						this.showProject(this.projectToOpen);
+					});
+				}
+		});
 	}
 
 	protected toggleShowActive(): void {
 		this.showActive = !this.showActive;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
+		this.updateBreadcrumb();
 		this.reloadData();
 	}
 
@@ -106,13 +122,25 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		this.filterChange(this.state.filter);
 	}
 
-	protected showProject(id): void {
-		this.dialogService.open(ProjectViewEditComponent,
-			[{provide: 'id', useValue: id}]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
+	protected updateBreadcrumb(): void {
+		this.notifierService.broadcast({
+			name: 'notificationHeaderBreadcrumbChange',
+			menu: ['Projects', this.showActive ? 'Active' : 'Completed']
 		});
+	}
+
+	protected showProject(id): void {
+		if (!this.projectOpen) {
+			this.projectOpen = true;
+			this.dialogService.open(ProjectViewEditComponent,
+				[{provide: 'id', useValue: id}]).then(result => {
+					this.projectOpen = false;
+					this.reloadData();
+			}).catch(result => {
+				this.projectOpen = false;
+				this.reloadData();
+			});
+		}
 	}
 
 	protected openCreateProject(): void {

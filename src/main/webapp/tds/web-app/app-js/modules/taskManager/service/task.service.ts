@@ -20,6 +20,7 @@ export class TaskService {
 	private readonly CUSTOM_COLUMNS_URL = `${ this.baseURL }/ws/task/customColumns`;
 	private readonly TASK_ACTION_INFO_URL = `${ this.baseURL }/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${ this.baseURL }/ws/task/{taskId}/resetAction`;
+	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -387,13 +388,15 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
-				if (response.rows) {
-					response.rows = response.rows.map(item => {
-						let newItem = { ...item };
-						newItem.taskNumber = newItem.taskNumber.toString();
-						return newItem;
-					})
+				if (!response.rows || response.rows === null) {
+					return {rows: [], totalCount: 0};
 				}
+				response.rows.forEach(item => {
+					for (let i = 0; i <= 4; i++) {
+						const property = `userSelectedCol${i}`;
+						item[property] = item[property] === 'null' ? '' : item[property];
+					}
+				});
 				return response;
 			}),
 			catchError(error => {
@@ -469,6 +472,21 @@ export class TaskService {
 	 */
 	resetTaskAction(taskId: number): Observable<any> {
 		return this.http.post(this.RESET_TASK_URL.replace('{taskId}', taskId.toString()), null)
+			.pipe(
+				map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
+	}
+
+	/**
+	 * GET - Returns the task api action summary.
+	 * @param taskId
+	 */
+	getTaskActionSummary(taskId: string): Observable<any> {
+		return this.http.get(this.TASK_ACTION_SUMMARY.replace('{taskId}', taskId.toString()))
 			.pipe(
 				map(response => response),
 				catchError(error => {

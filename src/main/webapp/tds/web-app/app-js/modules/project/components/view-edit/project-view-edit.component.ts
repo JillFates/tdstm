@@ -1,21 +1,24 @@
-import {Component, ElementRef, Inject, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {
+	Component,
+	Inject,
+	OnInit,
+	ViewChild
+} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {UIActiveDialogService, UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {ProjectModel} from '../../model/project.model';
-import {DateUtils} from '../../../../shared/utils/date.utils';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {DialogService} from '@progress/kendo-angular-dialog';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../../auth/model/user-context.model';
-import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {SetProject} from '../../actions/project.actions';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -24,16 +27,16 @@ import {SetProject} from '../../actions/project.actions';
 export class ProjectViewEditComponent implements OnInit {
 	public projectModel: ProjectModel = null;
 	public savedModel: ProjectModel = null;
-	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
+	private requiredFields = ['clientId', 'projectCode', 'projectName', 'completionDate'];
 	public managers;
 	public client;
 	public clients;
 	public planMethodologies;
 	public projectTypes;
-	public workflowCodes;
 	public projectManagers;
 	public possiblePartners;
 	public possibleManagers;
+	public availableBundles;
 	public partnerKey = {};
 	public projectId;
 	public projectLogoId;
@@ -50,8 +53,8 @@ export class ProjectViewEditComponent implements OnInit {
 	private logoOriginalFilename;
 	public retrieveImageTimestamp = (new Date()).getTime(); // Update this to refresh the project logo
 
-	@ViewChild('startTimePicker') startTimePicker;
-	@ViewChild('completionTimePicker') completionTimePicker;
+	@ViewChild('startDatePicker') startDatePicker;
+	@ViewChild('completionDatePicker') completionDatePicker;
 	constructor(
 		private dialogService: UIDialogService,
 		private projectService: ProjectService,
@@ -75,7 +78,6 @@ export class ProjectViewEditComponent implements OnInit {
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
-			workflowCode: 'STD_PROCESS',
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
@@ -93,6 +95,17 @@ export class ProjectViewEditComponent implements OnInit {
 		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 		this.getModel(this.projectId);
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+	}
+
+	// This is a work-around for firefox users
+	onOpenStartDatePicker (event) {
+		event.preventDefault();
+		this.startDatePicker.toggle();
+	}
+
+	onOpenCompletionDatePicker (event) {
+		event.preventDefault();
+		this.completionDatePicker.toggle();
 	}
 
 	public confirmDeleteProject() {
@@ -158,14 +171,14 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
-				this.projectModel.defaultBundleName = data.defaultBundle ? data.defaultBundle.name : '';
+				this.availableBundles = data.availableBundles;
+				this.projectModel.defaultBundle = data.defaultBundle ? data.defaultBundle : {};
 				this.projectModel.projectLogo = data.projectLogoForProject;
 				this.projectModel.projectName = data.projectInstance ? data.projectInstance.name : '';
 				this.projectModel.timeZone = data.timezone;
-				this.workflowCodes = data.workflowCodes;
 				this.projectTypes = data.projectTypes;
 
-				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId}));
+				this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
 				this.updateSavedFields();
 			});
 	}
@@ -181,7 +194,10 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateRequiredFields(this.projectModel)) {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
+			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
+				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
+			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename, this.projectId).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.updateSavedFields();
@@ -189,12 +205,7 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
-					this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
-						if (userContext) {
-							userContext.project = { id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp};
-						}
-					});
-					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl: '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp}));
+					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl:  this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''}));
 				}
 			});
 		}
@@ -277,6 +288,11 @@ export class ProjectViewEditComponent implements OnInit {
 
 	private clearFilename(e?: any) {
 		this.fetchResult = null;
+	}
+
+	onDeleteLogo() {
+		this.projectLogoId = 0;
+		this.projectModel.projectLogo = null;
 	}
 
 	/**

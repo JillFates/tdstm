@@ -37,29 +37,92 @@ class TaskTimeLineGraph {
 	}
 
 	/**
+	 * Returns {@code TaskVertex#vertices} size
 	 *
-	 * @return
+	 * @return {@code TaskVertex#vertices} size
 	 */
 	int verticesSize() {
 		return vertices.size()
 	}
 
 	/**
+	 * Retrieve an instance of {@code TaskVertex} by its {@code TaskVertex#taskNumber}
 	 *
 	 * @param taskNumber
-	 * @return
+	 * @return an instance of {@code TaskVertex}
+	 * 		or null if it is not present in {@code TaskVertex#verticesMap}
 	 */
 	TaskVertex getVertex(Integer taskNumber) {
 		return this.verticesMap[taskNumber]
 	}
 
 	/**
+	 * Retrieve an instance of {@code TaskVertex} by its {@code TaskVertex#taskNumber}
 	 *
-	 * @param taskVertex
-	 * @return
+	 * @param taskVertex an instance of {@code TaskVertex}
+	 * @return an instance of {@code TaskVertex}
+	 * 		or null if it is not present in {@code TaskVertex#verticesMap}
 	 */
 	TaskVertex getVertex(TaskVertex taskVertex) {
-		return this.getVertex(taskVertex.taskNumber)
+		return getVertex(taskVertex.taskNumber)
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#starts} is Empty
+	 *
+	 * @return true if {@code TaskVertex#starts} is empty
+	 * 			otherwise return false
+	 */
+	Boolean hasNoStarts() {
+		return starts.isEmpty()
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#sinks} is Empty
+	 *
+	 * @return true if {@code TaskVertex#sinks} is empty
+	 * 			otherwise return false
+	 */
+	Boolean hasNoSinks() {
+		return sinks.isEmpty()
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#starts} size is bigger than 1
+	 *
+	 * @return true if {@code TaskVertex#starts} size is bigger than 1
+	 * 			otherwise return false
+	 */
+	Boolean hasMultipleStarts() {
+		return starts.size() > 1
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#sinks} size is bigger than 1
+	 *
+	 * @return true if {@code TaskVertex#sinks} size is bigger than 1
+	 * 			otherwise return false
+	 */
+	Boolean hasMultipleSinks() {
+		return sinks.size() > 1
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#starts} size is equals to 1
+	 *
+	 * @return true if {@code TaskVertex#starts#size == 1}
+	 */
+	Boolean hasOneStart() {
+		return starts.size() == 1
+	}
+
+	/**
+	 * Returns if {@code TaskVertex#sinks} size is equals to 1
+	 *
+	 * @return true if {@code TaskVertex#sinks#size == 1}
+	 */
+	Boolean hasOneSink() {
+		return sinks.size() == 1
 	}
 
 	/**

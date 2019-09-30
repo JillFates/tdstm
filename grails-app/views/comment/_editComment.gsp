@@ -27,7 +27,7 @@
 						</td>
 						<td colspan="4">
 							<tds:select required="true" ng-model="ac.category" datasource="ds.categories" id="category" name="category" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(net.transitionmanager.task.AssetComment).category.inList}"
-							noSelection="['':'please select']" ng-change="updateWorkflowTransitions(ac.assetEntity, this.value, 'workFlowTransitionId', 'predecessorId','')"></tds:select>
+							noSelection="['':'please select']" ng-change="updateWorkflowTransitions(ac.assetEntity, this.value, 'predecessorId','')"></tds:select>
 						</td>
 					</tr>
 					<tr>

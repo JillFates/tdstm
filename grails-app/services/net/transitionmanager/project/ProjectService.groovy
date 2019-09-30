@@ -8,7 +8,6 @@ import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
-import net.transitionmanager.common.Timezone
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
@@ -96,6 +95,7 @@ class ProjectService implements ServiceMethods {
 	DataScriptService          dataScriptService
 	LicenseCommonService       licenseCommonService
 	FileSystemService          fileSystemService
+	MoveBundleService		   moveBundleService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -1917,7 +1917,6 @@ class ProjectService implements ServiceMethods {
 			runbookOn = projectCommand.runbookOn
 			startDate = projectCommand.startDate
 			timezone = getTimezone(projectCommand.timeZone)
-			workflowCode = projectCommand.workflowCode
 		}
 
 		project.save(failOnError: true, flush: true)
@@ -1934,6 +1933,13 @@ class ProjectService implements ServiceMethods {
 
 			// Create the default bundle
 			createDefaultBundle(project, projectCommand.defaultBundleName)
+		} else {
+			if (projectCommand.defaultBundle) {
+				def bundle = MoveBundle.findById(projectCommand.defaultBundle.id)
+				if (bundle) {
+					project.defaultBundle = bundle
+				}
+			}
 		}
 
 		// Deal with the Project Manager if one is supplied
@@ -1942,9 +1948,17 @@ class ProjectService implements ServiceMethods {
 		}
 
 		// Deal with the adding the project logo if one was supplied
-		if (projectCommand.projectLogo) {
+		if (projectCommand.projectLogo && projectCommand.originalFilename) {
 			File logoFile = fileSystemService.openTempFile(projectCommand.projectLogo)
 			createOrUpdateLogo(project, logoFile, projectCommand.originalFilename)
+		}
+		else {
+			if (!projectCommand.projectLogo) {
+				ProjectLogo projectLogo = ProjectLogo.findByProject(project)
+				if(projectLogo) {
+					projectLogo.delete()
+				}
+			}
 		}
 
 		// Set the new project as the user's current project.

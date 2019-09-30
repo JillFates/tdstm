@@ -35,6 +35,7 @@ import {PostNoticesManagerService} from '../modules/auth/service/post-notices-ma
 import {PostNoticesService} from '../modules/auth/service/post-notices.service';
 import {PostNoticesValidatorService} from '../modules/auth/service/post-notices-validator.service';
 import {LocalStorageProvider} from './providers/localstorage.provider';
+import {AssetTagUIWrapperService} from './services/asset-tag-ui-wrapper.service';
 // Shared Directives
 import {UIAutofocusDirective} from './directives/autofocus-directive';
 import {UIHandleEscapeDirective} from './directives/handle-escape-directive';
@@ -280,6 +281,7 @@ export class SharedModule {
 				ComponentCreatorService,
 				UILoaderService,
 				UIDialogService,
+				AssetTagUIWrapperService,
 				UIActiveDialogService,
 				// Services
 				HeaderService,

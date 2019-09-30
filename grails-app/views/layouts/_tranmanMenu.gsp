@@ -77,7 +77,7 @@
                     </a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
-                            <g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">List Projects</g:link>
+                            <g:link class="mmlink" controller="module" action="project" id="list" params="[active:'active']" onclick="hideMegaMenu('projectMegaMenu')">Projects</g:link>
                         </li>
                         <li class="divider"></li>
                         <g:if test="${currProject}">
@@ -110,7 +110,7 @@
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
-                                moduProviders
+                                Providers
                             </g:link>
                         </li>
                          <tds:hasPermission permission="${Permission.CredentialView}">

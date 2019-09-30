@@ -88,7 +88,7 @@
                             <tr class="prop">
                                 <td valign="top" class="name">Default Bundle:</td>
 
-                                <td valign="top" class="value">{{savedModel?.defaultBundleName}}</td>
+                                <td valign="top" class="value">{{savedModel?.defaultBundle.name}}</td>
 
                             </tr>
 
@@ -132,13 +132,6 @@
                             </tr>
 
                             <tr class="prop">
-                                <td valign="top" class="name">Workflow Code:</td>
-
-                                <td valign="top" class="value">{{savedModel?.workflowCode}}</td>
-
-                            </tr>
-
-                            <tr class="prop">
                                 <td valign="top" class="name">GUID:</td>
 
                                 <td valign="top" class="value">
@@ -162,6 +155,11 @@
                     <a routerLink="/fieldsettings/list">
                         <button style="color:black" class="btn btn-action tds-action-button btn-secondary tds-generic-button" (click)="cancelCloseDialog()">
                             Field Settings
+                        </button>
+                    </a>
+                    <a routerLink="/planning/dashboard">
+                        <button style="color:black" class="btn btn-action tds-action-button btn-secondary tds-generic-button" (click)="cancelCloseDialog()">
+                            Planning Dashboard
                         </button>
                     </a>
                     <tds-button-close class="btn-secondary pull-right"(click)="cancelCloseDialog()"></tds-button-close>
@@ -218,14 +216,14 @@
                     <tr class="prop">
                         <td valign="top" class="name">Start Date:</td>
                         <td valign="top" class="value">
-                            <kendo-datepicker [(ngModel)]="projectModel.startDate"></kendo-datepicker>
+                            <kendo-datepicker #startDatePicker (open)="onOpenStartDatePicker($event)" [(ngModel)]="projectModel.startDate"></kendo-datepicker>
                         </td>
                     </tr>
 
                     <tr class="prop">
                         <td valign="top" class="name">Completion Date:&nbsp;<span style="color: red">*</span></td>
                         <td valign="top" class="value">
-                            <kendo-datepicker [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
+                            <kendo-datepicker #completionDatePicker (open)="onOpenCompletionDatePicker($event)" [(ngModel)]="projectModel.completionDate"></kendo-datepicker>
                         </td>
                     </tr>
 
@@ -240,7 +238,12 @@
                     <tr>
                         <td valign="top" class="name"><b>Project Logo:</b></td>
                         <td valign="top" class="value">
+                            <div *ngIf="projectModel.projectLogo?.name">
+                                <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId + '?' + retrieveImageTimestamp"/>
+                                <img src="/tdstm/assets/icons/delete.png" (click)="onDeleteLogo()" style="border:0px;padding:6px;cursor:pointer">
+                            </div>
                             <kendo-upload
+                                    *ngIf="!projectModel.projectLogo?.name"
                                     #kendoUploadInstance="kendoUpload"
                                     [restrictions]="file.uploadRestrictions"
                                     [autoUpload]="file.autoUpload"
@@ -264,7 +267,7 @@
                     <tr>
                         <td valign="top" class="name"><b>Default Bundle:</b></td>
                         <td valign="top" class="value">
-                            <input type="text" id="defaultBundleName" name="defaultBundleName" [(ngModel)]="projectModel.defaultBundleName"/>
+                            <kendo-dropdownlist id="defaultBundle" name="defaultBundle" [data]="availableBundles" [(ngModel)]="projectModel.defaultBundle" [valueField]="'id'" [textField]="'name'" [valuePrimitive]="false"></kendo-dropdownlist>
                         </td>
                     </tr>
 
@@ -305,11 +308,6 @@
                         <td valign="top" class="name">Collect Reporting Metrics:</td>
                         <td> <input type="checkbox" name="collectMetrics" id="collectMetrics" value="true" checked="checked" style="margin-top:0px" [(ngModel)]="projectModel.collectMetrics"/></td>
                     </tr>
-
-                    <td valign="top" class="name"><b>WorkFlow Code:&nbsp;<span style="color: red">*</span></b></td>
-                    <td valign="top" class="value">
-                        <kendo-dropdownlist id="workflowCodeId" name="workflowCode" [(ngModel)]="projectModel.workflowCode" [data]="workflowCodes" [valuePrimitive]="true"></kendo-dropdownlist>
-                    </td>
 
                     <tr>
                         <td valign="top" class="name"><b>Plan Methodology:</b></td>

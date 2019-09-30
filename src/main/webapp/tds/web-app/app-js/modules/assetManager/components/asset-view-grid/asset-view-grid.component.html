@@ -128,7 +128,7 @@
 		</kendo-grid-column>
 
 		<!-- Action -->
-		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [locked]="true"
+		<kendo-grid-command-column [width]="75" [class]="{'k-custom-command-column': true}" [minResizableWidth]="75" [locked]="true"
 								   *ngIf="model && model.columns && model.columns.length > 0">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="text-center">
@@ -251,12 +251,11 @@
             </ng-template>
 			<!-- Asset Tags Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property === 'tagAssets'">
-				<div class="single-line-tags" [ngClass]="showFullTags ? 'show-full-tags': ''">
+				<div class="single-line-tags"
+					 (mouseleave)="refreshTableSize($event)"
+					 [ngClass]="showFullTags ? 'show-full-tags': ''">
 					<ng-template ngFor let-tag [ngForOf]="dataItem[column.domain+'_'+column.property]" let-i="index">
-						<ng-template [ngIf]="i === 2">
-							<span class="dots-for-tags">...</span>
-						</ng-template>
-						<span class="label tag" [ngClass]="tag.css">{{i}} {{tag.name}}</span>
+						<span class="label tag" [ngClass]="tag.css">{{tag.name}}</span>
 					</ng-template>
 				</div>
 			</ng-template>

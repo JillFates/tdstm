@@ -17,13 +17,12 @@ import {EventModel} from '../../../event/model/event.model';
 })
 export class ProjectCreateComponent implements OnInit {
 	public managers;
-	public workflowCodes;
 	public planMethodologies;
 	public clients;
 	public partners;
 	public projectTypes;
 	public projectModel: ProjectModel = null;
-	private requiredFields = ['clientId', 'projectCode', 'projectName', 'workflowCode', 'completionDate'];
+	private requiredFields = ['clientId', 'projectCode', 'projectName', 'completionDate'];
 	private defaultModel = null;
 	private logoOriginalFilename;
 	public file = new KendoFileUploadBasicConfig();
@@ -50,7 +49,6 @@ export class ProjectCreateComponent implements OnInit {
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
-			workflowCode: 'STD_PROCESS',
 			projectCode: '',
 			projectType: 'Standard',
 			comment: '',
@@ -72,7 +70,6 @@ export class ProjectCreateComponent implements OnInit {
 			let data = result.data;
 			this.managers = data.managers;
 			this.managers = data.managers.filter((item, index) => index === 0 || item.name !== data.managers[index - 1].name); // Filter duplicate names
-			this.workflowCodes = data.workflowCodes;
 			this.clients = data.clients;
 			this.partners = data.partners;
 			this.projectTypes = data.projectTypes;

@@ -28,6 +28,7 @@ import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.tag.TagEventService
 import net.transitionmanager.tag.TagService
 import org.springframework.jdbc.core.JdbcTemplate
+import com.tdssrc.grails.TimeUtil
 
 /**
  * Handles WS calls of the EventService.

@@ -6,6 +6,7 @@ class ProjectCommand implements CommandObject {
 	Boolean collectMetrics
 	String comment
 	Date completionDate
+	Object defaultBundle
 	String defaultBundleName
 	String description
 	Long id
@@ -20,6 +21,5 @@ class ProjectCommand implements CommandObject {
 	Integer runbookOn
 	Date startDate
 	String timeZone
-	String workflowCode
 
 }

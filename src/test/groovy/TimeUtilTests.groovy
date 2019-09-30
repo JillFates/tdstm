@@ -8,6 +8,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
 import spock.lang.Issue
+import spock.lang.Unroll
 import test.AbstractUnitSpec
 
 import java.sql.Timestamp
@@ -24,6 +25,8 @@ import static com.tdssrc.grails.TimeUtil.FULL
 class TimeUtilTests extends AbstractUnitSpec {
 
 	void setup() {
+		// Set timezone to GMT because Idea doesn't respect the -Duser.timezone=GMT
+		TimeZone.setDefault(TimeZone.getTimeZone('GMT'))
 		login()
 	}
 
@@ -463,5 +466,53 @@ class TimeUtilTests extends AbstractUnitSpec {
 			"1979-08-02T10:00:00Z" | true
 			"1979-08-02T10:00Z"    | true
 			"1979/08/02T10:00:00Z" | false
+	}
+
+	@Unroll
+	void 'Test #timeZone has #timeZoneOffset offset'(){
+		expect:'getTimeZoneOffset for a given time zone will qeual the offset'
+			TimeUtil.getTimeZoneOffset(timeZone) == timeZoneOffset || TimeUtil.getTimeZoneOffset(timeZone) == dstTimeZoneOffset
+		where:
+			timeZone                         | timeZoneOffset        | dstTimeZoneOffset
+			TimeUtil.defaultTimeZone         | TimeUtil.GMT_OFFSET   | TimeUtil.GMT_OFFSET
+			'Etc/GMT+12'                     | '-12:00'              | '-12:00'
+			'Pacific/Midway'                 | '-11:00'              | '-11:00'
+			'US/Hawaii'                      | '-10:00'              | '-10:00'
+			'US/Alaska'                      | '-08:00'              | '-09:00'
+			'US/Arizona'                     | '-07:00'              | '-07:00'
+			'US/Pacific'                     | '-07:00'              | '-08:00'
+			'America/Belize'                 | '-06:00'              | '-06:00'
+			'US/Central'                     | '-05:00'              | '-06:00'
+			'US/Michigan'                    | '-04:00'              | '-05:00'
+			'Canada/Atlantic'                | '-03:00'              | '-04:00'
+			'America/Argentina/Cordoba'      | '-03:00'              | '-03:00'
+			'Canada/Newfoundland'            | '-02:30'              | '-03:30'
+			'America/Miquelon'               | '-02:00'              | '-03:00'
+			'Etc/GMT+1'                      | '-01:00'              | '-01:00'
+			'Etc/GMT-14'                     | '+14:00'              | '+14:00'
+			'Pacific/Tongatapu'              | '+13:00'              | '+13:00'
+			'Pacific/Chatham'                | '+12:45'              | '+13:45'
+			'Pacific/Fiji'                   | '+12:00'              | '+12:00'
+			'Pacific/Guadalcanal'            | '+11:00'              | '+11:00'
+			'Australia/Lord_Howe'            | '+10:30'              | '+11:00'
+			'Pacific/Guam'                   | '+10:00'              | '+10:00'
+			'Australia/Broken_Hill'          | '+09:30'              | '+10:30'
+			'Pacific/Palau'                  | '+09:00'              | '+09:00'
+			'Australia/Eucla'                | '+08:45'              | '+08:45'
+			'Asia/Taipei'                    | '+08:00'              | '+08:00'
+			'Asia/Ho_Chi_Minh'               | '+07:00'              | '+07:00'
+			'Asia/Rangoon'                   | '+06:30'              | '+06:30'
+			'Asia/Dacca'                     | '+06:00'              | '+06:00'
+			'Asia/Kathmandu'                 | '+05:45'              | '+05:45'
+			'Asia/Calcutta'                  | '+05:30'              | '+05:30'
+			'Indian/Maldives'                | '+05:00'              | '+05:00'
+			'Europe/Astrakhan'               | '+04:00'              | '+03:00'
+			'Antarctica/Syowa'               | '+03:00'              | '+03:00'
+			'Europe/Budapest'                | '+02:00'              | '+01:00'
+			'Europe/Belfast'                 | '+01:00'              | '+00:00'
+			'Iceland'                        | '+00:00'              | '+00:00'
+			'GMT'                            | '+00:00'              | '+00:00'
+			'Greenwich'                      | '+00:00'              | '+00:00'
+			'Etc/GMT0'                       | '+00:00'              | '+00:00'
 	}
 }
