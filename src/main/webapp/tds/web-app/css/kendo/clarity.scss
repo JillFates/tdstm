@@ -1,0 +1,60 @@
+.k-grid {
+	border: 0;
+	background: transparent;
+	.k-grid-header-wrap,
+	.k-grid-footer-wrap {
+		border-width: 0;
+	}
+	.k-header {
+		line-height: 24px;
+		.grid-actions {
+			text-align: right;
+			.clr-radio-wrapper {
+				display: inline-block;
+			}
+			label {
+				font-size: 13px;
+				font-weight: normal;
+				padding: 0 15px 0 18px;
+			}
+			.active label {
+				font-weight: 500;
+				color: $color-active;
+			}
+		}
+	}
+	.k-grid-header {
+		th {
+			font-size: 11px;
+			color: $color-active;
+			font-weight: 500;
+			font-style: normal;
+			line-height: 30px;
+			padding: 0 6px;
+			text-align: left;
+			label {
+				all: unset;
+				margin: 0;
+				font-size: 11px;
+				font-weight: 500;
+				line-height: 30px;
+			}
+		}
+	}
+	.k-grid-content {
+		table {
+			border: 1px solid $color-border;
+			border-width: 0 1px;
+			box-sizing: border-box;
+			border-collapse: collapse;
+		}
+		tr {
+			border: 1px solid $color-border;
+			box-sizing: border-box;
+			border-collapse: collapse;
+			td {
+				border-width: 0;
+			}
+		}
+	}
+}

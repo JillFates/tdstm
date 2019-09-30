@@ -1,23 +1,60 @@
 <div class="user-dashboard-component">
-    <div class="panel panel-default">
-        <div class="panel-heading">
+	<div class="clr-row">
+		<clr-select-container class="clr-col-12 project-selection">
+				<label>Project: </label>
+			<select
+				clrSelect
+				name="selectedProjectID"
+				[(ngModel)]="selectedProjectID"
+				(ngModelChange)="onChangeProject()"
+			>
+				<option
+					*ngFor="let project of projectList"
+					[value]="project.id"
+					[attr.selected]="
+					selectedProjectID === project.id
+					"
+					>{{ project.name }}</option
+				>
+			</select>
+			{{selectedProject | json}}
+		</clr-select-container>
+	</div>
+
+    <!-- <div class="panel panel-default"> -->
+        <!-- <div class="panel-heading">
             <span>Project:</span>
             <kendo-dropdownlist [data]="projectList" [(ngModel)]="selectedProject" (ngModelChange)="onChangeProject()" textField="name" valueField="id"></kendo-dropdownlist>
-        </div>
-        <div class="panel-body">
-            <div class="col-md-6 cell-container">
+        </div> -->
+        <!-- <div class="panel-body"> -->
+				<div class="clr-row">
+						<div class="clr-col-6 cell-container">
                 <kendo-grid
                         [data]="eventList"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
-                        <img src="/tdstm/assets/icons/calendar.png"/>
-                        <strong>Events</strong> <span> - Your assigned events and your team</span>
-                        <div class="event-status-toolbar">
-                            <input type="radio" name="event-status" [value]="true"  [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Active</span>
-                            <input type="radio" name="event-status" [value]="false" [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Completed</span>
-                        </div>
-                        <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </ng-template>
+						<div class="clr-row">
+							<div class="grid-label clr-col-6">
+								<strong>Events</strong> <span> - Your assigned events and your team</span>
+							</div>
+							<div class="grid-actions clr-col-6">
+								<clr-radio-wrapper [class.active]="showActiveEvents">
+									<input type="radio" clrRadio value="option1" name="event-status" [value]="true" [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();" />
+									<label>Active</label>
+								</clr-radio-wrapper>
+								<clr-radio-wrapper [class.active]="!showActiveEvents">
+									<input type="radio" clrRadio value="option1" name="event-status" [value]="false" [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();" />
+									<label>Completed</label>
+								</clr-radio-wrapper>
+								<button class="btn btn-icon btn-link btn-sm" (click)="fetchEventsForGrid()"><clr-icon shape="repeat"></clr-icon></button>
+								<!-- <label [class.active]="showActiveEvents"><input type="radio" name="event-status" [value]="true"  [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Active</span></label>
+								<label [class.active]="!showActiveEvents"><input type="radio" name="event-status" [value]="false" [(ngModel)]="showActiveEvents" (change)="fetchEventsForGrid();"> <span>Completed</span></label> -->
+								<!-- <div class="kendo-grid-toolbar__refresh-btn" >
+									<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+								</div> -->
+							</div>
+						</div>
+					</ng-template>
 
                     <!-- Configured View Columns (*ngFor) -->
                     <kendo-grid-column *ngFor="let column of eventColumnModel.columns"
@@ -43,7 +80,6 @@
                             [data]="taskList"
                             [selectable]="true">
                         <ng-template kendoGridToolbarTemplate>
-                            <img src="/tdstm/assets/icons/table.png"/>
                             <strong>Task Summary</strong> <span> - Active tasks assigned to you</span>
                             <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchTasksForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                         </ng-template>
@@ -87,12 +123,11 @@
                     <span>{{summaryDetail}}</span>
                 </div>
             </div>
-            <div class="col-md-6 cell-container">
+            <div class="clr-col-6 cell-container">
                 <kendo-grid
                         [data]="eventNewsList"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate>
-                        <img src="/tdstm/assets/icons/newspaper.png"/>
                         <strong>Event News</strong> <span> - Active news for your events</span>
                         <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchEventNewsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
@@ -119,7 +154,6 @@
                         (cellClick)="handleApplicationClicked($event)"
                         class="clickable-grid">
                     <ng-template kendoGridToolbarTemplate>
-                        <img src="/tdstm/assets/icons/svg/application_menu.svg" width="16" height="16"/>
                         <strong>Applications</strong> <span> - Your applications as an SME or Owner</span>
                         <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchApplicationsForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
@@ -143,7 +177,6 @@
                         (cellClick)="handlePersonClicked($event)"
                         class="clickable-grid">
                     <ng-template kendoGridToolbarTemplate>
-                        <img src="/tdstm/assets/icons/group.png"/>
                         <strong>Active People</strong><span> - Currently active people on this project</span>
                         <div class="kendo-grid-toolbar__refresh-btn" (click)="fetchPeopleForGrid()"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
                     </ng-template>
@@ -161,6 +194,6 @@
                     </kendo-grid-column>
                 </kendo-grid>
             </div>
-        </div>
+        <!-- </div> -->
     </div>
 </div>
