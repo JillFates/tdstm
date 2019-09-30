@@ -620,8 +620,9 @@ export class TaskListComponent {
 	 * @param sort
 	 */
 	onSortChangeHandler(sort: Array<SortDescriptor>): void {
-		// prevent sort on the action column
-		if (sort[0].field === 'actionColumn') {
+		// prevent sort on the non-sortable action column
+		if (this.columnsModel
+			.findIndex(item => item.property === sort[0].field && item.sortable === false) >= 0) {
 			return;
 		}
 		this.grid.state.sort = sort;
