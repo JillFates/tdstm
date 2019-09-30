@@ -1194,11 +1194,10 @@ class ReportsService implements ServiceMethods {
         StringBuilder sinksRef = new StringBuilder()
         StringBuilder cyclicalsRef = new StringBuilder()
 
-        Boolean publishedValues = viewUnpublished ? [true, false] : [true]
         CPAResults cpaResults
 
         try {
-            cpaResults = timeLineService.calculateCPA(moveEvent)
+            cpaResults = timeLineService.calculateCPA(moveEvent, viewUnpublished)
         } catch (e) {
             exceptionString += "No Tasks"
         }
@@ -1276,6 +1275,8 @@ class ReportsService implements ServiceMethods {
                 }
                 sinksRef.append('</ul>')
             }
+
+            List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
 
             personTasks = AssetComment.executeQuery('''
 				from AssetComment

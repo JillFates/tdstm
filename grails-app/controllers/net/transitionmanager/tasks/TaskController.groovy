@@ -1003,7 +1003,7 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		List<Task> tasks = timeLineService.getEventTasks(me).findAll{it.isPublished in publishedValues}
+		List<Task> tasks = timeLineService.getEventTasks(me, viewUnpublished)
 		List<TaskDependency> deps = timeLineService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list

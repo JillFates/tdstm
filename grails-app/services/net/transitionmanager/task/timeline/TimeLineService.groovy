@@ -28,13 +28,14 @@ class TimeLineService implements ServiceMethods {
 	 * and instance of {@code TaskTimeLineGraph}.
 	 *
 	 * @param event an instance of {@code MoveEvent}
+	 * @param viewUnpublished show only published tasks or all tasks
 	 *
 	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
 	 * 			and instance of {@code TaskTimeLineGraph}
 	 */
-	CPAResults calculateCPA(MoveEvent event) {
+	CPAResults calculateCPA(MoveEvent event, Boolean viewUnpublished = false) {
 
-		List<Task> tasks = getEventTasks(event)
+		List<Task> tasks = getEventTasks(event, viewUnpublished)
 		List<TaskDependency> taskDependencies = getTaskDependencies(tasks)
 
 		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)
@@ -47,22 +48,30 @@ class TimeLineService implements ServiceMethods {
 	 * Used to load all related tasks associated with an event
 	 *
 	 * @param moveEvent the event to retrieve tasks for
-	 * @return List<Task>  a list of tasks
+	 * @param viewUnpublished show only published tasks or all tasks
+	 * @return List<Task>     a list of tasks
 	 */
-	List<Task> getEventTasks(MoveEvent moveEvent) {
-		def tasks = []
-		if (moveEvent) {
-			tasks = Task.findAllByMoveEvent(moveEvent)
-		}
+	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
 
-		return tasks
+		if (!event)
+			return []
+
+		if (viewUnpublished) {
+			return Task.where {
+				moveEvent == event
+			}.list()
+		} else {
+			return Task.where {
+				moveEvent == event && isPublished == true
+			}.list()
+		}
 	}
 
 	/**
 	 * Used to get the list of task dependencies for a given list of tasks
 	 *
 	 * @param List <AssetComment>  a list of tasks
-	 * @return List<TaskDependency>  a list of the dependencies associated to the tasks
+	 * @return List<TaskDependency>     a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
 		return TaskDependency.where {
