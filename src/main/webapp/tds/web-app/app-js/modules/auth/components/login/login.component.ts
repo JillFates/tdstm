@@ -110,7 +110,8 @@ export class LoginComponent implements OnInit {
 					this.loginInfo.config.authorityPrompt ===
 					this.authorityOptions.SELECT
 				) {
-					this.defaultAuthorityItem = ''; //`Select ${this.loginInfo.config.authorityLabel}`;
+					// `Select ${this.loginInfo.config.authorityLabel}`;
+					this.defaultAuthorityItem = '';
 					this.loginModel.authority = this.defaultAuthorityItem;
 					selector = '.k-dropdown-wrap';
 				} else if (
@@ -237,11 +238,11 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(StandardNoticesComponent, [
-					{
-						provide: Notices,
-						useValue: { notices: notices },
-					},
-			  ])
+				{
+					provide: Notices,
+					useValue: {notices: notices},
+				},
+			])
 			: Promise.resolve(true);
 	}
 
@@ -253,8 +254,8 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(MandatoryNoticesComponent, [
-					{ provide: Notices, useValue: { notices: notices } },
-			  ])
+				{provide: Notices, useValue: {notices: notices}},
+			])
 			: Promise.resolve(true);
 	}
 
