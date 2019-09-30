@@ -233,6 +233,9 @@ export class ProjectViewEditComponent implements OnInit {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
+		}, {
+			provide: String,
+			useValue: this.projectModel.timeZone
 		}]).then(result => {
 			this.projectModel.timeZone = result.timezone;
 		}).catch(result => {
