@@ -248,7 +248,7 @@ export class EventsService {
 		for (i = 0; i < postObject.tagIds.length; i++) {
 			postObject.tagIds[i] = postObject.tagIds[i].id;
 		}
-		return this.http.post(`../ws/moveEvent/saveEvent/${id}`, JSON.stringify(postObject))
+		return this.http.post(`../ws/moveEvent/save/${id}`, JSON.stringify(postObject))
 			.map((response: any) => {
 				return response;
 			})
@@ -256,7 +256,7 @@ export class EventsService {
 	}
 
 	deleteEvent(id): Observable<any> {
-		return this.http.delete(`../ws/moveEvent/deleteEvent/${id}`)
+		return this.http.delete(`../ws/moveEvent/delete/${id}`)
 			.map((response: any) => {
 				return response;
 			})

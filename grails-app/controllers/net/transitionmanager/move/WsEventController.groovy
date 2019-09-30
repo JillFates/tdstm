@@ -67,76 +67,56 @@ class WsEventController implements ControllerMethods {
 	def listEvents() {
 		Project project = getProjectForWs()
 		List<MoveEvent> events = moveEventService.listMoveEvents(project)
-		List<Map> eventsMap = events.collect { event ->
-			formatEventsForMap(event)
+		List<Map> eventsMap = events.collect { MoveEvent event ->
+			Map presetPropertiesMap = ['moveBundlesString': event.getMoveBundlesString()]
+			GormUtil.domainObjectToMap(event, MoveEvent.BASIC_EVENT_FIELDS, null, false, presetPropertiesMap)
 		}
 		renderSuccessJson(eventsMap)
 	}
 
-	def formatEventsForMap(MoveEvent event) {
-		Map eventMap = GormUtil.domainObjectToMap(event, MoveEvent.BASIC_EVENT_FIELDS, null, false)
-		eventMap.put('moveBundlesString', event.getMoveBundlesString())
-		return eventMap
-	}
-
 	@HasPermission(Permission.EventView)
-	def getModelForViewEdit(String id) {
-		Project project = getProjectForWs()
-        String moveEventId = id
-		List availableBundles = moveBundleService.lookupList(project)
-		List runbookStatuses = com.tdssrc.grails.GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList
+	def getModelForViewEdit(Long moveEventId) {
 		ListCommand filter = populateCommandObject(ListCommand)
-		List<Map> tags = tagService.list(
-				projectForWs,
-				filter.name,
-				filter.description,
-				filter.dateCreated,
-				filter.lastUpdated,
-				filter.bundleId ?[filter.bundleId] : [],
-				filter.eventId
-		)
+		Project project = getProjectForWs()
+		MoveEvent moveEvent
+
+		// Use the event id in the parameter, fetch the user preference otherwise.
 		if (moveEventId) {
+			// Fail if the move event doesn't exist or it doesn't belong to the user's current project.
+			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
 			userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEventId)
-			def moveBundleId = userPreferenceService.moveBundleId
+			Long moveBundleId = NumberUtil.toLong(userPreferenceService.moveBundleId)
 			if (moveBundleId) {
-				def moveBundle = MoveBundle.get(moveBundleId)
-				if (moveBundle?.moveEvent?.id != Integer.parseInt(moveEventId)) {
+				MoveBundle moveBundle = fetchDomain(MoveBundle, [id: moveBundleId], project)
+				if (moveBundle?.moveEvent?.id != moveEventId) {
 					userPreferenceService.removePreference(UserPreferenceEnum.CURR_BUNDLE)
 				}
 			}
-		}
-		else {
-			moveEventId = userPreferenceService.getPreference(UserPreferenceEnum.MOVE_EVENT)
-		}
-
-		if (!moveEventId) {
-			renderErrorJson()
-			return
+		} else {
+			moveEventId =  NumberUtil.toLong(userPreferenceService.getPreference(UserPreferenceEnum.MOVE_EVENT))
+			moveEvent = fetchDomain(MoveEvent, [id: moveEventId], project)
 		}
 
-		MoveEvent moveEvent = MoveEvent.get(moveEventId)
-		if (!moveEvent) {
-			flash.message = "MoveEvent not found with id $moveEventId"
-			renderErrorJson(flash.message)
-			return
-		}
-
-		List selectedBundles = moveEvent.moveBundles.collect { MoveBundle moveBundle ->
-			[id: moveBundle.id, name: moveBundle.name]
-		}
-
-		List selectedTags = moveEvent.tagEvents.collect { TagEvent tagEvent ->
-			tagEvent.tag
-		}
-
-		renderSuccessJson([moveEventInstance: moveEvent, availableBundles: availableBundles, selectedBundles: selectedBundles, runbookStatuses: runbookStatuses, selectedTags: selectedTags, tags: tags])
+		renderSuccessJson([
+			moveEventInstance: moveEvent,
+			availableBundles: moveBundleService.lookupList(project),
+			selectedBundles: moveEvent.moveBundles.collect { MoveBundle moveBundle ->
+				[id: moveBundle.id, name: moveBundle.name]
+			},
+			runbookStatuses: GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList,
+			selectedTags: moveEvent.tagEvents.collect { TagEvent tagEvent ->
+				tagEvent.tag
+			},
+			tags: tagService.list(project, filter.name, filter.description, filter.dateCreated, filter.lastUpdated,
+				filter.bundleId ?[filter.bundleId] : [], filter.eventId)
+		])
 	}
 
 	@HasPermission(Permission.EventCreate)
 	def getModelForCreate() {
 		Project project = securityService.userCurrentProject
-		List bundles = moveBundleService.lookupList(project)
-		List runbookStatuses = com.tdssrc.grails.GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList
+		List<Map> bundles = moveBundleService.lookupList(project)
+		List runbookStatuses = GormUtil.getConstrainedProperties(MoveEvent).runbookStatus.inList
 		ListCommand filter = populateCommandObject(ListCommand)
 		List<Map> tags = tagService.list(
 				projectForWs,
@@ -152,74 +132,18 @@ class WsEventController implements ControllerMethods {
 	}
 
 	@HasPermission(Permission.EventCreate)
-	def saveEvent(String id) {
-		if (id == null || id == 'null') {
-			CreateEventCommand event = populateCommandObject(CreateEventCommand)
-			Project currentProject = securityService.userCurrentProject
-
-			MoveEvent moveEvent = moveEventService.save(event, currentProject)
-
-			if (!moveEvent.hasErrors()) {
-				flash.message = "MoveEvent $moveEvent.name created"
-				renderSuccessJson()
-			}
-			else {
-				flash.message = moveEvent.errors.toString()
-				renderErrorJson(flash.message)
-			}
-		}
-		else {
-			// populate create event command from request
-			CreateEventCommand command = populateCommandObject(CreateEventCommand)
-			Project project = getProjectForWs()
-
-			try {
-				MoveEvent moveEvent = moveEventService.update(id.toLong(), command)
-				moveBundleService.assignMoveEvent(moveEvent, command.moveBundle)
-
-                List tagEventsToDelete = moveEvent.tagEvents.findAll { !command.tagIds.contains( it.tagId ) } // Find all tag event ids to delete
-				List<Long> tagEventIdsToDelete = tagEventsToDelete.collect { it -> it.id }
-                moveEvent.tagEvents.removeAll(tagEventsToDelete)
-				
-				if (tagEventIdsToDelete.size() > 0) {
-					tagEventService.removeTags(project, tagEventIdsToDelete)
-				}
-
-				List tagEventTagIds = moveEvent.tagEvents.collect { it -> it.tagId} // Get all the tagIds of the tagEvents
-				List tagIdsToAdd = command.tagIds.findAll { !tagEventTagIds.contains( it )} // Find all tags to add
-
-				if (command.tagIds) {
-					tagEventService.applyTags(project, tagIdsToAdd, moveEvent.id)
-				}
-				flash.message = "MoveEvent '$moveEvent.name' updated"
-				renderSuccessJson()
-			} catch (EmptyResultException e) {
-				flash.message = "MoveEvent not found with id $params.id"
-				renderErrorJson(flash.message)
-			} catch (ValidationException e) {
-				renderErrorJson(e.message)
-			}
-		}
+	def save(Long moveEventId) {
+		CreateEventCommand command = populateCommandObject(CreateEventCommand)
+		Project project = getProjectForWs()
+		MoveEvent moveEvent = moveEventService.createOrUpdate(project, command, moveEventId)
+		renderSuccessJson(GormUtil.domainObjectToMap(moveEvent))
 	}
 
 	@HasPermission(Permission.EventDelete)
-	def deleteEvent(String id) {
-		try {
-			MoveEvent moveEvent = MoveEvent.get(id)
-			if (moveEvent) {
-				String moveEventName = moveEvent.name
-				moveEventService.deleteMoveEvent(moveEvent)
-				flash.message = "MoveEvent $moveEventName deleted"
-			}
-			else {
-				flash.message = "MoveEvent not found with id $params.id"
-			}
-		}
-		catch (e) {
-			log.error(e.message, e)
-			flash.message = e
-		}
-		renderSuccessJson()
+	def delete(Long moveEventId) {
+		MoveEvent moveEvent = fetchDomain(MoveEvent, [id: moveEventId])
+		moveEventService.deleteMoveEvent(moveEvent)
+		renderSuccessJson("Move Event ${moveEvent.name} deleted.")
 	}
 
 	@HasPermission(Permission.DashboardMenuView)
