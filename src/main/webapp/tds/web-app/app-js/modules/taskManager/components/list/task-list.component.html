@@ -165,7 +165,7 @@
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div [ngClass]="{'sortable-column' : column.type !== 'action'}">
+						<div [ngClass]="{'sortable-column' : (column.type !== 'action' && column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
 					</ng-template>
