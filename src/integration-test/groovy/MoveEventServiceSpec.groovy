@@ -37,7 +37,7 @@ class MoveEventServiceSpec extends Specification {
 					description: RandomStringUtils.randomAscii(10),
 					runbookStatus: 'Pending'
 			)
-			MoveEvent moveEvent = moveEventService.save(command, project)
+			MoveEvent moveEvent = moveEventService.createOrUpdate(project, command)
 		then: 'move event is saved to db'
 			moveEvent
 			moveEvent.id
@@ -52,7 +52,7 @@ class MoveEventServiceSpec extends Specification {
 					description: RandomStringUtils.randomAscii(10),
 					runbookStatus: 'Pending'
 			)
-			MoveEvent moveEvent = moveEventService.save(command, project)
+			MoveEvent moveEvent = moveEventService.createOrUpdate(project, command)
 		when: 'Finding a move event by Id'
 			MoveEvent foundMoveEvent = moveEventService.findById(moveEvent.id, true)
 		then: 'Move event is retrieved from db'
@@ -73,21 +73,21 @@ class MoveEventServiceSpec extends Specification {
 					description: RandomStringUtils.randomAscii(10),
 					runbookStatus: 'Pending'
 			)
-			MoveEvent moveEvent = moveEventService.save(command, project)
+			MoveEvent moveEvent = moveEventService.createOrUpdate(project, command)
 		when: 'Updating a move event'
 			CreateEventCommand updateCommand = new CreateEventCommand(
 					name: RandomStringUtils.randomAscii(10),
 					description: RandomStringUtils.randomAscii(10),
 					runbookStatus: 'Pending'
 			)
-			MoveEvent updatedMoveEvent = moveEventService.update(moveEvent.id, updateCommand)
+			MoveEvent updatedMoveEvent = moveEventService.createOrUpdate(project, updateCommand, moveEvent.id)
 		then: 'Move event is updated in db'
 			updatedMoveEvent
 			updatedMoveEvent.id
 			updatedMoveEvent.runbookStatus == 'Pending'
 		when: 'Updating a move event missing constraints DomainUpdateException is thrown'
 			updateCommand.name = ''
-			moveEventService.update(moveEvent.id, updateCommand)
+			moveEventService.createOrUpdate(project, updateCommand, moveEvent.id)
 		then: 'DomainUpdateException is thrown'
 			thrown(ValidationException)
 	}
@@ -109,7 +109,7 @@ class MoveEventServiceSpec extends Specification {
 					description: RandomStringUtils.randomAscii(10),
 					runbookStatus: 'Pending'
 			)
-			MoveEvent moveEvent = moveEventService.save(command, project)
+			MoveEvent moveEvent = moveEventService.createOrUpdate(project, command)
 		when: 'Exporting runbook to Excel'
 			Map<String, ?> exportRunbookToExcel = moveEventService.exportRunbookToExcel(moveEvent, false)
 		then: 'a workbook and a file filename is returned'
