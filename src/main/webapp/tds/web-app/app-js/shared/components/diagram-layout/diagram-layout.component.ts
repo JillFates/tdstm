@@ -430,10 +430,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		iconShape.desiredSize = new go.Size(25, 25);
 		iconShape.isGeometryPositioned = true;
 		iconShape.position = new go.Point(0, 0);
-		iconShape.bind(new Binding('background', 'icon',
-			(val: any) => this.getStatusBackground(this.stateIcons[val])));
-		iconShape.bind(new Binding('geometry', 'icon',
-			(val: any) => this.getIcon(this.stateIcons[val])));
+		iconShape.bind(new Binding('background', 'status',
+			(val: string) => this.getStatusBackground(this.stateIcons[val.toLowerCase()])));
+		iconShape.bind(new Binding('geometry', 'status',
+			(val: string) => this.getIcon(this.stateIcons[val.toLowerCase()])));
 
 		return iconShape;
 	}
@@ -453,7 +453,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		categoryIconShape.stroke = '#ddd';
 		categoryIconShape.fill = '#908f8f';
 		categoryIconShape.bind(new Binding('geometry', 'category',
-			(val: any) => this.getIcon(this.categoryIcons[val])));
+			(val: string) => this.getIcon(this.categoryIcons[val.toLowerCase()])));
 
 		return categoryIconShape;
 	}
@@ -631,29 +631,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	mediumScaleNodeTemplate(): void {
 		const node = new go.Node(go.Panel.Horizontal);
 
-		const  iconShape = new go.Shape();
-		iconShape.figure = 'RoundedRectangle';
-		iconShape.margin = 3;
-		iconShape.strokeWidth = 2;
-		iconShape.alignment = go.Spot.LeftCenter;
-		iconShape.stroke = 'white';
-		iconShape.desiredSize = new go.Size(25, 25);
-		iconShape.bind(new Binding('background', 'icon',
-			(val: any) => this.getStatusBackground(this.stateIcons[val])));
-		iconShape.bind(new Binding('geometry', 'icon',
-			(val: any) => this.getIcon(this.stateIcons[val])));
 		node.add(this.iconShape());
 
-		const  categoryIconShape = new go.Shape();
-		categoryIconShape.figure = 'RoundedRectangle';
-		categoryIconShape.margin = 3;
-		categoryIconShape.strokeWidth = 2;
-		categoryIconShape.alignment = go.Spot.LeftCenter;
-		categoryIconShape.desiredSize = new go.Size(25, 25);
-		categoryIconShape.stroke = '#7a7a7a';
-		categoryIconShape.bind(new Binding('geometry', 'category',
-			(val: any) => this.getIcon(this.categoryIcons[val])));
 		node.add(this.categoryIconShape());
+		// node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -672,9 +653,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		shape.figure = 'Rectangle';
 		shape.background = 'red';
 		shape.desiredSize = new go.Size(25, 35);
-		shape.bind(new go.Binding('fill', 'category', this.getCategoryColor));
+		shape.bind(new go.Binding('fill', 'status',
+			(status: string) => this.getStatusColor(status.toLowerCase())));
 		node.add(shape);
-		node.contextMenu = this.contextMenu();
+		// node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -686,9 +668,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	/**
 	 * Node bubble color based on category
 	 **/
-	getCategoryColor(name: string): string {
-		const color = categoryColors[name];
-		return color ? color : '#3c8dbc';
+	getStatusColor(name: string): string {
+		if (!this.stateIcons[name]) { return '#ddd'; }
+		return this.stateIcons[name].background;
 	}
 
 	/**

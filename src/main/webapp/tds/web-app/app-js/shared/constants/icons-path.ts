@@ -1,12 +1,12 @@
 import {faCheck, faCogs, faEdit, faEye, faPause, faPlay, faUser} from '@fortawesome/free-solid-svg-icons';
 
 export const STATE_ICONS_PATH = {
-	start: {
+	started: {
 		iconAlt: '\uf04b',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.7 272l-176 101c-15.8 8.8-35.7-2.5-35.7-21V152c0-18.4 19.8-29.8 35.7-21l176 107c16.4 9.2 16.4 32.9 0 42z',
 		color: '#fff',
-		background: '#01ab08'
+		background: 'Turquoise'
 	},
 	// play: '\uf144',
 	hold: {
@@ -17,22 +17,22 @@ export const STATE_ICONS_PATH = {
 		background: '#fff200'
 	},
 	// pause: '\uf28c',
-	clock: {
+	pending: {
 		iconAlt: '\uf017',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm57.1 350.1L224.9 294c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h48c6.6 0 12 5.4 12 12v137.7l63.5 46.2c5.4 3.9 6.5 11.4 2.6 16.8l-28.2 38.8c-3.9 5.3-11.4 6.5-16.8 2.6z',
 		color: '#fff',
-		background: '#fff200'
+		background: '#9e9e9e'
 	},
 	// clock: '\uf017',
-	pending: {
+	pendingMinus: {
 		iconAlt: '\uf068',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z',
 		color: '#fff',
 		background: '#9e9e9e'
 	},
-	ready: {
+	completed: {
 		iconAlt: '\uf00c',
 		// tslint:disable-next-line:max-line-length
 		icon: 'F M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z',
@@ -45,6 +45,13 @@ export const STATE_ICONS_PATH = {
 		icon: 'F M500.5 231.4l-192-160C287.9 54.3 256 68.6 256 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2zm-256 0l-192-160C31.9 54.3 0 68.6 0 96v320c0 27.4 31.9 41.8 52.5 24.6l192-160c15.3-12.8 15.3-36.4 0-49.2z',
 		color: '#fff',
 		background: '#99d9ea'
+	},
+	ready: {
+		iconAlt: '\uf144',
+		// tslint:disable-next-line:max-line-length
+		icon: 'F M371.7 238l-176-107c-15.8-8.8-35.7 2.5-35.7 21v208c0 18.4 19.8 29.8 35.7 21l176-101c16.4-9.1 16.4-32.8 0-42zM504 256C504 119 393 8 256 8S8 119 8 256s111 248 248 248 248-111 248-248zm-448 0c0-110.5 89.5-200 200-200s200 89.5 200 200-89.5 200-200 200S56 366.5 56 256z',
+		color: '#fff',
+		background: '#40c057'
 	}
 };
 
