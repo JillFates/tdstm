@@ -9,7 +9,7 @@ import {ReportComponent} from '../report.component';
 	template: `
 		<div class="content body">
 			<tds-report-toggle-filters [hideFilters]="hideFilters"
-																 (toggle)="toggleFilters($event)"
+																 (toggle)="toggleFilters()"
 																 [disabled]="!generatedReport"></tds-report-toggle-filters>
 			<section class="box-body">
 				<div>
@@ -57,20 +57,6 @@ import {ReportComponent} from '../report.component';
 												[textField]="'text'"
 												[valueField]="'id'"
 												[(ngModel)]="selectedStartWith"
-												[loading]="loadingLists">
-											</kendo-dropdownlist>
-										</div>
-									</div>
-									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="testingList">Testing</label>
-										<div class="col-sm-3">
-											<kendo-dropdownlist
-												name="testingList"
-												class="form-control"
-												[data]="testingList"
-												[textField]="'name'"
-												[valueField]="'id'"
-												[(ngModel)]="selectedTesting"
 												[loading]="loadingLists">
 											</kendo-dropdownlist>
 										</div>
@@ -129,8 +115,6 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 	selectedBundle: any = null;
 	smeList: Array<any>;
 	selectedSme: any = null;
-	testingList: Array<any>;
-	selectedTesting: any = null;
 	startsWithList: Array<any>;
 	selectedStartWith: any = null;
 	endsWithList: Array<any>;
@@ -177,8 +161,6 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 					this.selectedStartWith = this.startsWithList.find(item => item.id === 'shutdown');
 					this.endsWithList = lists.categories;
 					this.selectedEndWith = this.endsWithList.find(item => item.id === 'startup');
-					this.testingList = lists.testingList;
-					this.selectedTesting = this.testingList[0];
 					this.outageWindowList = lists.outageList;
 					this.selectedOutage = this.outageWindowList.find(item => item.field === 'drRtoDesc');
 					this.loadingLists = false;
@@ -214,7 +196,6 @@ export class ApplicationEventResultsReportComponent extends ReportComponent {
 			this.selectedSme.id,
 			this.selectedStartWith.id,
 			this.selectedEndWith.id,
-			this.selectedTesting.id,
 			this.selectedOutage.field).subscribe(result => {
 				this.hideFilters = true;
 				this.reportResult = this.reportsService.getSafeHtml(result);

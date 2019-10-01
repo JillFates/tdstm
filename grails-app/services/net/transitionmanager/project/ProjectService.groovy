@@ -1955,7 +1955,9 @@ class ProjectService implements ServiceMethods {
 		else {
 			if (!projectCommand.projectLogo) {
 				ProjectLogo projectLogo = ProjectLogo.findByProject(project)
-				projectLogo.delete()
+				if(projectLogo) {
+					projectLogo.delete()
+				}
 			}
 		}
 
