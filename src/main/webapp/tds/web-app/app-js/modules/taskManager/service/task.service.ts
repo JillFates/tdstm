@@ -1,13 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import { catchError, map } from 'rxjs/operators';
 import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
-import { catchError, map } from 'rxjs/operators';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
+import {ITask} from '../model/task-edit-create.model';
+import {IGraphTask} from '../model/graph-task.model';
+import {IMoveEvent} from '../model/move-event.model';
+
+export interface IGrapTaskResponseBody {
+	status: string;
+	data: IGraphTask[];
+}
+
+export interface ITaskResponseBody {
+	status: string;
+	data: ITask[];
+}
+
+export interface IMoveEventResponseBody {
+	status: string;
+	data: IMoveEvent[];
+}
+type GraphTaskType = HttpResponse<IGrapTaskResponseBody>
 
 /**
  * @name TaskService
@@ -21,6 +40,9 @@ export class TaskService {
 	private readonly TASK_ACTION_INFO_URL = `${ this.baseURL }/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${ this.baseURL }/ws/task/{taskId}/resetAction`;
 	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
+	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
+	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
+	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/task/moveEventTaskGraphSvg`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -494,5 +516,34 @@ export class TaskService {
 					return error;
 				})
 			);
+	}
+
+	/**
+	 * GET - Find task for neighborhood component
+	 * @param taskId: number | string
+	 * @param filters: {[key: string]: string}[]
+	 */
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphTask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
+			{ params, observe: 'response' })
+			.map(res => res.body.data);
+	}
+
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<ITask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+			{ params, observe: 'response' })
+			.map(res => res.body.data);
+	}
+
+	/**
+	 * create http params object to be passed onto requests
+	 */
+	createHttpParams(params: any): HttpParams {
+		return new HttpParams()
+		.set('myTasks', params.myTasks)
+		.set('minimizeAutoTasks', params.minimizeAutoTasks)
+		.set('viewUnpublished', params.viewUnpublished);
 	}
 }
