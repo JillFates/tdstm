@@ -346,7 +346,6 @@ var GraphUtil = (function ($) {
 	public.correctPanelSize = function (panelId) {
 		var panel = $('#' + panelId);
 		panel.css('height', '');
-		panel.css('overflow-y', 'scroll');
 		var svgContainer = $('#svgContainerId');
 		if (panel.size() == 0 || svgContainer.size() == 0 || svgContainer.children().size() == 0)
 			return false;
@@ -369,8 +368,8 @@ var GraphUtil = (function ($) {
 		if($('#dependenciesPanelId').size() == 0)
 			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
-			$('.dependency_panel_action_buttons').css('position', 'fixed');
-			$('.dependency_panel_action_buttons').css('bottom', '45px');
+			$('.dependency_panel_action_buttons').css('position', 'absolute');
+			$('.dependency_panel_action_buttons').css('bottom', '0');
 		} else {
 			$('.dependency_panel_action_buttons').css('position', '');
 			$('.dependency_panel_action_buttons').css('bottom', '5px');
