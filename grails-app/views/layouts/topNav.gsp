@@ -105,14 +105,14 @@
                 <div class="container menu-top-container ${((!isLicenseManagerEnabled)? 'menu-top-container-full-menu' : '')}">
                     <div class="navbar-header branding">
                         <g:if test="${isLicenseManagerEnabled}">
-                            <asset:image src="images/TMHeaderLogo_v4.7.png" alt="Transition Manager" border="0" />
+                            <asset:image src="/tdstm/tds/web-app/assets/images/transitionLogo.svg" alt="Transition Manager" border="0" />
                         </g:if>
                         <g:else>
                             <g:if test="${setImage}">
                                 <img src="${createLink(controller:'project', action:'showImage', id:setImage)}" alt="${currProject.name} project" />
                             </g:if>
                             <g:else>
-                                <asset:image src="images/TMHeaderLogo_v4.7.png" alt="Transition Manager" border="0" />
+                                <asset:image src="/tdstm/tds/web-app/assets/images/transitionLogo.svg" alt="Transition Manager" border="0" />
                             </g:else>
                         </g:else>
                     </div>
