@@ -95,7 +95,7 @@ class ProjectService implements ServiceMethods {
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
-	static final String DEFAULT_PROJECT_LOGO_DIR = 'tdstm/tds/web-app/assets/images'
+	static final String DEFAULT_PROJECT_LOGO_DIR = 'web-app/assets/images'
 
 	static final String DEFAULT_TRANSITIONMANAGER_LOGO = 'transitionLogo.svg'
 

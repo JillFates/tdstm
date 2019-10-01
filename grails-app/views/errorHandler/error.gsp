@@ -45,10 +45,10 @@
 						<i class="fa fa-bars"></i>
 					</button>
 					<g:if test="${isLicenseManagerEnabled}">
-						<asset:image id="logo-header" src="/tdstm/tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
+						<asset:image id="logo-header" src="/../tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
 					</g:if>
 					<g:else>
-						<asset:image id="logo-header" src="/tdstm/tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
+						<asset:image id="logo-header" src="/../tds/web-app/assets/images/transitionLogo.svg" alt="TransitionManager" border="0" />
 					</g:else>
 				</div>
 			</div><!-- /.container-fluid -->
