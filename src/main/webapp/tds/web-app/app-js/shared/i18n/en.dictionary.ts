@@ -145,7 +145,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'ASSET_EXPORT': {
-		'ASSET_EXPORT': 'Asset Export',
+		'ASSET_EXPORT': 'Export Assets',
 		'SELECT_BUNDLE': 'Select one or more bundles:',
 		'CHOOSE_ITEM': 'Select one or more items to export:',
 		'EXPORT_BUTTON': 'Export Excel',
