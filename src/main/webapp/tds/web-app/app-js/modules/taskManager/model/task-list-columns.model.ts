@@ -2,6 +2,16 @@ import { GridColumnModel } from '../../../shared/model/data-list-grid.model';
 
 export const taskListColumnsModel: Array<GridColumnModel> = [
 	{
+		label: '',
+		property: 'actionColumn',
+		type: 'action',
+		width: 30,
+		locked: false,
+		resizable: false,
+		sortable: false,
+		headerClass: ['no-sort-header']
+	},
+	{
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
@@ -21,7 +31,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol0',
 		property: 'userSelectedCol0',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -30,7 +40,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol1',
 		property: 'userSelectedCol1',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -39,16 +49,18 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 80,
+		width: 100,
 		locked: false,
-		cellClass: 'task-updated'
+		cellClass: 'task-updated',
+		sortable: false
 	},
 	{
 		label: 'Due Date',
 		property: 'dueDate',
 		type: 'text',
 		width: 100,
-		locked: false
+		locked: false,
+		filterable: true
 	},
 	{
 		label: 'Status',
@@ -63,7 +75,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol2',
 		property: 'userSelectedCol2',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -72,7 +84,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol3',
 		property: 'userSelectedCol3',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -81,7 +93,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'userSelectedCol4',
 		property: 'userSelectedCol4',
 		type: 'text',
-		width: 130,
+		width: 180,
 		locked: false,
 		columnMenu: true,
 		filterable: true
@@ -90,7 +102,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Suc.',
 		property: 'assetName',
 		type: 'number',
-		width: 50,
+		width: 80,
 		locked: false
 	},
 	{

@@ -153,6 +153,7 @@
 					</button>
 				</div>
 				<kendo-grid-column *ngFor="let column of columnsModel"
+													 [resizable]="column.resizable"
 													 field="{{column.property}}"
 													 [locked]="column.locked"
 													 format="{{column.format}}"
@@ -161,12 +162,17 @@
 													 [class]="column.cellClass ? column.cellClass : ''"
 													 [style]="column.cellStyle ? column.cellStyle : ''"
 													 [width]="!column.width ? 100 : column.width"
-													 [filterable]=""
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div class="sortable-column">
-							<label> {{column.label}}</label>
+						<div [ngClass]="{'sortable-column' : (column.type !== 'action' && column.sortable !==	false)}">
+							<label>{{column.label}}</label>
+						</div>
+					</ng-template>
+					<!-- edit action column -->
+					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+						<div class="is-grid-link tds-action-button-set">
+							<tds-button-edit (click)="onOpenTaskEditHandler(dataItem)"></tds-button-edit>
 						</div>
 					</ng-template>
 					<!-- task Number -->
@@ -181,7 +187,7 @@
 					</ng-template>
 					<!-- updated -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
-						<span class="task-updated-cell {{dataItem.updatedClass}}">{{dataItem.updatedTime}}</span>
+						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
 					</ng-template>
 					<!-- status -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>

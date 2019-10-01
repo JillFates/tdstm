@@ -38,6 +38,9 @@ import {Store} from '@ngxs/store';
 import {SetEvent} from '../../../event/action/event.actions';
 import { TaskStatus } from '../../model/task-edit-create.model';
 import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
+import { TaskEditComponent } from '../edit/task-edit.component';
+import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
+import { DateUtils } from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: 'task-list',
@@ -351,6 +354,49 @@ export class TaskListComponent {
 		});
 	}
 
+	public onOpenTaskEditHandler(taskRow: any): void {
+		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
+
+		this.taskService.getTaskDetails(taskRow.id)
+			.subscribe((res) => {
+				let modelHelper = new TaskEditCreateModelHelper(
+					this.userContext.timezone,
+					this.userContext.dateFormat,
+					this.taskService,
+					this.dialogService,
+					this.translate);
+				taskDetailModel.detail = res;
+				taskDetailModel.modal = {
+					title: 'Task Edit',
+					type: ModalType.EDIT
+				};
+
+				let model = modelHelper.getModelForDetails(taskDetailModel);
+				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
+				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
+				model.modal = taskDetailModel.modal;
+
+				this.dialogService.extra(TaskEditComponent, [
+					{provide: TaskDetailModel, useValue: clone(model)}
+				], false, false)
+					.then(result => {
+						if (result) {
+							if (result.isDeleted) {
+								this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+									this.search();
+								});
+							} else {
+								this.search();
+							}
+						}
+
+					}).catch(result => {
+					// do nothing.
+				});
+
+			});
+	}
+
 	/**
 	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
 	 * @param taskRow: any
@@ -537,7 +583,7 @@ export class TaskListComponent {
 	 * @param $event: CellClickEvent
 	 */
 	onCellClickHandler($event: CellClickEvent): void {
-		if ($event.columnIndex !== 0
+		if ($event.columnIndex !== 0 && $event.columnIndex !== 1
 			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
 			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 			expandedEvent.index = $event.rowIndex;
@@ -574,6 +620,11 @@ export class TaskListComponent {
 	 * @param sort
 	 */
 	onSortChangeHandler(sort: Array<SortDescriptor>): void {
+		// prevent sort on the non-sortable action column
+		if (this.columnsModel
+			.findIndex(item => item.property === sort[0].field && item.sortable === false) >= 0) {
+			return;
+		}
 		this.grid.state.sort = sort;
 		this.search();
 	}

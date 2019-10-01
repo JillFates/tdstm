@@ -3567,6 +3567,11 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			throw new RuntimeException("Error while trying to create task. error=${GormUtil.allErrorsString(task)}, asset=$asset, TaskSpec=$taskSpec")
 		}
 
+		// If the spec for the task defines a note, create it and add it to the task.
+		if (taskSpec.containsKey('note') && taskSpec['note']) {
+			addNote(task, whom, taskSpec['note'], 0)
+		}
+
 		// Perform the assignment logic
 		errMsg = assignWhomAndTeamToTask(task, taskSpec, projectStaff, settings)
 		if (errMsg) {
@@ -5714,6 +5719,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			List userSelectedCols = []
 			(1..5).each { colId ->
 				String value = getColumnValue(taskPref[colId.toString()], it)
+				value = value != 'null' ? value : ''
 				userSelectedCols << (value?.getClass()?.isEnum() ? value?.value() : value)
 			}
 
@@ -5745,7 +5751,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				assetEntityId: it.assetEntity?.id,
 				assetEntityAssetType: it.assetEntity?.assetType ,
 				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
-				instructionsLinkURL: instructionsLinkURL,
+				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,
