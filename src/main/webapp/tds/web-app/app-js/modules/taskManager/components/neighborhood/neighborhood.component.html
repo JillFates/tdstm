@@ -102,15 +102,10 @@
     <tds-diagram-layout
     [nodeDataArray]="nodeData$ | async"
     [linksPath]="links$ | async"
+    [currentUserId]="currentUserId$ | async"
     [containerWidth]="'100%'"
     [containerHeight]="'700px'"
     (nodeClicked)="loadTasks($event)"
-    (showTaskDetailsClicked)="showTaskDetails($event)"
-    (editClicked)="editTask($event)"
-    (contextmenu)="avoidDefault()"
     #graph></tds-diagram-layout>
   </div>
-    <kendo-dialog title="Task" *ngIf="opened" (close)="close('cancel')" [minWidth]="250" [width]="450">
-      <p style="margin: 30px; text-align: center; color: #7a7a7a;">Show/Edit task details for <span style="font-weight: bold;">{{selectedTask.id}}</span></p>
-    </kendo-dialog>
 </div>

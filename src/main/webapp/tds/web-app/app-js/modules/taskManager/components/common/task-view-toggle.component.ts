@@ -64,7 +64,6 @@ export class TaskViewToggleComponent implements OnInit {
 	 * add styles for active view toggle button and disable it
 	 **/
 	makeActive(element: ElementRef): void {
-		console.log('button', element);
 		this.renderer.addClass(element.nativeElement, 'tvt-btn-disabled');
 		this.renderer.setAttribute(element.nativeElement, 'disabled', 'disabled');
 	}

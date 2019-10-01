@@ -1,11 +1,11 @@
-import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {of, Observable, BehaviorSubject} from 'rxjs';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {Observable, BehaviorSubject, ReplaySubject} from 'rxjs';
 import {distinct, map, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 
 import {TaskService} from '../../service/task.service';
 import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
-import {IGraphTask} from '../../model/graph-task.model';
+import {IGraphNode} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
@@ -21,11 +21,10 @@ export interface ILinkPath {
 
 @Component({
 	selector: 'tds-neighborhood',
-	templateUrl: './neighborhood.component.html',
-	// styleUrls: ['../../../../../css/page/module/taskManager/neighborhood.component.scss']
+	templateUrl: './neighborhood.component.html'
 })
 export class NeighborhoodComponent implements OnInit {
-	tasks: IGraphTask[];
+	tasks: IGraphNode[];
 	nodeData$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 	links$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 	@ViewChild('graph') graph: DiagramLayoutComponent;
@@ -58,11 +57,11 @@ export class NeighborhoodComponent implements OnInit {
 	urlParams: any;
 	teamHighlights$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 	selectedTeamHighlight: string;
+	currentUserId$: ReplaySubject<string | number> = new ReplaySubject(1);
 
 	constructor(
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
-			private renderer: Renderer2,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
 			private preferenceService: PreferenceService
@@ -133,7 +132,7 @@ export class NeighborhoodComponent implements OnInit {
 			viewUnpublished: this.viewUnpublished ? '1' : '0'
 		};
 		this.taskService.findTask(taskNumber, filters)
-			.subscribe((res: IGraphTask[]) => {
+			.subscribe((res: IGraphNode[]) => {
 				if (res && res.length > 0) {
 					console.log('tasks:', res);
 					this.tasks = res;
@@ -219,7 +218,7 @@ export class NeighborhoodComponent implements OnInit {
 
 		// Add tasks to nodeDataArray constant
 		// and create linksPath object from taskNumber and successors
-		tasksCopy.map((t: IGraphTask | any) => {
+		tasksCopy.map((t: IGraphNode | any) => {
 			t.task.key = t.task.taskNumber;
 			nodeDataArr.push(t.task);
 			linksPath.push(...this.getLinksPath(t.task.taskNumber, t.successors))
@@ -227,6 +226,7 @@ export class NeighborhoodComponent implements OnInit {
 
 		this.nodeData$.next(nodeDataArr);
 		this.links$.next(linksPath);
+		this.currentUserId$.next(this.userContext.user.id);
 	}
 
 	/**
@@ -246,7 +246,6 @@ export class NeighborhoodComponent implements OnInit {
 	 * TreeLayout to use (if selected) by the diagram
 	 **/
 	treeLayout(): void {
-		console.log('Tree Layout selected');
 		this.graph.setTreeLayout();
 	}
 
@@ -307,24 +306,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	zoomOut() {
 		this.graph.zoomOut();
-	}
-
-	showTaskDetails(id: number): void {
-		this.selectedTask = { id };
-		this.open();
-	}
-
-	editTask(id: number): void {
-		this.selectedTask = { id };
-		this.open();
-	}
-
-	public close(status?: any) {
-		this.opened = false;
-	}
-
-	public open() {
-		this.opened = true;
 	}
 
 	/**
@@ -389,10 +370,6 @@ export class NeighborhoodComponent implements OnInit {
 
 	refreshDiagram(): void {
 		this.loadAll();
-	}
-
-	avoidDefault(): boolean {
-		return false;
 	}
 
 }

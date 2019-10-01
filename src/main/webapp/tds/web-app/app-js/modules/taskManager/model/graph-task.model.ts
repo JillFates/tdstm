@@ -1,9 +1,9 @@
-export interface IGraphTask {
-	task: ITask;
+export interface IGraphNode {
+	task: IGraphTask;
 	successors: any[];
 }
 
-interface ITask {
+export interface IGraphTask {
 	id?: number | string;
 	key?: number | string;
 	taskNumber?: number | string;

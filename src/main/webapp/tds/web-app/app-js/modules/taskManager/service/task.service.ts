@@ -10,12 +10,12 @@ import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
-import {IGraphTask} from '../model/graph-task.model';
+import {IGraphNode} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
 
 export interface IGrapTaskResponseBody {
 	status: string;
-	data: IGraphTask[];
+	data: IGraphNode[];
 }
 
 export interface ITaskResponseBody {
@@ -499,7 +499,7 @@ export class TaskService {
 	 * @param taskId: number | string
 	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphTask[]> {
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphNode[]> {
 		const params = this.createHttpParams(filters);
 		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
 			{ params, observe: 'response' })

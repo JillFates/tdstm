@@ -45,7 +45,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		DialogsModule,
 		TooltipModule,
 		// Route
-		TaskManagerRouteModule,
+		TaskManagerRouteModule
 	],
 	declarations: [
 		TaskListComponent,
@@ -58,7 +58,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		TagsResolveService,
 		ReportsService,
 		TaskService
-	],
+	]
 })
 
 export class TaskManagerModule {

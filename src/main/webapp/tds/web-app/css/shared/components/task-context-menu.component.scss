@@ -1,35 +1,3 @@
-.diagram-layout-container {
-  position: relative;
-  padding-left: 15px;
-  padding-right: 15px;
-  min-height: 530px;
-}
-
-.overview-container {
-  position: absolute;
-  width: 200px;
-  height: 100px;
-  top: 10px;
-  left: 15px;
-  background-color: aliceblue;
-  z-index: 300; /* make sure its in front */
-  border: solid 1px blue;
-}
-
-.reset-overview-index {
-  z-index: 2;
-}
-
-#graph-control-btn-group {
-  position: absolute;
-  bottom: 40px;
-  left: 40px;
-  z-index: 999;
-}
-
-#graph-control-btn-group > .btn {
-  background-color: #dddddd;
-}
 
 #ctx-menu {
   width: 150px;
@@ -76,8 +44,8 @@
 }
 #ctx-menu li:hover ul li {
   display: block;
-  margin-left: 0px;
-  margin-top: 0px;
+  margin-left: 0;
+  margin-top: 0;
 }
 
 .ctx-menu-btn {

@@ -109,6 +109,7 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
+import {TaskContextMenuComponent} from './components/diagram-layout/context-menu/task-context-menu.component';
 
 @NgModule({
 	imports: [
@@ -191,7 +192,8 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSModalPageWrapperComponent,
 		PowerComponent,
 		DiagramLayoutComponent,
-		CircleCountdownComponent
+		CircleCountdownComponent,
+		TaskContextMenuComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -259,7 +261,8 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
-		CircleCountdownComponent
+		CircleCountdownComponent,
+		TaskContextMenuComponent
 	],
 	entryComponents: [
 		DynamicComponent,

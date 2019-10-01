@@ -6,7 +6,8 @@ import {
 	OnChanges,
 	SimpleChanges,
 	EventEmitter,
-	Renderer2, ViewChild, ElementRef
+	ViewChild,
+	ElementRef
 } from '@angular/core';
 import * as go from 'gojs';
 import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../constants/icons-path';
@@ -23,8 +24,10 @@ import {
 	TextBlock
 } from 'gojs';
 import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
-import {icon} from '@fortawesome/fontawesome-svg-core';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
+import {ReplaySubject} from 'rxjs';
+import {TaskContextMenuComponent} from './context-menu/task-context-menu.component';
+import {ITaskContextMenuModel} from './context-menu/task-context-menu.model';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -59,67 +62,15 @@ const categoryColors = {
 					<fa-icon [icon]="faIcons.faSearchMinus" size="lg"></fa-icon>
 				</button>
 			</div>
-			<div id="ctx-menu" #ctxMenu>
-				<ul>
-					<li id="start">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.start.icon" [styles]="{ color: ctxMenuIcons.start.color }">
-							</fa-icon>
-							Start
-						</button>
-					</li>
-					<li id="done">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.done.icon" [styles]="{ color: ctxMenuIcons.done.color }">
-							</fa-icon>
-							Done
-						</button>
-					</li>
-					<li id="hold">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.hold.icon" [styles]="{ color: ctxMenuIcons.hold.color }">
-							</fa-icon>
-							Hold
-						</button>
-					</li>
-					<li id="invoke">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.invoke.icon" [styles]="{ color: ctxMenuIcons.invoke.color }">
-							</fa-icon>
-							Invoke
-						</button>
-					</li>
-					<li id="edit">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.edit.icon" [styles]="{ color: ctxMenuIcons.edit.color }">
-							</fa-icon>
-							Edit
-						</button>
-					</li>
-					<li id="view">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.view.icon" [styles]="{ color: ctxMenuIcons.view.color }">
-							</fa-icon>
-							View
-						</button>
-					</li>
-					<li id="assign-to-me">
-						<button class="btn">
-							<fa-icon [icon]="ctxMenuIcons.assignToMe.icon" [styles]="{ color: ctxMenuIcons.assignToMe.color }">
-							</fa-icon>
-							Assign to me
-						</button>
-					</li>
-				</ul>
-			</div>
+			<tds-task-context-menu
+				[data]="ctxMenuData$ | async"
+				#taskCtxMenu></tds-task-context-menu>
 			<div
 				id="overview-container"
 				class="overview-container"
 				[class.reset-overview-index]="resetOvIndex"
 				#overviewContainer></div>
-		</div>
-	`,
-	// styleUrls: ['../../../../../css/shared/components/diagram-layout.component.scss']
+		</div>`,
 })
 export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@Input() name: string;
@@ -131,11 +82,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@Input() layoutOpts: go.Layout;
 	@Input() containerWidth: string;
 	@Input() containerHeight: string;
+	@Input() currentUserId: string | number;
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() editClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() showTaskDetailsClicked: EventEmitter<number> = new EventEmitter<number>();
 	@ViewChild('diagramLayout') diagramLayout: ElementRef;
 	@ViewChild('overviewContainer') overviewContainer: ElementRef;
+	@ViewChild('taskCtxMenu') taskCtxMenu: TaskContextMenuComponent;
 	stateIcons = STATE_ICONS_PATH;
 	categoryIcons = CATEGORY_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
@@ -148,10 +101,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	actualNodeTemplate: number;
 	diagramOverview: Overview;
 	resetOvIndex: boolean;
-	@ViewChild('ctxMenu') ctxMenu: ElementRef;
-	shouldShowCtxMenu = false;
+	ctxMenuData$: ReplaySubject<ITaskContextMenuModel> = new ReplaySubject();
 
-	constructor(private renderer: Renderer2) { /* Constructor */ }
+	constructor() { /* Constructor */ }
 
 	/**
 	 * Detect changes to update nodeDataArray and linksPath accordingly
@@ -338,7 +290,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		const node = new go.Node(go.Panel.Horizontal);
 		node.selectionAdorned = true;
 		node.add(this.containerPanel());
-		// node.contextMenu = this.contextMenu();
+		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -634,7 +586,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		node.add(this.iconShape());
 
 		node.add(this.categoryIconShape());
-		// node.contextMenu = this.contextMenu();
+		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -656,7 +608,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		shape.bind(new go.Binding('fill', 'status',
 			(status: string) => this.getStatusColor(status.toLowerCase())));
 		node.add(shape);
-		// node.contextMenu = this.contextMenu();
+		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -674,84 +626,33 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	}
 
 	/**
-	 * Node Context menu containing a variety of operations like 'edit task', 'show task detail', 'ready', etc
+	 * Node Context menu containing a variety of operations like 'edit task', 'show task detail', 'start', 'hold', etc
 	 **/
 	contextMenu(): any {
 		const $ = go.GraphObject.make;
-		return $(go.HTMLInfo,  // that has one button
-			{ show: () => this.showCtxMenu, mainElement: this.ctxMenu.nativeElement }
-							// $('ContextMenuButton',
-							// 		$(go.TextBlock, { text: 'Change Color', stroke: '#3c8dbc'}),
-							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.changeColor(e, obj, this.diagram) }),
-							// $('ContextMenuButton',
-							// 		$(go.TextBlock, { text: 'Show Detail', stroke: '#3c8dbc'}),
-							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.showTaskDetails(obj, this.diagram) }),
-							// $('ContextMenuButton',
-							// 		$(go.TextBlock, { text: 'Edit', stroke: '#3c8dbc'}),
-							// 		{ click: (e: go.InputEvent, obj: go.GraphObject) => this.editTask(obj, this.diagram) })
-							// more ContextMenuButtons would go here
+		return $(go.HTMLInfo,  // HTML element to contain the context menu
+		{
+								show: (obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool) => this.showCtxMenu(obj, diagram, tool),
+								mainElement: this.taskCtxMenu.ctxMenu.nativeElement
+							}
 					); // end Adornment
 	}
 
 	/**
-	 * handler to decide whether or not context menu should be shown
+	 * handler to show context menu and pass relevant data to context menu component
+	 * @param {GraphObject} obj
+	 * @param {Diagram} diagram
+	 * @param {Tool} tool
 	 **/
 	showCtxMenu(obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool): void {
-		this.renderer.setStyle(this.ctxMenu.nativeElement, 'display', 'block');
-
-		this.shouldShowCtxMenu = true;
-
-		const mousePt = diagram.lastInput.viewPoint;
-		this.renderer.setStyle(this.ctxMenu.nativeElement, 'left', `${mousePt.x}px`);
-		this.renderer.setStyle(this.ctxMenu.nativeElement, 'top', `${mousePt.y}px`);
-	}
-
-	/**
-	 * Show task detail context menu option
-	 * @param {GraphObject} obj > diagram node object
-	 * @param {Diagram} diagram > diagram reference
-	 **/
-	showTaskDetails(obj: go.GraphObject, diagram: go.Diagram): void {
-		const nodeData = obj.part.data;
-		this.showTaskDetailsClicked.emit(nodeData.id);
-	}
-
-	/**
-	 * Edit task context menu option
-	 * @param {GraphObject} obj > diagram node object
-	 * @param {Diagram} diagram > diagram reference
-	 **/
-	editTask(obj: go.GraphObject, diagram: go.Diagram): void {
-		const nodeData = obj.part.data;
-		this.editClicked.emit(nodeData.id);
-	}
-
-	/**
-	 * Change Color context menu option
-	 * @param {InputEvent} e > input event
-	 * @param {GraphObject} obj > diagram node object
-	 * @param {Diagram} diagram > diagram reference
-	 **/
-	changeColor(e: go.InputEvent, obj: go.GraphObject, diagram: Diagram) {
-		diagram.commit(d => {
-			// get the context menu that holds the button that was clicked
-			const contextmenu = obj.part;
-			console.log('menu: ', contextmenu);
-			// get the node data to which the Node is data bound
-			const nodedata = contextmenu.data;
-			// compute the next color for the node
-			let newcolor = 'lightblue';
-			switch (nodedata.color) {
-				case 'lightblue': newcolor = 'lightgreen'; break;
-				case 'lightgreen': newcolor = 'lightyellow'; break;
-				case 'lightyellow': newcolor = 'orange'; break;
-				case 'orange': newcolor = 'lightblue'; break;
-			}
-			// modify the node data
-			// this evaluates data Bindings and records changes in the UndoManager
-			d.model.set(nodedata, 'color', newcolor);
-		}, 'changed color');
-
+		if (this.taskCtxMenu) {
+			const mousePt = diagram.lastInput.viewPoint;
+			this.ctxMenuData$.next({
+				selectedNode: obj.part.data,
+				currentUserId: this.currentUserId,
+				mousePt: {x: `${mousePt.x}px`, y: `${mousePt.y}px`}
+			});
+		}
 	}
 
 	/**
