@@ -313,7 +313,8 @@
                     </button>
                     <tds-task-actions
 														*ngIf="model.id && model.status"
-														[task]="model"
+														[taskStatus]="model.status"
+														[taskActionInfoModel]="taskActionInfoModel"
                             (start)="onStartTask()"
                             (done)="onDoneTask()"
                             (invoke)="onInvoke()"
