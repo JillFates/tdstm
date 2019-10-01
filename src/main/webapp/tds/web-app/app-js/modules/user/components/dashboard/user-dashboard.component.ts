@@ -111,9 +111,6 @@ export class UserDashboardComponent implements OnInit {
 				this.projectInstance = result.projectInstance;
 				this.selectedProject = this.projectInstance;
 				this.selectedProjectID = this.projectInstance.id;
-				console.log(this.projectList);
-				console.log(this.selectedProject);
-				console.log(this.selectedProjectID);
 			});
 		this.applicationColumnModel = new ApplicationColumnModel();
 		this.activePersonColumnModel = new ActivePersonColumnModel();

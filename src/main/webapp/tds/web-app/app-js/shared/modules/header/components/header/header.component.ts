@@ -70,6 +70,7 @@ export class HeaderComponent {
 					this.pageMetaData.hideTopNav = true;
 				}
 				this.userContext = userContext;
+				console.log(userContext);
 			});
 	}
 
