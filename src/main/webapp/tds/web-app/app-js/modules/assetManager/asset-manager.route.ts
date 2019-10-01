@@ -134,7 +134,7 @@ export const AssetManagerRoute: Routes = [
 		path: AssetExplorerStates.ASSET_EXPORT.url,
 		data: {
 			page: {
-				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: []
+				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: ['ASSETS.ASSETS', 'ASSET_EXPORT.ASSET_EXPORT']
 			}
 		},
 		component: ExportComponent,
