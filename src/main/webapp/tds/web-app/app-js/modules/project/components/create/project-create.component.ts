@@ -10,6 +10,7 @@ import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-up
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {EventModel} from '../../../event/model/event.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-create`,
@@ -141,6 +142,10 @@ export class ProjectCreateComponent implements OnInit {
 
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
+			this.projectModel.startDate.setHours(0,0,0,0);
+			this.projectModel.completionDate.setHours(0,0,0,0);
+			this.projectModel.startDate.setMinutes ( this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			this.projectModel.completionDate.setMinutes ( this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
