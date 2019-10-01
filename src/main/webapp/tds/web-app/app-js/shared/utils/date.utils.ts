@@ -81,6 +81,17 @@ export class DateUtils {
 	}
 
 	/**
+	 * Corrects a date to GMT without need of the client's timezone
+	 * @param {sourceTime} date
+	 * @returns {Date} The date adjusted to GMT (Timezone remains the same)
+	 */
+	public static adjustDateTimezoneOffset(sourceTime: Date): Date {
+		var adjustedTime = new Date ( sourceTime );
+		adjustedTime.setMinutes ( sourceTime.getMinutes() + sourceTime.getTimezoneOffset() );
+		return adjustedTime;
+	}
+
+	/**
 	 * Get the Date without the hh:mm:ss
 	 * @param {sourceTime} The original source in a GMT based timezone
 	 * @returns {string} The formatted day without hh:mm:ss
