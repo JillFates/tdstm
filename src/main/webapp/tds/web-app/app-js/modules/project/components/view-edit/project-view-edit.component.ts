@@ -168,9 +168,9 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
 				this.projectModel.startDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate));
-				this.projectModel.startDate.setHours(0,0,0,0);
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.completionDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate));
-				this.projectModel.completionDate.setHours(0,0,0,0);
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
 				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
@@ -199,10 +199,10 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm() {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
-			this.projectModel.startDate.setHours(0,0,0,0);
-			this.projectModel.completionDate.setHours(0,0,0,0);
-			this.projectModel.startDate.setMinutes ( this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
-			this.projectModel.completionDate.setMinutes ( this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			this.projectModel.startDate.setHours(0, 0, 0, 0);
+			this.projectModel.completionDate.setHours(0, 0, 0, 0);
+			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
