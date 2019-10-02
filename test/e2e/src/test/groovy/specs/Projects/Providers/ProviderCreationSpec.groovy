@@ -31,6 +31,7 @@ class ProviderCreationSpec extends GebReportingSpec{
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
     }
 
     def setup() {
