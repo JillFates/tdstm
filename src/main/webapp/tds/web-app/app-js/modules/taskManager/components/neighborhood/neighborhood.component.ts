@@ -13,6 +13,10 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ReportsService} from '../../../reports/service/reports.service';
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {TaskEditComponent} from '../edit/task-edit.component';
 
 export interface ILinkPath {
 	from: number | string;
@@ -64,7 +68,8 @@ export class NeighborhoodComponent implements OnInit {
 			private activatedRoute: ActivatedRoute,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
-			private preferenceService: PreferenceService
+			private preferenceService: PreferenceService,
+			private dialogService: UIDialogService
 		) {
 				this.activatedRoute.queryParams.subscribe(params => {
 					if (params) { this.urlParams = params; }
@@ -370,6 +375,97 @@ export class NeighborhoodComponent implements OnInit {
 
 	refreshDiagram(): void {
 		this.loadAll();
+	}
+
+	/**
+	 * Put the task on start status
+	 **/
+	start(): void {
+		// TODO
+	}
+
+	/**
+	 * Put the task on hold status
+	 **/
+	hold(): void {
+		// TODO
+
+	}
+
+	/**
+	 * Put the task on done status
+	 **/
+	done(): void {
+		// TODO
+
+	}
+
+	/**
+	 * Put the task on invoke status
+	 **/
+	invoke(): void {
+		// TODO
+
+	}
+
+	/**
+	 * Put the task on reset status
+	 **/
+	reset(): void {
+		// TODO
+
+	}
+
+	/**
+	 * Show task detail context menu option
+	 **/
+	showTaskDetails(id: string | number): void {
+		let taskDetailModel: TaskDetailModel = {
+			id: `${id}`,
+			modal: {
+				title: 'Task Detail'
+			},
+			detail: {
+				currentUserId: this.userContext.user.id
+			}
+		};
+
+		this.dialogService.open(TaskDetailComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		])
+			.then(result => {
+				console.log('then: ', result);
+			}).catch(result => {
+			if (result) {
+				console.log('catch: ', result);
+			}
+		});
+	}
+
+	/**
+	 * Edit task context menu option
+	 **/
+	editTask(id: string | number): void {
+		let taskDetailModel: TaskDetailModel = {
+			id: `${id}`,
+			modal: {
+				title: 'Task Edit'
+			},
+			detail: {
+				currentUserId: this.userContext.user.id
+			}
+		};
+
+		this.dialogService.extra(TaskEditComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		], false, false)
+			.then(result => {
+				console.log('then: ', result);
+			}).catch(result => {
+			if (result) {
+				console.log('catch: ', result);
+			}
+		});
 	}
 
 }

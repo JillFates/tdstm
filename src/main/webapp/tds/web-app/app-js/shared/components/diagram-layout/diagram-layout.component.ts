@@ -26,8 +26,8 @@ import {
 import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
 import {ReplaySubject} from 'rxjs';
-import {TaskContextMenuComponent} from './context-menu/task-context-menu.component';
-import {ITaskContextMenuModel} from './context-menu/task-context-menu.model';
+import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
+import {ITaskContextMenuModel} from './context-menu/diagram-context-menu.model';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -84,11 +84,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@Input() containerHeight: string;
 	@Input() currentUserId: string | number;
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
-	@Output() editClicked: EventEmitter<number> = new EventEmitter<number>();
-	@Output() showTaskDetailsClicked: EventEmitter<number> = new EventEmitter<number>();
+	@Output() editClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
+	@Output() showTaskDetailsClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
 	@ViewChild('diagramLayout') diagramLayout: ElementRef;
 	@ViewChild('overviewContainer') overviewContainer: ElementRef;
-	@ViewChild('taskCtxMenu') taskCtxMenu: TaskContextMenuComponent;
+	@ViewChild('taskCtxMenu') taskCtxMenu: DiagramContextMenuComponent;
 	stateIcons = STATE_ICONS_PATH;
 	categoryIcons = CATEGORY_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
@@ -243,8 +243,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 
 	/**
 	 * Links template configuration
-	 * @param {go.Link} templateOpts > optional configuration to use for the template
-	 * @param {go.Shape} linkShapeOpts > optional shape for links
+	 * @param {Link} templateOpts > optional configuration to use for the template
+	 * @param {Shape} linkShapeOpts > optional shape for links
 	 **/
 	linkTemplate(templateOpts?: go.Link, linkShapeOpts?: go.Shape): go.Link {
 
