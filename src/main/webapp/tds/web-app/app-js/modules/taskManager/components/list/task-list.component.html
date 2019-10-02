@@ -76,18 +76,16 @@
 				[data]="grid.gridData"
 				[pageSize]="grid.state.take"
 				[skip]="grid.state.skip"
-				[pageable]="{pageSizes: grid.defaultPageOptions, info: true}"
-				(pageChange)="grid.pageChange($event)"
-				[filter]="grid.state.filter"
+				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
+				(pageChange)="onPageChangeHandler($event)"
 				[filterable]="true"
-				(filterChange)="grid.filterChange($event)"
 				[resizable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
 				[sortable]="{mode:'single'}"
+				(sortChange)="onSortChangeHandler($event)"
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
-				(sortChange)="grid.sortChange($event)"
 				(cellClick)="onCellClickHandler($event)">
 				<!-- Column Menu -->
 				<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
@@ -155,6 +153,7 @@
 					</button>
 				</div>
 				<kendo-grid-column *ngFor="let column of columnsModel"
+													 [resizable]="column.resizable"
 													 field="{{column.property}}"
 													 [locked]="column.locked"
 													 format="{{column.format}}"
@@ -163,12 +162,17 @@
 													 [class]="column.cellClass ? column.cellClass : ''"
 													 [style]="column.cellStyle ? column.cellStyle : ''"
 													 [width]="!column.width ? 100 : column.width"
-													 [filterable]=""
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div class="sortable-column">
-							<label> {{column.label}}</label>
+						<div [ngClass]="{'sortable-column' : column.type !== 'action'}">
+							<label>{{column.label}}</label>
+						</div>
+					</ng-template>
+					<!-- edit action column -->
+					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+						<div class="is-grid-link tds-action-button-set">
+							<tds-button-edit (click)="onOpenTaskEditHandler(dataItem)"></tds-button-edit>
 						</div>
 					</ng-template>
 					<!-- task Number -->
@@ -183,7 +187,7 @@
 					</ng-template>
 					<!-- updated -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
-						<span class="task-updated-cell {{dataItem.updatedClass}}">{{dataItem.updatedTime}}</span>
+						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
 					</ng-template>
 					<!-- status -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
@@ -193,9 +197,9 @@
 						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
-								<input [(ngModel)]="column.filter" (keyup)="grid.onFilter(column)"
+								<input [(ngModel)]="column.filter" (keyup)="onFilterChangeHandler(column)"
 											 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="grid.clearValue(column)"
+								<span *ngIf="column.filter" (click)="onFilterChangeHandler(column, true)"
 											style="cursor:pointer;color:#656565;pointer-events:all"
 											class="fa fa-times form-control-feedback"></span>
 							</ng-template>

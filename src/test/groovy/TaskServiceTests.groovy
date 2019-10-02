@@ -10,14 +10,11 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.CommentNote
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-import org.joda.time.DateTime
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import spock.lang.Specification
@@ -25,7 +22,7 @@ import spock.lang.Specification
 class TaskServiceTests extends Specification implements ServiceUnitTest<TaskService>, DataTest{
 
 	void setupSpec(){
-		mockDomains AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, Person, WorkflowTransition, Project, Workflow
+		mockDomains AssetEntity, AssetComment, CommentNote, TaskDependency, RoleType, Person, Project
 	}
 
 	void setup(){
@@ -57,7 +54,6 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				completionDate: (new Date() + 5).clearTime(),
 				description: 'projectDescription',
 				client: new PartyGroup(name: 'client'),
-				workflowCode: '12345',
 				guid: StringUtil.generateGuid()
 			).save(flush: true)
 
@@ -476,30 +472,11 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 			4L == params['tagListSize']
 	}
 
-	def 'Test createTaskFromSpec with workflow'() {
+	def 'Test createTaskFromSpec'() {
 		setup:
 			service.sequenceService = Mock(SequenceService)
-			Workflow workflow = new Workflow(process: 'process')
-			workflow.save(flush: true)
-
 			RoleType role = new RoleType(id: 'SECURITY', type: 'SECURITY', level: 0)
 			role.save(flush: true)
-
-			WorkflowTransition workflowTransition = new WorkflowTransition(
-				category: 'Category',
-				transId: 1,
-				workflow: workflow,
-				role: role,
-				name: 'workflow',
-				type: 'process',
-				plan_start_time: DateTime.newInstance().toDate(),
-				plan_completion_time: DateTime.newInstance().plusDays(1).toDate(),
-				duration: 1,
-				duration_scale: TimeScale.D,
-				code: 'code')
-
-			workflowTransition.save(flush: true)
-
 
 		when:
 			def recipeId = 1
@@ -511,7 +488,6 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 				completionDate: (new Date() + 5).clearTime(),
 				description: 'projectDescription',
 				client: new PartyGroup(name: 'client'),
-				workflowCode: workflowTransition.code,
 				guid: StringUtil.generateGuid()
 			).save(flush: true)
 
@@ -527,24 +503,12 @@ class TaskServiceTests extends Specification implements ServiceUnitTest<TaskServ
 
 			def exceptions = new StringBuilder()
 
-			def workflowMap = [
-				workflow_transition_id: workflowTransition.id,
-				category              : 'Category',
-				plan_start_time       : DateTime.newInstance().toDate(),
-				plan_completion_time  : DateTime.newInstance().plusDays(1).toDate(),
-				duration              : 1,
-				duration_scale        : TimeScale.D
-			]
-
 			def asset = null
 			AssetComment task = service.createTaskFromSpec(
-				recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, workflowMap, asset)
+				recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, asset)
 
 		then: 'we get a new task object'
 			task != null
-
-		and: 'the workflow transition is obtained (currently a mock object)'
-			task.workflowTransition != null
 
 	}
 

@@ -29,10 +29,11 @@ class ProjectMock {
 		completionDate.clearTime()
 
 		Project project = new Project(
-				  name: projectName, projectCode: projectCode,
-				  completionDate: completionDate, description: projectDescription,
+				  name: projectName,
+				  projectCode: projectCode,
+				  completionDate: completionDate,
+				  description: projectDescription,
 				  client: new PartyGroup(name: projectClientName),
-				  workflowCode: 'STD_PROCESS',
 				  guid: UUID.randomUUID().toString()
 		)
 

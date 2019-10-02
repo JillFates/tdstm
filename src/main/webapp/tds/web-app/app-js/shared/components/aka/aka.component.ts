@@ -6,21 +6,26 @@ import { ManufacturerService} from '../../../modules/assetExplorer/service/manuf
 	selector: 'tds-aka',
 	template: `
         <div class="aka-component">
+            <tds-button-add id="btnAddAka" class="btn-primary"
+                            [tabindex]="tabindex" [disabled]="hasError"
+                            [title]="'AKA.ADD' | translate"
+                            (click)="onAdd('')">
+            </tds-button-add>
             <div class="aka-items">
                 <div class="aka-item" *ngFor="let aka of akas;let index = index;trackBy:trackByIndex;">
-                    <input type="text" [(ngModel)]="akas[index]" (change)="onAkaChange($event, index)" [disabled]="hasError && indexError !== index">
+                    <input type="text" [tabindex]="tabindex" [(ngModel)]="akas[index]" (change)="onAkaChange($event, index)" [disabled]="hasError && indexError !== index">
                     <span *ngIf="!hasError || (hasError && indexError === index)" class="glyphicon glyphicon-remove delete-aka" (click)="onDelete(index)" title="Delete aka"></span>
                 </div>
                 <div>
                     <label *ngIf="hasError" style="color: red">{{errorMessage}}</label>
                 </div>
             </div>
-            <button (click)="onAdd('')" [disabled]="hasError" id="btnAdAka">Add AKA</button>
         </div>
 	`
 })
 export class AkaComponent implements OnInit {
 	@Input('aka') akaCollection: Array<Aka>;
+	@Input('tabindex') tabindex: string;
 	@Input('akaParent') akaParent: AkaParent;
 	@Output('modelChange') modelChange = new EventEmitter<AkaChanges>();
 	@Output('validationErrors') validationErrors = new EventEmitter<boolean>();

@@ -18,7 +18,6 @@ import grails.gorm.transactions.Transactional
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
-import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.application.ApplicationProfilesCommand
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
@@ -28,6 +27,7 @@ import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.command.ApplicationMigrationCommand
+import net.transitionmanager.command.reports.ActivityMetricsCommand
 import net.transitionmanager.command.reports.DatabaseConflictsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
@@ -45,7 +45,6 @@ import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectService
 import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.UserLogin
@@ -53,7 +52,13 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.RunbookService
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
+import net.transitionmanager.task.timeline.CPAResults
+import net.transitionmanager.task.timeline.TaskTimeLineGraph
+import net.transitionmanager.task.timeline.TaskVertex
+import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
@@ -84,6 +89,7 @@ class ReportsService implements ServiceMethods {
     ControllerService controllerService
     ProjectService projectService
     TagAssetService tagAssetService
+    TimeLineService timeLineService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -143,7 +149,6 @@ class ReportsService implements ServiceMethods {
             clientAccess           : eventsProjectInfo.clientAccess,
             projectStaffList       : eventsProjectInfo.projectStaffList,
             list                   : eventsProjectInfo.list,
-            workFlowCodeSelected   : eventBundleInfo.workFlowCodeSelected,
             steps                  : eventBundleInfo.steps,
             moveBundleSize         : moveBundles.size(),
             moveBundles            : moveBundles,
@@ -571,23 +576,12 @@ class ReportsService implements ServiceMethods {
     }
 
     def getEventsBundelsInfo(moveBundles, MoveEvent moveEvent, eventErrorList) {
-        Set workFlowCode = moveBundles.workflowCode
-        def workFlow = moveBundles.workflowCode
-        def workFlowCodeSelected = [:]
         def steps = [:]
-
-        if (workFlowCode.size() == 1) {
-            workFlowCodeSelected[HtmlUtil.escape(moveEvent.name) + '  (Event)   All Bundles have same WorkFlow  '] = workFlow[0]
-        } else {
-            moveBundles.each {
-                workFlowCodeSelected[HtmlUtil.escape(it.name) + '(Bundle)    Uses WorkFlow '] = it.workflowCode
-            }
-        }
 
         List<String> dashBoardOk = []
         moveBundles.each { moveBundle ->
             List<String> labels = []
-            def moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'transitionId'])
+            def moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'moveBundle'])
             if (!moveBundleStep) {
                 steps[moveBundle.name] = "No steps created"
                 eventErrorList << 'EventsBundle'
@@ -602,8 +596,11 @@ class ReportsService implements ServiceMethods {
             }
         }
 
-        [workFlowCodeSelected: workFlowCodeSelected, steps: steps,
-         eventErrorList      : eventErrorList, dashBoardOk: dashBoardOk]
+        [
+            steps         : steps,
+            eventErrorList: eventErrorList,
+            dashBoardOk   : dashBoardOk
+        ]
     }
 
     /**
@@ -1187,7 +1184,6 @@ class ReportsService implements ServiceMethods {
      * used to get cyclical references, multiple sink vertices and assignment data.
      */
     def getTaskAnalysisInfo(MoveEvent moveEvent, eventErrorList, boolean viewUnpublished = false) {
-        def dfsMap
         String cyclicalsError = ''
         String startsError = ''
         String sinksError = ''
@@ -1198,72 +1194,82 @@ class ReportsService implements ServiceMethods {
         StringBuilder sinksRef = new StringBuilder()
         StringBuilder cyclicalsRef = new StringBuilder()
 
-        def publishedValues = viewUnpublished ? [true, false] : [true]
-        def tasks = runbookService.getEventTasks(moveEvent).findAll { it.isPublished in publishedValues }
-        def deps = runbookService.getTaskDependencies(tasks)
-        def tmp = runbookService.createTempObject(tasks, deps)
+        Boolean publishedValues = viewUnpublished ? [true, false] : [true]
+        CPAResults cpaResults
 
         try {
-            dfsMap = runbookService.processDFS(tasks, deps, tmp)
+            cpaResults = timeLineService.calculateCPA(moveEvent)
         } catch (e) {
             exceptionString += "No Tasks"
         }
 
-        if (dfsMap) {
-            if (dfsMap.cyclicals?.size() == 0) {
+        TaskTimeLineGraph graph = cpaResults.graph
+        TimelineSummary summary = cpaResults.summary
+        List<Task> tasks = cpaResults.tasks
+
+        Closure<String> htmlConverter = { TaskVertex taskVertex, Task task ->
+            String content = "<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()}"
+            if (task.taskSpec) {
+                content += " [TaskSpec ${task.taskSpec}]"
+            }
+            return content
+        }
+
+        if (cpaResults) {
+
+            if (!summary.hasCycles()) {
                 cyclicalsError = greenSpan('Cyclical References: OK')
             } else {
                 eventErrorList << 'Tasks'
                 cyclicalsError = redSpan('Cyclical References:')
                 cyclicalsRef.append('<ol>')
-
-                dfsMap.cyclicals.each { c ->
-                    def task = c.value.loopback
+                summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
-                    c.value.stack.each { cycTaskId ->
-                        task = tasks.find { it.id == cycTaskId }
-                        if (task) {
-                            cyclicalsRef.append("<li>$task.taskNumber $task.comment [TaskSpec $task.taskSpec]")
-                        } else {
-                            cyclicalsRef.append("<li>Unexpected error trying to find task record id $cycTaskId")
-                        }
+                    c.each { TaskVertex cyclicalTask ->
+                        Task task = tasks.find { it.id == cyclicalTask.taskId }
+                        cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
-                    cyclicalsRef.append(" >> $c.value.loopback.taskNumber $c.value.loopback.comment</li>")
                     cyclicalsRef.append('</ul>')
                 }
-
                 cyclicalsRef.append('</ol>')
             }
 
             // check for multiple starts
-            if (dfsMap.starts?.size() == 1) {
-                startsError = greenSpan('Start Vertices: OK')
-            } else if (dfsMap.starts?.size() == 0) {
-                eventErrorList << 'Tasks'
-                startsError = redSpan('Start Vertices: <br> No start task was found.')
+            if (graph.hasNoStarts()) {
+				eventErrorList << 'Tasks'
+				startsError = redSpan('Start Vertices: <br> No start task was found.')
+            } else if (graph.hasOneStart()) {
+				startsError = greenSpan('Start Vertices: OK')
             } else {
                 eventErrorList << 'Tasks'
                 startsError = redSpan('''Start Vertices: <br>
 					Warning - More than one task has no predecessors. Typical events will have just one starting task
 					(e.g. Prep for Move Event). This is an indicator that some task wiring may be incorrect.''')
                 startsRef.append('<ul>')
-                dfsMap.starts.each { startsRef.append("<li>$it [TaskSpec $it.taskSpec]") }
+
+                graph.starts.each { TaskVertex taskVertex ->
+                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    startsRef.append(htmlConverter(taskVertex, task))
+                }
                 startsRef.append('</ul>')
             }
 
             // check for multiple sinks
-            if (dfsMap.sinks?.size() == 1) {
-                sinksError = greenSpan('Sink Vertices: OK')
-            } else if (dfsMap.sinks?.size() == 0) {
+            if (graph.hasNoSinks()) {
                 eventErrorList << 'Tasks'
                 sinksError = redSpan('Sink Vertices: <br> No end task was found, which is typically the result of cyclical references.')
+            } else if (graph.hasOneSink()) {
+                sinksError = greenSpan('Sink Vertices: OK')
             } else {
                 eventErrorList << 'Tasks'
                 sinksError = redSpan('''Sink Vertices: <br>
 					Warning - More than one task has no successors. Typical events will have just one ending task
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
-                dfsMap.sinks.each { sinksRef.append("<li>$it [TaskSpec $it.taskSpec]") }
+                graph.sinks.each { TaskVertex taskVertex ->
+                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    sinksRef.append(htmlConverter(taskVertex, task))
+                }
                 sinksRef.append('</ul>')
             }
 
@@ -1395,7 +1401,7 @@ class ReportsService implements ServiceMethods {
         HSSFSheet tasksSheet = book.getSheet("tasks")
 
         List preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-                                  '', '', '', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart', 'estFinish', 'actStart', 'dateResolved', 'workflow', 'category',
+                                  '', '', '', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart', 'estFinish', 'actStart', 'dateResolved', 'category',
                                   'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
         moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
@@ -1478,7 +1484,6 @@ class ReportsService implements ServiceMethods {
             StringBuilder duration = new StringBuilder()
             def customParam
             String windowColor
-            List<AssetComment> workflow
             def durationHours
 
             if (finishTime && startTime) {
@@ -1500,15 +1505,9 @@ class ReportsService implements ServiceMethods {
                 customParam = it[command.outageWindow]
             }
 
-            if (command.testing) {
-                Long workflowTransitionId = NumberUtil.toPositiveLong(command.testing)
-                WorkflowTransition workflowTransaction = WorkflowTransition.get(workflowTransitionId)
-                workflow = appComments.findAll { it?.workflowTransition == workflowTransaction }.sort { it.actStart }
-                workflow.removeAll([null])
-            }
             appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
                     customParam: customParam ? customParam + (command.outageWindow == 'drRtoDesc' ? 'h' : '') : '',
-                    windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
+                    windowColor: windowColor)
         }
 
         [appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]

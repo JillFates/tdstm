@@ -2220,66 +2220,6 @@ div.my-task-container select.slc-event {
 div.content-wrapper #bodycontent #userProjectId {
   width: 250px; }
 
-div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper {
-  max-width: 960px;
-  margin-top: 4px; }
-  div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.gauge-graph-wrapper {
-    margin-top: 22px;
-    text-align: center; }
-  div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.elapsed-time-wrapper {
-    margin-top: 12px;
-    text-align: center; }
-  div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper {
-    margin-top: 22px;
-    text-align: center;
-    height: 190px; }
-    div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper ul.nav-tabs {
-      border-bottom: 1px solid #ddd; }
-      div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper ul.nav-tabs li button.btn-add-news {
-        margin-left: 92px;
-        margin-top: 1px; }
-    div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper div.tab-content div.tab-pane {
-      max-height: 129px;
-      overflow-x: auto; }
-      div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper div.tab-content div.tab-pane ul {
-        list-style-type: none;
-        text-align: left;
-        line-height: 23px;
-        margin-top: 11px; }
-        div.content-wrapper section.dashboard-event-wrapper div.general-event-info-wrapper div.tab-items-wrapper div.tab-content div.tab-pane ul li {
-          background-image: none; }
-
-div.content-wrapper section.dashboard-task-summary-wrapper div.box div#newssection {
-  background: none;
-  border: none; }
-  div.content-wrapper section.dashboard-task-summary-wrapper div.box div#newssection div.prog_bar_text {
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
-    display: inline-flex;
-    text-align: center; }
-
-div.content-wrapper section.dashboard-task-summary-wrapper div.box div#bdlsection {
-  margin-left: 32px;
-  background: none;
-  border: none; }
-  div.content-wrapper section.dashboard-task-summary-wrapper div.box div#bdlsection div#bdltabs {
-    height: 32px;
-    border-bottom: 1px solid #ddd; }
-    div.content-wrapper section.dashboard-task-summary-wrapper div.box div#bdlsection div#bdltabs span:first-child {
-      margin-left: 5px; }
-    div.content-wrapper section.dashboard-task-summary-wrapper div.box div#bdlsection div#bdltabs span.tab-item.mbhinactive:hover {
-      background: #f7f7f7;
-      border: 1px solid #ddd;
-      border-color: #eee #eee #ddd;
-      border-radius: 4px 4px 0 0; }
-    div.content-wrapper section.dashboard-task-summary-wrapper div.box div#bdlsection div#bdltabs span.tab-item.mbhactive {
-      border: 1px solid #ddd;
-      color: #000;
-      border-radius: 4px 4px 0 0;
-      cursor: default;
-      background-color: #fff;
-      border-bottom-color: transparent; }
-
 div.content-wrapper div.execution-phase-wrapper {
   margin-left: 20px; }
 

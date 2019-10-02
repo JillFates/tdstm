@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fc02cd35-538f-44d4-ab55-9171393f6b1a",
+		"_postman_id": "a44c66cb-5448-4a0e-9c22-4c3ec310168b",
 		"name": "Actions Endpoints Automation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -44,7 +44,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"username\":\"api_test_user\",\"password\":\"api_password\"}"
+					"raw": "{ \"username\":\"{{username}}\", \"password\":\"{{password}}\" }"
 				},
 				"url": {
 					"raw": "{{host}}/tdstm/auth/signIn",

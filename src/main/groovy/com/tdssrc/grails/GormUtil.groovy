@@ -10,6 +10,7 @@ import grails.util.Holders
 import grails.web.databinding.DataBindingUtils
 import groovy.transform.Memoized
 import groovy.util.logging.Slf4j
+import net.transitionmanager.command.CommandObject
 import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Room
 import net.transitionmanager.exception.DomainUpdateException
@@ -1527,5 +1528,53 @@ class GormUtil{
 			}
 		}
 		return true
+	}
+
+	/**
+	 * This method uses a command object to populate a domain instance. If an id is passed, the corresponding instance
+	 * will be fetched from the database, otherwise a new instance is created.
+	 * The user of this method can control which properties shouldn't be updated by passing their names in the
+	 * skipProperties list.
+	 *
+	 * The method doesn't check data types, so it's up to the user to make sure these match in the command object
+	 * and the domain.
+	 *
+	 * An important note is that the method WILL NOT save the instance. This is to give the user the possibility
+	 * of further assign/update fields before saving. This is to avoid triggering validation errors unnecessarily.
+	 *
+	 * @param project - user's current project.
+	 * @param domainClass - the domain class that will be instantiated.
+	 * @param id - if not null, an instance with this id will be fetched from the database.
+	 * @param commandObject - command object instance which will be used for copying properties values over to the domain instance.
+	 * @param skipProperties - list of properties in the domain object that must not be updated.
+	 * @param throwException - whether or not an exception should be thrown on error.
+	 * @return the domain instance (not saved).
+	 */
+	static Object populateDomainFromCommand(Project project, Class domainClass, Long id, CommandObject commandObject, List<String> skipProperties = null, throwException = false) {
+		Object domainInstance
+
+		// Determine if a new instance is needed or one should be fetched from the database.
+		if (id) {
+			domainInstance = findInProject(project, domainClass, id, throwException)
+		} else {
+			domainInstance = domainClass.newInstance()
+		}
+
+		// Fetch the persistent properties for the domain not explicitly excluded by the skipProperties parameter.
+		List<String> domainProperties = getDomainProperties(domainClass, null, skipProperties)*.name
+
+		// Iterate over the persistent properties checking if they are available in the command object.
+		for (String propertyName in domainProperties) {
+			// If the command object has the given property, use that value to set the domain instance's field.
+			if (commandObject.hasProperty(propertyName)) {
+				domainInstance[propertyName] = commandObject[propertyName]
+			}
+		}
+
+		if (domainProperties.contains('project') && !(skipProperties && skipProperties.contains('project'))) {
+			domainInstance.project = project
+		}
+
+		return domainInstance
 	}
 }

@@ -19,6 +19,7 @@ class ApiActionCommand implements CommandObject {
     Credential credential
     ApiCatalog apiCatalog
     String connectorMethod
+    String dictionaryMethodName
     String asyncQueue
     String callbackMethod
     CallbackMode callbackMode

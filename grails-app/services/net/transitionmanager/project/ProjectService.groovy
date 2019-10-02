@@ -4,7 +4,9 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.action.ApiCatalogService
 import net.transitionmanager.asset.ApplicationAssetMap
 import net.transitionmanager.asset.AssetCableMap
+import net.transitionmanager.command.ProjectCommand
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SequenceService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -14,6 +16,7 @@ import net.transitionmanager.imports.DataScriptService
 import net.transitionmanager.license.LicenseAdminService
 import net.transitionmanager.license.LicenseCommonService
 import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.CredentialService
@@ -80,7 +83,6 @@ class ProjectService implements ServiceMethods {
 	JdbcTemplate               jdbcTemplate
 	PartyRelationshipService   partyRelationshipService
 	SequenceService            sequenceService
-	StateEngineService         stateEngineService
 	UserPreferenceService      userPreferenceService
 	CustomDomainService        customDomainService
 	LicenseAdminService        licenseAdminService
@@ -92,6 +94,8 @@ class ProjectService implements ServiceMethods {
 	CredentialService          credentialService
 	DataScriptService          dataScriptService
 	LicenseCommonService       licenseCommonService
+	FileSystemService          fileSystemService
+	MoveBundleService		   moveBundleService
 
 	static final String ASSET_TAG_PREFIX = 'TM-'
 
@@ -379,7 +383,7 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers and workflowcodes.
+	 * Get all clients, partners, managers.
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
@@ -392,14 +396,15 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
-		[clients: getAllClients(),
-		 partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-		 managers: managers.sort { it.partyIdTo?.lastName },
-		 workflowCodes: stateEngineService.getWorkflowCode()]
+		[
+			clients : getAllClients(),
+			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
+			managers: managers.sort { it.partyIdTo?.lastName }
+		]
 	}
 
 	/**
-	 * This method used to get all clients,patners,managers and workflowcodes for action edit.
+	 * This method used to get all clients,patners,managers for action edit.
 	 */
 	def getprojectEditDetails(Project projectInstance){
 		def userCompany = securityService.userLoginPerson.company
@@ -451,9 +456,16 @@ class ProjectService implements ServiceMethods {
 			partnerStaff.sort{it.partyIdTo?.lastName}
 		}
 
-		return [projectPartners:projectPartners, projectManagers:projectManagers, moveManager:moveManager,
-			companyStaff:companyStaff, clientStaff:clientStaff, partnerStaff:partnerStaff, companyPartners:companyPartners,
-			projectLogoForProject:projectLogoForProject, workflowCodes: stateEngineService.getWorkflowCode()]
+		return [
+			projectPartners      : projectPartners,
+			projectManagers      : projectManagers,
+			moveManager          : moveManager,
+			companyStaff         : companyStaff,
+			clientStaff          : clientStaff,
+			partnerStaff         : partnerStaff,
+			companyPartners      : companyPartners,
+			projectLogoForProject: projectLogoForProject
+		]
 	}
 
 	/**
@@ -741,7 +753,6 @@ class ProjectService implements ServiceMethods {
 					name: bundleName,
 					project: project,
 					useForPlanning: true,
-					workflowCode: project.workflowCode,
 					startTime: project.startDate,
 					completionTime: project.completionDate
 				)
@@ -1796,8 +1807,9 @@ class ProjectService implements ServiceMethods {
 					guid                 : project.guid,
 					projectName          : project.name,
 					projectCode          : project.projectCode,
-					clientName           : project.client.name,
+					clientName           : project.client.toString(),
 					description          : project.description ?: '',
+					comment				 : project.comment ?: '',
 					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
@@ -1862,20 +1874,105 @@ class ProjectService implements ServiceMethods {
 	 * @param file - the File resource to reference
 	 * @return the ProjectLogo object
 	 */
-	ProjectLogo createOrUpdate(Project project, file) {
+	ProjectLogo createOrUpdateLogo(Project project, File file, String originalFilename) {
 		assert file
 		assert project
 
-		String origFileName = file.originalFilename
-		int slashIndex = Math.max(origFileName.lastIndexOf('/'), origFileName.lastIndexOf('\\'))
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project) ?: new ProjectLogo(project: project)
+		projectLogo.name = originalFilename
+		projectLogo.setData(new FileInputStream(file))
+		return projectLogo.save(flush: true)
+	}
 
-		if (slashIndex > -1) {
-			origFileName = origFileName.substring(slashIndex + 1)
+	/**
+	 * This methods creates (or updates) a project based on the given CommandObject. It also takes cares of
+	 * cloning the default FieldSettings and creating the default bundle.
+	 * 
+	 * @param projectCommand
+	 * @return
+	 */
+	Project createOrUpdateProject(ProjectCommand projectCommand) {
+		Project project
+		if (projectCommand.id > 0) {
+			if (securityService.hasAccessToProject(projectCommand.id)) {
+				project = Project.get(projectCommand.id)
+			} else {
+				UserLogin userlogin = securityService.getUserLogin()
+				throw new InvalidParamException("User ${userlogin.username} doesn't have access to the project ${projectCommand.id}.")
+			}
+		} else {
+			project = new Project()
+		}
+		
+		project.with {
+			client = PartyGroup.findById(projectCommand.clientId)
+			comment = projectCommand.comment
+			completionDate = projectCommand.completionDate
+			description = projectCommand.description
+			guid = StringUtil.generateGuid()
+			name = projectCommand.projectName
+			planMethodology = projectCommand.planMethodology
+			projectCode = projectCommand.projectCode
+			projectType = projectCommand.projectType
+			runbookOn = projectCommand.runbookOn
+			startDate = projectCommand.startDate
+			timezone = getTimezone(projectCommand.timeZone)
 		}
 
-		ProjectLogo pl = ProjectLogo.findByProject(project) ?: new ProjectLogo(name: origFileName, project: project)
-		pl.setData file.inputStream
+		project.save(failOnError: true, flush: true)
 
-		return pl.save(flush: true)
+		// Set the project's owner.
+		setOwner(project, securityService.userLoginPerson.company)
+
+		// Assign partners
+		updateProjectPartners(project, projectCommand.partnerIds)
+
+		if (!projectCommand.id) {
+			// Clone default field settings
+			cloneDefaultSettings(project)
+
+			// Create the default bundle
+			createDefaultBundle(project, projectCommand.defaultBundleName)
+		} else {
+			if (projectCommand.defaultBundle) {
+				def bundle = MoveBundle.findById(projectCommand.defaultBundle.id)
+				if (bundle) {
+					project.defaultBundle = bundle
+				}
+			}
+		}
+
+		// Deal with the Project Manager if one is supplied
+		if (projectCommand.projectManagerId > 0) {
+			personService.addToProjectTeam(project.id, projectCommand.projectManagerId, RoleType.CODE_TEAM_PROJ_MGR)
+		}
+
+		// Deal with the adding the project logo if one was supplied
+		if (projectCommand.projectLogo && projectCommand.originalFilename) {
+			File logoFile = fileSystemService.openTempFile(projectCommand.projectLogo)
+			createOrUpdateLogo(project, logoFile, projectCommand.originalFilename)
+		}
+		else {
+			if (!projectCommand.projectLogo) {
+				ProjectLogo projectLogo = ProjectLogo.findByProject(project)
+				if(projectLogo) {
+					projectLogo.delete()
+				}
+			}
+		}
+
+		// Set the new project as the user's current project.
+		userPreferenceService.setCurrentProjectId(project.id)
+
+		project.save()
+
+		return project
+	}
+
+	/**
+	 * @return the PersonService instance from the container.
+	 */
+	private PersonService getPersonService() {
+		return ApplicationContextHolder.getBean('personService', PersonService)
 	}
 }

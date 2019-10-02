@@ -3,19 +3,11 @@
     <div class="col-md-4 k-align-self-center">
       <p class="task-graph-title">Task Graph</p>
     </div>
-    <div class="col-md-3 text-center k-align-self-center">
-      <button class="neighborhood-btn btn" (click)="layeredDigraphLayout()">
-        <fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
-      </button>
-      <button class="neighborhood-btn btn" (click)="treeLayout()">
-        <fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
-      </button>
-      <button class="neighborhood-btn btn" (click)="forceDirectedLayout()">
-        <fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
-      </button>
+    <div class="col-md-4 text-center k-align-self-center">
+      <tds-task-view-toggle></tds-task-view-toggle>
     </div>
     
-    <div class="col-md-3 k-align-self-center">
+    <div class="col-md-2 k-align-self-center">
 <!--      <label class="d-inline-block task-chk-container">-->
 <!--        My Task-->
 <!--        <input  type="checkbox" checked="checked" />-->
@@ -49,7 +41,7 @@
   </div>
 
   <div class="row task-manager-sub-header">
-    <div class="col-md-4">
+    <div class="col-md-4  k-align-self-center">
       <label class="neighborhood-control-label">Event:</label>
       <kendo-dropdownlist
         textField="name"
@@ -67,22 +59,22 @@
       <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="filterChange()" />
       <label class="d-inline-block task-chk-container">
         My Tasks
-        <input  type="checkbox" checked="checked" />
+        <input  type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
         <span class="checkmark"></span>
       </label>
       <button class="btn">
         <fa-icon [icon]="icons.faSignal" size="lg" [rotate]="270"></fa-icon>
       </button>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 k-align-self-center">
       <label class="d-inline-block task-chk-container">
-        <input  type="checkbox" checked="checked" />
+        <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
         <span class="checkmark"></span>
         Minimize Auto Tasks
       </label>
 
       <label class="d-inline-block task-chk-container">
-        <input  type="checkbox"/>
+        <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
         <span class="checkmark"></span>
         View Unpublished
       </label>

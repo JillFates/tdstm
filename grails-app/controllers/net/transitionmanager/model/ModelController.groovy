@@ -728,8 +728,21 @@ class ModelController implements ControllerMethods, PaginationMethods {
 			powerUsed = powerUsed ? powerUsed.toDouble().round(1) : ''
 		}
 		def modelMap = [id:model.id,
+						akaCollection: model.getAliases(),
+						connectorsCollection: ModelConnector.findAllByModel(model, [sort: "id"]),
 						manufacturer:model.manufacturer?.name,
+						manufacturerId: model.manufacturer?.id,
 						modelName:model.modelName,
+						modelHeight: model.height,
+						modelWidth: model.width,
+						modelWeight: model.weight,
+						layoutStyle: model.layoutStyle,
+						productLine: model.productLine,
+						modelFamily: model.modelFamily,
+						modelDepth: model.depth,
+						endOfLifeDate: model.endOfLifeDate,
+						endOfLifeStatus: model.endOfLifeStatus,
+						sourceURL: model.sourceURL,
 						description:model.description,
 						assetType:model.assetType,
 						powerUse:powerUsed,
@@ -742,14 +755,21 @@ class ModelController implements ControllerMethods, PaginationMethods {
 						bladeCount:model.bladeCount,
 						bladeLabelCount:model.bladeLabelCount,
 						bladeHeight:model.bladeHeight,
-						bladeHeight:model.bladeHeight,
 						sourceTDSVersion:model.sourceTDSVersion,
 						powerNameplate: powerNameplate,
 						powerDesign : powerDesign,
 						cpuType : model.cpuType,
 						cpuCount : model.cpuCount,
 						memorySize : model.memorySize,
-						storageSize : model.storageSize
+						storageSize : model.storageSize,
+						createdBy: model.createdBy ? model.createdBy.firstName + ' ' + model.createdBy.lastName : '',
+						updatedBy: model.updatedBy ? model.updatedBy.firstName + ' ' + model.updatedBy.lastName : '',
+						validatedBy: model.validatedBy ? model.validatedBy.firstName + ' ' + model.validatedBy.lastName : '',
+						roomObject: model.roomObject,
+						sourceTDS: model.sourceTDS,
+						modelStatus: model.modelStatus,
+						powerType: userPreferenceService.getPreference(PREF.CURR_POWER_TYPE)
+
 		]
 		render modelMap as JSON
 	}

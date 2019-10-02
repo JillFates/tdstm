@@ -88,42 +88,13 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><span style="color: green;"><b>WorkFlow: OK </b></span></td>
-			</tr>
-			<tr>
-				<td></td>
-				<td><g:each in="${workFlowCodeSelected}" var="workFlow"
-						status="i">
-						<span style="color: green; margin-left: 50px;">
-							${workFlow.key}:${workFlow.value}
-						</span>
-						<br></br>
-					</g:each></td>
-
-			</tr>
-			<tr>
-				<td></td>
 
 				<td><g:if
 						test="${dashBoardOk[0]?.contains('No steps created')}">
 						<span style="color: red;"><b>Dashboard </b><br></br></span>
 					</g:if> <g:else>
 						<span style="color: green;"><b>Dashboard OK</b><br></br></span>
-					</g:else> <span> <g:each in="${steps}" var="workFlow">
-							<g:if test="${workFlow.value=='No steps created'}">
-								<span style="color: red; margin-left: 50px;">
-									${workFlow.key}: ${workFlow.value}
-								</span>
-								<br></br>
-							</g:if>
-							<g:else>
-								<span style="color: green; margin-left: 50px;">
-									${workFlow.key}: ${workFlow.value}
-								</span>
-								<br></br>
-							</g:else>
-						</g:each>
-				</span></td>
+					</g:else>
 
 			</tr>
 			<tr>
@@ -331,7 +302,7 @@
 			<tr>
 				<td></td>
 				<td>
-					<g:render template="${project.runbookOn == 0  ? '/reports/workflowTeamList' : '/reports/functionTasks' }" model="[bundleMap:bundleMap]"> </g:render>
+					<g:render template='/reports/functionTasks' model="[bundleMap:bundleMap]"> </g:render>
 				</td>
 			</tr>
 			<%--<tr>
@@ -410,36 +381,36 @@
 				<td>&nbsp;</td>
 				<td>
 					<g:if test="${taskerrMsg}">
-						<span style="color: green;"><b><h2>${taskerrMsg}</h2></b></span>
+						<span style="color: green;"><b><h2>${raw(taskerrMsg)}</h2></b></span>
 					</g:if>
-					${cyclicalsError}
+					${raw(cyclicalsError)}
 					<div style="margin-left: 50px">
-						${cyclicalsRef.toString()}
+						${raw(cyclicalsRef.toString())}
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${startsError}
+					${raw(startsError)}
 					<div style="margin-left: 50px">
-						${startsRef.toString()}
+						${raw(startsRef.toString())}
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${sinksError}
+					${raw(sinksError)}
 					<div style="margin-left: 50px">
-						${sinksRef.toString()}
+						${raw(sinksRef.toString())}
 					</div>
 				</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
 				<td>
-					${personAssignErr}
+					${raw(personAssignErr)}
 					<g:if test="${personTasks && personTasks.size()>0}">
 						<table style="width: auto; margin-left: 100px;">
 							<tr>

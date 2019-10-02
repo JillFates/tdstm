@@ -64,10 +64,12 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
-	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE
+	ASSET_LIST_SIZE: PREFERENCE_LIST_SIZE,
+	WRAP_TAGS_COLUMN: PREFERENCE_WRAP_TAGS_COLUMN,
 } = PREFERENCES_LIST;
 declare var jQuery: any;
 
@@ -93,10 +95,11 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
 	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
+	private showFullTags = false;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
-		this.displayCreateButton = this.getDisplayCreateButton(),
+		this.displayCreateButton = this.getDisplayCreateButton();
 		// changing the view reset selections
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.setActionCreateButton(viewId);
@@ -106,6 +109,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	public currentFields = [];
 	public justPlanning = false;
+	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
 	public gridMessage = 'ASSET_EXPLORER.GRID.INITIAL_VALUE';
@@ -145,7 +149,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private permissionService: PermissionService,
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
-		private userContextService: UserContextService) {
+		private userContextService: UserContextService,
+		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -165,12 +170,13 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.getPreferences()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((preferences: any) => {
-			this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
-
-			this.bulkCheckboxService.setPageSize(this.gridState.take);
-			this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
-			this.justPlanningChange.emit(this.justPlanning);
-			this.onReload();
+				this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
+				this.bulkCheckboxService.setPageSize(this.gridState.take);
+				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
+				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
+				this.showFullTags = this.toggleTagsColumn;
+				this.justPlanningChange.emit(this.justPlanning);
+				this.onReload();
 		});
 
 		// Iterate Fields to get reference for this context
@@ -206,7 +212,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private getPreferences(): Observable<any> {
-		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING);
+		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING, PREFERENCE_WRAP_TAGS_COLUMN);
 	}
 
 	/**
@@ -246,6 +252,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		if (this.tagSelector) {
 			this.tagSelector.reset();
 		}
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
@@ -265,6 +272,9 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 
 	onReload(): void {
 		this.modelChange.emit();
+		setTimeout(() => {
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+		}, 500);
 	}
 
 	/**
@@ -392,6 +402,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		).forEach((c: ViewColumn) => {
 			c.width = data[0].newWidth;
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	onChangeBulkCheckbox(checkboxState: CheckboxState): void {
@@ -462,6 +473,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}).catch(result => {
 			console.log('Cancel:', result);
 		});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 
 	}
 
@@ -523,8 +535,11 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		];
 
 		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
-			.then(() => this.onReload())
-			.catch((err) => this.onReload() )
+			.then(() => {
+				this.onReload();
+				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
+			})
+			.catch((err) => this.onReload() );
 	}
 
 	/**
@@ -554,8 +569,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 					common_assetClass: dataItem.common_assetClass
 				};
 				this.onShow(data);
-
 			}
+			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 		}).catch( error => console.log('error', error));
 	}
 
@@ -748,6 +763,28 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}
 
 		return this.assetExplorerService.query(viewId, payload);
+	}
+
+	/**
+	 * Toggles and saves the user preference to either hide or show all the tags inline or inline-block
+	 * */
+	public onToggleTagsView(event): void {
+		event.stopPropagation();
+		event.preventDefault();
+		this.showFullTags = !this.showFullTags;
+		this.preferenceService.setPreference(PREFERENCE_WRAP_TAGS_COLUMN, this.showFullTags.toString())
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(() => {
+				// nothing to do here
+			});
+	}
+
+	/**
+	 * Changes the height of the table row when the user
+	 * moves the mouse out of the tags cell
+	 * */
+	public refreshTableSize(event): void {
+		event.target.parentElement.parentElement.style.height = '28px';
 	}
 
 	/**
