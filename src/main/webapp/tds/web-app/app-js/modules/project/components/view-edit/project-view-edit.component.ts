@@ -73,8 +73,8 @@ export class ProjectViewEditComponent implements OnInit {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
+			startDate: null,
+			completionDate: null,
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
@@ -165,7 +165,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.client = data.client;
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
-				this.projectModel.startDate = new Date(this.projectModel.startDate);
+				this.projectModel.startDate = this.projectModel.startDate ? new Date(this.projectModel.startDate) : null;
 				this.projectModel.completionDate = new Date(this.projectModel.completionDate);
 				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
