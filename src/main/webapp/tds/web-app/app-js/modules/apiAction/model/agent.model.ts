@@ -16,6 +16,7 @@ export class CredentialModel {
 
 export class AgentMethodModel {
 	id?: string | number;
+	uId?: string | number;
 	name?: string;
 	dictionaryMethodName?: string;
 	description?: string;

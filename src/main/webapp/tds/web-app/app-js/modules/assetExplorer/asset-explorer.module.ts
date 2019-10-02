@@ -40,6 +40,7 @@ import {TaskActionsComponent} from '../taskManager/components/task-actions/task-
 import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
+import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
 
 @NgModule({
 	imports: [
@@ -75,7 +76,8 @@ import {ModelDeviceEditComponent} from './components/device/model-device/compone
 		TaskEditComponent,
 		TaskDetailComponent,
 		TaskActionsComponent,
-		TaskNotesComponent
+		TaskNotesComponent,
+		TaskActionSummaryComponent
 	],
 	providers: [
 		// Services
@@ -96,7 +98,8 @@ import {ModelDeviceEditComponent} from './components/device/model-device/compone
 		AssetDependencyEditComponent,
 		TaskCommentDialogComponent,
 		TaskCommentComponent,
-		TaskActionsComponent
+		TaskActionsComponent,
+		TaskActionSummaryComponent
 	],
 	entryComponents: [
 		AssetShowComponent,
@@ -116,7 +119,8 @@ import {ModelDeviceEditComponent} from './components/device/model-device/compone
 		ManufacturerEditComponent,
 		ModelDeviceEditComponent,
 		ModelDeviceShowComponent,
-		AssetCloneComponent
+		AssetCloneComponent,
+		TaskActionSummaryComponent
 	],
 })
 

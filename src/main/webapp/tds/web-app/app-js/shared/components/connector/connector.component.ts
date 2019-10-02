@@ -66,6 +66,7 @@ import { Connector } from './model/connector.model';
 					</div>
                 </div>
             </div>
+			<div *ngIf="hasErrors" class="duplicated-labels">There are duplicated labels</div>
         </div>
 	`
 })
@@ -78,11 +79,14 @@ export class ConnectorComponent implements OnInit {
 	types: string[];
 	modelTypeSelected: string;
 	connectors: Connector[];
+	hasErrors: boolean;
+	readonly connectorLabel = 'Connector';
 
 	constructor() {
 		this.positions = ['Right', 'Left', 'Top', 'Bottom'];
 		this.types = ['Ether', 'Serial', 'Power', 'Fiber', 'SCSI', 'USB', 'KVM', 'ILO', 'Management', 'SAS', 'Other'];
 		this.modelTypeSelected = null;
+		this.hasErrors = false;
 	}
 
 	ngOnInit() {
@@ -90,11 +94,18 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	/**
-	 * Add a new empty aka element
+	 * Add a new empty connector element
 	 */
 	onAdd(): void {
-		const count = this.connectors.length;
-		const connector: Connector = { id: null, type: 'Ether', label: `Connector${count + 1}`, labelPosition: 'Right', connectorPosX: 0, connectorPosY: 0};
+		let count = 0;
+		let nextLabel = '';
+
+		do {
+			count += 1;
+			nextLabel = `${this.connectorLabel}${count}`;
+		} while (this.connectors.find((connector: Connector) => connector.label.toLowerCase() === nextLabel.toLowerCase()));
+
+		const connector: Connector = { id: null, type: 'Ether', label: nextLabel, labelPosition: 'Right', connectorPosX: 0, connectorPosY: 0};
 		this.connectors.push(connector);
 		this.reportChanges();
 	}
@@ -111,7 +122,7 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	/**
-	 * Delete an aka and report the changes to the host component
+	 * Delete an connector and report the changes to the host component
 	 * @param {number} index
 	 */
 	onDelete(index: number): void {
@@ -140,9 +151,28 @@ export class ConnectorComponent implements OnInit {
 	}
 
 	/**
-	 * Report about aka changes to the host component
+	 * Determine if the connectors has duplicated labels
+	 * @returns {boolean}
+	 */
+	hasDuplicatedLabels(): boolean {
+		const items = [];
+
+		this.connectors.forEach((connector: Connector) => {
+			const label = connector.label.toLowerCase();
+			if (items.indexOf(label) === -1) {
+				items.push(label);
+			}
+		});
+
+		return items.length !== this.connectors.length;
+	}
+
+	/**
+	 * Report about connector changes to the host component
 	 */
 	reportChanges(): void {
+		this.hasErrors = this.hasDuplicatedLabels();
+
 		const added = this.connectors.filter((item) => item.id === null);
 
 		const edited = this.connectors.filter((item) => {
