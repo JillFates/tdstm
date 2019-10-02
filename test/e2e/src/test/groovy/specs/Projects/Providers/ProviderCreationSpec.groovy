@@ -47,7 +47,7 @@ class ProviderCreationSpec extends GebReportingSpec{
             at MenuPage
         when: 'The user goes to the Providers page'
             projectsModule.goToProviders()
-
+            sleep(1000)
         then: 'The Providers Page loads with no problem'
             at ProvidersPage
     }
