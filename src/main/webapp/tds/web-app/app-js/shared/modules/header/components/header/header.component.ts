@@ -68,6 +68,9 @@ export class HeaderComponent {
 			.subscribe((userContext: UserContextModel) => {
 				if (!userContext.user) {
 					this.pageMetaData.hideTopNav = true;
+				} else if (!userContext.project.logoUrl) {
+					userContext.project.logoUrl =
+						'/tdstm/tds/web-app/assets/images/transitionLogo.svg';
 				}
 				this.userContext = userContext;
 			});
@@ -97,13 +100,16 @@ export class HeaderComponent {
 	}
 
 	public openDateTimezoneModal(): void {
-
-		this.dialogService.extra(UserDateTimezoneComponent, [{
-			provide: Boolean,
-			useValue: false
-		}]).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		this.dialogService
+			.extra(UserDateTimezoneComponent, [
+				{
+					provide: Boolean,
+					useValue: false,
+				},
+			])
+			.catch(result => {
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	/**
