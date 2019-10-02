@@ -314,7 +314,7 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Fullscreen');
+		$('#fullscreenButtonId').children('h4').html('Full Screen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -476,9 +476,6 @@ var GraphUtil = (function ($) {
 			if (public.isFullscreen()){
 				$('#dependencyDivId').addClass('floating');
 				$('#dependencyDivId').css('overflow-x', '');
-				setTimeout(function(){
-					$('#dependencyDivId').css('overflow-x', 'scroll');
-				}, 500);
 			}
 			else{
 				$('#dependencyDivId').removeClass('floating');
