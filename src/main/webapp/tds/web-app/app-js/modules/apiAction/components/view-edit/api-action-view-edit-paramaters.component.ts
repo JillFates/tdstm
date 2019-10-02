@@ -156,7 +156,7 @@ export class ApiActionViewEditParamatersComponent {
 	@Input('commonFieldSpecs') commonFieldSpecs: any;
 	@Output('onValuesChange') onValuesChangeEmitter: EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>
 		= new EventEmitter<{ parameterList: Array<any>, isFormValid: boolean }>();
-	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
+	@ViewChild('apiActionParametersForm', {static: false}) apiActionParametersForm: NgForm;
 	actionTypes = ActionType;
 	apiActionParameterColumnModel = new APIActionParameterColumnModel();
 	COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;

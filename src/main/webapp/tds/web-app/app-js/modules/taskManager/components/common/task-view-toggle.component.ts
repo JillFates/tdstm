@@ -31,9 +31,9 @@ const routeNames = {
 })
 export class TaskViewToggleComponent implements OnInit {
 	icons = FA_ICONS;
-	@ViewChild('taskManager') taskManager: ElementRef;
-	@ViewChild('neighborhood') neighborhood: ElementRef;
-	@ViewChild('taskTimeline') taskTimeline: ElementRef;
+	@ViewChild('taskManager', {static: false}) taskManager: ElementRef;
+	@ViewChild('neighborhood', {static: false}) neighborhood: ElementRef;
+	@ViewChild('taskTimeline', {static: false}) taskTimeline: ElementRef;
 
 	constructor(
 		private router: Router,
