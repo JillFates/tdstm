@@ -1,7 +1,7 @@
 import {
 	Component,
 	ElementRef,
-	HostListener,
+	HostListener, Input,
 	OnDestroy,
 	OnInit,
 	QueryList,
@@ -160,8 +160,8 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	lastSelectedAgentMethodModel: AgentMethodModel = {
-		id: '0',
-		name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
+		uId: '0',
+		dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
@@ -174,6 +174,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected hasEarlyAccessTMRPermission = false;
 	loadingLists = true;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	isApiActionParametersFormValid = true;
 
 	constructor(
 		public originalModel: APIActionModel,
@@ -284,10 +285,10 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			this.modifySignatureByProperty('dictionary');
 		}
 		this.dictionaryList.push(...result.data.agentNames);
-		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id) {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.uId) {
 			this.onDictionaryValueChange(this.apiActionModel.dictionary);
 		} else {
-			this.agentMethodList.push({ id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
+			this.agentMethodList.push({ uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER') });
 			this.apiActionModel.agentMethod = this.agentMethodList[0];
 			this.modifySignatureByProperty('agentMethod');
 		}
@@ -401,6 +402,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 						this.apiActionModel.id = result.id;
 						this.apiActionModel.version = result.version;
 						this.apiActionModel.actionType = result.actionType;
+						this.apiActionModel.dictionaryMethodName = result.dictionaryMethodName;
 						this.dataSignature = JSON.stringify(this.apiActionModel);
 						this.dataParameterListSignature = JSON.stringify(this.parameterList);
 					}
@@ -487,7 +489,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	protected changeToEditApiAction(): void {
 		this.editModeFromView = true;
 		this.modalType = this.actionTypes.EDIT;
-		console.log(this.modalType);
 		this.getModalTitle();
 		this.verifyIsValidForm();
 		this.focusForm();
@@ -574,7 +575,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			});
 		});
 	}
-
 	/**
 	 * Determine if the tab is enabled
 	 * @param num
@@ -602,9 +602,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		if (this.editModeFromView) {
 			this.validInfoForm = this.editModeFromView;
 		}
-		if (this.apiActionParametersForm) {
-			this.validParametersForm = this.apiActionParametersForm.valid;
-		}
+		this.validParametersForm = this.isApiActionParametersFormValid;
 	}
 
 	/**
@@ -633,10 +631,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					.subscribe(
 					(result: any) => {
 						this.agentMethodList = new Array<AgentMethodModel>();
-						this.agentMethodList.push({id: 0, name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
-
+						this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 						if (this.apiActionModel.agentMethod) {
-							this.apiActionModel.agentMethod = result.find((agent) => agent.id === this.apiActionModel.agentMethod.id);
+							this.apiActionModel.agentMethod = result.find((agent) => {
+								return (agent.id + agent.name) === this.apiActionModel.agentMethod.uId;
+							});
 						}
 
 						if (!this.apiActionModel.agentMethod) {
@@ -649,7 +648,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					(err) => console.log(err));
 			} else {
 				this.agentMethodList = new Array<AgentMethodModel>();
-				this.agentMethodList.push({id: '0', name: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
+				this.agentMethodList.push({uId: '0', dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')});
 				this.apiActionModel.agentMethod = this.agentMethodList[0];
 			}
 		} else if (this.lastSelectedDictionaryModel) {
@@ -688,6 +687,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private loadAgentMethodModel(changeMethod: boolean): void {
 		if (changeMethod) {
 			this.apiActionModel.endpointUrl = this.apiActionModel.agentMethod.endpointUrl;
+			this.apiActionModel.dictionaryMethodName = this.apiActionModel.agentMethod.name || this.apiActionModel.agentMethod.dictionaryMethodName;
 			this.apiActionModel.docUrl = this.apiActionModel.agentMethod.docUrl;
 			this.apiActionModel.isPolling = this.apiActionModel.agentMethod.isPolling;
 			this.apiActionModel.polling = this.apiActionModel.agentMethod.polling;
@@ -706,7 +706,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		} else if (this.lastSelectedAgentMethodModel) {
 			// Return the value to the previous one if is on the same List
 			let agentMethod = this.agentMethodList.find((method) => {
-				return method.id === this.lastSelectedAgentMethodModel.id;
+				return (method.id + method.name) === this.lastSelectedAgentMethodModel.uId;
 			});
 			if (agentMethod) {
 				this.apiActionModel.agentMethod = R.clone(this.lastSelectedAgentMethodModel);
@@ -822,7 +822,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * Dropdown opens in a global document context, this helps to expands the limits
 	 */
 	protected onOpenAgentMethod(): void {
-		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.id !== '0') {
+		if (this.apiActionModel.agentMethod && this.apiActionModel.agentMethod.uId !== '0') {
 			this.lastSelectedAgentMethodModel = R.clone(this.apiActionModel.agentMethod);
 		}
 		setTimeout(() => {
@@ -867,25 +867,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Add a new argument to the list of parameters and refresh the list.
-	 */
-	onAddParameter(): void {
-		this.parameterList.push({
-			paramName: '',
-			desc: '',
-			type: 'string',
-			context: '',
-			fieldName: '',
-			currentFieldList: [],
-			value: '',
-			readonly: false,
-			required: false,
-			encoded: false
-		});
-		this.verifyIsValidForm();
-	}
-
-	/**
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
 	 * if the value is USER_DEF, the field will become a text input field
 	 */
@@ -906,26 +887,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 					dataItem.fieldName = property;
 				}
 			}
-			this.verifyIsValidForm();
-		}
-	}
-
-	/**
-	 * Make the Field from Context, filterable
-	 * @param filter
-	 */
-	public filterChange(filter: any, dataItem: any): void {
-		dataItem.currentFieldList = dataItem.sourceFieldList.filter((s) => s.label.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
-	}
-
-	/**
-	 * Delete from the paramaters the argument passed.
-	 * @param dataItem
-	 */
-	onDeleteParameter(event: any, dataItem: APIActionParameterModel): void {
-		let parameterIndex = this.parameterList.indexOf(dataItem);
-		if (parameterIndex >= 0) {
-			this.parameterList.splice(parameterIndex, 1);
+			dataItem.fieldName = dataItem.fieldName && dataItem.fieldName.field ? dataItem.fieldName.field : '';
 			this.verifyIsValidForm();
 		}
 	}
@@ -1013,33 +975,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	isViewMode(): boolean {
 		return this.modalType === this.actionTypes.VIEW;
-	}
-
-	/**
-	 * Get the Label value to show on the UI like Application instead of APPLICATION
-	 * @param context
-	 * @returns {string}
-	 */
-	getAssetClassValue(context: any): string {
-		let assetClass = this.assetClassesForParameters.find((param) => {
-			return param.assetClass === context || param.assetClass === context.assetClass;
-		});
-		if (assetClass && assetClass.value) {
-			return assetClass.value;
-		}
-		return context;
-	};
-
-	/**
-	 * Workaround to stop propagation on shared events on Kendo
-	 * Clicking on enter was causing other events to execute
-	 * @param event
-	 */
-	public getOnInputKey(event: any): void {
-		if (event.key === KEYSTROKE.ENTER) {
-			event.preventDefault();
-			event.stopPropagation();
-		}
 	}
 
 	private focusForm() {
@@ -1134,5 +1069,11 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 */
 	getDataScriptName(): string {
 		return (this.apiActionModel && this.apiActionModel.defaultDataScript && this.apiActionModel.defaultDataScript.name) || '';
+	}
+
+	onParametersFormChange(event: {parameterList: Array<any>, isFormValid: boolean}): void {
+		this.isApiActionParametersFormValid = event.isFormValid;
+		this.parameterList = this.parameterList;
+		this.verifyIsValidForm();
 	}
 }

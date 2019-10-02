@@ -10,19 +10,20 @@ class TaskVertexSpec extends Specification {
 	void 'test can create a TaskVertex with default constructor'() {
 
 		setup:
-			TaskVertex taskVertex = new TaskVertex(id, taskNumber)
+			TaskVertex taskVertex = new TaskVertex(taskId, taskNumber, taskComment)
 
 		expect:
 			with(taskVertex, TaskVertex) {
-				id == id
+				taskId == taskId
 				taskNumber == taskNumber
+				taskComment == taskComment
 				duration == 0
 			}
 
 		where:
-			id      | taskNumber
-			1234567 | 'Task III'
-			1234997 | ''
+			taskId   | taskNumber | taskComment
+			1234567l | 1234567    | 'Task III'
+			1234997l | 1234997    | ''
 	}
 
 	@Unroll
@@ -32,7 +33,9 @@ class TaskVertexSpec extends Specification {
 			Date pointInTime = TimeUtil.nowGMT()
 
 		expect:
-			new TaskVertex(12345,
+			new TaskVertex(
+				9999999l,
+				12345,
 				'TASK III',
 				duration,
 				status,
@@ -53,7 +56,9 @@ class TaskVertexSpec extends Specification {
 			Date taskActualStart = TimeUtil.dateFromUsingMinutes(-10, pointInTime)
 
 		and:
-			TaskVertex taskVertex = new TaskVertex(12345,
+			TaskVertex taskVertex = new TaskVertex(
+				9999999l,
+				12345,
 				'TASK III',
 				30,
 				AssetCommentStatus.STARTED,
@@ -70,10 +75,10 @@ class TaskVertexSpec extends Specification {
 	void 'test can add predecessor to a TaskVertex'() {
 
 		given: 'a TaskVertex instance'
-			TaskVertex taskVertex = new TaskVertex(1234, 'Task III', 360)
+			TaskVertex taskVertex = new TaskVertex(9999999l, 1234, 'Task III', 360)
 
 		and: 'another TaskVertex'
-			TaskVertex predecessor = new TaskVertex(4321, 'Task V', 1600)
+			TaskVertex predecessor = new TaskVertex(9999998l, 4321, 'Task V', 1600)
 
 		when: 'a predecessor is added'
 			taskVertex.addPredecessor(predecessor)
@@ -88,10 +93,10 @@ class TaskVertexSpec extends Specification {
 	void 'test can add successor to a TaskVertex'() {
 
 		given: 'a TaskVertex instance'
-			TaskVertex taskVertex = new TaskVertex(1234, 'Task III', 360)
+			TaskVertex taskVertex = new TaskVertex(9999999l, 1234, 'Task III', 360)
 
 		and: 'another TaskVertex'
-			TaskVertex successor = new TaskVertex(4321, 'Task V', 1600)
+			TaskVertex successor = new TaskVertex(9999988l, 4321, 'Task V', 1600)
 
 		when: 'a successor is added'
 			taskVertex.addSuccessor(successor)

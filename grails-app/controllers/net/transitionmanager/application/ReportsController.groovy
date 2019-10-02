@@ -28,8 +28,6 @@ import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.project.Workflow
-import net.transitionmanager.project.WorkflowTransition
 import net.transitionmanager.security.Permission
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.common.ControllerService
@@ -539,7 +537,7 @@ class ReportsController implements ControllerMethods {
 		def tasksSheet = book.getSheet("tasks")
 
 		def preMoveColumnList = ['taskNumber', 'comment', 'assetEntity', 'assetClass', 'assetId', 'taskDependencies', 'assignedTo', 'instructionsLink', 'role', 'status',
-								'','','', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'workflow', 'category',
+								'','','', 'notes', 'duration', 'durationLocked', 'durationScale', 'estStart','estFinish','actStart', 'dateResolved', 'category',
 								'dueDate', 'dateCreated', 'createdBy', 'moveEvent', 'taskBatchId']
 
 		moveBundleService.issueExport(taskList, preMoveColumnList, tasksSheet, tzId,
@@ -598,22 +596,31 @@ class ReportsController implements ControllerMethods {
 			}
 
 			reportFields << [
-				taskNumber: task.taskNumber?.toString(),
+				taskNumber      : task.taskNumber?.toString(),
 				taskDependencies: WebUtil.listAsMultiValueString(visibleDependencies.predecessor?.comment),
-				assetEntity: task.assetEntity?.assetName, comment: task.comment,
-				assignedTo: task.assignedTo?.toString() ?: '', status: task.status,
+				assetEntity     : task.assetEntity?.assetName,
+				comment         : task.comment,
+				assignedTo      : task.assignedTo?.toString() ?: '',
+				status          : task.status,
 				instructionsLink: task.instructionsLink?.toString() ?: '',
-				datePlanned: '', outStanding: '', dateRequired: '', workflow: '',
-				clientName: project?.client?.name, team: task.role?.toString() ?: '',
-				projectName: project?.name, notes: WebUtil.listAsMultiValueString(task.notes),
-				duration: task.duration?.toString() ?: '',
-				estStart: TimeUtil.formatDate(task.estStart),
-				estFinish: TimeUtil.formatDate(task.estFinish),
-				actStart: TimeUtil.formatDate(task.actStart),
-				actFinish: TimeUtil.formatDate(task.actFinish),
-				createdOn: TimeUtil.formatDate(task.dateCreated),
-				createdBy: task.createdBy.toString(), moveEvent: task.moveEvent?.toString() ?: '',
-				timezone: tzId, rptTime: TimeUtil.formatDate(currDate)]
+				datePlanned     : '',
+				outStanding     : '',
+				dateRequired    : '',
+				clientName      : project?.client?.name,
+				team            : task.role?.toString() ?: '',
+				projectName     : project?.name,
+				notes           : WebUtil.listAsMultiValueString(task.notes),
+				duration        : task.duration?.toString() ?: '',
+				estStart        : TimeUtil.formatDate(task.estStart),
+				estFinish       : TimeUtil.formatDate(task.estFinish),
+				actStart        : TimeUtil.formatDate(task.actStart),
+				actFinish       : TimeUtil.formatDate(task.actFinish),
+				createdOn       : TimeUtil.formatDate(task.dateCreated),
+				createdBy       : task.createdBy.toString(),
+				moveEvent       : task.moveEvent?.toString() ?: '',
+				timezone        : tzId,
+				rptTime         : TimeUtil.formatDate(currDate)
+			]
 		}
 		if(!reportFields) {
 			flash.message = " No Assets Were found for  selected values  "
@@ -700,13 +707,15 @@ class ReportsController implements ControllerMethods {
 		def moveBundleList = MoveBundle.findAllByProject(project)
 		def moveBundleId = userPreferenceService.moveBundleId
 		def smeList = reportsService.getSmeList(moveBundleId, true)
-		def workflow = Workflow.findByProcess(project.workflowCode)
-		def workflowTransitions = WorkflowTransition.findAll(
-				'FROM WorkflowTransition where workflow=? order by transId', [workflow])
 		String domain = AssetClass.APPLICATION.toString()
 		List appAttributes = customDomainService.fieldSpecs(project, domain, CustomDomainService.ALL_FIELDS, ["field", "label"])
-		[moveBundles:moveBundleList, moveBundleId:moveBundleId, smeList:smeList.sort{it.lastName},
-		 workflowTransitions:workflowTransitions, appAttributes:appAttributes]
+
+		[
+			moveBundles  : moveBundleList,
+			moveBundleId : moveBundleId,
+			smeList      : smeList.sort { it.lastName },
+			appAttributes: appAttributes
+		]
 	}
 
 	/**
@@ -752,7 +761,6 @@ class ReportsController implements ControllerMethods {
 			def duration = new StringBuilder()
 			def customParam
 			def windowColor
-			def workflow
 			def durationHours
 
 			if(finishTime && startTime){
@@ -774,14 +782,9 @@ class ReportsController implements ControllerMethods {
 				customParam = it[params.outageWindow]
 			}
 
-			if (params.workflowTransId) {
-				def workflowTransaction = WorkflowTransition.get(params.workflowTransId)
-				workflow = appComments.findAll{it?.workflowTransition == workflowTransaction}.sort{it.actStart}
-				workflow.removeAll([null])
-			}
 			appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
 				customParam: customParam ? customParam + (params.outageWindow == 'drRtoDesc' ? 'h': '') : '',
-				windowColor: windowColor, workflow: workflow ? workflow[0].duration + " " + workflow[0].durationScale : '')
+				windowColor: windowColor)
 		}
 
 		[appList: appList, moveBundle: currentBundle, sme: currentSme ?: 'All', project: project]

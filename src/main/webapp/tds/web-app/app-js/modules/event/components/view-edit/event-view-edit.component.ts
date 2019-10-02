@@ -8,6 +8,8 @@ import {EventModel} from '../../model/event.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {KEYSTROKE} from '../../../../shared/model/constants';
+import {Store} from '@ngxs/store';
+import {SetEvent} from '../../action/event.actions';
 
 @Component({
 	selector: `event-view-edit-component`,
@@ -33,6 +35,7 @@ export class EventViewEditComponent implements OnInit {
 		private promptService: UIPromptService,
 		private activeDialog: UIActiveDialogService,
 		private translatePipe: TranslatePipe,
+		private store: Store,
 		@Inject('id') private id: any) {
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 		this.eventId = this.id;
@@ -85,6 +88,7 @@ export class EventViewEditComponent implements OnInit {
 		this.eventsService.deleteEvent(this.eventId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
+					this.store.dispatch(new SetEvent(null));
 					this.activeDialog.close();
 				}
 			});

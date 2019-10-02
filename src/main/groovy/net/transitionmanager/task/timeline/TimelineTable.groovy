@@ -39,7 +39,11 @@ class TimelineTable {
 		this.windowEndTime = windowEndTime
 		vertices = graph.vertices
 		vertices.each { TaskVertex vertex ->
-			vertex.initialize(currentTime)
+			Date startingPoint = currentTime
+			if (windowStartTime > currentTime) {
+				startingPoint = windowStartTime
+			}
+			vertex.initialize(startingPoint)
 		}
 	}
 
@@ -161,6 +165,10 @@ class TimelineTable {
 
 		sink.latestFinish = sink.earliestFinish
 		sink.latestFinishDate = sink.earliestFinishDate
+
+		if (!windowEndTime) {
+			windowEndTime = sink.latestFinishDate
+		}
 
 		Integer windowEndTimeDifference = 0
 		if (!sink.hasStarted() && !sink.hasFinished() && windowEndTime > sink.latestFinishDate) {

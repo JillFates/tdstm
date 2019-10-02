@@ -39,7 +39,7 @@ export class APIActionColumnModel {
 			},
 			{
 				label: 'Method',
-				property: 'connectorMethod',
+				property: 'dictionaryMethodName',
 				type: 'text',
 				width: 125
 			}, {
@@ -157,6 +157,7 @@ export enum APIActionType {
 export class APIActionModel {
 	id?: number;
 	name: string;
+	dictionaryMethodName?: string;
 	tabActionType?: APIActionType;
 	actionType?: any;
 	commandLine?: string;
@@ -304,7 +305,7 @@ export class APIActionParameterModel {
 	desc?: string;
 	type?: string;
 	context?: string;
-	fieldName?: string;
+	fieldName?: any;
 	value?: string;
 	currentFieldList?: Array<any>;
 	sourceFieldList?: Array<any>;

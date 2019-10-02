@@ -375,7 +375,7 @@ function getDeatiledReport( records, table ){
 			/* for project */
 			case "project" :
 				var thead ="<tr><th>project_id</th><th>client_id</th><th>project_code</th><th>description</th>"+
-							"<th>track_changes</th><th>workflow_code</th><th>start_date</th><th>completion_date</th><tr>"	
+							"<th>track_changes</th><th>start_date</th><th>completion_date</th><tr>"
 				for( i = 0; i < dataLength; i++){
 					var cssClass = 'odd'
 					if(i % 2 == 0){
@@ -383,7 +383,7 @@ function getDeatiledReport( records, table ){
 					}
 					var record = records[i]
 					tbody +="<tr class='"+cssClass+"'><td>"+record.project_id+"</td><td>"+record.client_id+"</td>"+
-							"<td>"+record.project_code+"</td><td>"+record.description+"</td><td>"+record.track_changes+"</td><td>"+record.workflow_code+"</td>"+
+							"<td>"+record.project_code+"</td><td>"+record.description+"</td><td>"+record.track_changes+"</td>"+
 							"<td nowrap>"+getConvertedTimeFormate(record.start_date, userDTFormat, timeZone)+"</td>"+
 							"<td nowrap>"+getConvertedTimeFormate(record.completion_date, userDTFormat, timeZone)+"</td></tr>"
 				}

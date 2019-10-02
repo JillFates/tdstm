@@ -3,11 +3,13 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {NgForm} from '@angular/forms';
 import {ViewChild} from '@angular/core';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {FieldSettingsModel} from '../../model/field-settings.model';
 
 export abstract class ConfigurationCommonComponent {
 	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
 
 	constructor(
+		public field: FieldSettingsModel,
 		public activeDialog: UIActiveDialogService,
 		public prompt: UIPromptService,
 		public translate: TranslatePipe) {
@@ -16,9 +18,14 @@ export abstract class ConfigurationCommonComponent {
 
 	/**
 	 * Display warning message about loosing values if user moves forward
+	 * just display the warning when the field is not new
 	 * @returns {Promise<boolean>}
 	 */
 	protected displayWarningMessage(): Promise<boolean> {
+		if (this.field.isNew) {
+			return Promise.resolve(true);
+		}
+
 		return this.prompt.open(
 			this.translate.transform('GLOBAL.CONFIRM'),
 			this.translate.transform('FIELD_SETTINGS.WARNING_VALIDATION_CHANGE'),

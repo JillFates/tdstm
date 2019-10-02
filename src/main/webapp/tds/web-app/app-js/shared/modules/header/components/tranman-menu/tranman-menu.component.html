@@ -4,7 +4,7 @@
         <li *ngIf="hasPermission(permission.AdminMenuView)" class="dropdown menu-parent-admin">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin</a>
             <ul class="dropdown-menu menu-item-expand" role="menu">
-                
+
                 <li class="menu-child-item menu-admin-portal">
                     <a href="/tdstm/admin/home">Admin Portal</a>
                 </li>
@@ -24,7 +24,7 @@
                     <a href="/tdstm/assetEntity/assetOptions">Asset Options</a>
                 </li>
                 <li class="divider"></li>
-                
+
                 <li class="menu-child-item menu-list-companies">
                     <a href="/tdstm/partyGroup/list">List Companies</a>
                 </li>
@@ -42,12 +42,7 @@
                 </li>
                 <ng-container *ngIf="!userContext.licenseInfo.license.isManager">
                     <li class="divider"></li>
-                    
-                    <li class="menu-child-item menu-list-workflows">
-                        <a href="/tdstm/workflow/home">List Workflows </a>
-                    </li>
-                    <li class="divider"></li>
-                    
+                    <li class="menu-parent-item">Manage Model Library</li>
                     <li class="menu-child-item menu-list-manufacturers">
                         <a href="/tdstm/manufacturer/list">List Manufacturers</a>
                     </li>
@@ -65,11 +60,11 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
                     <li class="menu-child-item menu-projects-active-projects">
-                        <a href="/tdstm/project/list?active=active" class="mmlink">List Projects</a>
+                        <a [routerLink]="['/project','list']" [queryParams]="{active:'active'}" class="mmlink">Projects</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-projects-current-project">
-                        <a href="/tdstm/projectUtil/index" class="mmlink">
+                        <a [routerLink]="['/project','list']" [queryParams]="{show:userContext.project.id}" class="mmlink">
                             <span class="menu-link-project-name">Project Details</span>
                         </a>
                     </li>
@@ -86,7 +81,7 @@
                         <a [routerLink]="['/tag','list']">Tags</a>
                     </li>
                     <li class="divider"></li>
-                    
+
                     <li class="menu-child-item ">
                         <a [routerLink]="['/provider','list']">Providers</a>
                     </li>
@@ -137,9 +132,6 @@
                     <li class="menu-child-item menu-parent-assets-database-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',2,'show']" id="2">Databases</a>
                     </li>
-                    <li class="menu-child-item menu-parent-assets-storage-list assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',5,'show']" id="5">Physical Storage</a>
-                    </li>
                     <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',6,'show']" id="6">Logical Storage</a>
                     </li>
@@ -178,7 +170,7 @@
             <li *ngIf="hasPermission(permission.EventMenuView)" class="dropdown menu-parent-planning">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Planning</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                    
+
                     <li class="menu-child-item menu-parent-planning-event-list">
                         <a [routerLink]="['/event','list']" >List Events</a>
                     </li>
@@ -195,7 +187,7 @@
                         <a href="/tdstm/moveEvent/exportRunbook">Export Runbook</a>
                     </li>
                     <li class="divider"></li>
-                    
+
                     <li class="menu-child-item menu-parent-planning-list-bundles">
                             <a [routerLink]="['/bundle','list']">List Bundles</a>
                     </li>
@@ -207,7 +199,7 @@
             <li *ngIf="hasPermission(permission.TaskView)" class="dropdown menu-parent-tasks">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                    
+
                     <li class="menu-child-item menu-parent-tasks-my-tasks">
                         <a href="/tdstm/task/listUserTasks">{{'TASK_MANAGER.MY_TASKS' | translate}} ({{taskTodoCount}})</a>
                     </li>
@@ -237,7 +229,7 @@
             <li *ngIf="hasPermission(permission.DashboardMenuView)" class="dropdown menu-parent-dashboard">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dashboards</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                    
+
                     <li class="menu-child-item menu-parent-dashboard-user-dashboard">
                         <a [routerLink]="['/user','dashboard']">User Dashboard</a>
                     </li>
@@ -252,7 +244,7 @@
             <li *ngIf="hasPermission(permission.ReportMenuView)" class="dropdown menu-parent-reports">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports</a>
                 <ul class="dropdown-menu menu-item-expand" role="menu">
-                    
+
                     <li class="menu-child-item menu-reports-application-profiles">
 											<a [routerLink]="['reports','applicationProfiles']" >Application Profiles</a>
                     </li>
@@ -273,7 +265,7 @@
                     </li>
                     <ng-template [ngIf]="hasPermission(permission.ReportViewEventDay)">
                         <li class="divider"></li>
-                        
+
 												<li class="menu-child-item menu-reports-application-migration">
 													<a [routerLink]="['reports','applicationEventResults']" >Application Event Results</a>
 												</li>

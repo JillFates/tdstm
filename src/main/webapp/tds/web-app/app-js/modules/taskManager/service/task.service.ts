@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import { catchError, map } from 'rxjs/operators';
 import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
-import { catchError, map } from 'rxjs/operators';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
 import {IGraphTask} from '../model/graph-task.model';
@@ -39,6 +39,7 @@ export class TaskService {
 	private readonly CUSTOM_COLUMNS_URL = `${ this.baseURL }/ws/task/customColumns`;
 	private readonly TASK_ACTION_INFO_URL = `${ this.baseURL }/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${ this.baseURL }/ws/task/{taskId}/resetAction`;
+	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
 	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/task/moveEventTaskGraphSvg`;
@@ -409,13 +410,15 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
-				if (response.rows) {
-					response.rows = response.rows.map(item => {
-						let newItem = { ...item };
-						newItem.taskNumber = newItem.taskNumber.toString();
-						return newItem;
-					})
+				if (!response.rows || response.rows === null) {
+					return {rows: [], totalCount: 0};
 				}
+				response.rows.forEach(item => {
+					for (let i = 0; i <= 4; i++) {
+						const property = `userSelectedCol${i}`;
+						item[property] = item[property] === 'null' ? '' : item[property];
+					}
+				});
 				return response;
 			}),
 			catchError(error => {
@@ -501,24 +504,46 @@ export class TaskService {
 	}
 
 	/**
+	 * GET - Returns the task api action summary.
+	 * @param taskId
+	 */
+	getTaskActionSummary(taskId: string): Observable<any> {
+		return this.http.get(this.TASK_ACTION_SUMMARY.replace('{taskId}', taskId.toString()))
+			.pipe(
+				map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
+	}
+
+	/**
 	 * GET - Find task for neighborhood component
 	 * @param taskId: number | string
+	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string): Observable<IGraphTask[]> {
-		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`, { observe: 'response' })
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphTask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
+			{ params, observe: 'response' })
+			.map(res => res.body.data);
+	}
+
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<ITask[]> {
+		const params = this.createHttpParams(filters);
+		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+			{ params, observe: 'response' })
 			.map(res => res.body.data);
 	}
 
 	/**
-	 * GET - moveEvents for neighborhood component
+	 * create http params object to be passed onto requests
 	 */
-	findMoveEvents(): Observable<IMoveEvent[]> {
-		return this.http.get<IMoveEventResponseBody>(`${this.MOVE_EVENT_URL}`, { observe: 'response' })
-			.map(res => res.body.data);
-	}
-
-	findTasksByMoveEventId(id: number): Observable<ITask[]> {
-		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`, { observe: 'response' })
-			.map(res => res.body.data);
+	createHttpParams(params: any): HttpParams {
+		return new HttpParams()
+		.set('myTasks', params.myTasks)
+		.set('minimizeAutoTasks', params.minimizeAutoTasks)
+		.set('viewUnpublished', params.viewUnpublished);
 	}
 }

@@ -57,7 +57,8 @@
                                     <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
 									    <td class="valueNW ${standardFieldSpecs.model.imp?:''}">
                                             <tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
-                                                <a *ngIf="isModelLinkAvailable()" (click)="showModel('${assetEntity.model?.id}')">${assetEntity.model}</a>
+                                                <a *ngIf="isModelLinkAvailable()"
+                                                   (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
                                                 <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
                                                 <g:if test="${! assetEntity.model?.isValid()}">
                                                     <span style="color: red;">
@@ -67,7 +68,6 @@
                                             </tdsAngular:tooltipSpan> 
 									    </td>
                                     <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
-
                                    <g:if test="${!(assetEntity.assetType in ['VM'])}">
                                         <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
                                             [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="roomSource" />}"

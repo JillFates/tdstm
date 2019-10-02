@@ -101,9 +101,9 @@
 			<!-- Actionable assets Cell Template -->
 			<ng-template kendoGridCellTemplate let-dataItem
 			             *ngIf="actionableAssets.includes(column.property)">
-				<div class="actionable-column">
+				<span class="actionable-column">
 					{{dataItem[column.property]}}
-				</div>
+				</span>
 			</ng-template>
 
 

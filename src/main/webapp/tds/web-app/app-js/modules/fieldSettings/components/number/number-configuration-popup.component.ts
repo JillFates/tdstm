@@ -27,7 +27,7 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 		public activeDialog: UIActiveDialogService,
 		public prompt: UIPromptService,
 		public translate: TranslatePipe) {
-			super(activeDialog, prompt, translate);
+			super(field, activeDialog, prompt, translate);
 			this.model = { ...this.field.constraints } as NumberConfigurationConstraintsModel;
 			this.localMinRange = this.model.isDefaultConfig ? null : this.model.minRange;
 			this.minRange = this.localMinRange;

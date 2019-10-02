@@ -13,7 +13,7 @@ class StepSnapshotTests extends Specification {
 		def now = new Date()
 		MoveBundleStep mbs
 		use (TimeCategory) {
-			mbs = new MoveBundleStep(label: "Testing Code", transitionId: 666, planStartTime: now - 1.hour,
+			mbs = new MoveBundleStep(label: "Testing Code", planStartTime: now - 1.hour,
 			                         planCompletionTime: now + 1.hour)
 		}
 		ss = new StepSnapshot(moveBundleStep: mbs, tasksCount: 120, tasksCompleted: 60, duration: 3600,

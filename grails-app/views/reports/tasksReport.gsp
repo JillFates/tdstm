@@ -24,7 +24,6 @@
             <th>Estimated Finish</th>
             <th>Actual Start</th>
             <th>Actual Finish</th>
-            <th>WorkFlow Step</th>
             <th>Category</th>
             <th>Due Date</th>
             <th>Created on</th>

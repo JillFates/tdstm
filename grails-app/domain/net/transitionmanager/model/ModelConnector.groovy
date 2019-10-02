@@ -14,7 +14,7 @@ class ModelConnector {
 	String labelPosition
 	Integer connectorPosX
 	Integer connectorPosY
-	String status
+	String status = 'missing'
 	String option
 	Date dateCreated
 	Date lastModified

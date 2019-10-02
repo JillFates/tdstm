@@ -38,6 +38,9 @@ function changeStatus(id, status, currentStatus, from){
 					} else if (status=="Completed") {
 						$('#done_button_'+id).remove();
 					}
+                    if (data.lastUpdatedTimePassed) {
+                        $('#lastUpdated_' + id).html('Just now');
+                    }
 				} else {
 					$('#myTaskList').html(data)
 					hideStatus(id, status)

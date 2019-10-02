@@ -65,7 +65,7 @@
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Action</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.apiAction && model.apiAction.text || ''}}</span></td>
+                                                    <td class="valueNW"><a (click)="openTaskActionSummaryDetailHandler()">{{model.apiAction && model.apiAction.text || ''}}</a></td>
                                                 </tr>
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
@@ -156,10 +156,6 @@
 												  <td class="valueNW task-{{model.status |  lowercase}}">
 													  <span>{{model.status}}</span>
 												  </td>
-                                                    <td class="label N" nowrap="nowrap">
-                                                        <label><span>Workflow</span></label>
-                                                    </td>
-                                                    <td class="valueNW"><span>{{model.workflow || ''}}</span></td>
 
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Duration Delta</span></label>

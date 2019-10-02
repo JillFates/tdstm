@@ -141,12 +141,14 @@ export class FieldSettingsGridComponent implements OnInit {
 	 * just whenever there is a delete action pending to be saved
 	 */
 	protected onSaveAll(): void {
-		this.askForDeleteUnderlayingData()
-			.then((deleteUnderLaying: boolean) => {
-				if (deleteUnderLaying) {
-					this.notifySaveAll(deleteUnderLaying)
-				}
-			});
+		if (!(!this.isEditable || !this.isDirty || this.formHasError)) {
+			this.askForDeleteUnderlayingData()
+				.then((deleteUnderLaying: boolean) => {
+					if (deleteUnderLaying) {
+						this.notifySaveAll(deleteUnderLaying)
+					}
+				});
+			}
 	}
 
 	/**
@@ -158,8 +160,8 @@ export class FieldSettingsGridComponent implements OnInit {
 
 		if (countFieldsToDelete) {
 			return this.prompt.open(
-				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-				this.translate.transform('FIELD_SETTINGS.CLEAR_UNDERLAYING_DATA', [countFieldsToDelete > 1 ? 'fields' : 'field'] ),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_TITLE'),
+				this.translate.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_MESSAGE'),
 				this.translate.transform('GLOBAL.YES'),
 				this.translate.transform('GLOBAL.NO'),
 				true);
@@ -419,11 +421,12 @@ export class FieldSettingsGridComponent implements OnInit {
 
 	/**
 	 * Handle a change of custom control type event
+	 * just for already created fields display a warning about changing the control type
 	 * @param dataItem Current grid cell item
 	 * @param fieldTypeChange contains the info about the conversion, save and reset events
 	 */
 	protected  onFieldTypeChange(dataItem: any, fieldTypeChange: any) {
-		if (fieldTypeChange) {
+		if (dataItem && !dataItem.isNew && fieldTypeChange) {
 			this.prompt.open(
 				'Confirmation Required',
 				fieldTypeChange.conversion.getWarningMessage(),
@@ -435,11 +438,10 @@ export class FieldSettingsGridComponent implements OnInit {
 					fieldTypeChange.reset();
 				}
 			});
-
-			return;
+		} else {
+			this.setIsDirty(true);
+			fieldTypeChange.save();
 		}
-
-		console.error('Cannot find custom field transition');
 	}
 
 	protected onControlModelChange(newValue: CUSTOM_FIELD_CONTROL_TYPE, dataItem: FieldSettingsModel) {

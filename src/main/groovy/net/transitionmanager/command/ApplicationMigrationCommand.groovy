@@ -1,7 +1,5 @@
 package net.transitionmanager.command
 
-import net.transitionmanager.project.Workflow
-
 class ApplicationMigrationCommand {
 
 	/**
@@ -23,9 +21,6 @@ class ApplicationMigrationCommand {
 	 * Asset Comment Category.
 	 */
 	String stopCategory
-
-	/** Workflow Transition ID */
-	Long testing
 
 
 	String outageWindow
