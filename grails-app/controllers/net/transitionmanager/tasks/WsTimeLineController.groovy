@@ -14,7 +14,7 @@ import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.CriticalPathRoute
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
-import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
 
 import java.text.DateFormat
@@ -22,7 +22,7 @@ import java.text.DateFormat
 @Secured('isAuthenticated()')
 class WsTimeLineController implements ControllerMethods {
 
-	TimeLineService timeLineService
+	TimelineService timelineService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
@@ -30,7 +30,7 @@ class WsTimeLineController implements ControllerMethods {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
 
-		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
@@ -80,7 +80,7 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
@@ -93,7 +93,7 @@ class WsTimeLineController implements ControllerMethods {
 	def baseline() {
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		CPAResults cpaResults = timeLineService.updateTaskFromCPA(moveEvent)
+		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
@@ -107,7 +107,7 @@ class WsTimeLineController implements ControllerMethods {
 
 		boolean showAll = params.showAll == 'true'
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		CPAResults cpaResults = timeLineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
