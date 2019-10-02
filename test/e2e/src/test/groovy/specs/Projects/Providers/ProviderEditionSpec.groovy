@@ -33,6 +33,7 @@ class ProviderEditionSpec extends GebReportingSpec{
         login()
         at MenuPage
         projectsModule.goToProviders()
+        sleep(1000)
         at ProvidersPage
         waitFor{createBtn.click()}
         at CreateProviderPage
