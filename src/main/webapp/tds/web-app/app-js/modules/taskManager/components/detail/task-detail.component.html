@@ -103,7 +103,7 @@
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.dueDate | date:dateFormat}}</span></td>
+                                                    <td class="valueNW"><span>{{model.dueDate || ''}}</span></td>
                                                 </tr>
 
 
@@ -116,12 +116,12 @@
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedStart | date:dateFormatTime}}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedStart || ''}}</span></td>
 
                                                     <td class="label N" nowrap="nowrap">
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedFinish | date:dateFormatTime }}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedFinish || ''}}</span></td>
 
                                                 </tr>
 
