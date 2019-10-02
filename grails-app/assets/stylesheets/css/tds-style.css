@@ -1389,12 +1389,6 @@ aside.main-sidebar {
     padding: 0;
     float: right; }
 
-section.content-header h1 {
-  color: #333333 !important;
-  font-weight: 500 !important;
-  font-size: 24px !important;
-  margin: 0px !important; }
-
 div.message-wrapper {
   top: 8%;
   margin: auto;
@@ -1403,15 +1397,18 @@ div.message-wrapper {
   right: 0;
   width: 43%;
   z-index: 1100; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn {
-    -webkit-transition: all linear 0.25s;
-    transition: all linear 0.25s; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn.ng-hide {
-    opacity: 0; }
-  div.message-wrapper div.message-wrapper-container div.alert.fadeIn.ng-show {
-    opacity: 1; }
 
-div.k-animation-container div.k-notification {
+div.message-wrapper-container.fadeIn {
+  -webkit-transition: all linear 0.25s;
+  transition: all linear 0.25s; }
+
+div.message-wrapper-container.fadeIn.ng-hide {
+  opacity: 0; }
+
+div.message-wrapper-container.fadeIn.ng-show {
+  opacity: 1; }
+
+div.k-notification {
   top: 8% !important;
   margin: auto !important;
   position: fixed !important;
@@ -1421,7 +1418,7 @@ div.k-animation-container div.k-notification {
   z-index: 1100 !important;
   background-color: inherit !important;
   border: inherit !important; }
-  div.k-animation-container div.k-notification div.alert {
+  div.k-notification div.alert {
     border: inherit !important; }
 
 div.content-wrapper {

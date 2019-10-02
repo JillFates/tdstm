@@ -1,13 +1,23 @@
 // Clarity Overrides App Wide
 body,
 html {
-	font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+	font-family: 'Roboto', 'Metropolis', 'Avenir Next', 'Helvetica Neue', Arial,
+		serif;
 	background: #fff;
 }
 
 body div.content-wrapper {
 	background: #fff;
 }
+
+.content-header {
+	> h1 {
+		font-weight: bold;
+		font-size: 18px;
+		line-height: 24px;
+	}
+}
+
 .modal {
 	display: none;
 }
