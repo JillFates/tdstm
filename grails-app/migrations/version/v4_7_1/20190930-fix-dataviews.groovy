@@ -4,19 +4,11 @@ databaseChangeLog = {
 	changeSet(author: "tpelletier", id: "20190930 TM-15976-0") {
 		comment('Delete all Favorite Dataview dependencies')
 
-		preConditions(onFail: 'MARK_RAN') {
-			sqlCheck(expectedResult: '0', 'select count(*) from DATABASECHANGELOG where ID = "20180809 TM-10208-1"')
-		}
-
 		sql("delete from favorite_dataview;")
 	}
 
 	changeSet(author: "tpelletier", id: "20171109 TM-15976-1") {
 		comment('Increments current dataview ids above the highest id ')
-
-		preConditions(onFail: 'MARK_RAN') {
-			sqlCheck(expectedResult: '0', 'select count(*) from DATABASECHANGELOG where ID = "20180809 TM-10208-1"')
-		}
 
 		grailsChange {
 			change {
@@ -33,13 +25,9 @@ databaseChangeLog = {
 	changeSet(author: "tpelletier", id: "20171109 TM-15976-2") {
 		comment('Updates AUTO_INCREMENT value for dataview table ')
 
-		preConditions(onFail: 'MARK_RAN') {
-			sqlCheck(expectedResult: '0', 'select count(*) from DATABASECHANGELOG where ID = "20180809 TM-10208-1"')
-		}
-
 		grailsChange {
 			change {
-				int highestId = sql.firstRow("SELECT id FROM dataview ORDER BY id DESC LIMIT 0, 1").id
+				int highestId = sql.firstRow("select max(id) from dataview").id
 
 				sql.executeUpdate("""
 					ALTER TABLE dataview AUTO_INCREMENT=${highestId + 1};
