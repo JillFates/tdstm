@@ -31,6 +31,7 @@ class ProviderEditionSpec extends GebReportingSpec{
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
         at MenuPage
         projectsModule.goToProviders()
         sleep(1000)

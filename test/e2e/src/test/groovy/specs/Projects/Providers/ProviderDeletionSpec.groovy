@@ -28,6 +28,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
         at MenuPage
         projectsModule.goToProviders()
         at ProvidersPage
