@@ -250,6 +250,7 @@ export const en_DICTIONARY: Object = {
 		'APPLICATION_EVENT_RESULTS': 'Application Event Results'
 	},
 	'PLANNING': {
+		'DASHBOARD': 'Dashboard',
 		'PLANNING': 'Planning',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'BUNDLES': {
@@ -399,6 +400,7 @@ export const en_DICTIONARY: Object = {
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
 		'NOTICES': 'Notices',
+		'NOTICE_LIST': 'Notice List',
 		'VIEW_HTML': 'View HTML',
 		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',
