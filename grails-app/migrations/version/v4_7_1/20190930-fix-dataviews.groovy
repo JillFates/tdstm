@@ -12,7 +12,7 @@ databaseChangeLog = {
 
 		grailsChange {
 			change {
-				int highestId = sql.firstRow("SELECT id FROM dataview ORDER BY id DESC LIMIT 0, 1").id
+				int highestId = sql.firstRow("select max(id) as id from dataview").id
 
 				sql.executeUpdate("""
 					UPDATE dataview SET id=id+$highestId
@@ -27,7 +27,7 @@ databaseChangeLog = {
 
 		grailsChange {
 			change {
-				int highestId = sql.firstRow("select max(id) from dataview").id
+				int highestId = sql.firstRow("select max(id) as id from dataview").id
 
 				sql.executeUpdate("""
 					ALTER TABLE dataview AUTO_INCREMENT=${highestId + 1};
