@@ -14,7 +14,7 @@ import {
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	APIActionType,
-	EVENT_BEFORE_CALL_TEXT,
+	EVENT_BEFORE_CALL_TEXT, EVENT_DEFAULT_ERROR_SCRIPT, EVENT_DEFAULT_ERROR_WEB_API,
 	EventReaction,
 	EventReactionType,
 	Languages
@@ -956,6 +956,17 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		this.validateAllSyntax()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe();
+	}
+
+	/**
+	 * On Error Reaction Checkbox change, default its script value if its currently empty.
+	 * @param value: boolean
+	 */
+	onErrorReactionCheckboxChangeHandler(value: boolean): void {
+		if (value && !this.apiActionModel.eventReactions[3].value ) {
+			const isWebAPI = this.apiActionModel.actionType && this.apiActionModel.actionType.id === this.WEB_API;
+			this.apiActionModel.eventReactions[3].value = isWebAPI ? EVENT_DEFAULT_ERROR_WEB_API : EVENT_DEFAULT_ERROR_SCRIPT
+		}
 	}
 
 	/**
