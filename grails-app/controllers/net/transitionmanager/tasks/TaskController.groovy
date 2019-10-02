@@ -39,10 +39,7 @@ import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
-import net.transitionmanager.task.timeline.TaskTimeLineGraph
-import net.transitionmanager.task.timeline.TimeLine
-import net.transitionmanager.task.timeline.TimeLineService
-import net.transitionmanager.task.timeline.TimelineSummary
+import net.transitionmanager.task.timeline.TimelineService
 import org.apache.commons.lang3.math.NumberUtils
 import org.springframework.context.MessageSource
 import org.springframework.jdbc.core.JdbcTemplate
@@ -87,7 +84,7 @@ class TaskController implements ControllerMethods {
 	PartyRelationshipService partyRelationshipService
 	ReportsService reportsService
 	RunbookService runbookService
-	TimeLineService timeLineService
+	TimelineService timelineService
 	TaskService taskService
 	TaskActionService taskActionService
 	UserPreferenceService userPreferenceService
@@ -1003,8 +1000,8 @@ digraph runbook {
 			render "Unable to find event $meId"
 			return
 		}
-		List<Task> tasks = timeLineService.getEventTasks(me, viewUnpublished)
-		List<TaskDependency> deps = timeLineService.getTaskDependencies(tasks)
+		List<Task> tasks = timelineService.getEventTasks(me, viewUnpublished)
+		List<TaskDependency> deps = timelineService.getTaskDependencies(tasks)
 
 		// add any tasks referenced by the dependencies that are not in the task list
 		deps.each {
@@ -1171,8 +1168,8 @@ digraph runbook {
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $me</h1>")
 
 		try {
-			tasks = timeLineService.getEventTasks(me)
-			deps = timeLineService.getTaskDependencies(tasks)
+			tasks = timelineService.getEventTasks(me)
+			deps = timelineService.getTaskDependencies(tasks)
 			def tmp = runbookService.createTempObject(tasks, deps)
 
 			dfsMap = runbookService.processDFS(tasks, deps, tmp)
