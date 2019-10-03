@@ -1447,7 +1447,7 @@ class AssetEntityService implements ServiceMethods {
 		def assetComment
 		// TODO : JPM 7/2017 : getCommonModelForShows - determine what this AssetComment logic is doing as it looks obsolete
 		if (AssetComment.executeQuery('select count(*) from AssetComment ' +
-			'where assetEntity=?0 and commentType=? and dateResolved=?',
+			'where assetEntity=?0 and commentType=?1 and dateResolved=?2',
 			[assetEntity, 'issue', null])[0])
 		{
 			assetComment = "issue"
