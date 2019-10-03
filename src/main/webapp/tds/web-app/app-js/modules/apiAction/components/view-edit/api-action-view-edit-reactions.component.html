@@ -106,7 +106,7 @@
 						<div class="col-sm-12">
 							<code-mirror #reactionCodeMirror
 													 id="apiActionStatusDetermination"
-													 [mode]="reactionCodeMirror.mode"
+													 [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[0].value">
 							</code-mirror>
 							<div *ngIf="eventReactions[0].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
@@ -135,7 +135,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[1].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionSuccess" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionSuccess" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[1].value"></code-mirror>
 							<div *ngIf="eventReactions[1].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -163,7 +163,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[2].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionDefault" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionDefault" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[2].value"></code-mirror>
 							<div *ngIf="eventReactions[2].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -192,7 +192,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[3].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionError" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionError" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[3].value"></code-mirror>
 							<div *ngIf="eventReactions[3].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -220,7 +220,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[4].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionFailed" [mode]="reactionCodeMirror.mode" [(model)]="eventReactions[4].value">
+							<code-mirror #reactionCodeMirror id="apiActionFailed" [mode]="codeMirrorMode" [(model)]="eventReactions[4].value">
 							</code-mirror>
 							<div *ngIf="eventReactions[4].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -247,7 +247,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[5].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionLapsed" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionLapsed" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[5].value"></code-mirror>
 							<div *ngIf="eventReactions[5].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -278,7 +278,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[6].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionStalled" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionStalled" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[6].value"></code-mirror>
 							<div *ngIf="eventReactions[6].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -310,7 +310,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[7].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionBeforeCall" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionBeforeCall" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[7].value"></code-mirror>
 							<div *ngIf="eventReactions[7].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>
@@ -339,7 +339,7 @@
 					</div>
 					<div class="form-group" *ngIf="eventReactions[8].open">
 						<div class="col-sm-12">
-							<code-mirror #reactionCodeMirror id="apiActionAfterCall" [mode]="reactionCodeMirror.mode"
+							<code-mirror #reactionCodeMirror id="apiActionAfterCall" [mode]="codeMirrorMode"
 													 [(model)]="eventReactions[8].value"></code-mirror>
 							<div *ngIf="eventReactions[8].state === CHECK_ACTION.INVALID" style="margin-left: 50px;">
 								<label class="control-label" style="color:darkred;">Syntax Error</label>

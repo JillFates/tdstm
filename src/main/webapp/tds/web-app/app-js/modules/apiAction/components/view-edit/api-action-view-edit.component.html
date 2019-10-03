@@ -871,13 +871,14 @@
 					<div *ngIf="isCurrentTab(tabsEnum.Reactions)"
 					     class="tab-pane" style="padding-left:15px"  [ngClass]="{'active':isCurrentTab(tabsEnum.Reactions), 'is-remote-section': isRemote()}" id="tab_reactions">
 						<api-action-view-edit-reactions
-							#reactionsComponent
+							#apiActionViewEditReactionsComponent
 							[eventReactions]="apiActionModel.eventReactions"
 							[modalType]="modalType"
 							[isRemote]="isRemote()"
 							[actionType]="apiActionModel.actionType"
 							[isPolling]="apiActionModel.isPolling"
-							(verifyCode)="verifyCode($event)">
+							[codeMirrorMode]="codeMirror.mode"
+							[(invalidScriptSyntax)]="invalidScriptSyntax">
 						</api-action-view-edit-reactions>
 					</div>
 				</div>

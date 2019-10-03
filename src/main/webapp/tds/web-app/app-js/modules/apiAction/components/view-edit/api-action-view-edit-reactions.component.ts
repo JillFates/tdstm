@@ -9,8 +9,9 @@ import {
 import { ActionType } from '../../../../shared/model/data-list-grid.model';
 import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
 import { takeUntil } from 'rxjs/operators';
-import { ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
+import { APIActionService } from '../../service/api-action.service';
 
 @Component({
 	selector: 'api-action-view-edit-reactions',
@@ -22,25 +23,25 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	@Input() isPolling: boolean;
 	@Input() modalType: ActionType;
 	@Input() actionType: any;
-	@Input() isRemote: boolean
-	@Output('verifyCode') verifyCodeEmitter: EventEmitter<any> = new EventEmitter<any>();
+	@Input() isRemote: boolean;
+	@Input() codeMirrorMode: string;
+	@Input() invalidScriptSyntax: boolean;
+	@Output() invalidScriptSyntaxChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 	@ViewChildren('reactionCodeMirror') codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	reactionCodeMirror = {
 		mode: 'Groovy',
 		rows: 10,
 		cols: 4
 	};
-	public codeMirrorComponent: CodeMirrorComponent;
 	actionTypes = ActionType;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
-	invalidScriptSyntax: boolean;
 	CHECK_ACTION = CHECK_ACTION;
 
-	constructor() {
-		this.invalidScriptSyntax = false;
+	constructor(private apiActionService: APIActionService) {
 	}
 
 	ngOnInit(): void {
+		this.reactionCodeMirror.mode = this.codeMirrorMode;
 		setTimeout(() => this.disableEnableCodeMirrors(), 500);
 	}
 
@@ -124,14 +125,6 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	}
 
 	/**
-	 * Emits the verify/check code syntax event.
-	 * @param eventReaction
-	 */
-	verifyCode(eventReaction: EventReaction): void {
-		this.verifyCodeEmitter.emit(eventReaction);
-	}
-
-	/**
 	 * Disables or Enable codemirrors text areas based on the VIEW/EDIT mode.
 	 */
 	disableEnableCodeMirrors(): void {
@@ -151,5 +144,72 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 					}, 100);
 				});
 			});
+	}
+
+	/**
+	 *  Verify the current Event Reaction input is a valid code
+	 * @param {EventReaction} eventReaction
+	 */
+	verifyCode(eventReaction: EventReaction): void {
+		this.validateAllSyntax(eventReaction)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
+	}
+
+	/**
+	 * Execute the validation and return an Observable
+	 * so we can attach this event to different validations
+	 * @returns {Observable<any>}
+	 */
+	validateAllSyntax(singleEventReaction?: EventReaction): Observable<any> {
+		return new Observable(observer => {
+			let scripts = [];
+			// Doing a single Event reaction Validation
+			if (singleEventReaction) {
+				if (singleEventReaction.value !== '') {
+					scripts.push({ code: singleEventReaction.type, script: singleEventReaction.value });
+				}
+			} else {
+				this.eventReactions.forEach((eventReaction: EventReaction) => {
+					eventReaction.state = CHECK_ACTION.UNKNOWN;
+					eventReaction.error = '';
+					if (eventReaction.value !== '') {
+						scripts.push({ code: eventReaction.type, script: eventReaction.value });
+					}
+				});
+			}
+			this.apiActionService.validateCode(scripts)
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
+					(result: any) => {
+						this.invalidScriptSyntax = false;
+						result.forEach((eventResult: any) => {
+							let eventReaction = this.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
+							if (!eventResult['validSyntax']) {
+								let errorResult = '';
+								eventResult.errors.forEach((error: string) => {
+									errorResult += error['message'] + '\n';
+								});
+								eventReaction.error = errorResult;
+								eventReaction.state = CHECK_ACTION.INVALID;
+								this.invalidScriptSyntax = true;
+							} else {
+								eventReaction.state = CHECK_ACTION.VALID;
+							}
+						});
+						this.invalidScriptSyntaxChange.emit(this.invalidScriptSyntax);
+						observer.next();
+					},
+					(err) => console.log(err));
+		});
+	}
+
+	/**
+	 * Execute the API to validated every Syntax Value.
+	 */
+	public onCheckAllSyntax(): void {
+		this.validateAllSyntax()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe();
 	}
 }

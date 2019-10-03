@@ -14,9 +14,7 @@ import {
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	APIActionType,
-	EVENT_BEFORE_CALL_TEXT, EVENT_DEFAULT_ERROR_SCRIPT, EVENT_DEFAULT_ERROR_WEB_API,
 	EventReaction,
-	EventReactionType,
 	Languages
 } from '../../model/api-action.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
@@ -86,6 +84,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
+	@ViewChild('apiActionViewEditReactionsComponent') apiActionViewEditReactionsComponent: ApiActionViewEditReactionsComponent;
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
@@ -108,7 +107,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private dataParameterListSignature: string;
 	private requiredFields = ['name', 'provider', 'actionType'];
 	private intervals = INTERVALS;
-	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
 	public selectedInterval = { value: 0, interval: '' };
 	public selectedLapsed = { value: 0, interval: '' };
@@ -857,69 +855,10 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 *  Verify the current Event Reaction input is a valid code
-	 * @param {EventReaction} eventReaction
-	 */
-	verifyCode(eventReaction: EventReaction): void {
-		this.validateAllSyntax(eventReaction)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe();
-	}
-
-	/**
-	 * Execute the validation and return an Observable
-	 * so we can attach this event to different validations
-	 * @returns {Observable<any>}
-	 */
-	validateAllSyntax(singleEventReaction?: EventReaction): Observable<any> {
-		return new Observable(observer => {
-			let scripts = [];
-			// Doing a single Event reaction Validation
-			if (singleEventReaction) {
-				if (singleEventReaction.value !== '') {
-					scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
-				}
-			} else {
-				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
-					eventReaction.state = this.checkActionModel.UNKNOWN;
-					eventReaction.error = '';
-					if (eventReaction.value !== '') {
-						scripts.push({code: eventReaction.type, script: eventReaction.value});
-					}
-				});
-			}
-			this.apiActionService.validateCode(scripts)
-				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe(
-				(result: any) => {
-					this.invalidScriptSyntax = false;
-					result.forEach((eventResult: any) => {
-						let eventReaction = this.apiActionModel.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
-						if (!eventResult['validSyntax']) {
-							let errorResult = '';
-							eventResult.errors.forEach((error: string) => {
-								errorResult += error['message'] + '\n';
-							});
-							eventReaction.error = errorResult;
-							eventReaction.state = this.checkActionModel.INVALID;
-							this.invalidScriptSyntax = true;
-						} else {
-							eventReaction.state = this.checkActionModel.VALID;
-						}
-					});
-					observer.next();
-				},
-				(err) => console.log(err));
-		});
-	}
-
-	/**
 	 * Execute the API to validated every Syntax Value.
 	 */
 	onCheckAllSyntax(): void {
-		this.validateAllSyntax()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe();
+		this.apiActionViewEditReactionsComponent.onCheckAllSyntax();
 	}
 
 	/**
@@ -983,7 +922,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 	getClonedCodeMirrorSettings(properties: any): any {
 		const cloned =  Object.assign({}, this.codeMirror, properties);
-
 		return cloned;
 	}
 
