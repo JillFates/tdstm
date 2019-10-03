@@ -97,10 +97,6 @@ class WsMoveBundleController implements ControllerMethods {
 	def save(Long moveBundleId) {
 		Project project = getProjectForWs()
 		MoveBundleCommand moveBundleCommand = populateCommandObject(MoveBundleCommand)
-		if(!moveBundleId && MoveBundle.findByName(moveBundleCommand.name)) {
-			renderErrorJson('Error: Bundle with the name \'' + moveBundleCommand.name + '\' already exists.')
-			return
-		}
 		MoveBundle moveBundle = moveBundleService.saveOrUpdate(moveBundleCommand, project, moveBundleId)
 		renderSuccessJson(moveBundle.toMap())
 	}
