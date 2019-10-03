@@ -28,7 +28,7 @@ export const EventRoute: Routes = [
 			page: {
 				title: 'EVENT.LIST',
 				instruction: '',
-				menu: ['EVENT.EVENTS', 'GLOBAL.LIST']
+				menu: ['PLANNING.PLANNING', 'EVENT.LIST']
 			},
 			requiresAuth: true,
 		},

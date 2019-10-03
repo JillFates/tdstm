@@ -5717,7 +5717,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			List userSelectedCols = []
 			(1..5).each { colId ->
 				String columnName = taskPref[colId.toString()]
-				String value = getColumnValue(columnName, it)
+				String value = getColumnValue(columnName, it) ?: ''
 
 				if(columnName == 'durationScale'){
 					value = ((value.toUpperCase()) as TimeScale).value
@@ -5754,7 +5754,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				assetEntityId: it.assetEntity?.id,
 				assetEntityAssetType: it.assetEntity?.assetType ,
 				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
-				instructionsLinkURL: instructionsLinkURL,
+				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,

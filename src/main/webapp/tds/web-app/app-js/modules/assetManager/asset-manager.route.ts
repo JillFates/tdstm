@@ -14,6 +14,7 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 import {AssetViewConfigComponent} from './components/asset-view-config/asset-view-config.component';
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
+import {ExportComponent} from './components/asset-export/export.component';
 
 /**
  * Asset Manager Route States
@@ -32,6 +33,9 @@ export class AssetExplorerStates {
 	};
 	public static readonly REPORT_SHOW = {
 		url: 'views/:id/show'
+	};
+	public static readonly ASSET_EXPORT = {
+		url: 'export'
 	};
 }
 
@@ -125,7 +129,17 @@ export const AssetManagerRoute: Routes = [
 		},
 		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
-	}
+	},
+	{
+		path: AssetExplorerStates.ASSET_EXPORT.url,
+		data: {
+			page: {
+				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: ['ASSETS.ASSETS', 'ASSET_EXPORT.ASSET_EXPORT']
+			}
+		},
+		component: ExportComponent,
+		canActivate: [AuthGuardService, ModuleResolveService]
+	},
 ];
 
 @NgModule({

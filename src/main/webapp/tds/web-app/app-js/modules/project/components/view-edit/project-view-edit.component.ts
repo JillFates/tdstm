@@ -46,6 +46,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public canEditProject;
 	public editing = false;
 	protected userTimeZone: string;
+	protected userDateFormat: string;
 	public file = new KendoFileUploadBasicConfig();
 	public fetchResult: any;
 	public transformResult: ApiResponseModel;
@@ -87,6 +88,7 @@ export class ProjectViewEditComponent implements OnInit {
 			planMethodology: ''
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
 		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
 		this.file.uploadRestrictions = {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
@@ -165,8 +167,10 @@ export class ProjectViewEditComponent implements OnInit {
 				this.client = data.client;
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
-				this.projectModel.startDate = new Date(this.projectModel.startDate);
-				this.projectModel.completionDate = new Date(this.projectModel.completionDate);
+				this.projectModel.startDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate));
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate));
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
 				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
@@ -195,6 +199,10 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm() {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
+			this.projectModel.startDate.setHours(0, 0, 0, 0);
+			this.projectModel.completionDate.setHours(0, 0, 0, 0);
+			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
@@ -233,6 +241,9 @@ export class ProjectViewEditComponent implements OnInit {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
+		}, {
+			provide: String,
+			useValue: this.projectModel.timeZone
 		}]).then(result => {
 			this.projectModel.timeZone = result.timezone;
 		}).catch(result => {

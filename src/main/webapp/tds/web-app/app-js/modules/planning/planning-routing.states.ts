@@ -21,6 +21,7 @@ export const PlanningRoute: Routes = [
 		data: {
 			page: {
 				title: 'Planning Dashboard',
+				menu: ['PLANNING.DASHBOARD', 'PLANNING.PLANNING'],
 				instruction: ''
 			},
 			requiresAuth: true,
