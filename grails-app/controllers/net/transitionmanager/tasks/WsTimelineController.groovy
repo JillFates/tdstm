@@ -6,7 +6,9 @@ import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
-import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.command.task.ExportTimelineCommand
+import net.transitionmanager.command.task.CalculateTimelineCommandObject
+import net.transitionmanager.command.task.ReadTimelineCommandObject
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
@@ -22,15 +24,18 @@ import net.transitionmanager.task.timeline.TimelineSummary
 import java.text.DateFormat
 
 @Secured('isAuthenticated()')
-class WsTimeLineController implements ControllerMethods {
+class WsTimelineController implements ControllerMethods {
 
 	TimelineService timelineService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
 
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
+		CalculateTimelineCommandObject commandObject = populateCommandObject(CalculateTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
+		Boolean recalculate = commandObject.isRecalculate()
 
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
@@ -83,7 +88,11 @@ class WsTimeLineController implements ControllerMethods {
 
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+
+		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -96,7 +105,10 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskTimelineView)
 	def baseline() {
 
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -109,8 +121,10 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def exportCPA() {
 
-		boolean showAll = params.showAll == 'true'
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		ExportTimelineCommand commandObject = populateCommandObject(ExportTimelineCommand)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
@@ -147,7 +161,7 @@ class WsTimeLineController implements ControllerMethods {
 			String timesExtra = ''
 			String tailExtra = ''
 
-			if (showAll) {
+			if (commandObject.showAll) {
 				durationExtra = "<th>Act Duration</th><th>Deviation</th>"
 				timesExtra = "<th>Act Start</th>"
 				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th><th>Class</th>" +
@@ -201,7 +215,7 @@ class WsTimeLineController implements ControllerMethods {
 				durationExtra = ''
 				timesExtra = ''
 				tailExtra = ''
-				if (showAll) {
+				if (commandObject.showAll) {
 					durationExtra = "<td>$actual</td><td>$deviation</td>"
 					timesExtra = "<td>$actStart</td>"
 					tailExtra = "<td>${task.taskSpec ?: ''}</td>" +
