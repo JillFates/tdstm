@@ -132,10 +132,11 @@
 					<div class="task-action-buttons">
 						<tds-task-actions
 							*ngIf="dataItem.id && dataItem.status"
-							[task]="dataItem"
+							[taskStatus]="dataItem.status"
 							[showDelayActions]="true"
 							[showDetails]="true"
 							[buttonClass]="'btn-primary'"
+							[taskActionInfoModel]="getTaskActionInfoModel(dataItem.id)"
 							(start)="updateTaskStatus(dataItem.id, TaskStatus.STARTED)"
 							(done)="updateTaskStatus(dataItem.id, TaskStatus.COMPLETED)"
 							(invoke)="invokeActionHandler(dataItem)"
@@ -165,7 +166,7 @@
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div [ngClass]="{'sortable-column' : column.type !== 'action'}">
+						<div [ngClass]="{'sortable-column' : (column.type !== 'action' && column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
 					</ng-template>
@@ -197,11 +198,12 @@
 						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
-								<input [(ngModel)]="column.filter" (keyup)="onFilterChangeHandler(column)"
-											 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="onFilterChangeHandler(column, true)"
-											style="cursor:pointer;color:#656565;pointer-events:all"
-											class="fa fa-times form-control-feedback"></span>
+								<tds-filter-input
+									name="{{column.property}}"
+									[value]="column.filter || ''"
+									placeholder="{{'GLOBAL.FILTER' | translate}}"
+									(filter)="onFilterChangeHandler($event, column)">
+								</tds-filter-input>
 							</ng-template>
 						</div>
 					</ng-template>

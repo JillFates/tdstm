@@ -314,7 +314,7 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Fullscreen');
+		$('#fullscreenButtonId').children('h4').html('Full Screen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -346,7 +346,6 @@ var GraphUtil = (function ($) {
 	public.correctPanelSize = function (panelId) {
 		var panel = $('#' + panelId);
 		panel.css('height', '');
-		panel.css('overflow-y', 'scroll');
 		var svgContainer = $('#svgContainerId');
 		if (panel.size() == 0 || svgContainer.size() == 0 || svgContainer.children().size() == 0)
 			return false;
@@ -369,8 +368,8 @@ var GraphUtil = (function ($) {
 		if($('#dependenciesPanelId').size() == 0)
 			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
-			$('.dependency_panel_action_buttons').css('position', 'fixed');
-			$('.dependency_panel_action_buttons').css('bottom', '45px');
+			$('.dependency_panel_action_buttons').css('position', 'absolute');
+			$('.dependency_panel_action_buttons').css('bottom', '0');
 		} else {
 			$('.dependency_panel_action_buttons').css('position', '');
 			$('.dependency_panel_action_buttons').css('bottom', '5px');
@@ -476,9 +475,6 @@ var GraphUtil = (function ($) {
 			if (public.isFullscreen()){
 				$('#dependencyDivId').addClass('floating');
 				$('#dependencyDivId').css('overflow-x', '');
-				setTimeout(function(){
-					$('#dependencyDivId').css('overflow-x', 'scroll');
-				}, 500);
 			}
 			else{
 				$('#dependencyDivId').removeClass('floating');
