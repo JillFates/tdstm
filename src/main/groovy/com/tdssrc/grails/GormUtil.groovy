@@ -551,13 +551,17 @@ class GormUtil{
 	 */
 	@Memoized
 	static List<PersistentProperty> getDomainProperties(Class domainClass, List<String> properties = null, List<String> skipProperties = null) {
-		List<PersistentProperty> domainProperties = []
-		boolean allProperties = false
 		PersistentEntity dfdc = getDomainClass(domainClass)
+		// This list will contain the domain properties returned from this method.
+		List<PersistentProperty> domainProperties = []
+		// This list will contain all the persistent properties for the domain class plus the identities.
+		List<PersistentProperty> persistentPropertiesAndIdentities = dfdc.persistentProperties
+		persistentPropertiesAndIdentities.addAll(dfdc.identity)
+		boolean allProperties = false
 
 		if (properties) {
 			for (String property in properties) {
-				PersistentProperty domainProperty = dfdc.persistentProperties.find{ it.name == property}
+				PersistentProperty domainProperty = persistentPropertiesAndIdentities.find{ it.name == property}
 
 				if (domainProperty) {
 					domainProperties << domainProperty
@@ -573,13 +577,7 @@ class GormUtil{
 		}
 
 		if (allProperties) {
-			domainProperties = dfdc.getPersistentProperties()
-			// Grails won't fetch the Id property if it's not properly defined as a field
-			PersistentProperty idProperty = dfdc.persistentProperties.find{ it.name == 'id'}
-
-			if (idProperty) {
-				domainProperties.addAll(dfdc.identity)
-			}
+			domainProperties = persistentPropertiesAndIdentities
 		}
 
 		if (skipProperties) {
