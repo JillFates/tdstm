@@ -1,15 +1,13 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {ProjectModel} from '../../model/project.model';
-import {Router} from '@angular/router';
-import {UIActiveDialogService, UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
-import {ASSET_IMPORT_FILE_UPLOAD_TYPE, DIALOG_SIZE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
+import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {EventModel} from '../../../event/model/event.model';
 
 @Component({
 	selector: `project-create`,
@@ -81,6 +79,9 @@ export class ProjectCreateComponent implements OnInit {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
+		}, {
+			provide: String,
+			useValue: this.projectModel.timeZone
 		}]).then(result => {
 			this.projectModel.timeZone = result.timezone;
 		}).catch(result => {
@@ -141,6 +142,10 @@ export class ProjectCreateComponent implements OnInit {
 
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
+			this.projectModel.startDate.setHours(0, 0, 0, 0);
+			this.projectModel.completionDate.setHours(0, 0, 0, 0);
+			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();

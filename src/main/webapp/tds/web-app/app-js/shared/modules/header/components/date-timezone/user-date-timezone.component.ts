@@ -15,6 +15,16 @@ import {Observable} from 'rxjs';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
 
 declare var jQuery: any;
+// Work-around for deprecated jQuery functionality
+jQuery.browser = {};
+(function () {
+	jQuery.browser.msie = false;
+	jQuery.browser.version = 0;
+	if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+		jQuery.browser.msie = true;
+		jQuery.browser.version = RegExp.$1;
+	}
+})();
 
 @Component({
 	selector: 'date-timezone-modal',
@@ -37,6 +47,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 
 	constructor(
 		public shouldReturnData: Boolean,
+		public defaultTimeZone: String,
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
 		private translatePipe: TranslatePipe,
@@ -72,6 +83,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			jQuery('#timezoneImage').timezonePicker({
 				target: '#dateTimezone'
 			});
+
 			// Get the Selected area
 			jQuery('#timezoneMap').find('area').click((element: any) => {
 				this.timezonePinShow = true;
@@ -84,6 +96,14 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			}
 			// Delay time to allow the Picker to be initialized
 		}, 800);
+
+		setTimeout(() => {
+			this.defaultTimeZone = this.timezonesList.includes(this.defaultTimeZone) ? this.defaultTimeZone : '';
+			if (this.defaultTimeZone) {
+				this.selectedTimezone = this.defaultTimeZone;
+			}
+			// Timeout to ensure this is always done if a valid timezone is provided
+		}, 1500)
 
 		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe((res: any) => {
 			this.selectedTimeFormat = res[PREFERENCES_LIST.CURR_DT_FORMAT];
