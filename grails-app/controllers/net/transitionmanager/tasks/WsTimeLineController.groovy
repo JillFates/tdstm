@@ -1,10 +1,12 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
@@ -49,12 +51,12 @@ class WsTimeLineController implements ControllerMethods {
 				starts   : graph.starts.collect { it.taskId },
 				startDate: startDate,
 				cycles   : summary.cycles.collect { it.collect { it.taskId } },
-				items    : tasks.collect { Task task ->
+				tasks    : tasks.collect { Task task ->
 					[
 						id            : task.id,
 						number        : task.taskNumber,
-						assetName     : task.assetName,
-						comment       : task.comment,
+						asset         : GormUtil.domainObjectToMap(task.assetEntity,['id', 'assetName', 'assetType', 'assetClass']),
+						name          : task.comment,
 						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
 						durationScale : task.durationScale?.name(),
@@ -67,9 +69,11 @@ class WsTimeLineController implements ControllerMethods {
 						estStart      : recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart,
 						estFinish     : recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish,
 						assignedTo    : task.assignedTo?.toString(),
-						role          : task.role,
-						predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
-							it.successor.id
+						team          : task.role,
+						isAutomatic   : task.isAutomatic(),
+						hasAction     : task.hasAction(),
+						predecessorIds: task.taskDependencies.findAll { it.successor.id == task.id }.collect {
+							it.predecessor.id
 						}
 					]
 				}
