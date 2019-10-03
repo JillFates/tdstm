@@ -24,6 +24,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
 
 @Component({
 	selector: `task-detail`,
@@ -360,4 +361,16 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			});
 	}
 
+	/**
+	 * Opens the action summary modal.
+	 */
+	openTaskActionSummaryDetailHandler(): void {
+		this.dialogService.extra(TaskActionSummaryComponent, [
+			{ provide: TaskDetailModel, useValue: this.taskDetailModel }
+		]).then((result) => {
+			// do nothing, modal was closed;
+		}).catch(result => {
+			// do nothing, modal was closed
+		});
+	}
 }

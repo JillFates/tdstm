@@ -33,7 +33,7 @@ class ETLScriptsPage extends Page {
         firstDSProvider { dsTableRows[0].find("td", "aria-colindex": "3")}
         firstDSDescription { dsTableRows[0].find("td", "aria-colindex": "4")}
         firstDSMode { dsTableRows[0].find("td", "aria-colindex": "5")}
-        firstDSEditButton { dsTableRows[0].find("td", "aria-colindex": "1").find("button span", class: "glyphicon-pencil")}
+        firstDSEditButton { $("div", class:"tds-action-button-set").find("tds-button-edit")}
         projectsModule { module ProjectsMenuModule}
         trashIconList {$(".fa.fa-fw.fa-trash")}
         confirmationModal {$("div.modal-dialog.modal-sm")}

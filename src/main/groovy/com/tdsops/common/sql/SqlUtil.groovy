@@ -1,16 +1,21 @@
 package com.tdsops.common.sql
 
 
+import com.tdssrc.grails.DateTimeFilterUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
+import grails.util.Pair
 import net.transitionmanager.dataview.FieldSpec
 import net.transitionmanager.search.FieldSearchData
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang3.StringUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+import java.sql.Timestamp
+
 class SqlUtil {
+
 	public static final String COMMA = ","
 	public static final String STRING_QUOTE = "'"
 	public static final String LEFT_PARENTHESIS = "("
@@ -24,7 +29,7 @@ class SqlUtil {
 	 * @param andOr - the boolean identifier (default 'and')
 	 * @return String concatenated string
 	 */
-	static String appendToWhere(String query, String additional, String andOr='and') {
+	static String appendToWhere(String query, String additional, String andOr = 'and') {
 		return query + (query ? ' ' + andOr + ' ' : '') + additional
 	}
 
@@ -310,6 +315,12 @@ class SqlUtil {
 			return
 		}
 
+		if (isDateOrDatetimeField(fieldSearchData)) {
+			// call new method to add date/datetime filter logic
+			handleDateOrDatetimeField(fieldSearchData)
+			return
+		}
+
 		String originalFilter = fieldSearchData.filter.trim()
 
 		switch(originalFilter) {
@@ -467,6 +478,21 @@ class SqlUtil {
 			// Then, to manage this case, we simply add a false where clause, expecting an empty list of results.
 			fieldSearchData.sqlSearchExpression = " 1 = 0"
 		}
+	}
+
+	/**
+	 * Handle DateTime filters using {@code DateTimeFilterUtil}.
+	 *
+	 * @param fieldSearchData an instance {@code FieldSearchData}
+	 * @see DateTimeFilterUtil
+	 */
+	private static void handleDateOrDatetimeField(FieldSearchData fieldSearchData) {
+
+		Pair<Date, Date> result = DateTimeFilterUtil.parseUserEntry(fieldSearchData.filter)
+		fieldSearchData.sqlSearchExpression = " (${fieldSearchData.whereProperty} BETWEEN :${fieldSearchData.columnAlias}_start AND :${fieldSearchData.columnAlias}_end) "
+
+		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_start', result.getaValue())
+		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_end', result.getbValue())
 	}
 
 	/**
@@ -786,6 +812,16 @@ class SqlUtil {
 	private static boolean isEnumerationField(FieldSearchData fsd) {
 		return fsd.type?.isEnum()
 	}
+
+	/**
+	 *
+	 * @param fsd
+	 * @return
+	 */
+	private static boolean isDateOrDatetimeField(FieldSearchData fsd) {
+		return (fsd.type in [Date, Timestamp])
+	}
+
 	/**
 	 * Determine if the field being used for filtering is numeric.
 	 * @param fsd

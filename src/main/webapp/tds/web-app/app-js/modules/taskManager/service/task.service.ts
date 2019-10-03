@@ -5,7 +5,6 @@ import { SingleCommentModel } from '../../assetExplorer/components/single-commen
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import { catchError, map } from 'rxjs/operators';
-
 import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/combobox-search-param.model';
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
@@ -40,6 +39,7 @@ export class TaskService {
 	private readonly CUSTOM_COLUMNS_URL = `${ this.baseURL }/ws/task/customColumns`;
 	private readonly TASK_ACTION_INFO_URL = `${ this.baseURL }/ws/task/getInfoForActionBar/{taskId}`;
 	private readonly RESET_TASK_URL = `${ this.baseURL }/ws/task/{taskId}/resetAction`;
+	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
 	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/task/moveEventTaskGraphSvg`;
@@ -410,6 +410,15 @@ export class TaskService {
 	getTaskList(filters: any): Observable<any> {
 		return this.http.post(this.TASK_LIST_URL, filters).pipe(
 			map((response: any) => {
+				if (!response.rows || response.rows === null) {
+					return {rows: [], totalCount: 0};
+				}
+				response.rows.forEach(item => {
+					for (let i = 0; i <= 4; i++) {
+						const property = `userSelectedCol${i}`;
+						item[property] = item[property] === 'null' ? '' : item[property];
+					}
+				});
 				return response;
 			}),
 			catchError(error => {
@@ -485,6 +494,21 @@ export class TaskService {
 	 */
 	resetTaskAction(taskId: number): Observable<any> {
 		return this.http.post(this.RESET_TASK_URL.replace('{taskId}', taskId.toString()), null)
+			.pipe(
+				map(response => response),
+				catchError(error => {
+					console.error(error);
+					return error;
+				})
+			);
+	}
+
+	/**
+	 * GET - Returns the task api action summary.
+	 * @param taskId
+	 */
+	getTaskActionSummary(taskId: string): Observable<any> {
+		return this.http.get(this.TASK_ACTION_SUMMARY.replace('{taskId}', taskId.toString()))
 			.pipe(
 				map(response => response),
 				catchError(error => {
