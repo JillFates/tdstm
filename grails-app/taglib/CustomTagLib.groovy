@@ -370,9 +370,7 @@ class CustomTagLib implements InitializingBean {
 		if(licenseInfo.banner) {
 			out << """
 				<div class="breadcrumb licensing-banner-message breadcrumb-${crumbs.size}">
-					<div class="callout">
-						<p><strong>${licenseInfo.banner}</strong></p>
-					</div>
+					<div class="callout">${licenseInfo.banner}</div>
 				</div>"""
 		}
 
