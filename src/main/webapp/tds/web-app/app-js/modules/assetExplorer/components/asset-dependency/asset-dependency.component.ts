@@ -218,6 +218,17 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
+	 * Return the name of the person name who created or update the dependency
+	 * @param {any}  person  Person who created or updated the dependency
+	 * @returns {string}
+	 */
+	protected getPersonName(person: any): string {
+		const {firstName, lastName = ''} = person;
+
+		return `${firstName} ${lastName}`;
+	}
+
+	/**
 	 * Delete a dependency previous confirmation
 	 * @param {DependencyType} dependencyType Type of dependency to be deleted
 	 * @return {void)

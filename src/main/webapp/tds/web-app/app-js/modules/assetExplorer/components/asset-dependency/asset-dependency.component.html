@@ -94,11 +94,11 @@
                         <div class="dependency-row-legend">Created by</div>
                         <div class="dependency-a">
                             <label class="dependency-label created-dates" *ngIf="dependencyA && dependencyA.createdBy">
-                            {{dependencyA.createdBy.firstName}} {{dependencyA.createdBy.lastName}} at {{dependencyA?.dateCreated}}
+                            {{getPersonName(dependencyA.createdBy)}} at {{dependencyA?.dateCreated}}
                             </label></div>
                         <div class="dependency-b">
                             <label class="dependency-label created-dates" *ngIf="dependencyB && dependencyB.createdBy">
-                                {{dependencyB.createdBy.firstName}} {{dependencyB.createdBy.lastName}} at {{dependencyB?.dateCreated}}
+                                {{getPersonName(dependencyB.createdBy)}} at {{dependencyB?.dateCreated}}
                             </label>
                         </div>
                     </div>
@@ -107,12 +107,12 @@
                         <div class="dependency-row-legend">Updated by</div>
                         <div class="dependency-a">
                             <label class="dependency-label updated-dates" *ngIf="dependencyA && dependencyA.updatedBy">
-                                {{dependencyA.updatedBy.firstName}} {{dependencyA.updatedBy.lastName}} at {{dependencyA?.lastUpdated}}
+                                {{getPersonName(dependencyA.updatedBy)}} at {{dependencyA?.lastUpdated}}
                             </label>
                         </div>
                         <div class="dependency-b">
                             <label class="dependency-label updated-dates" *ngIf="dependencyB && dependencyB.updatedBy">
-                                {{dependencyB.updatedBy.firstName}} {{dependencyB.updatedBy.lastName}} at {{dependencyB?.lastUpdated}}
+                                {{getPersonName(dependencyB.updatedBy)}} at {{dependencyB?.lastUpdated}}
                             </label>
                         </div>
                     </div>
