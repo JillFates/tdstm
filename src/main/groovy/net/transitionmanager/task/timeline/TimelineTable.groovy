@@ -51,20 +51,23 @@ class TimelineTable {
 	 * During critical path analysis on the graph, walking forward {@code TimeLine#doDijkstraForEarliestTimes}
 	 * from sources to sinks, it calculates earliest start time and
 	 * earliest start finish using
-	 * @param successor
-	 * @param predecessor
+	 * @param vertex an instance of {@code TaskVertex}
+	 * @param predecessor another instance of {@code TaskVertex}, predecessor of vertex param.
 	 * @return true: any of the times were updated, false otherwise.
 	 */
-	boolean checkAndUpdateEarliestTimes(TaskVertex currentVertex, TaskVertex successor) {
+	boolean checkAndUpdateEarliestTimes(TaskVertex vertex, TaskVertex successor) {
 
-
-		if (successor.earliestStart == 0 || (currentVertex.earliestFinish > successor.earliestStart)) {
-			successor.earliestStart = currentVertex.earliestFinish
+		if (successor.earliestStart == 0 || (vertex.earliestFinish > successor.earliestStart)) {
+			successor.earliestStart = vertex.earliestFinish
 			successor.earliestFinish = successor.earliestStart + successor.remaining + successor.elapsed
-			successor.criticalPredecessor = currentVertex
+			successor.criticalPredecessor = vertex
 
 			use(TimeCategory) {
-				successor.earliestStartDate = currentVertex.earliestFinishDate
+				successor.earliestStartDate = vertex.earliestFinishDate
+				// Validate if earliestStartDate is in range [windowStartTime, windowEndTime]
+				if (successor.earliestStartDate < windowStartTime && !successor.hasStarted()) {
+					successor.earliestStartDate = windowStartTime
+				}
 				successor.earliestFinishDate = successor.earliestStartDate + successor.remaining.minutes + successor.elapsed.minutes
 			}
 
@@ -90,6 +93,9 @@ class TimelineTable {
 
 			use(TimeCategory) {
 				predecessor.latestFinishDate = vertex.latestStartDate
+				if (predecessor.hasStarted() || predecessor.hasFinished()) {
+					predecessor.latestFinishDate = predecessor.earliestFinishDate
+				}
 				predecessor.latestStartDate = predecessor.latestFinishDate - predecessor.remaining.minutes - predecessor.elapsed.minutes
 			}
 
