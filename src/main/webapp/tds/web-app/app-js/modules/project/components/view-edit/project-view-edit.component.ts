@@ -37,7 +37,6 @@ export class ProjectViewEditComponent implements OnInit {
 	public possiblePartners;
 	public possibleManagers;
 	public availableBundles;
-	public partnerKey = {};
 	public projectId;
 	public projectLogoId;
 	public projectGUID;
@@ -76,7 +75,7 @@ export class ProjectViewEditComponent implements OnInit {
 			description: '',
 			startDate: new Date(),
 			completionDate: new Date(),
-			partnerIds: [],
+			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,
 			projectCode: '',
@@ -148,12 +147,9 @@ export class ProjectViewEditComponent implements OnInit {
 				});
 				this.projectModel = projectModel;
 				this.possiblePartners = data.possiblePartners;
-				data.possiblePartners.forEach((partner) => {
-					this.partnerKey[partner.id] = partner.name;
-				});
 
 				data.projectPartners.forEach((partner) => {
-					this.projectModel.partnerIds.push(partner.id);
+					this.projectModel.partners.push({id: partner.id, name: partner.name});
 				});
 
 				this.planMethodologies = [];

@@ -44,7 +44,7 @@ export class ProjectCreateComponent implements OnInit {
 			description: '',
 			startDate: new Date(),
 			completionDate: new Date(),
-			partnerIds: [],
+			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,
 			projectCode: '',
@@ -138,6 +138,10 @@ export class ProjectCreateComponent implements OnInit {
 
 	private clearFilename(e?: any) {
 		this.fetchResult = null;
+	}
+
+	public onSelectionChangePartner(e) {
+		console.log(e);
 	}
 
 	public saveForm() {
