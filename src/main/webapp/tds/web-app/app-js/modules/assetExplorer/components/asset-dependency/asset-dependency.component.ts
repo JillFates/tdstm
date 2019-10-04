@@ -121,7 +121,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Add to the dependency provided as argument the dateCreated and lastUpdated field of the asset parameter
+	 * Add to the dependency provided as argument the created and updated info of the asset parameter
 	 * @param {any} dependency Object containing the dependency to change
 	 * @param {any} asset Asset containing the dateCreated and lastUpdated fields
 	 * @return {any) Original dependency modified adding the extra date field
@@ -131,8 +131,8 @@ export class AssetDependencyComponent extends UIExtraDialog {
 			return dependency;
 		}
 
-		const { dateCreated, lastUpdated }  = asset;
-		return Object.assign({}, dependency, { dateCreated, lastUpdated });
+		const { dateCreated, lastUpdated, createdBy, updatedBy }  = asset;
+		return Object.assign({}, dependency, { dateCreated, lastUpdated, createdBy, updatedBy });
 	}
 
 	/**
@@ -215,6 +215,17 @@ export class AssetDependencyComponent extends UIExtraDialog {
 			aDependencyHasChanged: false,
 			bDependencyHasChanged: false,
 		}
+	}
+
+	/**
+	 * Return the name of the person name who created or update the dependency
+	 * @param {any}  person  Person who created or updated the dependency
+	 * @returns {string}
+	 */
+	protected getPersonName(person: any): string {
+		const {firstName, lastName = ''} = person;
+
+		return `${firstName} ${lastName}`;
 	}
 
 	/**
