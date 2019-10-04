@@ -1,11 +1,8 @@
 package com.tdsops.etl
 
-import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
-// Adding ignore, so that I can get the Grails 4 branch built, and I'll write up a ticket for these and assign it to Diego.
-@Ignore
 class ElementSpec extends Specification {
 
 	void 'test Element String functions'() {
