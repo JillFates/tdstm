@@ -71,7 +71,6 @@ import org.springframework.dao.CannotAcquireLockException
 import org.springframework.dao.IncorrectResultSizeDataAccessException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
-import org.springframework.transaction.TransactionStatus
 
 import java.text.DateFormat
 
@@ -80,7 +79,6 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
-
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -2459,7 +2457,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						genTitles.each { generalTaskTitle ->
 							// Replace the potential title:[array] with just the current title
 							taskSpec.title = generalTaskTitle
-							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null, null)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null)
 
 							taskSpecTasks[taskSpec.id] << newTask
 
