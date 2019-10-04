@@ -8,6 +8,8 @@ import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../..
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {EventModel} from '../../../event/model/event.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-create`,
