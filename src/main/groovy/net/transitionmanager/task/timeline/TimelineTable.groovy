@@ -52,7 +52,7 @@ class TimelineTable {
 	 * from sources to sinks, it calculates earliest start time and
 	 * earliest start finish using
 	 * @param vertex an instance of {@code TaskVertex}
-	 * @param predecessor another instance of {@code TaskVertex}, predecessor of vertex param.
+	 * @param successor another instance of {@code TaskVertex}, predecessor of vertex param.
 	 * @return true: any of the times were updated, false otherwise.
 	 */
 	boolean checkAndUpdateEarliestTimes(TaskVertex vertex, TaskVertex successor) {
@@ -64,8 +64,9 @@ class TimelineTable {
 
 			use(TimeCategory) {
 				successor.earliestStartDate = vertex.earliestFinishDate
-				// Validate if earliestStartDate is in range [windowStartTime, windowEndTime]
-				if (successor.earliestStartDate < windowStartTime && !successor.hasStarted()) {
+				if (successor.hasStarted()) {
+					successor.earliestStartDate = successor.actualStart ?: vertex.earliestFinishDate
+				} else if (successor.earliestStartDate < windowStartTime) { // Validate if earliestStartDate is in range [windowStartTime, windowEndTime]
 					successor.earliestStartDate = windowStartTime
 				}
 				successor.earliestFinishDate = successor.earliestStartDate + successor.remaining.minutes + successor.elapsed.minutes
@@ -93,7 +94,7 @@ class TimelineTable {
 
 			use(TimeCategory) {
 				predecessor.latestFinishDate = vertex.latestStartDate
-				if (predecessor.hasStarted() || predecessor.hasFinished()) {
+				if (predecessor.hasStarted()) {
 					predecessor.latestFinishDate = predecessor.earliestFinishDate
 				}
 				predecessor.latestStartDate = predecessor.latestFinishDate - predecessor.remaining.minutes - predecessor.elapsed.minutes
@@ -177,7 +178,7 @@ class TimelineTable {
 		}
 
 		Integer windowEndTimeDifference = 0
-		if (!sink.hasStarted() && !sink.hasFinished() && windowEndTime > sink.latestFinishDate) {
+		if (!sink.hasStarted() && windowEndTime > sink.latestFinishDate) {
 			use(TimeCategory) {
 				windowEndTimeDifference = (windowEndTime - sink.latestFinishDate).minutes
 			}

@@ -195,10 +195,18 @@ class TaskVertex {
 	 * It is defined by {@code AssetCommentStatus#STARTED} and
 	 * {@code AssetCommentStatus#HOLD}
 	 * @return true if {@code TaskVertex#status} is in
-	 * 		[{@code AssetCommentStatus#STARTED}, {@code AssetCommentStatus#HOLD}]
+	 * 		[{@code AssetCommentStatus#STARTED},
+	 * 		{@code AssetCommentStatus#HOLD},
+	 * 		{@code AssetCommentStatus#COMPLETED},
+	 * 		{@code AssetCommentStatus#TERMINATED}]
 	 */
 	Boolean hasStarted() {
-		return status in [AssetCommentStatus.STARTED, AssetCommentStatus.HOLD]
+		return status in [
+			AssetCommentStatus.STARTED,
+			AssetCommentStatus.HOLD,
+			AssetCommentStatus.COMPLETED,
+			AssetCommentStatus.TERMINATED
+		]
 	}
 
 	/**
@@ -249,7 +257,7 @@ class TaskVertex {
 	 */
 	Integer getSlack() {
 		Integer slack = 0
-		if (!hasStarted() && !hasFinished()) {
+		if (!hasStarted()) {
 			slack = TimeUtil.minutesElapsed(earliestStartDate, latestStartDate)
 		}
 
