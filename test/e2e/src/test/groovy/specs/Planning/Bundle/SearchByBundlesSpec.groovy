@@ -114,7 +114,7 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDate((today-9000).format("MM/dd/YYYY"),true)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
     }
 
     def "11. Negative completion date scenario"(){
@@ -123,6 +123,6 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDate((today-9000).format("MM/dd/YYYY"),false)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
        }
 }

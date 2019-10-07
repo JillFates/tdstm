@@ -32,6 +32,7 @@ class CreatePlanningBundlesSpec extends GebReportingSpec {
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
         at MenuPage
         planningModule.goToListBundles()
     }
@@ -66,19 +67,21 @@ class CreatePlanningBundlesSpec extends GebReportingSpec {
     }
 
 
-    def "3. The user is led to Bundle detail landing once the bundle is created"(){
-        given: 'The user has entered all mandatory data'
+    def "3. The user sees in the list the bundle they have just created"(){
+        given: 'The user has entered all mandatory data and checked the planning checkbox'
             clearName()
             enterBundleData bundleData
             clickPlanning()
         when: 'The user clicks save'
             clickSave()
-        then: 'The Bundle detail Landing page is displayed'
+        then: 'The Bundle List Page is displayed'
             at ListBundlesPage
-        and: 'The data displayed is the data entered by the user'
+
+        when: 'The data displayed is the data entered by the user'
             filterByName(bundleData[0])
             clickOnBundle()
             at BundleDetailPage
+        then:
             validateDataDisplayed bundleData
     }
 

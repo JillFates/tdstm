@@ -10,8 +10,7 @@ class ListBundlesPage extends Page {
     static at = {
         listBundlesPageTitle.text() == "Bundle List"
         listBundlesPageBreadcrumbs[0].text()   == "Planning"
-        listBundlesPageBreadcrumbs[1].text()   == "Bundles"
-        listBundlesPageBreadcrumbs[2].text()   == "List"
+        listBundlesPageBreadcrumbs[1].text()   == "Bundle List"
 
     }
 
@@ -118,12 +117,12 @@ class ListBundlesPage extends Page {
 
     def validateBundleIsNotListed(bName){
         filterByName(bName)
-        sleep(1000)
+        sleep(2000)
         noRecordsMsg.displayed
     }
 
     def verifyRowsDisplayed(){
-        selectFilter()
+
         numberOfRows()>0
     }
     /**

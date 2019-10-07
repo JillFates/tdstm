@@ -38,6 +38,7 @@ class BundleDeleteSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(2000)
         planningModule.goToListBundles()
         sleep(2000)
         at ListBundlesPage
@@ -95,10 +96,10 @@ class BundleDeleteSpec extends GebReportingSpec {
             at BundleDetailPage
         when: 'The user clicks on Delete and confirms'
             confirmDeletion()
-        then: 'The bundle is deleted'
             at ListBundlesPage
             clearNameFilter()
             filterByName bundleData1[0]
+        then: 'The bundle is deleted'
             validateBundleIsNotListed(bundleName)
     }
 
@@ -127,10 +128,10 @@ class BundleDeleteSpec extends GebReportingSpec {
             at BundleDetailPage
         when: 'The user clicks on Cancel and confirms'
             confirmDeletion()
-        then: 'The bundle is not deleted'
             at ListBundlesPage
             filterByName bundleData2[0]
             selectPlanningOption(false)
+        then: 'The bundle is not deleted'
             validateBundleIsNotListed(bundleName)
     }
 }

@@ -36,6 +36,7 @@ class BundleCleanUpSpec extends GebReportingSpec {
         login()
         at MenuPage
         planningModule.goToListBundles()
+        sleep(1500)
         at ListBundlesPage
 
     }
@@ -55,12 +56,8 @@ class BundleCleanUpSpec extends GebReportingSpec {
         confirmDeletion()
         at ListBundlesPage
         filterByName baseName
-        selectFilter()
-        if (isPlanning) {
-            clickPlanningFilter()
-        } else {
-            clickNonPlanningFilter()
-        }
+        selectPlanningOption(isPlanning)
+
     }
 
     def deleteBundles(isPlanning = false) {
