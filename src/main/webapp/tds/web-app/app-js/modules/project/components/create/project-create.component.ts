@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {ProjectModel} from '../../model/project.model';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
@@ -8,6 +8,7 @@ import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../..
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-create`,
@@ -28,6 +29,8 @@ export class ProjectCreateComponent implements OnInit {
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
 
+	@ViewChild('startDatePicker') startDatePicker;
+	@ViewChild('completionDatePicker') completionDatePicker;
 	constructor(
 		private projectService: ProjectService,
 		private promptService: UIPromptService,
@@ -42,8 +45,8 @@ export class ProjectCreateComponent implements OnInit {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
+			startDate: null,
+			completionDate: null,
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
@@ -87,6 +90,17 @@ export class ProjectCreateComponent implements OnInit {
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	// This is a work-around for firefox users
+	onOpenStartDatePicker (event) {
+		event.preventDefault();
+		this.startDatePicker.toggle();
+	}
+
+	onOpenCompletionDatePicker (event) {
+		event.preventDefault();
+		this.completionDatePicker.toggle();
 	}
 
 	public onSelectFile(e?: any): void {
@@ -141,7 +155,7 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateRequiredFields(this.projectModel)) {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
 			this.projectModel.startDate.setHours(0, 0, 0, 0);
 			this.projectModel.completionDate.setHours(0, 0, 0, 0);
 			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
