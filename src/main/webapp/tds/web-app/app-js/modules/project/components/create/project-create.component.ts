@@ -156,10 +156,14 @@ export class ProjectCreateComponent implements OnInit {
 
 	public saveForm() {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
-			this.projectModel.startDate.setHours(0, 0, 0, 0);
-			this.projectModel.completionDate.setHours(0, 0, 0, 0);
-			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
-			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			if (this.projectModel.startDate) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			}
+			if (this.projectModel.completionDate) {
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();
