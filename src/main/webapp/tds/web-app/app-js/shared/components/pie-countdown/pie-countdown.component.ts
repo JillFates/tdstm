@@ -110,7 +110,6 @@ export class PieCountdownComponent implements OnInit {
 	*/
 	getTimerClass(): string {
 		const seconds = this.selectedTimerOption && this.selectedTimerOption.seconds || '';
-
 		return seconds ? `timer-${seconds}-seconds` : '';
 	}
 
