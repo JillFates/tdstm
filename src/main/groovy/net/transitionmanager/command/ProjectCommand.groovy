@@ -28,7 +28,7 @@ class ProjectCommand implements CommandObject {
 		defaultBundle nullable: true
 
 		planMethodology validator: { val, obj, errors ->
-			if (!val.startsWith('custom')) {
+			if (val && !val.startsWith('custom')) {
 				errors.rejectValue('planMethodology', 'project.plan.methodology.invalid')
 			}
 		}
