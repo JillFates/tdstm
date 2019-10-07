@@ -32,6 +32,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public client;
 	public clients;
 	public planMethodologies;
+	public methodologyKey;
 	public projectTypes;
 	public projectManagers;
 	public possiblePartners;
@@ -156,11 +157,11 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectModel.partnerIds.push(partner.id);
 				});
 
-				this.planMethodologies = [];
-				data.planMethodologies.forEach((methodology) => {
-					this.planMethodologies.push(methodology.label);
+				this.planMethodologies = data.planMethodologies ? data.planMethodologies : [];
+				this.methodologyKey = {};
+				this.planMethodologies.forEach((methodology) => {
+					this.methodologyKey[methodology.field] = methodology.label;
 				});
-
 				this.possibleManagers = data.possibleManagers ? data.possibleManagers : [];
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
