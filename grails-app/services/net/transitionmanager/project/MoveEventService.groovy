@@ -282,7 +282,7 @@ class MoveEventService implements ServiceMethods {
 			// Deletes all UserPreference pointing to this event.
 			jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEvent.id)
 			// Deletes all AppMoveEvent related to this event.
-			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?', [moveEvent.id])
+			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?0', [moveEvent.id])
 			// Nulls out references to this event in comments and tasks.
 			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?0", [moveEvent.id])
 			// Deletes the event.
