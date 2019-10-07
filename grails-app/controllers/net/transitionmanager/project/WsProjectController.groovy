@@ -95,7 +95,11 @@ class WsProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		// Copy plan methodology field from the default project
 		Project defaultProject = Project.defaultProject
-		List<Map> managers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
+		List<Map> managers = projectDetails.managers.collect { manager ->
+			Party party = GrailsHibernateUtil.unwrapIfProxy(manager.partyIdTo)
+			[name: party.toString(), id: party.id ]
+		}
+
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		params.planMethodology = defaultProject.planMethodology
