@@ -30,7 +30,6 @@ export const TDSAppRoute: Routes = [
 	{path: Paths.notice, loadChildren: '../modules/noticeManager/notice-manager.module#NoticeManagerModule'},
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
 	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
-	{path: 'assetExport', loadChildren: '../modules/assetExport/asset-export.module#AssetExportModule'},
 ];
 
 @NgModule({
