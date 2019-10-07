@@ -2457,7 +2457,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 						genTitles.each { generalTaskTitle ->
 							// Replace the potential title:[array] with just the current title
 							taskSpec.title = generalTaskTitle
-							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null, null)
+							newTask = createTaskFromSpec(recipeId, whom, taskList, taskSpec, projectStaff, settings, exceptions, null)
 
 							taskSpecTasks[taskSpec.id] << newTask
 
