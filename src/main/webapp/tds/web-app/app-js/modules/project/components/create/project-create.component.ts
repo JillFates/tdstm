@@ -45,8 +45,8 @@ export class ProjectCreateComponent implements OnInit {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: null,
-			completionDate: null,
+			startDate: new Date(),
+			completionDate: new Date(),
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
@@ -59,6 +59,7 @@ export class ProjectCreateComponent implements OnInit {
 			planMethodology: ''
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
+		this.projectModel.completionDate.setMonth(this.projectModel.completionDate.getMonth()+2);
 		this.file.uploadRestrictions = {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
 			maxFileSize: 50000
