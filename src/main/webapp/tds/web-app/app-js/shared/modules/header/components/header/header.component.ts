@@ -85,6 +85,9 @@ export class HeaderComponent {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: false
+		}, {
+			provide: String,
+			useValue: ''
 		}]).catch(result => {
 			console.log('Dismissed Dialog');
 		});

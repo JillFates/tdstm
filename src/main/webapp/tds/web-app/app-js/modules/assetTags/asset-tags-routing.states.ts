@@ -31,7 +31,7 @@ export const AssetTagsRoute: Routes = [
 			page: {
 				title: 'ASSET_TAGS.MANAGE_TAGS',
 				instruction: '',
-				menu: ['GLOBAL.PROJECTS', 'ASSET_TAGS.MANAGE_TAGS'],
+				menu: ['GLOBAL.PROJECT', 'ASSET_TAGS.MANAGE_TAGS'],
 				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-project-tags'}
 			},
 			requiresAuth: true,

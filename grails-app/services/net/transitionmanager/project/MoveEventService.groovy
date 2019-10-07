@@ -7,6 +7,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.tag.TagEventService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.asset.AssetEntity
@@ -89,41 +90,39 @@ class MoveEventService implements ServiceMethods {
 		me
 	}
 
-	/**
-	 * Used to create a new move event.
-	 *
-	 * @param event The event command object with the parameters to create a new event.
-	 * @param currentProject The current project to create an event for.
-	 *
-	 * @return the instance of the move event created, which may contain errors if the save doesn't work(failOnError: false)
-	 */
-	MoveEvent save(CreateEventCommand event, Project currentProject) {
-		MoveEvent moveEvent = new MoveEvent(
-			project: currentProject,
-			name: event.name,
-			description: event.description,
-			runbookStatus: event.runbookStatus,
-			runbookBridge1: event.runbookBridge1,
-			runbookBridge2: event.runbookBridge2,
-			videolink: event.videolink,
-			estStartTime: event.estStartTime,
-			estCompletionTime: event.estCompletionTime,
-			apiActionBypass: event.apiActionBypass
-		)
 
-		if (moveEvent.project.runbookOn == 1) {
-			moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
+	/**
+	 * Create or update a MoveEvent based on the given CommandObject.
+	 * @param project
+	 * @param eventCommand
+	 * @param moveEventId
+	 * @return
+	 */
+	MoveEvent createOrUpdate(Project project, CreateEventCommand eventCommand, Long moveEventId = null) {
+		MoveEvent moveEvent = getOrCreate(MoveEvent, moveEventId, project)
+		eventCommand.populateDomain(moveEvent, false, ['moveBundle', 'tagIds'])
+		moveEvent.save()
+
+		// Determine if there are any tagEvents to delete.
+		List<TagEvent> tagEventsToDelete = moveEvent.tagEvents?.findAll{ TagEvent tagEvent -> !eventCommand.tagIds.contains( tagEvent.tagId ) }
+		if (tagEventsToDelete) {
+			moveEvent.tagEvents.removeAll(tagEventsToDelete)
+			tagEventService.removeTags(project, tagEventsToDelete*.id)
 		}
 
-		moveEvent.save(failOnError: false)
+		// Assign the corresponding move bundles.
+		moveBundleService.assignMoveEvent(moveEvent, eventCommand.moveBundle)
 
-		if (!moveEvent.hasErrors()) {
-			moveBundleService.assignMoveEvent(moveEvent, event.moveBundle)
-			moveBundleService.createManualMoveEventSnapshot(moveEvent)
-
-			if (event.tagIds) {
-				tagEventService.applyTags(currentProject, event.tagIds, moveEvent.id)
-			}
+		// Create a list with the tags (if any) already set for this event instance.
+		List<Long> existingTagEvents = moveEvent.tagEvents*.tagId
+		// Define the list of tags that need to be added to the event.
+		List<Long> tagEventIdsToAdd = eventCommand.tagIds
+		// If the event had already some tags, filter those out so we don't add them twice.
+		if (existingTagEvents) {
+			tagEventIdsToAdd = eventCommand.tagIds.collect { Long tagId -> !existingTagEvents.contains(tagId)}
+		}
+		if (tagEventIdsToAdd) {
+			tagEventService.applyTags(project, tagEventIdsToAdd, moveEvent)
 		}
 
 		return moveEvent
@@ -336,20 +335,6 @@ class MoveEventService implements ServiceMethods {
 	MoveEvent findById(Long id, boolean throwException = false) {
 		Project currentProject = securityService.getUserCurrentProject()
 		return GormUtil.findInProject(currentProject, MoveEvent, id, throwException)
-	}
-
-	/**
-	 * Update a move event
-	 * @param id - move event id to update
-	 * @param command - move event command object
-	 * @return
-	 */
-	MoveEvent update(Long id, CreateEventCommand command) {
-		MoveEvent moveEvent = findById(id, true)
-		moveEvent.properties = command
-		moveEvent.save()
-
-		return moveEvent
 	}
 
 	/**
