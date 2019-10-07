@@ -514,18 +514,35 @@ class AssetComment {
 
 	Map toMap() {
 		Map dataMap = [
-				id: id,
-				assetEntityId: assetEntity.id,
-				assetName: assetEntity.assetName,
-				assetType: assetEntity.assetType,
-				createdBy: [id:createdBy.id, name: createdBy.toString()],
-				comment: comment,
-				category: category,
-				lastUpdated: lastUpdated,
-				dateCreated: dateCreated,
-				dateResolved: dateResolved,
-				assignedTo: assignedTo?.toString() ?: '',
-				isResolved: dateResolved ? 'Yes' : 'No'
+			id                  : id,
+			assetEntityId       : assetEntity.id,
+			assetName           : assetEntity.assetName,
+			assetType           : assetEntity.assetType,
+			createdBy           : [id: createdBy.id, name: createdBy.toString()],
+			comment             : comment,
+			category            : category,
+			lastUpdated         : lastUpdated,
+			dateCreated         : dateCreated,
+			dateResolved        : dateResolved,
+			assignedTo          : assignedTo?.toString() ?: '',
+			isResolved          : dateResolved ? 'Yes' : 'No',
+			durationScale       : durationScale.name(),
+			apiActionInvokedAt  : apiActionInvokedAt,
+			apiActionCompletedAt: apiActionCompletedAt,
+			duration            : duration,
+			taskSpec            : taskSpec,
+			hardAssigned        : hardAssigned,
+			sendNotification    : sendNotification,
+			priority            : priority,
+			status              : status,
+			moveEvent           : moveEvent.id,
+			taskNumber          : taskNumber,
+			estimatedStart      : estStart,
+			estimatedFinish     : estFinish,
+			actualStart         : actStart,
+			actualFinish        : actFinish,
+			percentageComplete  : percentageComplete,
+			dueDate             : dueDate
 		]
 		return dataMap
 	}
