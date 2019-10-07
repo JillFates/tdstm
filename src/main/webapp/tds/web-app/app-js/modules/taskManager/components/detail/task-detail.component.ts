@@ -25,6 +25,7 @@ import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: `task-detail`,
@@ -53,6 +54,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
+	taskActionInfoModel: TaskActionInfoModel;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -128,6 +130,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
+		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
+			.subscribe((result: TaskActionInfoModel) => {
+			this.taskActionInfoModel = result;
+		});
 	}
 
 	/**

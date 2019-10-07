@@ -51,7 +51,8 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		type: 'text',
 		width: 100,
 		locked: false,
-		cellClass: 'task-updated'
+		cellClass: 'task-updated',
+		sortable: false
 	},
 	{
 		label: 'Due Date',

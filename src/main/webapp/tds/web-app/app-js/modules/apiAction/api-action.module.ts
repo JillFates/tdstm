@@ -24,6 +24,7 @@ import {APIActionResolveService} from './resolve/api-action-resolve.service';
 import {APIActionService} from './service/api-action.service';
 import {CustomDomainService} from '../fieldSettings/service/custom-domain.service';
 import { ApiActionViewEditParamatersComponent } from './components/view-edit/api-action-view-edit-paramaters.component';
+import { ApiActionViewEditReactionsComponent } from './components/view-edit/api-action-view-edit-reactions.component';
 
 @NgModule({
 	imports: [
@@ -45,7 +46,8 @@ import { ApiActionViewEditParamatersComponent } from './components/view-edit/api
 		APIActionViewEditComponent,
 		PopupPollingComponent,
 		PopupProvidesDataComponent,
-		ApiActionViewEditParamatersComponent
+		ApiActionViewEditParamatersComponent,
+		ApiActionViewEditReactionsComponent
 	],
 	providers: [
 		// Resolve

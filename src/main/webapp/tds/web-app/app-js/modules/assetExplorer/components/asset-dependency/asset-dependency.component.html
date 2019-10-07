@@ -91,19 +91,32 @@
                      [ngClass]="{'has-dependency-a': dependencyA, 'has-dependency-b': dependencyB}">
 
                     <div class="dependency-row">
-                        <div class="dependency-row-legend">Date created</div>
-                        <div class="dependency-a"><label class="dependency-label">{{dependencyA?.dateCreated}}</label></div>
-                        <div class="dependency-b"><label class="dependency-label">{{dependencyB?.dateCreated}}</label></div>
+                        <div class="dependency-row-legend">Created by</div>
+                        <div class="dependency-a">
+                            <label class="dependency-label created-dates" *ngIf="dependencyA && dependencyA.createdBy">
+                            {{getPersonName(dependencyA.createdBy)}} at {{dependencyA?.dateCreated}}
+                            </label></div>
+                        <div class="dependency-b">
+                            <label class="dependency-label created-dates" *ngIf="dependencyB && dependencyB.createdBy">
+                                {{getPersonName(dependencyB.createdBy)}} at {{dependencyB?.dateCreated}}
+                            </label>
+                        </div>
                     </div>
 
                     <div class="dependency-row">
-                        <div class="dependency-row-legend">Last updated</div>
-                        <div class="dependency-a"><label class="dependency-label">{{dependencyA?.lastUpdated}}</label></div>
-                        <div class="dependency-b"><label class="dependency-label">{{dependencyB?.lastUpdated}}</label></div>
+                        <div class="dependency-row-legend">Updated by</div>
+                        <div class="dependency-a">
+                            <label class="dependency-label updated-dates" *ngIf="dependencyA && dependencyA.updatedBy">
+                                {{getPersonName(dependencyA.updatedBy)}} at {{dependencyA?.lastUpdated}}
+                            </label>
+                        </div>
+                        <div class="dependency-b">
+                            <label class="dependency-label updated-dates" *ngIf="dependencyB && dependencyB.updatedBy">
+                                {{getPersonName(dependencyB.updatedBy)}} at {{dependencyB?.lastUpdated}}
+                            </label>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
             <div class="modal-footer form-group-center">
                 <div *ngIf="!isEditing; else buttonsEditModeTemplate">

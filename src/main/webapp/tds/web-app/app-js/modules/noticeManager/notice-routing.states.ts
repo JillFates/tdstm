@@ -29,7 +29,7 @@ export const NoticeManagerRoute: Routes = [
 			page: {
 				title: 'NOTICE.NOTICE_ADMINISTRATION',
 				instruction: '',
-				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE', 'GLOBAL.LIST'],
+				menu: ['GLOBAL.ADMIN', 'NOTICE.NOTICE_LIST'],
 				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-admin-notice-manager', subMenu: true }
 			},
 			requiresAuth: true,
