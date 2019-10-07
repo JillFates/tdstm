@@ -1891,6 +1891,7 @@ class ProjectService implements ServiceMethods {
 	 * @param projectCommand
 	 * @return
 	 */
+	@Transactional
 	Project createOrUpdateProject(ProjectCommand projectCommand) {
 		Project project
 		if (projectCommand.id > 0) {
