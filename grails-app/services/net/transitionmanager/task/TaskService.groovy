@@ -5717,6 +5717,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			List userSelectedCols = []
 			(1..5).each { colId ->
 				String value = getColumnValue(taskPref[colId.toString()], it)
+				value = value != 'null' ? value : ''
 				userSelectedCols << (value?.getClass()?.isEnum() ? value?.value() : value)
 			}
 
@@ -5748,7 +5749,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				assetEntityId: it.assetEntity?.id,
 				assetEntityAssetType: it.assetEntity?.assetType ,
 				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
-				instructionsLinkURL: instructionsLinkURL,
+				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,

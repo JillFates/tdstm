@@ -1,15 +1,14 @@
-import {Component, ElementRef, OnInit, Renderer2} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ProjectService} from '../../service/project.service';
 import {ProjectModel} from '../../model/project.model';
-import {Router} from '@angular/router';
-import {UIActiveDialogService, UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
-import {ASSET_IMPORT_FILE_UPLOAD_TYPE, DIALOG_SIZE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
+import {ASSET_IMPORT_FILE_UPLOAD_TYPE, FILE_UPLOAD_TYPE_PARAM} from '../../../../shared/model/constants';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
-import {EventModel} from '../../../event/model/event.model';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-create`,
@@ -30,6 +29,8 @@ export class ProjectCreateComponent implements OnInit {
 	public transformResult: ApiResponseModel;
 	public transformInProcess = false;
 
+	@ViewChild('startDatePicker') startDatePicker;
+	@ViewChild('completionDatePicker') completionDatePicker;
 	constructor(
 		private projectService: ProjectService,
 		private promptService: UIPromptService,
@@ -44,8 +45,8 @@ export class ProjectCreateComponent implements OnInit {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
+			startDate: null,
+			completionDate: null,
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
@@ -81,11 +82,25 @@ export class ProjectCreateComponent implements OnInit {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
+		}, {
+			provide: String,
+			useValue: this.projectModel.timeZone
 		}]).then(result => {
 			this.projectModel.timeZone = result.timezone;
 		}).catch(result => {
 			console.log('Dismissed Dialog');
 		});
+	}
+
+	// This is a work-around for firefox users
+	onOpenStartDatePicker (event) {
+		event.preventDefault();
+		this.startDatePicker.toggle();
+	}
+
+	onOpenCompletionDatePicker (event) {
+		event.preventDefault();
+		this.completionDatePicker.toggle();
 	}
 
 	public onSelectFile(e?: any): void {
@@ -140,7 +155,15 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public saveForm() {
-		if (this.validateRequiredFields(this.projectModel)) {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
+			if (this.projectModel.startDate) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			}
+			if (this.projectModel.completionDate) {
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			this.projectService.saveProject(this.projectModel, this.logoOriginalFilename).subscribe((result: any) => {
 				if (result.status === 'success') {
 					this.activeDialog.close();

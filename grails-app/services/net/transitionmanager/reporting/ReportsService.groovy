@@ -57,7 +57,7 @@ import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
-import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
@@ -89,7 +89,7 @@ class ReportsService implements ServiceMethods {
     ControllerService controllerService
     ProjectService projectService
     TagAssetService tagAssetService
-    TimeLineService timeLineService
+    TimelineService timelineService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -1194,11 +1194,10 @@ class ReportsService implements ServiceMethods {
         StringBuilder sinksRef = new StringBuilder()
         StringBuilder cyclicalsRef = new StringBuilder()
 
-        Boolean publishedValues = viewUnpublished ? [true, false] : [true]
         CPAResults cpaResults
 
         try {
-            cpaResults = timeLineService.calculateCPA(moveEvent)
+            cpaResults = timelineService.calculateCPA(moveEvent, viewUnpublished)
         } catch (e) {
             exceptionString += "No Tasks"
         }
@@ -1215,6 +1214,10 @@ class ReportsService implements ServiceMethods {
             return content
         }
 
+        Closure<Task> findInTasks = { TaskVertex taskVertex, List<Task> taskList ->
+            return taskList.find { it.id == taskVertex.taskId }
+        }
+
         if (cpaResults) {
 
             if (!summary.hasCycles()) {
@@ -1226,7 +1229,7 @@ class ReportsService implements ServiceMethods {
                 summary.cycles.each { List<TaskVertex> c ->
                     cyclicalsRef.append("<li> Circular Reference Stack: <ul>")
                     c.each { TaskVertex cyclicalTask ->
-                        Task task = tasks.find { it.id == cyclicalTask.taskId }
+                        Task task = findInTasks(cyclicalTask, tasks)
                         cyclicalsRef.append(htmlConverter(cyclicalTask, task))
                     }
                     cyclicalsRef.append('</ul>')
@@ -1248,7 +1251,7 @@ class ReportsService implements ServiceMethods {
                 startsRef.append('<ul>')
 
                 graph.starts.each { TaskVertex taskVertex ->
-                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    Task task = findInTasks(taskVertex, tasks)
                     startsRef.append(htmlConverter(taskVertex, task))
                 }
                 startsRef.append('</ul>')
@@ -1267,11 +1270,13 @@ class ReportsService implements ServiceMethods {
 					(e.g. Move Event Complete). This is an indicator that some task wiring may be incorrect.''')
                 sinksRef.append('<ul>')
                 graph.sinks.each { TaskVertex taskVertex ->
-                    Task task = tasks.find { it.id == taskVertex.taskId }
+                    Task task = findInTasks(taskVertex, tasks)
                     sinksRef.append(htmlConverter(taskVertex, task))
                 }
                 sinksRef.append('</ul>')
             }
+
+            List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
 
             personTasks = AssetComment.executeQuery('''
 				from AssetComment
