@@ -99,17 +99,17 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	// This is a work-around for firefox users
-	onOpenStartDatePicker (event) {
+	onOpenStartDatePicker (event): void {
 		event.preventDefault();
 		this.startDatePicker.toggle();
 	}
 
-	onOpenCompletionDatePicker (event) {
+	onOpenCompletionDatePicker (event): void {
 		event.preventDefault();
 		this.completionDatePicker.toggle();
 	}
 
-	public confirmDeleteProject() {
+	public confirmDeleteProject(): void {
 		this.promptService.open(
 			'Confirmation Required',
 			'WARNING: Are you sure you want to delete this project? This cannot be undone.', 'Confirm', 'Cancel')
@@ -121,7 +121,7 @@ export class ProjectViewEditComponent implements OnInit {
 			.catch((error) => console.log(error));
 	}
 
-	private deleteProject() {
+	private deleteProject(): void {
 		this.projectService.deleteProject(this.projectId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
@@ -130,11 +130,11 @@ export class ProjectViewEditComponent implements OnInit {
 			});
 	}
 
-	public switchToEdit() {
+	public switchToEdit(): void {
 		this.editing = true;
 	}
 
-	private getModel(id) {
+	private getModel(id): void {
 		this.projectService.getModelForProjectViewEdit(id)
 			.subscribe((result) => {
 				let data = result.data;
@@ -183,7 +183,7 @@ export class ProjectViewEditComponent implements OnInit {
 			});
 	}
 
-	private updateSavedFields() {
+	private updateSavedFields(): void {
 		this.savedModel = JSON.parse(JSON.stringify(this.projectModel));
 
 		this.clients.forEach((client) => {
@@ -193,7 +193,7 @@ export class ProjectViewEditComponent implements OnInit {
 		});
 	}
 
-	public saveForm() {
+	public saveForm(): void {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
 			this.projectModel.startDate.setHours(0, 0, 0, 0);
 			this.projectModel.completionDate.setHours(0, 0, 0, 0);
@@ -233,7 +233,7 @@ export class ProjectViewEditComponent implements OnInit {
 		return returnVal;
 	}
 
-	openTimezoneModal() {
+	openTimezoneModal(): void {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
@@ -276,7 +276,7 @@ export class ProjectViewEditComponent implements OnInit {
 		this.clearFilename();
 	}
 
-	public completeEventHandler(e: SuccessEvent) {
+	public completeEventHandler(e: SuccessEvent): void {
 		let response = e.response.body.data;
 		if (response && response.operation === 'delete') { // file deleted successfully
 			this.clearFilename();
@@ -293,16 +293,21 @@ export class ProjectViewEditComponent implements OnInit {
 		}
 	}
 
-	private clearFilename(e?: any) {
+	private clearFilename(e?: any): void {
 		this.fetchResult = null;
 	}
 
-	onPartnerSelectionChange(partner, selection) {
+	/**
+	 * Handling for partner selection
+	 * @param partner - The partner to modify
+	 * @param selection - The event (Object that will be used to modify the selected partner)
+	 */
+	public onPartnerSelectionChange(partner: any, selection: any): void {
 		partner.id = selection.id;
 		partner.name = selection.name;
 	}
 
-	onDeleteLogo() {
+	public onDeleteLogo(): void {
 		this.projectLogoId = 0;
 		this.projectModel.projectLogo = null;
 	}
