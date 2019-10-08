@@ -445,6 +445,10 @@ class AssetComment {
 		return myTask
 	}
 
+	/**
+	 * Map definition of the Task that will be used for the Graph Endpoints
+	 * @return a Map definition of the Task
+	 */
 	Map mapForGraphs() {
 		[
 				  id            : id,
