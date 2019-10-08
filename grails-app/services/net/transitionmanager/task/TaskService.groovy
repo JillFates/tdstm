@@ -64,6 +64,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -79,6 +80,7 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -5729,6 +5731,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			AssetEntity asset = GrailsHibernateUtil.unwrapIfProxy(it.assetEntity)
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5746,9 +5750,9 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				score: it.score ?: 0,
 				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
 				dueClass: dueClass,
-				assetEntityId: it.assetEntity?.id,
-				assetEntityAssetType: it.assetEntity?.assetType ,
-				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
+				assetEntityId: asset?.id,
+				assetEntityAssetType: asset?.assetType ,
+				assetEntityAssetClass: asset?.assetClass?.toString(),
 				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
