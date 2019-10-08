@@ -43,8 +43,8 @@ export class TaskEditCreateModelHelper {
 	 */
 	public getModelForEdit(model: any): any {
 		this.model = model;
-		this.model.estimatedStart = new Date(this.model.estimatedStart);
-		this.model.estimatedFinish = new Date(this.model.estimatedFinish);
+		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
+		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
