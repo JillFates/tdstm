@@ -123,10 +123,18 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openTaskDetailView(comment: any): void {
+		const currentUserId = (
+			this.userContext &&
+			this.userContext.person &&
+			this.userContext.person
+		) ? this.userContext.person.id : null ;
 		let taskDetailModel: TaskDetailModel = {
 			id: comment.taskId,
 			modal: {
 				title: 'Task Detail'
+			},
+			detail: {
+				currentUserId
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
