@@ -596,7 +596,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 				apiActionList          : apiActionList,
 				assetClass             : assetComment.assetEntity?.assetClass?.toString(),
 				assetClasses           : assetEntityService.getAssetClasses(),
-				assetComment           : assetComment.toMap(),
+				assetComment           : assetComment.taskToMap(),
 				assetId                : assetComment.assetEntity?.id ?: "",
 				assetName              : assetComment.assetEntity?.assetName ?: "",
 				assetType              : assetComment.assetEntity?.assetType,

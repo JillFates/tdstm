@@ -434,7 +434,7 @@ class CommentService implements ServiceMethods {
 				boolean status = assetComment.commentType == AssetCommentType.TASK && !assetComment.isResolved()
 
 				map = [
-					assetComment: assetComment.toMap(),
+					assetComment: assetComment.taskToMap(),
 					status: status,
 					cssClass: css,
 					statusCss: taskService.getCssClassForStatus(assetComment.status),
