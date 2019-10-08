@@ -113,6 +113,9 @@ class AssetComment {
 	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
 	static final List<String> planningCategories = AssetCommentCategory.planningCategories
 
+	// Used by the isMyTask method
+	static final List<AssetCommentStatus> canBeMyTasksForTheseStatuses = [AssetCommentStatus.PENDING, AssetCommentStatus.PLANNED, AssetCommentStatus.READY]
+
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
 	Map tmpDefSucc
@@ -436,8 +439,6 @@ class AssetComment {
 	boolean isMyTask(Person person, List<String> teams) {
 		boolean myTask = ( assignedTo == person )
 		if ( !myTask ) {
-			List<AssetCommentStatus> canBeMyTasksForTheseStatuses = [AssetCommentStatus.PENDING, AssetCommentStatus.PLANNED, AssetCommentStatus.READY]
-
 			myTask = this.role in teams &&
 					  this.status in canBeMyTasksForTheseStatuses &&
 					  (this.assignedTo == null || this.assignedTo && this.hardAssigned == 0 )
