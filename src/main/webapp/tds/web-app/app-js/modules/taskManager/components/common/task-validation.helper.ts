@@ -1,5 +1,5 @@
-import {TaskStatus} from '../../../../modules/taskManager/model/task-edit-create.model';
-import {IGraphTask} from '../../../../modules/taskManager/model/graph-task.model';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {IGraphTask} from '../../model/graph-task.model';
 
 export class TaskValidationHelper {
 

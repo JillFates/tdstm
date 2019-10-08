@@ -10,7 +10,7 @@ import {
 	ElementRef
 } from '@angular/core';
 import * as go from 'gojs';
-import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../constants/icons-path';
+import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../modules/taskManager/components/common/constants/task-icon-path';
 import {
 	Adornment,
 	Binding,

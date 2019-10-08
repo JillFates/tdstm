@@ -8,7 +8,7 @@ import {
 	ViewChild
 } from '@angular/core';
 
-import {CTX_MENU_ICONS_PATH} from '../../../constants/icons-path';
+import {CTX_MENU_ICONS_PATH} from '../../../../modules/taskManager/components/common/constants/task-icon-path';
 import {
 	HideBtn,
 	IHideBtn,

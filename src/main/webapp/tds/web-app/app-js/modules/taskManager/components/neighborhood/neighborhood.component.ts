@@ -19,14 +19,14 @@ import {TaskDetailComponent} from '../detail/task-detail.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {TaskEditComponent} from '../edit/task-edit.component';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskActionEvents} from '../../../../shared/components/diagram-layout/constants/task-action-events.constant';
+import {TaskActionEvents} from '../common/constants/task-action-events.constant';
 import {TaskStatus} from '../../model/task-edit-create.model';
 import {ITaskEvent} from '../../model/task-event.model';
 import {
 	ContainerComp,
 	IDiagramContextMenuOption
 } from '../../../../shared/components/diagram-layout/model/diagram-context-menu.model';
-import {CTX_MENU_ICONS_PATH} from '../../../../shared/constants/icons-path';
+import {CTX_MENU_ICONS_PATH} from '../common/constants/task-icon-path';
 import {Permission} from '../../../../shared/model/permission.model';
 import {ILinkPath} from '../../../../shared/components/diagram-layout/model/diagram-layout.model';
 import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';

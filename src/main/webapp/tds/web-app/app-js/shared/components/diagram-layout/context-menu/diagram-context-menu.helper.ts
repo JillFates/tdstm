@@ -1,5 +1,5 @@
 import {ContainerComp, IDiagramContextMenuField} from '../model/diagram-context-menu.model';
-import {TaskValidationHelper} from './task-validation.helper';
+import {TaskValidationHelper} from '../../../../modules/taskManager/components/common/task-validation.helper';
 import {IGraphTask, TASK_OPTION_LABEL} from '../../../../modules/taskManager/model/graph-task.model';
 
 export class DiagramContextMenuHelper {
