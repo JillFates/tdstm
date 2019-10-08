@@ -29,7 +29,8 @@ class ProjectCommand implements CommandObject {
 		projectLogo nullable: true
 		collectMetrics range: 0..1
 		planMethodology validator: { val, obj, errors ->
-			if (val && ! val ==~ /custom[0-9]{2}/) {
+			//The regex is looking for values that start with custom followed by a number 0 through 99
+			if (val && ! val ==~ /custom[0-9]{2}/){
 				errors.rejectValue('planMethodology', 'project.plan.methodology.invalid')
 			}
 		},
