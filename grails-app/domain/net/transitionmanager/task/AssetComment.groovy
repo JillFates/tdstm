@@ -434,9 +434,10 @@ class AssetComment {
 	 * @return true if the task can be considered theirs based on the status and assignment
 	 */
 	boolean isMyTask(Person person, List<String> teams) {
-		List<AssetCommentStatus> canBeMyTasksForTheseStatuses = [AssetCommentStatus.PENDING, AssetCommentStatus.PLANNED, AssetCommentStatus.READY]
 		boolean myTask = ( assignedTo == person )
 		if ( !myTask ) {
+			List<AssetCommentStatus> canBeMyTasksForTheseStatuses = [AssetCommentStatus.PENDING, AssetCommentStatus.PLANNED, AssetCommentStatus.READY]
+
 			myTask = this.role in teams &&
 					  this.status in canBeMyTasksForTheseStatuses &&
 					  (this.assignedTo == null || this.assignedTo && this.hardAssigned == 0 )
