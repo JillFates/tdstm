@@ -46,7 +46,7 @@ export class ProjectCreateComponent implements OnInit {
 			description: '',
 			startDate: new Date(),
 			completionDate: new Date(),
-			partnerIds: [],
+			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,
 			projectCode: '',
@@ -65,7 +65,7 @@ export class ProjectCreateComponent implements OnInit {
 		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
 	}
 
-	private getModel() {
+	private getModel(): void {
 		this.projectService.getModelForProjectCreate().subscribe((result: any) => {
 			let data = result.data;
 			this.managers = data.managers;
@@ -77,7 +77,7 @@ export class ProjectCreateComponent implements OnInit {
 		});
 	}
 
-	openTimezoneModal() {
+	openTimezoneModal(): void {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
@@ -121,7 +121,7 @@ export class ProjectCreateComponent implements OnInit {
 		this.clearFilename();
 	}
 
-	public completeEventHandler(e: SuccessEvent) {
+	public completeEventHandler(e: SuccessEvent): void {
 		let response = e.response.body.data;
 		if (response && response.operation === 'delete') { // file deleted successfully
 			this.clearFilename();
@@ -138,11 +138,21 @@ export class ProjectCreateComponent implements OnInit {
 		}
 	}
 
-	private clearFilename(e?: any) {
+	private clearFilename(e?: any): void {
 		this.fetchResult = null;
 	}
 
-	public saveForm() {
+	/**
+	 * Handling for partner selection
+	 * @param partner - The partner to modify
+	 * @param selection - The event (Object that will be used to modify the selected partner)
+	 */
+	onPartnerSelectionChange(partner, selection): void {
+		partner.id = selection.id;
+		partner.name = selection.name;
+	}
+
+	public saveForm(): void {
 		if (this.validateRequiredFields(this.projectModel)) {
 			this.projectModel.startDate.setHours(0, 0, 0, 0);
 			this.projectModel.completionDate.setHours(0, 0, 0, 0);
