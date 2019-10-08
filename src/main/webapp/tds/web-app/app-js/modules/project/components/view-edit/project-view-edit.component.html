@@ -233,9 +233,9 @@
                             <div *ngFor="let partner of projectModel.partners; let i = index">
                                 <kendo-dropdownlist style="display: block; margin-bottom: 2px"
                                                     [ngModel]="partner"
-                                                    (selectionChange)="partner.id = $event.id; partner.name = $event.name"
+                                                    (selectionChange)="onPartnerSelectionChange(partner, $event)"
                                                     [name]="'partner_' + i"
-                                                    [data]="partners"
+                                                    [data]="possiblePartners"
                                                     [textField]="'name'"
                                                     [valueField]="'id'"></kendo-dropdownlist>
                             </div>

@@ -140,6 +140,11 @@ export class ProjectCreateComponent implements OnInit {
 		this.fetchResult = null;
 	}
 
+	onPartnerSelectionChange(partner, selection) {
+		partner.id = selection.id;
+		partner.name = selection.name;
+	}
+
 	public saveForm() {
 		if (this.validateRequiredFields(this.projectModel)) {
 			this.projectModel.startDate.setHours(0, 0, 0, 0);

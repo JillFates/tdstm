@@ -297,6 +297,11 @@ export class ProjectViewEditComponent implements OnInit {
 		this.fetchResult = null;
 	}
 
+	onPartnerSelectionChange(partner, selection) {
+		partner.id = selection.id;
+		partner.name = selection.name;
+	}
+
 	onDeleteLogo() {
 		this.projectLogoId = 0;
 		this.projectModel.projectLogo = null;
