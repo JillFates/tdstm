@@ -6,6 +6,8 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
+import groovy.time.TimeCategory
+
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.imports.TaskBatch
@@ -18,6 +20,7 @@ import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
@@ -58,12 +61,15 @@ class AssetComment {
 	TimeScale durationScale = M     // Scale that duration represents m)inute, h)our, d)ay, w)eek
 	Integer priority = 3            // An additional option to score the order that like tasks should be processed where 1=highest and 5=lowest
 
-	Date estStart
-	Date estFinish
-	Date actStart
+	Date estStart					// Earliest time a task should start based on the plan
+	Date estFinish					// Earliest time a task should finsh
+	Date latestStart				// Computed field (estStart + slack)
+	Date latestFinish				// Computed field (estFinish + slack)
+	Date actStart					// The actual time that a task was started by a person or automated trigger
+	// Date actFinish		// Alias of dateResolved
+
 	Date constraintTime               // For tasks that have a constraint on the time that it can start or finish (typically used for start event or start testing)
 	TimeConstraintType constraintType // The type of constraint for time (e.g. MSO-Must Start On, )
-	// Date actFinish		// Alias of dateResolved
 
 	Integer slack                     // Indicated the original or recalculated slack time that this task has based on other predecessors of successors of this task
 	String role                       // The team that will perform the task
@@ -93,6 +99,10 @@ class AssetComment {
 
 	// The percentage of the task that has been completed (manually set by users)
 	Integer percentageComplete = 0
+
+	// Flag that the CPA calculations will set true if the task is part of the critical path
+	Boolean isCriticalPath = false
+
 
 	static hasMany = [notes: CommentNote, taskDependencies: TaskDependency]
 
@@ -187,44 +197,48 @@ class AssetComment {
 		/*
 			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER
 
-			The objectives are sort the list descending in this order:
-				- HOLD 900
-					+ last updated factor ASC
-				- DONE recently (60 seconds), to allow undo 800
-					+ actual finish factor DESC
-				- STARTED tasks     700
-					- Hard assigned to user	+55
-					- by the user	+50
-					- + Est Start Factor to sort ASC
-				- READY tasks		600
-					- Hard assigned to user	+55
-					- Assigned to user		+50
-					- + Est Start factor to sort ASC
-				- PENDING tasks		500
-					- + Est Start factor to sort ASC
-				- DONE tasks		200
-					- Assigned to User	+50
-					- + actual finish factor DESC
-					- DONE by others	+0 + actual finish factor DESC
-				- All other statuses ?
-				- Task # DESC (handled outside the score)
-
-			The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
-
-			DON'T THINK THIS APPLIES ANY MORE - Category of Startup, Physical, Moveday, or Shutdown +10
-			- If duedate exists and is older than today +5
-			- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 		*/
-		// TODO : JPM 11/2015 : TM-4249 Eliminate Timezone computation 'CONVERT_TZ(SUBTIME(NOW(),'00:01:00.0')....' below
-		score formula: "CASE status \
-			WHEN '$HOLD' THEN 900 \
-			WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 800, 200) + status_updated/NOW() \
-			WHEN '$STARTED' THEN 700 + 1 - IFNULL(est_start,NOW())/NOW() \
-			WHEN '$READY' THEN 600 + 1 - IFNULL(est_start,NOW())/NOW() \
-			WHEN '$PENDING' THEN 500 + 1 - IFNULL(est_start,NOW())/NOW() \
-			ELSE 0 END + \
-			IF(role='$AUTOMATIC_ROLE',-100,0) + \
-			(6 - priority) * 5"
+		score formula: """
+			CASE status
+				WHEN '$HOLD' THEN 9000000
+				WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
+				WHEN '$STARTED' THEN 7000000
+				WHEN '$READY' THEN 6000000
+				WHEN '$PENDING' THEN 5000000
+				WHEN '$PLANNED' THEN 4000000
+				WHEN '$TERMINATED' THEN 2000000
+				ELSE 0 
+			END
+			- if(status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
+				COALESCE( ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(status_updated))/60), 0)
+				,0
+			)
+			+ if(status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(est_start + slack),
+				COALESCE( 
+					FLOOR( 
+						SQRT( 10000 * 
+							if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 
+								ROUND( (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(est_start) - slack) / 60),
+								ROUND( (UNIX_TIMESTAMP(est_start) + slack - UNIX_TIMESTAMP(NOW())) / 60)
+							) 
+						) * if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 1, -1)
+					)
+				, 0)
+			, 0)
+			""".toString()
+
+		latestStart formula: '''
+				if(slack is null, est_start, 
+					if(est_start + slack, date_format(addtime(est_start,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+				)
+			'''
+
+		latestFinish formula: '''
+				if(slack is null, est_finish, 
+					if(est_finish + slack, date_format(addtime(est_finish,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+				)
+			'''
+
 	}
 
 	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
@@ -484,6 +498,8 @@ class AssetComment {
 			estDurationMinutes: durationInMinutes(),
 			estStart: estStart,
 			estFinish: estFinish,
+			slack: slack,
+			isCriticalPath: isCriticalPath,
 			actStart: actStart,
 			actFinish: actFinish,
 			team: role ?: '',
@@ -503,12 +519,18 @@ class AssetComment {
 	// task Manager column header names and its labels
 	static final Map<String, String> taskCustomizeFieldAndLabel = [
 		actFinish: 'Actual Finish', actStart: 'Actual Start', apiAction: 'Action Name',
-		assetName: 'Asset Name', assetType: 'Asset Type', assignedTo: 'Assigned To', category: 'Category',
-		bundle: 'Move Bundle', commentType: 'Comment Type', createdBy: 'Created By', dateCreated: 'Date Created',
+		assetName: 'Asset Name', assetType: 'Asset Type', assignedTo: 'Assigned To',
+		bundle: 'Move Bundle',
+		category: 'Category', commentType: 'Comment Type', createdBy: 'Created By', isCriticalPath: 'Critical Path',
+		dateCreated: 'Date Created',
 		dateResolved: 'Date Resolved', displayOption: 'Display Option', duration: 'Duration',
-		durationScale: 'Duration Scale', estStart: 'Estimated Start', estFinish: 'Estimated Finish', event: 'Move Event',
+		durationScale: 'Duration Scale',
+		estFinish: 'Earliest Finish', estStart: 'Earliest Start',
+		event: 'Event',
+		latestFinish: 'Latest Finish', latestStart: 'Latest Start',
 		hardAssigned: 'Hard Assignment', instructionsLink: 'Instructions Link', isPublished: 'Is Published', lastUpdated: 'Last Updated',
-		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team', sendNotification: 'Send Notification',
+		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team', 
+		sendNotification: 'Send Notification', slack: 'Slack', 
 		statusUpdated: 'Status Updated', percentageComplete: 'Completion %', taskSpec: 'TaskSpec ID'
 	].asImmutable()
 

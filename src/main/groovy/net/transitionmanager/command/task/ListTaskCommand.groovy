@@ -37,8 +37,11 @@ class ListTaskCommand implements CommandObject {
 	String estStart
 	String hardAssigned
 	String instructionsLink
+	Boolean isCriticalPath
 	String isPublished
 	String lastUpdated
+	String latestFinish
+	String latestStart
 	String bundle
 	String event
 	String priority
@@ -81,7 +84,10 @@ class ListTaskCommand implements CommandObject {
 		hardAssigned nullable: true
 		instructionsLink nullable: true
 		isPublished nullable: true
+		isCriticalPath nullable: true
 		lastUpdated nullable: true
+		latestFinish nullable: true
+		latestStart nullable: true
 		bundle nullable: true
 		event nullable: true
 		priority nullable: true

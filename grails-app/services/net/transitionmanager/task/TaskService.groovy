@@ -73,10 +73,16 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.transaction.TransactionStatus
 
+import java.sql.Timestamp
 import java.text.DateFormat
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
@@ -230,53 +236,35 @@ class TaskService implements ServiceMethods {
 			queryArgs.minAgo = minAgo
 
 			/*
-
 				NOTE THAT THIS LOGIC IS DUPLICATED IN THE AssetComment Domain for score formula SO IT NEEDS TO BE MAINTAINED TOGETHER
-
-				The objectives are sort the list descending in this order:
-					- HOLD 900
-						+ last updated factor ASC
-					- DONE recently (60 seconds), to allow undo 800
-						+ actual finish factor DESC
-					- STARTED tasks		700
-						- Hard assigned to user +55
-						- by the user	+50
-						- + Est Start Factor to sort ASC
-					- READY tasks		600
-						- Hard assigned to user +55
-						- Assigned to user		+50
-						- + Est Start factor to sort ASC
-					- PENDING tasks		500
-						- + Est Start factor to sort ASC
-					- DONE tasks		200
-						- Assigned to User	+50
-						- + actual finish factor DESC
-						- DONE by others	+0 + actual finish factor DESC
-					- All other statuses ?
-					- Task # DESC (handled outside the score)
-					- AUTO tasks have lessor priority than normal PENDING tasks
-
-				The inverse of Priority will be added to any score * 5 so that Priority tasks bubble up above hard assigned to user
-
-				DON'T THINK THIS APPLIES ANY MORE - Category of Startup, Physical, Moveday, or Shutdown +10
-				- If duedate exists and is older than today +5
-				- Priority - Six (6) - <priority value> (so a priority of 5 will add 1 to the score and 1 adds 5)
 			*/
-			// TODO : JPM 11/2015 : The DONE calculation below needs to change due to tickets TM-4249 and TM-4250
-			// This calculation is completely wrong.
 			sql.append(""",
-				((CASE t.status
-				WHEN '$ACS.HOLD' THEN 900
-				WHEN '$ACS.COMPLETED' THEN IF(t.status_updated >= :minAgo, 800, 200) + UNIX_TIMESTAMP(t.status_updated) / UNIX_TIMESTAMP(:now)
-				WHEN '$ACS.STARTED' THEN 700 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
-				WHEN '$ACS.READY' THEN 600 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
-				WHEN '$ACS.PENDING' THEN 500 + 1 - UNIX_TIMESTAMP(IFNULL(t.est_start,:now)) / UNIX_TIMESTAMP(:now)
-				ELSE 0
-				END) +
-				IF(t.assigned_to_id=:assignedToId AND t.status IN('$ACS.STARTED','$ACS.READY'), IF(t.hard_assigned=1, 55, 50), 0) +
-				IF(t.assigned_to_id=:assignedToId AND t.status='$ACS.COMPLETED',50, 0) +
-				IF(t.role='AUTO', -100, 0) +
-				(6 - t.priority) * 5) AS score """)
+				CASE t.status
+					WHEN '$HOLD' THEN 9000000
+					WHEN '$COMPLETED' THEN IF(t.status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
+					WHEN '$STARTED' THEN 7000000
+					WHEN '$READY' THEN 6000000
+					WHEN '$PENDING' THEN 5000000
+					WHEN '$PLANNED' THEN 4000000
+					WHEN '$TERMINATED' THEN 2000000
+					ELSE 0
+				END
+				- if(t.status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
+					COALESCE( ROUND((UNIX_TIMESTAMP(:now) - UNIX_TIMESTAMP(t.status_updated))/60), 0)
+					,0)
+				+ if(t.status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(t.est_start + t.slack),
+					COALESCE(
+						FLOOR(
+							SQRT( 10000 *
+								if( (UNIX_TIMESTAMP(t.est_start) + t.slack) < UNIX_TIMESTAMP(:now),
+									ROUND( (UNIX_TIMESTAMP(:now) - UNIX_TIMESTAMP(t.est_start) - t.slack) / 60),
+									ROUND( (UNIX_TIMESTAMP(t.est_start) + t.slack -UNIX_TIMESTAMP(:now)) / 60)
+								)
+							) * if( (UNIX_TIMESTAMP(t.est_start) + t.slack) < UNIX_TIMESTAMP(:now), 1, -1)
+						)
+					, 0)
+				, 0) as score
+			""")
 		}
 
 		// Add Successor Count
@@ -374,46 +362,6 @@ class TaskService implements ServiceMethods {
 		} else {
 			[all: allTasks, todo: todoTasks, user: assignedTasks]
 		}
-	}
-
-	def getUserTasksOriginal(person, project, search=null, sortOn='c.dueDate', sortOrder='ASC, c.lastUpdated DESC') {
-
-		// TODO : Runbook: getUserTasks - should get the user's project roles instead of global roles
-
-		// List of statuses that user should be able to see in when soft assigned to others and user has proper role
-
-		Map<String, Object> queryArgs = [project: project, assignedTo: person, type: AssetCommentType.TASK,
-		                                 roles: securityService.getPersonRoles(person, RoleTypeGroup.STAFF),
-		                                 statuses: [ACS.PLANNED, ACS.PENDING, ACS.READY, ACS.STARTED]*.toString()]
-
-		//log.error "person:$person.id"
-		// Find all Tasks assigned to the person OR assigned to a role that is not hard assigned (to someone else)
-
-		search = StringUtils.trimToNull(search)
-
-		StringBuilder hql = new StringBuilder('FROM AssetComment AS c')
-		if (search) {
-			// Join on the AssetEntity and embed the search criteria
-			hql.append(', AssetEntity AS a WHERE c.assetEntity.id=a.id AND a.assetTag=:search AND ')
-			// Add the search param to the hql params
-			queryArgs.search = search
-		} else {
-			hql.append(' WHERE ')
-		}
-		hql.append('c.project=:project AND c.commentType=:type ')
-		// TODO : runbook : my tasks should only show mine.	 All should show mine and anything that my teams has started or complete
-		hql.append('AND (c.assignedTo=:assignedTo OR (c.role IN (:roles) AND c.status IN (:statuses) AND c.hardAssigned != 1)) ')
-
-		// TODO : Security : getUserTasks - sortOn/sortOrder should be defined instead of allowing user to INJECT, also shouldn't the column name have the 'a.' prefix?
-		// Add the ORDER to the HQL
-		// hql.append("ORDER BY $sortOn $sortOrder")
-
-		// log.error "HQL for userTasks: $hql"
-
-		List<AssetComment> allTasks = AssetComment.executeQuery(hql.toString(), queryArgs)
-		List<AssetComment> todoTasks = allTasks.findAll { [AssetCommentStatus.READY, AssetCommentStatus.STARTED].contains(it.status) }
-
-		[all: allTasks, todo: todoTasks]
 	}
 
 	/**
@@ -5926,15 +5874,20 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	 * 	 TODO this should be changed back to private.
 	 */
 	String getColumnValue(String fieldName, AssetComment task) {
-		def result
+		String result
 		switch (fieldName) {
 			case 'assetName': result = task.assetEntity?.assetName; break
 			case 'assetType': result = task.assetEntity?.assetType; break
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
-			case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
-				result = TimeUtil.formatDateTime(task[fieldName])
+			//case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
+//				result = TimeUtil.formatDateTime(task[fieldName])
+			case { task[fieldName] instanceof Timestamp}:
+				result = task[fieldName] ? TimeUtil.formatDateTime(task[fieldName] as Date, TimeUtil.FORMAT_DATE_TIME_15) : ''
+				break
+			case { task[fieldName] instanceof Date}:
+				result = task[fieldName] ? TimeUtil.formatDate(task[fieldName] as Date) : ''
 				break
 			case "event": result = task.moveEvent?.name; break
 			case "bundle": result = task.assetEntity?.moveBundle?.name; break

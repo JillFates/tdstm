@@ -464,12 +464,15 @@ class AssetCommentQueryBuilder {
 		'filter'            : [builder: filterBuilder],
 		'hardAssigned'      : [property: 'ac.hardAssigned', builder: eqBuilder],
 		'instructionsLink'  : [property: 'ac.instructionsLink', builder: likeBuilder],
+		'isCriticalPath'    : [property: 'ac.isCriticalPath', builder: boolEqBuilder],
 		'isPublished'       : [property: 'ac.isPublished', builder: boolEqBuilder],
 		'isResolved'        : [property: 'ac.dateResolved', builder: zeroIsNullBuilder],
-		'hardAssigned'      : [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
 		'justActionable'    : [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.ActionableStatusCodes],
 		'justMyTasks'       : [builder: justMyTasksBuilder],
 		'justRemaining'     : [property: 'ac.status', builder: notEqIfSetBuilder, value: AssetCommentStatus.COMPLETED],
+		'lastUpdated'       : [property: 'ac.lastUpdated', builder: likeBuilder, type: Date],
+		'latestFinish'      : [property: 'ac.lastUpdated', builder: likeBuilder, type: Date],
+		'latestStart'       : [property: 'ac.lastUpdated', builder: likeBuilder, type: Date],
 		'moveEvent'         : [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
 		'priority'          : [property: 'ac.priority', builder: likeBuilder, type: Integer],
 		'resolution'        : [property: 'ac.resolution', builder: likeBuilder],
@@ -481,8 +484,7 @@ class AssetCommentQueryBuilder {
 		'percentageComplete': [property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec'          : [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber'        : [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished'   : [builder: viewUnpublishedBuilder],
-		'lastUpdated'       : [property: 'ac.lastUpdated', builder: likeBuilder, type: Date]
+		'viewUnpublished'   : [builder: viewUnpublishedBuilder]
 	]
 
 }
