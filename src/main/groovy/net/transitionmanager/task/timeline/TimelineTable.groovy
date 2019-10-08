@@ -51,8 +51,11 @@ class TimelineTable {
 	 * During critical path analysis on the graph, walking forward {@code TimeLine#doDijkstraForEarliestTimes}
 	 * from sources to sinks, it calculates earliest start time and
 	 * earliest start finish using
+	 *
 	 * @param vertex an instance of {@code TaskVertex}
-	 * @param successor another instance of {@code TaskVertex}, predecessor of vertex param.
+	 * @param successor an instance of {@code TaskVertex},
+	 * 		that belongs to {@code TaskVertex#successors} List
+	 *
 	 * @return true: any of the times were updated, false otherwise.
 	 */
 	boolean checkAndUpdateEarliestTimes(TaskVertex vertex, TaskVertex successor) {
@@ -66,7 +69,8 @@ class TimelineTable {
 				successor.earliestStartDate = vertex.earliestFinishDate
 				if (successor.hasStarted()) {
 					successor.earliestStartDate = successor.actualStart ?: vertex.earliestFinishDate
-				} else if (successor.earliestStartDate < windowStartTime) { // Validate if earliestStartDate is in range [windowStartTime, windowEndTime]
+				} else if (successor.earliestStartDate < windowStartTime) {
+					// Validate if earliestStartDate is in range [windowStartTime, windowEndTime]
 					successor.earliestStartDate = windowStartTime
 				}
 				successor.earliestFinishDate = successor.earliestStartDate + successor.remaining.minutes + successor.elapsed.minutes
@@ -79,10 +83,13 @@ class TimelineTable {
 	}
 
 	/**
+	 * During critical path analysis on the graph, walking backwards {@code TimeLine#doDijkstraForLatestTimes}
+	 * from sinks to sources, it calculates {@code TaskVertex#latestFinish} and {@code TaskVertex#latestStart} of predecessor param.
 	 *
-	 * @param predecessor
-	 * @param vertex
-	 * @return
+	 * @param vertex an instance of {@code TaskVertex}
+	 * @param predecessor an instance of {@code TaskVertex},
+	 * 		that belongs to {@code TaskVertex#predecessors} List
+	 * @return true: any of the times were updated, false otherwise.
 	 */
 	boolean checkAndUpdateLatestTimes(TaskVertex predecessor, TaskVertex vertex) {
 
