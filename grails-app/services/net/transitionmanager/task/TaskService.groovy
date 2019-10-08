@@ -5945,7 +5945,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
-				result = result instanceof String ? result : result.toString()
+				result = result instanceof String || result == null ? result : result.toString()
 		}
 		return result
 	}
