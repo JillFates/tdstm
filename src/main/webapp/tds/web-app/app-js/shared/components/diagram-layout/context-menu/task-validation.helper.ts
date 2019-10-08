@@ -33,7 +33,7 @@ export class TaskValidationHelper {
 	 * Validate if Neighborhood button should appear
 	 **/
 	static shouldDisplayNeighborhoodButton(data: IGraphTask): boolean {
-		return data.successors.length > 0 || data.predecessors.length > 0;
+		return data.successors && data.successors.length > 0 || data.predecessors && data.predecessors.length > 0;
 	}
 
 	/**
@@ -47,6 +47,6 @@ export class TaskValidationHelper {
 	 * Validate if AssignToMe button should appear
 	 **/
 	static shouldDisplayAssignToMeButton(data: IGraphTask, currentUser: string): boolean {
-		return data.assignedTo !== currentUser;
+		return data.assignedTo && data.assignedTo !== currentUser;
 	}
 }
