@@ -102,12 +102,11 @@
     <tds-diagram-layout
     [nodeDataArray]="nodeData$ | async"
     [linksPath]="links$ | async"
-    [currentUserId]="currentUserId$ | async"
+    [currentUser]="currentUser$ | async"
+    [contextMenuOptions]="ctxMenuOpts$ | async"
     [containerWidth]="'100%'"
     [containerHeight]="'700px'"
     (nodeClicked)="loadTasks($event)"
-    (showTaskDetailsClicked)="showTaskDetails($event)"
-    (editClicked)="editTask($event)"
     #graph></tds-diagram-layout>
   </div>
 </div>

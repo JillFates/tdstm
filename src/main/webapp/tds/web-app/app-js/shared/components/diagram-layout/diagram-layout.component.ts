@@ -27,7 +27,9 @@ import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon
 import {FA_ICONS} from '../../constants/fontawesome-icons';
 import {ReplaySubject} from 'rxjs';
 import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
-import {ITaskContextMenuModel} from './context-menu/diagram-context-menu.model';
+import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/diagram-context-menu.model';
+import {IGraphTask} from '../../../modules/taskManager/model/graph-task.model';
+import {IDiagramLayoutModel} from './model/diagram-layout.model';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -73,8 +75,6 @@ const categoryColors = {
 		</div>`,
 })
 export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
-	@Input() name: string;
-	@Input() model: any;
 	@Input() nodeDataArray = [];
 	@Input() linksPath = [];
 	@Input() nodeTemplateOpts: go.Node;
@@ -82,7 +82,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@Input() layoutOpts: go.Layout;
 	@Input() containerWidth: string;
 	@Input() containerHeight: string;
-	@Input() currentUserId: string | number;
+	@Input() currentUser: any;
+	@Input() contextMenuOptions: IDiagramContextMenuOption;
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
 	@Output() editClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
 	@Output() showTaskDetailsClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
@@ -101,7 +102,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	actualNodeTemplate: number;
 	diagramOverview: Overview;
 	resetOvIndex: boolean;
-	ctxMenuData$: ReplaySubject<ITaskContextMenuModel> = new ReplaySubject();
+	ctxMenuData$: ReplaySubject<IDiagramContextMenuModel> = new ReplaySubject();
 
 	constructor() { /* Constructor */ }
 
@@ -109,10 +110,12 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * Detect changes to update nodeDataArray and linksPath accordingly
 	 **/
 	ngOnChanges(simpleChanges: SimpleChanges): void {
-		if (simpleChanges && (simpleChanges.nodeDataArray && simpleChanges.linksPath)
-				&& !(simpleChanges.nodeDataArray.firstChange && simpleChanges.linksPath.firstChange)
-		) {
-			this.loadAll();
+		if (simpleChanges) {
+			if ((simpleChanges.nodeDataArray && simpleChanges.nodeDataArray)
+				&& !(simpleChanges.nodeDataArray.firstChange && simpleChanges.nodeDataArray.firstChange)
+			) {
+				this.loadAll();
+			}
 		}
 	}
 
@@ -639,7 +642,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	}
 
 	/**
-	 * handler to show context menu and pass relevant data to context menu component
+	 * handler to show context menu passing relevant data to context menu component
 	 * @param {GraphObject} obj
 	 * @param {Diagram} diagram
 	 * @param {Tool} tool
@@ -649,8 +652,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 			const mousePt = diagram.lastInput.viewPoint;
 			this.ctxMenuData$.next({
 				selectedNode: obj.part.data,
-				currentUserId: this.currentUserId,
-				mousePt: {x: `${mousePt.x}px`, y: `${mousePt.y}px`}
+				currentUser: this.currentUser,
+				mousePt: {x: `${mousePt.x}px`, y: `${mousePt.y}px`},
+				options: this.contextMenuOptions
 			});
 		}
 	}
@@ -667,6 +671,21 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 **/
 	restoreOverviewIndex(): void {
 		this.resetOvIndex = false;
+	}
+
+	/**
+	 * update node on graph
+	 **/
+	updateNode(data: IGraphTask): void {
+		this.diagram.commit(d => {
+			const update = Object.assign({}, data);
+			if (!update.key) { update.key = data.taskNumber; }
+			console.log('update key: ', update.key, d.nodes.map(n => n.part.data.key));
+			const node = d.nodes.filter(f => f.part.data.key === update.key).first();
+			console.log('node: ', node.part.data);
+			node.part.data = update;
+			node.updateAdornments();
+		});
 	}
 
 }

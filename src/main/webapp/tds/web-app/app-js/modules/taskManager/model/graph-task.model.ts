@@ -48,6 +48,7 @@ export interface IGraphTask {
 	instructionsLink?: any;
 	isCriticalPath?: boolean;
 	isPublished?: boolean;
+	isAutomatic?: boolean;
 	lastUpdated?: string;
 	moveEvent?: IMoveEvent;
 	mustVerify?: number;
@@ -66,6 +67,9 @@ export interface IGraphTask {
 	taskBatch?: ITaskBatch;
 	taskDependencies?: ITaskDependencies[];
 	taskSpec?: number;
+	predecessors?: number[];
+	predecessorList?: number[];
+	successorList?: number[];
 }
 
 interface IAssetEntity {
@@ -91,4 +95,17 @@ interface IProject {
 
 interface IMoveEvent {
 	id?: number;
+}
+
+export const enum TASK_OPTION_LABEL {
+	HOLD = 'Hold',
+	START = 'Start',
+	DONE = 'Done',
+	RESET = 'Reset',
+	INVOKE = 'Invoke',
+	ASSET_DETAILS = 'Asset Details',
+	VIEW = 'View',
+	EDIT = 'Edit',
+	ASSIGN_TO_ME = 'Assign to me',
+	NEIGHBORHOOD = 'Neighborhood'
 }

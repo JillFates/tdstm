@@ -1,10 +1,21 @@
-import {faCheck, faCogs, faEdit, faEye, faPause, faPlay, faUser} from '@fortawesome/free-solid-svg-icons';
+import {
+	faBuilding,
+	faCheck,
+	faCogs,
+	faEdit,
+	faEye,
+	faHome,
+	faPause,
+	faPlay,
+	faUndo,
+	faUser
+} from '@fortawesome/free-solid-svg-icons';
 
 export const STATE_ICONS_PATH = {
 	started: {
-		iconAlt: '\uf04b',
+		iconAlt: '\uf050',
 		// tslint:disable-next-line:max-line-length
-		icon: 'F M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.7 272l-176 101c-15.8 8.8-35.7-2.5-35.7-21V152c0-18.4 19.8-29.8 35.7-21l176 107c16.4 9.2 16.4 32.9 0 42z',
+		icon: 'F M512 76v360c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12V284.1L276.5 440.6c-20.6 17.2-52.5 2.8-52.5-24.6V284.1L52.5 440.6C31.9 457.8 0 443.4 0 416V96c0-27.4 31.9-41.7 52.5-24.6L224 226.8V96c0-27.4 31.9-41.7 52.5-24.6L448 226.8V76c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12z',
 		color: '#fff',
 		background: 'Turquoise'
 	},
@@ -117,45 +128,73 @@ export const CATEGORY_ICONS_PATH = {
 
 export const CTX_MENU_ICONS_PATH = {
 	start: {
+		name: 'started',
 		iconAlt: '\uf00c',
 		// tslint:disable-next-line:max-line-length
 		icon: faPlay,
 		color: '#01ab08'
 	},
 	done: {
+		name: 'done',
 		iconAlt: '\uf00c',
 		// tslint:disable-next-line:max-line-length
 		icon: faCheck,
 		color: '#0b63a8'
 	},
 	hold: {
+		name: 'hold',
 		iconAlt: '\uf00c',
 		// tslint:disable-next-line:max-line-length
 		icon: faPause,
 		color: '#fff200'
 	},
 	invoke: {
+		name: 'invoke',
 		iconAlt: '\uf085',
 		// tslint:disable-next-line:max-line-length
 		icon: faCogs,
 		color: '#9e9e9e'
 	},
 	edit: {
+		name: 'edit',
 		iconAlt: '\uf044',
 		// tslint:disable-next-line:max-line-length
 		icon: faEdit,
 		color: '#9e9e9e'
 	},
 	view: {
+		name: 'view',
 		iconAlt: '\uf06e',
 		// tslint:disable-next-line:max-line-length
 		icon: faEye,
 		color: '#9e9e9e'
 	},
 	assignToMe: {
+		name: 'assignToMe',
 		iconAlt: '\uf007',
 		// tslint:disable-next-line:max-line-length
 		icon: faUser,
 		color: '#9e9e9e'
 	},
+	reset: {
+		name: 'reset',
+		iconAlt: '\uf0e2',
+		// tslint:disable-next-line:max-line-length
+		icon: faUndo,
+		color: '#9e9e9e'
+	},
+	neighborhood: {
+		name: 'neighborhood',
+		iconAlt: '\uf015',
+		// tslint:disable-next-line:max-line-length
+		icon: faHome,
+		color: '#9e9e9e'
+	},
+	assetDetail: {
+		name: 'assetDetail',
+		iconAlt: '\uf1ad',
+		// tslint:disable-next-line:max-line-length
+		icon: faBuilding,
+		color: '#9e9e9e'
+	}
 };
