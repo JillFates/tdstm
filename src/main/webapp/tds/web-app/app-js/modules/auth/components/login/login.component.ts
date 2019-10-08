@@ -60,6 +60,10 @@ export class LoginComponent implements OnInit {
 		username: '',
 		password: ''
 	};
+	/**
+	 * To show loader and disable the login button
+	 */
+	public onLoginProgress = false;
 
 	/**
 	 * For Auh label to show
@@ -121,6 +125,7 @@ export class LoginComponent implements OnInit {
 		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
 		} else {
+			this.onLoginProgress = true;
 			this.store.dispatch(
 				new Login({
 					username: this.loginModel.username,
@@ -129,7 +134,9 @@ export class LoginComponent implements OnInit {
 				})
 			).pipe(
 				withLatestFrom(this.userContext$)
-			).subscribe(([_, userContext]) => this.validateLogin(_, userContext));
+			).subscribe(
+				([_, userContext]) => this.validateLogin(_, userContext)
+			);
 		}
 	}
 
@@ -140,6 +147,7 @@ export class LoginComponent implements OnInit {
 	 * @param userContext
 	 */
 	private validateLogin(_, userContext: UserContextModel): void {
+		this.onLoginProgress = false;
 		this.userContextModel = userContext;
 		if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
 			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices.length > 0) {

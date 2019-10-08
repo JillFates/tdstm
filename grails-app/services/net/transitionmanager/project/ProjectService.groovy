@@ -1810,8 +1810,8 @@ class ProjectService implements ServiceMethods {
 					clientName           : project.client.toString(),
 					description          : project.description ?: '',
 					comment				 : project.comment ?: '',
-					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
-					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
+					startDate            : project.startDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
+					completionDate       : project.completionDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
 					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
 					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
@@ -1955,7 +1955,9 @@ class ProjectService implements ServiceMethods {
 		else {
 			if (!projectCommand.projectLogo) {
 				ProjectLogo projectLogo = ProjectLogo.findByProject(project)
-				projectLogo.delete()
+				if(projectLogo) {
+					projectLogo.delete()
+				}
 			}
 		}
 

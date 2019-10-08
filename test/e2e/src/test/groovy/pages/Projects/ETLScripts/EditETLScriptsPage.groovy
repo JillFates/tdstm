@@ -56,6 +56,5 @@ class EditETLScriptsPage extends Page{
 
     def clickOnSaveButton(){
         waitFor{datascriptSaveBtn.click()}
-        commonsModule.waitForDialogModalHidden()
     }
 }

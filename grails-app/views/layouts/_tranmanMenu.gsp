@@ -110,7 +110,7 @@
                         <li class="menu-parent-item">Integrations</li>
                         <li class="menu-child-item ">
                             <g:link class="mmlink" controller="module" action="provider" id="list">
-                                moduProviders
+                                Providers
                             </g:link>
                         </li>
                          <tds:hasPermission permission="${Permission.CredentialView}">
@@ -228,7 +228,7 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
-                                    <a href="/tdstm/module/assetExport/export">Export Assets</a>
+                                    <a href="/tdstm/module/asset/export">Export Assets</a>
 %{--                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>--}%
                                 </li>
                             </tds:hasPermission>

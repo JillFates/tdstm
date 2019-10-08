@@ -26,7 +26,7 @@ import { taskListColumnsModel } from '../../model/task-list-columns.model';
 import { TaskDetailModel } from '../../model/task-detail.model';
 import { TaskDetailComponent } from '../detail/task-detail.component';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import {ObjectUtils} from '../../../../shared/utils/object.utils';
+import { ObjectUtils } from '../../../../shared/utils/object.utils';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
@@ -34,10 +34,14 @@ import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.modul
 import { TaskCreateComponent } from '../create/task-create.component';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
-import {Store} from '@ngxs/store';
-import {SetEvent} from '../../../event/action/event.actions';
+import { Store } from '@ngxs/store';
+import { SetEvent } from '../../../event/action/event.actions';
 import { TaskStatus } from '../../model/task-edit-create.model';
 import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
+import { TaskEditComponent } from '../edit/task-edit.component';
+import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
+import { DateUtils } from '../../../../shared/utils/date.utils';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: 'task-list',
@@ -47,7 +51,6 @@ export class TaskListComponent {
 	@ViewChild('gridComponent') gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
-	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	justRemaining: boolean;
 	justMyTasks: boolean;
 	viewUnpublished: boolean;
@@ -59,6 +62,8 @@ export class TaskListComponent {
 	selectedCustomColumn: any;
 	selectedEvent: any;
 	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
+	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
+	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
 	private pageSize: number;
 	private currentPage: number;
@@ -67,7 +72,7 @@ export class TaskListComponent {
 	private userContext: UserContextModel;
 	private rowsExpanded: boolean;
 	private rowsExpandedMap: any;
-	private gridDefaultSort: Array<SortDescriptor>;
+	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
 
 	constructor(
 		private taskService: TaskService,
@@ -78,7 +83,7 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
-		this.gridDefaultSort = [{field: 'taskNumber', dir: 'asc'}];
+		this.gridDefaultSort = [{ field: 'taskNumber', dir: 'asc' }];
 		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;
@@ -92,7 +97,408 @@ export class TaskListComponent {
 		this.rowsExpanded = false;
 		this.rowsExpandedMap = {};
 		this.currentPage = 1;
+		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 		this.onLoad();
+	}
+
+	/**
+	 * On Custom Column configuration change. Set the new column configuration and reload the task list.
+	 * @param customColumn
+	 * @param newColumn
+	 * @param service
+	 */
+	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
+		service.close();
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
+			.subscribe(result => {
+				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
+				this.search();
+			});
+	}
+
+	/**
+	 * On Event select change.
+	 */
+	onEventSelect(): void {
+		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
+		this.onFiltersChange();
+	}
+
+	/**
+	 * On Any other change.
+	 * @param selection: Array<any>
+	 */
+	onFiltersChange($event ?: any): void {
+		this.search();
+	}
+
+	/**
+	 * Search for a task on the current grid data and expands it. The rest of the rows gets collapsed.
+	 * @param taskId: number
+	 */
+	searchTaskAndExpandRow(taskId: number): void {
+		(this.gridComponent.data as GridDataResult).data.forEach((item, index) => {
+			if (item.id === taskId) {
+				this.gridComponent.expandRow(index);
+			} else {
+				this.gridComponent.collapseRow(index);
+			}
+		});
+	}
+
+	/**
+	 * On Create Task button handler open the Create task modal.
+	 */
+	onCreateTaskHandler(): void {
+		let taskCreateModel: TaskDetailModel = {
+			id: '',
+			modal: {
+				title: 'Create Task',
+				type: ModalType.CREATE
+			},
+			detail: {
+				assetClass: '',
+				assetEntity: '',
+				assetName: '',
+				currentUserId: this.userContext.user.id
+			}
+		};
+		this.dialogService.extra(TaskCreateComponent, [
+			{ provide: TaskDetailModel, useValue: taskCreateModel }
+		]).then((result) => {
+			if (result) {
+				this.search();
+			}
+		}).catch(result => {
+			if (result) {
+				// nothing
+			}
+		});
+	}
+
+	/**
+	 * On Taks Detail button handler oepn the task detail modal.
+	 * @param taskRow: any
+	 */
+	onOpenTaskDetailHandler(taskRow: any): void {
+		let taskDetailModel: TaskDetailModel = {
+			id: taskRow.id,
+			modal: {
+				title: 'Task Detail'
+			}
+		};
+		this.dialogService.extra(TaskDetailComponent, [
+			{ provide: TaskDetailModel, useValue: taskDetailModel }
+		]).then((result) => {
+			if (result) {
+				if (result.isDeleted) {
+					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+						this.search();
+					});
+				} else if (result.shouldOpenTask) {
+					this.onOpenTaskDetailHandler(result.commentInstance);
+				} else {
+					this.search(parseInt(taskRow.id, 0));
+				}
+			}
+		}).catch(result => {
+			if (result) {
+				this.search(parseInt(taskRow.id, 0));
+			}
+		});
+	}
+
+	public onOpenTaskEditHandler(taskRow: any): void {
+		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
+		this.taskService.getTaskDetails(taskRow.id)
+			.subscribe((res) => {
+				let modelHelper = new TaskEditCreateModelHelper(
+					this.userContext.timezone,
+					this.userContext.dateFormat,
+					this.taskService,
+					this.dialogService,
+					this.translate);
+				taskDetailModel.detail = res;
+				taskDetailModel.modal = {
+					title: 'Task Edit',
+					type: ModalType.EDIT
+				};
+				let model = modelHelper.getModelForDetails(taskDetailModel);
+				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
+				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
+				model.modal = taskDetailModel.modal;
+				this.dialogService.extra(TaskEditComponent, [
+					{ provide: TaskDetailModel, useValue: clone(model) }
+				], false, false)
+					.then(result => {
+						if (result) {
+							if (result.isDeleted) {
+								this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
+									this.search();
+								});
+							} else {
+								this.search(parseInt(taskRow.id, 0));
+							}
+						}
+					}).catch(result => {
+					// do nothing.
+				});
+			});
+	}
+
+	/**
+	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
+	 * @param taskRow: any
+	 * @param days: string
+	 */
+	changeTimeEst(taskRow: any, days: string): void {
+		this.taskService.changeTimeEst(taskRow.id, days)
+			.subscribe(() => {
+				taskRow.updatedTime = '0s';
+			});
+	}
+
+	/**
+	 * On View Timeline button handler.
+	 */
+	onViewTimelineHandler(): void {
+		this.openLinkInNewTab('/tdstm/task/taskTimeline');
+	}
+
+	/**
+	 * On View Neighborhood button handler.
+	 */
+	onViewTaskNeighborHandler(dataItem: any): void {
+		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
+	}
+
+	/**
+	 * On View Task Graph button handler.
+	 */
+	onViewTaskGraphHandler(): void {
+		const url = `/tdstm/task/taskGraph?moveEventId=${ this.selectedEvent.id }&viewUnpublished=${ this.viewUnpublished }`;
+		this.openLinkInNewTab(url);
+	}
+
+	/**
+	 * Opens a link in a new browser tab
+	 * @param url
+	 */
+	openLinkInNewTab(url: string): void {
+		window.open(url, '_blank');
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param assetId: number
+	 * @param assetClass: string
+	 */
+	onOpenAssetDetailHandler(taskRow: any): void {
+		this.dialogService.open(AssetShowComponent,
+			[UIDialogService,
+				{ provide: 'ID', useValue: taskRow.assetEntityId },
+				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
+				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
+			], DIALOG_SIZE.LG).then(result => {
+				// nothing
+		}).catch(result => {
+			console.error('rejected: ' + result);
+		});
+	}
+
+	/**
+	 * Update the task status.
+	 * @param id: string
+	 * @param status: string
+	 */
+	updateTaskStatus(id: string, status: string): void {
+		this.taskService.updateStatus(id, status)
+			.subscribe(() => {
+				this.search(parseInt(id, 0));
+			});
+	}
+
+	/**
+	 * On Invoke button click.
+	 * @param taskRow: any
+	 */
+	invokeActionHandler(taskRow: any): void {
+		this.taskService.invokeAction(taskRow.id)
+			.subscribe(result => {
+				this.search(parseInt(taskRow.id, 0));
+			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.loadTaskInfoModel($event.dataItem.id).subscribe(() => {
+			// loaded.
+		});
+		this.rowsExpandedMap[$event.index] = true;
+	}
+
+	/**
+	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
+		this.rowsExpandedMap[$event.index] = false;
+	}
+
+	/**
+	 * On AssignToMe button Handler, reassigns the task to current user.
+	 * @param taskRow: any
+	 */
+	onAssignToMeHandler(taskRow: any): void {
+		const request = {
+			id: taskRow.id.toString(),
+			status: taskRow.status
+		}
+		this.taskService.assignToMe(request)
+			.subscribe(result => {
+				taskRow.assignedTo = this.userContext.person.id;
+				this.search(parseInt(taskRow.id, 0));
+			});
+	}
+
+	/**
+	 * On Reset button click handler.
+	 * @param taskRow: any
+	 */
+	onResetTaskHandler(taskRow: any): void {
+		this.taskService.resetTaskAction(taskRow.id).subscribe(result => {
+			this.search(parseInt(taskRow.id, 0));
+		});
+	}
+
+	/**
+	 * On clear filters button click, clear all available filters.
+	 */
+	onClearFiltersHandler(): void {
+		this.columnsModel
+			.filter(column => column.filterable)
+			.forEach((column: GridColumnModel) => {
+				column.filter = '';
+			});
+		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
+			this.grid.state.filter.filters
+				.forEach((filter: FilterDescriptor) => {
+					filter.value = '';
+				});
+			// reset pagination to be on page 1
+			this.onPageChangeHandler({ skip: 0, take: this.pageSize });
+		}
+	}
+
+	/**
+	 * Determines if current columns has been filtered (contains value).
+	 */
+	areFiltersDirty(): boolean {
+		return this.columnsModel
+			.filter(column => column.filter).length > 0;
+	}
+
+	/**
+	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
+	 */
+	onBulkActionHandler(): void {
+		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
+		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
+		if (!this.rowsExpanded) {
+			taskRows.forEach((taskRow: any, index: number) => {
+				index = this.grid.getRowPaginatedIndex(index);
+				expandedEvent.dataItem = taskRow;
+				expandedEvent.index = index;
+				this.onRowDetailExpandHandler(expandedEvent);
+				this.gridComponent.expandRow(index);
+			});
+			this.rowsExpanded = true;
+		} else {
+			taskRows.forEach((taskRow, index) => {
+				index = this.grid.getRowPaginatedIndex(index);
+				expandedEvent.dataItem = taskRow;
+				expandedEvent.index = index;
+				this.onRowDetailCollapseHandler(expandedEvent);
+				this.gridComponent.collapseRow(index);
+			});
+			this.rowsExpanded = false;
+		}
+	}
+
+	/**
+	 * On cell click open the task action bar
+	 * @param $event: CellClickEvent
+	 */
+	onCellClickHandler($event: CellClickEvent): void {
+		if ($event.columnIndex !== 0 && $event.columnIndex !== 1
+			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
+			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
+			expandedEvent.index = $event.rowIndex;
+			expandedEvent.dataItem = $event.dataItem;
+			// collapse
+			if (this.rowsExpandedMap[$event.rowIndex]) {
+				this.onRowDetailCollapseHandler(expandedEvent);
+				this.gridComponent.collapseRow($event.rowIndex);
+				// expand
+			} else {
+				this.onRowDetailExpandHandler(expandedEvent);
+				this.gridComponent.expandRow($event.rowIndex);
+			}
+		}
+	}
+
+	/**
+	 * On Page Change, update grid state & handle pagination on server side.
+	 */
+	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
+		this.grid.state.skip = skip;
+		this.grid.state.take = take;
+		if (take !== this.pageSize) {
+			this.userPreferenceService.setPreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE, this.pageSize.toString())
+				.subscribe(() => {/* at this point preference should be saved */
+				});
+		}
+		this.pageSize = take;
+		this.currentPage = this.grid.getCurrentPage();
+		this.search();
+	}
+
+	/**
+	 * On Sort Change, update grid state and search().
+	 * @param sort
+	 */
+	onSortChangeHandler(sort: Array<SortDescriptor>): void {
+		// prevent sort on the non-sortable action column
+		if (this.columnsModel
+			.findIndex(item => item.property === sort[0].field && item.sortable === false) >= 0) {
+			return;
+		}
+		this.grid.state.sort = sort;
+		this.search();
+	}
+
+	/**
+	 * On filter changes do the search().
+	 * @param column
+	 * @param clearFilter
+	 */
+	onFilterChangeHandler($event: string, column: GridColumnModel, clearFilter = false): void {
+		column.filter = $event;
+		if (clearFilter) {
+			column.filter = '';
+		}
+		const filterColumn = { ...column };
+		if (filterColumn.property.startsWith('userSelectedCol')) {
+			filterColumn.property = this.currentCustomColumns[filterColumn.property];
+		}
+		const filters = this.grid.getFilter(filterColumn);
+		this.grid.state.filter = filters;
+		// reset pagination to be on page 1
+		this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 	}
 
 	/**
@@ -100,9 +506,9 @@ export class TaskListComponent {
 	 * if it exists returns the url filter value, otherwise returns the user preference value
 	 * @param {string} paramName  Name of the parameter received in the url
 	 * @param {string} preferenceKey  Name of user preference key
-	*/
+	 */
 	private getUrlParamOrUserPreference(paramName: string, preferenceKey: string): Observable<any> {
-		return  hasIn(paramName, this.urlParams) ?
+		return hasIn(paramName, this.urlParams) ?
 			Observable.of(this.urlParams[paramName]) :
 			this.userPreferenceService.getSinglePreference(preferenceKey);
 	}
@@ -116,13 +522,11 @@ export class TaskListComponent {
 			.subscribe(params => {
 				this.urlParams = params;
 			});
-
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
 		});
 		this.loading = true;
-
 		const observables = forkJoin(
 			this.taskService.getCustomColumns(),
 			this.getUrlParamOrUserPreference('moveEvent', PREFERENCES_LIST.CURRENT_EVENT_ID),
@@ -133,7 +537,6 @@ export class TaskListComponent {
 		observables.subscribe({
 				next: value => {
 					const [custom, currentEventId, listSize, unpublished, justRemaining] = value;
-
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
 					// Task list size
@@ -229,372 +632,23 @@ export class TaskListComponent {
 		request['moveEvent'] = request.moveEvent === 0 ? '0' : request.moveEvent;
 		// Add field filters
 		if (this.grid.state.filter && this.grid.state.filter.filters.length > 0) {
-			this.grid.state.filter.filters.forEach( (filter: FilterDescriptor) => {
+			this.grid.state.filter.filters.forEach((filter: FilterDescriptor) => {
 				request[filter.field as string] = filter.value;
 			});
 		}
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
-				this.rowsExpandedMap = {};
-				this.rowsExpanded = false;
 				this.loading = false;
-				setTimeout(() => this.searchTaskAndExpandRow(taskId), 100);
-			});
-	}
-
-	/**
-	 * On Custom Column configuration change. Set the new column configuration and reload the task list.
-	 * @param customColumn
-	 * @param newColumn
-	 * @param service
-	 */
-	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
-		service.close();
-		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
-		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
-			.subscribe(result => {
-				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
-				this.search();
-			});
-	}
-
-	/**
-	 * On Event select change.
-	 */
-	onEventSelect(): void {
-		this.store.dispatch(new SetEvent({id: this.selectedEvent.id, name: this.selectedEvent.name}));
-		this.onFiltersChange();
-	}
-
-	/**
-	 * On Any other change.
-	 * @param selection: Array<any>
-	 */
-	onFiltersChange($event ?: any): void {
-		this.search();
-	}
-
-	/**
-	 * Search for a task on the current grid data and expands it. The rest of the rows gets collapsed.
-	 * @param taskId: number
-	 */
-	searchTaskAndExpandRow(taskId: number): void {
-		(this.gridComponent.data as GridDataResult).data.forEach((item, index) => {
-			if (item.id === taskId) {
-				this.gridComponent.expandRow(index);
-			} else {
-				this.gridComponent.collapseRow(index);
-			}
-		});
-	}
-
-	/**
-	 * On Create Task button handler open the Create task modal.
-	 */
-	onCreateTaskHandler(): void {
-		let taskCreateModel: TaskDetailModel = {
-			id: '',
-			modal: {
-				title: 'Create Task',
-				type: ModalType.CREATE
-			},
-			detail: {
-				assetClass: '',
-				assetEntity: '',
-				assetName: '',
-				currentUserId: this.userContext.user.id
-			}
-		};
-		this.dialogService.extra(TaskCreateComponent, [
-			{ provide: TaskDetailModel, useValue: taskCreateModel }
-		]).then((result) => {
-			if (result) {
-				this.search();
-			}
-		}).catch(result => {
-			if (result) {
-				// console.log(result);
-			}
-		});
-	}
-
-	/**
-	 * On Taks Detail button handler oepn the task detail modal.
-	 * @param taskRow: any
-	 */
-	onOpenTaskDetailHandler(taskRow: any): void {
-		let taskDetailModel: TaskDetailModel = {
-			id: taskRow.id,
-			modal: {
-				title: 'Task Detail'
-			}
-		};
-		this.dialogService.extra(TaskDetailComponent, [
-			{ provide: TaskDetailModel, useValue: taskDetailModel }
-		]).then((result) => {
-			if (result) {
-				if (result.isDeleted) {
-					this.taskService.deleteTaskComment(taskRow.id).subscribe(result => {
-						this.search();
-					});
-				} else if (result.shouldOpenTask) {
-					this.onOpenTaskDetailHandler(result.commentInstance);
+				// silently load all task action info model, this to improve the performance when opening the task detail row.
+				if (taskId && taskId >= 0) {
+					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
 				} else {
-					this.search();
-				}
-			}
-		}).catch(result => {
-			if (result) {
-				this.search();
-			}
-		});
-	}
-
-	/**
-	 * Changes the time estimation of a task, on success immediately update the task updatedTime.
-	 * @param taskRow: any
-	 * @param days: string
-	 */
-	changeTimeEst(taskRow: any, days: string): void {
-		this.taskService.changeTimeEst(taskRow.id, days)
-			.subscribe(() => {
-				taskRow.updatedTime = '0s';
-			});
-	}
-
-	/**
-	 * On View Timeline button handler.
-	 */
-	onViewTimelineHandler(): void {
-		this.openLinkInNewTab('/tdstm/task/taskTimeline');
-	}
-
-	/**
-	 * On View Neighborhood button handler.
-	 */
-	onViewTaskNeighborHandler(dataItem: any): void {
-		this.openLinkInNewTab(`/tdstm/task/taskGraph?neighborhoodTaskId=${ dataItem.id }`)
-	}
-
-	/**
-	 * On View Task Graph button handler.
-	 */
-	onViewTaskGraphHandler(): void {
-		const url = `/tdstm/task/taskGraph?moveEventId=${ this.selectedEvent.id }&viewUnpublished=${ this.viewUnpublished }`;
-		this.openLinkInNewTab(url);
-	}
-
-	/**
-	 * Opens a link in a new browser tab
-	 * @param url
-	 */
-	openLinkInNewTab(url: string): void {
-		window.open(url, '_blank');
-	}
-
-	/**
-	 * Show the asset popup detail.
-	 * @param assetId: number
-	 * @param assetClass: string
-	 */
-	onOpenAssetDetailHandler(taskRow: any): void {
-		this.dialogService.open(AssetShowComponent,
-			[UIDialogService,
-				{ provide: 'ID', useValue: taskRow.assetEntityId },
-				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
-				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
-			// console.log('success: ' + result);
-		}).catch(result => {
-			console.error('rejected: ' + result);
-		});
-	}
-
-	/**
-	 * Update the task status.
-	 * @param id: string
-	 * @param status: string
-	 */
-	updateTaskStatus(id: string, status: string): void {
-		this.taskService.updateStatus(id, status)
-			.subscribe(() => {
-				this.search(parseInt(id, 0));
-			});
-	}
-
-	/**
-	 * On Invoke button click.
-	 * @param taskRow: any
-	 */
-	invokeActionHandler(taskRow: any): void {
-		this.taskService.invokeAction(taskRow.id)
-			.subscribe(result => {
-				this.search(parseInt(taskRow.id, 0));
-			});
-	}
-
-	/**
-	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.rowsExpandedMap[$event.index] = true;
-	}
-
-	/**
-	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
-		this.rowsExpandedMap[$event.index] = false;
-	}
-
-	/**
-	 * On AssignToMe button Handler, reassigns the task to current user.
-	 * @param taskRow: any
-	 */
-	onAssignToMeHandler(taskRow: any): void {
-		const request = {
-			id: taskRow.id.toString(),
-			status: taskRow.status
-		}
-		this.taskService.assignToMe(request)
-			.subscribe(result => {
-				taskRow.assignedTo = this.userContext.person.id;
-				this.search(taskRow.id);
-			});
-	}
-
-	/**
-	 * On Reset button click handler.
-	 * @param taskRow: any
-	 */
-	onResetTaskHandler(taskRow: any): void {
-		this.taskService.resetTaskAction(taskRow.id).subscribe(result => {
-			this.search(taskRow.id);
-		});
-	}
-
-	/**
-	 * On clear filters button click, clear all available filters.
-	 */
-	onClearFiltersHandler(): void {
-		this.columnsModel
-			.filter(column => column.filterable)
-			.forEach((column: GridColumnModel) => {
-				column.filter = '';
-			});
-		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
-			this.grid.state.filter.filters
-				.forEach((filter: FilterDescriptor) => {
-					filter.value = '';
-				});
-			// reset pagination to be on page 1
-			this.onPageChangeHandler({skip: 0, take: this.pageSize});
-		}
-	}
-
-	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return this.columnsModel
-			.filter(column => column.filter).length > 0;
-	}
-
-	/**
-	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
-	 */
-	onBulkActionHandler(): void {
-		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
-		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-		if (!this.rowsExpanded) {
-			taskRows.forEach((taskRow: any, index: number) => {
-				index = this.grid.getRowPaginatedIndex(index);
-				expandedEvent.dataItem = taskRow;
-				expandedEvent.index = index;
-				if (taskRow.status === 'Ready' || taskRow.status === 'Started') {
-					this.onRowDetailExpandHandler(expandedEvent);
-					this.gridComponent.expandRow(index);
+					result.rows.forEach(taskRow => {
+						this.loadTaskInfoModel(taskRow.id, true).subscribe(() => {/* loaded */});
+					});
 				}
 			});
-			this.rowsExpanded = true;
-		} else {
-			taskRows.forEach((taskRow, index) => {
-				index = this.grid.getRowPaginatedIndex(index);
-				expandedEvent.dataItem = taskRow;
-				expandedEvent.index = index;
-				this.onRowDetailCollapseHandler(expandedEvent);
-				this.gridComponent.collapseRow(index);
-			});
-			this.rowsExpanded = false;
-		}
-	}
-
-	/**
-	 * On cell click open the task action bar
-	 * @param $event: CellClickEvent
-	 */
-	onCellClickHandler($event: CellClickEvent): void {
-		if ($event.columnIndex !== 0
-			&& this.currentCustomColumns[$event.column.field] !== 'assetName') {
-			let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-			expandedEvent.index = $event.rowIndex;
-			expandedEvent.dataItem = $event.dataItem;
-			// collapse
-			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onRowDetailCollapseHandler(expandedEvent);
-				this.gridComponent.collapseRow($event.rowIndex);
-				// expand
-			} else {
-				this.onRowDetailExpandHandler(expandedEvent);
-				this.gridComponent.expandRow($event.rowIndex);
-			}
-		}
-	}
-
-	/**
-	 * On Page Change, update grid state & handle pagination on server side.
-	 */
-	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
-		this.grid.state.skip = skip;
-		this.grid.state.take = take;
-		if (take !== this.pageSize) {
-			this.userPreferenceService.setPreference(PREFERENCES_LIST.TASK_MANAGER_LIST_SIZE, this.pageSize.toString())
-				.subscribe(() => {/* at this point preference should be saved */ });
-		}
-		this.pageSize = take;
-		this.currentPage = this.grid.getCurrentPage();
-		this.search();
-	}
-
-	/**
-	 * On Sort Change, update grid state and search().
-	 * @param sort
-	 */
-	onSortChangeHandler(sort: Array<SortDescriptor>): void {
-		this.grid.state.sort = sort;
-		this.search();
-	}
-
-	/**
-	 * On filter changes do the search().
-	 * @param column
-	 * @param clearFilter
-	 */
-	onFilterChangeHandler(column: GridColumnModel, clearFilter = false): void {
-		if (clearFilter) {
-			column.filter = '';
-		}
-		const filterColumn = {...column};
-		if (filterColumn.property.startsWith('userSelectedCol')) {
-			filterColumn.property = this.currentCustomColumns[filterColumn.property];
-		}
-		const filters = this.grid.getFilter(filterColumn);
-		this.grid.state.filter = filters;
-		// reset pagination to be on page 1
-		this.onPageChangeHandler({skip: 0, take: this.pageSize});
 	}
 
 	/**
@@ -603,7 +657,40 @@ export class TaskListComponent {
 	 */
 	private reloadGridData(result: any, totalCount: number): void {
 		this.grid.resultSet = result;
-		this.grid.gridData = {data: result, total: totalCount};
+		this.grid.gridData = { data: result, total: totalCount };
 		this.grid.notifyUpdateGridHeight();
+	}
+
+	/**
+	 * Returns the task action info model.
+	 */
+	private getTaskActionInfoModel(taskId: string): TaskActionInfoModel {
+		if (!isNaN(taskId as any)) {
+			taskId = taskId.toString();
+		}
+		return this.taskActionInfoModels.get(taskId);
+	}
+
+	/**
+	 * Loads Task action information model into the Models Map.
+	 */
+	private loadTaskInfoModel(taskId: string, forceReload = false): Observable<TaskActionInfoModel> {
+		if (!isNaN(taskId as any)) {
+			taskId = taskId.toString();
+		}
+		return new Observable(observer => {
+			if (!this.taskActionInfoModels.has(taskId) || forceReload) {
+				this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+					.subscribe((result: TaskActionInfoModel) => {
+						const taskActionInfoModel = result;
+						this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+						observer.next(result);
+						observer.complete();
+					});
+			} else {
+				observer.next(this.taskActionInfoModels.get(taskId));
+				observer.complete();
+			}
+		});
 	}
 }
