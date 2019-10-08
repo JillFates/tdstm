@@ -28,7 +28,8 @@ class ProjectCommand implements CommandObject {
 		defaultBundle nullable: true
 
 		planMethodology validator: { val, obj, errors ->
-			if (val && !val.startsWith('custom')) {
+			//The regex is looking for values that start with custom followed by a number 0 through 99
+			if (val && ! val ==~ /custom[0-9]{2}/){
 				errors.rejectValue('planMethodology', 'project.plan.methodology.invalid')
 			}
 		}
