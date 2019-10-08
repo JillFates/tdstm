@@ -3,7 +3,7 @@ package net.transitionmanager.command
 class ProjectCommand implements CommandObject {
 
 	Long       clientId
-	Boolean    collectMetrics
+	Integer    collectMetrics
 	String     comment
 	Date       completionDate
 	Object     defaultBundle
@@ -26,12 +26,14 @@ class ProjectCommand implements CommandObject {
 		id nullable: true
 		runbookOn nullable: true
 		defaultBundle nullable: true
-
+		projectLogo nullable: true
+		collectMetrics range: 0..1
 		planMethodology validator: { val, obj, errors ->
-			if (val && !val.startsWith('custom')) {
+			if (val && ! val ==~ /custom[0-9]{2}/) {
 				errors.rejectValue('planMethodology', 'project.plan.methodology.invalid')
 			}
-		}
+		},
+		nullable: true
 	}
 
 }

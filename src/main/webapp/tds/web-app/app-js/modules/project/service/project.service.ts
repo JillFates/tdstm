@@ -22,6 +22,18 @@ export class ProjectService {
 	getProjects(): Observable<any> {
 		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
+				response.data.activeProjects.forEach((item: any) => {
+					item.completionDate = item.completionDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.completionDate), DateUtils.SERVER_FORMAT_DATE) : '';
+					item.startDate = item.startDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.startDate), DateUtils.SERVER_FORMAT_DATE) : '';
+				});
+				response.data.completedProjects.forEach((item: any) => {
+					item.completionDate = item.completionDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.completionDate), DateUtils.SERVER_FORMAT_DATE) : '';
+					item.startDate = item.startDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.startDate), DateUtils.SERVER_FORMAT_DATE) : '';
+				});
 				return response.data;
 			})
 			.catch((error: any) => error);
@@ -54,8 +66,10 @@ export class ProjectService {
 	}
 
 	saveProject(model, originalFilename = '', id = ''): Observable<any> {
-		model['originalFilename'] = originalFilename;
-		return this.http.post(`../ws/project/saveProject/${id}`, model)
+		let postModel = JSON.parse(JSON.stringify(model));
+		postModel['originalFilename'] = originalFilename;
+		postModel.planMethodology = postModel.planMethodology.field;
+		return this.http.post(`../ws/project/saveProject/${id}`, postModel)
 				.map((response: any) => {
 					return response;
 				})

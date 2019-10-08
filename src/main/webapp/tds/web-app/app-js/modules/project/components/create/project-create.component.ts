@@ -53,7 +53,7 @@ export class ProjectCreateComponent implements OnInit {
 			defaultBundleName: 'TBD',
 			timeZone: '',
 			collectMetrics: true,
-			planMethodology: ''
+			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
 		this.file.uploadRestrictions = {
