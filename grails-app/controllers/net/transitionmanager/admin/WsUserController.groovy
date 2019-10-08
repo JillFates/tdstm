@@ -285,7 +285,6 @@ class WsUserController implements ControllerMethods {
 
 	/**
 	* Sets a user preference through an AJAX call
-  * params are readed by CommandObject
 	* @param code - the preference code for the preference that is being set
 	* @param value - the value to set the preference to
 	*/
