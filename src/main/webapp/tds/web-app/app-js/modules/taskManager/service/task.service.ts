@@ -26,7 +26,6 @@ export interface IMoveEventResponseBody {
 	status: string;
 	data: IMoveEvent[];
 }
-type GraphTaskType = HttpResponse<IGrapTaskResponseBody>
 
 /**
  * @name TaskService
