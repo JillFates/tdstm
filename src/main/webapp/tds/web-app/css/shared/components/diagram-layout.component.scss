@@ -1,7 +1,7 @@
 .diagram-layout-container {
   position: relative;
-  padding-left: 15px;
-  padding-right: 15px;
+  //padding-left: 15px;
+  //padding-right: 15px;
   min-height: 530px;
 }
 
@@ -24,59 +24,9 @@
   position: absolute;
   bottom: 40px;
   left: 40px;
-  z-index: 9999;
+  z-index: 999;
 }
 
 #graph-control-btn-group > .btn {
   background-color: #dddddd;
-}
-
-
-/* CSS for the traditional context menu */
-#ctx-menu {
-  z-index: 10002;
-  position: absolute;
-  left: 5px;
-  border: 1px solid #444;
-  background-color: #F5F5F5;
-  display: none;
-  box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
-  font-size: 12px;
-  font-family: sans-serif;
-  font-weight: bold;
-}
-#ctx-menu ul {
-  list-style: none;
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-}
-#ctx-menu li a {
-  position: relative;
-  min-width: 60px;
-  color: #444;
-  display: inline-block;
-  padding: 6px;
-  text-decoration: none;
-  cursor: pointer;
-}
-#ctx-menu li:hover {
-  background: #CEDFF2;
-  color: #EEE;
-}
-#ctx-menu li ul li {
-  display: none;
-}
-#ctx-menu li ul li a {
-  position: relative;
-  min-width: 60px;
-  padding: 6px;
-  text-decoration: none;
-  cursor: pointer;
-}
-#ctx-menu li:hover ul li {
-  display: block;
-  margin-left: 0px;
-  margin-top: 0px;
 }

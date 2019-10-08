@@ -1856,6 +1856,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
 #personHighlightSelectId_listbox * {
   cursor: pointer; }
 
+div #dependecy-control {
+  height: calc(100% - 30px);
+  overflow: auto; }
+
 #levelsUpId, #levelsDownId {
   width: 20px;
   padding-right: 0px; }

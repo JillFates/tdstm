@@ -1,11 +1,12 @@
-import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
-import {of, Observable, BehaviorSubject} from 'rxjs';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinct, map, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
+import {Location} from '@angular/common';
 
 import {TaskService} from '../../service/task.service';
 import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
-import {IGraphTask} from '../../model/graph-task.model';
+import {IGraphNode, IGraphTask, TASK_OPTION_LABEL} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
@@ -13,21 +14,39 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ReportsService} from '../../../reports/service/reports.service';
-
-export interface ILinkPath {
-	from: number | string;
-	to: number | string;
-}
+import {TaskDetailModel} from '../../model/task-detail.model';
+import {TaskDetailComponent} from '../detail/task-detail.component';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {TaskEditComponent} from '../edit/task-edit.component';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {TaskActionEvents} from '../common/constants/task-action-events.constant';
+import {TaskStatus} from '../../model/task-edit-create.model';
+import {ITaskEvent} from '../../model/task-event.model';
+import {
+	ContainerComp,
+	IDiagramContextMenuOption
+} from '../../../../shared/components/diagram-layout/model/diagram-context-menu.model';
+import {CTX_MENU_ICONS_PATH} from '../common/constants/task-icon-path';
+import {Permission} from '../../../../shared/model/permission.model';
+import {ILinkPath} from '../../../../shared/components/diagram-layout/model/diagram-layout.model';
+import {DIALOG_SIZE, ModalType} from '../../../../shared/model/constants';
+import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
+import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
+import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {clone} from 'ramda';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {AlertType} from '../../../../shared/model/alert.model';
 
 @Component({
 	selector: 'tds-neighborhood',
-	templateUrl: './neighborhood.component.html',
-	// styleUrls: ['../../../../../css/page/module/taskManager/neighborhood.component.scss']
+	templateUrl: './neighborhood.component.html'
 })
 export class NeighborhoodComponent implements OnInit {
-	tasks: IGraphTask[];
+	tasks: IGraphNode[];
 	nodeData$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 	links$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	ctxMenuOpts$: ReplaySubject<IDiagramContextMenuOption> = new ReplaySubject(2);
 	@ViewChild('graph') graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
 	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownListComponent;
@@ -42,7 +61,6 @@ export class NeighborhoodComponent implements OnInit {
 		completed: 'completed'
 	};
 	opened: boolean;
-	selectedTask: any;
 	filterText: string;
 	textFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
 	icons = FA_ICONS;
@@ -58,17 +76,22 @@ export class NeighborhoodComponent implements OnInit {
 	urlParams: any;
 	teamHighlights$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 	selectedTeamHighlight: string;
+	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
+	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 
 	constructor(
 			private taskService: TaskService,
 			private activatedRoute: ActivatedRoute,
-			private renderer: Renderer2,
 			private userContextService: UserContextService,
 			private reportService: ReportsService,
-			private preferenceService: PreferenceService
+			private preferenceService: PreferenceService,
+			private dialogService: UIDialogService,
+			private notifierService: NotifierService,
+			private location: Location,
+			private translatePipe: TranslatePipe
 		) {
 				this.activatedRoute.queryParams.subscribe(params => {
-					if (params) { this.urlParams = params; }
+					if (params) { this.urlParams = Object.assign({}, params); }
 				});
 	}
 
@@ -83,8 +106,33 @@ export class NeighborhoodComponent implements OnInit {
 		this.loadEventList();
 		this.eventsDropdownOpened();
 		this.eventsDropdownClosed();
+		this.subscribeToEvents();
 		// this.teamHighlightDropdownOpened();
 		// this.teamHighlightDropdownClosed();
+	}
+
+	subscribeToEvents(): void {
+		this.notifierService
+			.on(TaskActionEvents.START, data => this.start({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.HOLD, data => this.hold({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.DONE, data => this.done({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.RESET, data => this.reset({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.INVOKE, data => this.invoke({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.SHOW, data => this.showTaskDetails({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.EDIT, data => this.editTask({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.NEIGHBORHOOD, data => this.onNeighborhood({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.ASSIGN_TO_ME, data => this.assignToMe({name: data.name, task: data.node}));
+		this.notifierService
+			.on(TaskActionEvents.SHOW_ASSET_DETAIL, data =>
+				this.showAssetDetail({name: data.name, task: data.node}));
 	}
 
 	/**
@@ -123,17 +171,17 @@ export class NeighborhoodComponent implements OnInit {
 
 	/**
 		* Load tasks
-		* @param {number} taskNumber to load tasks from
+		* @param {number} taskId to load tasks from
 	 **/
-	loadTasks(taskNumber: number): void {
+	loadTasks(taskId: number): void {
 
 		const filters = {
 			myTasks: this.myTasks ? '1' : '0',
 			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
 			viewUnpublished: this.viewUnpublished ? '1' : '0'
 		};
-		this.taskService.findTask(taskNumber, filters)
-			.subscribe((res: IGraphTask[]) => {
+		this.taskService.findTask(taskId, filters)
+			.subscribe((res: IGraphNode[]) => {
 				if (res && res.length > 0) {
 					console.log('tasks:', res);
 					this.tasks = res;
@@ -219,14 +267,89 @@ export class NeighborhoodComponent implements OnInit {
 
 		// Add tasks to nodeDataArray constant
 		// and create linksPath object from taskNumber and successors
-		tasksCopy.map((t: IGraphTask | any) => {
+		tasksCopy.map((t: IGraphNode | any) => {
 			t.task.key = t.task.taskNumber;
+			if (!t.task.successors) { t.task.successors = t.successors; }
 			nodeDataArr.push(t.task);
 			linksPath.push(...this.getLinksPath(t.task.taskNumber, t.successors))
 		});
 
 		this.nodeData$.next(nodeDataArr);
 		this.links$.next(linksPath);
+		this.currentUser$.next(this.userContext.user);
+		this.ctxMenuOpts$.next(this.ctxMenuOptions());
+	}
+
+	ctxMenuOptions(): IDiagramContextMenuOption {
+		return  {
+			containerComp: ContainerComp.NEIGHBORHOOD,
+			fields: [
+				{
+					label: TASK_OPTION_LABEL.HOLD,
+					event: TaskActionEvents.HOLD,
+					icon: this.ctxMenuIcons.hold,
+					status: TaskStatus.HOLD,
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.START,
+					event: TaskActionEvents.START,
+					icon: this.ctxMenuIcons.start,
+					status: TaskStatus.STARTED,
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.DONE,
+					event: TaskActionEvents.DONE,
+					icon: this.ctxMenuIcons.done,
+					status: TaskStatus.COMPLETED,
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.RESET,
+					event: TaskActionEvents.RESET,
+					icon: this.ctxMenuIcons.reset,
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.INVOKE,
+					event: TaskActionEvents.INVOKE,
+					icon: this.ctxMenuIcons.invoke,
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.NEIGHBORHOOD,
+					event: TaskActionEvents.NEIGHBORHOOD,
+					icon: this.ctxMenuIcons.neighborhood,
+					status: 'neighborhood',
+					permission: Permission.TaskChangeStatus
+				},
+				{
+					label: TASK_OPTION_LABEL.ASSET_DETAILS,
+					event: TaskActionEvents.SHOW_ASSET_DETAIL,
+					icon: this.ctxMenuIcons.assetDetail,
+					permission: Permission.AssetView
+				},
+				{
+					label: TASK_OPTION_LABEL.VIEW,
+					event: TaskActionEvents.SHOW,
+					icon: this.ctxMenuIcons.view,
+					permission: Permission.TaskView
+				},
+				{
+					label: TASK_OPTION_LABEL.EDIT,
+					event: TaskActionEvents.EDIT,
+					icon: this.ctxMenuIcons.edit,
+					permission: Permission.TaskEdit
+				},
+				{
+					label: TASK_OPTION_LABEL.ASSIGN_TO_ME,
+					event: TaskActionEvents.ASSIGN_TO_ME,
+					icon: this.ctxMenuIcons.assignToMe,
+					permission: Permission.TaskEdit
+				}
+			]
+		};
 	}
 
 	/**
@@ -246,7 +369,6 @@ export class NeighborhoodComponent implements OnInit {
 	 * TreeLayout to use (if selected) by the diagram
 	 **/
 	treeLayout(): void {
-		console.log('Tree Layout selected');
 		this.graph.setTreeLayout();
 	}
 
@@ -307,24 +429,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	zoomOut() {
 		this.graph.zoomOut();
-	}
-
-	showTaskDetails(id: number): void {
-		this.selectedTask = { id };
-		this.open();
-	}
-
-	editTask(id: number): void {
-		this.selectedTask = { id };
-		this.open();
-	}
-
-	public close(status?: any) {
-		this.opened = false;
-	}
-
-	public open() {
-		this.opened = true;
 	}
 
 	/**
@@ -391,8 +495,228 @@ export class NeighborhoodComponent implements OnInit {
 		this.loadAll();
 	}
 
-	avoidDefault(): boolean {
-		return false;
+	/**
+	 * Put the task on start status
+	 **/
+	start(data?: ITaskEvent): void {
+		if (data) {
+			console.log('start data: ', data);
+			const payload = {
+				id: `${data.task.id}`,
+				status: TaskStatus.STARTED,
+				currentStatus: data.task.status
+			};
+
+			this.taskService.updateTaskStatus(payload)
+				.subscribe((result) => {
+					if (result) {
+						this.updateGraphNode(result.assetComment);
+					}
+				});
+		}
+	}
+
+	/**
+	 * Put the task on hold status
+	 **/
+	hold(data?: ITaskEvent): void {
+
+		if (data) {
+			console.log('start data: ', data);
+			const payload = {
+				id: `${data.task.id}`,
+				status: TaskStatus.HOLD,
+				currentStatus: data.task.status
+			};
+
+			this.taskService.updateTaskStatus(payload)
+				.subscribe((result) => {
+					if (result) {
+						this.updateGraphNode(result.assetComment);
+					}
+				});
+		}
+
+	}
+
+	/**
+	 * Put the task on done status
+	 **/
+	done(data?: ITaskEvent): void {
+
+		if (data) {
+			console.log('start data: ', data);
+			const payload = {
+				id: `${data.task.id}`,
+				status: TaskStatus.COMPLETED,
+				currentStatus: data.task.status
+			};
+
+			this.taskService.updateTaskStatus(payload)
+				.subscribe((result) => {
+					if (result) {
+						this.updateGraphNode(result.assetComment);
+					}
+				});
+		}
+
+	}
+
+	/**
+	 * Put the task on invoke status
+	 **/
+	invoke(data?: ITaskEvent): void {
+		this.taskService.invokeAction(`${data.task.id}`)
+			.subscribe((result) => {
+				console.log('result: ', result);
+			});
+	}
+
+	/**
+	 * Put the task on reset status
+	 **/
+	reset(data?: ITaskEvent): void {
+
+		this.taskService.resetTaskAction(Number(data.task.id))
+			.subscribe((result) => {
+				console.log('result: ', result);
+			});
+
+	}
+
+	/**
+	 * Show task detail context menu option
+	 **/
+	showTaskDetails(data?: ITaskEvent): void {
+		if (data.task) { data.task.predecessorList = data.task.predecessors || [1, 2, 3] }
+		if (data.task) { data.task.successorList = data.task.successors || [] }
+
+		let taskDetailModel: TaskDetailModel = {
+			id: `${data.task.id}`,
+			modal: {
+				title: 'Task Detail'
+			},
+			detail: {
+				currentUserId: this.userContext.user.id
+			}
+		};
+
+		this.dialogService.extra(TaskDetailComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		], false, false)
+			.then(result => {
+				console.log('result: ', result);
+				this.updateGraphNode(result.assetComment);
+			}).catch(result => {
+			if (result) {
+				console.log('catch: ', result);
+			}
+		});
+	}
+
+	/**
+	 * Open the Task Edit Modal
+	 * @param data
+	 */
+	editTask(data?: ITaskEvent): void {
+		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
+
+		this.taskService.getTaskDetails(`${data.task.id}`)
+			.subscribe((res) => {
+				let modelHelper = new TaskEditCreateModelHelper(
+					this.userContext.user,
+					this.userContext.dateFormat,
+					this.taskService, this.dialogService,
+					this.translatePipe);
+				taskDetailModel.detail = res;
+				taskDetailModel.modal = {
+					title: 'Task Edit',
+					type: ModalType.EDIT
+				};
+
+				let model = modelHelper.getModelForDetails(taskDetailModel);
+				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
+				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
+				model.modal = taskDetailModel.modal;
+
+				this.dialogService.extra(TaskEditComponent, [
+					{provide: TaskDetailModel, useValue: clone(model)}
+				], false, false)
+					.then(result => {
+						if (result) {
+							this.updateGraphNode(result.assetComment);
+						}
+
+					}).catch(result => {
+					if (result) {
+						console.error('Error: ', result)
+					}
+				});
+
+			});
+	}
+
+	/**
+	 * Show the asset popup detail.
+	 * @param data: ITaskEvent
+	 */
+	showAssetDetail(data: ITaskEvent): void {
+		const assetId = data.task.assetEntity.id;
+		if (assetId) {
+			this.taskService.getClassForAsset(`${assetId}`).subscribe(res => {
+				if (res.assetClass) {
+					this.dialogService.open(AssetShowComponent,
+						[UIDialogService,
+							{ provide: 'ID', useValue: data.task.assetEntity.id },
+							{ provide: 'ASSET', useValue: res.assetClass },
+							{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
+						], DIALOG_SIZE.LG).then(result => {
+						// console.log('success: ' + result);
+					}).catch(result => {
+						console.error('rejected: ' + result);
+					});
+				} else {
+					this.notifierService.broadcast({
+						name: AlertType.DANGER,
+						message: 'Invalid asset type'
+					});
+				}
+			})
+		}
+	}
+
+	/**
+	 * Open the neighborhood window
+	 */
+	onNeighborhood(data?: ITaskEvent): void {
+		const currentUrl = this.location.path().replace(this.urlParams.taskId, `${data.task.id}`);
+		this.location.go(currentUrl);
+		this.urlParams.taskId = data.task.id;
+		this.loadTasks(Number(data.task.id));
+	}
+
+	/**
+	 * Assign the task to the current user
+	 */
+	assignToMe(data?: ITaskEvent): void {
+		if (data) {
+			const payload = {
+				id: `${data.task.id}`,
+				status: data.task.status
+			};
+
+			this.taskService.assignToMe(payload)
+				.subscribe((result) => {
+					if (result) {
+						data.task.assignedTo = result.assignedToName;
+						this.updateGraphNode(data.task);
+					}
+				});
+		}
+	}
+
+	updateGraphNode(node: IGraphTask): void {
+		this.graph.updateNode(node);
 	}
 
 }
