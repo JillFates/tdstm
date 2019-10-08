@@ -38,7 +38,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	public timezonesList = [];
 	// List of possible date time formats
 	public timeFormatList = [DateUtils.PREFERENCE_MIDDLE_ENDIAN, DateUtils.PREFERENCE_LITTLE_ENDIAN];
-	public selectedTimezone;
+	public selectedTimezone = { id: 411, code: 'GMT', label: 'GMT'};
 	public selectedTimeFormat;
 	// The timezone Pin is controlled by the Timezone picker, this helps to control it outside the jquery lib
 	public timezonePinShow = false;
@@ -47,7 +47,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 
 	constructor(
 		public shouldReturnData: Boolean,
-		public defaultTimeZone: String,
+		public defaultTimeZone: string,
 		private headerService: HeaderService,
 		private preferenceService: PreferenceService,
 		private translatePipe: TranslatePipe,
@@ -58,12 +58,28 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	private getUserData(): void {
 		let data = [
 			this.retrieveMapAreas(),
-			this.retrieveTimezones()
+			this.headerService.getTimezones(),
+			this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ)
 		];
 
 		forkJoin(data).subscribe((result: any) => {
 			this.mapAreaList = result[0];
 			this.timezonesList = result[1];
+
+			this.selectedTimeFormat = result[2][PREFERENCES_LIST.CURR_DT_FORMAT];
+			this.selectedTimezone = this.timezonesList.find((timezone) => timezone.code === result[2][PREFERENCES_LIST.CURR_TZ]);
+
+			this.dateTimezoneData = JSON.stringify({
+				timezone: this.selectedTimezone,
+				datetimeFormat: this.selectedTimeFormat
+			});
+
+			let defaultTimeZone = this.timezonesList.find((timezone) => timezone.code === this.defaultTimeZone);
+			if (defaultTimeZone) {
+				this.selectedTimezone = defaultTimeZone;
+			}
+
+			this.prepareMapData();
 		});
 	}
 
@@ -79,6 +95,12 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 		}
 
 		this.getUserData();
+	}
+
+	/**
+	 *  Prepare all the data for the Map
+	 */
+	private prepareMapData(): void {
 		setTimeout(() => {
 			jQuery('#timezoneImage').timezonePicker({
 				target: '#dateTimezone'
@@ -87,32 +109,14 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			// Get the Selected area
 			jQuery('#timezoneMap').find('area').click((element: any) => {
 				this.timezonePinShow = true;
-				this.selectedTimezone = jQuery(element.currentTarget).attr('data-timezone');
+				this.selectedTimezone = this.timezonesList.find( (timezone) => timezone.code === jQuery(element.currentTarget).attr('data-timezone'));
 			});
 
-			if (this.selectedTimezone && this.selectedTimezone !== null && this.selectedTimezone !== '') {
+			if (this.selectedTimezone && this.selectedTimezone.code !== null && this.selectedTimezone.code !== '') {
 				// Preselect the timezone (this feature was not available in the original implementation)
 				this.onTimezoneSelected(this.selectedTimezone);
 			}
 			// Delay time to allow the Picker to be initialized
-		}, 800);
-
-		setTimeout(() => {
-			this.defaultTimeZone = this.timezonesList.includes(this.defaultTimeZone) ? this.defaultTimeZone : '';
-			if (this.defaultTimeZone) {
-				this.selectedTimezone = this.defaultTimeZone;
-			}
-			// Timeout to ensure this is always done if a valid timezone is provided
-		}, 1500)
-
-		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_DT_FORMAT, PREFERENCES_LIST.CURR_TZ).subscribe((res: any) => {
-			this.selectedTimeFormat = res[PREFERENCES_LIST.CURR_DT_FORMAT];
-			this.selectedTimezone = res[PREFERENCES_LIST.CURR_TZ];
-
-			this.dateTimezoneData = JSON.stringify({
-				timezone: this.selectedTimezone,
-				datetimeFormat: this.selectedTimeFormat
-			});
 		});
 	}
 
@@ -171,34 +175,16 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	}
 
 	/**
-	 * Get the List of TimeZones
-	 */
-	private retrieveTimezones(): Observable<any> {
-		return new Observable((observer: any) => {
-			this.headerService.getTimezones().subscribe(
-				(result: any) => {
-					let timezones = [];
-					result.forEach((timezone: any) => {
-						timezones.push(timezone.code);
-					});
-					observer.next(timezones);
-					observer.complete();
-				},
-				(err) => console.log(err));
-		});
-	}
-
-	/**
 	 * After the timezone has been selected from the dropdown it should auto-select
 	 * the proper value on the Map
 	 * @param timezone
 	 */
-	public onTimezoneSelected(timezone: string): void {
+	public onTimezoneSelected(timezone: any): void {
 		// we ensure it is hide by default for elements like GMT that does not exist in the map
 		this.timezonePinShow = false;
 		jQuery('#timezoneMap').find('area').each((m, areaElement) => {
 			// Find the timezone attribute from the map itself
-			if (areaElement.getAttribute('data-timezone') === timezone) {
+			if (areaElement.getAttribute('data-timezone') === timezone.code) {
 				// Emulate the click to get the PIN in place
 				this.timezonePinShow = true;
 				setTimeout(() => {
@@ -213,7 +199,7 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 	 */
 	public onSave(): void {
 		const params = {
-			timezone: this.selectedTimezone,
+			timezone: this.selectedTimezone.code,
 			datetimeFormat: this.selectedTimeFormat
 		};
 

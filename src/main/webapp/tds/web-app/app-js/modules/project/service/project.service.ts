@@ -68,8 +68,9 @@ export class ProjectService {
 	saveProject(model, originalFilename = '', id = ''): Observable<any> {
 		let postModel = JSON.parse(JSON.stringify(model));
 		postModel['originalFilename'] = originalFilename;
-		postModel.planMethodology = postModel.planMethodology.field;
-		return this.http.post(`../ws/project/saveProject/${id}`, postModel)
+		postModel['planMethodology'] = postModel.planMethodology.field;
+		postModel['partnerIds'] = postModel.partners.map(p => p.id);
+		return this.http.post(`../ws/project/saveProject/${id}`, model)
 				.map((response: any) => {
 					return response;
 				})
