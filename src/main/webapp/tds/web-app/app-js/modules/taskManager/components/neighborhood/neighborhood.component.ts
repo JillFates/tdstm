@@ -36,6 +36,7 @@ import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {AlertType} from '../../../../shared/model/alert.model';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -660,18 +661,27 @@ export class NeighborhoodComponent implements OnInit {
 	 * @param data: ITaskEvent
 	 */
 	showAssetDetail(data: ITaskEvent): void {
-		if (data.task.assetEntity.id) {
-			this.dialogService.open(AssetShowComponent,
-				[UIDialogService,
-					{ provide: 'ID', useValue: data.task.assetEntity.id },
-					{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-				], DIALOG_SIZE.LG).then(result => {
-				// console.log('success: ' + result);
-			}).catch(result => {
-				console.error('rejected: ' + result);
-			});
-		} else {
-			// TODO
+		const assetId = data.task.assetEntity.id;
+		if (assetId) {
+			this.taskService.getClassForAsset(`${assetId}`).subscribe(res => {
+				if (res.assetClass) {
+					this.dialogService.open(AssetShowComponent,
+						[UIDialogService,
+							{ provide: 'ID', useValue: data.task.assetEntity.id },
+							{ provide: 'ASSET', useValue: res.assetClass },
+							{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
+						], DIALOG_SIZE.LG).then(result => {
+						// console.log('success: ' + result);
+					}).catch(result => {
+						console.error('rejected: ' + result);
+					});
+				} else {
+					this.notifierService.broadcast({
+						name: AlertType.DANGER,
+						message: 'Invalid asset type'
+					});
+				}
+			})
 		}
 	}
 
