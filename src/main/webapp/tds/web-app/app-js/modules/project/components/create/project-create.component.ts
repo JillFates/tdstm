@@ -40,13 +40,14 @@ export class ProjectCreateComponent implements OnInit {
 
 	ngOnInit() {
 		this.getModel();
+		let today = new Date();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
+			startDate: new Date(today),
+			completionDate: new Date(today.setMonth(today.getMonth()+2)),
 			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
@@ -59,7 +60,6 @@ export class ProjectCreateComponent implements OnInit {
 			planMethodology: ''
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
-		this.projectModel.completionDate.setMonth(this.projectModel.completionDate.getMonth()+2);
 		this.file.uploadRestrictions = {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
 			maxFileSize: 50000
