@@ -7,7 +7,7 @@ import {
 	SimpleChanges,
 	EventEmitter,
 	ViewChild,
-	ElementRef
+	ElementRef, HostListener
 } from '@angular/core';
 import * as go from 'gojs';
 import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../modules/taskManager/components/common/constants/task-icon-path';
@@ -51,7 +51,7 @@ const categoryColors = {
 			<div
 					id="diagram-layout"
 					[style.width]="containerWidth"
-					[style.height]="containerHeight"
+					[style.height]="screenHeight"
 					#diagramLayout></div>
 			<div id="graph-control-btn-group">
 				<button class="btn btn-block">
@@ -103,8 +103,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	diagramOverview: Overview;
 	resetOvIndex: boolean;
 	ctxMenuData$: ReplaySubject<IDiagramContextMenuModel> = new ReplaySubject();
+	screenHeight: any;
 
-	constructor() { /* Constructor */ }
+	constructor() {
+		this.onResize();
+	}
 
 	/**
 	 * Detect changes to update nodeDataArray and linksPath accordingly
@@ -117,6 +120,12 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 				this.loadAll();
 			}
 		}
+	}
+
+	@HostListener('window:resize', ['$event'])
+	onResize(event?: any) {
+		this.screenHeight = `${window.innerHeight - 230}px`;
+		console.log(this.screenHeight);
 	}
 
 	ngAfterViewInit() {
