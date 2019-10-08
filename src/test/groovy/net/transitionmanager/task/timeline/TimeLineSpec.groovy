@@ -1179,6 +1179,51 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
+	void 'test can calculate critical path for a graph with three TaskVertex in circular cycle'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('06:00')
+			Date windowEndTime = hourInDay('07:30')
+			Date currentTime = hourInDay('06:00')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertex(1l, 1, A, 30).addEdgeTo(B)
+				.withVertex(2l, 2, B, 60).addEdgeTo(C)
+				.withVertex(3l, 3, C, 30).addEdgeTo(A) // Creates a circular cycle
+				.build()
+
+		when: 'TimeLine calculates its critical path'
+			new TimeLine(taskTimeLineGraph).calculate(windowStartTime, windowEndTime, currentTime)
+
+		then:
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				!criticalPath
+				slack == 0
+				earliestStartDate == null
+				earliestFinishDate == null
+				latestStartDate == null
+				latestFinishDate == null
+			}
+
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				!criticalPath
+				slack == 0
+				earliestStartDate == null
+				earliestFinishDate == null
+				latestStartDate == null
+				latestFinishDate == null
+			}
+
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				!criticalPath
+				slack == 0
+				earliestStartDate == null
+				earliestFinishDate == null
+				latestStartDate == null
+				latestFinishDate == null
+			}
+	}
+
 	private Date hourInDay(String dateTime) {
 		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
 	}
