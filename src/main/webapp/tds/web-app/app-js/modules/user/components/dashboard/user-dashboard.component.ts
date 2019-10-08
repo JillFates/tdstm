@@ -127,15 +127,17 @@ export class UserDashboardComponent implements OnInit {
 			id: comment.taskId,
 			modal: {
 				title: 'Task Detail'
-			},
-			detail: {
-				currentUserId: 5662
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		]).then(() => {
-			this.fetchTasksForGrid();
+		]).then((result) => {
+			if (result && result.shouldOpenTask) {
+				this.openTaskDetailView(result.commentInstance)
+			} else {
+				this.fetchTasksForGrid();
+			}
+
 		}).catch(result => {
 			if (!result) {
 				this.fetchTasksForGrid();
