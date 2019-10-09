@@ -28,7 +28,7 @@ export const BundleRoute: Routes = [
 			page: {
 				title: 'PLANNING.BUNDLES.LIST',
 				instruction: '',
-				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.BUNDLES', 'GLOBAL.LIST'],
+				menu: ['PLANNING.PLANNING', 'PLANNING.BUNDLES.LIST'],
 			},
 			requiresAuth: true
 		},

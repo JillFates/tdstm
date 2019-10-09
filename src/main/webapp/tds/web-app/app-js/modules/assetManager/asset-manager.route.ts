@@ -125,7 +125,7 @@ export const AssetManagerRoute: Routes = [
 		},
 		canActivate: [AuthGuardService, ModuleResolveService],
 		runGuardsAndResolvers: 'always'
-	}
+	},
 ];
 
 @NgModule({

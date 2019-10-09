@@ -60,21 +60,21 @@
                             <tr class="prop">
                                 <td valign="top" class="name">Start Date:</td>
 
-                                <td valign="top" class="value">{{savedModel?.startDate | tdsDateTime: userTimeZone}}</td>
+                                <td valign="top" class="value">{{savedModel?.startDate | tdsDate: userDateFormat}}</td>
 
                             </tr>
 
                             <tr class="prop">
                                 <td valign="top" class="name">Completion Date:</td>
 
-                                <td valign="top" class="value">{{savedModel?.completionDate | tdsDateTime: userTimeZone}}</td>
+                                <td valign="top" class="value">{{savedModel?.completionDate | tdsDate: userDateFormat}}</td>
 
                             </tr>
 
                             <tr class="prop">
                                 <td valign="top" class="name">Associated Partners:</td>
 
-                                <td valign="top" class="value"><ul><li *ngFor="let partner of savedModel?.partnerIds">{{partnerKey[partner]}}</li></ul></td>
+                                <td valign="top" class="value"><ul><li *ngFor="let partner of savedModel?.partners">{{partner.name}}</li></ul></td>
                             </tr>
 
                             <tr class="prop">
@@ -230,8 +230,16 @@
                     <tr class="prop">
                         <td valign="top" class="name">Associated Partners:</td>
                         <td valign="top" class="value">
-                            <kendo-dropdownlist style="display: block; margin-bottom: 2px" *ngFor="let partnerId of projectModel.partnerIds;" [data]="possiblePartners" [ngModel]="partnerId" (selectionChange)="partnerId = $event" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
-                            <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
+                            <div *ngFor="let partner of projectModel.partners; let i = index">
+                                <kendo-dropdownlist style="display: block; margin-bottom: 2px"
+                                                    [ngModel]="partner"
+                                                    (selectionChange)="onPartnerSelectionChange(partner, $event)"
+                                                    [name]="'partner_' + i"
+                                                    [data]="possiblePartners"
+                                                    [textField]="'name'"
+                                                    [valueField]="'id'"></kendo-dropdownlist>
+                            </div>
+                            <button class="btn btn-secondary" (click)="projectModel.partners.push({id:0, name:''})">Add Partner</button>
                         </td>
                     </tr>
 
