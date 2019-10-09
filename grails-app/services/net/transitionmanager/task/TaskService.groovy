@@ -5860,8 +5860,6 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
-			//case ~/statusUpdated|estFinish|dateCreated|dateResolved|estStart|actStart|actFinish|lastUpdated/:
-//				result = TimeUtil.formatDateTime(task[fieldName])
 			case { task[fieldName] instanceof Timestamp}:
 				result = task[fieldName] ? TimeUtil.formatDateTime(task[fieldName] as Date, TimeUtil.FORMAT_DATE_TIME_15) : ''
 				break
