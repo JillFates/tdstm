@@ -185,7 +185,7 @@ export class TaskEditCreateModelHelper {
 			instructionsLinkURL: detail.instructionsLinkURL || '',
 			priority: assetComment.priority,
 			assetName: detail.assetName,
-			comment:  assetComment.comment || '',
+			comment:  assetComment.title || '',
 			assetClass: {id: detail.assetClass, text: detail.assetClasses && detail.assetClasses[detail.assetClass] || ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
 			status: assetComment && assetComment.status || '',

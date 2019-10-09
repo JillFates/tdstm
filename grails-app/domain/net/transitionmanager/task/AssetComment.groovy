@@ -472,7 +472,6 @@ class AssetComment {
 			assetType                : assetEntity?.assetType,
 			taskNumber               : taskNumber,
 			title                    : comment,
-			comment                  : comment,
 			status                   : status,
 			statusUpdated            : statusUpdated,
 			statusUpdatedElapsed     : TimeUtil.ago(statusUpdated),
