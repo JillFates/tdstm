@@ -291,7 +291,8 @@ class WsUserController implements ControllerMethods {
 	@HasPermission(Permission.UserGeneralAccess)
 	def savePreference() {
     	SavePreferenceCommand savePreference = populateCommandObject(SavePreferenceCommand)
-    	userPreferenceService.setPreference(savePreference.code, savePreference.value)
+		validateCommandObject(savePreference)
+		userPreferenceService.setPreference(savePreference.code, savePreference.value)
     	renderSuccessJson()
 	}
 
