@@ -233,37 +233,12 @@ class TaskService implements ServiceMethods {
 			queryArgs.now = now
 			queryArgs.minAgo = minAgo
 
-			/*
-				NOTE THAT THIS LOGIC IS DUPLICATED IN THE AssetComment Domain for score formula SO IT NEEDS TO BE MAINTAINED TOGETHER
-			*/
-			sql.append(""",
-				CASE t.status
-					WHEN '$HOLD' THEN 9000000
-					WHEN '$COMPLETED' THEN IF(t.status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
-					WHEN '$STARTED' THEN 7000000
-					WHEN '$READY' THEN 6000000
-					WHEN '$PENDING' THEN 5000000
-					WHEN '$PLANNED' THEN 4000000
-					WHEN '$TERMINATED' THEN 2000000
-					ELSE 0
-				END
-				- if(t.status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
-					COALESCE( ROUND((UNIX_TIMESTAMP(:now) - UNIX_TIMESTAMP(t.status_updated))/60), 0)
-					,0)
-				+ if(t.status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(t.est_start + t.slack),
-					COALESCE(
-						FLOOR(
-							SQRT( 10000 *
-								if( (UNIX_TIMESTAMP(t.est_start) + t.slack) < UNIX_TIMESTAMP(:now),
-									ROUND( (UNIX_TIMESTAMP(:now) - UNIX_TIMESTAMP(t.est_start) - t.slack) / 60),
-									ROUND( (UNIX_TIMESTAMP(t.est_start) + t.slack -UNIX_TIMESTAMP(:now)) / 60)
-								)
-							) * if( (UNIX_TIMESTAMP(t.est_start) + t.slack) < UNIX_TIMESTAMP(:now), 1, -1)
-						)
-					, 0)
-				, 0) as score
-			""")
+			// With the magic of Lazy String interpolation we get the ability to reuse the SQL used in the domain class
+			// here as well.
+			String scoreTableAlias = 't.'
+			sql.append(', ' + AssetComment.ScoreSQLFormula.toString() + ' as score')
 		}
+
 
 		// Add Successor Count
 		sql.append(', (SELECT count(*) FROM task_dependency td WHERE predecessor_id=t.asset_comment_id) AS successors ')

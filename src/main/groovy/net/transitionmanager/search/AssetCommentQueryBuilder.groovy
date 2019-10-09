@@ -287,12 +287,12 @@ class AssetCommentQueryBuilder {
 
 	/**
 	 * Construct a clause 'field = true' or 'field = false'
+	 * If the filter value entered by the user can not be resolved as a boolean type then the criteria will just be
+	 * ignored. This will allow the user to type T, tr, tru, or true, in order to get to a valid boolean string value
+	 * without getting an error message in the UI.
 	 */
-	Closure boolEqBuilder = { String field, Map fieldMap ->
-		Boolean value = StringUtil.toBoolean(requestParams[field])
-		if (value == null) {
-			invalidCriterion = true
-		} else {
+	Closure boolEqBuilder = { String field, Map fieldMap -> Boolean value = StringUtil.toBoolean(requestParams[field])
+		if (value != null) {
 			processField(field, fieldMap, '=', ":${field}", value)
 		}
 	}
@@ -343,7 +343,7 @@ class AssetCommentQueryBuilder {
 			case "dueOpenIssue":
 				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
-		// 'break' intentionally omitted.
+				// 'break' intentionally omitted.
 
 			case "openIssue" :
 				whereClauses << "ac.category IN (:discoveryCategories)"

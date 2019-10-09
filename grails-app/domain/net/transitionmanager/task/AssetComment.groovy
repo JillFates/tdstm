@@ -130,6 +130,40 @@ class AssetComment {
 	Boolean isImported = false
 	/* End transient properties for Task Generation.*/
 
+	/*
+	 * The ScoreSQLFormula String uses Lazy String interpolation to populate the table reference in the SQL appropriately
+	 * so that the formula can be reused. The variable scoreTableAlias must be in scope when evaluating ScoreSQLFormula.
+	 */
+	static final String scoreTableAlias = ''
+	static final String ScoreSQLFormula = """
+			CASE status
+				WHEN '$HOLD' THEN 9000000
+				WHEN '$COMPLETED' THEN IF(${->scoreTableAlias}status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
+				WHEN '$STARTED' THEN 7000000
+				WHEN '$READY' THEN 6000000
+				WHEN '$PENDING' THEN 5000000
+				WHEN '$PLANNED' THEN 4000000
+				WHEN '$TERMINATED' THEN 2000000
+				ELSE 0
+			END
+			- if(status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
+				COALESCE( ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(${->scoreTableAlias}status_updated))/60), 0)
+				,0
+			)
+			+ if(${->scoreTableAlias}status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(${->scoreTableAlias}est_start + slack),
+				COALESCE(
+					FLOOR(
+						SQRT( 10000 *
+							if( (UNIX_TIMESTAMP(${->scoreTableAlias}est_start) + ${->scoreTableAlias}slack) < UNIX_TIMESTAMP(NOW()),
+								ROUND( (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(${->scoreTableAlias}est_start) - slack) / 60),
+								ROUND( (UNIX_TIMESTAMP(${->scoreTableAlias}est_start) + ${->scoreTableAlias}slack - UNIX_TIMESTAMP(NOW())) / 60)
+							)
+						) * if( (UNIX_TIMESTAMP(${->scoreTableAlias}est_start) + ${->scoreTableAlias}slack) < UNIX_TIMESTAMP(NOW()), 1, -1)
+					)
+				, 0)
+			, 0)
+		"""
+
 	static constraints = {
 		actStart nullable: true
 		assetEntity nullable: true
@@ -194,45 +228,49 @@ class AssetComment {
 			resolution sqltype: 'text'
 			taskNumber sqltype: 'shortint unsigned'
 		}
-		/*
-			NOTE THAT THIS LOGIC IS DUPLICATED IN THE TaskService.getUserTasks method SO IT NEEDS TO BE MAINTAINED TOGETHER
 
-		*/
-		score formula: """
-			CASE status
-				WHEN '$HOLD' THEN 9000000
-				WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
-				WHEN '$STARTED' THEN 7000000
-				WHEN '$READY' THEN 6000000
-				WHEN '$PENDING' THEN 5000000
-				WHEN '$PLANNED' THEN 4000000
-				WHEN '$TERMINATED' THEN 2000000
-				ELSE 0 
-			END
-			- if(status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
-				COALESCE( ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(status_updated))/60), 0)
-				,0
-			)
-			+ if(status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(est_start + slack),
-				COALESCE( 
-					FLOOR( 
-						SQRT( 10000 * 
-							if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 
-								ROUND( (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(est_start) - slack) / 60),
-								ROUND( (UNIX_TIMESTAMP(est_start) + slack - UNIX_TIMESTAMP(NOW())) / 60)
-							) 
-						) * if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 1, -1)
-					)
-				, 0)
-			, 0)
-			""".toString()
+		// The score provides a way of sorting the tasks such that the more prevalent tasks appear at the top by status
+		// and then by latest status change or those that need to be acted upon first based on critical path.
+		// Note that the value assignment uses lazy String interpolation for the table name alias.
+		score formula: ScoreSQLFormula.toString()
 
+//		score formula: """
+//			CASE status
+//				WHEN '$HOLD' THEN 9000000
+//				WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
+//				WHEN '$STARTED' THEN 7000000
+//				WHEN '$READY' THEN 6000000
+//				WHEN '$PENDING' THEN 5000000
+//				WHEN '$PLANNED' THEN 4000000
+//				WHEN '$TERMINATED' THEN 2000000
+//				ELSE 0
+//			END
+//			- if(status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
+//				COALESCE( ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(status_updated))/60), 0)
+//				,0
+//			)
+//			+ if(status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(est_start + slack),
+//				COALESCE(
+//					FLOOR(
+//						SQRT( 10000 *
+//							if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()),
+//								ROUND( (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(est_start) - slack) / 60),
+//								ROUND( (UNIX_TIMESTAMP(est_start) + slack - UNIX_TIMESTAMP(NOW())) / 60)
+//							)
+//						) * if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 1, -1)
+//					)
+//				, 0)
+//			, 0)
+//			""".toString()
+
+		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestStart formula: '''
 				if(slack is null, est_start, 
 					if(est_start + slack, date_format(addtime(est_start,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
 				)
 			'''
 
+		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestFinish formula: '''
 				if(slack is null, est_finish, 
 					if(est_finish + slack, date_format(addtime(est_finish,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
@@ -241,9 +279,12 @@ class AssetComment {
 
 	}
 
-	static transients = ['actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
-	                     'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
-	                     'tmpIsFunnellingTask', 'isActionable']
+	static transients = [
+			'actFinish', 'assetName', 'assignedToString', 'done', 'isImported', 'runbookTask',
+	        'tmpAssociatedAssets', 'tmpDefPred', 'tmpDefSucc', 'tmpHasSuccessorTaskFlag',
+	        'tmpIsFunnellingTask', 'isActionable',
+			'scoreFormula'
+	]
 
 	// TODO : need method to handle inserting new assetComment or updating so that the category+taskNumber is unique
 
@@ -518,20 +559,35 @@ class AssetComment {
 
 	// task Manager column header names and its labels
 	static final Map<String, String> taskCustomizeFieldAndLabel = [
-		actFinish: 'Actual Finish', actStart: 'Actual Start', apiAction: 'Action Name',
-		assetName: 'Asset Name', assetType: 'Asset Type', assignedTo: 'Assigned To',
-		bundle: 'Move Bundle',
-		category: 'Category', commentType: 'Comment Type', createdBy: 'Created By', isCriticalPath: 'Critical Path',
+		actFinish: 'Actual Finish',
+		actStart: 'Actual Start',
+		apiAction: 'Action Name',
+		assetName: 'Asset Name',
+		assetType: 'Asset Type',
+		assignedTo: 'Assigned To',
+		bundle: 'Bundle',
+		category: 'Category',
+		createdBy: 'Created By',
+		isCriticalPath: 'Critical Path',
 		dateCreated: 'Date Created',
-		dateResolved: 'Date Resolved', displayOption: 'Display Option', duration: 'Duration',
+		duration: 'Duration',
 		durationScale: 'Duration Scale',
-		estFinish: 'Earliest Finish', estStart: 'Earliest Start',
+		estFinish: 'Earliest Finish',
+		estStart: 'Earliest Start',
 		event: 'Event',
-		latestFinish: 'Latest Finish', latestStart: 'Latest Start',
-		hardAssigned: 'Hard Assignment', instructionsLink: 'Instructions Link', isPublished: 'Is Published', lastUpdated: 'Last Updated',
-		priority: 'Priority', resolution: 'Resolution', resolvedBy: 'Resolved By', role: 'Team', 
-		sendNotification: 'Send Notification', slack: 'Slack', 
-		statusUpdated: 'Status Updated', percentageComplete: 'Completion %', taskSpec: 'TaskSpec ID'
+		latestFinish: 'Latest Finish',
+		latestStart: 'Latest Start',
+		hardAssigned: 'Hard Assignment',
+		instructionsLink: 'Instructions Link',
+		isPublished: 'Is Published',
+		lastUpdated: 'Last Updated',
+		priority: 'Priority',
+		role: 'Team',
+		sendNotification: 'Send Notification',
+		slack: 'Slack',
+		statusUpdated: 'Status Updated',
+		percentageComplete: 'Completion %',
+		taskSpec: 'TaskSpec ID'
 	].asImmutable()
 
 	Map toMap() {

@@ -1,5 +1,6 @@
 package net.transitionmanager.command.task
 
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.command.CommandObject
 
 class ListTaskCommand implements CommandObject {
@@ -12,7 +13,7 @@ class ListTaskCommand implements CommandObject {
 	String  sortColumn
 	String  sortOrder       = 'ASC'
 
-	//Filter columns
+	// Filterable columns
 	String comment
 	String assetName
 	String assetType
@@ -25,7 +26,6 @@ class ListTaskCommand implements CommandObject {
 	String actFinish
 	String actStart
 	String category
-	String commentType
 	String percentageComplete
 	String createdBy
 	String dateCreated
@@ -37,7 +37,7 @@ class ListTaskCommand implements CommandObject {
 	String estStart
 	String hardAssigned
 	String instructionsLink
-	Boolean isCriticalPath
+	String isCriticalPath
 	String isPublished
 	String lastUpdated
 	String latestFinish
@@ -45,9 +45,8 @@ class ListTaskCommand implements CommandObject {
 	String bundle
 	String event
 	String priority
-	String resolution
-	String resolvedBy
 	String sendNotification
+	String slack
 	String statusUpdated
 	String taskSpec
 
@@ -75,7 +74,6 @@ class ListTaskCommand implements CommandObject {
 		percentageComplete nullable: true
 		createdBy nullable: true
 		dateCreated nullable: true
-		dateResolved nullable: true
 		displayOption nullable: true
 		duration nullable: true
 		durationScale nullable: true
@@ -91,8 +89,6 @@ class ListTaskCommand implements CommandObject {
 		bundle nullable: true
 		event nullable: true
 		priority nullable: true
-		resolution nullable: true
-		resolvedBy nullable: true
 		sendNotification nullable: true
 		statusUpdated nullable: true
 		taskSpec nullable: true
