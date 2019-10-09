@@ -46,7 +46,7 @@ export class ProjectCreateComponent implements OnInit {
 			clientId: 0,
 			projectName: '',
 			description: '',
-			startDate: new Date(today),
+			startDate: new Date(),
 			completionDate: new Date(today.setMonth(today.getMonth()+2)),
 			partnerIds: [],
 			projectLogo: '',
