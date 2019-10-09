@@ -234,34 +234,6 @@ class AssetComment {
 		// Note that the value assignment uses lazy String interpolation for the table name alias.
 		score formula: ScoreSQLFormula.toString()
 
-//		score formula: """
-//			CASE status
-//				WHEN '$HOLD' THEN 9000000
-//				WHEN '$COMPLETED' THEN IF(status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
-//				WHEN '$STARTED' THEN 7000000
-//				WHEN '$READY' THEN 6000000
-//				WHEN '$PENDING' THEN 5000000
-//				WHEN '$PLANNED' THEN 4000000
-//				WHEN '$TERMINATED' THEN 2000000
-//				ELSE 0
-//			END
-//			- if(status in ('$HOLD', '$COMPLETED', '$STARTED', '$TERMINATED'),
-//				COALESCE( ROUND((UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(status_updated))/60), 0)
-//				,0
-//			)
-//			+ if(status in ('$READY', '$PENDING', '$PLANNED') AND NOT ISNULL(est_start + slack),
-//				COALESCE(
-//					FLOOR(
-//						SQRT( 10000 *
-//							if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()),
-//								ROUND( (UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(est_start) - slack) / 60),
-//								ROUND( (UNIX_TIMESTAMP(est_start) + slack - UNIX_TIMESTAMP(NOW())) / 60)
-//							)
-//						) * if( (UNIX_TIMESTAMP(est_start) + slack) < UNIX_TIMESTAMP(NOW()), 1, -1)
-//					)
-//				, 0)
-//			, 0)
-//			""".toString()
 
 		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestStart formula: '''
