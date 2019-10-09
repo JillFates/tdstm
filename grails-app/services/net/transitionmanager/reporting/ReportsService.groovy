@@ -56,7 +56,7 @@ import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
 import net.transitionmanager.task.timeline.TaskTimeLineGraph
 import net.transitionmanager.task.timeline.TaskVertex
-import net.transitionmanager.task.timeline.TimeLineService
+import net.transitionmanager.task.timeline.TimelineService
 import net.transitionmanager.task.timeline.TimelineSummary
 import org.apache.commons.lang3.RandomUtils
 import org.apache.commons.lang3.StringUtils
@@ -87,7 +87,7 @@ class ReportsService implements ServiceMethods {
     ControllerService controllerService
     ProjectService projectService
     TagAssetService tagAssetService
-    TimeLineService timeLineService
+    TimelineService timelineService
 
     @Transactional(readOnly = true)
     def generatePreMoveCheckList(projectId, MoveEvent moveEvent, boolean viewUnpublished = false) {
@@ -1195,7 +1195,7 @@ class ReportsService implements ServiceMethods {
         CPAResults cpaResults
 
         try {
-            cpaResults = timeLineService.calculateCPA(moveEvent, viewUnpublished)
+            cpaResults = timelineService.calculateCPA(moveEvent, viewUnpublished)
         } catch (e) {
             exceptionString += "No Tasks"
         }

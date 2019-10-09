@@ -486,7 +486,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			}
 			for (note in notesList) {
 				notes << [
-					TimeUtil.formatDateTime(note.dateCreated, TimeUtil.FORMAT_DATE_TIME_3),
+					TimeUtil.formatDateTime(note.dateCreated),
 					note.createdBy?.toString(),
 					note.note,
 					note.createdBy?.id]

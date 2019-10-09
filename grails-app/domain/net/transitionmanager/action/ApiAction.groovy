@@ -148,7 +148,7 @@ class ApiAction {
 		callbackMethod nullable: true
 		callbackMode nullable: true
 		commandLine nullable: true, size: 0..1024
-		connectorMethod size: 1..64
+		connectorMethod nullable: true, size: 1..64, validator: connectorMethodValidator()
 		dictionaryMethodName nullable: true
 		credential nullable: true, validator: crossProviderValidator()
 		defaultDataScript nullable: true, validator: crossProviderValidator()
@@ -377,6 +377,16 @@ class ApiAction {
 			if (valueProviderId != domainObject.provider.id) {
 				return Message.InvalidFieldForDomain
 			}
+		}
+	}
+
+	static Closure connectorMethodValidator() {
+		return { value, ApiAction domainObject ->
+			if (!value && domainObject.actionType == ActionType.WEB_API) {
+				return 'appAction.connectorMethod.nullable'
+			}
+
+			return true
 		}
 	}
 

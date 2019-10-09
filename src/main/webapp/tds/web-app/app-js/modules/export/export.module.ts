@@ -8,11 +8,11 @@ import {SharedModule} from '../../shared/shared.module';
 import {DropDownsModule} from '@progress/kendo-angular-dropdowns';
 import {DialogModule} from '@progress/kendo-angular-dialog';
 // Route Module
-import {AssetExportRouteModule} from './asset-export-route.module';
+import {ExportRouteModule} from './export-route.module';
 // Services
 import {ExportAssetService} from './service/export-asset.service'
 // Components
-import {ExportComponent} from './components/export/export.component';
+import {ExportAssetComponent} from './components/export-asset/export-asset.component';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 
 @NgModule({
@@ -25,7 +25,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 		DropDownsModule,
 		DialogModule,
 		// Route
-		AssetExportRouteModule
+		ExportRouteModule
 	],
 	providers: [
 		// Resolve
@@ -33,8 +33,8 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 		ExportAssetService
 	],
 	declarations: [
-		ExportComponent,
+		ExportAssetComponent,
 	]
 })
-export class AssetExportModule {
+export class ExportModule {
 }

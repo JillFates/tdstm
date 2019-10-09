@@ -14,7 +14,7 @@ import java.sql.SQLException
 
 @Transactional
 @CompileStatic
-class TimeLineService implements ServiceMethods {
+class TimelineService implements ServiceMethods {
 
 	/**
 	 * Instance of {@code JdbcTemplate} used to save CPA results in Database
@@ -49,29 +49,26 @@ class TimeLineService implements ServiceMethods {
 	 *
 	 * @param moveEvent the event to retrieve tasks for
 	 * @param viewUnpublished show only published tasks or all tasks
-	 * @return List<Task>     a list of tasks
+	 * @return List<Task>      a list of tasks
 	 */
 	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
 
 		if (!event)
 			return []
 
-		if (viewUnpublished) {
-			return Task.where {
-				moveEvent == event
-			}.list()
-		} else {
-			return Task.where {
-				moveEvent == event && isPublished == true
-			}.list()
-		}
+		return Task.where {
+			moveEvent == event
+			if (!viewUnpublished) {
+				isPublished == true
+			}
+		}.list()
 	}
 
 	/**
 	 * Used to get the list of task dependencies for a given list of tasks
 	 *
 	 * @param List <AssetComment>  a list of tasks
-	 * @return List<TaskDependency>     a list of the dependencies associated to the tasks
+	 * @return List<TaskDependency>      a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
 		return TaskDependency.where {

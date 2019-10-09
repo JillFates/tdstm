@@ -411,18 +411,20 @@
 			}
 
 			function setGroupTablePosition () {
-				var windowWidth = $(window).width();
-				var dependencyDiv = $('#dependencyDivId')
-                var dependencyTable = $('#dependencyTableWrapperId')
-				var rightOffset = dependencyDiv.parent().offset().left;
-				var leftOffset = dependencyDiv.offset().left;
-				var extraOffset = $('#graphToolbarId').outerWidth() ? $('#graphToolbarId').outerWidth() : 0;
-				if (dependencyDiv.hasClass('floating'))
-					dependencyTable.css('max-width', (windowWidth - extraOffset - ((leftOffset - extraOffset) * 2)) + 'px');
-				else
-					dependencyTable.css('max-width', (windowWidth - rightOffset - leftOffset) + 'px');
+				var tools = $('#toolsContainerId');
+				var dependencyDiv = $('#dependencyDivId');
+				var toolsWidth = tools.width();
+                var dependencyTable = $('#dependencyTableWrapperId');
 
-                $('#dependencyTableWrapperId').css('overflow-x', 'scroll');
+				if (dependencyDiv.hasClass('floating')) {
+					dependencyDiv.css('right', 0);
+					dependencyDiv.css('left', toolsWidth + 20);
+				}
+				else{
+					dependencyTable.css('max-width', 'auto');
+				}
+
+                $('#dependencyTableWrapperId').css('overflow-x', 'auto');
 			}
 
 			$(document).ready(function () {

@@ -4,7 +4,7 @@
   "description": "TransitionManager API Automation Project",
   "main": "nextman.js",
   "scripts": {
-    "test": "ls -l nextman.js"
+    "combine": "postman-combine-collections -f src/**/**/* -o tm-collection.json"
   },
   "keywords": [
     "test",
@@ -16,7 +16,8 @@
   "dependencies": {
     "commander": "^2.15.1",
     "deepmerge": "^2.1.0",
-    "newman": "^4.1.0",
-    "newman-reporter-html": "^1.0.2"
+    "newman": "^4.5.4",
+    "newman-reporter-html": "^1.0.2",
+    "postman-combine-collections": "^1.1.1"
   }
 }
