@@ -7,6 +7,7 @@ import { SharedModule } from '../../shared/shared.module';
 // Kendo
 // import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { ClarityModule } from '@clr/angular';
+import { TdsComponentLibraryModule } from 'tds-component-library';
 
 // Route Module
 import { AuthRouteModule } from './auth-route.module';
@@ -35,6 +36,7 @@ import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory
 		// DropDownsModule,
 		// Claritys
 		ClarityModule,
+		TdsComponentLibraryModule,
 		// Route
 		AuthRouteModule,
 	],

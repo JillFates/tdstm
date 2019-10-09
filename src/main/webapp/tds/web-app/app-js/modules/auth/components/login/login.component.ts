@@ -67,6 +67,8 @@ export class LoginComponent implements OnInit {
 		password: '',
 	};
 
+	public loginState: string = 'default';
+
 	/**
 	 * For Auh label to show
 	 */
@@ -145,6 +147,7 @@ export class LoginComponent implements OnInit {
 		) {
 			this.errMessage = 'Username and password are required';
 		} else {
+			this.loginState = 'loading';
 			this.store
 				.dispatch(
 					new Login({
@@ -158,9 +161,12 @@ export class LoginComponent implements OnInit {
 					})
 				)
 				.pipe(withLatestFrom(this.userContext$))
-				.subscribe(([_, userContext]) =>
-					this.validateLogin(_, userContext)
-				);
+				.subscribe(([_, userContext]) => {
+					this.loginState = !userContext.error
+						? 'success'
+						: 'default';
+					this.validateLogin(_, userContext);
+				});
 		}
 	}
 
@@ -192,6 +198,7 @@ export class LoginComponent implements OnInit {
 				this.navigateTo();
 			}
 		} else if (this.userContextModel.error) {
+			this.loginState = 'default';
 			// An error has occurred
 			this.notifierService.broadcast({
 				name: 'stopLoader',
@@ -238,11 +245,11 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(StandardNoticesComponent, [
-				{
-					provide: Notices,
-					useValue: {notices: notices},
-				},
-			])
+					{
+						provide: Notices,
+						useValue: { notices: notices },
+					},
+			  ])
 			: Promise.resolve(true);
 	}
 
@@ -254,8 +261,8 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(MandatoryNoticesComponent, [
-				{provide: Notices, useValue: {notices: notices}},
-			])
+					{ provide: Notices, useValue: { notices: notices } },
+			  ])
 			: Promise.resolve(true);
 	}
 
