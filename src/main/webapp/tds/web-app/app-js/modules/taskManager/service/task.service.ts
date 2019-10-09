@@ -41,7 +41,7 @@ export class TaskService {
 	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
-	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/task/moveEventTaskGraphSvg`;
+	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeLine`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -517,15 +517,25 @@ export class TaskService {
 	 * @param filters: {[key: string]: string}[]
 	 */
 	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphNode[]> {
-		const params = this.createHttpParams(filters);
+		const params = this.createHttpFilterParams(filters);
 		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
 			{ params, observe: 'response' })
 			.map(res => res.body.data);
 	}
 
 	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<any> {
-		const params = this.createHttpParams(filters);
-		return this.http.get<any>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+		const extraParams = { ...filters };
+		extraParams.id = id;
+		extraParams.mode = 'C';
+
+		const params = new HttpParams()
+			.set('id', extraParams.id)
+			.set('mode', extraParams.mode)
+			.set('myTasks', extraParams.myTasks)
+			.set('minimizeAutoTasks', extraParams.minimizeAutoTasks)
+			.set('viewUnpublished', extraParams.viewUnpublished);
+
+		return this.http.get<any>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}`,
 			{ params, observe: 'response' })
 			.map(res => res.body);
 	}
@@ -533,7 +543,7 @@ export class TaskService {
 	/**
 	 * create http params object to be passed onto requests
 	 */
-	createHttpParams(params: any): HttpParams {
+	createHttpFilterParams(params: any): HttpParams {
 		return new HttpParams()
 		.set('myTasks', params.myTasks)
 		.set('minimizeAutoTasks', params.minimizeAutoTasks)
