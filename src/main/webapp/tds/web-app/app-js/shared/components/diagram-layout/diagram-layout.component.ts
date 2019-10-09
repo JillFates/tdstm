@@ -125,7 +125,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@HostListener('window:resize', ['$event'])
 	onResize(event?: any) {
 		this.screenHeight = `${window.innerHeight - 230}px`;
-		console.log(this.screenHeight);
 	}
 
 	ngAfterViewInit() {
