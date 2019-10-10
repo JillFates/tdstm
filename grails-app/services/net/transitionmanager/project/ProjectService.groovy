@@ -658,8 +658,6 @@ class ProjectService implements ServiceMethods {
 		// remove Move Bundle
 
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
-		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))".toString(), [project: projectInstance ])
-		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
 		String teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)".toString(), [project: projectInstance ])

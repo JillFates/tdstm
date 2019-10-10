@@ -118,7 +118,6 @@ export class EventsService {
 						percDurationStarted: model.percDurationStarted || '',
 						teamTaskMatrix: model.teamTaskMatrix || [],
 						moveEvent: model.moveEvent,
-						moveBundleSteps: model.moveBundleSteps || [],
 						moveBundleList: model.moveBundleList || []
 					}
 				}
@@ -196,10 +195,6 @@ export class EventsService {
 
 					if (result.planSum) {
 						result.planSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.planSum.compTime);
-					}
-
-					if (result.revSum) {
-						result.revSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.revSum.compTime);
 					}
 				}
 

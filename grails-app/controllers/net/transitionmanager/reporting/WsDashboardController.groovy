@@ -9,6 +9,7 @@ import com.tdsops.tm.enums.domain.ValidationType
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetDependencyBundle
@@ -24,7 +25,6 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
@@ -39,8 +39,26 @@ class WsDashboardController implements ControllerMethods {
 	CustomDomainService customDomainService
 
 	/**
-	 * Returns the data used to render the Event Dashboard including the work flow steps and the statistics of
-	 * what there is to do and what has been accomplished.
+	 * Returns data used to render the Event Dashboard
+	 * based on the following json structure:
+	 * <code>
+	 * 		snapshot: [
+	 * 			"revisedComp"  The Event revisedCompletionTime
+	 * 			"moveBundleId"  The Bundle ID
+	 * 			"calcMethod"  The Event calc method: Is one of METHOD_LINEAR = 'L' or METHOD_MANUAL = 'M'
+	 * 			"systime"  The actual system time
+	 * 			"eventStartDate  The estStartTime of the Event
+	 * 			"planSum": [
+	 * 					"dialInd"  The dial indicator percentage of the MoveEventSnapshot
+	 * 					"compTime"  The maximum completionTime of the bundles associated to the Event
+	 * 					"dayTime"  The difference between now and the eventStartTime
+	 * 					"eventDescription"  The event description
+	 * 					"eventString"  One of "Countdown Until Event" or "Elapsed Event Time".
+	 * 					"eventRunbook"  The runbookStatus property of the Event
+	 * 			]
+	 * 		]
+	 * </code>
+	 *
 	 * @param id - the move bundle id
 	 * @param moveEventId
 	 * @return JSON map
@@ -48,13 +66,13 @@ class WsDashboardController implements ControllerMethods {
 	@HasPermission(Permission.DashboardMenuView)
 	def bundleData() {
 		String error = ""
-		Project project = securityService.userCurrentProject
+		Project project = getProjectForWs()
 		def moveEventId = params.moveEventId
 		def moveBundleId = params.id
 		MoveEvent moveEvent
 		MoveBundle moveBundle
 
-		// Validate that the user is legitly accessing the proper move event
+		// Validate that the user is legally accessing the proper move event
 		if (! moveEventId.isNumber() ) {
 			error = "Move event id is invalid"
 		} else {
@@ -78,80 +96,11 @@ class WsDashboardController implements ControllerMethods {
 				}
 			}
 		}
-
 		if (error) {
 			renderAsJson(error: error)
 			return
 		}
-
-		Date sysTime = TimeUtil.nowGMT()
-		int sysTimeInMs = sysTime.getTime() / 1000
-
-		def planSumCompTime
-		def moveEventPlannedSnapshot
-		def moveEventRevisedSnapshot
-		def revisedComp
-		def dayTime
-		String eventString = ""
-		if (moveEvent) {
-
-			def resultMap = jdbcTemplate.queryForMap( """
-				SELECT max(mb.completion_time) as compTime,
-				min(mb.start_time) as startTime
-				FROM move_bundle mb WHERE mb.move_event_id = $moveEvent.id
-				""" )
-
-			planSumCompTime = resultMap?.compTime
-			Date eventStartTime = moveEvent.estStartTime
-			if (eventStartTime || resultMap?.startTime) {
-				if(!eventStartTime){
-					eventStartTime = new Date(resultMap?.startTime?.getTime())
-				}
-				if (eventStartTime>sysTime) {
-					dayTime = TimeCategory.minus(eventStartTime, sysTime)
-					eventString = "Countdown Until Event"
-				} else {
-					dayTime = TimeCategory.minus(sysTime, eventStartTime)
-					eventString = "Elapsed Event Time"
-				}
-			}
-			/*
-			* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
-			*/
-			def query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-			// moveEventPlannedSnapshot = MoveEventSnapshot.find( query , [moveEvent , MoveEventSnapshot.TYPE_PLANNED] )[0]
-			// moveEventRevisedSnapshot = MoveEventSnapshot.find( query , [moveEvent, MoveEventSnapshot.TYPE_REVISED] )[0]
-			moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "P"] )[0]
-			moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, "R"] )[0]
-			revisedComp = moveEvent.revisedCompletionTime
-			if (revisedComp) {
-				revisedComp = new Date(revisedComp.time)
-			}
-		}
-
-		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
-
-		renderAsJson(snapshot: [
-			revisedComp: moveEvent?.revisedCompletionTime,
-			moveBundleId: moveBundleId,
-			calcMethod: moveEvent?.calcMethod,
-			planDelta: moveEventPlannedSnapshot?.planDelta,
-			systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
-			planSum: [
-				dialInd: moveEventPlannedSnapshot?.dialIndicator,
-				confText: 'High',
-				confColor: 'green',
-				compTime: planSumCompTime,
-				dayTime: eventClockCountdown,
-				eventDescription: moveEvent?.description,
-				eventString: eventString,
-				eventRunbook: moveEvent?.runbookStatus
-			],
-			revSum: [dialInd: moveEventRevisedSnapshot?.dialIndicator,
-			         compTime: TimeUtil.formatDateTime(revisedComp, TimeUtil.FORMAT_DATE_TIME_11)],
-			runbookOn: project.runbookOn,
-			eventStartDate: moveEvent.estStartTime
-		])
+		renderAsJson(moveEventService.bundleData(moveEvent, moveBundle))
 	}
 
 	/**

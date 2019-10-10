@@ -1,4 +1,3 @@
-<%@ page import="net.transitionmanager.project.MoveBundleStep" %>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page import="com.tdsops.tm.enums.domain.UserPreferenceEnum"%>
 <html>
@@ -226,42 +225,6 @@
 							<input type="hidden" value="${moveBundleList ? moveBundleList[0]?.id : ''}" id="defaultBundleId">
 							<g:each in="${moveBundleList}" status="i" var="moveBundle">
 								<div id="bundlediv${moveBundle.id}" class="${i == 0 ? 'show_bundle_step' : 'hide_bundle_step'}">
-									<g:if test="${moveBundleSteps.size() > 0}">
-										<g:each in="${moveBundleSteps}" status="j" var="moveBundleStep">
-										<div style="float: left; width: 130px;">
-											<ul class="bdetails">
-												<li class="heading" title="${moveBundleStep.label}">
-													<g:if test="${moveBundleStep?.label?.length()>10}">
-														${moveBundleStep.label.substring(0,11)}..
-													</g:if>
-													<g:else>
-														${moveBundleStep.label}
-													</g:else>
-												</li>
-												<li id="percentage_${moveBundle.id}"></li>
-												<g:if test="${runbookOn == 1 }">
-													<li class="tasks" id="tasks_${moveBundle.id}">&nbsp</li>
-												</g:if>
-												<li class="schstart">
-													<span id="plan_start_${moveBundle.id}"></span>&nbsp;
-												</li>
-												<li class="schfinish">
-													<span id="plan_completion_${moveBundle.id}"></span>&nbsp;
-												</li>
-												<li class="actstart" id="li_start_${moveBundle.id}">
-													<div id="act_start_${moveBundle.id}" title=""></div>
-												</li>
-												<li class="actfinish" id="li_finish_${moveBundle.id}">
-													<div id="act_completion_${moveBundle.id}" title=""></div>
-												</li>
-											</ul>
-											<!-- <div id="chartdiv_${moveBundle.id}" align="center" style="display: none;">
-												<img id="chart_${moveBundle.id}"
-																	src="${resource(dir:'i/dials',file:'dial-50sm.png')}">
-														</div> -->
-										</div>
-									</g:each>
-									</g:if>
 								</div>
 							</g:each>
 						</div>

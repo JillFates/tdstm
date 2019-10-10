@@ -1,6 +1,8 @@
 package net.transitionmanager.project
 
 import com.tdsops.tm.enums.domain.TimeScale
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import net.transitionmanager.asset.Application
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -519,21 +521,6 @@ class MoveEventService implements ServiceMethods {
 
 	}
 
-	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
-		List<MoveBundleStep> moveBundleSteps = []
-
-		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
-
-			if (step) {
-				moveBundleSteps.addAll(step)
-			}
-		}
-
-		return moveBundleSteps
-	}
-
-
 	/**
 	 * Find different stats for the given event, grouped by category.
 	 * @param project
@@ -584,8 +571,74 @@ class MoveEventService implements ServiceMethods {
 			// Sort by the category "natural" sort order
 			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
 		}
-
 		return stats
+	}
+
+	/**
+	 * Returns different data used to render the Event Dashboard
+	 * @param moveEvent
+	 * @param moveBundle
+	 * @return
+	 */
+	Map bundleData(MoveEvent moveEvent, MoveBundle moveBundle) {
+		Date sysTime = TimeUtil.nowGMT()
+
+		Date planSumCompTime
+		MoveEventSnapshot moveEventPlannedSnapshot
+		MoveEventSnapshot moveEventRevisedSnapshot
+		Date revisedComp
+		TimeDuration dayTime
+		String eventString = ""
+
+		if (moveEvent) {
+
+			Map resultMap = jdbcTemplate.queryForMap( """
+					SELECT max(mb.completion_time) as compTime,
+					min(mb.start_time) as startTime
+					FROM move_bundle mb WHERE mb.move_event_id = $moveEvent.id
+				""" )
+
+			planSumCompTime = resultMap?.compTime
+			Date eventStartTime = moveEvent.estStartTime
+			if (eventStartTime || resultMap?.startTime) {
+				if(!eventStartTime){
+					eventStartTime = new Date(resultMap?.startTime?.getTime())
+				}
+				if (eventStartTime>sysTime) {
+					dayTime = TimeCategory.minus(eventStartTime, sysTime)
+					eventString = "Countdown Until Event"
+				} else {
+					dayTime = TimeCategory.minus(sysTime, eventStartTime)
+					eventString = "Elapsed Event Time"
+				}
+			}
+
+			// select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+			String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+			moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+			moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_REVISED] )[0]
+			revisedComp = moveEvent.revisedCompletionTime
+			if (revisedComp) {
+				revisedComp = new Date(revisedComp.time)
+			}
+		}
+		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
+
+		return [snapshot: [
+				revisedComp: moveEvent?.revisedCompletionTime,
+				moveBundleId: moveBundle.id,
+				calcMethod: moveEvent?.calcMethod,
+				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
+				eventStartDate: moveEvent.estStartTime,
+				planSum: [
+						dialInd: moveEventPlannedSnapshot?.dialIndicator,
+						compTime: planSumCompTime,
+						dayTime: eventClockCountdown,
+						eventDescription: moveEvent?.description,
+						eventString: eventString,
+						eventRunbook: moveEvent?.runbookStatus
+				]
+		]]
 	}
 
 	/**
