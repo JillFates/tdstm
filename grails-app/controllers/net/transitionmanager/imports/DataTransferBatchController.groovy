@@ -139,8 +139,7 @@ class DataTransferBatchController implements ControllerMethods {
 		if (!project) {
 			flash.message = "Please select project to view Manage Batches"
 		}
-
-		if (!params.max) {
+		if (!params.max || params.max == '0') {
 			params.max = 25
 		}
 
