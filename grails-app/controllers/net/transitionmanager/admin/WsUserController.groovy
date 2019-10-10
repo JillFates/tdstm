@@ -9,6 +9,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.project.ProjectLogo
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -112,6 +113,8 @@ class WsUserController implements ControllerMethods {
 			project = getProjectForWs()
 		}
 
+		def projectLogo = ProjectLogo.findByProject(project)
+
 		List projects = [project]
 		List userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
 		if (userProjects) {
@@ -122,6 +125,7 @@ class WsUserController implements ControllerMethods {
 				person: person,
 				projects: projects,
 				projectInstance: project,
+				projectLogoId: projectLogo?.id,
 				movedayCategories: AssetComment.moveDayCategories
 		)
 	}
