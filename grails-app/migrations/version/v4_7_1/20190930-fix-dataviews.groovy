@@ -14,8 +14,12 @@ databaseChangeLog = {
 			change {
 				int highestId = sql.firstRow("select max(id) as id from dataview").id
 
+				if(highestId < 1001){
+					highestId = 1001
+				}
+
 				sql.executeUpdate("""
-					UPDATE dataview SET id=id+$highestId
+					UPDATE dataview SET id=id + $highestId
 					WHERE id < 1001 AND is_system=0 and project_id <> 2 and person_id is not null;
 				""")
 			}
