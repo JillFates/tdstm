@@ -14,27 +14,23 @@ class ListTaskCommand implements CommandObject {
 	String  sortOrder       = 'ASC'
 
 	// Filterable columns
-	String comment
-	String assetName
-	String assetType
-	String taskNumber
-	String dueDate
-	String status
-	String assignedTo
-	String apiAction
-	String role
 	String actFinish
 	String actStart
+	String apiAction
+	String assetName
+	String assetType
+	String assignedTo
+	String bundle
 	String category
-	String percentageComplete
+	String comment
 	String createdBy
 	String dateCreated
-//	String dateResolved
-	String displayOption
+	String dueDate
 	String duration
 	String durationScale
 	String estFinish
 	String estStart
+	String event
 	String hardAssigned
 	String instructionsLink
 	String isCriticalPath
@@ -42,12 +38,14 @@ class ListTaskCommand implements CommandObject {
 	String lastUpdated
 	String latestFinish
 	String latestStart
-	String bundle
-	String event
+	String percentageComplete
 	String priority
+	String role
 	String sendNotification
 	String slack
+	String status
 	String statusUpdated
+	String taskNumber
 	String taskSpec
 
 	static constraints = {
@@ -57,39 +55,39 @@ class ListTaskCommand implements CommandObject {
 		sortOrder inList: ['ASC', 'DESC']
 		moveEvent nullable: true
 
-		//filter columns
-		comment nullable: true
-		assetName nullable: true
-		assetType nullable: true
-		taskNumber nullable: true
-		dueDate nullable: true
-		status nullable: true
-		assignedTo nullable: true
-		apiAction nullable: true
-		role nullable: true
+		// filterable columns
 		actFinish nullable: true
 		actStart nullable: true
+		apiAction nullable: true
+		assetName nullable: true
+		assetType nullable: true
+		assignedTo nullable: true
+		bundle nullable: true
 		category nullable: true
-		percentageComplete nullable: true
+		comment nullable: true
 		createdBy nullable: true
 		dateCreated nullable: true
+		dueDate nullable: true
 		duration nullable: true
 		durationScale nullable: true
 		estFinish nullable: true
 		estStart nullable: true
+		event nullable: true
 		hardAssigned nullable: true
 		instructionsLink nullable: true
-		isPublished nullable: true
 		isCriticalPath nullable: true
+		isPublished nullable: true
 		lastUpdated nullable: true
 		latestFinish nullable: true
 		latestStart nullable: true
-		bundle nullable: true
-		event nullable: true
+		percentageComplete nullable: true
 		priority nullable: true
-		slack nullable: true
+		role nullable: true
 		sendNotification nullable: true
+		slack nullable: true
+		status nullable: true
 		statusUpdated nullable: true
+		taskNumber nullable: true
 		taskSpec nullable: true
 	}
 }
