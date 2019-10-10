@@ -69,7 +69,7 @@
     "rxjs-compat": "6.4.0",
     "zone.js": "0.10.0",
     "compressorjs": "1.0.5",
-    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.1.tgz"
+    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.2.tgz"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",
