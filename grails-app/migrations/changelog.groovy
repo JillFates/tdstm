@@ -72,4 +72,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_1/20190828-add-CPA-results-in-task.groovy'
 	include file: 'version/v4_7_1/20190903-drop-workflow-columns.groovy'
 	include file: 'version/v4_7_1/20190905-add-dictionaryMethodName.groovy'
+	include file: 'version/v4_7_2/20190930-update-dataviews.groovy'
 }
