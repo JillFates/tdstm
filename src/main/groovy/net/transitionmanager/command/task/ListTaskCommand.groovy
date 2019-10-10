@@ -29,7 +29,7 @@ class ListTaskCommand implements CommandObject {
 	String percentageComplete
 	String createdBy
 	String dateCreated
-	String dateResolved
+//	String dateResolved
 	String displayOption
 	String duration
 	String durationScale
@@ -70,11 +70,9 @@ class ListTaskCommand implements CommandObject {
 		actFinish nullable: true
 		actStart nullable: true
 		category nullable: true
-		commentType nullable: true
 		percentageComplete nullable: true
 		createdBy nullable: true
 		dateCreated nullable: true
-		displayOption nullable: true
 		duration nullable: true
 		durationScale nullable: true
 		estFinish nullable: true
@@ -89,6 +87,7 @@ class ListTaskCommand implements CommandObject {
 		bundle nullable: true
 		event nullable: true
 		priority nullable: true
+		slack nullable: true
 		sendNotification nullable: true
 		statusUpdated nullable: true
 		taskSpec nullable: true

@@ -134,8 +134,8 @@ class AssetComment {
 	 * The ScoreSQLFormula String uses Lazy String interpolation to populate the table reference in the SQL appropriately
 	 * so that the formula can be reused. The variable scoreTableAlias must be in scope when evaluating ScoreSQLFormula.
 	 */
-	static final String scoreTableAlias = ''
-	static final String ScoreSQLFormula = """
+	private static final String scoreTableAlias = ''
+	private static final String ScoreSQLFormula = """
 			CASE status
 				WHEN '$HOLD' THEN 9000000
 				WHEN '$COMPLETED' THEN IF(${->scoreTableAlias}status_updated >= SUBTIME(NOW(),'00:01:00.0'), 8000000, 3000000)
@@ -440,6 +440,10 @@ class AssetComment {
 		return true
 	}
 
+	/**
+	 * Returns the task as a string objecvt
+	 * @return
+	 */
 	String toString() {
 		(taskNumber ? taskNumber.toString() + ':' : '') + StringUtils.left(comment, 25)
 	}
@@ -449,6 +453,15 @@ class AssetComment {
     */
 	boolean isActionable() {
 		!(status in [ COMPLETED, TERMINATED ])
+	}
+
+	/**
+	 * Used to access the SQL Formula used to calculate the score for a task
+	 * @param scoreTableAlias - the table alias name including the dot (.) suffix (e.g. 't.' )
+	 * @return the SQL text to include into a SQL JDBC statement
+	 */
+	static String scoreSQLFormula(String scoreTableAlias) {
+		ScoreSQLFormula.toString()
 	}
 
 	/**
