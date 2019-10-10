@@ -363,7 +363,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.gridState = state;
 		setTimeout(() => {
 			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
-		}, 500);
+		}, 700);
 	}
 
 	/**

@@ -274,7 +274,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.modelChange.emit();
 		setTimeout(() => {
 			this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
-		}, 500);
+		}, 700);
 	}
 
 	/**
@@ -776,8 +776,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(() => {
 				// nothing to do here
+				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 			});
-		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**
