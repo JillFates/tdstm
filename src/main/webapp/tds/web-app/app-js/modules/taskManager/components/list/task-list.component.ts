@@ -638,17 +638,6 @@ export class TaskListComponent {
 				request[filter.field as string] = filter.value;
 			});
 		}
-
-		setTimeout(() => {
-			this.loaderService.stopProgress();
-		}, LOADER_IDLE_PERIOD);
-
-		setTimeout(() => {
-			if (this.loading) {
-				this.loaderService.initProgress();
-				this.loaderService.toggle();
-			}
-		}, LOADER_IDLE_PERIOD * 10);
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
@@ -662,6 +651,14 @@ export class TaskListComponent {
 					});
 				}
 			});
+		this.loaderService.stopProgress();
+
+		setTimeout(() => {
+			if (this.loading) {
+				this.loaderService.initProgress();
+				this.loaderService.toggle();
+			}
+		}, LOADER_IDLE_PERIOD * 10);
 	}
 
 	/**
