@@ -236,7 +236,8 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		response.outputStream << is
+		renderErrorJson("Error: Preview must be in JSON format.") // TODO: Add support for Excel/CSV file JSON responses in WS.
+		// response.outputStream << is
 		is.close()
 
 	}
