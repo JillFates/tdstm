@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
 import 'rxjs/add/operator/map';
@@ -9,12 +9,23 @@ import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
-import {IGraphNode} from '../model/graph-task.model';
+import {IGraphNode, IGraphTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
 
 export interface IGrapTaskResponseBody {
 	status: string;
 	data: IGraphNode[];
+}
+
+export interface IMoveEventTaskResponseBody {
+	status?: string;
+	data?: {
+		cycles?: number[];
+		sinks?: number[];
+		starts?: number[];
+		startDate?: string;
+		tasks?: IGraphTask[];
+	};
 }
 
 export interface ITaskResponseBody {
@@ -41,7 +52,7 @@ export class TaskService {
 	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
-	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeLine`;
+	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeline/timeline`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -523,7 +534,7 @@ export class TaskService {
 			.map(res => res.body.data);
 	}
 
-	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<any> {
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IGraphNode[]> {
 		const extraParams = { ...filters };
 		extraParams.id = id;
 		extraParams.mode = 'C';
@@ -535,9 +546,19 @@ export class TaskService {
 			.set('minimizeAutoTasks', extraParams.minimizeAutoTasks)
 			.set('viewUnpublished', extraParams.viewUnpublished);
 
-		return this.http.get<any>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}`,
+		return this.http.get<IMoveEventTaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}`,
 			{ params, observe: 'response' })
-			.map(res => res.body);
+			.map(res => {
+				const tasks = res.body.data && res.body.data.tasks;
+				const graphNodes: IGraphNode[] = [];
+				if (tasks) {
+					tasks.map(t => {
+						graphNodes.push({task: t})
+					});
+					return graphNodes;
+				}
+				return [];
+			});
 	}
 
 	/**

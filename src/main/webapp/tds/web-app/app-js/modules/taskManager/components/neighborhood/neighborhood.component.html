@@ -80,8 +80,7 @@
   </div>
   <div class="row diagram-container">
     <tds-diagram-layout
-    [nodeDataArray]="nodeData$ | async"
-    [linksPath]="links$ | async"
+		[nodeData]="nodeData$ | async"
     [currentUser]="currentUser$ | async"
     [contextMenuOptions]="ctxMenuOpts$ | async"
     [containerWidth]="'100%'"

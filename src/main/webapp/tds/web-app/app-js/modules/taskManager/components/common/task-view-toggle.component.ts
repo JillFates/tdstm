@@ -1,6 +1,7 @@
 import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TaskManagerRoutingStates} from '../../task-manager-routing.states';
 
 const routeNames = {
 	TASK_MANAGER: 'taskManager',
@@ -12,17 +13,32 @@ const routeNames = {
 	selector: 'tds-task-view-toggle',
 	template: `
 		<div kendoTooltip position="bottom" filter="span" tooltipClass="tvt-tooltip" class="text-center k-align-self-center">
-			<span title="Task Manager" id="task-manager" class="task-view-toggle-btn btn" (click)="taskManagerView()" #taskManager>
+			<span
+			title="Task Manager"
+			id="task-manager"
+			class="task-view-toggle-btn btn"
+			(click)="taskManagerView()"
+			#taskManager>
 				<div>
 					<fa-icon [icon]="icons.faListUl" size="lg"></fa-icon>
 				</div>
 			</span>
-			<span title="Task Graph" id="neighborhood" class="task-view-toggle-btn btn" (click)="neighborhoodView()" #neighborhood>
+			<span
+				title="Task Graph"
+				id="neighborhood"
+				class="task-view-toggle-btn btn"
+				(click)="neighborhoodView()"
+				#neighborhood>
 				<div>
 					<fa-icon [icon]="icons.faSitemap" size="lg" [rotate]="270"></fa-icon>
 				</div>
 			</span>
-			<span title="Task Timeline" id="task-timeline" class="task-view-toggle-btn btn" (click)="taskTimeLineView()" #taskTimeline>
+			<span
+				title="Task Timeline"
+				id="task-timeline"
+				class="task-view-toggle-btn btn"
+				(click)="taskTimeLineView()"
+				#taskTimeline>
 				<div>
 					<fa-icon [icon]="icons.faStream" size="lg"></fa-icon>
 				</div>
@@ -34,6 +50,9 @@ export class TaskViewToggleComponent implements OnInit {
 	@ViewChild('taskManager') taskManager: ElementRef;
 	@ViewChild('neighborhood') neighborhood: ElementRef;
 	@ViewChild('taskTimeline') taskTimeline: ElementRef;
+	disableNeighborhood: boolean;
+	disableTaskManager: boolean;
+	disableTaskTimeline: boolean;
 
 	constructor(
 		private router: Router,
@@ -52,10 +71,13 @@ export class TaskViewToggleComponent implements OnInit {
 		this.activatedRoute.url.subscribe(d => {
 			if (d.find(p => p.path === routeNames.TASK_MANAGER)) {
 				this.makeActive(this.taskManager);
+				this.disableTaskManager = true;
 			} else if (d.find(p => p.path === routeNames.NEIGHBORHOOD)) {
 				this.makeActive(this.neighborhood);
+				this.disableNeighborhood = true;
 			} else if (d.find(p => p.path === routeNames.TASK_TIMELINE)) {
 				this.makeActive(this.taskTimeline);
+				this.disableTaskTimeline = true;
 			}
 		});
 	}
@@ -72,26 +94,27 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the task manager view on a new tab
 	 **/
 	taskManagerView(): void {
-		const url = 'taskManager/list';
-		window.open(url, '_blank');
+		if (this.disableTaskManager) { return; }
+		this.router.navigate([TaskManagerRoutingStates.TASK_MANAGER_LIST.url]);
 	}
 
 	/**
 	 * open the neighborhood view on a new tab
 	 **/
 	neighborhoodView(): void {
-		const url = 'neighborhood';
-		window.open(url, '_blank');
+		if (this.disableNeighborhood) { return; }
+		this.router.navigate([TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url]);
 	}
 
 	/**
 	 * open the task timeline view on a new tab
 	 **/
 	taskTimeLineView(): void {
+		if (this.disableTaskTimeline) { return; }
 		// TODO remove currentUrl variable and 'task/' prefix after timeline is refactored to current angular version
 		let currentUrl = window.location.href;
 		currentUrl = currentUrl.substr(0, currentUrl.indexOf('module'));
 		let url = `${currentUrl}task/taskTimeline`;
-		window.open(url, '_blank');
+		window.open(url);
 	}
 }

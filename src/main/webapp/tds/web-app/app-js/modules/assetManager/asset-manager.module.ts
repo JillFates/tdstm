@@ -36,6 +36,7 @@ import {AssetViewShowComponent} from './components/asset-view-show/asset-view-sh
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 import {ExportComponent} from './components/asset-export/export.component';
 import {ExportAssetService} from './service/export-asset.service';
+import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 
 @NgModule({
 	imports: [
@@ -62,7 +63,8 @@ import {ExportAssetService} from './service/export-asset.service';
 		AssetViewExportComponent,
 		AssetViewGridComponent,
 		AssetViewShowComponent,
-		ExportComponent
+		ExportComponent,
+		ArchitectureGraphComponent
 	],
 	providers: [
 		// Resolve
