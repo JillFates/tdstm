@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 @Slf4j(value = 'logger')
-class Element implements RangeChecker, ETLCommand {
+class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidator {
 
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
@@ -607,6 +607,7 @@ class Element implements RangeChecker, ETLCommand {
 	 */
 	Element prepend(Object el) {
 		if (el) {
+			checkUndefinedLocalVariable(el)
 			this.value = String.valueOf(el) + this.toString()
 		}
 
@@ -789,10 +790,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	Element set(Object variableName) {
-		if (!(variableName instanceof String) ||
-			processor.hasVariable(variableName) ||
-			!processor.binding.isValidETLVariableName(variableName)
-		) {
+		if (!(variableName instanceof String) || processor.hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 
@@ -837,6 +835,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of Element class
 	 */
 	Element concat(String separator, Object... values) {
+		checkUndefinedLocalVariables(values)
 		this.value = ETLTransformation.concat(separator, this.value, values)
 		checkLoadedElement()
 		return this

@@ -12,12 +12,12 @@ package com.tdsops.etl
  * @param values
  * @return
  */
-class ETLFindElement implements ETLStackableCommand {
+class ETLFindElement implements ETLStackableCommand, UndefinedLocalVariableValidator {
 
 
 	/**
 	 * Reference to the ETLProcessor instance that created this instance of ETLFindElement
-	 * @see ETLFindElement(ETLProcessor processor, ETLDomain domain, Integer rowIndex)
+	 * @see ETLFindElement(ETLProcessorprocessor,ETLDomaindomain,IntegerrowIndex)
 	 */
 	ETLProcessor processor
 	/**
@@ -92,8 +92,8 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return
 	 */
 	ETLFindElement into(String property) {
-		if(!currentFind.fields.isEmpty() &&
-			!currentFind.statement){
+		if (!currentFind.fields.isEmpty() &&
+			!currentFind.statement) {
 			throw ETLProcessorException.incorrectFindCommandStructure()
 		}
 		validateReference(property)
@@ -118,11 +118,11 @@ class ETLFindElement implements ETLStackableCommand {
 
 		validateReference(currentFind.fieldDefinition.name)
 
-		if(!findStatementBuilder.currentCondition.isComplete()){
+		if (!findStatementBuilder.currentCondition.isComplete()) {
 			throw ETLProcessorException.incorrectFindCommandStructure()
 		}
 
-		if(!results?.objects){
+		if (!results?.objects) {
 			findDomainObjectResults(currentFind.domain, findStatementBuilder.conditions)
 		}
 
@@ -136,8 +136,8 @@ class ETLFindElement implements ETLStackableCommand {
 	 * @return
 	 */
 	ETLFindElement by(String... fields) {
-		for(field in fields){
-			ETLFieldDefinition fieldDefinition =  processor.lookUpFieldDefinition(currentDomain, field)
+		for (field in fields) {
+			ETLFieldDefinition fieldDefinition = processor.lookUpFieldDefinition(currentDomain, field)
 			currentFind.fields.add(fieldDefinition.name)
 		}
 		return this
@@ -165,7 +165,7 @@ class ETLFindElement implements ETLStackableCommand {
 		//TODO dcorrea. Refactor this to use same code from FindStatementBuilder and operations
 		this.currentFind.statement = new FindStatementBuilder(conditions)
 
-		if(!results?.objects){
+		if (!results?.objects) {
 			findDomainObjectResults(currentFind.domain, this.currentFind.statement.conditions)
 		}
 
@@ -183,14 +183,14 @@ class ETLFindElement implements ETLStackableCommand {
 	 */
 	private void findDomainObjectResults(String domain, List<FindCondition> conditions) {
 
-		try{
+		try {
 
 			currentFind.objects = lookupResultsInCache(domain, conditions)
 
-		} catch (all){
+		} catch (all) {
 
 			processor.debugConsole.debug("Error in find command: ${all.getMessage()} ")
-			if (currentFind.errors == null){
+			if (currentFind.errors == null) {
 				currentFind.errors = []
 			}
 			currentFind.errors.add(all.getMessage())
@@ -201,11 +201,11 @@ class ETLFindElement implements ETLStackableCommand {
 			matchOn: null
 		]
 
-		if (currentFind.objects && !currentFind.objects.isEmpty()){
+		if (currentFind.objects && !currentFind.objects.isEmpty()) {
 			results.objects = currentFind.objects
 			results.matchOn = findings.size()
 
-			if (currentFind.objects.size() > 1){
+			if (currentFind.objects.size() > 1) {
 				currentFind.errors = [DomainClassQueryHelper.FIND_RESULTS_MULTIPLE_RECORDS]
 			}
 		}
@@ -254,7 +254,7 @@ class ETLFindElement implements ETLStackableCommand {
 	 */
 	private List<?> checkValues(Object... values) {
 
-		if(currentFind.fields.size() != values.size()){
+		if (currentFind.fields.size() != values.size()) {
 			throw ETLProcessorException.incorrectAmountOfParameters(
 				currentFind.fields,
 				values)
@@ -268,7 +268,7 @@ class ETLFindElement implements ETLStackableCommand {
 	 * If not It throws an exception
 	 */
 	private void checkProject() {
-		if(!processor.project){
+		if (!processor.project) {
 			throw ETLProcessorException.nonProjectDefined()
 		}
 	}
@@ -310,7 +310,7 @@ class ETLFindElement implements ETLStackableCommand {
 			values: []
 		)
 
-		if(!mainSelectedDomain){
+		if (!mainSelectedDomain) {
 			mainSelectedDomain = domain
 		}
 	}
@@ -363,22 +363,22 @@ class ETLFindElement implements ETLStackableCommand {
 	 */
 	String stackableErrorMessage() {
 
-		if(currentFind.statement){
+		if (currentFind.statement) {
 			currentFind.statement.stackableErrorMessage()
-		} else{
+		} else {
 			String error = ''
 
 			Set<String> missingProperties = []
 
-			if (! currentFind.fields ) {
+			if (!currentFind.fields) {
 				missingProperties << 'by'
 			}
 
-			if (! currentFind.values ) {
+			if (!currentFind.values) {
 				missingProperties << 'with'
 			}
 
-			if (! currentFind.property ) {
+			if (!currentFind.property) {
 				missingProperties << 'into'
 			}
 

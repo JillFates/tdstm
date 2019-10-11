@@ -318,7 +318,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An MissingMethodException exception is thrown'
 			ETLProcessorException exception = thrown ETLProcessorException
-			exception.message == 'No such property: invalid'
+			exception.message == 'Unrecognized command invalid with args [on]'
 	}
 
 	void 'test can read labels from dataSource and create a map of columns'() {
@@ -2258,44 +2258,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
-	void 'test can throw an Exception if variable names does not end with Var postfix'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name,mfg,model,type
-				xraysrv01,Dell,PE2950,Server
-				zuludb01,HP,BL380,Blade
-				""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				GroovyMock(DebugConsole),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				console on
-				read labels
-				set myLocalVariable with 'Custom Name'
-				iterate {
-					domain Device
-					load 'Name' with myLocalVar
-				}
-			""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == ETLProcessorException.missingPropertyException('myLocalVariable').message
-
-		cleanup:
-			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
-			}
-	}
-
-	void 'test can throw an Exception if variable names is used incorrectly in second time'() {
+	void 'test can not throw an Exception if variable names is used incorrectly in second time'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -2323,9 +2286,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				}
 			""".stripIndent())
 
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == ETLProcessorException.invalidSetParameter().message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		cleanup:
 			if (fileName) {
@@ -2763,7 +2725,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'exception should be thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'No such property: append'
+			e.message == 'Unrecognized command append with args [-, Prod]'
 	}
 
 	@See('TM-11530')
@@ -3101,6 +3063,210 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'A console content could be recovered after processing an ETL Script'
 			etlProcessor.debugConsole.buffer.toString().contains('fields=[[assetName:[init:xraysrv01, value:xraysrv01]]]')
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can define variables without ending in Var'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					ACME
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					read labels
+					domain Application
+					iterate {
+						extract 'name' load 'assetName'
+						set appVersion with '1.0.0'  
+					}
+			'''.stripIndent())
+
+		then: 'Results should contain Device Name assigment'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							originalValue == 'ACME'
+							value == 'ACME'
+						}
+					}
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+				}
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can define variables without ending in Var for Element'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					ACME
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					read labels
+					domain Application
+					iterate {
+						extract 'name' set appVersion
+						load 'assetName' with appVersion
+						load 'appVersion' with '1.0.0'  
+					}
+			'''.stripIndent())
+
+		then: 'Results should contain Device Name assigment'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							originalValue == 'ACME'
+							value == 'ACME'
+						}
+					}
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+				}
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can throw an Exception if variable names does exists in several scenarios'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' transform with append('::', variable) 
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' transform with concat('-', variable) 
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' prepend variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load 'assetName'
+					find Device by 'assetName', 'description' with variable, 'DESC' into 'assetName'
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		cleanup:
 			if (fileName) {
