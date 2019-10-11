@@ -810,12 +810,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myLocalVar = CE
+						def myLocal = CE
 
-						if ( myLocalVar == 'Microsoft'){
-							load 'appVendor' with myLocalVar
+						if ( myLocal == 'Microsoft'){
+							load 'appVendor' with myLocal
 						} else {
-							load 'environment' with myLocalVar
+							load 'environment' with myLocal
 						}
 					}
 				""".stripIndent())
@@ -1484,9 +1484,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'vendor name' load 'appVendor'
 					if (DOMAIN.appVendor.unknownMethod('Mi')){
-						set environmentVar with 'Production'
+						set environment with 'Production'
 					} else {
-						set environmentVar with 'Development'
+						set environment with 'Development'
 					}
 				}
 			""".stripIndent())
@@ -1569,9 +1569,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'vendor name' load 'appVendor'
 					if (!SOURCE.technology.unknownMethod('NGM')){
-						set environmentVar with 'Production'
+						set environment with 'Production'
 					} else {
-						set environmentVar with 'Development'
+						set environment with 'Development'
 					}
 				}
 			""".stripIndent())
@@ -1880,8 +1880,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				iterate {
 					domain Device
-					set myLocalVar with 'Custom Name'
-					load 'Name' with myLocalVar
+					set myLocal with 'Custom Name'
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -1940,8 +1940,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				iterate {
 					domain Device
-					set myLocalVar with SOURCE.'name'
-					load 'Name' with myLocalVar
+					set myLocal with SOURCE.'name'
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -2001,8 +2001,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					domain Device
 					extract 'type' load 'environment'
-					set myLocalVar with DOMAIN.environment
-					load 'Name' with myLocalVar
+					set myLocal with DOMAIN.environment
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -2071,12 +2071,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'name' load 'Name'
 					load 'custom1' with 'abc'
 
-					extract 'mfg' set myMfgVar
-					myMfgVar += " (" + extract('type') + ")"
-					load 'Manufacturer' with myMfgVar
+					extract 'mfg' set myMfg
+					myMfg += " (" + extract('type') + ")"
+					load 'Manufacturer' with myMfg
 
-					set anotherVar with 'xyzzy'
-					load 'custom2' with anotherVar
+					set another with 'xyzzy'
+					load 'custom2' with another
 				}
 			""".stripIndent())
 
@@ -2218,10 +2218,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				console on
 				read labels
-				set myLocalVar with 'Custom Name'
+				set myLocal with 'Custom Name'
 				iterate {
 					domain Device
-					load 'Name' with myLocalVar
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -2279,10 +2279,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				console on
 				read labels
-				set myLocalVar with 'Custom Name'
+				set myLocal with 'Custom Name'
 				iterate {
 					domain Device
-					set myLocalVar with 'Another value'
+					set myLocal with 'Another value'
 				}
 			""".stripIndent())
 
@@ -2580,8 +2580,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						set envVar with 'Prod'
-						extract 'vendor name' transform with append('-', envVar) load 'environment'
+						set env with 'Prod'
+						extract 'vendor name' transform with append('-', env) load 'environment'
 					}
 				""".stripIndent())
 
@@ -2637,15 +2637,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							extract 'ip' transform with lowercase() set ipVar
-							extract 'srv' set srvVar
+							extract 'ip' transform with lowercase() set ip
+							extract 'srv' set srv
 
-							lookup 'assetName' with srvVar
+							lookup 'assetName' with srv
 							if ( LOOKUP.notFound() ) {
 								// Set the server name first time seen
-								load 'Name' with srvVar
+								load 'Name' with srv
 							}
-							load 'IP Address' transform with append(', ', ipVar)
+							load 'IP Address' transform with append(', ', ip)
 						}
 					""".stripIndent())
 
@@ -2717,9 +2717,9 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							set envVar with 'Prod'
+							set env with 'Prod'
 
-							load 'Name' with append('-', envVar)
+							load 'Name' with append('-', env)
 						}
 					""".stripIndent())
 
@@ -2750,18 +2750,18 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
-					extract 'firstname' set firstNameVar
-					//assert firstNameVar == 'Tony'
+					extract 'firstname' set firstName
+					//assert firstName == 'Tony'
 					
-					extract 'lastname' set lastNameVar
-					//assert lastNameVar == 'Baker'
+					extract 'lastname' set lastName
+					//assert lastName == 'Baker'
 					
-					set fullNameVar with firstNameVar + ' ' + lastNameVar
-					//assert firstNameVar == 'Tony'
-					//assert lastNameVar == 'Baker'
-					//assert fullNameVar == 'Tony Baker'
+					set fullName with firstName + ' ' + lastName
+					//assert firstName == 'Tony'
+					//assert lastName == 'Baker'
+					//assert fullName == 'Tony Baker'
 					
-					load 'description' with fullNameVar
+					load 'description' with fullName
 				}
 				""".stripIndent())
 
@@ -2814,8 +2814,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 				   extract 'name' load 'assetName'
 				   extract 'cpu' load 'custom1' when populated
-				   extract 'description' set descVar
-				   load 'description' with descVar when populated
+				   extract 'description' set desc
+				   load 'description' with desc when populated
 				   extract 'nothingThere' load 'custom2' when populated
 				   extract 'retire date' transform with toDate() load 'Retire Date' when populated
 				}
