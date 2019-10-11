@@ -46,7 +46,6 @@ const enum NodeTemplateEnum {
 		<div class="diagram-layout-container">
 			<div
 					id="diagram-layout"
-					[style.width]="containerWidth"
 					[style.height]="screenHeight"
 					#diagramLayout></div>
 			<div id="graph-control-btn-group">
@@ -75,8 +74,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@Input() nodeTemplateOpts: go.Node;
 	@Input() linkTemplateOpts: go.Link;
 	@Input() layoutOpts: go.Layout;
-	@Input() containerWidth: string;
-	@Input() containerHeight: string;
 	@Input() currentUser: any;
 	@Input() contextMenuOptions: IDiagramContextMenuOption;
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
@@ -112,7 +109,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 **/
 	ngOnChanges(simpleChanges: SimpleChanges): void {
 		if (simpleChanges) {
-			if ((simpleChanges.nodeData && simpleChanges.nodeData)
+			if (simpleChanges.nodeData
+				&& (!!simpleChanges.nodeData.currentValue.data && !!simpleChanges.nodeData.currentValue.linksPath)
 				&& !(simpleChanges.nodeData.firstChange && simpleChanges.nodeData.firstChange)
 			) {
 				this.loadAll();
@@ -145,7 +143,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Load data model used by the diagram
 	 **/
 	loadModel(): void {
-		if (this.nodeData.data && this.nodeData.linksPath && this.nodeData.data.length < 600) {
+		if (this.nodeData.data.length < 600) {
 			this.myModel = new go.GraphLinksModel(this.nodeData.data, this.nodeData.linksPath);
 		} else {
 			this.myModel = new go.GraphLinksModel(
@@ -622,7 +620,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 **/
 	highlightNodesByTeam(matches: any[]): void {
 		this.diagram.commit(d => {
-			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.userSelectedCol3));
+			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.team));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);

@@ -20,7 +20,7 @@ export class TaskManagerRoutingStates {
 		url: 'list'
 	};
 	public static readonly TASK_NEIGHBORHOOD = {
-		url: 'neighborhood'
+		url: 'task-graph'
 	};
 }
 

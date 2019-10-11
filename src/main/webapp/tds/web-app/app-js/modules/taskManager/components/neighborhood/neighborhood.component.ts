@@ -5,6 +5,7 @@ import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 import {clone} from 'ramda';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
 import {TaskService} from '../../service/task.service';
 import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
@@ -37,6 +38,7 @@ import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {Title} from '@angular/platform-browser';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -48,7 +50,7 @@ export class NeighborhoodComponent implements OnInit {
 	ctxMenuOpts$: ReplaySubject<IDiagramContextMenuOption> = new ReplaySubject(2);
 	@ViewChild('graph') graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
-	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownListComponent;
+	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownButtonComponent;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -65,16 +67,14 @@ export class NeighborhoodComponent implements OnInit {
 	icons = FA_ICONS;
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
-	isEventDropdownOpen: boolean;
-	isTeamHighlightDropdownOpen: boolean;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	userContext: UserContextModel;
 	viewUnpublished: boolean;
 	myTasks: boolean;
 	minimizeAutoTasks: boolean;
 	urlParams: any;
-	teamHighlights$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-	selectedTeamHighlight: string;
+	teamHighlights$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	selectedTeam: string;
 	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 
@@ -87,7 +87,8 @@ export class NeighborhoodComponent implements OnInit {
 			private dialogService: UIDialogService,
 			private notifierService: NotifierService,
 			private location: Location,
-			private translatePipe: TranslatePipe
+			private translatePipe: TranslatePipe,
+			private titleService: Title
 		) {
 				this.activatedRoute.queryParams.subscribe(params => {
 					if (params) { this.urlParams = Object.assign({}, params); }
@@ -95,6 +96,7 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.titleService.setTitle('Task Graph');
 		this.loadAll();
 	}
 
@@ -103,11 +105,6 @@ export class NeighborhoodComponent implements OnInit {
 		this.loadUserContext();
 		this.loadFilters();
 		this.loadEventList();
-		this.eventsDropdownOpened();
-		this.eventsDropdownClosed();
-		this.subscribeToEvents();
-		// this.teamHighlightDropdownOpened();
-		// this.teamHighlightDropdownClosed();
 	}
 
 	subscribeToEvents(): void {
@@ -253,6 +250,7 @@ export class NeighborhoodComponent implements OnInit {
 		if (!this.tasks) { return; }
 		const nodeDataArr = [];
 		const linksPath = [];
+		const teams = [];
 
 		const tasksCopy = this.tasks.slice();
 
@@ -263,13 +261,14 @@ export class NeighborhoodComponent implements OnInit {
 			const predecessorIds = t.task.predecessorIds && t.task.predecessorIds;
 
 			t.task.key = t.task.id;
+			if (!!t.task.team && !teams.includes(t.task.team)) { teams.push(t.task.team); }
 			nodeDataArr.push(t.task);
 
 			if (predecessorIds && predecessorIds.length > 0) {
 				linksPath.push(...this.getLinksPathByPredecessorIds(t.task.id, predecessorIds));
 			}
 		});
-
+		this.teamHighlights$.next(teams.map(t => ({label: t})));
 		this.nodeData$.next({ data: nodeDataArr, linksPath });
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
@@ -426,8 +425,8 @@ export class NeighborhoodComponent implements OnInit {
 	/**
 	 * highlight nodes by team on the diagram
 	 **/
-	highlightByTeam(team: string): void {
-		const matches = [team];
+	highlightByTeam(team: any): void {
+		const matches = [team.label];
 		this.graph.highlightNodesByTeam(matches);
 	}
 
@@ -443,46 +442,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	zoomOut() {
 		this.graph.zoomOut();
-	}
-
-	/**
-	 * When events dropdown is opened remove z-index from minimap so that the options are visible
-	 **/
-	eventsDropdownOpened(): void {
-		this.eventsDropdown.open.subscribe(() => {
-			this.isEventDropdownOpen = false;
-			this.graph.resetOverviewIndex();
-		})
-	}
-
-	/**
-	 * When events dropdown is closed reset z-index on minimap so that it's visible on top of th diagram
-	 **/
-	eventsDropdownClosed(): void {
-		this.eventsDropdown.close.subscribe(() => {
-			this.isEventDropdownOpen = false;
-			this.graph.restoreOverviewIndex();
-		})
-	}
-
-	/**
-	 * When Team Highlight dropdown is opened remove z-index from minimap so that the options are visible
-	 **/
-	teamHighlightDropdownOpened(): void {
-		this.teamHighlightDropdown.open.subscribe(() => {
-			this.isTeamHighlightDropdownOpen = false;
-			this.graph.resetOverviewIndex();
-		})
-	}
-
-	/**
-	 * When Team Highlight dropdown is closed reset z-index on minimap so that it's visible on top of th diagram
-	 **/
-	teamHighlightDropdownClosed(): void {
-		this.teamHighlightDropdown.close.subscribe(() => {
-			this.isTeamHighlightDropdownOpen = false;
-			this.graph.restoreOverviewIndex();
-		})
 	}
 
 	/**

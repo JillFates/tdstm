@@ -74,6 +74,7 @@ export interface IGraphTask {
 	predecessorIds?: number[];
 	predecessorList?: number[];
 	successorList?: number[];
+	team?: string;
 }
 
 interface IAssetEntity {

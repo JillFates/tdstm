@@ -69,10 +69,10 @@ export class TaskViewToggleComponent implements OnInit {
 	 **/
 	subscribeToActivatedRoute(): void {
 		this.activatedRoute.url.subscribe(d => {
-			if (d.find(p => p.path === routeNames.TASK_MANAGER)) {
+			if (d.find(p => p.path === TaskManagerRoutingStates.TASK_MANAGER_LIST.url)) {
 				this.makeActive(this.taskManager);
 				this.disableTaskManager = true;
-			} else if (d.find(p => p.path === routeNames.NEIGHBORHOOD)) {
+			} else if (d.find(p => p.path === TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url)) {
 				this.makeActive(this.neighborhood);
 				this.disableNeighborhood = true;
 			} else if (d.find(p => p.path === routeNames.TASK_TIMELINE)) {
