@@ -1,12 +1,15 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
 import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
@@ -23,26 +26,52 @@ import java.text.DateFormat
 class WsTimeLineController implements ControllerMethods {
 
 	TimelineService timelineService
+	ControllerService controllerService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
+		
+		// handle move events
+		Long projectId = controllerService.getProjectForPage(this, 'before using the task graph')?.id
+		if (!projectId) {
+			return
+		}
+		
+		def moveEvents = MoveEvent.findAllByProject(Project.load(projectId))
+		def eventPref = userPreferenceService.getPreference(UserPreferenceEnum.MOVE_EVENT) ?: '0'
+		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+		if (selectedEventId == 0) {
+			render ([data:data, moveEvents:moveEvents, selectedEventId:selectedEventId] as JSON)
+			return
+		}
 
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
 		List<Task> tasks = cpaResults.tasks
-
+		
+		// calculate the start date for the event
 		Date startDate
 		if (recalculate) {
 			startDate = findEarliestStartVertex(graph.vertices)
 		} else {
 			startDate = findEarliestStartTask(tasks)
+			log.info "startDate = ${startDate}"
 		}
-
+		
+		// build the roles list
+		def roles = []
+		tasks.each { task ->
+			def role = task.role
+			if (role && !roles.contains(role)) {
+				roles.push(role)
+			}
+		}
+		
 		render([
 			data: [
 				sinks    : graph.sinks.collect { it.taskId },
@@ -58,22 +87,26 @@ class WsTimeLineController implements ControllerMethods {
 						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
 						durationScale : task.durationScale?.name(),
-						startInitial  : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart), TimeUtil.GRANULARITY_MINUTES),
-						endInitial    : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish), TimeUtil.GRANULARITY_MINUTES),
+						/*startInitial  : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart), TimeUtil.GRANULARITY_SECONDS * 1000),
+						endInitial    : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish), TimeUtil.GRANULARITY_SECONDS * 1000),*/
 						slack         : recalculate ? graph.getVertex(task.taskNumber).slack : task.slack,
 						actualStart   : task.actStart,
 						status        : task.status,
 						actFinish     : task.actFinish,
 						estStart      : recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart,
 						estFinish     : recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish,
-						assignedTo    : task.assignedTo?.toString(),
+						assignedTo    : task.assignedTo ? task.assignedTo?.toString() : 'NONE',
 						role          : task.role,
 						predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
-							it.successor.id
+							log.info "[${task.id}] ${task}, it = ${it}, it.predecessorId = ${it.predecessorId}"
+							it.predecessorId
 						}
 					]
-				}
-			]
+				},
+				roles    : roles
+			],
+			selectedEventId: selectedEventId,
+			moveEvents: moveEvents
 		] as JSON)
 	}
 
@@ -294,6 +327,8 @@ class WsTimeLineController implements ControllerMethods {
 	 * @return lowest estStart from a list of {@code Task}
 	 */
 	private Date findEarliestStartTask(List<Task> taskList) {
-		return taskList.min { it.estStart }.estStart
+		log.info "findEarliestStartTask ${taskList}"
+		return taskList.min { log.info "\t > task is ${it} AT ${it.estStart}"
+			it.estStart }.estStart
 	}
 }

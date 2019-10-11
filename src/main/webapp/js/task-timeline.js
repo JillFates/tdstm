@@ -18,7 +18,8 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
-	generateGraph();
+	//generateGraph();
+    submitForm();
 });
 
 
@@ -41,6 +42,8 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param status
  */
 function buildGraph(response, status) {
+    console.log('buildGraph');
+    console.log(response);
 
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
@@ -57,6 +60,7 @@ function buildGraph(response, status) {
 	// parse the data received from the server
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
+	console.log(data)
 	var ready = false;
 
 	// if the event has no tasks show an error message and exit
@@ -126,6 +130,10 @@ function buildGraph(response, status) {
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
+	console.log('doing scale calculations:');
+    console.log('\t > parseStartDate(data.startDate) = ', parseStartDate(data.startDate));
+    console.log('\t > items[items.length - 1].end = ', items[items.length - 1].end);
+    //return
 	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].end);
 	var x = d3.time.scale()
 		.domain([parseStartDate(data.startDate), items[items.length - 1].end])
@@ -133,7 +141,9 @@ function buildGraph(response, status) {
 	var x1 = d3.time.scale()
 		.domain(x.domain())
 		.range([0, x.range()[1] * zoomScale]);
-
+    console.log('\t > x = ', x.domain(), '-->', x.range());
+    console.log('\t > x1 = ', x1.domain(), '-->', x1.range());
+    //return
 	// perform the stacking layout algorithm then determine the width and height of the graphs
 	var maxStack = calculateStacks();
 	var mainHeight = ((maxStack + 1) * mainRectHeight * 1.5);
@@ -443,11 +453,15 @@ function buildGraph(response, status) {
 	}
 
 	// stores the svg elements for the graph axis
+    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ', axisDefs);
 	var axisElements = {
 		mainMinuteAxis: mainTranslator.append('svg:g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
-			.call(axisDefs.x1MainGraphAxis),
+			.call(function(a, b){
+			    console.log('aaaaaaaaaa ', a)
+			    axisDefs.x1MainGraphAxis(a, b);
+            }),
 
 		miniMinuteAxis: mini.append('svg:g')
 			.attr('transform', 'translate(0,' + miniHeight + ')')
@@ -459,6 +473,7 @@ function buildGraph(response, status) {
 			.attr('class', 'axis hour')
 			.call(axisDefs.xHourAxis)
 	}
+    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ after ', axisElements);
 
 
 	// construct the line representing the current time
@@ -747,7 +762,7 @@ function buildGraph(response, status) {
 			.append('svg:title')
 			.html(function (d) {
 				return d.number
-					+ ': ' + d.name
+					+ ': ' + d.comment
 					+ ' - ' + ((d.assignedTo != 'null') ? (d.assignedTo) : ('Unassigned'))
 					+ ' - ' + d.status;
 			});
@@ -893,7 +908,7 @@ function buildGraph(response, status) {
 				.attr('style', function (d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 				.append('span')
 				.attr('class', 'itemLabel')
-				.html(function (d) { return d.number + ': ' + d.name; });
+				.html(function (d) { return d.number + ': ' + d.comment; });
 
 			labels.exit().remove();
 		}
@@ -913,8 +928,8 @@ function buildGraph(response, status) {
 			.attr('class', function (d) { return 'miniItem ' + getClasses(d); });
 
 
-		if (window.performance && window.performance.now)
-			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
+//		if (window.performance && window.performance.now)
+//			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 	}
 
 	// clears all items from the main group then redraws them
@@ -1088,6 +1103,7 @@ function buildGraph(response, status) {
 
 	// gets the points string for task polygons
 	function getPoints(d) {
+	    console.log('getPoints(',d,')');
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1462,7 +1478,23 @@ function buildGraph(response, status) {
 	 - corrects any impossible start times for tasks */
 	function sanitizeData(tasks, dependencies) {
 
+
 		data.searchFilter = '';
+
+        // convert all data to its proper format
+        if (data.startDate == undefined) {
+            console.log('NO START DATE GIVEN, USING EARLIEST TASK');
+            data.items.forEach( task => {
+                if (task.estStart != undefined) {
+                    if (data.startDate == undefined || task.estStart < data.startDate) {
+                        data.startDate = new Date(task.estStart);
+                    }
+                }
+            });
+            //data.startDate = new Date(Date.now());
+        }
+        let startTime = parseStartDate(data.startDate);
+        console.log('startTime = ', startTime);
 
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
@@ -1470,34 +1502,82 @@ function buildGraph(response, status) {
 			items[i].redundantSuccessors = [];
 			items[i].redundantPredecessors = [];
 		}
+/*
+        // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
+        for (var i = 0; i < Object.keys(data.cycles).size(); i++) {
+            var key = parseInt(Object.keys(data.cycles)[i]);
+            var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
+            var stack = data.cycles[Object.keys(data.cycles)[i]];
+            for (var j = 0; j < stack.size(); ++j) {
+                var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
+                if (node.predecessorIds.indexOf(key) != -1) {
+                    // construct a dependency object and move the predecessorId to the redundant list
+                    var depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
+                    depObject.root = predecessor.root;
+                    predecessor.redundantSuccessors.push(depObject);
+                    node.redundantPredecessors.push(depObject);
+                    dependencies.push(depObject);
+                    node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
+                }
+            }
+        }
+*/
+        // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
+        console.log('cycles:');
+        console.log(data.cycles);
+        for (let c = 0; c < data.cycles.size(); c++) {
+            let cycle = data.cycles[c];
+            let firstId = parseInt(cycle[0]);
+            let lastId = parseInt(cycle[cycle.size() - 1]);
+            let firstNode = items[binarySearch(items, firstId, 0, items.length - 1)];
+            let lastNode = items[binarySearch(items, lastId, 0, items.length - 1)];
 
-		// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
-		for (var i = 0; i < Object.keys(data.cyclicals).size(); i++) {
-			var key = parseInt(Object.keys(data.cyclicals)[i]);
-			var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
-			var stack = data.cyclicals[Object.keys(data.cyclicals)[i]];
-			for (var j = 0; j < stack.size(); ++j) {
-				var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
-				if (node.predecessorIds.indexOf(key) != -1) {
-					// construct a dependency object and move the predecessorId to the redundant list
-					var depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
-					depObject.root = predecessor.root;
-					predecessor.redundantSuccessors.push(depObject);
-					node.redundantPredecessors.push(depObject);
-					dependencies.push(depObject);
-					node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
-				}
-			}
-		}
+            let depObject = { "predecessor": lastNode, "successor": firstNode, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
+            depObject.root = lastNode.root;
+            lastNode.redundantSuccessors.push(depObject);
+            firstNode.redundantPredecessors.push(depObject);
+            dependencies.push(depObject);
+            //firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
+            console.log('preds before: ' + firstNode.predecessorIds);
+            firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
+            console.log('preds after: ' + firstNode.predecessorIds);
+            console.log('firstNode = ', firstNode, ', lastNode = ', lastNode);
 
-		// if there are cyclical structures, tell the user that the data might be inaccurate
-		if (Object.keys(data.cyclicals).size() > 0)
+            /*
+            let cycle = data.cycles[c];
+            let key = parseInt(cycle[cycle.size() - 1]);
+            let predecessor = items[binarySearch(items, key, 0, items.length - 1)];
+            console.log(cycle);
+            console.log('\t key = ', key, ', predecessor = ', predecessor);
+            for (let n = 0; n < cycle.size(); ++n) {
+                let node = items[binarySearch(items, cycle[n], 0, items.length - 1)];
+                console.log('\t\t node[', n, '] = ', node);
+                if (node.predecessorIds.indexOf(key) != -1) {
+                    // construct a dependency object and move the predecessorId to the redundant list
+                    let depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
+                    depObject.root = predecessor.root;
+                    predecessor.redundantSuccessors.push(depObject);
+                    node.redundantPredecessors.push(depObject);
+                    dependencies.push(depObject);
+                    node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
+                }
+            }
+
+             */
+        }
+
+
+
+
+        // if there are cyclical structures, tell the user that the data might be inaccurate
+		if (Object.keys(data.cycles).size() > 0)
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
 
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
 		if (starts.size() > 1) {
-			var earliest = starts[0].startInitial;
+            var earliest = starts[0].startInitial;
+            //var earliest = starts[0].estStart;
 			for (var i = 0; i < starts.size(); i++) {
 				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
@@ -1505,10 +1585,12 @@ function buildGraph(response, status) {
 			}
 			var root = {};
 			root.id = -10;
-			root.name = 'root';
+			root.comment = 'root';
 			root.root = true;
-			root.startInitial = 0;
-			root.endInitial = 0;
+//			root.startInitial = 0;
+//			root.endInitial = 0;
+            root.estStart = startTime;
+            root.estFinish = new Date(startTime.getTime() + 1);
 			root.predecessorIds = [];
 			items = [root].concat(items);
 			data.root = root;
@@ -1516,14 +1598,46 @@ function buildGraph(response, status) {
 			data.root = items[binarySearch(items, starts[0], 0, items.length - 1)];
 		}
 
-		// convert all data to its proper format
-		var startTime = parseStartDate(data.startDate);
-		for (var i = 0; i < items.length; ++i) {
+        let unknownStarts = [];
+		for (let i = 0; i < items.length; ++i) {
+		    /*if (items[i].startInitial)
+		    console.log(' > parsing item ', items[i]);
+            items[i].startInitial = new Date(startInitial).getTime()
+		    console.log('\t > startInitial = ', items[i].startInitial, ', startTime = ', startTime);
 			items[i].milestone = (items[i].startInitial == items[i].endInitial);
+			console.log("\t > before:");
+			console.log(items[i].startInitial);
 			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial) * 60000);
-			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);
-			items[i].start = null;
-			items[i].end = null;
+            console.log("\t > after:");
+            console.log(items[i].startInitial);
+            console.log("\t > time:");
+            console.log(startTime.getTime());
+
+            items[i].endInitial = new Date(endInitial).getTime()
+			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);*/
+		    if (items[i].estStart == undefined) {
+                unknownStarts.push(i);
+            }
+            //items[i].milestone = ((items[i].estStart) && (items[i].estStart == items[i].estFinish));
+            items[i].milestone = (items[i].duration == 0);
+            if (items[i].estStart) {
+                items[i].estStart = new Date(items[i].estStart);
+//                items[i].startInitial = parseStartDate(items[i].estStart.getTime())
+//            } else {
+//                items[i].startInitial = parseStartDate(items[i].startInitial + data.startDate.getTime());
+            }
+            if (items[i].estFinish) {
+                console.log('QQQQ items[i].estFinish = ' + items[i].estFinish);
+                console.log(items[i]);
+                items[i].estFinish = new Date(items[i].estFinish);
+//                items[i].endInitial = items[i].estFinish.getTime();
+            }
+//            items[i].endInitial = parseStartDate(items[i].endInitial);
+//            items[i].endInitial = new Date(items[i].endInitial.getTime() + (items[i].milestone * 60000));
+            console.log(' > item = ', items[i]);
+            //console.log('\t > start-end ===== ', items[i].startInitial, ' - ', items[i].endInitial);
+            items[i].start = items[i].estStart;
+			items[i].end = items[i].estEnd;
 			items[i].exChild = null;
 			items[i].exParent = null;
 			items[i].endOfExclusive = null;
@@ -1539,6 +1653,11 @@ function buildGraph(response, status) {
 			items[i].siblingGroupParents = [];
 			items[i].childGroups = [];
 		}
+
+		// if there are undefined start dates and no cycles, alert the user
+        if (unknownStarts.size() > 0) {
+            alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+        }
 
 		// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
 		for (var i = 0; i < items.length; ++i)
@@ -2114,7 +2233,7 @@ function buildGraph(response, status) {
 								else
 									output += '\t.';
 							}
-							output += '\t:' + list[j].name;
+							output += '\t:' + list[j].comment;
 							console.log('\t > ' + output);
 						}
 						console.log('--------------------------------------------');
@@ -2195,7 +2314,7 @@ function buildGraph(response, status) {
 
 		function outputChildMatrix(node) {
 			var successors = getSuccessors(node);
-			console.log('child matrix for node [' + node.id + '] ' + node.name);
+			console.log('child matrix for node [' + node.id + '] ' + node.comment);
 			console.log('----------------------');
 			for (var i = 0; i < successors.size(); ++i) {
 				var node = successors[i];
@@ -2206,7 +2325,7 @@ function buildGraph(response, status) {
 					else
 						output += '\t.';
 				}
-				console.log('\t > ' + output + ' "' + node.name + '"');
+				console.log('\t > ' + output + ' "' + node.comment + '"');
 			}
 			console.log('----------------------');
 		}
@@ -2356,9 +2475,18 @@ function buildGraph(response, status) {
 
 	// ensures times are correct
 	function calculateTimes(task, checking) {
+	    console.log('calculateTimes(', task, checking, ')');
 		if (!task.start) {
 			if (task.predecessors.length == 0) {
-				task.start = task.startInitial;
+				//task.start = new Date(task.startInitial);
+                //task.start = task.estStart;
+                if (task.estStart) {
+                    task.start = task.estStart
+                //} else if (task.startInitial) {
+                //    task.start = new Date(data.startDate.getTime() + task.startInitial)
+                } else {
+                    task.start = data.startDate;
+                }
 			} else {
 				checking.push(task);
 				var latest = 0;
@@ -2368,7 +2496,7 @@ function buildGraph(response, status) {
 						latest = tmp;
 				}
 				checking.pop(task);
-				task.start = latest;
+				task.start = new Date(latest);
 			}
 		}
 		if (!task.end) {
@@ -2376,7 +2504,15 @@ function buildGraph(response, status) {
 				task.start = new Date(task.start.getTime() - 2);
 				task.end = new Date(task.start.getTime() - 1);
 			} else {
-				task.end = new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime()));
+                //console.log('!!!!!!!!!!! task.end = new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime()));')
+                //console.log('!!!!!!!!!!! ',new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime())),' = new Date(', task.start.getTime(), ' + (', task.endInitial.getTime(), ' - ', task.startInitial.getTime(), '));')
+                if (task.estFinish) {
+                    task.end = task.estFinish;
+                } else {
+                    task.end = new Date(task.start.getTime() + (task.duration * 60000));
+                }
+                //task.end = task.endInitial;
+                //task.end = task.estFinish;
 			}
 		}
 		return task.end;
@@ -2414,6 +2550,7 @@ function buildGraph(response, status) {
 }
 
 function submitForm() {
+    console.log('submitForm()')
 	$('.chart').remove();
 	d3.select('#svgContainerId').style('display', 'none')
 	generateGraph($('#moveEventId').val());
@@ -2424,6 +2561,7 @@ function submitForm() {
  * Call the REST API to grab the data to generate the Timeline
  */
 function generateGraph(event) {
+    console.log('generateGraph(',event,')');
 	var params = {};
 
 	if (event != 0) {
@@ -2433,14 +2571,43 @@ function generateGraph(event) {
 	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
 
 	$('#spinnerId').css('display', 'block');
-
-	jQuery.ajax({
-		dataType: 'json',
-		url: 'taskTimelineData',
-		data: params,
-		type: 'GET',
-		complete: buildGraph
-	});
+/*
+    jQuery.ajax({
+        dataType: 'json',
+        url: 'taskTimelineData',
+        data: params,
+        type: 'GET',
+        /*complete: buildGraph*/
+/*        complete: function (results) {
+            console.log('old function(', event, '):');
+            console.log(JSON.parse(results.responseText))
+        }
+    });
+*/
+    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
+    /*if (event != 0 && event != undefined)
+        jQuery.ajax({
+            dataType: 'json',
+            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/getTimelineData',
+            type: 'GET',
+            complete:  function (response, status) {
+                console.log('new function(', event, '):');
+                console.log(response);
+                buildGraph(response)
+            }
+        });*/
+    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
+    if (event != 0 && event != undefined)
+        jQuery.ajax({
+            dataType: 'json',
+            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/timeline',
+            type: 'GET',
+            complete:  function (response, status) {
+                console.log('new function(', event, '):');
+                console.log(JSON.parse(response.responseText))
+                buildGraph(response)
+            }
+        });
 }
 
 // highlight tasks matching the user's regex
@@ -2471,7 +2638,7 @@ function performSearch() {
 
 			_(data.items).forEach(function (task, i) {
 
-				var name = task.name;
+				var name = task.comment;
 
 				if (searchString == '') {
 					task.highlight = false;
@@ -2508,11 +2675,17 @@ function handleClearFilterStatus() {
  * have a Date object in the user's time zone.
  */
 function parseStartDate(startDate) {
+//    console.log('parseStartDate(',startDate,')')
 	var momentTZ = moment().tz(tdsCommon.timeZone());
 	var localTZOffset = new Date().getTimezoneOffset();
 	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
+//    console.log(momentTZ)
+//    console.log(localTZOffset)
+//    console.log(momentStartDate)
 	momentStartDate = momentStartDate.tz("GMT");
 	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
+//	console.log('returning:')
+//    console.log(momentStartDate.valueOf())
 	return new Date(momentStartDate.valueOf());
 }
 
