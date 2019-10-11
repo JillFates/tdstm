@@ -24,6 +24,8 @@ class UserContext {
 
 	String logoUrl
 
+	List<Project> alternativeProjects
+
 
 	/**
 	 * Create and return a map representation of the User's context with only a selection of fields.
@@ -53,6 +55,10 @@ class UserContext {
 				logoUrl: logoUrl
 			]
 		}
+
+		List<Map> alternativeProjectsList = alternativeProjects.collect { Project pr ->
+			[id: pr.id, name: pr.name]
+		}
 		return [
 		    user: [
 		        id: userLogin.id,
@@ -67,7 +73,8 @@ class UserContext {
 			event: eventMap,
 			bundle: bundleMap,
 			timezone: timezone,
-			dateFormat: dateFormat
+			dateFormat: dateFormat,
+			alternativeProjects: alternativeProjectsList
 		]
 	}
 }

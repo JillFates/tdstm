@@ -619,15 +619,15 @@ class ProjectService implements ServiceMethods {
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
 		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
 		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
-		String prefDelSql = '''
+		String prefDelSql = """
 			delete from UserPreference up where
-			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
-			(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or
-			(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or
-			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
-			'''
-		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
-		UserPreference.executeUpdate(prefDelSql, prefDelMap)
+			(up.preferenceCode in(:projectCodesList) and up.value = :projectId) or
+			(up.preferenceCode in (:bundleCodesList) and up.value in ($bundleQuery)) or
+			(up.preferenceCode in (:eventCodesList) and up.value in ($eventQuery)) or
+			(up.preferenceCode = '$roomCode' and up.value in ($roomQuery))
+			"""
+		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes, projectId: projectInstance.id.toString(), project: projectInstance]
+		Integer cant = UserPreference.executeUpdate(prefDelSql, prefDelMap)
 
 		// Setting Configuration settings
 		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
