@@ -64,7 +64,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -1738,7 +1737,7 @@ class ReportsService implements ServiceMethods {
         def projectNameFont = book.createFont()
         projectNameFont.setFontHeightInPoints((short)12)
         projectNameFont.setFontName("Arial")
-        projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+        projectNameFont.setBold(true)
 
         def projectNameCellStyle
         projectNameCellStyle = book.createCellStyle()
