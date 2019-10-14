@@ -107,13 +107,17 @@ class WsUserController implements ControllerMethods {
 		Person person = currentPerson()
 
 		if(id && id != "undefined") {
-			project = Project.findById(id.toLong())
-			userPreferenceService.setCurrentProjectId(project.id)
+			if (projectService.hasAccessToProject(id)) {
+				project = Project.findById(id.toLong())
+				userPreferenceService.setCurrentProjectId(project.id)
+			} else {
+				throw new InvalidParamException('Current user does not have access to project with ID ' + id)
+			}
 		} else {
 			project = getProjectForWs()
 		}
 
-		def projectLogo = ProjectLogo.findByProject(project)
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
 
 		List projects = [project]
 		List userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)

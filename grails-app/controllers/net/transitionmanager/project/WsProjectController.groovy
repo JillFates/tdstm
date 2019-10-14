@@ -127,7 +127,7 @@ class WsProjectController implements ControllerMethods {
 		}
 
 		def imageId
-		def projectLogo = ProjectLogo.findByProject(project)
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
 		if (projectLogo) {
 			imageId = projectLogo.id
 		}
