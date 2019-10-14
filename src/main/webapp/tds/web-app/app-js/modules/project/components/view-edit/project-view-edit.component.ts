@@ -84,7 +84,7 @@ export class ProjectViewEditComponent implements OnInit {
 			defaultBundleName: 'TBD',
 			timeZone: '',
 			collectMetrics: true,
-			planMethodology: ''
+			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
 		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
@@ -152,11 +152,7 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectModel.partners.push({id: partner.id, name: partner.name});
 				});
 
-				this.planMethodologies = [];
-				data.planMethodologies.forEach((methodology) => {
-					this.planMethodologies.push(methodology.label);
-				});
-
+				this.planMethodologies = data.planMethodologies ? data.planMethodologies : [];
 				this.possibleManagers = data.possibleManagers ? data.possibleManagers : [];
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
@@ -167,7 +163,12 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.completionDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate));
 				this.projectModel.completionDate.setHours(0, 0, 0, 0);
-				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
+				let methodologyField = data.projectInstance ? data.projectInstance.planMethodology : '';
+				this.planMethodologies.forEach((methodology) => {
+					if (methodology.field == methodologyField) {
+						this.projectModel.planMethodology = methodology;
+					}
+				});
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';

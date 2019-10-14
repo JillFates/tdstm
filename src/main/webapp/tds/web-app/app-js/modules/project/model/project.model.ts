@@ -14,7 +14,7 @@ export class ProjectModel {
 	public defaultBundleName: string;
 	public timeZone: string;
 	public collectMetrics: boolean;
-	public planMethodology: string;
+	public planMethodology: any;
 }
 
 export class ProjectColumnModel {
