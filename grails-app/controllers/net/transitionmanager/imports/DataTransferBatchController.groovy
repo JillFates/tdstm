@@ -145,7 +145,7 @@ class DataTransferBatchController implements ControllerMethods {
 		validateCommandObject(dataviewParams)
 
 		Map findAllParams = [sort: "dateCreated", order: "desc"]
-		if((dataviewParams.max > 0)) {
+		if(dataviewParams.max > 0) {
 			findAllParams << [ max: dataviewParams.max, offset: dataviewParams.offset]
 		}
 
