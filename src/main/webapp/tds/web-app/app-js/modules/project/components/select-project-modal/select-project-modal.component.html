@@ -24,12 +24,15 @@
     </div>
 
     <div class="modal-footer form-group-center">
-		<div class="col-sm-12" *ngIf="projects.length > 0">
-			<tds-button-custom  (click)="onContinue()"
+		<div class="col-sm-12">
+			<tds-button-custom  (click)="onContinue()" *ngIf="projects.length > 0"
 				icon="check" 
 				title="Continue" 
-				class="btn-primary pull-left">
+				class="btn-primary pull-left"
+				[disabled]="!selectedProjectId">
 			</tds-button-custom>
+
+			<tds-button-cancel class="btn-secondary pull-right"  title="Cancel" (click)="onCancel()"></tds-button-cancel>
 		</div>
 	</div>
 </div>

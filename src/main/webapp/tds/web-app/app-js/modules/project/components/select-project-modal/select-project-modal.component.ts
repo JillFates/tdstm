@@ -31,7 +31,7 @@ export class SelectProjectModalComponent {
 	/**
 	 * Set the new Project Selected
 	 */
-	onContinue() {
+	public onContinue(): void {
 		const selectedId = parseInt(this.selectedProjectId, 0);
 		const project = this.projects.find((project: any) => {
 			return project.id === selectedId;
@@ -50,9 +50,16 @@ export class SelectProjectModalComponent {
 				this.store.dispatch(new PostNotices()),
 				this.store.dispatch(new LicenseInfo())
 			]).subscribe(() => {
-				this.activeDialog.close();
+				this.activeDialog.close({success: true});
 			});
 		});
+	}
+
+	/**
+	 * if user doesn't want to continue with the current login info
+	 */
+	public onCancel(): void {
+		this.activeDialog.close({success: false});
 	}
 
 }

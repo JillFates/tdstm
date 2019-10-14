@@ -170,7 +170,9 @@ export class LoginComponent implements OnInit {
 					provide: Array,
 					useValue: this.userContextModel.alternativeProjects
 				}]).then(result => {
-					this.getCurrentUserSnapshot();
+					if (result.success) {
+						this.getCurrentUserSnapshot();
+					}
 				});
 			});
 		} else if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
