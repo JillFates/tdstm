@@ -41,7 +41,7 @@ export class ButtonsFactoryService {
 				title: translate('GLOBAL.FILTER'),
 				tooltip: translate('GLOBAL.FILTER')
 			},
-			['tds-button-save']: {icon: 'floppy-o', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE')},
+			['tds-button-save']: {icon: 'floppy', title: translate('GLOBAL.SAVE'), tooltip: translate('GLOBAL.SAVE')},
 			['tds-button-undo']: {icon: 'undo', title: translate('GLOBAL.UNDO'), tooltip: translate('GLOBAL.UNDO')}
 		};
 	}
