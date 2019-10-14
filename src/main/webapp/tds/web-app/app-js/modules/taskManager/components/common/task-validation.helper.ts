@@ -33,14 +33,14 @@ export class TaskValidationHelper {
 	 * Validate if Neighborhood button should appear
 	 **/
 	static shouldDisplayNeighborhoodButton(data: IGraphTask): boolean {
-		return data.successors && data.successors.length > 0 || data.predecessors && data.predecessors.length > 0;
+		return data.predecessorIds && data.predecessorIds.length > 0 || data.successors && data.successors.length > 0;
 	}
 
 	/**
 	 * Validate if AssetDetails button should appear
 	 **/
 	static shouldDisplayAssetDetailsButton(data: IGraphTask): boolean {
-		return data.assetEntity && !!data.assetEntity.id;
+		return data.asset && !!data.asset.id;
 	}
 
 	/**

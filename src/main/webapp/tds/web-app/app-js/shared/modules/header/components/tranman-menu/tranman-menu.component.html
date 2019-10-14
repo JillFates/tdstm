@@ -182,6 +182,9 @@
                             <img src="/tdstm/assets/icons/chart_organisation.png" width="16" height="16" alt="Architecture Graph"> Architecture Graph
                         </a>
                     </li>
+                    <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-gojs-architecture-graph">
+                        <a [routerLink]="['/asset/architecture-graph']">GoJS Architecture Graph</a>
+                    </li>
                     <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
                         <a [routerLink]="['/asset','export']">Export Assets</a>
@@ -249,7 +252,7 @@
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-gojs-task-graph">
-                        <a [routerLink]="['/neighborhood']">GoJS Graph</a>
+                        <a [routerLink]="['/task-graph']">GoJS Task Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-timeline">
                         <a href="/tdstm/task/taskTimeline">Task Timeline</a>

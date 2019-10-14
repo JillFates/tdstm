@@ -26,6 +26,7 @@ import {NeighborhoodComponent} from './components/neighborhood/neighborhood.comp
 import {DialogsModule} from '@progress/kendo-angular-dialog';
 import {TaskViewToggleComponent} from './components/common/task-view-toggle.component';
 import {TooltipModule} from '@progress/kendo-angular-tooltip';
+import {DropDownButtonModule} from '@progress/kendo-angular-buttons';
 
 @NgModule({
 	imports: [
@@ -44,6 +45,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		DateInputsModule,
 		DialogsModule,
 		TooltipModule,
+		DropDownButtonModule,
 		// Route
 		TaskManagerRouteModule
 	],

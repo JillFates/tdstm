@@ -1,12 +1,12 @@
 export interface IGraphNode {
-	task: IGraphTask;
-	successors: any[];
+	task?: IGraphTask;
+	successors?: any[];
 }
 
 export interface IGraphTask {
 	id?: number | string;
 	key?: number | string;
-	taskNumber?: number | string;
+	number?: number | string;
 	label?: string;
 	style?: string;
 	color?: string;
@@ -19,11 +19,13 @@ export interface IGraphTask {
 	successors?: number[];
 	name?: string;
 	icon?: string;
-	actStart?: any;
+	actFinish?: any;
+	actualStart?: any;
 	apiAction?: any;
 	apiActionCompletedAt?: string;
 	apiActionInvokedAt?: string;
 	apiActionSettings?: any;
+	asset?: any;
 	assetEntity?: IAssetEntity;
 	assignedTo?: string;
 	attribute?: string;
@@ -41,12 +43,13 @@ export interface IGraphTask {
 	dueDate?: string;
 	duration?: number;
 	durationLocked?: boolean;
-	durationScale?: IDurationScale;
+	durationScale?: IDurationScale | string;
 	estFinish?: string;
 	estStart?: string;
+	hasAction?: boolean;
 	hardAssigned?: number;
 	instructionsLink?: any;
-	isCriticalPath?: boolean;
+	criticalPath?: boolean;
 	isPublished?: boolean;
 	isAutomatic?: boolean;
 	lastUpdated?: string;
@@ -64,12 +67,14 @@ export interface IGraphTask {
 	sendNotification?: boolean;
 	slack?: any;
 	statusUpdated?: any;
+	startInitial?: number;
 	taskBatch?: ITaskBatch;
 	taskDependencies?: ITaskDependencies[];
 	taskSpec?: number;
-	predecessors?: number[];
+	predecessorIds?: number[];
 	predecessorList?: number[];
 	successorList?: number[];
+	team?: string;
 }
 
 interface IAssetEntity {

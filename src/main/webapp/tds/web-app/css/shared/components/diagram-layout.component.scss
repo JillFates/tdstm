@@ -1,16 +1,21 @@
+
 .diagram-layout-container {
   position: relative;
   //padding-left: 15px;
   //padding-right: 15px;
-  min-height: 530px;
+  height: 100%;
+}
+
+#diagram-layout {
+  width: 100% !important;
 }
 
 .overview-container {
   position: absolute;
   width: 200px;
   height: 100px;
-  top: 10px;
-  left: 15px;
+  bottom: 20px;
+  right: 15px;
   background-color: aliceblue;
   z-index: 300; /* make sure its in front */
   border: solid 1px blue;

@@ -7,10 +7,10 @@ import {
 	SimpleChanges,
 	EventEmitter,
 	ViewChild,
-	ElementRef
+	ElementRef, HostListener, OnDestroy
 } from '@angular/core';
 import * as go from 'gojs';
-import {CATEGORY_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../modules/taskManager/components/common/constants/task-icon-path';
+import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../modules/taskManager/components/common/constants/task-icon-path';
 import {
 	Adornment,
 	Binding,
@@ -25,11 +25,14 @@ import {
 } from 'gojs';
 import {ITaskGraphIcon} from '../../../modules/taskManager/model/task-graph-icon.model';
 import {FA_ICONS} from '../../constants/fontawesome-icons';
-import {ReplaySubject} from 'rxjs';
+import {of, ReplaySubject} from 'rxjs';
 import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
 import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/diagram-context-menu.model';
 import {IGraphTask} from '../../../modules/taskManager/model/graph-task.model';
-import {IDiagramLayoutModel} from './model/diagram-layout.model';
+import * as moment from 'moment';
+import {delay, takeUntil, timeout} from 'rxjs/operators';
+import {NotifierService} from '../../services/notifier.service';
+import {TaskActionEvents} from '../../../modules/taskManager/components/common/constants/task-action-events.constant';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -37,21 +40,13 @@ const enum NodeTemplateEnum {
 	LOW_SCALE
 }
 
-const categoryColors = {
-	physical: 'brown',
-	shutdown: 'red',
-	general: '#ddd',
-	moveday: 'skyblue'
-};
-
 @Component({
 	selector: 'tds-diagram-layout',
 	template: `
 		<div class="diagram-layout-container">
 			<div
 					id="diagram-layout"
-					[style.width]="containerWidth"
-					[style.height]="containerHeight"
+					[style.height]="screenHeight"
 					#diagramLayout></div>
 			<div id="graph-control-btn-group">
 				<button class="btn btn-block">
@@ -74,14 +69,11 @@ const categoryColors = {
 				#overviewContainer></div>
 		</div>`,
 })
-export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
-	@Input() nodeDataArray = [];
-	@Input() linksPath = [];
+export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestroy {
+	@Input() nodeData: any = {};
 	@Input() nodeTemplateOpts: go.Node;
 	@Input() linkTemplateOpts: go.Link;
 	@Input() layoutOpts: go.Layout;
-	@Input() containerWidth: string;
-	@Input() containerHeight: string;
 	@Input() currentUser: any;
 	@Input() contextMenuOptions: IDiagramContextMenuOption;
 	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
@@ -91,11 +83,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	@ViewChild('overviewContainer') overviewContainer: ElementRef;
 	@ViewChild('taskCtxMenu') taskCtxMenu: DiagramContextMenuComponent;
 	stateIcons = STATE_ICONS_PATH;
-	categoryIcons = CATEGORY_ICONS_PATH;
+	assetIcons = ASSET_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 	faIcons = FA_ICONS;
 	diagram: go.Diagram;
-	myModel: go.Model;
+	myModel: go.GraphLinksModel;
 	direction = 0;
 	diagramAvailable = false;
 	tasks: any[];
@@ -103,24 +95,37 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	diagramOverview: Overview;
 	resetOvIndex: boolean;
 	ctxMenuData$: ReplaySubject<IDiagramContextMenuModel> = new ReplaySubject();
+	screenHeight: any;
+	largeArrayRemaining: boolean;
+	DATA_CHUNKS_SIZE = 200;
+	unsubscribe$: ReplaySubject<void> = new ReplaySubject();
 
-	constructor() { /* Constructor */ }
+	constructor(private notifierService: NotifierService) {
+		this.onResize();
+	}
 
 	/**
-	 * Detect changes to update nodeDataArray and linksPath accordingly
+	 * Detect changes to update nodeData and linksPath accordingly
 	 **/
 	ngOnChanges(simpleChanges: SimpleChanges): void {
 		if (simpleChanges) {
-			if ((simpleChanges.nodeDataArray && simpleChanges.nodeDataArray)
-				&& !(simpleChanges.nodeDataArray.firstChange && simpleChanges.nodeDataArray.firstChange)
+			if (simpleChanges.nodeData
+				&& (!!simpleChanges.nodeData.currentValue.data && !!simpleChanges.nodeData.currentValue.linksPath)
+				&& !(simpleChanges.nodeData.firstChange && simpleChanges.nodeData.firstChange)
 			) {
 				this.loadAll();
 			}
 		}
 	}
 
+	@HostListener('window:resize', ['$event'])
+	onResize(event?: any) {
+		this.screenHeight = `${window.innerHeight - 230}px`;
+	}
+
 	ngAfterViewInit() {
-		if (this.nodeDataArray && this.linksPath) {
+		this.notifierService.on(TaskActionEvents.NEIGHBORHOOD, () => this.cleanUpDiagram());
+		if (this.nodeData.data && this.nodeData.linksPath) {
 			this.loadAll();
 		}
 	}
@@ -132,7 +137,60 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		this.loadModel();
 		this.initialiseDiagramContainer();
 		this.generateDiagram();
+	}
 
+	/**
+	 * Load data model used by the diagram
+	 **/
+	loadModel(): void {
+		if (this.nodeData.data.length < 600) {
+			this.myModel = new go.GraphLinksModel(this.nodeData.data, this.nodeData.linksPath);
+		} else {
+			this.myModel = new go.GraphLinksModel(
+				this.nodeData.data.splice(0, this.DATA_CHUNKS_SIZE),
+				this.nodeData.linksPath.splice(0, this.DATA_CHUNKS_SIZE));
+			this.largeArrayRemaining = true;
+		}
+	}
+
+	handleLargeDataArray(): void {
+		this.largeArrayRemaining = false;
+		this.diagram.removeDiagramListener('AnimationFinished', null);
+		const dataCopy = this.nodeData.data.slice();
+		const linksCopy = this.nodeData.linksPath.slice();
+		const dataChunks = [];
+		const linkChunks = [];
+
+		while (dataCopy.length > this.DATA_CHUNKS_SIZE) {
+			dataChunks.push(dataCopy.splice(0, this.DATA_CHUNKS_SIZE));
+		}
+		dataChunks.push(dataCopy);
+
+		while (linksCopy.length > this.DATA_CHUNKS_SIZE) {
+			linkChunks.push(linksCopy.splice(0, this.DATA_CHUNKS_SIZE));
+		}
+		linkChunks.push(linksCopy);
+
+		of(...dataChunks)
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe(chunk => this.addNewNodesToDiagram(chunk));
+
+		of(...linkChunks)
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe(chunk => this.addNewLinksToDiagram(chunk));
+
+	}
+
+	addNewNodesToDiagram(c: any): void {
+		this.diagram.commitTransaction('add node data');
+		this.myModel.addNodeDataCollection(c);
+		this.diagram.commitTransaction('added new node data');
+	}
+
+	addNewLinksToDiagram(c: any): void {
+		this.diagram.commitTransaction('add link data');
+		this.myModel.addLinkDataCollection(c);
+		this.diagram.commitTransaction('added new link data');
 	}
 
 	/**
@@ -141,24 +199,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	initialiseDiagramContainer(): void {
 		if (!this.diagram) {
 			this.diagram = new Diagram(this.diagramLayout.nativeElement);
-		}
-	}
-
-	/**
-	 * Node click handler to set the adornments or any other operation on nodes when clicked
-	 **/
-	onNodeClick(inputEvent: InputEvent, obj: any): void {
-		if (obj && obj.part && obj.part.data) {
-			obj.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
-		}
-	}
-
-	/**
-	 * Load data model used by the diagram
-	 **/
-	loadModel(): void {
-		if (this.nodeDataArray && this.linksPath) {
-			this.myModel = new go.GraphLinksModel(this.nodeDataArray, this.linksPath);
 		}
 	}
 
@@ -180,7 +220,31 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		this.diagramAvailable = true;
 		this.overrideMouseWheel();
 		this.overviewTemplate();
-		this.diagram.commandHandler.zoomToFit();
+		this.diagramListeners();
+	}
+
+	diagramListeners(): void {
+		this.diagram.addDiagramListener('AnimationFinished', () => {
+			if (this.largeArrayRemaining) {
+				this.diagram.animationManager.isEnabled = false;
+				this.handleLargeDataArray();
+				setTimeout(() => {
+					this.diagram.animationManager.isEnabled = true;
+				}, 1000);
+			} else {
+				if (this.diagram.linkTemplate.routing !== go.Link.AvoidsNodes) { this.setDiagramLinksTemplate(); }
+				if (!this.diagram.animationManager.isEnabled) { this.diagram.animationManager.isEnabled = true; }
+			}
+		});
+	}
+
+	/**
+	 * Node click handler to set the adornments or any other operation on nodes when clicked
+	 **/
+	onNodeClick(inputEvent: InputEvent, obj: any): void {
+		if (obj && obj.part && obj.part.data) {
+			obj.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
+		}
 	}
 
 	/**
@@ -199,7 +263,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * @param {any} opts > optional configuration to use for the layout
 	 **/
 	setLayeredDigraphLayout(opts?: any): void {
-		// console.log('direction: ', this.direction);
 		const ldl = new go.LayeredDigraphLayout();
 		ldl.direction = 0;
 		ldl.layerSpacing = 25;
@@ -234,7 +297,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * Sets the template for each node in the Diagram
 	 **/
 	setDiagramNodeTemplate(): void {
-		this.diagram.nodeTemplate = this.setNodeTemplate();
+		if (this.nodeData.data && this.nodeData.data.length >= 600) {
+			this.diagram.scale = 0.3981115219913000;
+			this.lowScaleNodeTemplate();
+		} else {
+			this.diagram.scale = 0.8446089162177968;
+			this.diagram.nodeTemplate = this.setNodeTemplate();
+		}
 	}
 
 	/**
@@ -258,7 +327,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		}
 
 		const linkTemplate = new go.Link();
-		linkTemplate.routing = go.Link.AvoidsNodes;
+		linkTemplate.routing = this.largeArrayRemaining ? go.Link.Orthogonal : go.Link.AvoidsNodes;
 		linkTemplate.corner = 5;
 
 		const linkShape = new go.Shape();
@@ -274,7 +343,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * Links template configuration
 	 **/
 	setDirection(dir: any): void {
-		// console.log('Direction: ', dir.target.value);
 		this.direction = dir.target.value;
 	}
 
@@ -290,8 +358,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		}
 
 		this.actualNodeTemplate = NodeTemplateEnum.HIGH_SCALE;
+
 		const node = new go.Node(go.Panel.Horizontal);
 		node.selectionAdorned = true;
+		node.padding = new go.Margin(0, 0, 0, 0);
 		node.add(this.containerPanel());
 		node.contextMenu = this.contextMenu();
 
@@ -339,6 +409,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		container.strokeWidth = 2;
 		container.stroke = '#ddd';
 		container.fill = 'white';
+		container.margin = new go.Margin(0, 0, 0, 0);
 
 		return container;
 	}
@@ -349,6 +420,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	containerPanel(): go.Panel {
 		const panel = new go.Panel(go.Panel.Auto);
 		panel.background = '#fff';
+		panel.padding = new go.Margin(0, 0, 0, 0);
 
 		panel.add(this.containerShape());
 		panel.add(this.panelBody());
@@ -361,9 +433,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 **/
 	panelBody(): go.Panel {
 		const panel = new go.Panel(go.Panel.Horizontal);
-
+		panel.padding = new go.Margin(0, 0, 0, 0);
+		panel.margin = new go.Margin(0, 0, 0, 0);
 		panel.add(this.iconShape());
-		panel.add(this.categoryIconShape());
+		panel.add(this.assetIconShape());
 		panel.add(this.textBlockShape());
 
 		return panel;
@@ -373,44 +446,75 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * Icon shape configuration
 	 * @param {any} options > optional configuration to use for the icon shape
 	 **/
-	iconShape(options?: any): Shape {
+	iconShape(options?: any): go.TextBlock {
 		if (options) { return options; }
 
-		const  iconShape = new Shape();
-		iconShape.figure = 'RoundedRectangle';
-		iconShape.margin = 5;
-		iconShape.strokeWidth = 2;
-		iconShape.stroke = 'white';
-		iconShape.fill = 'white';
-		iconShape.desiredSize = new go.Size(25, 25);
-		iconShape.isGeometryPositioned = true;
-		iconShape.position = new go.Point(0, 0);
-		iconShape.bind(new Binding('background', 'status',
-			(val: string) => this.getStatusBackground(this.stateIcons[val.toLowerCase()])));
-		iconShape.bind(new Binding('geometry', 'status',
+		const  iconShape = new go.TextBlock();
+		// iconShape.figure = 'RoundedRectangle';
+		// iconShape.isGeometryPositioned = true;
+		// iconShape.strokeWidth = 2;
+		iconShape.textAlign = 'center';
+		iconShape.verticalAlignment = go.Spot.Center;
+		iconShape.margin = new go.Margin(0, 0, 0, 5);
+		iconShape.desiredSize = new go.Size(35, 35);
+		iconShape.font = '25px FontAwesome';
+
+		iconShape.bind(new Binding('text', 'status',
 			(val: string) => this.getIcon(this.stateIcons[val.toLowerCase()])));
+
+		iconShape.bind(new Binding('stroke', 'status',
+			(val: string) => this.getIconColor(this.stateIcons[val.toLowerCase()])));
+
+		iconShape.bind(new Binding('fill', 'status',
+			(val: string) => this.getIconColor(this.stateIcons[val.toLowerCase()])));
+
+		iconShape.bind(new Binding('background', 'status',
+			(val: string) => this.getBackgroundColor(this.stateIcons[val.toLowerCase()])));
 
 		return iconShape;
 	}
 
 	/**
-	 * Icon shape configuration for 'category' property
+	 * Icon shape configuration for 'asset' property
 	 * @param {any} options > optional configuration to use for the icon shape
 	 **/
-	categoryIconShape(options?: any): Shape {
+	assetIconShape(options?: any): go.TextBlock {
 		if (options) { return options; }
 
-		const  categoryIconShape = new Shape();
-		categoryIconShape.figure = 'RoundedRectangle';
-		categoryIconShape.margin = 8;
-		categoryIconShape.strokeWidth = 2;
-		categoryIconShape.desiredSize = new go.Size(25, 25);
-		categoryIconShape.stroke = '#ddd';
-		categoryIconShape.fill = '#908f8f';
-		categoryIconShape.bind(new Binding('geometry', 'category',
-			(val: string) => this.getIcon(this.categoryIcons[val.toLowerCase()])));
+		const  assetIconShape = new go.TextBlock();
+		// assetIconShape.figure = 'RoundedRectangle';
+		// assetIconShape.strokeWidth = 2;
+		// assetIconShape.fill = '#908f8f';
+		assetIconShape.textAlign = 'center';
+		assetIconShape.verticalAlignment = go.Spot.Center;
+		assetIconShape.margin = new go.Margin(0, 0, 0, 5);
+		assetIconShape.desiredSize = new go.Size(35, 35);
+		assetIconShape.font = '25px FontAwesome';
 
-		return categoryIconShape;
+		assetIconShape.bind(new Binding('text', 'asset',
+			(val: any) => {
+				if (val) {
+					return this.getIcon(this.assetIcons[val && val.assetType.toLowerCase()]);
+				} else {
+					return this.assetIcons.unknown.iconAlt;
+				}
+			}));
+
+		assetIconShape.bind(new Binding('stroke', 'asset',
+			(val: any) => this.getIconColor(this.assetIcons[val.assetType.toLowerCase()])));
+
+		assetIconShape.bind(new Binding('fill', 'asset',
+			(val: any) => this.getIconColor(this.assetIcons[val.assetType.toLowerCase()])));
+
+		assetIconShape.bind(new Binding('background', 'asset',
+			(val: any) => this.getBackgroundColor(this.stateIcons[val.assetType.toLowerCase()])));
+		// assetIconShape.bind(new Binding('geometry', 'asset',
+		// 	(val: any) => {
+		// 		if (val && val.assetType) { return this.getIcon(this.assetIcons[val.assetType.toLowerCase()]); }
+		// 		return go.Geometry.parse(this.assetIcons.unknown.icon);
+		// 	}));
+
+		return assetIconShape;
 	}
 
 	/**
@@ -425,7 +529,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 		textBlock.stroke = 'black';
 		textBlock.font = 'bold 16px sans-serif';
 		// textBlock.wrap = TextBlock.WrapBreakAll;
-		textBlock.bind(new Binding('text', 'comment'));
+		textBlock.bind(new Binding('text', 'name'));
 		return textBlock;
 	}
 
@@ -435,19 +539,25 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 **/
 	getIcon(icon: ITaskGraphIcon): any {
 		if (!icon) {
-			return go.Geometry.parse(this.categoryIcons.unknown.icon);
-			// return this.stateIcons.unknown;
+			return this.assetIcons.unknown.iconAlt;
 		}
-		return go.Geometry.parse(icon.icon);
-		// return this.stateIcons[name];
+		return icon.iconAlt;
 	}
 
 	/**
 	 * Status background handler to get background color for an icon by status
 	 * @param {ITaskGraphIcon} icon > icon from which to get background color
 	 **/
-	getStatusBackground(icon: ITaskGraphIcon): string {
-		return icon.background;
+	getIconColor(icon: ITaskGraphIcon): string {
+		return (icon && icon.color) || this.assetIcons.unknown.color;
+	}
+
+	/**
+	 * Status background handler to get background color for an icon by status
+	 * @param {ITaskGraphIcon} icon > icon from which to get background color
+	 **/
+	getBackgroundColor(icon: ITaskGraphIcon): string {
+		return (icon && icon.background) || this.assetIcons.unknown.background;
 	}
 
 	/**
@@ -480,11 +590,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	}
 
 	/**
-	 * highlight nodes by category name on the diagram
+	 * highlight nodes by asset type on the diagram
 	 **/
-	highlightNodesByCategory(matches: any[]): void {
+	highlightNodesByAssetType(matches: any[]): void {
 		this.diagram.commit(d => {
-			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.category));
+			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.asset && f.data.asset.assetType));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
@@ -510,7 +620,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 **/
 	highlightNodesByTeam(matches: any[]): void {
 		this.diagram.commit(d => {
-			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.userSelectedCol3));
+			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.team));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
@@ -525,7 +635,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	highlightNodesByText(match: string): void {
 		this.diagram.commit(d => {
 			if (match.length <= 0) { return d.clearSelection(); }
-			const highlightCollection = d.nodes.filter(f => f.data.comment.toLowerCase().includes(match.toLowerCase()));
+			const highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
@@ -537,7 +647,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	 * Override mousewheel handler to add the zooming scales
 	 **/
 	overrideMouseWheel(): void {
-		// console.log('overriding mouse wheel event');
 		const tool = this.diagram.currentTool;
 		tool.standardMouseWheel = () => {
 			go.Tool.prototype.standardMouseWheel.call(tool);
@@ -588,7 +697,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 
 		node.add(this.iconShape());
 
-		node.add(this.categoryIconShape());
+		node.add(this.assetIconShape());
 		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
@@ -621,7 +730,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	}
 
 	/**
-	 * Node bubble color based on category
+	 * Node bubble color based on status
 	 **/
 	getStatusColor(name: string): string {
 		if (!this.stateIcons[name]) { return '#ddd'; }
@@ -679,13 +788,23 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges {
 	updateNode(data: IGraphTask): void {
 		this.diagram.commit(d => {
 			const update = Object.assign({}, data);
-			if (!update.key) { update.key = data.taskNumber; }
-			console.log('update key: ', update.key, d.nodes.map(n => n.part.data.key));
+			if (!update.key) { update.key = data.number; }
 			const node = d.nodes.filter(f => f.part.data.key === update.key).first();
-			console.log('node: ', node.part.data);
 			node.part.data = update;
 			node.updateAdornments();
 		});
+	}
+
+	cleanUpDiagram(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
+		this.diagram.clear();
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
 	}
 
 }

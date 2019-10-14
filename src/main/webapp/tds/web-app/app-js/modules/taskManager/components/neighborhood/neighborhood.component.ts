@@ -3,12 +3,14 @@ import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
 import {distinct, map, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
+import {clone} from 'ramda';
+import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
+import {DropDownButtonComponent} from '@progress/kendo-angular-buttons/dist/es2015/dropdownbutton/dropdownbutton.component';
 
 import {TaskService} from '../../service/task.service';
 import {DiagramLayoutComponent} from '../../../../shared/components/diagram-layout/diagram-layout.component';
 import {IGraphNode, IGraphTask, TASK_OPTION_LABEL} from '../../model/graph-task.model';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
-import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {IMoveEvent} from '../../model/move-event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
@@ -34,9 +36,9 @@ import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-
 import {AssetExplorerModule} from '../../../assetExplorer/asset-explorer.module';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
+import {Title} from '@angular/platform-browser';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -44,12 +46,11 @@ import {AlertType} from '../../../../shared/model/alert.model';
 })
 export class NeighborhoodComponent implements OnInit {
 	tasks: IGraphNode[];
-	nodeData$: BehaviorSubject<any[]> = new BehaviorSubject([]);
-	links$: BehaviorSubject<any[]> = new BehaviorSubject([]);
+	nodeData$: BehaviorSubject<any> = new BehaviorSubject({});
 	ctxMenuOpts$: ReplaySubject<IDiagramContextMenuOption> = new ReplaySubject(2);
 	@ViewChild('graph') graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
-	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownListComponent;
+	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownButtonComponent;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -66,16 +67,14 @@ export class NeighborhoodComponent implements OnInit {
 	icons = FA_ICONS;
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
-	isEventDropdownOpen: boolean;
-	isTeamHighlightDropdownOpen: boolean;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	userContext: UserContextModel;
 	viewUnpublished: boolean;
 	myTasks: boolean;
 	minimizeAutoTasks: boolean;
 	urlParams: any;
-	teamHighlights$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
-	selectedTeamHighlight: string;
+	teamHighlights$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
+	selectedTeam: string;
 	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 
@@ -88,7 +87,8 @@ export class NeighborhoodComponent implements OnInit {
 			private dialogService: UIDialogService,
 			private notifierService: NotifierService,
 			private location: Location,
-			private translatePipe: TranslatePipe
+			private translatePipe: TranslatePipe,
+			private titleService: Title
 		) {
 				this.activatedRoute.queryParams.subscribe(params => {
 					if (params) { this.urlParams = Object.assign({}, params); }
@@ -96,6 +96,7 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.titleService.setTitle('Task Graph');
 		this.loadAll();
 	}
 
@@ -104,11 +105,6 @@ export class NeighborhoodComponent implements OnInit {
 		this.loadUserContext();
 		this.loadFilters();
 		this.loadEventList();
-		this.eventsDropdownOpened();
-		this.eventsDropdownClosed();
-		this.subscribeToEvents();
-		// this.teamHighlightDropdownOpened();
-		// this.teamHighlightDropdownClosed();
 	}
 
 	subscribeToEvents(): void {
@@ -183,7 +179,6 @@ export class NeighborhoodComponent implements OnInit {
 		this.taskService.findTask(taskId, filters)
 			.subscribe((res: IGraphNode[]) => {
 				if (res && res.length > 0) {
-					console.log('tasks:', res);
 					this.tasks = res;
 					this.generateModel();
 				}
@@ -194,7 +189,6 @@ export class NeighborhoodComponent implements OnInit {
 	 * Load events to fill events dropdown
 	 **/
 	loadEventList() {
-			console.log('evenList');
 			this.eventList$ = this.reportService
 				.getEventList()
 				.pipe(map(res => res.data));
@@ -205,8 +199,6 @@ export class NeighborhoodComponent implements OnInit {
 	 * @param {number} moveEventId of moveEvent to load tasks from
 	 **/
 	loadFromSelectedEvent(moveEventId?: number): void {
-		if (this.tasks) { return; }
-
 		const filters = {
 			myTasks: this.myTasks ? '1' : '0',
 			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
@@ -214,10 +206,7 @@ export class NeighborhoodComponent implements OnInit {
 		};
 		this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
 		.subscribe(res => {
-			this.tasks = res.tasks
-				.map(t =>
-					({task: t, successors: t.successors.includes(',')
-							? t.successors.split(',') : [t.successors]}));
+			this.tasks = res;
 			this.generateModel();
 		});
 	}
@@ -244,7 +233,6 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	checkboxFilterChange(): void {
-		console.log(this.tasks, !!this.tasks.find(t => t.task.id === Number(this.urlParams.taskId)));
 		// If actual task used by diagram comes from task manager neighborhood button, then reload
 		// from tasks endpoint, else load tasks from the actual selected event
 		if (this.urlParams && this.urlParams.taskId
@@ -262,20 +250,26 @@ export class NeighborhoodComponent implements OnInit {
 		if (!this.tasks) { return; }
 		const nodeDataArr = [];
 		const linksPath = [];
+		const teams = [];
 
 		const tasksCopy = this.tasks.slice();
 
-		// Add tasks to nodeDataArray constant
-		// and create linksPath object from taskNumber and successors
+		// Add tasks to nodeData constant
+		// and create linksPath object from number and successors
 		tasksCopy.map((t: IGraphNode | any) => {
-			t.task.key = t.task.taskNumber;
-			if (!t.task.successors) { t.task.successors = t.successors; }
-			nodeDataArr.push(t.task);
-			linksPath.push(...this.getLinksPath(t.task.taskNumber, t.successors))
-		});
 
-		this.nodeData$.next(nodeDataArr);
-		this.links$.next(linksPath);
+			const predecessorIds = t.task.predecessorIds && t.task.predecessorIds;
+
+			t.task.key = t.task.id;
+			if (!!t.task.team && !teams.includes(t.task.team)) { teams.push(t.task.team); }
+			nodeDataArr.push(t.task);
+
+			if (predecessorIds && predecessorIds.length > 0) {
+				linksPath.push(...this.getLinksPathByPredecessorIds(t.task.id, predecessorIds));
+			}
+		});
+		this.teamHighlights$.next(teams.map(t => ({label: t})));
+		this.nodeData$.next({ data: nodeDataArr, linksPath });
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
 	}
@@ -353,13 +347,32 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	/**
-	 * Load events to fill events dropdown
+	 * create LinksPath object from task succesors
+	 * @param {string | number} taskNumber
+	 * @param {number[]} successors
 	 **/
-	getLinksPath(taskNumber: string | number, successors: number[]): ILinkPath[] {
+	getLinksPathBySuccessors(taskNumber: string | number, successors: number[]): ILinkPath[] {
 		if (successors && successors.length > 0) {
 			return successors.map(dep => ({
 				from: taskNumber,
 				to: dep
+			}));
+		}
+		return [];
+	}
+
+	/**
+	 * create LinksPath object from task predecessorIds
+	 * @param {string | number} taskId
+	 * @param {number[]} predecessorIds
+	 **/
+	getLinksPathByPredecessorIds(taskId: string | number, predecessorIds: number[]): ILinkPath[] {
+		if (predecessorIds && predecessorIds.length > 0) {
+			return predecessorIds
+				.filter(f => !!this.tasks.find(t => t.task.id === f))
+				.map(pre => ({
+				from: pre,
+				to: taskId
 			}));
 		}
 		return [];
@@ -398,7 +411,7 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	highlightByCategory(category: string): void {
 		const matches = [category];
-		this.graph.highlightNodesByCategory(matches);
+		this.graph.highlightNodesByAssetType(matches);
 	}
 
 	/**
@@ -412,8 +425,8 @@ export class NeighborhoodComponent implements OnInit {
 	/**
 	 * highlight nodes by team on the diagram
 	 **/
-	highlightByTeam(team: string): void {
-		const matches = [team];
+	highlightByTeam(team: any): void {
+		const matches = [team.label];
 		this.graph.highlightNodesByTeam(matches);
 	}
 
@@ -429,46 +442,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	zoomOut() {
 		this.graph.zoomOut();
-	}
-
-	/**
-	 * When events dropdown is opened remove z-index from minimap so that the options are visible
-	 **/
-	eventsDropdownOpened(): void {
-		this.eventsDropdown.open.subscribe(() => {
-			this.isEventDropdownOpen = false;
-			this.graph.resetOverviewIndex();
-		})
-	}
-
-	/**
-	 * When events dropdown is closed reset z-index on minimap so that it's visible on top of th diagram
-	 **/
-	eventsDropdownClosed(): void {
-		this.eventsDropdown.close.subscribe(() => {
-			this.isEventDropdownOpen = false;
-			this.graph.restoreOverviewIndex();
-		})
-	}
-
-	/**
-	 * When Team Highlight dropdown is opened remove z-index from minimap so that the options are visible
-	 **/
-	teamHighlightDropdownOpened(): void {
-		this.teamHighlightDropdown.open.subscribe(() => {
-			this.isTeamHighlightDropdownOpen = false;
-			this.graph.resetOverviewIndex();
-		})
-	}
-
-	/**
-	 * When Team Highlight dropdown is closed reset z-index on minimap so that it's visible on top of th diagram
-	 **/
-	teamHighlightDropdownClosed(): void {
-		this.teamHighlightDropdown.close.subscribe(() => {
-			this.isTeamHighlightDropdownOpen = false;
-			this.graph.restoreOverviewIndex();
-		})
 	}
 
 	/**
@@ -500,7 +473,6 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	start(data?: ITaskEvent): void {
 		if (data) {
-			console.log('start data: ', data);
 			const payload = {
 				id: `${data.task.id}`,
 				status: TaskStatus.STARTED,
@@ -522,7 +494,6 @@ export class NeighborhoodComponent implements OnInit {
 	hold(data?: ITaskEvent): void {
 
 		if (data) {
-			console.log('start data: ', data);
 			const payload = {
 				id: `${data.task.id}`,
 				status: TaskStatus.HOLD,
@@ -545,7 +516,6 @@ export class NeighborhoodComponent implements OnInit {
 	done(data?: ITaskEvent): void {
 
 		if (data) {
-			console.log('start data: ', data);
 			const payload = {
 				id: `${data.task.id}`,
 				status: TaskStatus.COMPLETED,
@@ -568,7 +538,9 @@ export class NeighborhoodComponent implements OnInit {
 	invoke(data?: ITaskEvent): void {
 		this.taskService.invokeAction(`${data.task.id}`)
 			.subscribe((result) => {
-				console.log('result: ', result);
+				if (result) {
+					this.updateGraphNode(result);
+				}
 			});
 	}
 
@@ -579,7 +551,9 @@ export class NeighborhoodComponent implements OnInit {
 
 		this.taskService.resetTaskAction(Number(data.task.id))
 			.subscribe((result) => {
-				console.log('result: ', result);
+				if (result) {
+					this.updateGraphNode(result);
+				}
 			});
 
 	}
@@ -588,8 +562,6 @@ export class NeighborhoodComponent implements OnInit {
 	 * Show task detail context menu option
 	 **/
 	showTaskDetails(data?: ITaskEvent): void {
-		if (data.task) { data.task.predecessorList = data.task.predecessors || [1, 2, 3] }
-		if (data.task) { data.task.successorList = data.task.successors || [] }
 
 		let taskDetailModel: TaskDetailModel = {
 			id: `${data.task.id}`,
@@ -605,11 +577,10 @@ export class NeighborhoodComponent implements OnInit {
 			{provide: TaskDetailModel, useValue: taskDetailModel}
 		], false, false)
 			.then(result => {
-				console.log('result: ', result);
 				this.updateGraphNode(result.assetComment);
 			}).catch(result => {
 			if (result) {
-				console.log('catch: ', result);
+				console.error('catch: ', result);
 			}
 		});
 	}
@@ -661,18 +632,16 @@ export class NeighborhoodComponent implements OnInit {
 	 * @param data: ITaskEvent
 	 */
 	showAssetDetail(data: ITaskEvent): void {
-		const assetId = data.task.assetEntity.id;
-		if (assetId) {
-			this.taskService.getClassForAsset(`${assetId}`).subscribe(res => {
+		const asset = data.task.asset;
+		if (asset  && asset.id) {
+			this.taskService.getClassForAsset(`${asset.id}`).subscribe(res => {
 				if (res.assetClass) {
 					this.dialogService.open(AssetShowComponent,
 						[UIDialogService,
-							{ provide: 'ID', useValue: data.task.assetEntity.id },
+							{ provide: 'ID', useValue: asset.id },
 							{ provide: 'ASSET', useValue: res.assetClass },
 							{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-						], DIALOG_SIZE.LG).then(result => {
-						// console.log('success: ' + result);
-					}).catch(result => {
+						], DIALOG_SIZE.LG).catch(result => {
 						console.error('rejected: ' + result);
 					});
 				} else {
