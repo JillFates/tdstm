@@ -12,7 +12,7 @@ class DataviewManageImportBatchesExcel implements CommandObject {
 	int offset
 
 	static constraints = {
-		max nullable: false, inList: [0, 25, 50, 100]
+		max nullable: false, inList: [0, 25, 50, 100, 250]
 		offset nullable: true, min: 0
 	}
 }
