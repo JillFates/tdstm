@@ -28,6 +28,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
         at MenuPage
         projectsModule.goToProviders()
         at ProvidersPage
@@ -41,6 +42,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         at ProvidersPage
         // create second provider to be deleted
         waitFor{createBtn.click()}
+        sleep(1000)
         at CreateProviderPage
         waitFor {providerNameField.displayed}
         providerNameField = provName2
@@ -78,7 +80,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         when: 'The user clicks on delete button'
             clickDeleteButton()
         then:'The Confirmation Required modal is displayed'
-            commonsModule.waitForDialogModalDisplayed()
+            waitFor{confirmation.displayed}
     }
 
     def "3. The user clicks the No button and provider is not deleted"() {
@@ -94,7 +96,7 @@ class ProviderDeletionSpec extends GebReportingSpec{
         given: 'The user clicks the Delete button'
             clickDeleteButton()
         when: 'The user clicks Yes on the confirmation modal'
-            commonsModule.waitForDialogModalDisplayed()
+            waitFor{confirmation.displayed}
             commonsModule.clickOnButtonDialogModalByText("Yes")
         then:'The Providers page is displayed'
             at ProvidersPage
@@ -126,12 +128,12 @@ class ProviderDeletionSpec extends GebReportingSpec{
         when: 'The user clicks on delete action button in grid'
             clickOnFirstProviderDeleteActionButton()
         then:'Delete confirmation modal is displayed'
-            commonsModule.waitForDialogModalDisplayed()
+            waitFor{confirmation.displayed}
     }
 
     def "8. The user clicks on No and the 2nd provider is not deleted"() {
         given: 'The User is on the Providers delete confirmation modal'
-            commonsModule.waitForDialogModalDisplayed()
+            waitFor{confirmation.displayed}
         and: 'The user clicks on No button'
             commonsModule.clickOnButtonDialogModalByText("No")
         when: 'Providers list page is displayed'
@@ -148,16 +150,16 @@ class ProviderDeletionSpec extends GebReportingSpec{
         when: 'The user clicks on delete action button in providers grid'
             clickOnFirstProviderDeleteActionButton()
         then:'Delete confirmation modal is displayed'
-            commonsModule.waitForDialogModalDisplayed()
+            confirmation.displayed
     }
 
     def "10. The user deletes the 2nd provider created"() {
         given: 'The user is in confirmation modal'
-            commonsModule.waitForDialogModalDisplayed()
+            confirmation.displayed
         when: 'The User clicks on Yes button in confirmation modal'
             commonsModule.clickOnButtonDialogModalByText("Yes")
         then: 'Confirmation modal is closed'
-            commonsModule.waitForDialogModalHidden()
+            !confirmation.displayed
     }
 
     def "11. The user verifies the 2nd provider is deleted"() {
