@@ -4,6 +4,8 @@ import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
+import net.minidev.json.JSONObject
+import net.minidev.json.parser.JSONParser
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.imports.DataScript
@@ -15,7 +17,7 @@ import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.InvalidParamException
-import org.grails.web.json.JSONObject
+import org.apache.commons.io.FilenameUtils
 import com.tdssrc.grails.StopWatch
 
 /**
@@ -236,8 +238,13 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		renderErrorJson("Error: Preview must be in JSON format.") // TODO: Add support for Excel/CSV file JSON responses in WS.
-		// response.outputStream << is
+		if(FilenameUtils.getExtension(filename) != 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
+			renderErrorJson("Error: Preview must be in JSON format.")
+		} else {
+			JSONParser parser = new JSONParser()
+			JSONObject data = (JSONObject) parser.parse(new InputStreamReader(is))
+			renderSuccessJson(data)
+		}
 		is.close()
 
 	}
