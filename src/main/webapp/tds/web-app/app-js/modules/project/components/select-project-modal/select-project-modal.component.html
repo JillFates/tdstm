@@ -1,0 +1,35 @@
+<div tds-autofocus tds-handle-escape class="modal-content select-project-modal-component">
+    <div class="modal-header">
+        <h4 class="modal-title">{{'PROJECT.SELECT_PROJECT' | translate }}</h4>
+    </div>
+    <div class="modal-body">
+		<div [ngSwitch]="projects.length">
+			<label class="title-missing-project" *ngSwitchCase="0">{{ 'PROJECT.NO_ACTIVE_PROJECTS' | translate}} </label>
+			<label class="title-missing-project" *ngSwitchDefault>{{ 'PROJECT.MISSING_PROJECT' | translate}} </label>
+		</div>
+        <form name="form"
+              role="form"
+              data-toggle="validator"
+              class="form-horizontal"
+			  #form='ngForm'>
+			<div class="project-list-container">
+				<div *ngFor="let project of projects; let idx = index;">
+					<label for="project{{project.id}}" class="select-project">
+						<input id="project{{project.id}}" type="radio" value="{{project.id}}" name="projectId" [(ngModel)]="selectedProjectId" >
+						<span>{{project.name}}</span>
+					</label>
+				</div>
+			</div>
+        </form>
+    </div>
+
+    <div class="modal-footer form-group-center">
+		<div class="col-sm-12" *ngIf="projects.length > 0">
+			<tds-button-custom  (click)="onContinue()"
+				icon="check" 
+				title="Continue" 
+				class="btn-primary pull-left">
+			</tds-button-custom>
+		</div>
+	</div>
+</div>

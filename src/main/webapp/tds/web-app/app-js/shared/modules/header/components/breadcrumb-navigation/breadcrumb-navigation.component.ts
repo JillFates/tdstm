@@ -27,7 +27,7 @@ declare var jQuery: any;
                     <small>{{pageMetaData.instruction | translate}}</small>
                 </h1>
                 <div class="breadcrumb licensing-banner-message"
-                     *ngIf="userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
+                     *ngIf="userContext.licenseInfo && userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
                     <div class="callout">
                         <p><strong>{{userContext.licenseInfo.license.banner}}</strong></p>
                     </div>
