@@ -65,7 +65,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				switch (accessibleProjects.size()) {
 					// If they have access to no project, add the error and return.
 					case 0:
-						responseWriter.print(JsonUtil.toJson([error: "No project available for the given user."]))
+						responseWriter.print(JsonUtil.toJson([error: 'There are currently no active projects to choose from.  Please contact your administrator for assistance.']))
 						responseWriter.flush()
 						return
 					// If there's exactly one project, automatically set that project as the current one.
