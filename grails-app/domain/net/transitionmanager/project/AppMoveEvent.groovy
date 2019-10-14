@@ -10,7 +10,7 @@ class AppMoveEvent {
 
 	static constraints = {
 		application nullable: true
-		moveEvent nullable: true
+		moveEvent nullable: true, fetch: 'join'
 		value nullable: true
 	}
 }

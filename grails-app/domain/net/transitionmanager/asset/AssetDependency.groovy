@@ -59,6 +59,8 @@ class AssetDependency {
 
 	static mapping = {
 		autoTimestamp false
+		asset fetch: 'join'
+		dependent fetch: 'join'
 		comment sqltype: 'text'
 		createdBy column: 'created_by'
 		id column: 'asset_dependency_id'
@@ -89,14 +91,20 @@ class AssetDependency {
 		return AssetDependency.findAll(
 			'from AssetDependency where dependent=?0 order by asset.assetType, asset.assetName asc',
 			[assetEntity]
-		)
+		).collect{
+			it.asset = GrailsHibernateUtil.unwrapIfProxy(it.asset)
+			it
+		}
 	}
 
 	static List<AssetDependency> fetchRequiredDependenciesOf(AssetEntity assetEntity){
 		return AssetDependency.findAll(
 			'from AssetDependency where asset=?0 order by dependent.assetType, dependent.assetName asc',
 			[assetEntity]
-		)
+		).collect{
+			it.asset = GrailsHibernateUtil.unwrapIfProxy(it.asset)
+			it
+		}
 	}
 
 	/**

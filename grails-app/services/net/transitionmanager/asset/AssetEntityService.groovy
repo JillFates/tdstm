@@ -1481,7 +1481,8 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[   assetId: assetEntity?.id,
+		[
+			assetId: assetEntity?.id,
 		    assetComment: assetComment,
 		    assetCommentList: assetCommentList,
 		    dateFormat: userPreferenceService.getDateFormat(),
