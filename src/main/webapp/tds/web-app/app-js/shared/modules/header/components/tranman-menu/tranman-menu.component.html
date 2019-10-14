@@ -188,7 +188,7 @@
                     </li>
                     <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
-                        <a [routerLink]="['/asset','export']">Export Assets</a>
+                        <a [routerLink]="['/export','assets']">Export Assets</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets-etl">
                         <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>

@@ -19,14 +19,25 @@ class ProvidersDetailPage extends Page{
         deleteBtn {$("button", class:"btn btn-danger")}
         closeXIcon {$("button", "aria-label":"Close" , class:"close" , type:"button").find("span", "aria-hidden":"true")[0]}
         commonsModule { module CommonsModule }
+
+        //Confirmation popup
+        confirmation (required: false) {$("div.modal-content")[2]}
+        yesBtn (required: false) {confirmation.find("button.btn-primary", type: "submit")}
+
     }
 
     def clickDeleteButton(){
         waitFor{deleteBtn.click()}
+        sleep(1000)
     }
 
     def clickOnXButton(){
         waitFor{closeXIcon.click()}
         commonsModule.waitForDialogModalHidden()
     }
+
+    def clickYesButton(){
+        waitFor{yesBtn.click()}
+    }
+
 }

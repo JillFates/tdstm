@@ -136,7 +136,9 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
 		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
-		this.renderer.setStyle(target, 'height', '36px');
+		if (target) {
+			this.renderer.setStyle(target, 'height', '36px');
+		}
 	}
 
 	protected openEventDialogCreate(): void {

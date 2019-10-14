@@ -55,6 +55,7 @@ export class ProjectService {
 
 	saveProject(model, originalFilename = '', id = ''): Observable<any> {
 		model['originalFilename'] = originalFilename;
+		model['partnerIds'] = model.partners.map(p => p.id);
 		return this.http.post(`../ws/project/saveProject/${id}`, model)
 				.map((response: any) => {
 					return response;
