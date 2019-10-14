@@ -144,11 +144,13 @@ class DataTransferBatchController implements ControllerMethods {
 		DataviewManageImportBatchesExcel dataviewParams = populateCommandObject(DataviewManageImportBatchesExcel)
 		validateCommandObject(dataviewParams)
 
-		List<DataTransferBatch> dataTransferBatchList = (dataviewParams.max == 0) ?
-			DataTransferBatch.findAllByProjectAndTransferMode(project, "I",
-				[sort: "dateCreated", order: "desc"])
-			: DataTransferBatch.findAllByProjectAndTransferMode(project, "I",
-			[sort: "dateCreated", order: "desc", max: dataviewParams.max, offset: dataviewParams.offset ?: 0])
+		Map findAllParams = [sort: "dateCreated", order: "desc"]
+		if((dataviewParams.max > 0)) {
+			findAllParams << [ max: dataviewParams.max, offset: dataviewParams.offset]
+		}
+
+		List<DataTransferBatch> dataTransferBatchList = DataTransferBatch.
+			findAllByProjectAndTransferMode(project, "I", findAllParams)
 
 		def result = []
 		for (DataTransferBatch entry in dataTransferBatchList) {
