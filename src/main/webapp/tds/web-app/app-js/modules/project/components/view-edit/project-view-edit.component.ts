@@ -83,7 +83,7 @@ export class ProjectViewEditComponent implements OnInit {
 			comment: '',
 			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectMetrics: true,
+			collectMetrics: 1,
 			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
@@ -141,7 +141,7 @@ export class ProjectViewEditComponent implements OnInit {
 				let projectModel = this.projectModel;
 				// Fill the model based on the current person.
 				Object.keys(data.projectInstance).forEach((key) => {
-					if (key in projectModel && data.projectInstance[key]) {
+					if (key in projectModel && data.projectInstance[key] !== null) {
 						projectModel[key] = data.projectInstance[key];
 					}
 				});
