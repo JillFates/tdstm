@@ -1912,6 +1912,7 @@ class ProjectService implements ServiceMethods {
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
 			planMethodology = projectCommand.planMethodology
+			collectMetrics = projectCommand.collectMetrics ? 1 : 0
 			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn

@@ -54,7 +54,7 @@ export class ProjectCreateComponent implements OnInit {
 			comment: '',
 			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectMetrics: true,
+			collectMetrics: 1,
 			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
