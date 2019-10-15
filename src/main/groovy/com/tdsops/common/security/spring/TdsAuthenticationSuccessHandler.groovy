@@ -123,7 +123,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					if (hasUnacknowledgedNotices) {
 						addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
 					}
-					signInInfoMap.notices.noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson())
+					signInInfoMap.notices.noticesList = noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson())
 				}
 
 				addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
