@@ -12,7 +12,7 @@ package com.tdsops.etl
  * @param values
  * @return
  */
-class ETLFindElement implements ETLStackableCommand, UndefinedLocalVariableValidator {
+class ETLFindElement implements ETLStackableCommand {
 
 
 	/**
