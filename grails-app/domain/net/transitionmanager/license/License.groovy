@@ -58,18 +58,28 @@ class License {
 		bannerMessage	nullable:true
 	}
 
+	static transients = [ 'projectInstance' ]
+
 	boolean isActive(){
 		return (hash)? true : false
 	}
 
 	PartyGroup getClient(){
 		PartyGroup client
-		if(project != "all") {
-			Project project = Project.get(project)
-			client = project?.client
+		Project prj = projectInstance
+		if(prj) {
+			client = prj.client
 		}
 
 		return client
+	}
+
+	Project getProjectInstance() {
+		Project prj
+		if(project != "all") {
+			prj = Project.get(project)
+		}
+		return prj
 	}
 
 	/*
@@ -85,43 +95,43 @@ class License {
 				  // metricsGathering: false  // TODO: this is the client part of "Metrics Gathering" variable used by "tmci" to gather info is required in the CLIENT?
 		]
 
-		if(project != "all"){
-			Project prj = Project.get(project)
-			dProject.id = prj?.id
-			dProject.name = prj?.name
-			dProject.guid = prj?.guid
+		Project prj = projectInstance
+		if(prj){
+			dProject.id   = prj.id
+			dProject.name = prj.name
+			dProject.guid = prj.guid
 		}
 
 		String toEmail = (grailsApplication.config.tdstm?.license?.request_email) ?: ''
 
 		Map data = [
-			id				: id,
-			email			: email,
-			toEmail			: toEmail,
-			environment		: environment?.name(),
+			id         : id,
+			email      : email,
+			toEmail    : toEmail,
+			environment: environment?.name(),
 			owner: [
-				id: owner?.id,
+				id  : owner?.id,
 				name: owner?.name
 			],
-			type			: type?.name(),
-			method			: [
+			type  : type?.name(),
+			method: [
 				name: method?.name(),
 				max : max
 			],
-			status			: status?.name(),
-			installationNum	: installationNum,
-			project			: dProject,
-			client			: [
-			        id: client?.id,
-					name: client?.name
+			status         : status?.name(),
+			installationNum: installationNum,
+			project        : dProject,
+			client         : [
+				id  : client?.id,
+				name: client?.name
 			],
-			activationDate	: activationDate?.format("yyyy-MM-dd"),
-			expirationDate 	: expirationDate?.format("yyyy-MM-dd"),
-			requestDate		: requestDate,
-			requestNote		: requestNote,
-			hostName		: hostName,
-			websitename		: websitename,
-			bannerMessage	: bannerMessage
+			activationDate: activationDate?.format("yyyy-MM-dd"),
+			expirationDate: expirationDate?.format("yyyy-MM-dd"),
+			requestDate   : requestDate,
+			requestNote   : requestNote,
+			hostName      : hostName,
+			websitename   : websitename,
+			bannerMessage : bannerMessage
 		]
 
 		return data
