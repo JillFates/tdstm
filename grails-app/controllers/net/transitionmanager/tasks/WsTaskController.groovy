@@ -327,6 +327,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		Integer offset = paginationRowOffset(currentPage, maxRows)
 
 		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
+		userPreferenceService.setPreference(UserPreferenceEnum.MY_TASK, params.justMyTasks)
 		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
 		userPreferenceService.setMoveEventId params.moveEvent
 

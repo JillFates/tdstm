@@ -8,6 +8,7 @@ class ListTaskCommand implements CommandObject {
 	Integer page            = 0
 	Integer justRemaining   = 1
 	Integer viewUnpublished = 0
+	Integer justMyTasks     = 0
 	Long    moveEvent       = 0
 	String  sortColumn
 	String  sortOrder       = 'ASC'
@@ -49,7 +50,7 @@ class ListTaskCommand implements CommandObject {
 	String taskSpec
 
 	static constraints = {
-
+		justMyTasks range: 0..1, nullable: true
 		justRemaining range: 0..1, nullable: true
 		viewUnpublished range: 0..1, nullable: true
 		sortOrder inList: ['ASC', 'DESC']
