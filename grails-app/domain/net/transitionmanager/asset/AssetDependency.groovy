@@ -59,8 +59,8 @@ class AssetDependency {
 
 	static mapping = {
 		autoTimestamp false
-		asset fetch: 'join'
-		dependent fetch: 'join'
+		asset fetch: 'join', lazy: false
+		dependent fetch: 'join', lazy: false
 		comment sqltype: 'text'
 		createdBy column: 'created_by'
 		id column: 'asset_dependency_id'
