@@ -82,7 +82,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 
 			// This map will contain all the user-related data that needs to be sent in the response's payload.
 			Map signInInfoMap = [
-				userContext: userService.getUserContext(alternativeProjects).toMap()
+				userContext: userService.getUserContext(alternativeProjects).toMap(),
+				notices: [:]
 			]
 
 			if (securityService.shouldLockoutAccount(userLogin)) {
@@ -122,6 +123,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					if (hasUnacknowledgedNotices) {
 						addAttributeToSession(request, SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
 					}
+					signInInfoMap.notices.noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson())
 				}
 
 				addAttributeToSession(request, SecurityUtil.REDIRECT_URI, redirectUri)
@@ -129,10 +131,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				removeAttributeFromSession(request, TdsHttpSessionRequestCache.SESSION_EXPIRED)
 				removeAttributeFromSession(request, SecurityUtil.ACCOUNT_LOCKED_OUT)
 
-				signInInfoMap.notices = [
-					noticesList: noticeService.fetchPersonPostLoginNotices(securityService.loadCurrentPerson()),
-					redirectUrl: redirectUri
-				]
+				signInInfoMap.notices.redirectUrl = redirectUri
+
 			}
 
 
