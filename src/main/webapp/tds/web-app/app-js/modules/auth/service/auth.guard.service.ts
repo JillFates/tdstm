@@ -12,21 +12,20 @@ import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
 import {Observable} from 'rxjs';
 import {WindowService} from '../../../shared/services/window.service';
 import {TaskManagerRoutingStates} from '../../taskManager/task-manager-routing.states';
+import {UserContextModel} from '../model/user-context.model';
+import {UserContextService} from './user-context.service';
 
 @Injectable()
-export class AuthGuardService implements CanActivate, OnInit {
-
-	public licenseRequiredUrls = [TaskManagerRoutingStates.TASK_MANAGER_LIST]
+export class AuthGuardService implements CanActivate {
+	private userContext: UserContextModel;
 
 	constructor(
+		private appSettingsService: UserContextService,
 		private permissionService: PermissionService,
 		private windowService: WindowService,
 		private router: Router,
 		private store: Store) {
-	}
-
-	ngOnInit() {
-
+		this.getUserContext();
 	}
 
 	/**
@@ -35,7 +34,12 @@ export class AuthGuardService implements CanActivate, OnInit {
 	 * @param route
 	 * @param state
 	 */
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+		let requiresLicense: boolean = route.data['requiresLicense'];
+		if (requiresLicense && (!this.userContext.licenseInfo || !this.userContext.licenseInfo.license.isValid)) {
+			this.windowService.getWindow().location.href = '/tdstm/errorHandler/licensing';
+			return false;
+		}
 		let requiresPermission: string[] = route.data['requiresPermissions'];
 		// Always get Permissions, even if the view does not have it in order to make it available for the component
 		return this.permissionService.getPermissions().map(() => {
@@ -55,6 +59,12 @@ export class AuthGuardService implements CanActivate, OnInit {
 			localStorage.removeItem(APP_STATE_KEY);
 			this.windowService.getWindow().location.href = '/tdstm/module/auth/login';
 			return Observable.of(true);
+		});
+	}
+
+	protected getUserContext(): void {
+		this.appSettingsService.getUserContext().subscribe( (userContext: UserContextModel) => {
+			this.userContext = userContext;
 		});
 	}
 }
