@@ -34,8 +34,6 @@ import {AssetViewExportComponent} from './components/asset-view-export/asset-vie
 import {AssetViewGridComponent} from './components/asset-view-grid/asset-view-grid.component';
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
-import {ExportComponent} from './components/asset-export/export.component';
-import {ExportAssetService} from './service/export-asset.service';
 
 @NgModule({
 	imports: [
@@ -61,8 +59,7 @@ import {ExportAssetService} from './service/export-asset.service';
 		AssetViewSaveComponent,
 		AssetViewExportComponent,
 		AssetViewGridComponent,
-		AssetViewShowComponent,
-		ExportComponent
+		AssetViewShowComponent
 	],
 	providers: [
 		// Resolve
@@ -75,7 +72,6 @@ import {ExportAssetService} from './service/export-asset.service';
 		CustomDomainService,
 		AssetExplorerService,
 		TagService,
-		ExportAssetService,
 		AssetGlobalFiltersService
 	],
 	exports: [],
