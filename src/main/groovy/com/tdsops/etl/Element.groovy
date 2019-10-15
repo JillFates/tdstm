@@ -601,14 +601,14 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	}
 
 	/**
-	 * prefix a value and load it into a field
-	 * @param el
-	 * @return
+	 * Prefix a value and load it into a field
+	 * @param prefixValue
+	 * @return the element instance that received this command
 	 */
-	Element prepend(Object el) {
-		if (el) {
-			checkUndefinedLocalVariable(el)
-			this.value = String.valueOf(el) + this.toString()
+	Element prepend(Object prefixValue) {
+		if (prefixValue) {
+			checkUndefinedLocalVariable(prefixValue)
+			this.value = String.valueOf(prefixValue) + this.toString()
 		}
 
 		return this

@@ -34,13 +34,11 @@ class ETLBinding extends Binding {
 			throw new MissingPropertyException(name, this.getClass())
 		}
 
-		Object result = variables.get(name)
-
-		if (result == null && !variables.containsKey(name)) {
-			result = new LocalVariableDefinition(name)
+		if (variables.containsKey(name)) {
+			return variables.get(name)
+		} else {
+			return new LocalVariableDefinition(name)
 		}
-
-		return result
 	}
 
 	/**
