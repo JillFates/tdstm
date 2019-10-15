@@ -7,9 +7,7 @@ import {Store} from '@ngxs/store';
 import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
-import {LicenseInfo, PostNotices} from '../../../auth/action/login.actions';
-import {withLatestFrom} from 'rxjs/operators';
-import {forkJoin} from 'rxjs';
+import {PostNotices} from '../../../auth/action/login.actions';
 
 // Model
 
@@ -36,18 +34,19 @@ export class SelectProjectModalComponent {
 		const project = this.projects.find((project: any) => {
 			return project.id === selectedId;
 		});
-		// Set New Select Project at the user level
-		this.store.dispatch(new SetProject({
-			id: project.id,
-			name: project.name,
-			logoUrl: project.logoUrl
-		}));
 
 		// Set the preference at the Server Side
 		this.preferenceService.setPreference(PREFERENCES_LIST.CURR_PROJ, `${project.id}`).subscribe(() => {
-			// Get again the License Info and the Post Notices
-			this.store.dispatch([new PostNotices(), new LicenseInfo()]).subscribe(() => {
-				this.activeDialog.close({success: true});
+			// Set New Select Project at the user level
+			this.store.dispatch(
+				new SetProject({
+					id: project.id,
+					name: project.name,
+					logoUrl: project.logoUrl
+				})).subscribe(() => {
+				this.store.dispatch(new PostNotices()).subscribe(() => {
+					this.activeDialog.close({success: true});
+				});
 			});
 		});
 	}
