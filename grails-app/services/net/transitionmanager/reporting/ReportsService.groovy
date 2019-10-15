@@ -1202,10 +1202,6 @@ class ReportsService implements ServiceMethods {
             exceptionString += "No Tasks"
         }
 
-        TaskTimeLineGraph graph = cpaResults.graph
-        TimelineSummary summary = cpaResults.summary
-        List<Task> tasks = cpaResults.tasks
-
         Closure<String> htmlConverter = { TaskVertex taskVertex, Task task ->
             String content = "<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()}"
             if (task.taskSpec) {
@@ -1219,6 +1215,10 @@ class ReportsService implements ServiceMethods {
         }
 
         if (cpaResults) {
+
+            TaskTimeLineGraph graph = cpaResults.graph
+            TimelineSummary summary = cpaResults.summary
+            List<Task> tasks = cpaResults.tasks
 
             if (!summary.hasCycles()) {
                 cyclicalsError = greenSpan('Cyclical References: OK')
