@@ -17,6 +17,6 @@ class LocalVariableDefinition {
 	}
 
 	String toString() {
-		return "LocalVariable:$name"
+		return "$name"
 	}
 }
