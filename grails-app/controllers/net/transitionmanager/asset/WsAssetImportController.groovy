@@ -5,7 +5,6 @@ import com.tdssrc.grails.JsonUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.minidev.json.JSONObject
-import net.minidev.json.parser.JSONParser
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.imports.DataScript
@@ -238,12 +237,10 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		if(FilenameUtils.getExtension(filename) != 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
-			renderErrorJson("Error: Preview must be in JSON format.")
+		if(FilenameUtils.getExtension(filename) == 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
+			renderSuccessJson(JsonUtil.parseFile(is))
 		} else {
-			JSONParser parser = new JSONParser()
-			JSONObject data = (JSONObject) parser.parse(new InputStreamReader(is))
-			renderSuccessJson(data)
+			renderErrorJson("Error: Preview must be in JSON format.")
 		}
 		is.close()
 
