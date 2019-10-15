@@ -14,6 +14,7 @@ import {WindowService} from '../../../shared/services/window.service';
 import {TaskManagerRoutingStates} from '../../taskManager/task-manager-routing.states';
 import {UserContextModel} from '../model/user-context.model';
 import {UserContextService} from './user-context.service';
+import {UserContextState} from '../state/user-context.state';
 
 @Injectable()
 export class AuthGuardService implements CanActivate {
@@ -63,8 +64,6 @@ export class AuthGuardService implements CanActivate {
 	}
 
 	protected getUserContext(): void {
-		this.appSettingsService.getUserContext().subscribe( (userContext: UserContextModel) => {
-			this.userContext = userContext;
-		});
+		this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 	}
 }
