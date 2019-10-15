@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {pathOr} from 'ramda'
@@ -13,7 +13,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
-import {PreferenceService} from '../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 
 /**
  * @name EventsService
@@ -46,6 +46,7 @@ export class EventsService {
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
 	/**
@@ -232,9 +233,9 @@ export class EventsService {
 				let userTimeZone = this.preferenceService.getUserTimeZone();
 				eventModels.forEach((r) => {
 					r.estStartTime =  r.estStartTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estStartTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estStartTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 					r.estCompletionTime =  r.estCompletionTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estCompletionTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estCompletionTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return eventModels;
 			})

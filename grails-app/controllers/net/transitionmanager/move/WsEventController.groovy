@@ -70,7 +70,7 @@ class WsEventController implements ControllerMethods {
 		List<MoveEvent> events = moveEventService.listMoveEvents(project)
 		List<Map> eventsMap = events.collect { MoveEvent event ->
 			Map presetPropertiesMap = ['moveBundlesString': event.getMoveBundlesString()]
-			GormUtil.domainObjectToMap(event, MoveEvent.BASIC_EVENT_FIELDS, null, false, presetPropertiesMap)
+			GormUtil.domainObjectToMap(event, MoveEvent.DETAILED_LIST_FIELDS, null, false, presetPropertiesMap)
 		}
 		renderSuccessJson(eventsMap)
 	}
