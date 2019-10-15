@@ -46,10 +46,7 @@ export class SelectProjectModalComponent {
 		// Set the preference at the Server Side
 		this.preferenceService.setPreference(PREFERENCES_LIST.CURR_PROJ, `${project.id}`).subscribe(() => {
 			// Get again the License Info and the Post Notices
-			forkJoin([
-				this.store.dispatch(new PostNotices()),
-				this.store.dispatch(new LicenseInfo())
-			]).subscribe(() => {
+			this.store.dispatch([new PostNotices(), new LicenseInfo()]).subscribe(() => {
 				this.activeDialog.close({success: true});
 			});
 		});
