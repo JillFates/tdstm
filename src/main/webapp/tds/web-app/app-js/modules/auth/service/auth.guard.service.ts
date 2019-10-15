@@ -1,5 +1,5 @@
 // Angular
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 // State
 import {Logout} from '../action/login.actions';
@@ -11,15 +11,22 @@ import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
 // Others
 import {Observable} from 'rxjs';
 import {WindowService} from '../../../shared/services/window.service';
+import {TaskManagerRoutingStates} from '../../taskManager/task-manager-routing.states';
 
 @Injectable()
-export class AuthGuardService implements CanActivate {
+export class AuthGuardService implements CanActivate, OnInit {
+
+	public licenseRequiredUrls = [TaskManagerRoutingStates.TASK_MANAGER_LIST]
 
 	constructor(
 		private permissionService: PermissionService,
 		private windowService: WindowService,
 		private router: Router,
 		private store: Store) {
+	}
+
+	ngOnInit() {
+
 	}
 
 	/**
