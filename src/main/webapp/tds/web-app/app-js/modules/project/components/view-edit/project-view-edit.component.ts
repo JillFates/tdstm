@@ -165,7 +165,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectModel.completionDate.setHours(0, 0, 0, 0);
 				let methodologyField = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.planMethodologies.forEach((methodology) => {
-					if (methodology.field == methodologyField) {
+					if (methodology.field === methodologyField) {
 						this.projectModel.planMethodology = methodology;
 					}
 				});
