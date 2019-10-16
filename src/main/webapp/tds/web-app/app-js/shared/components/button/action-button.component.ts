@@ -29,7 +29,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-filter,
 		tds-button-save,
 		tds-button-undo,
-		tds-button-allergies
+		tds-button-script
 	`,
 	template: `
 		<button *ngIf="button"
