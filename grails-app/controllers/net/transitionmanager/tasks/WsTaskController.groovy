@@ -134,7 +134,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 
 	/**
 	 * Sign a Provided Message using the QZCertificate
-	 * @see https://qz.io/wiki/2.0-signing-messages
+	 * @see "https://qz.io/wiki/2.0-signing-messages"
 	 */
 	@HasPermission(Permission.TaskSignMessage)
 	def qzSignMessage() {
@@ -279,42 +279,42 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def listTasks(ListTaskCommand params) {
 		validateCommandObject(params)
 		Map<String, String> definedSortableFields = [
-			'comment'           : 'comment',
-			'assetName'         : 'assetName',
-			'assetType'         : 'assetType',
-			'taskNumber'        : 'taskNumber',
-			'dueDate'           : 'dueDate',
-			'status'            : 'status',
-			'assignedTo'        : 'assignedTo',
-			'apiAction'         : 'apiAction',
-			'role'              : 'role',
-			'actFinish'         : 'actFinish',
-			'actStart'          : 'actStart',
-			'category'          : 'category',
-			'commentType'       : 'commentType',
-			'percentageComplete': 'percentageComplete',
-			'createdBy'         : 'createdBy',
-			'dateCreated'       : 'dateCreated',
-			'dateResolved'      : 'dateResolved',
-			'displayOption'     : 'displayOption',
-			'duration'          : 'duration',
-			'durationScale'     : 'durationScale',
-			'estFinish'         : 'estFinish',
-			'estStart'          : 'estStart',
-			'hardAssigned'      : 'hardAssigned',
-			'instructionsLink'  : 'instructionsLink',
-			'isPublished'       : 'isPublished',
-			'lastUpdated'       : 'lastUpdated',
-			'bundle'            : 'bundle',
-			'event'             : 'event',
-			'priority'          : 'priority',
-			'resolution'        : 'resolution',
-			'resolvedBy'        : 'resolvedBy',
-			'sendNotification'  : 'sendNotification',
-			'statusUpdated'     : 'statusUpdated',
-			'taskSpec'          : 'taskSpec',
-			'score'             : 'score',
-			'updatedTime'       :'statusUpdated'
+				'actFinish'         : 'actFinish',
+				'actStart'          : 'actStart',
+				'apiAction'         : 'apiAction',
+				'assetName'         : 'assetName',
+				'assetType'         : 'assetType',
+				'assignedTo'        : 'assignedTo',
+				'bundle'            : 'bundle',
+				'category'          : 'category',
+				'comment'           : 'comment',
+				'createdBy'         : 'createdBy',
+				'dateCreated'       : 'dateCreated',
+				'dateResolved'      : 'dateResolved',
+				'dueDate'           : 'dueDate',
+				'duration'          : 'duration',
+				'durationScale'     : 'durationScale',
+				'estFinish'         : 'estFinish',
+				'estStart'          : 'estStart',
+				'event'             : 'event',
+				'hardAssigned'      : 'hardAssigned',
+				'instructionsLink'  : 'instructionsLink',
+				'isCriticalPath'    : 'isCriticalPath',
+				'isPublished'       : 'isPublished',
+				'lastUpdated'       : 'lastUpdated',
+				'latestFinish'      : 'latestFinish',
+				'latestStart'       : 'latestStart',
+				'percentageComplete': 'percentageComplete',
+				'priority'          : 'priority',
+				'role'              : 'role',
+				'score'             : 'score',
+				'sendNotification'  : 'sendNotification',
+				'slack'				: 'slack',
+				'status'            : 'status',
+				'statusUpdated'     : 'statusUpdated',
+				'taskNumber'        : 'taskNumber',
+				'taskSpec'          : 'taskSpec',
+				'updatedTime'       : 'statusUpdated'
 		].withDefault { key -> '' }
 
 		Project project = getProjectForWs()
