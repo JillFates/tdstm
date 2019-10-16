@@ -238,14 +238,14 @@ class AssetComment {
 		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestStart formula: '''
 				if(slack is null, est_start, 
-					if(est_start + slack, date_format(addtime(est_start,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+					if(est_start + slack, DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(est_start)+slack*60),'%Y-%m-%d %H:%i:%s'), null)
 				)
 			'''
 
 		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestFinish formula: '''
 				if(slack is null, est_finish, 
-					if(est_finish + slack, date_format(addtime(est_finish,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+					if(est_finish + slack, DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(est_finish)+slack*60),'%Y-%m-%d %H:%i:%s'), null)
 				)
 			'''
 
