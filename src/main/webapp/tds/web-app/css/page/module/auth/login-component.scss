@@ -31,6 +31,7 @@ div.login-component {
         .login-password__clr-container {
           .clr-input-group {
             padding-right: 0px;
+            max-width: inherit;
             .clr-input-group-icon-action {
               right: 31px;
               position: relative;
@@ -40,6 +41,14 @@ div.login-component {
             }
             .clr-input.clr-focus, .clr-input:focus {
               border-bottom: 1px solid #0092d1;
+            }
+          }
+          .clr-error {
+            .clr-input {
+              border-bottom-color: #c72100 !important;
+            }
+            .clr-validate-icon {
+              margin-left: -3px;
             }
           }
         }
