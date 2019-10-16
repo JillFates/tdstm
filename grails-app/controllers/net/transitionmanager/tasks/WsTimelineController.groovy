@@ -3,11 +3,10 @@ package net.transitionmanager.tasks
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
-import net.transitionmanager.command.task.ExportTimelineCommand
 import net.transitionmanager.command.task.CalculateTimelineCommandObject
+import net.transitionmanager.command.task.ExportTimelineCommand
 import net.transitionmanager.command.task.ReadTimelineCommandObject
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
@@ -37,31 +36,38 @@ class WsTimelineController implements ControllerMethods {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		Boolean recalculate = commandObject.isRecalculate()
 
-		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
 		List<Task> tasks = cpaResults.tasks
 
 		Date startDate
+		Date endDate
 		if (recalculate) {
-			startDate = findEarliestStartVertex(graph.vertices)
+			startDate = findEarliestStartVertex(graph.getStarts())?.earliestStartDate
+			endDate = findLatestFinishVertex(graph.getSinks())?.latestFinishDate
 		} else {
-			startDate = findEarliestStartTask(tasks)
+			List<Task> startTasks = tasks.findAll { it.taskNumber in [graph.getStarts()*.taskNumber] }
+			List<Task> sinkTasks = tasks.findAll { it.taskNumber in [graph.getSinks()*.taskNumber] }
+			startDate = findEarliestStartTask(startTasks)?.estStart
+			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
 		}
 
-		render([
+
+		renderAsJson(
 			data: [
 				sinks    : graph.sinks.collect { it.taskId },
 				starts   : graph.starts.collect { it.taskId },
 				startDate: startDate,
+				endDate  : endDate,
 				cycles   : summary.cycles.collect { it.collect { it.taskId } },
 				tasks    : tasks.collect { Task task ->
 					TaskVertex taskVertex = graph.getVertex(task.taskNumber)
 					[
 						id            : task.id,
 						number        : task.taskNumber,
-						asset         : GormUtil.domainObjectToMap(task.assetEntity,['id', 'assetName', 'assetType', 'assetClass']),
+						asset         : GormUtil.domainObjectToMap(task.assetEntity, ['id', 'assetName', 'assetType', 'assetClass']),
 						name          : task.comment,
 						criticalPath  : recalculate ? taskVertex.isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
@@ -78,13 +84,14 @@ class WsTimelineController implements ControllerMethods {
 						team          : task.role,
 						isAutomatic   : task.isAutomatic(),
 						hasAction     : task.hasAction(),
-						predecessorIds: task.taskDependencies.findAll { it.successor.id == task.id }.collect {
+						predecessorIds: task.taskDependencies?.findAll { it.successor.id == task.id }.collect {
 							it.predecessor.id
 						}
 					]
+
 				}
 			]
-		] as JSON)
+		)
 	}
 
 	@HasPermission(Permission.TaskTimelineView)
@@ -94,13 +101,13 @@ class WsTimelineController implements ControllerMethods {
 		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
-		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
 		}
 
-		render(buildResponse(cpaResults) as JSON)
+		renderAsJson(buildResponse(cpaResults))
 	}
 
 	@HasPermission(Permission.TaskTimelineView)
@@ -110,13 +117,15 @@ class WsTimelineController implements ControllerMethods {
 		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
-		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent)
+		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent, commandObject.viewUnpublished)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
 			throw new RuntimeException('Can not calculate critical path analysis with cycles')
 		}
 
-		render(buildResponse(cpaResults) as JSON)
+		renderAsJson(
+			message: cpaResults.tasks.size() + ' tasks updated'
+		)
 	}
 
 	@HasPermission(Permission.TaskViewCriticalPath)
@@ -126,7 +135,7 @@ class WsTimelineController implements ControllerMethods {
 		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
-		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
+		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.showAll)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
@@ -302,8 +311,18 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskVertexList list of {@code TaskVertex}
 	 * @return lowest earliestStartDate from a list of {@code TaskVertex}
 	 */
-	private Date findEarliestStartVertex(Collection<TaskVertex> taskVertexList) {
-		return taskVertexList.min { it.earliestStartDate }.earliestStartDate
+	private TaskVertex findEarliestStartVertex(Collection<TaskVertex> taskVertexList) {
+		return taskVertexList.min { it.earliestStartDate }
+	}
+
+	/**
+	 * Given a list of {@code TaskVertex} it calculate the latest latestFinishDate
+	 *
+	 * @param taskVertexList list of {@code TaskVertex}
+	 * @return latest latestFinishDate from a list of {@code TaskVertex}
+	 */
+	private TaskVertex findLatestFinishVertex(Collection<TaskVertex> taskVertexList) {
+		return taskVertexList.max { it.latestFinishDate }
 	}
 
 	/**
@@ -312,7 +331,18 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskList list of {@code Task}
 	 * @return lowest estStart from a list of {@code Task}
 	 */
-	private Date findEarliestStartTask(List<Task> taskList) {
-		return taskList.min { it.estStart }.estStart
+	private Task findEarliestStartTask(List<Task> taskList) {
+		return taskList.min { it.estStart }
 	}
+
+	/**
+	 * Given a list of {@code Task} it calculate the latest estFinish
+	 *
+	 * @param taskList list of {@code Task}
+	 * @return latest estFinish from a list of {@code Task}
+	 */
+	private Task findLatestFinishTask(List<Task> taskList) {
+		return taskList.min { it.estFinish }
+	}
+
 }
