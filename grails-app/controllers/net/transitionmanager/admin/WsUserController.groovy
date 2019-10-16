@@ -107,7 +107,7 @@ class WsUserController implements ControllerMethods {
 		Person person = currentPerson()
 
 		if(id && id != "undefined") {
-			if (projectService.hasAccessToProject(id)) {
+			if (projectService.hasAccessToProject(id.toLong())) {
 				project = Project.findById(id.toLong())
 				userPreferenceService.setCurrentProjectId(project.id)
 			} else {
