@@ -2692,14 +2692,14 @@ function parseStartDate(startDate) {
 function exportCriticalPath() {
     var eventId = $('#moveEventId').val();
     if (eventId && (eventId != 0) && (!$('#exportCriticalPathButton').hasClass('disabledLabel'))) {
-        window.open(tdsCommon.createAppURL("/wsTimeLine/exportCPA?showAll=true&id=" + eventId), '_blank');
+        window.open(tdsCommon.createAppURL("/wsTimeline/exportCPA?showAll=true&id=" + eventId), '_blank');
     }
 }
 
 function baselinePlan() {
     var eventId = $('#moveEventId').val();
     if (eventId && (eventId != 0) && (!$('#baselinePlanButton').hasClass('disabledLabel'))) {
-        window.open(tdsCommon.createAppURL("/wsTimeLine/baseline?id=" + eventId), '_blank');
+        window.open(tdsCommon.createAppURL("/wsTimeline/baseline?id=" + eventId), '_blank');
     }
 }
 

@@ -64,7 +64,6 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -1202,10 +1201,6 @@ class ReportsService implements ServiceMethods {
             exceptionString += "No Tasks"
         }
 
-        TaskTimeLineGraph graph = cpaResults.graph
-        TimelineSummary summary = cpaResults.summary
-        List<Task> tasks = cpaResults.tasks
-
         Closure<String> htmlConverter = { TaskVertex taskVertex, Task task ->
             String content = "<li>${taskVertex.taskId} ${taskVertex.taskComment?.encodeAsHTML()}"
             if (task.taskSpec) {
@@ -1219,6 +1214,10 @@ class ReportsService implements ServiceMethods {
         }
 
         if (cpaResults) {
+
+            TaskTimeLineGraph graph = cpaResults.graph
+            TimelineSummary summary = cpaResults.summary
+            List<Task> tasks = cpaResults.tasks
 
             if (!summary.hasCycles()) {
                 cyclicalsError = greenSpan('Cyclical References: OK')
@@ -1738,7 +1737,7 @@ class ReportsService implements ServiceMethods {
         def projectNameFont = book.createFont()
         projectNameFont.setFontHeightInPoints((short)12)
         projectNameFont.setFontName("Arial")
-        projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+        projectNameFont.setBold(true)
 
         def projectNameCellStyle
         projectNameCellStyle = book.createCellStyle()

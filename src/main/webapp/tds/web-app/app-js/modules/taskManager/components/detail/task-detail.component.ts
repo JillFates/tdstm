@@ -69,7 +69,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private userContextService: UserContextService) {
 
 		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
@@ -141,7 +141,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @param task
 	 */
 	public openTaskDetail(task: any, modalType: ModalType): void {
-		this.close({commentInstance: {id: task.taskId}, shouldOpenTask: true});
+		this.close({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
 	}
 
 	public onCollapseTaskDetail(): void {

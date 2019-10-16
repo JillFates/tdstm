@@ -15,7 +15,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
-		width: 100,
+		width: 80,
 		locked: false,
 		filterable: true
 	},
@@ -23,7 +23,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Description',
 		property: 'comment',
 		type: 'text',
-		width: 200,
+		width: 240,
 		locked: false,
 		filterable: true
 	},
@@ -66,7 +66,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Status',
 		property: 'status',
 		type: 'text',
-		width: 100,
+		width: 80,
 		locked: false,
 		cellClass: 'task-status',
 		filterable: true
@@ -109,7 +109,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Score',
 		property: 'score',
 		type: 'number',
-		width: 80,
+		width: 60,
 		locked: false
 	},
 ];

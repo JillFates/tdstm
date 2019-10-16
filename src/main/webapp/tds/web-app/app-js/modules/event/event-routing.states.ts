@@ -48,6 +48,7 @@ export const EventRoute: Routes = [
 				menu: ['EVENT.DASHBOARD', 'EVENT.EVENT']
 			},
 			requiresAuth: true,
+			requiresLicense: true
 		},
 		component: EventDashboardComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]

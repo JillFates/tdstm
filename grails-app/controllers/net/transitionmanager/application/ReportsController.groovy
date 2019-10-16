@@ -1,10 +1,5 @@
 package net.transitionmanager.application
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetDependencyBundle
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
@@ -19,29 +14,33 @@ import com.tdssrc.grails.WebUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeCategory
-import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
-import net.transitionmanager.controller.ControllerMethods
-import net.transitionmanager.project.AppMoveEvent
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.person.Person
-import net.transitionmanager.project.Project
-import net.transitionmanager.project.ProjectTeam
-import net.transitionmanager.security.Permission
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetDependencyBundle
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.command.metricdefinition.MetricDefinitionsCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.reporting.MetricReportingService
-import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.project.AppMoveEvent
+import net.transitionmanager.project.MoveBundle
+import net.transitionmanager.project.MoveBundleService
+import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.project.MoveEventService
+import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
+import net.transitionmanager.project.ProjectTeam
+import net.transitionmanager.reporting.MetricReportingService
+import net.transitionmanager.reporting.ReportsService
+import net.transitionmanager.security.Permission
+import net.transitionmanager.task.AssetComment
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Font
 import org.springframework.jdbc.core.JdbcTemplate
 
 import java.text.DateFormat
@@ -940,7 +939,7 @@ class ReportsController implements ControllerMethods {
 		def projectNameFont = book.createFont()
 		projectNameFont.setFontHeightInPoints((short)12)
 		projectNameFont.setFontName("Arial")
-		projectNameFont.setBoldweight(Font.BOLDWEIGHT_BOLD)
+		projectNameFont.setBold(true)
 
 		def projectNameCellStyle
 		projectNameCellStyle = book.createCellStyle()
