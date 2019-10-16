@@ -39,6 +39,8 @@
 							<div class="tds-action-button-set">
 								<tds-button-edit tooltip="Edit Name" [disabled]="!isUpdateAvailable()" (click)="onEditDataScript(dataItem)">
 								</tds-button-edit>
+								<tds-button-allergies tooltip="Edit Script" [disabled]="!isUpdateAvailable()" (click)="onEditDataScript(dataItem)">
+								</tds-button-allergies>
 								<tds-button-delete  [disabled]="!isDeleteAvailable()" (click)="onDeleteDataScript(dataItem)">
 								</tds-button-delete>
 							</div>
