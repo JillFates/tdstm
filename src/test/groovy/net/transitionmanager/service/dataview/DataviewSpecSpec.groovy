@@ -198,7 +198,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			}
 	}
 
-	void 'test can throw an exception creating a DataviewSpec with extra incorrect filters'() {
+	void 'test no exception is thrown when creating a DataviewSpec with extra incorrect filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
