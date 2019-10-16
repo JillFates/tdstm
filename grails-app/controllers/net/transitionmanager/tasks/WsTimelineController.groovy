@@ -54,7 +54,6 @@ class WsTimelineController implements ControllerMethods {
 			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
 		}
 
-
 		renderAsJson(
 			data: [
 				sinks    : graph.sinks.collect { it.taskId },

@@ -6,6 +6,8 @@ var debug = {};
 
 $(document).ready(function () {
 	// check keyup on the search field for the enter key
+	$('#baselinePlanButton').hide();
+
 	$('#searchBoxId').keyup(function (e) {
 		if (e.keyCode == 13)
 			$('#SubmitButtonId').submit();
@@ -18,10 +20,17 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
-	//generateGraph();
-    submitForm();
-});
+	$("input[name=mode]").on('change', function(ev) {
+		if(ev && ev.target && ev.target.value === 'C'){
+			$('#baselinePlanButton').hide();
+		}else {
+			$('#baselinePlanButton').show();
+		}
+		generateGraph();
+	});
 
+	generateGraph();
+});
 
 function displayWarningOrErrorMsg(isCyclical) {
 	var message = d3.select('div.body')
@@ -42,8 +51,6 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param status
  */
 function buildGraph(response, status) {
-    console.log('buildGraph');
-    console.log(response);
 
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
@@ -60,11 +67,10 @@ function buildGraph(response, status) {
 	// parse the data received from the server
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
-	console.log(data)
 	var ready = false;
-
+	var items = data.tasks;
 	// if the event has no tasks show an error message and exit
-	if (data.items.size() == 0) {
+	if (items.length === 0) {
 		displayWarningOrErrorMsg(false)
 		return;
 	}
@@ -83,7 +89,6 @@ function buildGraph(response, status) {
 	var scrollingLabelsPerformanceCutoff = 50;
 
 	// data received from the server
-	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
 	var siblingGroups = [];
@@ -130,19 +135,13 @@ function buildGraph(response, status) {
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
-	console.log('doing scale calculations:');
-    console.log('\t > parseStartDate(data.startDate) = ', parseStartDate(data.startDate));
-    console.log('\t > items[items.length - 1].end = ', items[items.length - 1].end);
-    //return
-	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].end);
+	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].estFinish);
 	var x = d3.time.scale()
-		.domain([parseStartDate(data.startDate), items[items.length - 1].end])
+		.domain([parseStartDate(data.startDate), items[items.length - 1].estFinish])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
 		.range([0, x.range()[1] * zoomScale]);
-    console.log('\t > x = ', x.domain(), '-->', x.range());
-    console.log('\t > x1 = ', x1.domain(), '-->', x1.range());
     //return
 	// perform the stacking layout algorithm then determine the width and height of the graphs
 	var maxStack = calculateStacks();
@@ -164,7 +163,7 @@ function buildGraph(response, status) {
 
 	// populate the Team select
 	var teamSelect = null;
-	populateTeamSelect();
+	// populateTeamSelect();
 
 
 	// stores data and functions used for dragging on the mini graph
@@ -453,13 +452,11 @@ function buildGraph(response, status) {
 	}
 
 	// stores the svg elements for the graph axis
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ', axisDefs);
 	var axisElements = {
 		mainMinuteAxis: mainTranslator.append('svg:g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
 			.call(function(a, b){
-			    console.log('aaaaaaaaaa ', a)
 			    axisDefs.x1MainGraphAxis(a, b);
             }),
 
@@ -473,8 +470,6 @@ function buildGraph(response, status) {
 			.attr('class', 'axis hour')
 			.call(axisDefs.xHourAxis)
 	}
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ after ', axisElements);
-
 
 	// construct the line representing the current time
 	var mainNowLine = mainTranslator.append('svg:line')
@@ -626,9 +621,9 @@ function buildGraph(response, status) {
 		});
 
 		// handle when the user changes the team filtering select
-		teamSelect.on('change', function () {
-			display(true, true);
-		});
+		// teamSelect.on('change', function () {
+		// 	display(true, true);
+		// });
 
 		// bind the zoom button listeners
 		$('#zoomInButtonId').on('click', function () {
@@ -929,7 +924,7 @@ function buildGraph(response, status) {
 
 
 //		if (window.performance && window.performance.now)
-//			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
+// //			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 	}
 
 	// clears all items from the main group then redraws them
@@ -1103,7 +1098,6 @@ function buildGraph(response, status) {
 
 	// gets the points string for task polygons
 	function getPoints(d) {
-	    console.log('getPoints(',d,')');
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1482,8 +1476,7 @@ function buildGraph(response, status) {
 		data.searchFilter = '';
 
         // convert all data to its proper format
-        if (data.startDate == undefined) {
-            console.log('NO START DATE GIVEN, USING EARLIEST TASK');
+        if (data.startDate === undefined) {
             data.items.forEach( task => {
                 if (task.estStart != undefined) {
                     if (data.startDate == undefined || task.estStart < data.startDate) {
@@ -1494,7 +1487,6 @@ function buildGraph(response, status) {
             //data.startDate = new Date(Date.now());
         }
         let startTime = parseStartDate(data.startDate);
-        console.log('startTime = ', startTime);
 
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
@@ -1506,7 +1498,7 @@ function buildGraph(response, status) {
         // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
         for (var i = 0; i < Object.keys(data.cycles).size(); i++) {
             var key = parseInt(Object.keys(data.cycles)[i]);
-            var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
+            var predecessor = items[binarySearch(items, key, 0, items.length - 1;
             var stack = data.cycles[Object.keys(data.cycles)[i]];
             for (var j = 0; j < stack.size(); ++j) {
                 var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
@@ -1523,8 +1515,6 @@ function buildGraph(response, status) {
         }
 */
         // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
-        console.log('cycles:');
-        console.log(data.cycles);
         for (let c = 0; c < data.cycles.size(); c++) {
             let cycle = data.cycles[c];
             let firstId = parseInt(cycle[0]);
@@ -1538,20 +1528,14 @@ function buildGraph(response, status) {
             firstNode.redundantPredecessors.push(depObject);
             dependencies.push(depObject);
             //firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
-            console.log('preds before: ' + firstNode.predecessorIds);
             firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
-            console.log('preds after: ' + firstNode.predecessorIds);
-            console.log('firstNode = ', firstNode, ', lastNode = ', lastNode);
 
             /*
             let cycle = data.cycles[c];
             let key = parseInt(cycle[cycle.size() - 1]);
             let predecessor = items[binarySearch(items, key, 0, items.length - 1)];
-            console.log(cycle);
-            console.log('\t key = ', key, ', predecessor = ', predecessor);
             for (let n = 0; n < cycle.size(); ++n) {
                 let node = items[binarySearch(items, cycle[n], 0, items.length - 1)];
-                console.log('\t\t node[', n, '] = ', node);
                 if (node.predecessorIds.indexOf(key) != -1) {
                     // construct a dependency object and move the predecessorId to the redundant list
                     let depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
@@ -1570,8 +1554,9 @@ function buildGraph(response, status) {
 
 
         // if there are cyclical structures, tell the user that the data might be inaccurate
-		if (Object.keys(data.cycles).size() > 0)
+		if (data.cycles.length > 0){
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
+		}
 
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
@@ -1601,17 +1586,9 @@ function buildGraph(response, status) {
         let unknownStarts = [];
 		for (let i = 0; i < items.length; ++i) {
 		    /*if (items[i].startInitial)
-		    console.log(' > parsing item ', items[i]);
             items[i].startInitial = new Date(startInitial).getTime()
-		    console.log('\t > startInitial = ', items[i].startInitial, ', startTime = ', startTime);
 			items[i].milestone = (items[i].startInitial == items[i].endInitial);
-			console.log("\t > before:");
-			console.log(items[i].startInitial);
 			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial) * 60000);
-            console.log("\t > after:");
-            console.log(items[i].startInitial);
-            console.log("\t > time:");
-            console.log(startTime.getTime());
 
             items[i].endInitial = new Date(endInitial).getTime()
 			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);*/
@@ -1627,15 +1604,11 @@ function buildGraph(response, status) {
 //                items[i].startInitial = parseStartDate(items[i].startInitial + data.startDate.getTime());
             }
             if (items[i].estFinish) {
-                console.log('QQQQ items[i].estFinish = ' + items[i].estFinish);
-                console.log(items[i]);
                 items[i].estFinish = new Date(items[i].estFinish);
 //                items[i].endInitial = items[i].estFinish.getTime();
             }
 //            items[i].endInitial = parseStartDate(items[i].endInitial);
 //            items[i].endInitial = new Date(items[i].endInitial.getTime() + (items[i].milestone * 60000));
-            console.log(' > item = ', items[i]);
-            //console.log('\t > start-end ===== ', items[i].startInitial, ' - ', items[i].endInitial);
             items[i].start = items[i].estStart;
 			items[i].end = items[i].estEnd;
 			items[i].exChild = null;
@@ -2189,7 +2162,6 @@ function buildGraph(response, status) {
 					}
 
 					/*
-					 console.log('BEFORE READDING DUPLICATES FOR ' + items[i].name)
 					 display(newList, groups);
 					 */
 
@@ -2219,12 +2191,10 @@ function buildGraph(response, status) {
 					}
 
 					/*
-					 console.log('AFTER READDING DUPLICATES FOR ' + items[i].name)
 					 display(newList, groups);
 					 */
 
 					function display(list, groups) {
-						console.log('--------------------------------------------');
 						for (var j = 0; j < list.length; ++j) {
 							var output = list[j].id + ' : ';
 							for (var k = 0; k < groups.length; ++k) {
@@ -2234,9 +2204,7 @@ function buildGraph(response, status) {
 									output += '\t.';
 							}
 							output += '\t:' + list[j].comment;
-							console.log('\t > ' + output);
 						}
-						console.log('--------------------------------------------');
 					}
 
 					// match the actual successor order to the calculated order
@@ -2314,8 +2282,6 @@ function buildGraph(response, status) {
 
 		function outputChildMatrix(node) {
 			var successors = getSuccessors(node);
-			console.log('child matrix for node [' + node.id + '] ' + node.comment);
-			console.log('----------------------');
 			for (var i = 0; i < successors.size(); ++i) {
 				var node = successors[i];
 				var output = node.id + ' : ';
@@ -2325,9 +2291,7 @@ function buildGraph(response, status) {
 					else
 						output += '\t.';
 				}
-				console.log('\t > ' + output + ' "' + node.comment + '"');
 			}
-			console.log('----------------------');
 		}
 
 		/*	compares two tasks, returning true if they have the same siblingGroups.
@@ -2475,7 +2439,6 @@ function buildGraph(response, status) {
 
 	// ensures times are correct
 	function calculateTimes(task, checking) {
-	    console.log('calculateTimes(', task, checking, ')');
 		if (!task.start) {
 			if (task.predecessors.length == 0) {
 				//task.start = new Date(task.startInitial);
@@ -2504,8 +2467,6 @@ function buildGraph(response, status) {
 				task.start = new Date(task.start.getTime() - 2);
 				task.end = new Date(task.start.getTime() - 1);
 			} else {
-                //console.log('!!!!!!!!!!! task.end = new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime()));')
-                //console.log('!!!!!!!!!!! ',new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime())),' = new Date(', task.start.getTime(), ' + (', task.endInitial.getTime(), ' - ', task.startInitial.getTime(), '));')
                 if (task.estFinish) {
                     task.end = task.estFinish;
                 } else {
@@ -2550,7 +2511,6 @@ function buildGraph(response, status) {
 }
 
 function submitForm() {
-    console.log('submitForm()')
 	$('.chart').remove();
 	d3.select('#svgContainerId').style('display', 'none')
 	generateGraph($('#moveEventId').val());
@@ -2561,53 +2521,31 @@ function submitForm() {
  * Call the REST API to grab the data to generate the Timeline
  */
 function generateGraph(event) {
-    console.log('generateGraph(',event,')');
 	var params = {};
 
-	if (event != 0) {
+	if (event !== 0) {
 		params = { 'moveEventId': event };
 	}
 
-	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
+	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? 'true' : 'false';
 
 	$('#spinnerId').css('display', 'block');
-/*
-    jQuery.ajax({
-        dataType: 'json',
-        url: 'taskTimelineData',
-        data: params,
-        type: 'GET',
-        /*complete: buildGraph*/
-/*        complete: function (results) {
-            console.log('old function(', event, '):');
-            console.log(JSON.parse(results.responseText))
-        }
-    });
-*/
-    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
-    /*if (event != 0 && event != undefined)
-        jQuery.ajax({
-            dataType: 'json',
-            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/getTimelineData',
-            type: 'GET',
-            complete:  function (response, status) {
-                console.log('new function(', event, '):');
-                console.log(response);
-                buildGraph(response)
-            }
-        });*/
-    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
-    if (event != 0 && event != undefined)
-        jQuery.ajax({
-            dataType: 'json',
-            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/timeline',
-            type: 'GET',
-            complete:  function (response, status) {
-                console.log('new function(', event, '):');
-                console.log(JSON.parse(response.responseText))
-                buildGraph(response)
-            }
-        });
+
+	var id = $('#moveEventId').val();
+	var mode = $("input[name=mode]:checked").val();
+
+	var queryParams = $.param({
+		id:id,
+		mode:mode
+	});
+
+	jQuery.ajax({
+		dataType: 'json',
+		url: '/tdstm/wsTimeline/timeline?'+ queryParams,
+		data: params,
+		type: 'GET',
+		complete: buildGraph
+	});
 }
 
 // highlight tasks matching the user's regex
@@ -2675,17 +2613,11 @@ function handleClearFilterStatus() {
  * have a Date object in the user's time zone.
  */
 function parseStartDate(startDate) {
-//    console.log('parseStartDate(',startDate,')')
 	var momentTZ = moment().tz(tdsCommon.timeZone());
 	var localTZOffset = new Date().getTimezoneOffset();
 	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
-//    console.log(momentTZ)
-//    console.log(localTZOffset)
-//    console.log(momentStartDate)
 	momentStartDate = momentStartDate.tz("GMT");
 	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
-//	console.log('returning:')
-//    console.log(momentStartDate.valueOf())
 	return new Date(momentStartDate.valueOf());
 }
 
