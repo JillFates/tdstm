@@ -80,10 +80,11 @@ export interface TaskActionsOptions {
 	`,
 })
 export class TaskActionsComponent implements OnInit, OnChanges {
-	@Input() task: any;
+	@Input() taskStatus: string;
 	@Input() showDelayActions: boolean;
 	@Input() showDetails: boolean;
 	@Input() buttonClass: string;
+	@Input() taskActionInfoModel: TaskActionInfoModel;
 	@Output() start: EventEmitter<void> = new EventEmitter<void>();
 	@Output() done: EventEmitter<void> = new EventEmitter<void>();
 	@Output() invoke: EventEmitter<void> = new EventEmitter<void>();
@@ -95,14 +96,12 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	invokeButton: any;
 	hasInvokePermission: boolean;
 	private userContext: UserContextModel;
-	private taskActionInfoModel: TaskActionInfoModel;
 
 	constructor(
 		private permissionService: PermissionService,
 		private userContextService: UserContextService,
 		private taskService: TaskService) {
 		this.userContext = null;
-		this.taskActionInfoModel = null;
 		this.hasInvokePermission = this.permissionService.hasPermission(Permission.ActionInvoke);
 		this.invokeButton = null;
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
@@ -114,7 +113,6 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 		if (!this.buttonClass) {
 			this.buttonClass = 'btn-default';
 		}
-		this.loadTaskInfoModel();
 	}
 
 	/**
@@ -126,33 +124,22 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 			changes.task.currentValue['status'] !== changes.task.previousValue['status'] ||
 			changes.task.currentValue['assignedTo'] !== changes.task.previousValue['assignedTo']
 		)) {
-			this.loadTaskInfoModel();
+			// on parent task model change
 		}
-	}
-
-	/**
-	 * Loads Task action information.
-	 */
-	loadTaskInfoModel(): void {
-		this.taskService.getTaskActionInfo(parseInt(this.task.id, 0))
-			.subscribe((result: TaskActionInfoModel) => {
-				this.taskActionInfoModel = result;
-				this.invokeButton = this.taskActionInfoModel.invokeButton;
-			})
 	}
 
 	/**
 	 * Determines if Done button can be shown.
 	 */
 	showDone(): boolean {
-		return [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.task.status) >= 0;
+		return [TaskStatus.READY, TaskStatus.STARTED].indexOf(this.taskStatus) >= 0;
 	}
 
 	/**
 	 * Determines if Start button can be shown.
 	 */
 	showStart(): boolean {
-		return [TaskStatus.READY].indexOf(this.task.status) >= 0;
+		return [TaskStatus.READY].indexOf(this.taskStatus) >= 0;
 	}
 
 	/**
@@ -162,7 +149,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 		return (this.taskActionInfoModel
 			&&
 			(!this.taskActionInfoModel.assignedTo || this.userContext.person.id !== this.taskActionInfoModel.assignedTo)
-			&& ([TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.task.status) >= 0));
+			&& ([TaskStatus.READY, TaskStatus.PENDING, TaskStatus.STARTED].indexOf(this.taskStatus) >= 0));
 	}
 
 	/**
@@ -178,16 +165,20 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	 */
 	showReset(): boolean {
 		return this.taskActionInfoModel
-			&& this.taskActionInfoModel.apiActionId && this.task.status === TaskStatus.HOLD;
+			&& this.taskActionInfoModel.apiActionId && this.taskStatus === TaskStatus.HOLD;
 	}
 
 	/**
 	 * Determines if Invoke button can be shown.
 	 */
 	showInvoke(): boolean {
-		return this.taskActionInfoModel
+		if (this.taskActionInfoModel
 			&& this.taskActionInfoModel.invokeButton
-			&& this.taskActionInfoModel.invokeButton !== null;
+			&& this.taskActionInfoModel.invokeButton !== null) {
+			this.invokeButton = this.taskActionInfoModel.invokeButton;
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -196,7 +187,7 @@ export class TaskActionsComponent implements OnInit, OnChanges {
 	showDelay(): boolean {
 		return this.taskActionInfoModel
 			&& this.taskActionInfoModel.category && this.taskActionInfoModel.category !== 'moveday'
-			&& this.task.status === TaskStatus.READY;
+			&& this.taskStatus === TaskStatus.READY;
 	}
 
 	/**

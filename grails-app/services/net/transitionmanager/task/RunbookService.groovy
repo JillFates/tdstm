@@ -20,32 +20,6 @@ class RunbookService implements ServiceMethods {
 	SessionFactory sessionFactory
 
 	/**
-	 * Used to load all runbook related tasks associated with an event
-	 * @param moveEvent the event to retrieve tasks for
-	 * @return List<AssetCommet> a list of tasks
-	 */
-	List<Task> getEventTasks(MoveEvent moveEvent) {
-		def tasks = []
-		if (moveEvent) {
-			tasks = Task.findAllByMoveEvent(moveEvent)
-		}
-
-		return tasks
-	}
-
-	/**
-	 * Used to get the list of task dependencies for a given list of tasks
-	 * @param List<AssetComment> a list of tasks
-	 * @return List<TaskDependency> a list of the dependencies associated to the tasks
-	 */
-	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
-		return TaskDependency.where {
-			assetComment in tasks
-			predecessor in tasks
-		}.list()
-	}
-
-	/**
 	 * This method returns a map containing all the tasks and their dependencies
 	 * for a given move event.
 	 *

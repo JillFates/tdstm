@@ -125,12 +125,17 @@ export class UserContextState {
 	@Action(SetProject)
 	setProject(ctx: StateContext<UserContextModel>, {payload}: SetProject) {
 		const state = ctx.getState();
-		ctx.setState({
-			...state,
-			project: payload,
-			event: null,
-			bundle: null,
-		});
+		return this.userService.getLicenseInfo().pipe(
+			tap(result => {
+				ctx.setState({
+					...state,
+					licenseInfo: result,
+					project: payload,
+					event: null,
+					bundle: null,
+				});
+			}),
+		);
 	}
 
 }

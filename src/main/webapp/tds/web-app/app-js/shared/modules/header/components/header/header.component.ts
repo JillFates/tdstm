@@ -1,24 +1,24 @@
 // Angular
-import { Component } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import {Component} from '@angular/core';
+import {FormGroup, FormControl} from '@angular/forms';
 // NGXS
-import { Store } from '@ngxs/store';
+import {Store} from '@ngxs/store';
 // Component
-import { UserPreferencesComponent } from '../preferences/user-preferences.component';
-import { UserEditPersonComponent } from '../edit-person/user-edit-person.component';
-import { UserDateTimezoneComponent } from '../date-timezone/user-date-timezone.component';
+import {UserPreferencesComponent} from '../preferences/user-preferences.component';
+import {UserEditPersonComponent} from '../edit-person/user-edit-person.component';
+import {UserDateTimezoneComponent} from '../date-timezone/user-date-timezone.component';
 // Service
-import { UserContextService } from '../../../../../modules/auth/service/user-context.service';
-import { UIDialogService } from '../../../../services/ui-dialog.service';
-import { NotifierService } from '../../../../services/notifier.service';
+import {UserContextService} from '../../../../../modules/auth/service/user-context.service';
+import {UIDialogService} from '../../../../services/ui-dialog.service';
+import {NotifierService} from '../../../../services/notifier.service';
 // Model
-import { UserContextModel } from '../../../../../modules/auth/model/user-context.model';
-import { PersonModel } from '../../../../components/add-person/model/person.model';
-import { PasswordChangeModel } from '../../model/password-change.model';
-import { DIALOG_SIZE } from '../../../../model/constants';
-import { PageMetadataModel } from '../../model/page-metadata.model';
-import { Logout } from '../../../../../modules/auth/action/login.actions';
-import { APP_STATE_KEY } from '../../../../providers/localstorage.provider';
+import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
+import {PersonModel} from '../../../../components/add-person/model/person.model';
+import {PasswordChangeModel} from '../../model/password-change.model';
+import {DIALOG_SIZE} from '../../../../model/constants';
+import {PageMetadataModel} from '../../model/page-metadata.model';
+import {Logout} from '../../../../../modules/auth/action/login.actions';
+import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 
 declare var jQuery: any;
 
@@ -55,9 +55,7 @@ export class HeaderComponent {
 				jQuery('div.content-wrapper').addClass('content-login-wrapper');
 			} else {
 				this.pageMetaData.hideTopNav = false;
-				jQuery('div.content-wrapper').removeClass(
-					'content-login-wrapper'
-				);
+				jQuery('div.content-wrapper').removeClass('content-login-wrapper');
 			}
 		});
 	}
@@ -89,27 +87,25 @@ export class HeaderComponent {
 	}
 
 	public openEditPersonModal(): void {
-		this.dialogService
-			.open(UserEditPersonComponent, [
-				{ provide: PersonModel, useValue: {} },
-				{ provide: PasswordChangeModel, useValue: {} },
-			])
-			.catch(result => {
-				//
-			});
+		this.dialogService.open(UserEditPersonComponent, [
+			{provide: PersonModel, useValue: {}},
+			{provide: PasswordChangeModel, useValue: {}}
+		]).catch(result => {
+			//
+		});
 	}
 
 	public openDateTimezoneModal(): void {
-		this.dialogService
-			.extra(UserDateTimezoneComponent, [
-				{
-					provide: Boolean,
-					useValue: false,
-				},
-			])
-			.catch(result => {
-				console.log('Dismissed Dialog');
-			});
+
+		this.dialogService.extra(UserDateTimezoneComponent, [{
+			provide: Boolean,
+			useValue: false
+		}, {
+			provide: String,
+			useValue: ''
+		}]).catch(result => {
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	/**

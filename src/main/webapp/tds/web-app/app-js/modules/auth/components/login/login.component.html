@@ -33,16 +33,10 @@
 								>Select
 								{{ loginInfo.config?.authorityLabel }}</option
 							>
-							<option
-								*ngFor="
-									let authority of loginInfo.config
-										.authorityList
-								"
-								[value]="authority"
-								[attr.selected]="
-									authority === defaultAuthorityItem
-								"
-								>{{ authority }}</option
+							<option *ngFor=" let authority of loginInfo.config.authorityList"
+                                    [value]="authority"
+								    [attr.selected]="authority === defaultAuthorityItem">
+                                {{ authority }}</option
 							>
 						</select>
 						<clr-control-error>

@@ -5,7 +5,7 @@
 		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
 		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)"><h4>Dependencies</h4></div>
 		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div>
-		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders showMenu" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Fullscreen</h4></div>
+		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders showMenu" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Full Screen</h4></div>
 		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
 				<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
@@ -254,7 +254,7 @@
 		}
 		div.dependency_panel_action_buttons {
 			position: absolute;
-			bottom: 47px;
+			bottom: 0;
 			background: white;
 			height: 33px;
 		}
@@ -266,54 +266,54 @@
 		}
 	</style>
 	<div id="dependenciesPanelId" class="graphPanel">
-		<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i class="fa fa-fw fa-caret-down"></i></label>
-		<br />
-		<div class="checkboxdiv_control dependency-type-panel open">
-			<table class="dependency-control-table" cellpadding="0" cellspacing="0">
-				<tr>
-					<th style="width: 134px;"></th>
-					<th style="text-align: center;">Show</th>
-					<th style="text-align: center;">Highlight</th>
-				</tr>
-				<tr>
-					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyTypeControls', 'dependencyType', this);"/></td>
-					<td></td>
-				</tr>
-				<g:each in="${dependencyType}" var="dependency">
+		<div id="dependecy-control">
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i class="fa fa-fw fa-caret-down"></i></label>
+			<br />
+			<div class="checkboxdiv_control dependency-type-panel open" >
+				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 					<tr>
-						<td style="width: 134px;"><span> ${dependency}</span></td>
-						<td style="text-align: center;"><input class="dependencyTypeControlsShow" parentid="dependencyTypeControl_show_all" type="checkbox" checked id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this)" value="${dependency}"/></td>
-						<td style="text-align: center;"><input class="dependencyTypeControlsHighlight" type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependency}"/></td>
+						<th style="width: 134px;"></th>
+						<th style="text-align: center;">Show</th>
+						<th style="text-align: center;">Highlight</th>
 					</tr>
-				</g:each>
-			</table>
-		</div>
+					<tr>
+						<td>All</td>
+						<td style="text-align: center;"><input state='1' type="checkbox" id="dependencyTypeControl_show_all" checked name="dependencyTypeControl_show__all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyTypeControls', 'dependencyType', this);"/></td>
+						<td></td>
+					</tr>
+					<g:each in="${dependencyType}" var="dependency">
+						<tr>
+							<td style="width: 134px;"><span> ${dependency}</span></td>
+							<td style="text-align: center;"><input class="dependencyTypeControlsShow" parentid="dependencyTypeControl_show_all" type="checkbox" checked id="dependencyTypeControl_show_${dependency}" name="dependencyTypeControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this)" value="${dependency}"/></td>
+							<td style="text-align: center;"><input class="dependencyTypeControlsHighlight" type="checkbox" id="dependencyTypeControl_highlight_${dependency}"name="dependencyTypeControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependency}"/></td>
+						</tr>
+					</g:each>
+				</table>
+			</div>
 
-		<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i class="fa fa-fw fa-caret-down"></i></label>
-		<br />
-		<div class="checkboxdiv_control dependency-show-panel open">
-			<table class="dependency-control-table" cellpadding="0" cellspacing="0">
-				<tr>
-					<th style="width: 134px;"></th>
-					<th style="text-align: center;">Show</th>
-					<th style="text-align: center;">Highlight</th>
-				</tr>
-				<tr>
-					<td>All</td>
-					<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyStatusControls', 'dependencyStatus', this);"/></td>
-					<td></td>
-				</tr>
-				<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i class="fa fa-fw fa-caret-down"></i></label>
+			<div class="checkboxdiv_control dependency-show-panel open">
+				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 					<tr>
-						<td style="width: 134px;"><span > ${dependencyStatusInst}</span></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this);" value="${dependencyStatusInst}"/></td>
-						<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyStatusControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
+						<th style="width: 134px;"></th>
+						<th style="text-align: center;">Show</th>
+						<th style="text-align: center;">Highlight</th>
 					</tr>
-				</g:each>
-			</table>
+					<tr>
+						<td>All</td>
+						<td style="text-align: center;"><input state='1' type="checkbox" checked id="dependencyStatusControl_show_all" name="dependencyStatusControl_show_all" onclick="GraphUtil.onSelectAllDependencyPanel('dependencyStatusControls', 'dependencyStatus', this);"/></td>
+						<td></td>
+					</tr>
+					<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+						<tr>
+							<td style="width: 134px;"><span > ${dependencyStatusInst}</span></td>
+							<td style="text-align: center;"><input class="dependencyStatusControlsShow" parentid="dependencyStatusControl_show_all" type="checkbox" checked id="show_${dependency}" name="dependencyStatusControl_show_${dependency}" onclick="GraphUtil.onSelectItemShowDependencyPanel(this);" value="${dependencyStatusInst}"/></td>
+							<td style="text-align: center;"><input class="dependencyStatusControlsHighlight" type="checkbox" id="highlight_${dependency}"name="dependencyStatusControl_highlight_${dependency}" onclick="GraphUtil.onSelectItemHighlightDependencyPanel(this)" value="${dependencyStatusInst}"/></td>
+						</tr>
+					</g:each>
+				</table>
+			</div>
 		</div>
-		<br /><br />
 		<div class="dependency_panel_action_buttons">
 			<input style="width: 241px;" type="button" value="Apply" class="pointer fullButton graphButton" onclick="GraphUtil.applyShowHideDependencies()">
 		</div>
