@@ -7,14 +7,11 @@
 				class="project-selection"
 				name="selectedProjectID"
 				[(ngModel)]="selectedProjectID"
-				(ngModelChange)="onChangeProject()"
-			>
+				(ngModelChange)="onChangeProject()">
 				<option
 					*ngFor="let project of projectList"
 					[value]="project.id"
-					[attr.selected]="selectedProjectID === project.id"
-					>{{ project.name }}</option
-				>
+					[attr.selected]="selectedProjectID === project.id">{{ project.name }}</option>
 			</select>
 		</clr-select-container>
 	</form>
@@ -43,9 +40,7 @@
 								/>
 								<label>Active</label>
 							</clr-radio-wrapper>
-							<clr-radio-wrapper
-								[class.active]="!showActiveEvents"
-							>
+							<clr-radio-wrapper [class.active]="!showActiveEvents">
 								<input
 									type="radio"
 									clrRadio
@@ -57,12 +52,7 @@
 								/>
 								<label>Completed</label>
 							</clr-radio-wrapper>
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchEventsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchEventsForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -107,12 +97,7 @@
 							<span> - Active news for your events</span>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchEventNewsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="fetchEventNewsForGrid()" class="flat" tooltip="Refresh"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -161,12 +146,7 @@
 							<span> - Your applications as an SME or Owner</span>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchApplicationsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchApplicationsForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -199,12 +179,7 @@
 							>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchPeopleForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchPeopleForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -243,12 +218,7 @@
 								<span> - Active tasks assigned to you</span>
 							</div>
 							<div class="grid-actions clr-col-6">
-								<button
-									class="btn btn-icon btn-link btn-sm"
-									(click)="fetchTasksForGrid()"
-								>
-									<clr-icon shape="repeat"></clr-icon>
-								</button>
+								<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchTasksForGrid()" class="flat"></tds-button-custom>
 							</div>
 						</div>
 					</ng-template>
