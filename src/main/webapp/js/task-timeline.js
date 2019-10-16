@@ -1498,7 +1498,7 @@ function buildGraph(response, status) {
         // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
         for (var i = 0; i < Object.keys(data.cycles).size(); i++) {
             var key = parseInt(Object.keys(data.cycles)[i]);
-            var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
+            var predecessor = items[binarySearch(items, key, 0, items.length - 1;
             var stack = data.cycles[Object.keys(data.cycles)[i]];
             for (var j = 0; j < stack.size(); ++j) {
                 var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
@@ -1554,8 +1554,9 @@ function buildGraph(response, status) {
 
 
         // if there are cyclical structures, tell the user that the data might be inaccurate
-		if (Object.keys(data.cycles).length > 0)
+		if (data.cycles.length > 0){
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
+		}
 
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
@@ -2526,7 +2527,7 @@ function generateGraph(event) {
 		params = { 'moveEventId': event };
 	}
 
-	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
+	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? 'true' : 'false';
 
 	$('#spinnerId').css('display', 'block');
 
