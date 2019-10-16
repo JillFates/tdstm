@@ -1,21 +1,16 @@
 package net.transitionmanager.service
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.security.Permissions
 import net.transitionmanager.security.PermissionsService
-import org.springframework.jdbc.core.JdbcTemplate
+import net.transitionmanager.security.RolePermissions
 import spock.lang.Specification
 
-@TestFor(PermissionsService)
-@TestMixin(GrailsUnitTestMixin)
-@Mock([Permissions])
-class PermissionsServiceSpec extends Specification {
+class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService>{
 
-	def setup() {
-		service.jdbcTemplate = Mock(JdbcTemplate)
+	void setupSpec() {
+		mockDomains Permissions, RolePermissions
 	}
 
 	void 'test can findAll permissions saved in database'() {
