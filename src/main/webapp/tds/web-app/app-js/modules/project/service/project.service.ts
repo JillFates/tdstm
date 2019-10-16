@@ -70,7 +70,8 @@ export class ProjectService {
 		postModel['originalFilename'] = originalFilename;
 		postModel['planMethodology'] = postModel.planMethodology.field;
 		postModel['partnerIds'] = postModel.partners.map(p => p.id);
-		return this.http.post(`../ws/project/saveProject/${id}`, model)
+		postModel['collectMetrics'] = postModel.collectMetrics ? true : false;
+		return this.http.post(`../ws/project/saveProject/${id}`, postModel)
 				.map((response: any) => {
 					return response;
 				})

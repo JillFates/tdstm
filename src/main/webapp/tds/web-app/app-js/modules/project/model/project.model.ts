@@ -13,7 +13,7 @@ export class ProjectModel {
 	public defaultBundle: any;
 	public defaultBundleName: string;
 	public timeZone: string;
-	public collectMetrics: boolean;
+	public collectMetrics: number;
 	public planMethodology: any;
 }
 
