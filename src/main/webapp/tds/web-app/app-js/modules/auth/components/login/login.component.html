@@ -1,12 +1,12 @@
 <div class="login-component clr-row" *ngIf="!redirectUser">
-	<div class="clr-col-5 login-wrap">
+	<div class="clr-col-5 login-component-form__wrapper">
 		<div class="clr-row clr-justify-content-center">
-			<section class="login-formarea clr-col-8 clr-align-self-center">
+			<section class="login-component-form__section clr-col-8 clr-align-self-center">
 				<h1>
 					<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
 				</h1>
 				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" >
-					<clr-select-container class="clr-col-12 has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
+					<clr-select-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
 						<select clrSelect
 								name="authority"
 								[(ngModel)]="loginModel.authority"
@@ -19,37 +19,25 @@
 						</select>
 						<clr-control-error>{{ loginInfo.config?.authorityLabel }} Required</clr-control-error>
 					</clr-select-container>
-					<clr-input-container class="clr-col-12 has-authority" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT" >
+					<clr-input-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.PROMPT" >
 						<input clrInput type="text" name="authority"
-							[ngClass]="{
-								'ng-invalid-not-touched': !loginForm.form
-									.touched
-							}"
+							[ngClass]="{'ng-invalid-not-touched': !loginForm.form.touched}"
 							[(ngModel)]="loginModel.authority"
-							placeholder="Enter {{
-								loginInfo.config?.authorityLabel
-							}}"
-							required
-						/>
+							placeholder="Enter {{loginInfo.config?.authorityLabel}}"
+							required />
 						<clr-control-error>{{ loginInfo.config?.authorityLabel }} Required</clr-control-error>
 					</clr-input-container>
 					<clr-input-container class="clr-col-12">
-						<input
-							clrInput
-							type="text"
-							[ngClass]="{
-								'ng-invalid-not-touched': !loginForm.form
-									.touched
-							}"
+						<input clrInput type="text"
+							[ngClass]="{ 'ng-invalid-not-touched': !loginForm.form.touched}"
 							name="username"
 							id="usernameid"
 							[(ngModel)]="loginModel.username"
 							placeholder="Username"
-							required
-						/>
+							required />
 						<clr-control-error>Incorrect Login Information</clr-control-error>
 					</clr-input-container>
-					<clr-password-container class="clr-col-12">
+					<clr-password-container class="clr-col-12 password-container">
 						<input clrPassword placeholder="Password" name="password" id="password" [(ngModel)]="loginModel.password" required />
 						<clr-control-error>Incorrect Login Information</clr-control-error>
 					</clr-password-container>
@@ -68,7 +56,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="clr-col-12 login-notice-area" *ngIf="loginInfo.notices.length > 0">
+					<div class="clr-col-12 login-notice__wrapper" *ngIf="loginInfo.notices.length > 0">
 						<div class="alert alert-info" role="alert" *ngFor="let notice of loginInfo.notices">
 							<div class="alert-items">
 								<div class="alert-item static">
@@ -83,7 +71,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="clr-col-12 login-button-area">
+					<div class="clr-col-12 login-button__wrapper">
 						<button type="submit" class="btn btn-primary" (click)="onLogin()">Log In</button>
 					</div>
 				</form>
