@@ -31,6 +31,7 @@ class ProviderCreationSpec extends GebReportingSpec{
         testCount = 0
         to LoginPage
         login()
+        sleep(1500)
     }
 
     def setup() {
@@ -47,7 +48,7 @@ class ProviderCreationSpec extends GebReportingSpec{
             at MenuPage
         when: 'The user goes to the Providers page'
             projectsModule.goToProviders()
-
+            sleep(1000)
         then: 'The Providers Page loads with no problem'
             at ProvidersPage
     }

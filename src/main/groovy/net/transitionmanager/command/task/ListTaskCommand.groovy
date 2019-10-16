@@ -1,5 +1,6 @@
 package net.transitionmanager.command.task
 
+import com.tdssrc.grails.StringUtil
 import net.transitionmanager.command.CommandObject
 
 class ListTaskCommand implements CommandObject {
@@ -8,87 +9,86 @@ class ListTaskCommand implements CommandObject {
 	Integer page            = 0
 	Integer justRemaining   = 1
 	Integer viewUnpublished = 0
+	Integer justMyTasks     = 0
 	Long    moveEvent       = 0
 	String  sortColumn
 	String  sortOrder       = 'ASC'
 
-	//Filter columns
-	String comment
-	String assetName
-	String assetType
-	String taskNumber
-	String dueDate
-	String status
-	String assignedTo
-	String apiAction
-	String role
+	// Filterable columns
 	String actFinish
 	String actStart
+	String apiAction
+	String assetName
+	String assetType
+	String assignedTo
+	String bundle
 	String category
-	String commentType
-	String percentageComplete
+	String comment
 	String createdBy
 	String dateCreated
-	String dateResolved
-	String displayOption
+	String dueDate
 	String duration
 	String durationScale
 	String estFinish
 	String estStart
+	String event
 	String hardAssigned
 	String instructionsLink
+	String isCriticalPath
 	String isPublished
 	String lastUpdated
-	String bundle
-	String event
+	String latestFinish
+	String latestStart
+	String percentageComplete
 	String priority
-	String resolution
-	String resolvedBy
+	String role
 	String sendNotification
+	String slack
+	String status
 	String statusUpdated
+	String taskNumber
 	String taskSpec
 
 	static constraints = {
-
+		justMyTasks range: 0..1, nullable: true
 		justRemaining range: 0..1, nullable: true
 		viewUnpublished range: 0..1, nullable: true
 		sortOrder inList: ['ASC', 'DESC']
 		moveEvent nullable: true
 
-		//filter columns
-		comment nullable: true
-		assetName nullable: true
-		assetType nullable: true
-		taskNumber nullable: true
-		dueDate nullable: true
-		status nullable: true
-		assignedTo nullable: true
-		apiAction nullable: true
-		role nullable: true
+		// filterable columns
 		actFinish nullable: true
 		actStart nullable: true
+		apiAction nullable: true
+		assetName nullable: true
+		assetType nullable: true
+		assignedTo nullable: true
+		bundle nullable: true
 		category nullable: true
-		commentType nullable: true
-		percentageComplete nullable: true
+		comment nullable: true
 		createdBy nullable: true
 		dateCreated nullable: true
-		dateResolved nullable: true
-		displayOption nullable: true
+		dueDate nullable: true
 		duration nullable: true
 		durationScale nullable: true
 		estFinish nullable: true
 		estStart nullable: true
+		event nullable: true
 		hardAssigned nullable: true
 		instructionsLink nullable: true
+		isCriticalPath nullable: true
 		isPublished nullable: true
 		lastUpdated nullable: true
-		bundle nullable: true
-		event nullable: true
+		latestFinish nullable: true
+		latestStart nullable: true
+		percentageComplete nullable: true
 		priority nullable: true
-		resolution nullable: true
-		resolvedBy nullable: true
+		role nullable: true
 		sendNotification nullable: true
+		slack nullable: true
+		status nullable: true
 		statusUpdated nullable: true
+		taskNumber nullable: true
 		taskSpec nullable: true
 	}
 }

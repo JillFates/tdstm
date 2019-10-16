@@ -14,7 +14,7 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
  */
 export class ExportRouteState {
 	public static readonly ASSET_EXPORT = {
-		url: 'asset'
+		url: 'assets'
 	};
 }
 
@@ -24,7 +24,7 @@ export const ExportRoute: Routes = [
 		path: ExportRouteState.ASSET_EXPORT.url,
 		data: {
 			page: {
-				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: []
+				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: ['ASSETS.ASSETS', 'ASSET_EXPORT.ASSET_EXPORT']
 			}
 		},
 		component: ExportAssetComponent,

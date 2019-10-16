@@ -678,7 +678,7 @@ digraph runbook {
 				LEFT OUTER JOIN person ON t.owner_id=person.person_id
 				WHERE t.project_id=$project.id AND t.move_event_id=$moveEventId
 				${viewUnpublished ? '' : ' AND t.is_published=1 '}
-				GROUP BY t.task_number
+				GROUP BY t.task_number, t.asset_comment_id
 			"""
 
 				//  -- IF(t.hard_assigned=1,t.role,'') as hard_assign,
