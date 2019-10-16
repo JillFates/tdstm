@@ -23,11 +23,30 @@ div.login-component {
         }
       }
       form.login-form {
+        // To destroy the autofill background color
+        input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0px 1000px white inset;
+        }
+
+        .login-password__clr-container {
+          .clr-input-group {
+            padding-right: 0px;
+            .clr-input-group-icon-action {
+              right: 31px;
+              position: relative;
+            }
+            .clr-input {
+              border-bottom: 1px solid #999;
+            }
+            .clr-input.clr-focus, .clr-input:focus {
+              border-bottom: 1px solid #0092d1;
+            }
+          }
+        }
         .login-button__wrapper,
         .login-notice__wrapper {
           margin-top: 1rem;
         }
-
       }
       // Looks is used on Forgot and Change Password, so keep it here
       .login-box-body {
