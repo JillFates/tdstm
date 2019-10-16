@@ -304,9 +304,11 @@
                                 <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
                             </li>
                             <tds:hasPermission permission="${Permission.TaskManagerView}">
-                                <li class="menu-child-item menu-parent-tasks-task-manager">
-                                    <g:link controller="module" action="taskManager" id="list">Task Manager</g:link>
-                                </li>
+                                <g:if test="${isLicenseValid}">
+                                    <li class="menu-child-item menu-parent-tasks-task-manager">
+                                        <g:link controller="module" action="taskManager" id="list">Task Manager</g:link>
+                                    </li>
+                                </g:if>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-task-graph">
@@ -352,9 +354,11 @@
                                     <a href="/tdstm/module/planning/dashboard">Planning Dashboard</a>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                                <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
-                            </li>
+                            <g:if test="${isLicenseValid}">
+                                <li class="menu-child-item menu-parent-dashboard-event-dashboard">
+                                        <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
+                                </li>
+                            </g:if>
                             <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">
                                 <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
