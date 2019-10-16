@@ -1,0 +1,428 @@
+{
+	"info": {
+		"_postman_id": "d45fc64e-acb6-4c7b-9fcc-8ceedccafe72",
+		"name": "ActionStartedUpdate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Ajax Login ActionStartedUpdate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "388ac198-266b-40f0-98f1-4bd350274747",
+						"exec": [
+							"",
+							"pm.test(\"JSESSIONID present\", function () {",
+							"    pm.expect(pm.cookies.has('JSESSIONID')).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"{{username}}\",\n    \"password\":\"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/auth/signIn",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"auth",
+						"signIn"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Normal Form Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "tdsadmin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "zelda123!",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{host}}/tdstm/auth/signIn",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"tdstm",
+								"auth",
+								"signIn"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "html",
+					"header": [
+						{
+							"key": "X-Application-Context",
+							"value": "application:development"
+						},
+						{
+							"key": "Content-Type",
+							"value": "text/html;charset=UTF-8"
+						},
+						{
+							"key": "Content-Language",
+							"value": "en-AR"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 25 Apr 2019 16:10:48 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "\r\n\r\n\n<!DOCTYPE html>\n<html>\n    <head>\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/>\n        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <title>TransitionManager</title>\n        <!-- Tell the browser to be responsive to screen width -->\n        <meta content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\" name=\"viewport\">\n        <link rel=\"shortcut icon\" type=\"image/x-icon\" href=\"/tdstm/assets/images/favicon.ico\"/>\n        <!-- Bootstrap 3.3.5 -->\n        <link rel=\"stylesheet\" href=\"/tdstm/dist/js/vendors/bootstrap/dist/css/bootstrap.min.css\">\n        <!-- Font Awesome -->\n        <link rel=\"stylesheet\" href=\"/tdstm/dist/css/fontawesome/font-awesome.min.css\">\n        <!-- Ionicons -->\n        <link rel=\"stylesheet\" href=\"/tdstm/dist/css/ionicons/2.0.1/css/ionicons.min.css\">\n        <!-- Theme style -->\n        <link rel=\"stylesheet\" href=\"/tdstm/dist/css/TDSTMLayout.min.css\">\n        <!-- General Template Style -->\n        <link rel=\"stylesheet\" href=\"/tdstm/tds/web-app/css/tds-style.css\">\n        <!-- Blue Skin -->\n        <link rel=\"stylesheet\" href=\"/tdstm/dist/css/skins/skin-blue.min.css\">\n        <!-- jQuery -->\n        <!-- LEGACY AND SUPPORT LEGACY CODE START -->\n        <script type=\"text/javascript\">\r\n\tvar contextPath = \"/tdstm\";\r\n</script>\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/tdstm/tds/web-app/css/legacy/tds-main.css\"/>\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/tdstm/tds/web-app/css/legacy/tds.css\"/>\n        <link rel=\"stylesheet\" type=\"text/css\" href=\"/tdstm/tds/web-app/css/legacy/codemirror.css\"/>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/jquery-1.9.1.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/jquery-1.9.1-ui.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/moment.min.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/moment-timezone-with-data.min.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/daterangepicker.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/tds-common.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/timezone/jquery.maphilight.min.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/timezone/jquery.timezone-picker.min.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/resources/person.js?compile=false\" ></script>\n        <script type=\"text/javascript\" src=\"/tdstm/assets/angular-support.js?compile=false\" ></script>\n        <script rel=\"prefetch\" src=\"/tdstm/js/tinymce/tinymce.min.js\"></script>\n        <script rel=\"prefetch\" src=\"/tdstm/js/tinymce/theme.min.js\"></script>\n        <!-- Boosttrap -->\n        <script src=\"/tdstm/dist/js/vendors/bootstrap/dist/js/bootstrap.min.js\"></script>\n        <!-- TDSTMLayout App -->\n        <script src=\"/tdstm/dist/js/TDSTMLayout.min.js\"></script>\n        <base href=\"/tdstm/module/\">\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"/>\n        <meta http-equiv=\"cache-control\" content=\"max-age=0\"/>\n        <meta http-equiv=\"cache-control\" content=\"no-cache\"/>\n        <meta http-equiv=\"expires\" content=\"0\"/>\n        <meta http-equiv=\"expires\" content=\"Tue, 01 Jan 1980 1:00:00 GMT\"/>\n        <meta http-equiv=\"pragma\" content=\"no-cache\"/>\n        <meta name=\"layout\" content=\"header\"/>\n        <style>\n            /*TODO: REMOVE ON COMPLETE MIGRATION */\n            body {\n                background-color: #ecf0f5 !important;\n            }\n            .content-wrapper {\n                background-color: #ecf0f5 !important;\n            }\n        </style>\n        <script type=\"text/javascript\">\r\n        \r\n\t\t$(document).ready(function() {\r\n\t\t\t$('.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('\n            <span class=\"ui-button-icon-primary ui-icon ui-icon-closethick\"></span>');\r\n\t\t\t$('.ui-dialog').addClass('old-legacy-content');\r\n\t\t});\n        </script>\n    </head>\n    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->\n    <body class=\"hold-transition skin-blue layout-top-nav\">\n        <div class=\"wrapper\">\n            <!-- / Injects the BODY -->\n            <tds-app>\n                <div id=\"main-loader\">\n                    <div id=\"loader-icon\">\n                        <div class=\"loader\"></div>\n                    </div>\n                </div>\n            </tds-app>\n            <script src=\"/tdstm/tds/web-app/dist/polyfills.js?_b=b73288c2a02098392e5b65e014abf00e\"></script>\n            <script src=\"/tdstm/tds/web-app/dist/vendor.js?_b=b73288c2a02098392e5b65e014abf00e\"></script>\n            <script src=\"/tdstm/tds/web-app/dist/app.js?_b=b73288c2a02098392e5b65e014abf00e\"></script>\n            <!-- /.content-wrapper -->\n            <footer class=\"main-footer\">\n                <div class=\"pull-right hidden-xs\">\n                    <span>Version 4.7.0-alpha (Development)</span>\n                </div>\n                <strong>\n                    <a href=\"http://www.transitionaldata.com/service/transitionmanager\" target=\"_blank\">&nbsp;TransitionManager&trade;</a> 2010-2019 .\n                </strong> All rights reserved.\n                <!-- /.container -->\r\n        \n            </footer>\n        </div>\n        <input type=\"text\" value=\"chrome-broke-the-web\" tabindex=\"-1\"\n        style=\"position: absolute; clip: rect(0, 0, 0, 0); overflow: hidden; width: 1px !important; height: 1px !important; margin: 0 -1px -1px 0 !important; white-space: nowrap;\"\n    />\n    </body>\n</html>"
+				}
+			]
+		},
+		{
+			"name": "Get Providers' list, save first one.",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aa8e308f-24ca-46fb-9260-b7562e1a0b9c",
+						"exec": [
+							"//We need a provider value for the Api Action",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"var providerId = jsonObject.data[0].id; ",
+							"",
+							"pm.environment.set(\"providerId\", providerId);",
+							"",
+							"var apiActionName = \"API Script New Action \" + _.random(1, 1000) + _.random(1, 1000) ;",
+							"",
+							"pm.environment.set(\"apiActionName\", apiActionName);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tdstm/ws/dataingestion/provider/list",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"dataingestion",
+						"provider",
+						"list"
+					]
+				},
+				"description": "Find all the providers for the user's current project."
+			},
+			"response": []
+		},
+		{
+			"name": "Create PowerShell Action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "427e5fea-90bd-4b86-acd4-ab1d77aede5c",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});",
+							"",
+							"var responseObject = JSON.parse(responseBody);",
+							"var apiID = responseObject.data.id;",
+							"pm.environment.set(\"apiID\", apiID);",
+							"pm.environment.set(\"apiActionId\", apiID);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{apiActionName}}\",\r\n  \"dictionaryMethodName\": \"Select...\",\r\n  \"remoteCredentialMethod\": \"PROMPTED\",\r\n  \"description\": \"\",\r\n  \"provider\":{\"id\":\"{{providerId}}\"},\r\n  \"script\": \"Update-TaskProgress -Progress 25 -Message 'The task executed'\",\r\n  \"apiCatalog\": {\r\n    \"id\": 0\r\n  },\r\n  \"connectorMethod\": \"0\",\r\n  \"httpMethod\": \"Select...\",\r\n  \"endpointUrl\": \"\",\r\n  \"docUrl\": \"\",\r\n  \"producesData\": 0,\r\n  \"isPolling\": 0,\r\n  \"pollingInterval\": 0,\r\n  \"pollingLapsedAfter\": 0,\r\n  \"pollingStalledAfter\": 0,\r\n  \"isRemote\": true,\r\n  \"debugEnabled\": false,\r\n  \"actionType\": \"POWER_SHELL\",\r\n  \"reactionScripts\": \"{\\\"STATUS\\\":\\\"// Check the HTTP response code for a 200 OK \\\\n if (response.status == SC.OK) { \\\\n \\\\t return SUCCESS \\\\n } else { \\\\n \\\\t return ERROR \\\\n}\\\",\\\"SUCCESS\\\":\\\"// Update the task status that the task completed\\\\n task.started()\\\",\\\"DEFAULT\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\\n\\\",\\\"ERROR\\\":\\\"// Put the task on hold and add a comment with the cause of the error\\\\n task.error( response.stderr )\\\",\\\"FAILED\\\":\\\"\\\",\\\"LAPSED\\\":\\\"\\\",\\\"STALLED\\\":\\\"\\\",\\\"PRE\\\":\\\"\\\",\\\"FINAL\\\":\\\"\\\"}\",\r\n  \"defaultDataScript\": {\r\n    \"id\": null\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/apiAction",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"apiAction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Task with PowerShell action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a8d26a13-2feb-4a02-907d-0e3e33a1765a",
+						"exec": [
+							"var jsonObject = JSON.parse(responseBody);",
+							"var taskName = jsonObject.assetComment.comment; ",
+							"var taskID = jsonObject.assetComment.id;",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Task Creation\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"QA API Created Task\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Percentage Complete is 0\", function () {",
+							"    pm.expect(jsonObject.assetComment.percentageComplete).to.eql(0);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Initial Status is Ready\", function () {",
+							"    pm.expect(jsonObject.assetComment.status).to.eql(\"Ready\");",
+							"});",
+							"",
+							"pm.test(\"Task is published\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonObject.assetComment.isPublished).to.eql(true);",
+							"});",
+							"",
+							"",
+							"pm.environment.set(\"taskName\", taskName);",
+							"pm.environment.set(\"taskID\", taskID);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "sec-fetch-mode",
+						"value": "cors"
+					},
+					{
+						"key": "origin",
+						"value": "https://tmqa02.transitionmanager.net"
+					},
+					{
+						"key": "accept-encoding",
+						"value": "gzip, deflate, br"
+					},
+					{
+						"key": "accept-language",
+						"value": "es-419,es;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "user-agent",
+						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+					},
+					{
+						"key": "content-type",
+						"value": "application/json"
+					},
+					{
+						"key": "accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "referer",
+						"value": "https://tmqa02.transitionmanager.net/tdstm/module/taskManager/list"
+					},
+					{
+						"key": "authority",
+						"value": "tmqa02.transitionmanager.net"
+					},
+					{
+						"key": "cookie",
+						"value": "JSESSIONID=0A3D168F815FE33B941042E315B6DC3A"
+					},
+					{
+						"key": "sec-fetch-site",
+						"value": "same-origin"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{  \r\n   \"assetClass\":\"APPLICATION\",\r\n   \"assetEntity\":\"\",\r\n   \"assetType\":\"\",\r\n   \"assignedTo\":\"0\",\r\n   \"category\":\"general\",\r\n   \"apiAction\":\"{{apiActionId}}\",\r\n   \"apiActionId\":\"{{apiActionId}}\",\r\n   \"actionInvocable\":\"\",\r\n   \"actionMode\":\"\",\r\n   \"comment\":\"QA API Created Task {{$randomInt}}{{$randomInt}}\",\r\n   \"commentFromId\":\"\",\r\n   \"commentId\":\"\",\r\n   \"commentType\":\"issue\",\r\n   \"deletePredId\":\"\",\r\n   \"dueDate\":\"\",\r\n   \"duration\":\"0\",\r\n   \"durationScale\":\"M\",\r\n   \"estFinish\":\"\",\r\n   \"estStart\":\"\",\r\n   \"forWhom\":\"\",\r\n   \"hardAssigned\":\"0\",\r\n   \"sendNotification\":\"1\",\r\n   \"isResolved\":\"0\",\r\n   \"instructionsLink\":\"\",\r\n   \"moveEvent\":\"348\",\r\n   \"mustVerify\":\"0\",\r\n   \"override\":\"0\",\r\n   \"predCount\":\"-1\",\r\n   \"predecessorCategory\":\"\",\r\n   \"prevAsset\":\"\",\r\n   \"priority\":\"3\",\r\n   \"resolution\":\"\",\r\n   \"role\":\"\",\r\n   \"status\":\"Ready\",\r\n   \"percentageComplete\":0,\r\n   \"manageDependency\":\"1\",\r\n   \"taskDependency\":[  \r\n\r\n   ],\r\n   \"taskSuccessor\":[  \r\n\r\n   ],\r\n   \"deletedPreds\":\"\",\r\n   \"workflowTransition\":\"\",\r\n   \"canEdit\":true,\r\n   \"durationLocked\":\"0\",\r\n   \"id\":\"\"\r\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/assetEntity/saveComment",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"assetEntity",
+						"saveComment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "invoke Remote action",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a0b9ec7-c9b9-43e4-a67c-6679cca45396",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var jsonObject = JSON.parse(responseBody);",
+							"",
+							"pm.test(\"Action section is retrieved\", function () {",
+							"     pm.expect(pm.response.text()).to.include(\"apiAction\");",
+							"});",
+							"",
+							"pm.test(\"Task section is retrieved.\", function () {",
+							"   pm.expect(pm.response.text()).to.include(\"task\");",
+							"   ",
+							"});",
+							"",
+							"//unsetting variables",
+							"",
+							"pm.environment.unset(\"providerId\");",
+							"pm.environment.unset(\"apiActionName\");",
+							"pm.environment.unset(\"apiID\");",
+							"pm.environment.unset(\"apiActionId\");",
+							"pm.environment.unset(\"taskName\");",
+							"pm.environment.unset(\"taskID\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"publicKey\":\"{{publicKey}}\"\n}"
+				},
+				"url": {
+					"raw": "{{host}}/tdstm/ws/task/{{taskID}}/recordRemoteActionStarted",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tdstm",
+						"ws",
+						"task",
+						"{{taskID}}",
+						"recordRemoteActionStarted"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
