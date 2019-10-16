@@ -6,6 +6,8 @@ var debug = {};
 
 $(document).ready(function () {
 	// check keyup on the search field for the enter key
+	$('#baselinePlanButton').hide();
+
 	$('#searchBoxId').keyup(function (e) {
 		if (e.keyCode == 13)
 			$('#SubmitButtonId').submit();
@@ -18,10 +20,17 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
-	//generateGraph();
-    submitForm();
-});
+	$("input[name=mode]").on('change', function(ev) {
+		if(ev && ev.target && ev.target.value === 'C'){
+			$('#baselinePlanButton').hide();
+		}else {
+			$('#baselinePlanButton').show();
+		}
+		generateGraph();
+	});
 
+	generateGraph();
+});
 
 function displayWarningOrErrorMsg(isCyclical) {
 	var message = d3.select('div.body')
@@ -60,11 +69,10 @@ function buildGraph(response, status) {
 	// parse the data received from the server
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
-	console.log(data)
 	var ready = false;
-
+	var items = data.tasks;
 	// if the event has no tasks show an error message and exit
-	if (data.items.size() == 0) {
+	if (items.length === 0) {
 		displayWarningOrErrorMsg(false)
 		return;
 	}
@@ -83,7 +91,6 @@ function buildGraph(response, status) {
 	var scrollingLabelsPerformanceCutoff = 50;
 
 	// data received from the server
-	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
 	var siblingGroups = [];
@@ -164,7 +171,7 @@ function buildGraph(response, status) {
 
 	// populate the Team select
 	var teamSelect = null;
-	populateTeamSelect();
+	// populateTeamSelect();
 
 
 	// stores data and functions used for dragging on the mini graph
@@ -626,9 +633,9 @@ function buildGraph(response, status) {
 		});
 
 		// handle when the user changes the team filtering select
-		teamSelect.on('change', function () {
-			display(true, true);
-		});
+		// teamSelect.on('change', function () {
+		// 	display(true, true);
+		// });
 
 		// bind the zoom button listeners
 		$('#zoomInButtonId').on('click', function () {
@@ -1103,7 +1110,7 @@ function buildGraph(response, status) {
 
 	// gets the points string for task polygons
 	function getPoints(d) {
-	    console.log('getPoints(',d,')');
+	    // console.log('getPoints(',d,')');
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1482,7 +1489,7 @@ function buildGraph(response, status) {
 		data.searchFilter = '';
 
         // convert all data to its proper format
-        if (data.startDate == undefined) {
+        if (data.startDate === undefined) {
             console.log('NO START DATE GIVEN, USING EARLIEST TASK');
             data.items.forEach( task => {
                 if (task.estStart != undefined) {
@@ -2561,53 +2568,31 @@ function submitForm() {
  * Call the REST API to grab the data to generate the Timeline
  */
 function generateGraph(event) {
-    console.log('generateGraph(',event,')');
 	var params = {};
 
-	if (event != 0) {
+	if (event !== 0) {
 		params = { 'moveEventId': event };
 	}
 
 	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
 
 	$('#spinnerId').css('display', 'block');
-/*
-    jQuery.ajax({
-        dataType: 'json',
-        url: 'taskTimelineData',
-        data: params,
-        type: 'GET',
-        /*complete: buildGraph*/
-/*        complete: function (results) {
-            console.log('old function(', event, '):');
-            console.log(JSON.parse(results.responseText))
-        }
-    });
-*/
-    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
-    /*if (event != 0 && event != undefined)
-        jQuery.ajax({
-            dataType: 'json',
-            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/getTimelineData',
-            type: 'GET',
-            complete:  function (response, status) {
-                console.log('new function(', event, '):');
-                console.log(response);
-                buildGraph(response)
-            }
-        });*/
-    /* AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA */
-    if (event != 0 && event != undefined)
-        jQuery.ajax({
-            dataType: 'json',
-            url: 'http://localhost:8080/tdstm/ws/timeline/' + event + '/timeline',
-            type: 'GET',
-            complete:  function (response, status) {
-                console.log('new function(', event, '):');
-                console.log(JSON.parse(response.responseText))
-                buildGraph(response)
-            }
-        });
+
+	var id = $('#moveEventId').val();
+	var mode = $("input[name=mode]:checked").val();
+
+	var queryParams = $.param({
+		id:id,
+		mode:mode
+	});
+
+	jQuery.ajax({
+		dataType: 'json',
+		url: '/tdstm/wsTimeline/timeline?'+ queryParams,
+		data: params,
+		type: 'GET',
+		complete: buildGraph
+	});
 }
 
 // highlight tasks matching the user's regex

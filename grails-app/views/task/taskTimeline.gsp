@@ -57,9 +57,19 @@
 							<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
 							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
 						</span>
-						<div style="float: right;" class="task-timeline-progress-wrapper">
-							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-						</div>
+						<span class="controlSpan radioboxContainer">
+							<input type="radio" name="mode" value="C"
+								   checked>
+							<label >Current Plan</label>
+							<input type="radio"  name="mode" value="R"
+							>
+							<label >Recalculate</label>
+						</span>
+						<span id="baselinePlanButton">
+							<div class="graphPanelTab" onclick="baselinePlan()" title="Baseline" ><h4>Baseline Plan</h4></div>
+%{--							<button type="button">Baseline </button>--}%
+						</span>
+
 					</div>
 					<!-- control panel -->
 					<div id="controlPanelId" class="graphPanel">
@@ -103,17 +113,7 @@
 										</span>
 									</td>
 								</tr>
-								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
-									<tr title="Execute critical path analysis">
-										<td colspan="3" style="padding-left :0px">
-											<span>
-												<label id="baselinePlanButton" class="pointer" onclick="baselinePlan()">
-													&nbsp;Baseline Plan
-												</label>
-											</span>
-										</td>
-									</tr>
-								</tds:hasPermission>
+
 								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">
