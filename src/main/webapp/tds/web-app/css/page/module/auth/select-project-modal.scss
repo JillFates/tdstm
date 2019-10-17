@@ -1,0 +1,17 @@
+.select-project-modal-component {
+  label.title-missing-project {
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+  div.project-list-container {
+    padding-left: 16px;
+    label.select-project {
+      cursor: pointer;
+      span {
+        padding-left: 10px;
+        position: relative;
+        top: -3px;
+      }
+    }
+  }
+}
