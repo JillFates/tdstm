@@ -72,7 +72,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				this.dateFormat = dateFormat;
 				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
 			});
-		this.updateBreadcrumb();
+		this.updateBreadcrumbAndTitle();
 		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
 	}
 
@@ -98,7 +98,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		this.showActive = !this.showActive;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
-		this.updateBreadcrumb();
+		this.updateBreadcrumbAndTitle();
 		this.reloadData();
 	}
 
@@ -122,10 +122,14 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		this.filterChange(this.state.filter);
 	}
 
-	protected updateBreadcrumb(): void {
+	protected updateBreadcrumbAndTitle(): void {
 		this.notifierService.broadcast({
 			name: 'notificationHeaderBreadcrumbChange',
 			menu: ['Projects', this.showActive ? 'Active' : 'Completed']
+		});
+		this.notifierService.broadcast({
+			name: 'notificationHeaderTitleChange',
+			title: 'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed')
 		});
 	}
 

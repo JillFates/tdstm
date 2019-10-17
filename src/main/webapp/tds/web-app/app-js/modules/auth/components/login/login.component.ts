@@ -66,6 +66,10 @@ export class LoginComponent implements OnInit {
 		username: '',
 		password: '',
 	};
+	/**
+	 * To show loader and disable the login button
+	 */
+	public onLoginProgress = false;
 
 	/**
 	 * Holds the state of the login Button
@@ -115,8 +119,7 @@ export class LoginComponent implements OnInit {
 					this.loginInfo.config.authorityPrompt ===
 					this.authorityOptions.SELECT
 				) {
-					// `Select ${this.loginInfo.config.authorityLabel}`;
-					this.defaultAuthorityItem = '';
+					this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
 					this.loginModel.authority = this.defaultAuthorityItem;
 					selector = '.k-dropdown-wrap';
 				} else if (
@@ -150,7 +153,7 @@ export class LoginComponent implements OnInit {
 		) {
 			this.errMessage = 'Username and password are required';
 		} else {
-			this.loginState = 'loading';
+			this.onLoginProgress = true;
 			this.store
 				.dispatch(
 					new Login({
@@ -164,12 +167,9 @@ export class LoginComponent implements OnInit {
 					})
 				)
 				.pipe(withLatestFrom(this.userContext$))
-				.subscribe(([_, userContext]) => {
-					this.loginState = !userContext.error
-						? 'success'
-						: 'default';
-					this.validateLogin(_, userContext);
-				});
+				.subscribe(([_, userContext]) =>
+					this.validateLogin(_, userContext)
+				);
 		}
 	}
 
@@ -180,6 +180,7 @@ export class LoginComponent implements OnInit {
 	 * @param userContext
 	 */
 	private validateLogin(_, userContext: UserContextModel): void {
+		this.onLoginProgress = false;
 		this.userContextModel = userContext;
 		if (
 			this.userContextModel &&

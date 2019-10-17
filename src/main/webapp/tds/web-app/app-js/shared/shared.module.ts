@@ -11,7 +11,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { UploadModule } from '@progress/kendo-angular-upload';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import { ClarityModule } from '@clr/angular';
-
+import { TdsComponentLibraryModule } from 'tds-component-library';
 // NGXS
 import { NGXS_PLUGINS, Store } from '@ngxs/store';
 // Shared Services
@@ -141,6 +141,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DialogModule,
 		ProgressBarModule,
 		FontAwesomeModule,
+		TdsComponentLibraryModule,
 	],
 	declarations: [
 		UIAutofocusDirective,

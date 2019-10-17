@@ -31,47 +31,52 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-undo
 	`,
 	template: `
-		<button *ngIf="button"
-			type="button"
-			[tabindex]="tabindex"
-			[disabled]="disabled || !hasAllPermissions"
-			[id]="id"
-			[title]="tooltip || button.tooltip || titleButton"
-			[ngClass]="buttonClasses">
-				<div class="tds-action-button-container">
-					<i class="{{configuredIconPrefixVendor + (icon || button.icon)}}"></i>
-					<span *ngIf="titleButton" class="title">{{titleButton}}</span>
-				</div>
-				<ng-content></ng-content>
-		</button>
+		<tds-button
+				[id]="id"
+				[type]="type"
+				[theme]="theme"
+				[small]="small"
+				[inverse]="inverse"
+				[outline]="outline"
+				[flat]="flat"
+				[icon]="icon || button.icon || ''"
+				[title]="tooltip || button.tooltip || ''"
+				[disabled]="disabled || !hasAllPermissions"
+				[tabindex]="tabindex">
+			{{ displayLabel ? titleButton : '' }}
+		</tds-button>
 	`,
 	host: {
-		'[class.tds-action-button--disabled]': 'disabled || !hasAllPermissions',
 		'[class.tds-generic-button]': 'true'
 	}
 })
 export class TDSActionButton implements OnInit, OnChanges {
+	@Input() disabled = false;
+	@Input() displayLabel = true;
+	@Input() flat: boolean;
+	@Input() icon = '';
+	@Input() iconPrefixVendor = '';
+	@Input() id = '';
+	@Input() inverse: boolean;
+	@Input() isIconButton = false;
+	@Input() outline: boolean;
+	@Input() permissions: string[];
+	@Input() small: string;
+	@Input() tabindex = '';
+	@Input() theme: string;
 	@Input() title = '';
 	@Input() tooltip = '';
-	@Input() icon = '';
-	@Input() id = '';
-	@Input() tabindex = '';
-	@Input() disabled = false;
-	@Input() isIconButton = false;
-	@Input() permissions: string[];
-	@Input() iconPrefixVendor = '';
+	@Input() type: string;
 	button: TDSButton;
 	titleButton: string;
 	hostClasses: any = [];
 	hasAllPermissions: boolean;
 	private buttonSelectorName: string;
-	private defaultIconPrefixVendor = 'fa fa-fw fa-';
 
-	constructor(
-		private elementRef: ElementRef,
-		private buttonsFactoryService: ButtonsFactoryService) {
+	constructor(private elementRef: ElementRef, private buttonsFactoryService: ButtonsFactoryService) {
 		this.hasAllPermissions = false;
 	}
+
 	/**
 	* Based on the selector name, creates the corresponding button
 	*/
@@ -97,54 +102,5 @@ export class TDSActionButton implements OnInit, OnChanges {
 		if (title !== null) {
 			this.titleButton = this.title || this.button.title;
 		}
-	}
-
-	/**
-	 * Get the prefix used by font awesome icons
-	 */
-	get configuredIconPrefixVendor() {
-		return this.iconPrefixVendor !== '' ? this.iconPrefixVendor : this.defaultIconPrefixVendor;
-	}
-
-	/**
-	 * Get the css classes used by the button, mixin the host classes into the inner button component
-	 */
-	get buttonClasses() {
-		let buttonClasses =  {
-			'btn': true,
-			'btn-action': true,
-			'tds-action-button': true,
-			'not-has-all-permissions': !this.hasAllPermissions,
-			'no-title-right': !this.titleButton
-		};
-		buttonClasses[this.buttonSelectorName] = true;
-
-		const hostClasses = this.getHostClasses();
-		const hasStyle = Array.from(this.hostClasses)
-			.some((className: string) => className.startsWith('btn-'));
-
-		if (!hasStyle) {
-			hostClasses['btn-default'] = true;
-		}
-
-		buttonClasses = {...buttonClasses, ...hostClasses};
-
-		const iconClasses = {
-			'tds-action-button--just-icon': true
-		};
-
-		return this.isIconButton ? iconClasses : buttonClasses;
-	}
-
-	/**
-	 * Get just the css classes used by the host
-	 */
-	getHostClasses() {
-		const classes = {};
-
-		Array.from(this.hostClasses)
-			.forEach((className: string) =>  classes[className] = true);
-
-		return classes;
 	}
 }

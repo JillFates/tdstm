@@ -288,22 +288,22 @@ class UrlMappings {
 
 		"/ws/moveEvent/createModel" {
 			controller = "wsEvent"
-			action = [GET:"getModelForCreate"]
+			action = [GET: "getModelForCreate"]
 		}
 
-		"/ws/moveEvent/viewEditModel/$id" {
+		"/ws/moveEvent/viewEditModel/$moveEventId" {
 			controller = "wsEvent"
-			action = [GET:"getModelForViewEdit"]
+			action = [GET: "getModelForViewEdit"]
 		}
 
-		"/ws/moveEvent/saveEvent/$id?" {
+		"/ws/moveEvent/save/$moveEventId?" {
 			controller = "wsEvent"
-			action = [POST:"saveEvent"]
+			action = [POST: "save"]
 		}
 
-		"/ws/moveEvent/deleteEvent/$id" {
+		"/ws/moveEvent/delete/$moveEventId" {
 			controller = "wsEvent"
-			action = [DELETE:"deleteEvent"]
+			action = [DELETE: "delete"]
 		}
 
 		"/ws/moveEventNews/$id?" {

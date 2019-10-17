@@ -777,6 +777,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe(() => {
 				// nothing to do here
 			});
+		this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
 	}
 
 	/**

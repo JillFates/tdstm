@@ -49,27 +49,39 @@ class TagEventService implements ServiceMethods {
 	}
 
 	/**
-	 * Creates tagEvents for a list of tags, to an event, and returns the list of tagEvents.
+	 * Creates tagEvents for a list of tags, given an event id, and returns the list of tagEvents.
 	 *
+	 * @param currentProject - user's current project.
 	 * @param tagIds The ids of the tags to apply create tagEvents for the event.
 	 * @param event The event to make tagEvents for.
 	 *
 	 * @return A List of tagEvents linking tags, to events.
 	 */
 	List<TagEvent> applyTags(Project currentProject, List<Long> tagIds, Long eventId) {
-		MoveEvent event = get(MoveEvent, eventId, currentProject)
+		return applyTags(currentProject, tagIds, get(MoveEvent, eventId, currentProject))
+	}
 
+	/**
+	 * Creates tagEvents for a list of tags, to an event instance, and returns the list of tagEvents.
+	 *
+	 * @param currentProject - user's current project.
+	 * @param tagIds The ids of the tags to apply create tagEvents for the event.
+	 * @param event The event to make tagEvents for.
+	 *
+	 * @return A List of tagEvents linking tags, to events.
+	 */
+	List<TagEvent> applyTags(Project project, List<Long> tagIds, MoveEvent moveEvent) {
 		List<TagEvent> tagEvents = tagIds.collect { Long tagId ->
-			Tag tag = get(Tag, tagId, currentProject)
+			Tag tag = get(Tag, tagId, project)
 
-			TagEvent tagEvent = new TagEvent(tag: tag, event: event)
-			event.refresh()
+			TagEvent tagEvent = new TagEvent(tag: tag, event: moveEvent)
+			moveEvent.refresh()
 			return tagEvent.save()
 		}
 
 		// Bump the last updated date for the given asset.
-		event.lastUpdated = TimeUtil.nowGMT()
-		event.save()
+		moveEvent.lastUpdated = TimeUtil.nowGMT()
+		moveEvent.save()
 
 		return tagEvents
 	}
