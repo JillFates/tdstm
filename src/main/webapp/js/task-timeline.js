@@ -20,6 +20,8 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
+	// loadTeams();
+
 	$("input[name=mode]").on('change', function(ev) {
 		if(ev && ev.target && ev.target.value === 'C'){
 			$('#baselinePlanButton').hide();
@@ -642,21 +644,6 @@ function buildGraph(response, status) {
 		}
 	}
 
-	// populate the team select
-	function populateTeamSelect() {
-		teamSelect = $("#teamSelectId")
-		teamSelect.children().remove();
-		teamSelect.append('<option value="ALL">All Teams</option>');
-		teamSelect.append('<option value="NONE">No Team Assignment</option>');
-		teamSelect.append('<option disabled>──────────</option>');
-
-		$.each(data.roles, function (index, team) {
-			teamSelect.append('<option value="' + team + '">' + team + '</option>');
-		});
-
-		teamSelect.val('ALL');
-	}
-
 	// called when the brush is dragged
 	function brushed() {
 		var brushRange = Math.abs(brush.extent()[1] - brush.extent()[0]);
@@ -849,8 +836,8 @@ function buildGraph(response, status) {
 				.attr('y', function (d) { return d.points.y2 + 3; })
 				.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
 				.attr('height', function (d) { return d.points.h; })
-				.text(function (d) { return d.number + ': ' + d.name; });
-
+				.text(function (d) { return d.number + ': ' + d.comment; });
+			// debugger
 
 			if (scaled || resized)
 				GraphUtil.forceReflow(itemLabels)
@@ -1478,9 +1465,9 @@ function buildGraph(response, status) {
         // convert all data to its proper format
         if (data.startDate === undefined) {
             data.items.forEach( task => {
-                if (task.estStart != undefined) {
-                    if (data.startDate == undefined || task.estStart < data.startDate) {
-                        data.startDate = new Date(task.estStart);
+                if (task.estInitial != undefined) {
+                    if (data.startDate == undefined || task.estInitial < data.startDate) {
+                        data.startDate = new Date(task.estInitial);
                     }
                 }
             });
@@ -1562,7 +1549,7 @@ function buildGraph(response, status) {
 		data.root = null;
 		if (starts.size() > 1) {
             var earliest = starts[0].startInitial;
-            //var earliest = starts[0].estStart;
+            //var earliest = starts[0].estInitial;
 			for (var i = 0; i < starts.size(); i++) {
 				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
@@ -1574,7 +1561,7 @@ function buildGraph(response, status) {
 			root.root = true;
 //			root.startInitial = 0;
 //			root.endInitial = 0;
-            root.estStart = startTime;
+            root.estInitial = startTime;
             root.estFinish = new Date(startTime.getTime() + 1);
 			root.predecessorIds = [];
 			items = [root].concat(items);
@@ -1592,14 +1579,14 @@ function buildGraph(response, status) {
 
             items[i].endInitial = new Date(endInitial).getTime()
 			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);*/
-		    if (items[i].estStart == undefined) {
+		    if (items[i].estInitial == undefined) {
                 unknownStarts.push(i);
             }
-            //items[i].milestone = ((items[i].estStart) && (items[i].estStart == items[i].estFinish));
+            //items[i].milestone = ((items[i].estInitial) && (items[i].estInitial == items[i].estFinish));
             items[i].milestone = (items[i].duration == 0);
-            if (items[i].estStart) {
-                items[i].estStart = new Date(items[i].estStart);
-//                items[i].startInitial = parseStartDate(items[i].estStart.getTime())
+            if (items[i].estInitial) {
+                items[i].estInitial = new Date(items[i].estInitial);
+//                items[i].startInitial = parseStartDate(items[i].estInitial.getTime())
 //            } else {
 //                items[i].startInitial = parseStartDate(items[i].startInitial + data.startDate.getTime());
             }
@@ -1609,7 +1596,7 @@ function buildGraph(response, status) {
             }
 //            items[i].endInitial = parseStartDate(items[i].endInitial);
 //            items[i].endInitial = new Date(items[i].endInitial.getTime() + (items[i].milestone * 60000));
-            items[i].start = items[i].estStart;
+            items[i].start = items[i].estInitial;
 			items[i].end = items[i].estEnd;
 			items[i].exChild = null;
 			items[i].exParent = null;
@@ -2442,9 +2429,9 @@ function buildGraph(response, status) {
 		if (!task.start) {
 			if (task.predecessors.length == 0) {
 				//task.start = new Date(task.startInitial);
-                //task.start = task.estStart;
-                if (task.estStart) {
-                    task.start = task.estStart
+                //task.start = task.estInitial;
+                if (task.estInitial) {
+                    task.start = task.estInitial
                 //} else if (task.startInitial) {
                 //    task.start = new Date(data.startDate.getTime() + task.startInitial)
                 } else {
@@ -2516,36 +2503,87 @@ function submitForm() {
 	generateGraph($('#moveEventId').val());
 }
 
+// populate the team select
+function populateTeamSelect(roles) {
+	teamSelect = $("#teamSelectId");
+	teamSelect.children().remove();
+	teamSelect.append('<option value="ALL">All Teams</option>');
+	teamSelect.append('<option value="NONE">No Team Assignment</option>');
+	teamSelect.append('<option disabled>──────────</option>');
+
+	$.each(roles, function (index, team) {
+		teamSelect.append('<option value="' + team + '">' + team + '</option>');
+	});
+
+	teamSelect.val('ALL');
+}
+
+function loadTeams() {
+	$('#spinnerId').css('display', 'block');
+	var url = tdsCommon.createAppURL('/wsTimeline/baseline');
+	jQuery.ajax({
+		dataType: 'json',
+		url: url,
+		type: 'GET',
+		complete: function (data) {
+			populateTeamSelect(data.roles);
+			$('#spinnerId').css('display', 'none');
+		}
+	});
+
+}
+
+function baseLine(){
+    var id = $('#moveEventId').val();
+
+    var params = {id:id};
+    params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? true : false;
+
+    $('#spinnerId').css('display', 'block');
+
+    var url;
+
+    url = tdsCommon.createAppURL('/wsTimeline/baseline');
+    jQuery.ajax({
+        dataType: 'json',
+        url: url,
+        data:params,
+        type: 'POST',
+        complete: function () {
+            $('#spinnerId').css('display', 'none');
+            generateGraph();
+        }
+    });
+}
+
+
+
 
 /**
  * Call the REST API to grab the data to generate the Timeline
  */
-function generateGraph(event) {
-	var params = {};
+function generateGraph() {
+    var id = $('#moveEventId').val();
+    var mode = $("input[name=mode]:checked").val();
+    var viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
-	if (event !== 0) {
-		params = { 'moveEventId': event };
-	}
+    $('#spinnerId').css('display', 'block');
 
-	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? 'true' : 'false';
+    var params = {
+        id:id,
+        mode:mode,
+        viewUnpublished:viewUnpublished
+    };
 
-	$('#spinnerId').css('display', 'block');
+    var queryParams = $.param(params);
 
-	var id = $('#moveEventId').val();
-	var mode = $("input[name=mode]:checked").val();
-
-	var queryParams = $.param({
-		id:id,
-		mode:mode
-	});
-
-	jQuery.ajax({
-		dataType: 'json',
-		url: '/tdstm/wsTimeline/timeline?'+ queryParams,
-		data: params,
-		type: 'GET',
-		complete: buildGraph
-	});
+    var url = tdsCommon.createAppURL('/wsTimeline/timeline?'+queryParams);
+    jQuery.ajax({
+        dataType: 'json',
+        url: url,
+        type: 'GET',
+        complete: buildGraph
+    });
 }
 
 // highlight tasks matching the user's regex

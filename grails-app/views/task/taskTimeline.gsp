@@ -66,7 +66,7 @@
 							<label >Recalculate</label>
 						</span>
 						<span id="baselinePlanButton">
-							<div class="graphPanelTab" onclick="baselinePlan()" title="Baseline" ><h4>Baseline Plan</h4></div>
+							<div class="graphPanelTab" onclick="baseLine()" title="Baseline" ><h4>Baseline Plan</h4></div>
 %{--							<button type="button">Baseline </button>--}%
 						</span>
 
