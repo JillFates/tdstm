@@ -67,6 +67,9 @@ export class LoginComponent implements OnInit {
 		password: '',
 	};
 
+	/**
+	 * Holds the state of the login Button
+	 */
 	public loginState: string = 'default';
 
 	/**
