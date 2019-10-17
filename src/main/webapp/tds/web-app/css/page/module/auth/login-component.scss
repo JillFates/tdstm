@@ -56,6 +56,12 @@ div.login-component {
         .login-notice__wrapper {
           margin-top: 1rem;
         }
+        .login-button__wrapper {
+          .login-button {
+            width: 100%;
+            max-width: 100%;
+          }
+        }
       }
       // Looks is used on Forgot and Change Password, so keep it here
       .login-box-body {

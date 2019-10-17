@@ -72,7 +72,13 @@
 						</div>
 					</div>
 					<div class="clr-col-12 login-button__wrapper">
-						<button type="submit" class="btn btn-primary" (click)="onLogin()">Log In</button>
+						<tds-button
+								class="login-button"
+								theme="primary"
+								state="{{onLoginProgress? 'loading' : 'default'}}"
+								(click)="onLogin()">
+							Log In
+						</tds-button>
 					</div>
 				</form>
 			</section>
