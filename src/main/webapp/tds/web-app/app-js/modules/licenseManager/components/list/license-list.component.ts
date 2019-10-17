@@ -28,7 +28,7 @@ import {
 // Kendo
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
-import {BooleanFilterData} from "../../../../shared/model/data-list-grid.model";
+import {BooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 
 declare var jQuery: any;
 
