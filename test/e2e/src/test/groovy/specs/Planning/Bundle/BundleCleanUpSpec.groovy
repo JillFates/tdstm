@@ -35,6 +35,7 @@ class BundleCleanUpSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(1500)
         planningModule.goToListBundles()
         sleep(1500)
         at ListBundlesPage

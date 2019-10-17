@@ -33,6 +33,7 @@ class SearchBundlesSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(1500)
         planningModule.goToListBundles()
         sleep(3000)
     }

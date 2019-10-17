@@ -36,7 +36,9 @@ class EditBundlesSpec extends GebReportingSpec {
         login()
         sleep(3000)
         at MenuPage
+        sleep(1500)
         planningModule.goToListBundles()
+        sleep(1500)
         at ListBundlesPage
         clickCreate()
         at CreateBundlePage

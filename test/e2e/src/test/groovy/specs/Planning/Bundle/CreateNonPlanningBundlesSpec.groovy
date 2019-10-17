@@ -35,6 +35,7 @@ class CreateNonPlanningBundlesSpec extends GebReportingSpec {
         at MenuPage
         sleep(1000)
         planningModule.goToListBundles()
+        sleep(1500)
     }
 
     def setup() {
