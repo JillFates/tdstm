@@ -31,7 +31,7 @@ class PermissionsService {
 	void update(Map params){
 
 		def paramList = params.column
-		jdbcTemplate.update("delete from role_permissions")
+		RolePermissions.deleteAll()
 		for (Permissions permission in Permissions.list()) {
 			for (String role in Permissions.Roles.NAMES) {
 				def param = params['role_' + permission.id + '_' + role]

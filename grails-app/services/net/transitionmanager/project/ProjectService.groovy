@@ -383,12 +383,12 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers.
+	 * Get all clients, partners, managers(id and name only).
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.executeQuery("""
+		List<PartyRelationship> managers = PartyRelationship.executeQuery("""
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
@@ -396,10 +396,16 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
+		managers = managers.sort { it.partyIdTo?.lastName }
+		List<Map<String,?>> managersMap = managers.collect { it -> [
+				  id  : it.partyIdTo.id,
+				  name: it.partyIdTo.toString()
+		]}
+
 		[
 			clients : getAllClients(),
 			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-			managers: managers.sort { it.partyIdTo?.lastName }
+			managers: managersMap
 		]
 	}
 
@@ -602,8 +608,7 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		def message
+	void deleteProject(projectId, includeProject=false) throws UnauthorizedException {
 		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
 		Project projectInstance = Project.get(projectId)
 
@@ -718,7 +723,6 @@ class ProjectService implements ServiceMethods {
 			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
-		return message
 	}
 
 	/**
@@ -1810,11 +1814,11 @@ class ProjectService implements ServiceMethods {
 					clientName           : project.client.toString(),
 					description          : project.description ?: '',
 					comment				 : project.comment ?: '',
-					startDate            : project.startDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
-					completionDate       : project.completionDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
+					startDate            : project.startDate,
+					completionDate       : project.completionDate,
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
-					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
-					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
+					licenseActivationDate: licenseData?.goodAfterDate,
+					licenseExpirationDate: licenseData?.goodBeforeDate
 			]
 		}
 	}
@@ -1912,6 +1916,7 @@ class ProjectService implements ServiceMethods {
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
 			planMethodology = projectCommand.planMethodology
+			collectMetrics = projectCommand.collectMetrics ? 1 : 0
 			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn
