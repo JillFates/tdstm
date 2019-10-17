@@ -86,6 +86,9 @@ export class DateUtils {
 	 * @returns {Date} The date adjusted to GMT (Timezone remains the same)
 	 */
 	public static adjustDateTimezoneOffset(sourceTime: Date): Date {
+		if (!sourceTime) {
+			return null;
+		}
 		let adjustedTime = new Date ( sourceTime );
 		adjustedTime.setMinutes ( sourceTime.getMinutes() + sourceTime.getTimezoneOffset() );
 		return adjustedTime;

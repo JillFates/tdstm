@@ -28,6 +28,7 @@ import {
 // Kendo
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {BooleanFilterData} from "../../../../shared/model/data-list-grid.model";
 
 declare var jQuery: any;
 
@@ -59,6 +60,7 @@ export class LicenseListComponent implements OnInit {
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
+	public booleanFilterData = BooleanFilterData;
 
 	constructor(
 		private dialogService: UIDialogService,

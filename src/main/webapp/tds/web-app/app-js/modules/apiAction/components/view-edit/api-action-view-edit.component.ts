@@ -14,9 +14,7 @@ import {
 	APIActionParameterColumnModel,
 	APIActionParameterModel,
 	APIActionType,
-	EVENT_BEFORE_CALL_TEXT,
 	EventReaction,
-	EventReactionType,
 	Languages
 } from '../../model/api-action.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
@@ -39,6 +37,7 @@ import { CHECK_ACTION } from '../../../../shared/components/check-action/model/c
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { takeUntil } from 'rxjs/operators';
+import { ApiActionViewEditReactionsComponent } from './api-action-view-edit-reactions.component';
 
 declare var jQuery: any;
 
@@ -83,9 +82,9 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	@ViewChild('simpleInfoForm') simpleInfoForm: NgForm;
 	@ViewChild('httpAPIForm') httpAPIForm: NgForm;
 	@ViewChild('apiActionParametersForm') apiActionParametersForm: NgForm;
-	@ViewChild('apiActionReactionForm') apiActionReactionForm: NgForm;
 	@ViewChildren('codeMirror') public codeMirrorComponents: QueryList<CodeMirrorComponent>;
 	@ViewChild('apiActionContainer') apiActionContainer: ElementRef;
+	@ViewChild('apiActionViewEditReactionsComponent') apiActionViewEditReactionsComponent: ApiActionViewEditReactionsComponent;
 	public codeMirrorComponent: CodeMirrorComponent;
 	protected tabsEnum = NavigationTab;
 	private WEB_API = 'WEB_API';
@@ -108,7 +107,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	private dataParameterListSignature: string;
 	private requiredFields = ['name', 'provider', 'actionType'];
 	private intervals = INTERVALS;
-	public eventBeforeCallText = EVENT_BEFORE_CALL_TEXT;
 	public interval = INTERVAL;
 	public selectedInterval = { value: 0, interval: '' };
 	public selectedLapsed = { value: 0, interval: '' };
@@ -585,7 +583,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			return actionTypeId === this.WEB_API;
 		}
 		if (actionType === APIActionType.SCRIPT) {
-			return actionTypeId !== null && actionTypeId !== this.WEB_API;
+			return actionTypeId !== null || actionTypeId !== this.WEB_API;
 		}
 		return false;
 	}
@@ -831,42 +829,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Show only the Event Label if one Event is selected
-	 */
-	showsEventLabel(): boolean {
-		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
-		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
-			let eventItem = events.find((event) => {
-				return eventReaction.type === event;
-			});
-			return eventItem !== undefined && eventReaction.selected;
-		});
-		return eventRectionItem !== undefined;
-	}
-
-	/**
-	 * Show only the Customize Label if one Custom is selected
-	 */
-	showsCustomizeLabel(): boolean {
-		let events = [EventReactionType.PRE, EventReactionType.FINAL];
-		let eventRectionItem = this.apiActionModel.eventReactions.find((eventReaction) => {
-			let eventItem = events.find((event) => {
-				return eventReaction.type === event;
-			});
-			return eventItem !== undefined && eventReaction.selected;
-		});
-		return eventRectionItem !== undefined;
-	}
-
-	/**
-	 * Close and Open the Panel for Code Mirror
-	 * @param {EventReaction} eventReaction
-	 */
-	openCloseCodeMirror(eventReaction: EventReaction): void {
-		eventReaction.open = !eventReaction.open;
-	}
-
-	/**
 	 * When the Context has change, we should load the list of params associate with the Asset Class,
 	 * if the value is USER_DEF, the field will become a text input field
 	 */
@@ -893,69 +855,10 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Execute the validation and return an Observable
-	 * so we can attach this event to different validations
-	 * @returns {Observable<any>}
-	 */
-	validateAllSyntax(singleEventReaction?: EventReaction): Observable<any> {
-		return new Observable(observer => {
-			let scripts = [];
-			// Doing a single Event reaction Validation
-			if (singleEventReaction) {
-				if (singleEventReaction.value !== '') {
-					scripts.push({code: singleEventReaction.type, script: singleEventReaction.value});
-				}
-			} else {
-				this.apiActionModel.eventReactions.forEach((eventReaction: EventReaction) => {
-					eventReaction.state = this.checkActionModel.UNKNOWN;
-					eventReaction.error = '';
-					if (eventReaction.value !== '') {
-						scripts.push({code: eventReaction.type, script: eventReaction.value});
-					}
-				});
-			}
-			this.apiActionService.validateCode(scripts)
-				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe(
-				(result: any) => {
-					this.invalidScriptSyntax = false;
-					result.forEach((eventResult: any) => {
-						let eventReaction = this.apiActionModel.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
-						if (!eventResult['validSyntax']) {
-							let errorResult = '';
-							eventResult.errors.forEach((error: string) => {
-								errorResult += error['message'] + '\n';
-							});
-							eventReaction.error = errorResult;
-							eventReaction.state = this.checkActionModel.INVALID;
-							this.invalidScriptSyntax = true;
-						} else {
-							eventReaction.state = this.checkActionModel.VALID;
-						}
-					});
-					observer.next();
-				},
-				(err) => console.log(err));
-		});
-	}
-
-	/**
-	 *  Verify the current Event Reaction input is a valid code
-	 * @param {EventReaction} eventReaction
-	 */
-	verifyCode(eventReaction: EventReaction): void {
-		this.validateAllSyntax(eventReaction)
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe();
-	}
-
-	/**
 	 * Execute the API to validated every Syntax Value.
 	 */
 	onCheckAllSyntax(): void {
-		this.validateAllSyntax()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe();
+		this.apiActionViewEditReactionsComponent.onCheckAllSyntax();
 	}
 
 	/**
@@ -979,21 +882,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 	private focusForm() {
 		this.apiActionContainer.nativeElement.focus();
-	}
-
-	protected isCheckSyntaxSectionDisabled(sectionIndex: number): boolean {
-		const eventReaction: EventReaction = this.apiActionModel.eventReactions[sectionIndex];
-		return eventReaction.value === '' || eventReaction.state === CHECK_ACTION.VALID;
-	}
-
-	public onEventReactionSelect(eventReaction: EventReaction): void {
-		if (eventReaction.type === EventReactionType.PRE) {
-			if (eventReaction.selected && eventReaction.value === '') {
-				eventReaction.value = this.eventBeforeCallText;
-			} else {
-				eventReaction.value = '';
-			}
-		}
 	}
 
 	canSave(): boolean {
@@ -1034,7 +922,6 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 
 	getClonedCodeMirrorSettings(properties: any): any {
 		const cloned =  Object.assign({}, this.codeMirror, properties);
-
 		return cloned;
 	}
 
@@ -1042,7 +929,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	 * Based on the action type determines if the invocation is remote
 	*/
 	isRemote(): boolean {
-		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== 'WEB_API');
+		return Boolean(this.apiActionModel.actionType && this.apiActionModel.actionType.id !== this.WEB_API);
 	}
 
 	/**

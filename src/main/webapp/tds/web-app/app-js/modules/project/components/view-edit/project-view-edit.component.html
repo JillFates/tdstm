@@ -60,7 +60,7 @@
                             <tr class="prop">
                                 <td valign="top" class="name">Start Date:</td>
 
-                                <td valign="top" class="value">{{savedModel?.startDate | tdsDate: userDateFormat}}</td>
+                                <td valign="top" class="value"><span *ngIf="savedModel?.startDate">{{savedModel?.startDate | tdsDate: userDateFormat}}</span></td>
 
                             </tr>
 
