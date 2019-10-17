@@ -9,7 +9,6 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
 import net.transitionmanager.command.ProjectCommand
-import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -18,22 +17,19 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
-import org.apache.tomcat.util.descriptor.web.ContextService
+
 /**
  * Handles WS calls of the ProjectsService
  */
 @Secured('isAuthenticated()')
 @Slf4j
 class WsProjectController implements ControllerMethods {
-
 	PartyRelationshipService partyRelationshipService
 	CustomDomainService customDomainService
 	PersonService personService
 	ProjectService projectService
-	ControllerService controllerService
 	UserPreferenceService userPreferenceService
-	ContextService contextService
-    MoveBundleService moveBundleService
+	MoveBundleService moveBundleService
 
 	/**
 	 * Gets the projects associated to a user
@@ -92,19 +88,18 @@ class WsProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		// Copy plan methodology field from the default project
 		Project defaultProject = Project.defaultProject
-		List<Map> managers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
-		params.planMethodology = defaultProject.planMethodology
 
 		renderSuccessJson([
-				clients: projectDetails.clients,
-				company: company,
-				managers: managers,
-		 		partners: projectDetails.partners,
-				projectInstance: new Project(params),
-				projectTypes: projectTypes,
-				planMethodologies:planMethodologies ])
+				  clients          : projectDetails.clients,
+				  company          : company,
+				  managers         : projectDetails.managers,
+				  partners         : projectDetails.partners,
+				  projectInstance  : new Project(params),
+				  projectTypes     : projectTypes,
+				  planMethodologies: planMethodologies
+		])
 	}
 
 	@HasPermission(Permission.ProjectView)
@@ -116,7 +111,6 @@ class WsProjectController implements ControllerMethods {
 		PartyGroup company = securityService.userLoginPerson.company
 		String companyId = company.id
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
-		Project defaultProject = Project.defaultProject
 
 		// Save and load various user preferences
 		userPreferenceService.setCurrentProjectId(project.id)
@@ -146,27 +140,26 @@ class WsProjectController implements ControllerMethods {
 			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
-		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
-		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
+		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(project)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		List availableBundles = moveBundleService.lookupList(project)
 
 		renderSuccessJson([
-				clients				 : projectDetails.clients,
-				projectInstance      : project,
-				timezone             : project.timezone?.label ?: '',
-				client               : project.client,
-				defaultBundle        : project.defaultBundle,
-				availableBundles	 : availableBundles,
-				possiblePartners	 : projectDetails.partners,
-				possibleManagers	 : possibleManagers,
-				projectPartners      : partyRelationshipService.getProjectPartners(project),
-				projectManagers      : projectService.getProjectManagers(project).collect{ it -> it.toString()},
-				projectLogoForProject: projectLogo,
-				isDeleteable         : isDeleteable,
-				planMethodology      : planMethodology,
-				projectTypes: projectTypes,
-				planMethodologies: planMethodologies
+				  clients              : projectDetails.clients,
+				  projectInstance      : project,
+				  timezone             : project.timezone?.label ?: '',
+				  client               : project.client,
+				  defaultBundle        : project.defaultBundle,
+				  availableBundles     : availableBundles,
+				  possiblePartners     : projectDetails.partners,
+				  possibleManagers     : projectDetails.managers,
+				  projectPartners      : partyRelationshipService.getProjectPartners(project),
+				  projectManagers      : projectService.getProjectManagers(project).collect { it -> it.toString() },
+				  projectLogoForProject: projectLogo,
+				  isDeleteable         : isDeleteable,
+				  planMethodology      : planMethodology,
+				  projectTypes         : projectTypes,
+				  planMethodologies    : planMethodologies
 		])
 	}
 
@@ -194,7 +187,7 @@ class WsProjectController implements ControllerMethods {
 
 		log.info "Project $project.name($project.id) is going to be deleted by $securityService.currentUsername"
 		try {
-			def message = projectService.deleteProject(project.id, true)
+			projectService.deleteProject(project.id, true)
 
 			flash.message = "Project $project.name deleted"
 			renderSuccessJson(flash.message)

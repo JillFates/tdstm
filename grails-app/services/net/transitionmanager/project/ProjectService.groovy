@@ -383,12 +383,12 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers.
+	 * Get all clients, partners, managers(id and name only).
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.executeQuery("""
+		List<PartyRelationship> managers = PartyRelationship.executeQuery("""
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
@@ -396,10 +396,16 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
+		managers = managers.sort { it.partyIdTo?.lastName }
+		List<Map<String,?>> managersMap = managers.collect { it -> [
+				  id  : it.partyIdTo.id,
+				  name: it.partyIdTo.toString()
+		]}
+
 		[
 			clients : getAllClients(),
 			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-			managers: managers.sort { it.partyIdTo?.lastName }
+			managers: managersMap
 		]
 	}
 
@@ -602,8 +608,7 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		def message
+	void deleteProject(projectId, includeProject=false) throws UnauthorizedException {
 		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
 		Project projectInstance = Project.get(projectId)
 
@@ -718,7 +723,6 @@ class ProjectService implements ServiceMethods {
 			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
-		return message
 	}
 
 	/**
