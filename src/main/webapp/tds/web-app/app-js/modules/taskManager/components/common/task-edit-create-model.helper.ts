@@ -145,6 +145,7 @@ export class TaskEditCreateModelHelper {
 	public getModelForDetails(task: any): any {
 		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
+		const asset = assetComment['asset'] || {};
 		const durationScale = assetComment.durationScale || null;
 		const [yes, no] = YesNoList;
 
@@ -184,7 +185,7 @@ export class TaskEditCreateModelHelper {
 			instructionsLinkLabel: detail.instructionsLinkLabel || '',
 			instructionsLinkURL: detail.instructionsLinkURL || '',
 			priority: assetComment.priority,
-			assetName: detail.assetName,
+			assetName: asset.name,
 			comment:  assetComment.title || '',
 			assetClass: {id: detail.assetClass, text: detail.assetClasses && detail.assetClasses[detail.assetClass] || ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
@@ -201,7 +202,7 @@ export class TaskEditCreateModelHelper {
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: PriorityList,
-			asset: {id: detail.assetId, text: detail.assetName},
+			asset: {id: asset.id, text: asset.name},
 			assignedTo: {id : (assetComment.assignedTo) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
 			event: {id: (assetComment.moveEvent) || null, text: detail.eventName},

@@ -6,8 +6,6 @@ import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.TimeUtil
-import groovy.time.TimeCategory
-
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.imports.TaskBatch
@@ -16,16 +14,16 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.StringUtils
 
-import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.TimeScale.M
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 
 class AssetComment {
 
@@ -508,8 +506,6 @@ class AssetComment {
 
 		return [
 			id                       : id,
-			assetName                : assetEntity?.assetName,
-			assetType                : assetEntity?.assetType,
 			taskNumber               : taskNumber,
 			title                    : comment,
 			status                   : status,
