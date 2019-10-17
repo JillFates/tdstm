@@ -7,7 +7,7 @@ import {
 	SimpleChanges,
 	EventEmitter,
 	ViewChild,
-	ElementRef, HostListener, OnDestroy
+	ElementRef, HostListener, OnDestroy, Renderer2
 } from '@angular/core';
 import * as go from 'gojs';
 import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../modules/taskManager/components/common/constants/task-icon-path';
@@ -29,10 +29,10 @@ import {of, ReplaySubject} from 'rxjs';
 import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
 import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/diagram-context-menu.model';
 import {IGraphTask} from '../../../modules/taskManager/model/graph-task.model';
-import * as moment from 'moment';
-import {delay, takeUntil, timeout} from 'rxjs/operators';
+import {takeUntil} from 'rxjs/operators';
 import {NotifierService} from '../../services/notifier.service';
 import {TaskActionEvents} from '../../../modules/taskManager/components/common/constants/task-action-events.constant';
+import {TaskTeam} from '../../../modules/taskManager/components/common/constants/task-team.constant';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -67,6 +67,9 @@ const enum NodeTemplateEnum {
 				class="overview-container"
 				[class.reset-overview-index]="resetOvIndex"
 				#overviewContainer></div>
+			<div id="node-tooltip" #nodeTooltip>
+				{{tooltipText}}
+			</div>
 		</div>`,
 })
 export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestroy {
@@ -82,6 +85,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@ViewChild('diagramLayout') diagramLayout: ElementRef;
 	@ViewChild('overviewContainer') overviewContainer: ElementRef;
 	@ViewChild('taskCtxMenu') taskCtxMenu: DiagramContextMenuComponent;
+	@ViewChild('nodeTooltip') nodeTooltip: ElementRef;
 	stateIcons = STATE_ICONS_PATH;
 	assetIcons = ASSET_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
@@ -99,8 +103,12 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	largeArrayRemaining: boolean;
 	DATA_CHUNKS_SIZE = 200;
 	unsubscribe$: ReplaySubject<void> = new ReplaySubject();
+	tooltipText: string;
 
-	constructor(private notifierService: NotifierService) {
+	constructor(
+		private notifierService: NotifierService,
+		private renderer: Renderer2
+		) {
 		this.onResize();
 	}
 
@@ -618,9 +626,18 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	/**
 	 * highlight nodes by team on the diagram
 	 **/
-	highlightNodesByTeam(matches: any[]): void {
+	highlightNodesByTeam(matches: string): void {
 		this.diagram.commit(d => {
-			const highlightCollection = d.nodes.filter(f => !!matches.find(m => m === f.data.team));
+			let highlightCollection: any;
+
+			if (matches && matches === TaskTeam.ALL_TEAMS) {
+				return;
+			} else if (matches === TaskTeam.NO_TEAM_ASSIGNMENT) {
+				highlightCollection = d.nodes.filter(f => !f.data.team);
+			} else {
+				highlightCollection = d.nodes.filter(f => matches === f.data.team);
+			}
+
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
@@ -630,15 +647,36 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 	/**
 	 * highlight filter, every node that has a description matching the text received will be highlighted
-	 * @param {string} match > optional configuration to use for the template
+	 * @param {string} match > criteria to highlight
+	 * @param {string} team > optional criteria to filter nodes to highlight
 	 **/
-	highlightNodesByText(match: string): void {
+	highlightNodesByText(match: string, team?: string): void {
 		this.diagram.commit(d => {
-			if (match.length <= 0) { return d.clearSelection(); }
-			const highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
+			if (!match || match.length < 1) { return d.clearSelection(); }
+			let highlightCollection: any;
+
+			if (match && team) {
+				if (team === TaskTeam.ALL_TEAMS) {
+					highlightCollection = d.nodes
+						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
+				} else if (team === TaskTeam.NO_TEAM_ASSIGNMENT) {
+					highlightCollection = d.nodes
+						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase())
+							&& !f.data.team);
+				} else {
+					highlightCollection = d.nodes
+						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase())
+							&& (f.data.team && f.data.team.includes(team)));
+				}
+			} else {
+				highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
+			}
+
 			d.selectCollection(highlightCollection);
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.centerRect(highlightCollection.first().actualBounds);
+			} else {
+				d.clearSelection();
 			}
 		});
 	}
@@ -719,6 +757,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		shape.desiredSize = new go.Size(25, 35);
 		shape.bind(new go.Binding('fill', 'status',
 			(status: string) => this.getStatusColor(status.toLowerCase())));
+		shape.toolTip = this.createTooltip();
 		node.add(shape);
 		node.contextMenu = this.contextMenu();
 
@@ -799,6 +838,36 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.unsubscribe$.next();
 		this.unsubscribe$.complete();
 		this.diagram.clear();
+	}
+
+	/**
+	 * Node Context menu containing a variety of operations like 'edit task', 'show task detail', 'start', 'hold', etc
+	 **/
+	createTooltip(): any {
+		const $ = go.GraphObject.make;
+		return $(go.HTMLInfo,  // HTML element to contain the context menu
+			{
+				show: (obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool) => this.showTooltip(obj, diagram, tool),
+				hide: () => this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'none'),
+				mainElement: this.nodeTooltip.nativeElement
+			}
+		); // end Adornment
+	}
+
+	/**
+	 * handler to show context menu passing relevant data to context menu component
+	 * @param {GraphObject} obj
+	 * @param {Diagram} diagram
+	 * @param {Tool} tool
+	 **/
+	showTooltip(obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool): void {
+		if (this.nodeTooltip.nativeElement) {
+			const mousePt = diagram.lastInput.viewPoint;
+			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'block');
+			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'left', `${mousePt.x + 10}px`);
+			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'top', `${mousePt.y}px`);
+			this.tooltipText = obj.part.data.name;
+		}
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

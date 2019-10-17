@@ -21,12 +21,13 @@
   </div>
 
   <div class="row task-manager-sub-header">
-    <div class="col-md-4  k-align-self-center">
+    <div class="col-md-2  k-align-self-center">
       <label class="neighborhood-control-label" for="neighborhood-events-dropdown">Event:</label>
       <kendo-dropdownlist
         id="neighborhood-events-dropdown"
         textField="name"
         valueField="id"
+        [ngClass]="'neighborhood-custom-dropdown'"
         [data]="eventList$ | async"
         (selectionChange)="loadFromSelectedEvent($event)"
         [(ngModel)]="selectedEvent"
@@ -34,35 +35,56 @@
         #eventsDropdown>
       </kendo-dropdownlist>
     </div>
-    <div class="col-md-4 highlight-filter-container">
-      <input type="text" class="form-control highlight-filter-control" placeholder="Highlight filter" [(ngModel)]="filterText" (ngModelChange)="highlightFilterChange()" />
-      <label class="d-inline-block task-chk-container">
-        My Tasks
-        <input name="myTasks" type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
-        <span class="checkmark"></span>
-      </label>
-      <kendo-dropdownbutton
-        id="neighborhood-team-highlight"
+    <div class="col-md-2  k-align-self-center">
+      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Teams:</label>
+      <kendo-dropdownlist
+        id="neighborhood-teams-dropdown"
         textField="label"
-        [icon]="'myspace'"
+        valueField="label"
+        [ngClass]="'neighborhood-custom-dropdown'"
+        [value]="selectedEvent"
         [data]="teamHighlights$ | async"
-        (itemClick)="highlightByTeam($event)"
+        (selectionChange)="highlightByTeam($event)"
         [(ngModel)]="selectedTeam"
-        ngDefaultControl
         #teamHighlightDropdown>
-      </kendo-dropdownbutton>
+      </kendo-dropdownlist>
+    </div>
+    <div class="col-md-2">
+      <div class="highlight-filter-container">
+        <div class="disp-table-cell">
+          <input
+            type="text"
+            class="form-control highlight-filter-control"
+            placeholder="Highlight filter"
+            [(ngModel)]="filterText"
+            (ngModelChange)="highlightFilterChange()"
+            #highlightFilterText
+          />
+        </div>
+        <div class="disp-table-cell">
+          <fa-icon
+            [icon]="icons.faWindowClose"
+            (click)="clearTextFilter()"
+            [ngClass]="['clear-icon-button']"
+            [hidden]="!filterText || filterText.length < 1"></fa-icon>
+        </div>
+      </div>
     </div>
 
-    <div class="col-md-2 k-align-self-center">
-      <label class="d-inline-block task-chk-container">
+    <div class="col-md-6 chk-filter-container">
+      <label class="task-chk-container">
         <input  type="checkbox" [(ngModel)]="minimizeAutoTasks" (ngModelChange)="onMinimizeAutoTasksFilterChange()" />
         <span class="checkmark"></span>
         Minimize Auto Tasks
       </label>
-    </div>
 
-    <div class="col-md-2 k-align-self-center">
-      <label class="d-inline-block task-chk-container">
+      <label class="task-chk-container">
+        <input name="myTasks" type="checkbox" [(ngModel)]="myTasks" (ngModelChange)="onMyTasksFilterChange()" />
+        <span class="checkmark"></span>
+        My Tasks
+      </label>
+
+      <label class="task-chk-container">
         <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
         <span class="checkmark"></span>
         View Unpublished

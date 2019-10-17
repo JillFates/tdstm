@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
-import {distinct, map, skip} from 'rxjs/operators';
+import {distinctUntilChanged, map, skip} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 import {clone} from 'ramda';
@@ -39,6 +39,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Title} from '@angular/platform-browser';
+import {TaskTeam} from '../common/constants/task-team.constant';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -51,6 +52,7 @@ export class NeighborhoodComponent implements OnInit {
 	@ViewChild('graph') graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
 	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownButtonComponent;
+	@ViewChild('highlightFilterText') highlightFilterText: ElementRef<HTMLElement>;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -63,7 +65,7 @@ export class NeighborhoodComponent implements OnInit {
 	};
 	opened: boolean;
 	filterText: string;
-	textFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
+	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
 	icons = FA_ICONS;
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
@@ -73,8 +75,8 @@ export class NeighborhoodComponent implements OnInit {
 	myTasks: boolean;
 	minimizeAutoTasks: boolean;
 	urlParams: any;
-	teamHighlights$: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
-	selectedTeam: string;
+	teamHighlights$: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+	selectedTeam: any;
 	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 
@@ -250,7 +252,7 @@ export class NeighborhoodComponent implements OnInit {
 		if (!this.tasks) { return; }
 		const nodeDataArr = [];
 		const linksPath = [];
-		const teams = [];
+		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
 
 		const tasksCopy = this.tasks.slice();
 
@@ -261,19 +263,25 @@ export class NeighborhoodComponent implements OnInit {
 			const predecessorIds = t.task.predecessorIds && t.task.predecessorIds;
 
 			t.task.key = t.task.id;
-			if (!!t.task.team && !teams.includes(t.task.team)) { teams.push(t.task.team); }
+			if (t.task.team && !teams
+				.find(team => t.task.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
+				teams.push({label: t.task.team});
+			}
 			nodeDataArr.push(t.task);
 
 			if (predecessorIds && predecessorIds.length > 0) {
 				linksPath.push(...this.getLinksPathByPredecessorIds(t.task.id, predecessorIds));
 			}
 		});
-		this.teamHighlights$.next(teams.map(t => ({label: t})));
+		this.teamHighlights$.next(teams);
 		this.nodeData$.next({ data: nodeDataArr, linksPath });
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
 	}
 
+	/**
+	 * options that will be included in the diagram context menu
+	 **/
 	ctxMenuOptions(): IDiagramContextMenuOption {
 		return  {
 			containerComp: ContainerComp.NEIGHBORHOOD,
@@ -426,7 +434,7 @@ export class NeighborhoodComponent implements OnInit {
 	 * highlight nodes by team on the diagram
 	 **/
 	highlightByTeam(team: any): void {
-		const matches = [team.label];
+		const matches = team.label;
 		this.graph.highlightNodesByTeam(matches);
 	}
 
@@ -458,12 +466,19 @@ export class NeighborhoodComponent implements OnInit {
 		this.textFilter
 			.pipe(
 				skip(2),
-				distinct()
+				distinctUntilChanged()
 			).subscribe(text => {
-				this.graph.highlightNodesByText(text);
+				if (this.selectedTeam && this.selectedTeam.label) {
+					this.graph.highlightNodesByText(text, this.selectedTeam.label);
+				} else {
+					this.graph.highlightNodesByText(text);
+				}
 		});
 	}
 
+	/**
+	 * Reload Diagram data and re-render
+	 */
 	refreshDiagram(): void {
 		this.loadAll();
 	}
@@ -684,8 +699,22 @@ export class NeighborhoodComponent implements OnInit {
 		}
 	}
 
+	/**
+	 * update node on diagram
+	 * @param {IGraphTask} node
+	 */
 	updateGraphNode(node: IGraphTask): void {
 		this.graph.updateNode(node);
+	}
+
+	/**
+	 * Clear text filter
+	 */
+	clearTextFilter(): void {
+		if (!this.filterText) { return; }
+		this.highlightFilterText.nativeElement.nodeValue = '';
+		this.filterText = '';
+		this.textFilter.next(null);
 	}
 
 }
