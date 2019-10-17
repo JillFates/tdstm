@@ -48,8 +48,8 @@ class WsTimelineController implements ControllerMethods {
 			startDate = findEarliestStartVertex(graph.getStarts())?.earliestStartDate
 			endDate = findLatestFinishVertex(graph.getSinks())?.latestFinishDate
 		} else {
-			List<Task> startTasks = tasks.findAll { it.taskNumber in [graph.getStarts()*.taskNumber] }
-			List<Task> sinkTasks = tasks.findAll { it.taskNumber in [graph.getSinks()*.taskNumber] }
+			List<Task> startTasks = tasks.findAll { it.taskNumber in graph.getStarts()*.taskNumber }
+			List<Task> sinkTasks = tasks.findAll { it.taskNumber in graph.getSinks()*.taskNumber }
 			startDate = findEarliestStartTask(startTasks)?.estStart
 			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
 		}
