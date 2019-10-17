@@ -99,16 +99,16 @@ class WsUserController implements ControllerMethods {
 
 	/**
 	 * Used by the User Dashboard
-	 * @param id - ID of the user requested
-	 * @return Success structure with person, projects, project instance, and moveday categories
+	 * @param id - ID of the project requested
+	 * @return Success structure with person, projects, project instance, project logo ID and moveday categories
 	 */
-	def modelForUserDashboard(String id) {
+	def modelForUserDashboard(Long id) {
 		Project project
 		Person person = currentPerson()
 
-		if(id && id != "undefined") {
-			if (projectService.hasAccessToProject(id.toLong())) {
-				project = Project.findById(id.toLong())
+		if (id) {
+			if (projectService.hasAccessToProject(id)) {
+				project = Project.findById(id)
 				userPreferenceService.setCurrentProjectId(project.id)
 			} else {
 				throw new InvalidParamException('Current user does not have access to project with ID ' + id)
