@@ -14,7 +14,7 @@ import {ComboBoxComponent} from '@progress/kendo-angular-dropdowns';
                             (filterChange)="onFilterChange($event)"
                             (valueChange)="onValueChange($event)"
                             [popupSettings]="{popupClass: 'combo-group-open'}"
-							tabindex="{{tabIndex}}"
+							[tabindex]="tabIndex"
                             name="comboGroup">
                 <ng-template kendoComboBoxItemTemplate let-dataItem>
                     <div *ngIf="dataItem.category === CATEGORY_BY_REFERENCE" >
