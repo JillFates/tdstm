@@ -55,8 +55,10 @@
 }
 
 .highlight-filter-container {
+  display: table;
   border-radius: 5px;
   border: 1px solid #ddd;
+  padding: 0 2px 0 2px;
 }
 
 .highlight-filter-container > .btn {
@@ -65,13 +67,17 @@
 }
 
 .highlight-filter-control {
-  width: 60%;
+  width: 90%;
   border: none;
-  display: inline !important;
+  display: table-cell !important;
+}
+
+.chk-filter-container {
+  display: table !important;
 }
 
 .task-chk-container {
-  display: inline;
+  display: table-cell;
   position: relative;
   padding-left: 25px;
   margin-bottom: 12px;
@@ -81,6 +87,7 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  margin-left: 0.5em;
 }
 
 .task-chk-container input {
@@ -158,6 +165,23 @@
   margin-bottom: 2px !important;
 }
 
-.k-button[ng-reflect-icon="myspace"] {
+.k-button[ng-reflect-icon="close-outline"] {
   border-radius: 15px !important;
+}
+
+.neighborhood-custom-dropdown {
+  width: 70% !important;
+}
+
+.disp-inline-block {
+  display: inline-block;
+}
+
+.disp-table-cell {
+  display: table-cell;
+}
+
+.clear-icon-button {
+  float: right;
+  cursor: pointer;
 }
