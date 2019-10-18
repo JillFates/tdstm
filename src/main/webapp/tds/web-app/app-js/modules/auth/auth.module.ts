@@ -2,14 +2,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// Shared
+// Modules
 import { SharedModule } from '../../shared/shared.module';
-// Kendo
-// import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
-import { ClarityModule } from '@clr/angular';
-
-// Route Module
 import { AuthRouteModule } from './auth-route.module';
+import { ClarityModule } from '@clr/angular';
+import { TdsComponentLibraryModule } from 'tds-component-library';
 // Services
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './service/auth.service';
@@ -32,9 +29,9 @@ import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory
 		SharedModule,
 		FormsModule,
 		// Kendo
-		// DropDownsModule,
 		// Claritys
 		ClarityModule,
+		TdsComponentLibraryModule,
 		// Route
 		AuthRouteModule,
 	],

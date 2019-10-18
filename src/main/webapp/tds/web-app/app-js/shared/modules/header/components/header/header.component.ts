@@ -50,13 +50,7 @@ export class HeaderComponent {
 	 */
 	private headerListeners(): void {
 		this.notifierService.on('notificationRouteChange', event => {
-			if (event.event.url.indexOf('/auth/') >= 0) {
-				this.pageMetaData.hideTopNav = true;
-				jQuery('div.content-wrapper').addClass('content-login-wrapper');
-			} else {
-				this.pageMetaData.hideTopNav = false;
-				jQuery('div.content-wrapper').removeClass('content-login-wrapper');
-			}
+			this.pageMetaData.hideTopNav = event.event.url.indexOf('/auth/') >= 0;
 		});
 	}
 
