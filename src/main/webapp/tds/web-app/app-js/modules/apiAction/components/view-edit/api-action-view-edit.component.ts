@@ -584,7 +584,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 			return actionTypeId === this.WEB_API;
 		}
 		if (actionType === APIActionType.SCRIPT) {
-			return actionTypeId !== null && actionTypeId !== this.WEB_API;
+			return actionTypeId !== null || actionTypeId !== this.WEB_API;
 		}
 		return false;
 	}

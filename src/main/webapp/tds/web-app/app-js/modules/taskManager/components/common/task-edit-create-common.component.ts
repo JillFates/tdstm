@@ -67,7 +67,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 

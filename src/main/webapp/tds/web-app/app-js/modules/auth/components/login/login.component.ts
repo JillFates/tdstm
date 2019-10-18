@@ -1,33 +1,28 @@
 // Angular
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
 // NGXS
-import { Select, Store } from '@ngxs/store';
+import {Select, Store} from '@ngxs/store';
+import {Login, LoginInfo} from '../../action/login.actions';
+import {UserContextState} from '../../state/user-context.state';
 // Service
-import { LoginService } from '../../service/login.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PostNoticesManagerService } from '../../service/post-notices-manager.service';
+import {LoginService} from '../../service/login.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PostNoticesManagerService} from '../../service/post-notices-manager.service';
+import {RouterUtils} from '../../../../shared/utils/router.utils';
+import {WindowService} from '../../../../shared/services/window.service';
+import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
 // Components
 import { MandatoryNoticesComponent } from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
 import { StandardNoticesComponent } from '../../../noticeManager/components/standard-notices/standard-notices.component';
 // Models
-import {
-	AuthorityOptions,
-	IFormLoginModel,
-	LoginInfoModel,
-} from '../../model/login-info.model';
-import { Login, LoginInfo, Logout } from '../../action/login.actions';
-import { UserContextModel } from '../../model/user-context.model';
-import { Router } from '@angular/router';
-import { RouterUtils } from '../../../../shared/utils/router.utils';
-import { WindowService } from '../../../../shared/services/window.service';
-import { APP_STATE_KEY } from '../../../../shared/providers/localstorage.provider';
-import { Observable } from 'rxjs';
-import { withLatestFrom } from 'rxjs/operators';
-import {
-	NoticeModel,
-	Notices,
-} from '../../../noticeManager/model/notice.model';
+import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
+import {UserContextModel} from '../../model/user-context.model';
+import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
+// Others
+import {Observable} from 'rxjs';
+import {withLatestFrom} from 'rxjs/operators';
 
 @Component({
 	selector: 'tds-login',
@@ -88,9 +83,7 @@ export class LoginComponent implements OnInit {
 		private notifierService: NotifierService,
 		private dialogService: UIDialogService,
 		private postNoticesManager: PostNoticesManagerService,
-		private windowService: WindowService
-	) {
-		this.destroyInitialSession();
+		private windowService: WindowService) {
 	}
 
 	/**
@@ -105,6 +98,12 @@ export class LoginComponent implements OnInit {
 			);
 			this.setFocus();
 		});
+
+		// If the session has already a value, redirect the user
+		this.userContextModel = this.store.selectSnapshot(UserContextState.getUserContext);
+		if (this.userContextModel !== null) {
+			this.validateLogin(this.userContextModel);
+		}
 	}
 
 	/**
@@ -154,32 +153,26 @@ export class LoginComponent implements OnInit {
 			this.errMessage = 'Username and password are required';
 		} else {
 			this.onLoginProgress = true;
-			this.store
-				.dispatch(
-					new Login({
-						username: this.loginModel.username,
-						password: this.loginModel.password,
-						authority:
-							this.loginModel.authority !==
-							this.defaultAuthorityItem
-								? this.loginModel.authority
-								: undefined,
-					})
-				)
-				.pipe(withLatestFrom(this.userContext$))
-				.subscribe(([_, userContext]) =>
-					this.validateLogin(_, userContext)
-				);
+			this.store.dispatch(
+				new Login({
+					username: this.loginModel.username,
+					password: this.loginModel.password,
+					authority: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
+				})
+			).pipe(
+				withLatestFrom(this.userContext$)
+			).subscribe(
+				([_, userContext]) => this.validateLogin(userContext)
+			);
 		}
 	}
 
 	/**
 	 * Validates and redirect the User
 	 * Also invoke the Notices if they are available
-	 * @param _
 	 * @param userContext
 	 */
-	private validateLogin(_, userContext: UserContextModel): void {
+	private validateLogin(userContext: UserContextModel): void {
 		this.onLoginProgress = false;
 		this.userContextModel = userContext;
 		if (
@@ -314,7 +307,6 @@ export class LoginComponent implements OnInit {
 	 * Or after you decide to cancel a mandatory Notice
 	 */
 	private destroyInitialSession() {
-		this.store.dispatch(new Logout());
 		localStorage.removeItem(APP_STATE_KEY);
 	}
 }
