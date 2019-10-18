@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
 	/**
 	 * Holds the state of the login Button
 	 */
-	public loginState: string = 'default';
+	public loginState = 'default';
 
 	/**
 	 * For Auh label to show
@@ -242,11 +242,11 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(StandardNoticesComponent, [
-					{
-						provide: Notices,
-						useValue: { notices: notices },
-					},
-			  ])
+				{
+					provide: Notices,
+					useValue: {notices: notices},
+				},
+			])
 			: Promise.resolve(true);
 	}
 
@@ -258,8 +258,8 @@ export class LoginComponent implements OnInit {
 
 		return notices.length
 			? this.dialogService.open(MandatoryNoticesComponent, [
-					{ provide: Notices, useValue: { notices: notices } },
-			  ])
+				{provide: Notices, useValue: {notices: notices}},
+			])
 			: Promise.resolve(true);
 	}
 
