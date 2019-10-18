@@ -114,6 +114,7 @@ export const en_DICTIONARY: Object = {
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		},
 		'DEPENDENCY_DETAIL': 'Dependency Detail',
+		'DEPENDENCY_EDIT': 'Dependency Edit',
 		'INDEX': {
 			'SAVED_VIEWS': 'Saved Views',
 			'ACTION': 'Action',
