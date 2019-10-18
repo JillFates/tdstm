@@ -55,7 +55,7 @@
 							</span>
 						</a>
 					</li>
-					<li *ngIf="hasEarlyAccessTMRPermission" role="presentation"
+					<li role="presentation"
 						[ngClass]="{'active':isCurrentTab(tabsEnum.Reactions)}">
 						<a href="#tab_reactions" *ngIf="isTabEnabled(EnumAPIActionType.HTTP_API) || isTabEnabled(EnumAPIActionType.SCRIPT); else labelTemplateReactions"
 						(click)="setCurrentTab(tabsEnum.Reactions)" data-toggle="tab">
