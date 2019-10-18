@@ -9,7 +9,7 @@ $(document).ready(function () {
 	$('#baselinePlanButton').hide();
 
 	$('#searchBoxId').keyup(function (e) {
-		if (e.keyCode == 13)
+		if (e.keyCode === 13)
 			$('#SubmitButtonId').submit();
 	});
 
@@ -20,7 +20,9 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
-	// loadTeams();
+	loadTeams();
+
+	$('#moveEventId option[value="349"]').attr("selected",true);
 
 	$("input[name=mode]").on('change', function(ev) {
 		if(ev && ev.target && ev.target.value === 'C'){
@@ -52,7 +54,7 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param response
  * @param status
  */
-function buildGraph(response, status) {
+function 	buildGraph(response, status) {
 
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
@@ -73,7 +75,7 @@ function buildGraph(response, status) {
 	var items = data.tasks;
 	// if the event has no tasks show an error message and exit
 	if (items.length === 0) {
-		displayWarningOrErrorMsg(false)
+		displayWarningOrErrorMsg(false);
 		return;
 	}
 
@@ -321,7 +323,7 @@ function buildGraph(response, status) {
 			chart.classed('dragging', false);
 			chart.classed('resizing', false);
 		}
-	}
+	};
 
 	// Sets the custom dragging behavior
 	mainDrag.behavior = d3.behavior.drag()
@@ -332,7 +334,11 @@ function buildGraph(response, status) {
 
 	// gets the container that will hold the svg
 	svgContainer = d3.select('div#svgContainerId')
-		.style('display', null)
+		.style('display', null);
+
+
+	// Remove the svg to rebuild it
+	$('#timelineSVGId').remove();
 
 	// construct the SVG
 	chart = svgContainer
@@ -719,7 +725,7 @@ function buildGraph(response, status) {
 					+ (p.x + p.w) + ',' + p.y2 + ' '
 					+ p.x2 + ',' + (p.y + p.h) + ' '
 					+ p.x + ',' + (p.y + p.h) + ' ';
-			})
+			});
 		polys.attr('class', function (d) { return 'mainItem ' + getClasses(d); });
 
 		// add any task polys in the new domain extents
@@ -823,7 +829,7 @@ function buildGraph(response, status) {
 			labels.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); });
 
 			// update the item labels' children
-			itemLabels.selectAll('text')
+			itemLabels.selectAll('text');
 
 			// add any labels in the new domain extents
 			labels.enter()
@@ -836,8 +842,7 @@ function buildGraph(response, status) {
 				.attr('y', function (d) { return d.points.y2 + 3; })
 				.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
 				.attr('height', function (d) { return d.points.h; })
-				.text(function (d) { return d.number + ': ' + d.comment; });
-			// debugger
+				.text(function (d) { return d.number + ': ' + d.name; });
 
 			if (scaled || resized)
 				GraphUtil.forceReflow(itemLabels)
@@ -890,7 +895,7 @@ function buildGraph(response, status) {
 				.attr('style', function (d) { return 'width: ' + (d.points.w - anchorOffset) + 'px !important;max-width: ' + Math.max(0, d.points.w - anchorOffset) + 'px !important;'; })
 				.append('span')
 				.attr('class', 'itemLabel')
-				.html(function (d) { return d.number + ': ' + d.comment; });
+				.html(function (d) { return d.number + ': ' + d.name; });
 
 			labels.exit().remove();
 		}
@@ -1085,6 +1090,7 @@ function buildGraph(response, status) {
 
 	// gets the points string for task polygons
 	function getPoints(d) {
+		// debugger;
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1102,17 +1108,20 @@ function buildGraph(response, status) {
 
 	// gets the points string for mini polygons
 	function getPointsMini(d) {
+
+		if( !(d.start instanceof Date)) d.start = new Date(d.start);
+
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var offset = Math.floor((taskHeight - 1) / 2);
 		var xa = Math.floor(x(d.start));
 		var ya = (d.stack - offset) * (miniRectHeight) + 1;
 		var w = Math.max(Math.floor(x(d.end)) - Math.floor(x(d.start)) - miniRectStroke, 1);
 		var h = (miniRectHeight) * taskHeight - miniRectStroke;
-		return xa + ',' + ya + ' '
+		var result =  xa + ',' + ya + ' '
 			+ (xa + w) + ',' + ya + ' '
 			+ (xa + w) + ',' + (ya + h) + ' '
 			+ xa + ',' + (ya + h) + ' ';
-
+		return result;
 	}
 
 	// used to get the offset used for dependency arrows' links to the task rects
@@ -1481,26 +1490,6 @@ function buildGraph(response, status) {
 			items[i].redundantSuccessors = [];
 			items[i].redundantPredecessors = [];
 		}
-/*
-        // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
-        for (var i = 0; i < Object.keys(data.cycles).size(); i++) {
-            var key = parseInt(Object.keys(data.cycles)[i]);
-            var predecessor = items[binarySearch(items, key, 0, items.length - 1;
-            var stack = data.cycles[Object.keys(data.cycles)[i]];
-            for (var j = 0; j < stack.size(); ++j) {
-                var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
-                if (node.predecessorIds.indexOf(key) != -1) {
-                    // construct a dependency object and move the predecessorId to the redundant list
-                    var depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
-                    depObject.root = predecessor.root;
-                    predecessor.redundantSuccessors.push(depObject);
-                    node.redundantPredecessors.push(depObject);
-                    dependencies.push(depObject);
-                    node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
-                }
-            }
-        }
-*/
         // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
         for (let c = 0; c < data.cycles.size(); c++) {
             let cycle = data.cycles[c];
@@ -1517,24 +1506,6 @@ function buildGraph(response, status) {
             //firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
             firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
 
-            /*
-            let cycle = data.cycles[c];
-            let key = parseInt(cycle[cycle.size() - 1]);
-            let predecessor = items[binarySearch(items, key, 0, items.length - 1)];
-            for (let n = 0; n < cycle.size(); ++n) {
-                let node = items[binarySearch(items, cycle[n], 0, items.length - 1)];
-                if (node.predecessorIds.indexOf(key) != -1) {
-                    // construct a dependency object and move the predecessorId to the redundant list
-                    let depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
-                    depObject.root = predecessor.root;
-                    predecessor.redundantSuccessors.push(depObject);
-                    node.redundantPredecessors.push(depObject);
-                    dependencies.push(depObject);
-                    node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
-                }
-            }
-
-             */
         }
 
 
@@ -1572,32 +1543,18 @@ function buildGraph(response, status) {
 
         let unknownStarts = [];
 		for (let i = 0; i < items.length; ++i) {
-		    /*if (items[i].startInitial)
-            items[i].startInitial = new Date(startInitial).getTime()
-			items[i].milestone = (items[i].startInitial == items[i].endInitial);
-			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial) * 60000);
-
-            items[i].endInitial = new Date(endInitial).getTime()
-			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);*/
-		    if (items[i].estInitial == undefined) {
+		    if (items[i].estInitial === undefined) {
                 unknownStarts.push(i);
             }
-            //items[i].milestone = ((items[i].estInitial) && (items[i].estInitial == items[i].estFinish));
-            items[i].milestone = (items[i].duration == 0);
+            items[i].milestone = (items[i].duration === 0);
             if (items[i].estInitial) {
                 items[i].estInitial = new Date(items[i].estInitial);
-//                items[i].startInitial = parseStartDate(items[i].estInitial.getTime())
-//            } else {
-//                items[i].startInitial = parseStartDate(items[i].startInitial + data.startDate.getTime());
             }
             if (items[i].estFinish) {
                 items[i].estFinish = new Date(items[i].estFinish);
-//                items[i].endInitial = items[i].estFinish.getTime();
             }
-//            items[i].endInitial = parseStartDate(items[i].endInitial);
-//            items[i].endInitial = new Date(items[i].endInitial.getTime() + (items[i].milestone * 60000));
             items[i].start = items[i].estInitial;
-			items[i].end = items[i].estEnd;
+			items[i].end = items[i].estFinish;
 			items[i].exChild = null;
 			items[i].exParent = null;
 			items[i].endOfExclusive = null;
@@ -2427,13 +2384,9 @@ function buildGraph(response, status) {
 	// ensures times are correct
 	function calculateTimes(task, checking) {
 		if (!task.start) {
-			if (task.predecessors.length == 0) {
-				//task.start = new Date(task.startInitial);
-                //task.start = task.estInitial;
+			if (task.predecessors.length === 0) {
                 if (task.estInitial) {
                     task.start = task.estInitial
-                //} else if (task.startInitial) {
-                //    task.start = new Date(data.startDate.getTime() + task.startInitial)
                 } else {
                     task.start = data.startDate;
                 }
@@ -2449,6 +2402,7 @@ function buildGraph(response, status) {
 				task.start = new Date(latest);
 			}
 		}
+
 		if (!task.end) {
 			if (task.root) {
 				task.start = new Date(task.start.getTime() - 2);
@@ -2499,7 +2453,7 @@ function buildGraph(response, status) {
 
 function submitForm() {
 	$('.chart').remove();
-	d3.select('#svgContainerId').style('display', 'none')
+	d3.select('#svgContainerId').style('display', 'none');
 	generateGraph($('#moveEventId').val());
 }
 
@@ -2511,8 +2465,8 @@ function populateTeamSelect(roles) {
 	teamSelect.append('<option value="NONE">No Team Assignment</option>');
 	teamSelect.append('<option disabled>──────────</option>');
 
-	$.each(roles, function (index, team) {
-		teamSelect.append('<option value="' + team + '">' + team + '</option>');
+	roles.forEach(function (team) {
+		teamSelect.append('<option value="' + team.id + '">' + team.title + '</option>');
 	});
 
 	teamSelect.val('ALL');
@@ -2520,13 +2474,14 @@ function populateTeamSelect(roles) {
 
 function loadTeams() {
 	$('#spinnerId').css('display', 'block');
-	var url = tdsCommon.createAppURL('/wsTimeline/baseline');
+	var url = tdsCommon.createAppURL('/team/list?json');
 	jQuery.ajax({
 		dataType: 'json',
 		url: url,
 		type: 'GET',
 		complete: function (data) {
-			populateTeamSelect(data.roles);
+			var roles = JSON.parse(data.responseText);
+			populateTeamSelect(roles);
 			$('#spinnerId').css('display', 'none');
 		}
 	});
@@ -2537,7 +2492,7 @@ function baseLine(){
     var id = $('#moveEventId').val();
 
     var params = {id:id};
-    params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? true : false;
+    params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
     $('#spinnerId').css('display', 'block');
 
@@ -2549,9 +2504,13 @@ function baseLine(){
         url: url,
         data:params,
         type: 'POST',
-        complete: function () {
-            $('#spinnerId').css('display', 'none');
-            generateGraph();
+        complete: function (ev) {
+        	var msgObj = JSON.parse(ev.responseText);
+        	if(msgObj && msgObj.message) {
+				alert(msgObj.message);
+			}
+        	generateGraph();
+			$('#spinnerId').css('display', 'none');
         }
     });
 }
@@ -2562,7 +2521,7 @@ function baseLine(){
 /**
  * Call the REST API to grab the data to generate the Timeline
  */
-function generateGraph() {
+function generateGraph(ev) {
     var id = $('#moveEventId').val();
     var mode = $("input[name=mode]:checked").val();
     var viewUnpublished = $('#viewUnpublishedId').is(':checked');
