@@ -1,11 +1,24 @@
 .user-dashboard-component
 	$primary-text-color: #18394B
-	.page-title, .section-title
-		color: $primary-text-color
-	.section-title
-		font-weight: bold
-	width: 97%
-	margin: 24px auto 24px auto
+	.project
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+			padding-left: 8px
+	.grid-header
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+		.description
+			font-weight: normal
+			font-size: 10px
+			line-height: 16px
+			margin-left: 5px
+	margin: 24px 15px 24px 15px
 	tds-button-custom.flat
 		tds-button
 			button
@@ -18,7 +31,10 @@
 				flex: none
 				width: auto
 	.project-selection
-		font-size: 14px
+		font-size: 13px
+		padding-left: 0
+		font-weight: 500
+		line-height: 18px
 	.event-status-toolbar
 		display: inline
 		margin-left: 30px
@@ -37,9 +53,9 @@
 	strong
 		vertical-align: middle
 		margin-left: 5px
-	span
-		vertical-align: middle
-		margin-left: 5px
+	//span
+	//	vertical-align: middle
+	//	margin-left: 5px
 	.kendo-grid-toolbar__refresh-btn
 		margin: 0
 	.event-list .k-grid
