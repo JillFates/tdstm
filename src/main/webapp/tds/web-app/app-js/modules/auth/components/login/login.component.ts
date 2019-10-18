@@ -1,26 +1,33 @@
 // Angular
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 // NGXS
-import {Select, Store} from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 // Service
-import {LoginService} from '../../service/login.service';
-import {NotifierService} from '../../../../shared/services/notifier.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PostNoticesManagerService} from '../../service/post-notices-manager.service';
+import { LoginService } from '../../service/login.service';
+import { NotifierService } from '../../../../shared/services/notifier.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PostNoticesManagerService } from '../../service/post-notices-manager.service';
 // Components
-import {MandatoryNoticesComponent} from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
-import {StandardNoticesComponent} from '../../../noticeManager/components/standard-notices/standard-notices.component';
+import { MandatoryNoticesComponent } from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import { StandardNoticesComponent } from '../../../noticeManager/components/standard-notices/standard-notices.component';
 // Models
-import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
-import {Login, LoginInfo, Logout} from '../../action/login.actions';
-import {UserContextModel} from '../../model/user-context.model';
-import {Router} from '@angular/router';
-import {RouterUtils} from '../../../../shared/utils/router.utils';
-import {WindowService} from '../../../../shared/services/window.service';
-import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
-import {Observable} from 'rxjs';
-import {withLatestFrom} from 'rxjs/operators';
-import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
+import {
+	AuthorityOptions,
+	IFormLoginModel,
+	LoginInfoModel,
+} from '../../model/login-info.model';
+import { Login, LoginInfo, Logout } from '../../action/login.actions';
+import { UserContextModel } from '../../model/user-context.model';
+import { Router } from '@angular/router';
+import { RouterUtils } from '../../../../shared/utils/router.utils';
+import { WindowService } from '../../../../shared/services/window.service';
+import { APP_STATE_KEY } from '../../../../shared/providers/localstorage.provider';
+import { Observable } from 'rxjs';
+import { withLatestFrom } from 'rxjs/operators';
+import {
+	NoticeModel,
+	Notices,
+} from '../../../noticeManager/model/notice.model';
 
 @Component({
 	selector: 'tds-login',
@@ -57,12 +64,17 @@ export class LoginComponent implements OnInit {
 	public loginModel: IFormLoginModel = {
 		authority: '',
 		username: '',
-		password: ''
+		password: '',
 	};
 	/**
 	 * To show loader and disable the login button
 	 */
 	public onLoginProgress = false;
+
+	/**
+	 * Holds the state of the login Button
+	 */
+	public loginState: string = 'default';
 
 	/**
 	 * For Auh label to show
@@ -76,7 +88,8 @@ export class LoginComponent implements OnInit {
 		private notifierService: NotifierService,
 		private dialogService: UIDialogService,
 		private postNoticesManager: PostNoticesManagerService,
-		private windowService: WindowService) {
+		private windowService: WindowService
+	) {
 		this.destroyInitialSession();
 	}
 
@@ -87,7 +100,9 @@ export class LoginComponent implements OnInit {
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
-			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
+			this.store.dispatch(
+				new LoginInfo({ buildVersion: this.loginInfo.buildVersion })
+			);
 			this.setFocus();
 		});
 	}
@@ -100,17 +115,28 @@ export class LoginComponent implements OnInit {
 		setTimeout(() => {
 			let selector = '.username';
 			if (this.loginInfo && this.loginInfo.config) {
-				if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
+				if (
+					this.loginInfo.config.authorityPrompt ===
+					this.authorityOptions.SELECT
+				) {
 					this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
 					this.loginModel.authority = this.defaultAuthorityItem;
 					selector = '.k-dropdown-wrap';
-				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
+				} else if (
+					this.loginInfo.config.authorityPrompt ===
+					this.authorityOptions.PROMPT
+				) {
 					selector = '.authority';
-				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.HIDDEN) {
+				} else if (
+					this.loginInfo.config.authorityPrompt ===
+					this.authorityOptions.HIDDEN
+				) {
 					this.loginModel.authority = this.loginInfo.config.authorityName;
 				}
 			}
-			let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
+			let inputField: HTMLElement = <HTMLElement>(
+				document.querySelectorAll(selector)[0]
+			);
 			if (inputField) {
 				inputField.focus();
 			}
@@ -121,21 +147,29 @@ export class LoginComponent implements OnInit {
 	 * Dispatch Action Login
 	 */
 	public onLogin(): void {
-		if (this.loginModel.username === '' || this.loginModel.password === '') {
+		if (
+			this.loginModel.username === '' ||
+			this.loginModel.password === ''
+		) {
 			this.errMessage = 'Username and password are required';
 		} else {
 			this.onLoginProgress = true;
-			this.store.dispatch(
-				new Login({
-					username: this.loginModel.username,
-					password: this.loginModel.password,
-					authority: (this.loginModel.authority !== this.defaultAuthorityItem) ? this.loginModel.authority : undefined
-				})
-			).pipe(
-				withLatestFrom(this.userContext$)
-			).subscribe(
-				([_, userContext]) => this.validateLogin(_, userContext)
-			);
+			this.store
+				.dispatch(
+					new Login({
+						username: this.loginModel.username,
+						password: this.loginModel.password,
+						authority:
+							this.loginModel.authority !==
+							this.defaultAuthorityItem
+								? this.loginModel.authority
+								: undefined,
+					})
+				)
+				.pipe(withLatestFrom(this.userContext$))
+				.subscribe(([_, userContext]) =>
+					this.validateLogin(_, userContext)
+				);
 		}
 	}
 
@@ -148,17 +182,27 @@ export class LoginComponent implements OnInit {
 	private validateLogin(_, userContext: UserContextModel): void {
 		this.onLoginProgress = false;
 		this.userContextModel = userContext;
-		if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
-			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices.length > 0) {
-				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map((notice: NoticeModel) => {
-					notice.sequence = notice.sequence || 0;
-					return notice;
-				});
+		if (
+			this.userContextModel &&
+			this.userContextModel.notices &&
+			this.userContextModel.notices.redirectUrl
+		) {
+			if (
+				this.userContextModel.postNotices &&
+				this.userContextModel.postNotices.notices.length > 0
+			) {
+				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map(
+					(notice: NoticeModel) => {
+						notice.sequence = notice.sequence || 0;
+						return notice;
+					}
+				);
 				this.showNotices();
 			} else {
 				this.navigateTo();
 			}
 		} else if (this.userContextModel.error) {
+			this.loginState = 'default';
 			// An error has occurred
 			this.notifierService.broadcast({
 				name: 'stopLoader',
@@ -203,10 +247,14 @@ export class LoginComponent implements OnInit {
 	private showStandardNotices() {
 		const notices = this.filterPostNotices(false);
 
-		return notices.length ? this.dialogService.open(StandardNoticesComponent, [{
-			provide: Notices,
-			useValue: {notices: notices}
-		}]) : Promise.resolve(true);
+		return notices.length
+			? this.dialogService.open(StandardNoticesComponent, [
+					{
+						provide: Notices,
+						useValue: { notices: notices },
+					},
+			  ])
+			: Promise.resolve(true);
 	}
 
 	/**
@@ -215,10 +263,11 @@ export class LoginComponent implements OnInit {
 	private showMandatoryNotices() {
 		const notices = this.filterPostNotices(true);
 
-		return notices.length ? this.dialogService
-				.open(MandatoryNoticesComponent, [{provide: Notices, useValue: {notices: notices}}])
-			:
-			Promise.resolve(true);
+		return notices.length
+			? this.dialogService.open(MandatoryNoticesComponent, [
+					{ provide: Notices, useValue: { notices: notices } },
+			  ])
+			: Promise.resolve(true);
 	}
 
 	/**
@@ -227,9 +276,13 @@ export class LoginComponent implements OnInit {
 	 */
 	private filterPostNotices(mandatory: boolean): any[] {
 		return this.userContextModel.postNotices.notices
-			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
+			.filter(notice =>
+				mandatory
+					? notice.needAcknowledgement
+					: !notice.needAcknowledgement
+			)
 			.map((notice: NoticeModel) => {
-				return {...notice, notShowAgain: false};
+				return { ...notice, notShowAgain: false };
 			});
 	}
 
@@ -239,10 +292,20 @@ export class LoginComponent implements OnInit {
 	 */
 	private navigateTo() {
 		this.redirectUser = true;
-		if (RouterUtils.isAngularRoute(this.userContextModel.notices.redirectUrl)) {
-			this.router.navigate(RouterUtils.getAngularRoute(this.userContextModel.notices.redirectUrl));
+		if (
+			RouterUtils.isAngularRoute(
+				this.userContextModel.notices.redirectUrl
+			)
+		) {
+			this.router.navigate(
+				RouterUtils.getAngularRoute(
+					this.userContextModel.notices.redirectUrl
+				)
+			);
 		} else {
-			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(this.userContextModel.notices.redirectUrl);
+			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(
+				this.userContextModel.notices.redirectUrl
+			);
 		}
 	}
 
