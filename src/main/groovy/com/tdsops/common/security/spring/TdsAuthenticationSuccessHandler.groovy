@@ -149,10 +149,10 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
 
 		if (startPage == StartPageEnum.PROJECT_SETTINGS.value) {
-			return '/projectUtil'
+			return '/module/project/list'
 		}
 		if (startPage == StartPageEnum.CURRENT_DASHBOARD.value || startPage == StartPageEnum.PLANNING_DASHBOARD.value) {
-			return securityService.hasPermission('BundleView') ? '/module/planning/dashboard' : '/projectUtil'
+			return securityService.hasPermission('BundleView') ? '/module/planning/dashboard' : '/module/project/list'
 		}
 		if (startPage == StartPageEnum.ADMIN_PORTAL.value) {
 			return '/admin/home'
