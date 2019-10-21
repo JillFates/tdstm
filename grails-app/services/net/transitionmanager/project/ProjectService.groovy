@@ -608,13 +608,17 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	void deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
-		Project projectInstance = Project.get(projectId)
+	void deleteProject(Long projectId, includeProject=false) throws UnauthorizedException {
 
-		if (!(projectInstance in projects)) {
+		if(projectId == Project.DEFAULT_PROJECT_ID) {
+			throw new InvalidParamException('The default project cannot be deleted.')
+		}
+
+		if (!securityService.hasAccessToProject(projectId)) {
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
+
+		Project projectInstance = Project.get(projectId)
 
 		// remove preferences
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = :project"
