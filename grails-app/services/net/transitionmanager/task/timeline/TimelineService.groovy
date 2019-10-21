@@ -1,8 +1,6 @@
 package net.transitionmanager.task.timeline
 
 import grails.gorm.transactions.Transactional
-import groovy.time.TimeCategory
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.service.ServiceMethods
@@ -51,7 +49,7 @@ class TimelineService implements ServiceMethods {
 	 *
 	 * @param moveEvent the event to retrieve tasks for
 	 * @param viewUnpublished show only published tasks or all tasks
-	 * @return List<Task>        a list of tasks
+	 * @return List<Task>          a list of tasks
 	 */
 	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
 		List<Task> tasks
@@ -74,7 +72,7 @@ class TimelineService implements ServiceMethods {
 	 * Used to get the list of task dependencies for a given list of tasks
 	 *
 	 * @param List <AssetComment> a list of tasks
-	 * @return List<TaskDependency>        a list of the dependencies associated to the tasks
+	 * @return List<TaskDependency>          a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
 		List<TaskDependency> dependencies
@@ -180,47 +178,6 @@ class TimelineService implements ServiceMethods {
 				return tasks.size()
 			}
 		})
-	}
-
-	/**
-	 * Increase size of {@code TaskVertex} for the following dates:
-	 * {@code TaskVertex#earliestStartDate}
-	 * {@code TaskVertex#latestStartDate}
-	 * {@code TaskVertex#earliestFinishDate}
-	 * {@code TaskVertex#latestFinishDate}
-	 *
-	 * @param taskVertex
-	 * @return same instance of {@code TaskVertex}
-	 * 			passed as parameter with modified values
-	 */
-	@CompileDynamic
-	private TaskVertex increaseDurations(TaskVertex taskVertex) {
-		use(TimeCategory) {
-			taskVertex.earliestStartDate = taskVertex.earliestStartDate + 1.minute
-			taskVertex.latestStartDate = taskVertex.latestStartDate + 1.minute
-			taskVertex.earliestFinishDate = taskVertex.earliestFinishDate + 1.minute
-			taskVertex.latestFinishDate = taskVertex.latestFinishDate + 1.minute
-		}
-		return taskVertex
-	}
-	/**
-	 * If one of the {@code TaskVertex} in {@code TaskTimeLineGraph#vertices}
-	 * has {@code TaskVertex#duration} equals to zero,
-	 * then we need to add one minute to visualize it correctly in Timeline
-	 * .info
-	 * @param cpaResults
-	 * @return
-	 */
-	@CompileDynamic
-	CPAResults checkAndUpdateZeroDurations(CPAResults cpaResults) {
-
-		cpaResults.graph.getVertices().each { TaskVertex taskVertex ->
-			if (taskVertex.duration == 0) {
-				increaseDurations(taskVertex)
-			}
-		}
-
-		return cpaResults
 	}
 }
 /**

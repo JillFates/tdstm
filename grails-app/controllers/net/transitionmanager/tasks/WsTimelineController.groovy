@@ -37,7 +37,6 @@ class WsTimelineController implements ControllerMethods {
 		Boolean recalculate = commandObject.isRecalculate()
 
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
-		cpaResults = timelineService.checkAndUpdateZeroDurations(cpaResults)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
@@ -54,6 +53,7 @@ class WsTimelineController implements ControllerMethods {
 			startDate = findEarliestStartTask(startTasks)?.estStart
 			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
 		}
+		Integer zeroDurationAdjustment = 60
 
 		renderAsJson(
 			data: [
@@ -64,6 +64,23 @@ class WsTimelineController implements ControllerMethods {
 				cycles   : summary.cycles.collect { it.collect { it.taskId } },
 				tasks    : tasks.collect { Task task ->
 					TaskVertex taskVertex = graph.getVertex(task.taskNumber)
+					// When a task duration is zero, UI needs a different solution:
+					// we need to add one minute on the estimatedFinish for tasks with zero duration
+					Date estimatedFinish = recalculate ? taskVertex.earliestFinishDate : task.estFinish
+					if (taskVertex.duration == 0 && estimatedFinish) {
+						estimatedFinish = TimeUtil.adjustSeconds(estimatedFinish, zeroDurationAdjustment)
+					}
+					// and add one minute on the estimatedStart for all the task's successors.
+					Date estimatedStart = recalculate ? taskVertex.earliestStartDate : task.estStart
+					if (estimatedStart && taskVertex.predecessors.any { it.duration == 0 }) {
+						estimatedStart = TimeUtil.adjustSeconds(estimatedStart, zeroDurationAdjustment)
+						// If any subsequent task that has a duration of fewer than two minutes
+						// will also need its estimated finish adjusted appropriately.
+						if (taskVertex.duration < 2) {
+							estimatedFinish = TimeUtil.adjustSeconds(estimatedFinish, zeroDurationAdjustment)
+						}
+					}
+
 					[
 						id            : task.id,
 						number        : task.taskNumber,
@@ -78,8 +95,8 @@ class WsTimelineController implements ControllerMethods {
 						actualStart   : task.actStart,
 						status        : task.status,
 						actFinish     : task.actFinish,
-						estStart      : recalculate ? taskVertex.earliestStartDate : task.estStart,
-						estFinish     : recalculate ? taskVertex.earliestFinishDate : task.estFinish,
+						estStart      : estimatedStart,
+						estFinish     : estimatedFinish,
 						assignedTo    : task.assignedTo?.toString(),
 						team          : task.role,
 						isAutomatic   : task.isAutomatic(),
