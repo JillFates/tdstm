@@ -524,31 +524,14 @@ class SqlUtil {
 	 */
 	private static void buildInList(FieldSearchData fieldSearchData, String inOp) {
 		def values = []
-		// this flags add support for '=null' or '!=null' among the list options
-		boolean isNull, isNotNull = false
 
 		fieldSearchData.filter.split('\\|').eachWithIndex{ String value, int index ->
-			String tValue = value.trim()
-			switch (tValue) {
-				case ~ /(?i)=null/:
-					isNull = true
-					break
-				case ~ /(?i)!null/:
-					isNotNull = true
-					break
-				default:
-					// Use underscores to avoid issues when handling sme, potentially conflicting with sme2
-					String namedParameter = "${fieldSearchData.columnAlias}__" + index
-					values << ':' + namedParameter
-					fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
-					break
-			}
+			// Use underscores to avoid issues when handling sme, potentially conflicting with sme2
+			String namedParameter = "${fieldSearchData.columnAlias}__" + index
+			values << ':' + namedParameter
+			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
-        fieldSearchData.sqlSearchExpression = (isNull || isNotNull) ? '(' : ''
-		fieldSearchData.sqlSearchExpression += fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
-		if (isNull || isNotNull) {
-			fieldSearchData.sqlSearchExpression += " OR $fieldSearchData.whereProperty IS ${isNotNull ? 'NOT ' : ''}NULL)"
-		}
+		fieldSearchData.sqlSearchExpression = "COALESCE(${fieldSearchData.whereProperty},'') $inOp" + ' (' + values.join(', ') + ')'
 	}
 
 	/**
