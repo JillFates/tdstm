@@ -21,7 +21,7 @@
                                                   [(ngModel)]="minRange"
                                                   [(value)]="localMinRange"
                                                   [max]="model.maxRange"
-                                                  (valueChange)="onMinRangeChange($event)">
+                                                  (ngModelChange)="onMinRangeChange($event)">
                             </kendo-numerictextbox> To
                             <kendo-numerictextbox style="width: 100px;"
                                                   name="maxRange"

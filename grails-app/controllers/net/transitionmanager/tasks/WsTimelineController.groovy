@@ -1,10 +1,14 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.time.TimeDuration
+import net.transitionmanager.command.task.ExportTimelineCommand
+import net.transitionmanager.command.task.CalculateTimelineCommandObject
+import net.transitionmanager.command.task.ReadTimelineCommandObject
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.security.Permission
@@ -20,15 +24,18 @@ import net.transitionmanager.task.timeline.TimelineSummary
 import java.text.DateFormat
 
 @Secured('isAuthenticated()')
-class WsTimeLineController implements ControllerMethods {
+class WsTimelineController implements ControllerMethods {
 
 	TimelineService timelineService
 
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def timeline() {
 
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
-		Boolean recalculate = 'R'.equalsIgnoreCase(params.mode) ?: false
+		CalculateTimelineCommandObject commandObject = populateCommandObject(CalculateTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
+		Boolean recalculate = commandObject.isRecalculate()
 
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
@@ -49,27 +56,30 @@ class WsTimeLineController implements ControllerMethods {
 				starts   : graph.starts.collect { it.taskId },
 				startDate: startDate,
 				cycles   : summary.cycles.collect { it.collect { it.taskId } },
-				items    : tasks.collect { Task task ->
+				tasks    : tasks.collect { Task task ->
+					TaskVertex taskVertex = graph.getVertex(task.taskNumber)
 					[
 						id            : task.id,
 						number        : task.taskNumber,
-						assetName     : task.assetName,
-						comment       : task.comment,
-						criticalPath  : recalculate ? graph.getVertex(task.taskNumber).isCriticalPath() : task.isCriticalPath,
+						asset         : GormUtil.domainObjectToMap(task.assetEntity,['id', 'assetName', 'assetType', 'assetClass']),
+						name          : task.comment,
+						criticalPath  : recalculate ? taskVertex.isCriticalPath() : task.isCriticalPath,
 						duration      : task.duration,
 						durationScale : task.durationScale?.name(),
-						startInitial  : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart), TimeUtil.GRANULARITY_MINUTES),
-						endInitial    : TimeUtil.elapsed(startDate, (recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish), TimeUtil.GRANULARITY_MINUTES),
-						slack         : recalculate ? graph.getVertex(task.taskNumber).slack : task.slack,
+						startInitial  : TimeUtil.elapsed(startDate, (recalculate ? taskVertex.earliestStartDate : task.estStart), TimeUtil.GRANULARITY_MINUTES),
+						endInitial    : TimeUtil.elapsed(startDate, (recalculate ? taskVertex.earliestFinishDate : task.estFinish), TimeUtil.GRANULARITY_MINUTES),
+						slack         : recalculate ? taskVertex.slack : task.slack,
 						actualStart   : task.actStart,
 						status        : task.status,
 						actFinish     : task.actFinish,
-						estStart      : recalculate ? graph.getVertex(task.taskNumber).earliestStartDate : task.estStart,
-						estFinish     : recalculate ? graph.getVertex(task.taskNumber).earliestFinishDate : task.estFinish,
+						estStart      : recalculate ? taskVertex.earliestStartDate : task.estStart,
+						estFinish     : recalculate ? taskVertex.earliestFinishDate : task.estFinish,
 						assignedTo    : task.assignedTo?.toString(),
-						role          : task.role,
-						predecessorIds: task.taskDependencies.findAll { it.assetComment.id == task.id }.collect {
-							it.successor.id
+						team          : task.role,
+						isAutomatic   : task.isAutomatic(),
+						hasAction     : task.hasAction(),
+						predecessorIds: task.taskDependencies.findAll { it.successor.id == task.id }.collect {
+							it.predecessor.id
 						}
 					]
 				}
@@ -79,7 +89,11 @@ class WsTimeLineController implements ControllerMethods {
 
 	@HasPermission(Permission.TaskTimelineView)
 	def calculateCPA() {
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+
+		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -92,7 +106,10 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskTimelineView)
 	def baseline() {
 
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		ReadTimelineCommandObject commandObject = populateCommandObject(ReadTimelineCommandObject)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.updateTaskFromCPA(moveEvent)
 
 		if (!cpaResults.summary.cycles.isEmpty()) {
@@ -105,8 +122,10 @@ class WsTimeLineController implements ControllerMethods {
 	@HasPermission(Permission.TaskViewCriticalPath)
 	def exportCPA() {
 
-		boolean showAll = params.showAll == 'true'
-		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		ExportTimelineCommand commandObject = populateCommandObject(ExportTimelineCommand)
+		validateCommandObject(commandObject)
+
+		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent)
 
 		TaskTimeLineGraph graph = cpaResults.graph
@@ -143,7 +162,7 @@ class WsTimeLineController implements ControllerMethods {
 			String timesExtra = ''
 			String tailExtra = ''
 
-			if (showAll) {
+			if (commandObject.showAll) {
 				durationExtra = "<th>Act Duration</th><th>Deviation</th>"
 				timesExtra = "<th>Act Start</th>"
 				tailExtra = "<th>TaskSpec</th><th>Hard Assigned</th><th>Resolved By</th><th>Class</th>" +
@@ -197,7 +216,7 @@ class WsTimeLineController implements ControllerMethods {
 				durationExtra = ''
 				timesExtra = ''
 				tailExtra = ''
-				if (showAll) {
+				if (commandObject.showAll) {
 					durationExtra = "<td>$actual</td><td>$deviation</td>"
 					timesExtra = "<td>$actStart</td>"
 					tailExtra = "<td>${task.taskSpec ?: ''}</td>" +

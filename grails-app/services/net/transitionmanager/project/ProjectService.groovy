@@ -383,12 +383,12 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers.
+	 * Get all clients, partners, managers(id and name only).
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.executeQuery("""
+		List<PartyRelationship> managers = PartyRelationship.executeQuery("""
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
@@ -396,10 +396,16 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
+		managers = managers.sort { it.partyIdTo?.lastName }
+		List<Map<String,?>> managersMap = managers.collect { it -> [
+				  id  : it.partyIdTo.id,
+				  name: it.partyIdTo.toString()
+		]}
+
 		[
 			clients : getAllClients(),
 			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-			managers: managers.sort { it.partyIdTo?.lastName }
+			managers: managersMap
 		]
 	}
 
@@ -602,14 +608,17 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		def message
-		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
-		Project projectInstance = Project.get(projectId)
+	void deleteProject(Long projectId, includeProject=false) throws UnauthorizedException {
 
-		if (!(projectInstance in projects)) {
+		if(projectId == Project.DEFAULT_PROJECT_ID) {
+			throw new InvalidParamException('The default project cannot be deleted.')
+		}
+
+		if (!securityService.hasAccessToProject(projectId)) {
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
+
+		Project projectInstance = Project.get(projectId)
 
 		// remove preferences
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = :project"
@@ -619,15 +628,15 @@ class ProjectService implements ServiceMethods {
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
 		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
 		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
-		String prefDelSql = '''
+		String prefDelSql = """
 			delete from UserPreference up where
-			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
-			(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or
-			(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or
-			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
-			'''
-		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
-		UserPreference.executeUpdate(prefDelSql, prefDelMap)
+			(up.preferenceCode in(:projectCodesList) and up.value = :projectId) or
+			(up.preferenceCode in (:bundleCodesList) and up.value in ($bundleQuery)) or
+			(up.preferenceCode in (:eventCodesList) and up.value in ($eventQuery)) or
+			(up.preferenceCode = '$roomCode' and up.value in ($roomQuery))
+			"""
+		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes, projectId: projectInstance.id.toString(), project: projectInstance]
+		Integer cant = UserPreference.executeUpdate(prefDelSql, prefDelMap)
 
 		// Setting Configuration settings
 		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
@@ -718,7 +727,6 @@ class ProjectService implements ServiceMethods {
 			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
-		return message
 	}
 
 	/**
@@ -1810,11 +1818,11 @@ class ProjectService implements ServiceMethods {
 					clientName           : project.client.toString(),
 					description          : project.description ?: '',
 					comment				 : project.comment ?: '',
-					startDate            : project.startDate.format(TimeUtil.FORMAT_DATE_ISO8601),
-					completionDate       : project.completionDate.format(TimeUtil.FORMAT_DATE_ISO8601),
+					startDate            : project.startDate,
+					completionDate       : project.completionDate,
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
-					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
-					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
+					licenseActivationDate: licenseData?.goodAfterDate,
+					licenseExpirationDate: licenseData?.goodBeforeDate
 			]
 		}
 	}
@@ -1912,6 +1920,7 @@ class ProjectService implements ServiceMethods {
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
 			planMethodology = projectCommand.planMethodology
+			collectMetrics = projectCommand.collectMetrics ? 1 : 0
 			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn

@@ -258,13 +258,15 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
-	'PROJECTS': 'Projects',
+	'PROJECT': {
+		'PROJECTS': 'Projects',
+		'SELECT_PROJECT': 'Select a Project',
+		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
+		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
+	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
-		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
-		the existing data falls outside the new validation ranges.
-		Please proceed with caution, press Confirm to proceed and change the validation settings,
-		or press Cancel to make no changes.`,
+		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',

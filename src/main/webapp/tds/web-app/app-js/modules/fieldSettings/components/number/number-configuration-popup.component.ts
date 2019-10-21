@@ -33,6 +33,15 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 			this.minRange = this.localMinRange;
 			this.buildExampleValue();
 	}
+	/**
+	 * Check Validity of the inputs. The sett
+	 */
+	public checkValidity(): void {
+		setTimeout(() => {
+			this.templateForm.form.controls.minRange.updateValueAndValidity();
+			this.templateForm.form.controls.maxRange.updateValueAndValidity();
+		})
+	}
 
 	/**
 	 * On Min range value changes.
@@ -57,14 +66,15 @@ export class NumberConfigurationPopupComponent extends ConfigurationCommonCompon
 		if (this.localMinRange !== null || this.model.maxRange !== null) {
 			this.model.allowNegative = false;
 		}
-		if (this.model.allowNegative === true) {
+		if (this.model.allowNegative) {
 			this.model.minRange = null;
 		} else {
-			if ((!this.localMinRange || this.localMinRange === null) && this.model.minRange === null) {
+			if (!this.localMinRange && this.model.minRange === null) {
 				this.model.minRange = 0;
 			}
 		}
 		this.model.format = NumberControlHelper.buildFormat(this.model);
+		this.checkValidity();
 		this.buildExampleValue();
 	}
 

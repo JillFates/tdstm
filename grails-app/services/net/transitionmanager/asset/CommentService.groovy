@@ -20,7 +20,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.search.AssetCommentQueryBuilder
+import net.transitionmanager.search.TaskQueryBuilder
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
@@ -434,7 +434,7 @@ class CommentService implements ServiceMethods {
 				boolean status = assetComment.commentType == AssetCommentType.TASK && !assetComment.isResolved()
 
 				map = [
-					assetComment: assetComment,
+					assetComment: assetComment.taskToMap(),
 					status: status,
 					cssClass: css,
 					statusCss: taskService.getCssClassForStatus(assetComment.status),
@@ -868,7 +868,7 @@ class CommentService implements ServiceMethods {
 			params['viewUnpublished'] = false
 		}
 
-		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder)
+		TaskQueryBuilder queryBuilder = new TaskQueryBuilder(project, params, sortIndex, sortOrder)
 		Map queryInfo = queryBuilder.buildQueries()
 
 		if (!queryInfo.invalidCriterion) {

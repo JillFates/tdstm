@@ -1,9 +1,11 @@
 package net.transitionmanager.user
 
+import com.tdsops.common.grails.ApplicationContextHolder
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
 
 class UserContext {
@@ -23,6 +25,8 @@ class UserContext {
 	String dateFormat
 
 	String logoUrl
+
+	List<Project> alternativeProjects
 
 
 	/**
@@ -53,6 +57,10 @@ class UserContext {
 				logoUrl: logoUrl
 			]
 		}
+
+		List<Map> alternativeProjectsList = alternativeProjects.collect { Project pr ->
+			[id: pr.id, name: pr.name, logoUrl: projectService.getProjectLogoUrl(pr)]
+		}
 		return [
 		    user: [
 		        id: userLogin.id,
@@ -67,7 +75,12 @@ class UserContext {
 			event: eventMap,
 			bundle: bundleMap,
 			timezone: timezone,
-			dateFormat: dateFormat
+			dateFormat: dateFormat,
+			alternativeProjects: alternativeProjectsList
 		]
+	}
+
+	private static ProjectService getProjectService() {
+		return ApplicationContextHolder.getBean('projectService', ProjectService)
 	}
 }
