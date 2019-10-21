@@ -396,6 +396,7 @@ export const en_DICTIONARY: Object = {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',
 		'CREATE_NOTICE': 'Create Notice',
+		'NOTICE_CREATE': 'Notice Create',
 		'EDIT_NOTICE': 'Notice Edit',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
