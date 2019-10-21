@@ -70,7 +70,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 						return
 					// If there's exactly one project, automatically set that project as the current one.
 					case 1:
-						project = alternativeProjects[0]
+						project = accessibleProjects[0]
 						userPreferenceService.setPreference(userLogin, UserPreferenceEnum.CURR_PROJ, project.id)
 						break
 					// If more than project is available, the user will have to select one.

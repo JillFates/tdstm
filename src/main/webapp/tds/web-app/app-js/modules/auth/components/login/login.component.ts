@@ -171,7 +171,9 @@ export class LoginComponent implements OnInit {
 					useValue: this.userContextModel.alternativeProjects
 				}]).then(result => {
 					if (result.success) {
-						this.getCurrentUserSnapshot();
+						setTimeout(() => {
+							this.getCurrentUserSnapshot();
+						}, 1000);
 					}
 				});
 			});
