@@ -37,6 +37,7 @@ class WsTimelineController implements ControllerMethods {
 		Boolean recalculate = commandObject.isRecalculate()
 
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
+		cpaResults = timelineService.checkAndUpdateZeroDurations(cpaResults)
 
 		TaskTimeLineGraph graph = cpaResults.graph
 		TimelineSummary summary = cpaResults.summary
@@ -341,7 +342,7 @@ class WsTimelineController implements ControllerMethods {
 	 * @return latest estFinish from a list of {@code Task}
 	 */
 	private Task findLatestFinishTask(List<Task> taskList) {
-		return taskList.min { it.estFinish }
+		return taskList.min { it.latestFinish }
 	}
 
 }
