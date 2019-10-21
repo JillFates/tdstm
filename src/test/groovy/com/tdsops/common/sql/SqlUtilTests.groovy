@@ -121,10 +121,14 @@ class SqlUtilTests extends Specification {
 			fsd.sqlSearchParameters["assetName__0"] == param0
 			fsd.sqlSearchParameters["assetName__1"] == param1
 		where:
-			filter   | expression                                        | param0 | param1
-			"ab|bc"  | "assetName IN (:assetName__0, :assetName__1)"     | "ab"   | "bc"
-			"-ab|bc" | "assetName NOT IN (:assetName__0, :assetName__1)" | "ab"   | "bc"
-			"!ab|bc" | "assetName NOT IN (:assetName__0, :assetName__1)" | "ab"   | "bc"
+			filter  	 	| expression                                        							| param0 | param1
+			"ab|bc"  		| "assetName IN (:assetName__0, :assetName__1)"     							| "ab"   | "bc"
+			"-ab|bc" 		| "assetName NOT IN (:assetName__0, :assetName__1)" 							| "ab"   | "bc"
+			"!ab|bc" 		| "assetName NOT IN (:assetName__0, :assetName__1)" 							| "ab"   | "bc"
+			"ab|bc|=null"	| "(assetName IN (:assetName__0, :assetName__1) OR assetName IS NULL)"			| "ab"   | "bc"
+			"ab|bc|!null"	| "(assetName IN (:assetName__0, :assetName__1) OR assetName IS NOT NULL)"		| "ab"   | "bc"
+			"-ab|bc|=null"	| "(assetName NOT IN (:assetName__0, :assetName__1) OR assetName IS NULL)"		| "ab"   | "bc"
+			"-ab|bc|!null"	| "(assetName NOT IN (:assetName__0, :assetName__1) OR assetName IS NOT NULL)"	| "ab"   | "bc"
 
 	}
 

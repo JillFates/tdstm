@@ -547,7 +547,7 @@ class SqlUtil {
         fieldSearchData.sqlSearchExpression = (isNull || isNotNull) ? '(' : ''
 		fieldSearchData.sqlSearchExpression += fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
 		if (isNull || isNotNull) {
-			fieldSearchData.sqlSearchExpression += " OR $fieldSearchData.whereProperty IS ${isNotNull ? 'NOT' : ''} NULL)"
+			fieldSearchData.sqlSearchExpression += " OR $fieldSearchData.whereProperty IS ${isNotNull ? 'NOT ' : ''}NULL)"
 		}
 	}
 
