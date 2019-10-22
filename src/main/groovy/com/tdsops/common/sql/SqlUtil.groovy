@@ -488,11 +488,18 @@ class SqlUtil {
 	 */
 	private static void handleDateOrDatetimeField(FieldSearchData fieldSearchData) {
 
-		Pair<Date, Date> result = DateTimeFilterUtil.parseUserEntry(fieldSearchData.filter)
-		fieldSearchData.sqlSearchExpression = " (${fieldSearchData.whereProperty} BETWEEN :${fieldSearchData.columnAlias}_start AND :${fieldSearchData.columnAlias}_end) "
+		try {
+			Pair<Date, Date> result = DateTimeFilterUtil.parseUserEntry(fieldSearchData.filter)
+			fieldSearchData.sqlSearchExpression = " (${fieldSearchData.whereProperty} BETWEEN :${fieldSearchData.columnAlias}_start AND :${fieldSearchData.columnAlias}_end) "
 
-		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_start', result.getaValue())
-		fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_end', result.getbValue())
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_start', result.getaValue())
+			fieldSearchData.addSqlSearchParameter(fieldSearchData.columnAlias + '_end', result.getbValue())
+		} catch (Exception ex){
+			// TM-TM-16089.
+			// To avoid unnecessary exception messages while user is typing filters
+			// it simplifies behaviour doing a query with 0 results.
+			fieldSearchData.sqlSearchExpression = '1 = 0'
+		}
 	}
 
 	/**
