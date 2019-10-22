@@ -74,6 +74,7 @@ export const en_DICTIONARY: Object = {
 		},
 		'TOTAL': 'Total',
 		'TIMEZONE': 'Time Zone Select',
+		'DATE_TIMEZONE': 'Date and Timezone',
 		'DATE_FORMAT': 'Date Format'
 	},
 	'AKA': {
