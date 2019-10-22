@@ -102,6 +102,14 @@ interface IMoveEvent {
 	id?: number;
 }
 
+export interface IMoveEventTask {
+	cycles?: number[];
+	sinks?: number[];
+	starts?: number[];
+	startDate?: string;
+	tasks?: IGraphTask[];
+}
+
 export const enum TASK_OPTION_LABEL {
 	HOLD = 'Hold',
 	START = 'Start',

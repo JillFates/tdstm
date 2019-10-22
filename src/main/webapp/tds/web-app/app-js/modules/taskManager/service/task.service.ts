@@ -9,7 +9,7 @@ import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
-import {IGraphNode, IGraphTask} from '../model/graph-task.model';
+import {IGraphNode, IGraphTask, IMoveEventTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
 
 export interface IGrapTaskResponseBody {
@@ -19,13 +19,7 @@ export interface IGrapTaskResponseBody {
 
 export interface IMoveEventTaskResponseBody {
 	status?: string;
-	data?: {
-		cycles?: number[];
-		sinks?: number[];
-		starts?: number[];
-		startDate?: string;
-		tasks?: IGraphTask[];
-	};
+	data?: IMoveEventTask;
 }
 
 export interface ITaskResponseBody {
@@ -534,7 +528,7 @@ export class TaskService {
 			.map(res => res.body.data);
 	}
 
-	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IGraphNode[]> {
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IMoveEventTask> {
 		const extraParams = { ...filters };
 		extraParams.id = id;
 		extraParams.mode = 'C';
@@ -549,15 +543,7 @@ export class TaskService {
 		return this.http.get<IMoveEventTaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}`,
 			{ params, observe: 'response' })
 			.map(res => {
-				const tasks = res.body.data && res.body.data.tasks;
-				const graphNodes: IGraphNode[] = [];
-				if (tasks) {
-					tasks.map(t => {
-						graphNodes.push({task: t})
-					});
-					return graphNodes;
-				}
-				return [];
+				return res.body.data;
 			});
 	}
 

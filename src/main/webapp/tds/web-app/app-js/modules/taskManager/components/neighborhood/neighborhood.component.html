@@ -97,7 +97,9 @@
 		[nodeData]="nodeData$ | async"
     [currentUser]="currentUser$ | async"
     [contextMenuOptions]="ctxMenuOpts$ | async"
-    (nodeClicked)="loadTasks($event)"
+    (nodeClicked)="onNeighborhood($event)"
+    (backTofullGraph)="viewFullGraphFromCache()"
+    (nodeUpdated)="updateGraphCache($event)"
     #graph></tds-diagram-layout>
   </div>
 </div>
