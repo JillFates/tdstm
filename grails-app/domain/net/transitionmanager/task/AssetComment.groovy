@@ -541,7 +541,7 @@ class AssetComment {
 			hardAssigned             : hardAssigned,
 			sendNotification         : sendNotification,
 			priority                 : priority,
-			moveEvent                : moveEvent.id,
+			moveEvent                : moveEvent?.id,
 			dueDate                  : dueDate,
 			instructionsLink         : instructionsLink
 		]
