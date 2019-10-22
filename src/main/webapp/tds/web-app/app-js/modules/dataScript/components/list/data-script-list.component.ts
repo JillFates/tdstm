@@ -28,6 +28,7 @@ import {CellClickEvent, RowArgs, GridDataResult} from '@progress/kendo-angular-g
 import {ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {DataScriptEtlBuilderComponent} from '../etl-builder/data-script-etl-builder.component';
 
 @Component({
 	selector: 'data-script-list',
@@ -201,7 +202,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Open The Dialog to Create, View or Edit the DataScript
+	 * Open The Dialog to Create, View or Edit the information associated with the datascript
 	 * @param {DataScriptModel} dataScriptModel
 	 * @param {number} actionType
 	 */
@@ -217,6 +218,20 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 					this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
 				}, 500);
 			}
+		}).catch(result => {
+			// on dialog close, do nothing ..
+		});
+	}
+
+	/**
+	 * Open The Dialog to modify the ETL DataScript itself
+	 * @param {DataScriptModel} dataScriptModel
+	 */
+	private openDataScriptEtlBuilder(dataScriptModel: DataScriptModel): void {
+		this.dialogService.extra(DataScriptEtlBuilderComponent, [
+			{ provide: DataScriptModel, useValue: dataScriptModel },
+		]).then(result => {
+			this.reloadDataScripts();
 		}).catch(result => {
 			// on dialog close, do nothing ..
 		});

@@ -31,6 +31,7 @@ export const en_DICTIONARY: Object = {
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
+		'SCRIPT': 'Script',
 		'UNDO': 'Undo',
 		'DEFAULT': 'Default',
 		'SHOW': 'Show',
