@@ -40,10 +40,10 @@
 	</div>	
 	<div class="generateWrapper">
 		<label for="generateTask">
-			<a class="btn btn-default has-spinner component-action-generate-tasks" id="generateTask" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
-				<img ng-src="{{applyRootPath('/assets/icons/table_gear.png')}}" />
-				Generate Tasks
-			</a>
+            <button class="btn btn-primary"  id="generateTask"  ng-click="createRecipe()" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
+                <img ng-src="{{applyRootPath('/assets/icons/svg/file-settings-line.svg')}}" height="20px" />
+                Generate Tasks
+            </button>
 		</label>
 	</div>
 </form>

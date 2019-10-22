@@ -53,6 +53,7 @@
 
 /* General Elements */
 div.cookbook_recipes_editor div.alert {
+  font-size: 14px;
   position: fixed;
   width: 300px;
   left: 50%;
@@ -61,6 +62,13 @@ div.cookbook_recipes_editor div.alert {
   z-index: 100;
   padding: 5px 15px;
   text-align: center; }
+  div.cookbook_recipes_editor div.alert button.close {
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    font-size: 25px;
+    color: #000;
+    height: 10px; }
 
 div.cookbook_recipes_editor div.alert {
   -webkit-transition: all ease 0.5s;
@@ -217,8 +225,6 @@ div.modal-dialog {
       border-radius: 0px;
       height: 39px;
       padding-top: 10px; }
-      div.modal-dialog div.modal-content div.modal-header h3 {
-        color: #fff !important; }
       div.modal-dialog div.modal-content div.modal-header button.close {
         opacity: 1;
         color: #fff; }
