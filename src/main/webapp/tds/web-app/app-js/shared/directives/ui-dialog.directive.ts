@@ -21,7 +21,7 @@ declare var jQuery: any;
         <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
             style="overflow-y: auto" role="dialog">
             <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
-                <div class="modal-content">
+                <div class="tds-modal-content">
                     <div #view></div>
                 </div>
             </div>

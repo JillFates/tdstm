@@ -116,7 +116,7 @@
 	<!-- BULK DELETE model -->
 	<div class="modal fade" id="bulkDeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
-	    <div class="modal-content">
+	    <div class="tds-modal-content">
 	      <div class="modal-header">
 		     <button id="bulkDeleteCloseAndReloadButton" aria-label="Close"
 					 class="close" type="button" onclick='Person.closePopup()' title="Close">

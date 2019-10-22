@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css);
@@ -992,7 +993,7 @@ form .btn-with-close-icon .fa-close {
 div.dates-info-container {
   padding: 4px 0 !important; }
 
-/* Exclusive for AngularJS*/
+/* Exclusive for AngularJS */
 .asset-tag-selector-component {
   margin: 0 5% 0 0;
   position: relative;
@@ -1023,7 +1024,7 @@ div.dates-info-container {
         font-family: FontAwesome;
         color: black;
         font-size: 14px;
-        content: "\f00d"; }
+        content: ""; }
       .asset-tag-selector-component .k-widget li span {
         margin-right: unset; }
       .asset-tag-selector-component .k-widget li span:not(.k-select) div {
@@ -1092,36 +1093,36 @@ div.dates-info-container {
 .striked-tag-item {
   text-decoration: line-through; }
 
-/*Move into colors after merge with David Branch*/
+/*Move into colors after merge with David Branch */
 .tag-black {
   background-color: black !important; }
 
 .tag-grey {
-  background-color: #e6e6e6 !important; }
+  background-color: #CCCCCC !important; }
 
 .tag-red {
   background-color: #f2d9e1 !important; }
 
 .tag-orange {
-  background-color: #f2e8d9 !important; }
+  background-color: #FAD7C3 !important; }
 
 .tag-yellow {
-  background-color: #eaf2d9 !important; }
+  background-color: #FAF0C3 !important; }
 
 .tag-green {
-  background-color: #d9f2d9 !important; }
+  background-color: #DFF0D0 !important; }
 
 .tag-cyan {
-  background-color: #d9f2ec !important; }
+  background-color: #E1F1F6 !important; }
 
 .tag-blue {
-  background-color: #d9e8f2 !important; }
+  background-color: #D3D7FA !important; }
 
 .tag-purple {
-  background-color: #dad9f2 !important; }
+  background-color: #EADEF5 !important; }
 
 .tag-pink {
-  background-color: #efd9f2 !important; }
+  background-color: #F9C7D3 !important; }
 
 .tag-white {
   background-color: white !important; }
@@ -1129,21 +1130,21 @@ div.dates-info-container {
 .tag-unselected {
   background-color: unset !important; }
 
-.asset-tag-selector-component-content .label.tag {
-  display: inline-block;
-  margin-right: 2px;
-  margin-bottom: 2px;
-  vertical-align: baseline;
-  text-align: center;
-  width: inherit;
-  height: 28px;
-  font-weight: 600;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 7px;
-  font-size: 13px;
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
-  color: #656565 !important; }
+.asset-tag-selector-component-content {
+  line-height: 21px;
+    line-height-height: 21px;
+    line-height-font-weight: 600;
+    line-height-padding-left: 10px;
+    line-height-padding-right: 10px;
+    line-height-font-size: 11px;
+    line-height-color: #333 !important; }
+  .asset-tag-selector-component-content .label.tag {
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: 2px;
+    vertical-align: baseline;
+    text-align: center;
+    width: inherit; }
 
 .main-header.header-component {
   display: block;

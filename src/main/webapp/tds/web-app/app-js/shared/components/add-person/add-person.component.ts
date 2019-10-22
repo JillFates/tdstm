@@ -12,7 +12,7 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 	template: `
         <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in add-person-component" id="add-person-component" data-backdrop="static" tabindex="0" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content" tds-ui-modal-decorator=""
+                <div class="tds-modal-content" tds-ui-modal-decorator=""
                      [options]="modalOptions">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">

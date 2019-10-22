@@ -9,7 +9,9 @@ html {
 body div.content-wrapper {
 	background: #fff;
 }
-
+a{
+	cursor: pointer;
+}
 .content-header {
 	> h1 {
 		font-weight: bold;

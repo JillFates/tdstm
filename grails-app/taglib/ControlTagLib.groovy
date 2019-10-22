@@ -20,6 +20,78 @@ class ControlTagLib {
 	static final String EXACTLY_MIN_MAX_VALIDATION_MESSAGE = 'Value must be exactly {min} character(s).'
 	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
+	def clrRowDetail = { Map attrs -> 
+		Map fieldSpec = attrs.field ?: [:]
+		def fieldValue = attrs.value ?: ""
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrRowDetail> tag requires field=fieldSpec Map')
+		}
+		StringBuilder tr = new StringBuilder("\n")
+		tr.append('<tr')
+		if(fieldValue == '') {
+			tr.append(' class="nodata"')
+		}
+		tr.append('>')
+		out << tr.toString()
+		clrInputLabel.call(attrs)
+		StringBuilder row = new StringBuilder("\n")
+		row.append('<td>')
+		row.append(HtmlUtil.escape(fieldValue))
+		row.append('</td>')
+		row.append('</tr>')
+		out << row.toString()
+	}
+
+	def clrInputLabel = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrInputLabel> tag requires field=fieldSpec Map')
+		}
+		StringBuilder sb = new StringBuilder("\n")
+
+		sb.append('<th class="')
+		// TODO : Determine if the fieldName is used in the LABEL class attribute
+		// sb.append(fieldSpec.field)
+		// if (fieldSpec.imp) {
+		// 	String imp = fieldSpec.imp
+		// 	sb.append(" ${imp}")
+
+
+		// 	// Determines if the imp is I)mportant or C)ritical
+		// 	// if (imp == "Y" || imp == "G") {
+		// 	// 	// Checks if the value for the input was given
+		// 	// 	if (attrs.containsKey("value")) {
+		// 	// 		// If the value for the input is empty, the label will be red.
+		// 	// 		if (attrs.value == null || StringUtil.isBlank(attrs.value.toString())) {
+		// 	// 			sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
+		// 	// 		}
+		// 	// 	}
+		// 	// }
+		// }
+		if (fieldSpec.constraints.required) {
+			sb.append(' required')
+		}
+		sb.append('">')
+		sb.append("\n")
+
+		// Build the LABEL element
+		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
+		sb.append('<label for="')
+		sb.append(fieldSpec.field)
+		sb.append('"')
+		sb.append(tooltipAttrib(fieldSpec))
+		sb.append(' >')
+		sb.append(HtmlUtil.escape(fieldSpec.label))
+		if (attrs.containsKey("labelSuffix")){
+            sb.append(HtmlUtil.escape(attrs.labelSuffix))
+        }
+
+		sb.append('</label>')
+
+		// Close out the TD
+		sb.append("\n</th>")
+		out << sb.toString()
+	}
 	/**
 	 * Used for wrapping UI elements when no other ControlTag applies.
 	 * This tag deals with adding the tooltip.

@@ -6,10 +6,9 @@
 <%@page import="grails.converters.JSON"%>
 
 <div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
-	 class="modal-content tds-angular-component-content">
+	 class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
-				aria-hidden="true">×</span></button>
+		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Edit</h4>
 	</div>
 	<div class="modal-body">
@@ -253,29 +252,29 @@
 				</table>
 			</form>
 	</div>
-	<div class="modal-footer form-group-center">
-		<tds-button-save
-				class="btn-primary pull-left component-action-update" tabindex="501"
-				tooltip="Update Asset"
-				[disabled]="!isDependenciesValidForm"
-				[permissions]="['${Permission.AssetEdit}']"
-				(click)="submitForm($event)">
-		</tds-button-save>
-
-		<tds:hasPermission permission="${Permission.AssetDelete}">
-			<tds-button-delete
-					tooltip="Delete Asset"
-					class="btn-danger component-action-delete" tabindex="502"
-					[permissions]="['${Permission.AssetDelete}']"
-					(click)="onDeleteAsset()">
-			</tds-button-delete>
-		</tds:hasPermission>
-
-		<tds-button-cancel
-				tooltip="Cancel Edit"
-				class="pull-right component-action-cancel"
-				tabindex="503"
-				(click)="onCancelEdit()">
-		</tds-button-cancel>
+	<div class="modal-sidenav form-group-center">
+		<nav class="modal-sidenav btn-link">
+			<tds-button-save 
+				(click)="submitForm($event)" 
+				[disabled]="!isDependenciesValidForm" 
+				[permissions]="['${Permission.AssetEdit}']" 
+				tooltip="Update" 
+				icon="pencil"
+				 tabindex="501"></tds-button-save>
+			<tds:hasPermission permission="${Permission.AssetDelete}">
+				<tds-button-delete
+						tooltip="Delete Asset"
+						class="btn-danger"
+						[permissions]="['${Permission.AssetDelete}']"
+						(click)="onDeleteAsset()"
+						 tabindex="502">
+				</tds-button-delete>
+			</tds:hasPermission>
+			<tds-button-cancel
+					tooltip="Cancel Edit"
+					tabindex="503"
+					(click)="onCancelEdit()">
+			</tds-button-cancel>
+		</nav>
 	</div>
 </div>

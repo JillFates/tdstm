@@ -13,7 +13,7 @@ import { TaskService } from '../../service/task.service';
 				 tabindex="-1"
 				 role="dialog">
 			<div class="modal-dialog modal-md" role="document">
-				<div class="modal-content resizable" style="width: 55vw;">
+				<div class="tds-modal-content resizable" style="width: 55vw;">
 					<div class="modal-header">
 						<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
 							<span aria-hidden="true">×</span>
