@@ -198,10 +198,12 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm(): void {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
-			this.projectModel.startDate.setHours(0, 0, 0, 0);
-			this.projectModel.completionDate.setHours(0, 0, 0, 0);
-			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
-			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			if (this.projectModel.startDate.getHours() > 0 || this.projectModel.completionDate.getHours() > 0) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
