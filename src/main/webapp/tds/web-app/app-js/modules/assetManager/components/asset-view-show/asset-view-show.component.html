@@ -1,70 +1,102 @@
 <div class="asset-explorer-view-show-component content body">
-    <section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
-        <div>
-            <div class="btn-group"
-                 *ngIf="config.canShowSaveButton">
-                <tds-button-save
-                        (click)="save(config.saveButtonId)"
-                        [ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
-                        [title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
-                        [attr.id]="config.saveButtonId">
-                </tds-button-save>
+	<section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
+		<div class="button-bar text-right">
+			<div>
+				<tds-button-custom [flat]="true" icon="repeat"></tds-button-custom>
+<!--				<tds-radial-progress class="inline-progress"-->
+<!--														 style="top: 4px; width: 30px; min-height: unset; min-width: unset; height: unset;"-->
+<!--														 [percent]="50"-->
+<!--														 size="small"></tds-radial-progress>-->
+			</div>
+		</div>
+		<div class="button-bar">
+			<!-- New buttons -->
+			<div class="inline">
+				<label class="clr-control-label inline">Saved Views: </label>
+				<tds-button-custom icon="add-text"></tds-button-custom>
+				<input id="justPlanning" type="checkbox" name="justPlanning"
+							 class="component-action-just-planning"
+							 [(ngModel)]="justPlanning">
+				<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
+					Just Planning
+				</label>
+			</div>
+			<div class="inline float-right">
+				<tds-button-custom icon="plus-circle"></tds-button-custom>
+				<tds-button-custom icon="logout"></tds-button-custom>
+				<tds-button-custom icon="pencil"></tds-button-custom>
+				<tds-button-custom icon="cog"></tds-button-custom>
+				<tds-button-custom icon="download"></tds-button-custom>
+			</div>
+			<!-- Save/Save As button -->
+			<!--
+			<div class="btn-group"
+					 *ngIf="config.canShowSaveButton">
+				<tds-button-save
+					(click)="save(config.saveButtonId)"
+					[ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
+					[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
+					[attr.id]="config.saveButtonId">
+				</tds-button-save>
+				<button type="button" class="btn dropdown-toggle"
+								[ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
+								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<span class="caret asset-view-show-caret"></span>
+					<span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<ul class="dropdown-menu">
+					<li *ngIf="config.canSave">
+						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
+					</li>
+					<li *ngIf="config.canSaveAs">
+						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
+					</li>
+				</ul>
+			</div>
+			-->
 
-                <button type="button" class="btn dropdown-toggle"
-                        [ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="caret asset-view-show-caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
+			<!-- Favorite button -->
+			<!--<tds-button-custom
+				[icon]="model.isFavorite ? 'star' : 'star-o'"
+				[title]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+				class="text-yellow"
+				isIconButton="true"
+				(click)="onFavorite()">
+			</tds-button-custom>-->
 
-                <ul class="dropdown-menu">
-                    <!-- Save Button -->
-                    <li *ngIf="config.canSave">
-                        <a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
-                    </li>
-                    <li *ngIf="config.canSaveAs">
-                        <a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
-                    </li>
-                </ul>
-            </div>
+			<!--	Export button	-->
+			<!--<tds-button-export (click)="onExport()" [id]="'btnExport'"></tds-button-export>-->
 
-            <tds-button-custom
-                        [icon]="model.isFavorite ? 'star' : 'star-o'"
-                        [title]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
-                        class="text-yellow"
-                        isIconButton="true"
-                        (click)="onFavorite()">
-            </tds-button-custom>
+			<!-- Asset Views dropdown -->
+			<!--<tds-asset-view-selector
+				#select="tdsAssetViewSelector">
+			</tds-asset-view-selector>-->
 
-            <tds-button-export (click)="onExport()" [id]="'btnExport'"></tds-button-export>
-
-            <tds-asset-view-selector
-                    #select="tdsAssetViewSelector">
-            </tds-asset-view-selector>
-            <tds-button-custom *ngIf="config.isEditAvailable"
-                        isIconButton="true"
-                        icon="cog"
-                        tooltip="Configure"
-                        class="pull-right"
-                        (click)="onEdit()">
-            </tds-button-custom>
-        </div>
-        <div class="box-body">
-            <asset-explorer-view-grid
-                    #assetExplorerViewGrid
-                    [hiddenFilters]="hiddenFilters"
-                    [data]=data
-                    (modelChange)="onQuery()"
-                    (justPlanningChange)="onJustPlanningChange($event)"
-                    (hiddenFiltersChange)="onHiddenFiltersChange($event)"
-                    [gridState]="gridState"
-                    (gridStateChange)="onGridStateChange($event)"
-                    [fields]="fields"
-                    [edit]="false"
-                    [model]="model.schema"
-                    [viewId]="model.id"
-                    [metadata]="metadata">
-            </asset-explorer-view-grid>
-        </div>
-    </section>
+			<!-- Edit (cog) button -->
+			<!--<tds-button-custom *ngIf="config.isEditAvailable"
+												 isIconButton="true"
+												 icon="cog"
+												 tooltip="Configure"
+												 class="pull-right"
+												 (click)="onEdit()">
+			</tds-button-custom>-->
+		</div>
+		<div class="box-body" style="padding-top: 0px">
+			<asset-explorer-view-grid
+				#assetExplorerViewGrid
+				[hiddenFilters]="hiddenFilters"
+				[data]=data
+				(modelChange)="onQuery()"
+				(justPlanningChange)="onJustPlanningChange($event)"
+				(hiddenFiltersChange)="onHiddenFiltersChange($event)"
+				[gridState]="gridState"
+				(gridStateChange)="onGridStateChange($event)"
+				[fields]="fields"
+				[edit]="false"
+				[model]="model.schema"
+				[viewId]="model.id"
+				[metadata]="metadata">
+			</asset-explorer-view-grid>
+		</div>
+	</section>
 </div>

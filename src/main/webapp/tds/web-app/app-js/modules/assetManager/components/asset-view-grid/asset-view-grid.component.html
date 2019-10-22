@@ -10,7 +10,7 @@
 		[sort]="gridState.sort"
 		[pageSize]="gridState.take"
 		[resizable]="true"
-		[pageable]="{ pageSizes: maxOptions, info: true}"
+		[pageable]="{ pageSizes: maxOptions, info: true }"
 		(dataStateChange)="dataStateChange($event)"
 		(columnResize)="onWidthChange($event)"
 		(cellClick)="cellClick($event)"
@@ -18,7 +18,9 @@
 
 		<!-- Header Toolbar -->
 		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
-			<div class="col-sm-6 bulkchange-section">
+
+			<!-- Bulk change button -->
+			<!--<div class="col-sm-6 bulkchange-section">
 				<div class="btn-group btn-between-space-5"
 				     *ngIf="config.displayCreateButton">
 
@@ -64,8 +66,10 @@
 					       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
 					<label style="margin-left: 4px;" for="justPlanning">Just Planning</label>
 				</div>
-			</div>
-			<div class="col-sm-6 filters-section">
+			</div>-->
+
+			<!-- Clear Filters/ Refresh buttons -->
+			<!--<div class="col-sm-6 filters-section">
 				<div *ngIf="hiddenFilters; then hiddenFiltersButton else clearFilters"></div>
 				<ng-template #clearFilters>
 					<tds-button-custom
@@ -96,7 +100,7 @@
 					class="component-action-reload pull-righ"
 					(click)="onReload()">
 				</tds-button-custom>
-			</div>
+			</div>-->
 		</ng-template>
 
 		<!-- Select All column -->

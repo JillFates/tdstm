@@ -24,7 +24,7 @@ import {UserContextState} from '../modules/auth/state/user-context.state';
 	imports: [
 		NgxsModule.forRoot([TDSAppState, UserContextState]),
 		NgxsReduxDevtoolsPluginModule.forRoot(),
-		NgxsLoggerPluginModule.forRoot(),
+		NgxsLoggerPluginModule.forRoot({disabled: true}),
 		// Angular Modules
 		BrowserModule,
 		HttpClientModule,

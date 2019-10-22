@@ -39,7 +39,7 @@ declare var jQuery: any;
 						{{ userContext.licenseInfo.license.banner }}
 					</div>
 				</div>
-				<ol class="breadcrumb">
+				<!--<ol class="breadcrumb">
 					<li
 						*ngFor="let menu of pageMetaData.menu; let last = last"
 						[ngClass]="{ active: last }"
@@ -56,7 +56,7 @@ declare var jQuery: any;
 							{{ menu.text || menu | translate }}
 						</ng-container>
 					</li>
-				</ol>
+				</ol>-->
 			</ng-container>
 		</section>
 		<tds-ui-dialog></tds-ui-dialog>
