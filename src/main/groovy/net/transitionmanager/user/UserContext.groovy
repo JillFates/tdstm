@@ -54,6 +54,7 @@ class UserContext {
 			projectMap = [
 				id: project.id,
 				name: project.name,
+				status: project.status,
 				logoUrl: logoUrl
 			]
 		}
