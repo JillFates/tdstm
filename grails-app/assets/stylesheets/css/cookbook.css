@@ -1,5 +1,10 @@
 /* Cookbook Styles */
 
+div.cookbook_recipes_editor div.container {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
 .paginationWrapper{
 	text-align: center;
 }
@@ -45,8 +50,6 @@ ul{
 }
 
 .fullWidth{width: 100%}
-
-#gridControls{margin-top:15px;}
 
 .create-recipe-tabs .tab-content {
 	padding: 15px;

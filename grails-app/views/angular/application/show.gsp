@@ -40,7 +40,7 @@
 						<div class="clr-col-12">
 							<g:render 
 								template="/angular/common/supportShow" 
-								model="[supportAssets:supportAssets, dependentAssets:dependentAssets, assetEntity: applicationInstance]" >
+								model="[supportAssets:supportAssets]" >
 							</g:render>
 						</div>
 					</div>
