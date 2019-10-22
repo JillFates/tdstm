@@ -1,10 +1,9 @@
 <div class="content body tds-kendo-grid task-list">
 	<form clrForm clrLayout="horizontal" class="">
-		<div>Selected event: {{selectedEvent | json}}</div>
 		<div class="clr-row">
-			<div class="clr-col-4">
+			<div class="clr-col-3">
 				<clr-select-container class="clr-form-control clr-row">
-					<label>Event: </label>
+					<label class="label-event-list">Event: </label>
 					<select clrSelect
 							class="select-event-list"
 							name="selectedEventId"
@@ -17,35 +16,24 @@
 					</select>
 				</clr-select-container>
 			</div>
-			<div class="clr-col-6">
-				<label for="one">
-					<input
-							type="checkbox"
-							name="one"
-							id="one"
-							[(ngModel)]="justRemaining"
-							(ngModelChange)="onFiltersChange()">
-					Just Remaining
-				</label>
-				<label for="two">
-					<input
-							type="checkbox"
-							name="two"
-							id="two"
-							[(ngModel)]="justMyTasks"
-							(ngModelChange)="onFiltersChange()">
-					Just Mine
-				</label>
-				<label for="three">
-					<input
-							type="checkbox"
-							name="three" id="three"
-							[(ngModel)]="viewUnpublished"
-							(ngModelChange)="onFiltersChange()">
-					View Unpublished
-				</label>
+			<div class="clr-col-5 checkbox-container">
+                <clr-checkbox-wrapper>
+					<input clrCheckbox type="checkbox" name="one" id="one" [(ngModel)]="justRemaining" (ngModelChange)="onFiltersChange()">
+                    <label>Just Remaining</label>
+				</clr-checkbox-wrapper>
+
+				<clr-checkbox-wrapper>
+					<input clrCheckbox type="checkbox" name="two" id="two" [(ngModel)]="justMyTasks" (ngModelChange)="onFiltersChange()">
+					<label>Just Mine</label>
+				</clr-checkbox-wrapper>
+
+				<clr-checkbox-wrapper>
+					<input clrCheckbox type="checkbox" name="three" id="three" [(ngModel)]="viewUnpublished" (ngModelChange)="onFiltersChange()">
+					<label>View Unpublished</label>
+				</clr-checkbox-wrapper>
 			</div>
-			<div class="clr-col-2">
+
+			<div class="clr-col-4">
 				buttons
 			</div>
 		</div>
