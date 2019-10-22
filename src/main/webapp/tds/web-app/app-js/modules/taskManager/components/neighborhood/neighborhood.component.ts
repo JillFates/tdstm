@@ -300,7 +300,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Creates a cache to hold the full graph so that a new call won't be needed when returning from a negihbor
+	 * Creates a cache to hold the full graph so that a new call won't be needed when returning from a neighbor
 	 * @param data
 	 */
 	cacheFullGraph(data: any): void {
