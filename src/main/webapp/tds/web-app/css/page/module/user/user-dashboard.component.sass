@@ -1,6 +1,29 @@
 .user-dashboard-component
-	width: 97%
-	margin: 24px auto 24px auto
+	$primary-text-color: #18394B
+	.project
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+			padding-left: 8px
+	.grid-header
+		.title
+			color: $primary-text-color
+			font-weight: bold
+			font-size: 14px
+			line-height: 24px
+		.description
+			font-weight: normal
+			font-size: 10px
+			line-height: 16px
+			margin-left: 5px
+	margin: 24px 15px 24px 15px
+	tds-button-custom.flat
+		tds-button
+			button
+				padding: 0
+				margin: 0
 	.project-selection-form
 		.clr-form-control
 			margin-top: 0
@@ -8,7 +31,10 @@
 				flex: none
 				width: auto
 	.project-selection
-		font-size: 14px
+		font-size: 13px
+		padding-left: 0
+		font-weight: 500
+		line-height: 18px
 	.event-status-toolbar
 		display: inline
 		margin-left: 30px
@@ -25,9 +51,6 @@
 	.panel-heading .k-widget.k-dropdown.k-header
 		margin-left: 5px
 	strong
-		vertical-align: middle
-		margin-left: 5px
-	span
 		vertical-align: middle
 		margin-left: 5px
 	.kendo-grid-toolbar__refresh-btn
@@ -55,9 +78,6 @@
 		.k-grid-content
 			font-family: helvetica, arial, sans-serif
 			font-size: 12px
-		.btn
-			margin-right: 16px
-			padding: 4px 8px
 		tr.k-detail-row > .k-hierarchy-cell
 			border-right: 0
 		tr.k-detail-row div
