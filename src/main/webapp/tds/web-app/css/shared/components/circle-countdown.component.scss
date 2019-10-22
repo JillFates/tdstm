@@ -1,0 +1,41 @@
+#countdown {
+  position: relative;
+  display: inline-block;
+  height: 35px;
+  width: 35px;
+  text-align: center;
+}
+
+#countdown-number {
+  color: #2196F3;
+  display: inline-block;
+  line-height: 35px;
+}
+
+#countdown-circle-container {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 30px;
+  height: 30px;
+  transform: rotateY(-180deg) rotateZ(-90deg);
+}
+
+#countdown-circle-container #countdown-circle {
+  stroke-dasharray: 90px;
+  stroke-dashoffset: 0px;
+  stroke-linecap: round;
+  stroke-width: 2px;
+  stroke: #2196F3;
+  fill: none;
+  //animation: countdown 30s linear infinite forwards;
+}
+
+@keyframes countdown {
+  from {
+    stroke-dashoffset: 0px;
+  }
+  to {
+    stroke-dashoffset: 90px;
+  }
+}
