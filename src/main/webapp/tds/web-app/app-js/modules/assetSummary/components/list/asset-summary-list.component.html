@@ -28,14 +28,14 @@
                             <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
                         </ng-template>
                         <ng-template kendoGridCellTemplate *ngIf="column.property === 'device'" let-dataItem>
-                            <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id, 'assetType': ' -VM\|\ Virtual'}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
+                            <a [routerLink]="['/asset','views',dataItem[column.property].id,'show']" [queryParams]="{'moveBundle.id': dataItem['bundle'].id, 'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="dataItem[column.property].count > 0"> {{dataItem[column.property].count}}</a>
                         </ng-template>
                         <ng-template kendoGridFooterTemplate let-dataItem>
                             <div *ngIf="column.property === 'bundle'">
                                 {{'GLOBAL.TOTAL' | translate}}
                             </div>
                             <a [routerLink]="['/asset','views', total[column.property].viewId,'show']" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property !== 'device'"> {{ total[column.property].total }}</a>
-                            <a [routerLink]="['/asset','views', total[column.property].viewId,'show']"[queryParams]="{'assetType': ' -VM\|\ Virtual'}" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property === 'device'"> {{ total[column.property].total }}</a>
+                            <a [routerLink]="['/asset','views', total[column.property].viewId,'show']"[queryParams]="{'assetType': ' -VM\|Virtual'}" class="overflow-ellipsis" *ngIf="total[column.property] && total[column.property].total > 0 && column.property === 'device'"> {{ total[column.property].total }}</a>
                         </ng-template>
                     </kendo-grid-column>
                 </kendo-grid>
