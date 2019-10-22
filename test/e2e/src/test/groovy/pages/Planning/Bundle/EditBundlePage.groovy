@@ -16,9 +16,9 @@ class EditBundlePage extends Page {
     }
 
     static content = {
-        bundleDetailPageTitle { $("section", class:"content-header").find("h1")}
-        updateBtn {$("input.save")}
-        cancelBtn {$("input.delete")[0]}
+        bundleDetailPageTitle {$('bundle-view-edit-component').find("h4.modal-title")}
+        saveBtn {$("button.tds-button-save")}
+        cancelBtn {$('button.tds-button-cancel')}
 
         nameValue {$("input#name")}
         descriptionValue {$("input#description")}
@@ -26,6 +26,8 @@ class EditBundlePage extends Page {
         commonsModule {module CommonsModule}
         completionTime {$("#completionTime")}
         startTime {$("#startTime")}
+        confirmBtn (required:false){$('button.btn.btn-primary.pull-left')[1]}
+        closeButton {$('tds-button-close')}
     }
 
     def editName(text){
@@ -37,11 +39,21 @@ class EditBundlePage extends Page {
     }
 
     def clickCancel(){
-        withConfirm(true) {cancelBtn.click() }
+        waitFor{ cancelBtn.click()}
+        sleep(1000)
+    }
+
+    def cancelEdition(){
+        waitFor{ cancelBtn.click()}
+        sleep(1000)
+        waitFor{confirmBtn.click()}
+        sleep(1000)
     }
 
     def clickSave(){
-        updateBtn.click()
+        sleep(1000)
+        saveBtn.click()
+        sleep(1000)
     }
 
     def changeIsPlanningValue(){
@@ -57,6 +69,11 @@ class EditBundlePage extends Page {
         completionTime = tomorrow.format("MM/dd/YYYY hh:mm aaa")
         def dateSet= [today.format("MM/dd/YYYY hh:mm aaa"),tomorrow.format("MM/dd/YYYY hh:mm aaa")]
         dateSet
+    }
+
+    def clickClose(){
+        closeButton.click()
+        sleep(1000)
     }
 }
 

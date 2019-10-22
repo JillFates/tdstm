@@ -39,6 +39,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public availableBundles;
 	public projectId;
 	public projectLogoId;
+	public savedProjectLogoId;
 	public projectGUID;
 	public dateCreated;
 	public lastUpdated;
@@ -158,6 +159,7 @@ export class ProjectViewEditComponent implements OnInit {
 				this.clients = data.clients ? data.clients : [];
 				this.client = data.client;
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
+				this.savedProjectLogoId = this.projectLogoId;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
 				this.projectModel.startDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate));
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
@@ -196,10 +198,12 @@ export class ProjectViewEditComponent implements OnInit {
 
 	public saveForm(): void {
 		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
-			this.projectModel.startDate.setHours(0, 0, 0, 0);
-			this.projectModel.completionDate.setHours(0, 0, 0, 0);
-			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
-			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			if (this.projectModel.startDate.getHours() > 0 || this.projectModel.completionDate.getHours() > 0) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
@@ -208,6 +212,7 @@ export class ProjectViewEditComponent implements OnInit {
 					this.updateSavedFields();
 					this.editing = false;
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
+					this.savedProjectLogoId = this.projectLogoId;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
 					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl:  this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''}));
@@ -343,6 +348,7 @@ export class ProjectViewEditComponent implements OnInit {
 					if (confirm) {
 						this.editing = false;
 						this.projectModel = JSON.parse(JSON.stringify(this.savedModel));
+						this.projectLogoId = this.savedProjectLogoId;
 					}
 				})
 				.catch((error) => console.log(error));

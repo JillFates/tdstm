@@ -22,6 +22,7 @@ import {ForgotPasswordComponent} from './components/forgot-password/forgot-passw
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {StandardNoticesComponent} from '../noticeManager/components/standard-notices/standard-notices.component';
 import {MandatoryNoticesComponent} from '../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import {SelectProjectModalComponent} from '../project/components/select-project-modal/select-project-modal.component';
 
 @NgModule({
 	imports: [
@@ -48,11 +49,13 @@ import {MandatoryNoticesComponent} from '../noticeManager/components/mandatory-n
 		ForgotPasswordComponent,
 		ChangePasswordComponent,
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		SelectProjectModalComponent
 	],
 	entryComponents: [
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		SelectProjectModalComponent
 	]
 })
 export class AuthModule {

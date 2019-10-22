@@ -192,7 +192,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def resetAction(Long id) {
 		AssetComment task = taskActionService.resetAction(id, currentPerson())
 		renderAsJson([
-			assetComment: task,
+			assetComment: task.taskToMap(),
 			task: task.taskToMap(),
 			status: task.status,
 			statusCss: taskService.getCssClassForStatus(task.status)

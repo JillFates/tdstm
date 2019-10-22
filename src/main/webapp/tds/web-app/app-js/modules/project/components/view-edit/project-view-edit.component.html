@@ -81,7 +81,7 @@
                                 <td valign="top" class="name">Project Logo:</td>
 
                                 <td valign="top" class="value">
-                                    <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId + '?' + retrieveImageTimestamp"/>
+                                    <img *ngIf="savedProjectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ savedProjectLogoId + '?' + retrieveImageTimestamp"/>
                                 </td>
                             </tr>
 
@@ -230,7 +230,7 @@
                     <tr class="prop">
                         <td valign="top" class="name">Associated Partners:</td>
                         <td valign="top" class="value">
-                            <div *ngFor="let partner of projectModel.partners; let i = index">
+                            <div style="display: -webkit-box" *ngFor="let partner of projectModel.partners; let i = index">
                                 <kendo-dropdownlist style="display: block; margin-bottom: 2px"
                                                     [ngModel]="partner"
                                                     (selectionChange)="onPartnerSelectionChange(partner, $event)"
@@ -238,6 +238,7 @@
                                                     [data]="possiblePartners"
                                                     [textField]="'name'"
                                                     [valueField]="'id'"></kendo-dropdownlist>
+                                <img style="margin: 6px; cursor: pointer" src="/tdstm/assets/icons/delete.png" (click)="projectModel.partners.splice(i,1)">
                             </div>
                             <button class="btn btn-secondary" (click)="projectModel.partners.push({id:0, name:''})">Add Partner</button>
                         </td>
@@ -246,12 +247,12 @@
                     <tr>
                         <td valign="top" class="name"><b>Project Logo:</b></td>
                         <td valign="top" class="value">
-                            <div *ngIf="projectModel.projectLogo?.name">
+                            <div *ngIf="projectLogoId">
                                 <img *ngIf="projectLogoId" width="30" height="30" [src]="'/tdstm/project/showImage/'+ projectLogoId + '?' + retrieveImageTimestamp"/>
                                 <img src="/tdstm/assets/icons/delete.png" (click)="onDeleteLogo()" style="border:0px;padding:6px;cursor:pointer">
                             </div>
                             <kendo-upload
-                                    *ngIf="!projectModel.projectLogo?.name"
+                                    *ngIf="!projectLogoId"
                                     #kendoUploadInstance="kendoUpload"
                                     [restrictions]="file.uploadRestrictions"
                                     [autoUpload]="file.autoUpload"
