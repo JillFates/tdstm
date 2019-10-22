@@ -61,11 +61,11 @@ export class AssetCommonShow implements OnInit {
 
 	showAssetDetailView(assetClass: string, id: number) {
 		this.dialogService.replace(AssetShowComponent, [
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass }],
+				{provide: 'ID', useValue: id},
+				{provide: 'ASSET', useValue: assetClass}],
 			DIALOG_SIZE.LG);
-			jQuery('body').addClass('modal-open');
-		}
+		jQuery('body').addClass('modal-open');
+	}
 
 	showDependencyView(assetId: number, dependencyAsset: number) {
 		this.assetService.getDependencies(assetId, dependencyAsset)

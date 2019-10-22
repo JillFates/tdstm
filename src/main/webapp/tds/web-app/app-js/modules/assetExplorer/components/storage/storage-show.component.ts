@@ -28,15 +28,15 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			notifierService: NotifierService,
 			userContextService: UserContextService,
 			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
-				this.mainAsset = modelId;
-				this.assetTags = metadata.assetTags;
+			super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+			this.mainAsset = modelId;
+			this.assetTags = metadata.assetTags;
 		}
 
 		showAssetEditView(): Promise<any> {
 			const componentParameters = [
-				{ provide: 'ID', useValue: this.mainAsset },
-				{ provide: 'ASSET', useValue: DOMAIN.STORAGE }
+				{provide: 'ID', useValue: this.mainAsset},
+				{provide: 'ASSET', useValue: DOMAIN.STORAGE}
 			];
 
 			return this.dialogService
@@ -54,23 +54,23 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			}
 			this.dialogService.extra(AssetCloneComponent, [
 				{provide: AssetModalModel, useValue: cloneModalModel}
-			], false, false).then( (result: CloneCLoseModel)  => {
+			], false, false).then((result: CloneCLoseModel) => {
 
 				if (result.clonedAsset && result.showEditView) {
 					const componentParameters = [
-						{ provide: 'ID', useValue: result.assetId },
-						{ provide: 'ASSET', useValue: DOMAIN.STORAGE }
+						{provide: 'ID', useValue: result.assetId},
+						{provide: 'ASSET', useValue: DOMAIN.STORAGE}
 					];
 
-					this.dialogService
-						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+					this.dialogService.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.STORAGE, result.assetId);
 				}
 			})
-				.catch( error => console.log('error', error));
+				.catch(error => console.log('error', error));
 		}
 
 	}
+
 	return StorageShowComponent;
 }
