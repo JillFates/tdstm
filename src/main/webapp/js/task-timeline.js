@@ -74,7 +74,7 @@ function 	buildGraph(response, status) {
 	var ready = false;
 	var items = data.tasks;
 	// if the event has no tasks show an error message and exit
-	if (items.length === 0) {
+	if (items.length === 0 ) {
 		displayWarningOrErrorMsg(false);
 		return;
 	}
@@ -111,37 +111,37 @@ function 	buildGraph(response, status) {
 	sanitizeData(items, dependencies);
 
 	// sort the tasks chronologically for the stacking algorithm
-	items.sort(function (a, b) {
-		var t1 = a.start ? (new Date(a.start)).getTime() : 0;
-		var t2 = b.start ? (new Date(b.start)).getTime() : 0;
-		if (t1 > t2)
-			return 1;
-		else if (t1 < t2)
-			return -1;
-		else if (a.milestone && !b.milestone)
-			return 1;
-		else if (!a.milestone && b.milestone)
-			return -1;
-		else if ((a.predecessors.length + a.successors.length) < (b.predecessors.length + b.successors.length))
-			return 1;
-		else if ((a.predecessors.length + a.successors.length) > (b.predecessors.length + b.successors.length))
-			return -1;
-		else if (a.predecessors.length < b.predecessors.length)
-			return 1;
-		else if (a.predecessors.length > b.predecessors.length)
-			return -1;
-		else
-			return 0;
-	});
+	// items.sort(function (a, b) {
+	// 	var t1 = a.start ? (new Date(a.start)).getTime() : 0;
+	// 	var t2 = b.start ? (new Date(b.start)).getTime() : 0;
+	// 	if (t1 > t2)
+	// 		return 1;
+	// 	else if (t1 < t2)
+	// 		return -1;
+	// 	else if (a.milestone && !b.milestone)
+	// 		return 1;
+	// 	else if (!a.milestone && b.milestone)
+	// 		return -1;
+	// 	else if ((a.predecessors.length + a.successors.length) < (b.predecessors.length + b.successors.length))
+	// 		return 1;
+	// 	else if ((a.predecessors.length + a.successors.length) > (b.predecessors.length + b.successors.length))
+	// 		return -1;
+	// 	else if (a.predecessors.length < b.predecessors.length)
+	// 		return 1;
+	// 	else if (a.predecessors.length > b.predecessors.length)
+	// 		return -1;
+	// 	else
+	// 		return 0;
+	// });
 
 	// set up the ranges for the mini and main graphs
 	var windowWidth = $(window).width(); // the width of the browser window
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
-	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].estFinish);
+	var d3Linear = getTimeFormatToDraw(parseDate(data.startDate), parseDate(data.endDate),false, data);
 	var x = d3.time.scale()
-		.domain([parseStartDate(data.startDate), items[items.length - 1].estFinish])
+		.domain([parseDate(data.startDate), items[items.length - 1].estFinish])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
@@ -538,7 +538,7 @@ function 	buildGraph(response, status) {
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseStartDate(data.startDate), new Date(Math.min(parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+		.extent([parseDate(data.startDate), new Date(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
 
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
@@ -701,7 +701,7 @@ function 	buildGraph(response, status) {
 
 			// update the scales for the axis
 
-			var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), true);
+			var innerTimeLine = getTimeFormatToDraw(parseDate(brush.extent()[0]), parseDate(brush.extent()[1]), true);
 			axisDefs.x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
 			axisDefs.x1MainGraphAxis.tickFormat(innerTimeLine.format);
 
@@ -750,9 +750,9 @@ function 	buildGraph(response, status) {
 			.append('svg:title')
 			.html(function (d) {
 				return d.number
-					+ ': ' + d.comment
-					+ ' - ' + ((d.assignedTo != 'null') ? (d.assignedTo) : ('Unassigned'))
-					+ ' - ' + d.status;
+					+ ': ' + d.name
+					+ ' - ' + (d.assignedTo ? d.assignedTo : 'Unassigned')
+					+ ' - ' + d.status
 			});
 
 		polys.exit().remove();
@@ -774,7 +774,7 @@ function 	buildGraph(response, status) {
 					var end = x1(d.successor.end);
 					var highest = start + (end - start) * 0.25;
 					return Math.round(Math.min(highest, start + anchorOffset));
-				})
+				});
 
 		if (resized)
 			lines
@@ -1474,15 +1474,16 @@ function 	buildGraph(response, status) {
         // convert all data to its proper format
         if (data.startDate === undefined) {
             data.items.forEach( task => {
-                if (task.estInitial != undefined) {
-                    if (data.startDate == undefined || task.estInitial < data.startDate) {
-                        data.startDate = new Date(task.estInitial);
+                if (task.estStart != undefined) {
+                    if (data.startDate == undefined || task.estStart < data.startDate) {
+                        data.startDate = new Date(task.estStart);
                     }
                 }
             });
             //data.startDate = new Date(Date.now());
         }
-        let startTime = parseStartDate(data.startDate);
+        let startTime = parseDate(data.startDate);
+        let endTime = parseDate(data.endDate);
 
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
@@ -1519,8 +1520,8 @@ function 	buildGraph(response, status) {
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
 		if (starts.size() > 1) {
+			// debugger;
             var earliest = starts[0].startInitial;
-            //var earliest = starts[0].estInitial;
 			for (var i = 0; i < starts.size(); i++) {
 				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
@@ -1530,30 +1531,32 @@ function 	buildGraph(response, status) {
 			root.id = -10;
 			root.comment = 'root';
 			root.root = true;
-//			root.startInitial = 0;
-//			root.endInitial = 0;
-            root.estInitial = startTime;
+
+
+			root.estStart = startTime;
             root.estFinish = new Date(startTime.getTime() + 1);
 			root.predecessorIds = [];
 			items = [root].concat(items);
 			data.root = root;
 		} else if (items.size() > 0) {
+			// debugger;
 			data.root = items[binarySearch(items, starts[0], 0, items.length - 1)];
 		}
 
         let unknownStarts = [];
+
 		for (let i = 0; i < items.length; ++i) {
-		    if (items[i].estInitial === undefined) {
+		    if (!items[i].estStart) {
                 unknownStarts.push(i);
             }
             items[i].milestone = (items[i].duration === 0);
-            if (items[i].estInitial) {
-                items[i].estInitial = new Date(items[i].estInitial);
+            if (items[i].estStart) {
+                items[i].estStart = new Date(items[i].estStart);
             }
             if (items[i].estFinish) {
                 items[i].estFinish = new Date(items[i].estFinish);
             }
-            items[i].start = items[i].estInitial;
+            items[i].start = items[i].estStart;
 			items[i].end = items[i].estFinish;
 			items[i].exChild = null;
 			items[i].exParent = null;
@@ -1570,10 +1573,11 @@ function 	buildGraph(response, status) {
 			items[i].siblingGroupParents = [];
 			items[i].childGroups = [];
 		}
-
+		s
 		// if there are undefined start dates and no cycles, alert the user
-        if (unknownStarts.size() > 0) {
+        if (unknownStarts.size() > 0 || !data.startDate || !data.endDate) {
             alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+            return;
         }
 
 		// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
@@ -2278,8 +2282,9 @@ function 	buildGraph(response, status) {
 						isExclusive = true;
 					}
 				} else {
-					getPredecessors(c).forEach(function (p) {
-						if (set.indexOf(p) == -1)
+					var predecessors =getPredecessors(c)
+					predecessors.map(function (p) {
+						if (set.indexOf(p) === -1)
 							isExclusive = false;
 					});
 				}
@@ -2383,40 +2388,8 @@ function 	buildGraph(response, status) {
 
 	// ensures times are correct
 	function calculateTimes(task, checking) {
-		if (!task.start) {
-			if (task.predecessors.length === 0) {
-                if (task.estInitial) {
-                    task.start = task.estInitial
-                } else {
-                    task.start = data.startDate;
-                }
-			} else {
-				checking.push(task);
-				var latest = 0;
-				for (var i = 0; i < task.predecessors.length; ++i) {
-					var tmp = calculateTimes(task.predecessors[i].predecessor, checking);
-					if (tmp > latest)
-						latest = tmp;
-				}
-				checking.pop(task);
-				task.start = new Date(latest);
-			}
-		}
-
-		if (!task.end) {
-			if (task.root) {
-				task.start = new Date(task.start.getTime() - 2);
-				task.end = new Date(task.start.getTime() - 1);
-			} else {
-                if (task.estFinish) {
-                    task.end = task.estFinish;
-                } else {
-                    task.end = new Date(task.start.getTime() + (task.duration * 60000));
-                }
-                //task.end = task.endInitial;
-                //task.end = task.estFinish;
-			}
-		}
+		task.start = parseDate(task.estStart);
+		task.end = parseDate(task.estFinish);
 		return task.end;
 	}
 
@@ -2609,13 +2582,14 @@ function handleClearFilterStatus() {
  * Parse start date that comes in zulu format and apply the time zone offset to
  * have a Date object in the user's time zone.
  */
-function parseStartDate(startDate) {
-	var momentTZ = moment().tz(tdsCommon.timeZone());
-	var localTZOffset = new Date().getTimezoneOffset();
-	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
-	momentStartDate = momentStartDate.tz("GMT");
-	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
-	return new Date(momentStartDate.valueOf());
+function parseDate(date) {
+	return new Date(date);
+	// var momentTZ = moment().tz(tdsCommon.timeZone());
+	// var localTZOffset = new Date().getTimezoneOffset();'
+	// var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
+	// momentStartDate = momentStartDate.tz("GMT");
+	// momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
+	// return new Date(momentStartDate.valueOf());
 }
 
 function exportCriticalPath() {
@@ -2722,8 +2696,8 @@ function getTimeLinePercent(startDate, endDate, percent) {
  * It calculate the tick number based on two dates
  * it returns an object that represent the best d3.time.xxx, d3.time.format(xxx) and the tick jump
  */
-function getTimeFormatToDraw(startDate, endDate, increasePer) {
-
+function getTimeFormatToDraw(startDate, endDate, increasePer, data) {
+	// debugger;
 	var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 		difference = 0,
 		maxTick = _MAX_TICK_PERFORMANCE,

@@ -58,16 +58,11 @@
 							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
 						</span>
 						<span class="controlSpan radioboxContainer">
-							<input type="radio" name="mode" value="C"
-								   checked>
-							<label >Current Plan</label>
-							<input type="radio"  name="mode" value="R"
-							>
-							<label >Recalculate</label>
+							<input type="radio" name="mode" value="C" checked id="modecId"> <label for="modecId" class="pointer">&nbsp;Current Plan</label>
+							<input type="radio"  name="mode" value="R" id="modeRId"> <label for="modeRId" class="pointer">&nbsp;Recalculate</label>
 						</span>
 						<span id="baselinePlanButton">
-							<div class="graphPanelTab" onclick="baseLine()" title="Baseline" ><h4>Baseline Plan</h4></div>
-%{--							<button type="button">Baseline </button>--}%
+							<button onclick="baseLine()" title="Baseline" class="baseline-btn"><label>Baseline Plan</label></button>
 						</span>
 
 					</div>
