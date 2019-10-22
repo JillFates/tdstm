@@ -71,7 +71,9 @@ export const en_DICTIONARY: Object = {
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
 		},
-		'TOTAL': 'Total'
+		'TOTAL': 'Total',
+		'TIMEZONE': 'Time Zone Select',
+		'DATE_FORMAT': 'Date Format'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'

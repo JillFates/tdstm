@@ -134,7 +134,7 @@ class WsProjectController implements ControllerMethods {
 		}
 
 		def imageId
-		def projectLogo = ProjectLogo.findByProject(project)
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
 		if (projectLogo) {
 			imageId = projectLogo.id
 		}
@@ -186,6 +186,9 @@ class WsProjectController implements ControllerMethods {
 	@HasPermission(Permission.ProjectEdit)
 	def saveProject(String projectId) {
 		ProjectCommand projectCommand = populateCommandObject(ProjectCommand)
+
+		validateCommandObject(projectCommand)
+
 		if (projectId) {
 			projectCommand.id = projectId.toLong()
 		}

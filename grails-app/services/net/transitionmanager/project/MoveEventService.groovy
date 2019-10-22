@@ -383,15 +383,17 @@ class MoveEventService implements ServiceMethods {
 					['Server','VM','Blade','Application','Logical Storage','Database'], bundlesList)
 			List<Long> allAssetIds = AssetEntity.findAllByMoveBundleInListAndProject(bundlesList, currentProject).id
 
-			unresolvedIssues = AssetComment.executeQuery("""
-				from AssetComment
-				where assetEntity.id in (:assetIds)
-				  and dateResolved = null
-				  and commentType=:commentType
-				  and category in ('general', 'discovery', 'planning', 'walkthru')
-				  AND isPublished IN (:publishedValues)
+			if (allAssetIds) {
+				unresolvedIssues = AssetComment.executeQuery("""
+					from AssetComment
+					where assetEntity.id in (:assetIds)
+				  	and dateResolved = null
+				  	and commentType=:commentType
+				  	and category in ('general', 'discovery', 'planning', 'walkthru')
+				  	and isPublished IN (:publishedValues)
 			""", [assetIds: allAssetIds, commentType: AssetCommentType.ISSUE,
 				  publishedValues: publishedValues])
+			}
 		}
 
 		preMoveIssue = AssetComment.findAllByMoveEventAndCategoryAndIsPublishedInList(

@@ -40,14 +40,15 @@ export class ProjectCreateComponent implements OnInit {
 
 	ngOnInit() {
 		this.getModel();
+		let today = new Date();
 		this.projectModel = new ProjectModel();
 		this.defaultModel = {
 			clientId: 0,
 			projectName: '',
 			description: '',
 			startDate: new Date(),
-			completionDate: new Date(),
-			partners: [],
+			completionDate: new Date(today.setMonth(today.getMonth() + 2)),
+			partnerIds: [],
 			projectLogo: '',
 			projectManagerId: 0,
 			projectCode: '',
@@ -55,8 +56,8 @@ export class ProjectCreateComponent implements OnInit {
 			comment: '',
 			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectMetrics: true,
-			planMethodology: ''
+			collectMetrics: 1,
+			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.projectModel = Object.assign({}, this.defaultModel, this.projectModel);
 		this.file.uploadRestrictions = {

@@ -168,9 +168,12 @@ export class EventDashboardComponent implements OnInit {
  	 * @param {number} id  Event id
 	 * @returns {any} Event found otherwhise null
 	*/
-	private getDefaultEvent(id: number): any {
-		if (id) {
-			return this.eventList.find((event) => event.id === id) || null;
+	private getDefaultEvent(id: string): any {
+		// event ids are integer so we need to cast accordly
+		const selectedId = id ? parseInt(id, 10) : null;
+
+		if (selectedId) {
+			return this.eventList.find((event) => event.id === selectedId) || null;
 		} else if (this.eventList.length)  {
 			return this.eventList[0];
 		}

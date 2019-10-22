@@ -215,6 +215,23 @@ export class LicenseManagerService {
 			root.filters.push({ field: column.property, operator: 'lte', value: end });
 		}
 
+		if (column.type === 'boolean') {
+			if (!filter) {
+				root.filters.push({
+					field: column.property,
+					operator: 'eq',
+					value: (column.filter === 'True' || column.filter === true)
+				});
+			} else {
+				if (column.filter !== null && column.filter !== '') {
+					filter = root.filters.find((r) => {
+						return r['field'] === column.property;
+					});
+					filter.value = (column.filter === 'True' || column.filter === true)
+				}
+			}
+		}
+
 		return root;
 	}
 

@@ -1810,11 +1810,11 @@ class ProjectService implements ServiceMethods {
 					clientName           : project.client.toString(),
 					description          : project.description ?: '',
 					comment				 : project.comment ?: '',
-					startDate            : project.startDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
-					completionDate       : project.completionDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
+					startDate            : project.startDate,
+					completionDate       : project.completionDate,
 					licenseType          : licenseData.type == License.Type.MULTI_PROJECT ? 'GLOBAL':'PROJECT',
-					licenseActivationDate: licenseData?.goodAfterDate?.format(TimeUtil.FORMAT_DATE_ISO8601),
-					licenseExpirationDate: licenseData?.goodBeforeDate?.format(TimeUtil.FORMAT_DATE_ISO8601)
+					licenseActivationDate: licenseData?.goodAfterDate,
+					licenseExpirationDate: licenseData?.goodBeforeDate
 			]
 		}
 	}
@@ -1913,6 +1913,7 @@ class ProjectService implements ServiceMethods {
 			guid = StringUtil.generateGuid()
 			name = projectCommand.projectName
 			planMethodology = projectCommand.planMethodology
+			collectMetrics = projectCommand.collectMetrics ? 1 : 0
 			projectCode = projectCommand.projectCode
 			projectType = projectCommand.projectType
 			runbookOn = projectCommand.runbookOn
