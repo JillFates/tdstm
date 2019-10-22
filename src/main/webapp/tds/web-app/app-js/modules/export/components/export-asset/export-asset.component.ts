@@ -15,10 +15,10 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 
 @Component({
 	selector: 'tds-asset-export',
-	templateUrl: 'export.component.html',
+	templateUrl: 'export-asset.component.html',
 	styles: []
 })
-export class ExportComponent implements OnInit {
+export class ExportAssetComponent implements OnInit {
 	protected gridColumns: any[];
 	public selectedAll = false;
 	private userPreferences = [];

@@ -15,7 +15,7 @@ declare var jQuery: any;
 	template: `
         <div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
-                <div class="modal-content">
+                <div class="tds-modal-content">
                     <div class="modal-header">
                         <button (click)="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                         <h4 class="modal-title">{{title}}</h4>

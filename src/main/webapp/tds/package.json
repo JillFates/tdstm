@@ -54,6 +54,7 @@
     "angular-in-memory-web-api": "0.8.0",
     "angular-progress-bar": "^1.0.9",
     "codemirror": "5.43.0",
+    "compressorjs": "1.0.5",
     "core-js": "2.6.4",
     "file-saver": "^2.0.2",
     "focus-trap": "^5.0.2",
@@ -67,9 +68,8 @@
     "roboto-fontface": "^0.10.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "zone.js": "0.10.0",
-    "compressorjs": "1.0.5",
-    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.5.tgz"
+    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.5.tgz",
+    "zone.js": "0.10.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.13.9",

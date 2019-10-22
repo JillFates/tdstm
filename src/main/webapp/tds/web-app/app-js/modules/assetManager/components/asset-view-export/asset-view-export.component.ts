@@ -9,7 +9,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 @Component({
 	selector: 'asset-explorer-view-export',
 	template: `
-        <div class="modal-content">
+        <div class="tds-modal-content">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
                 <h4 class="modal-title">Export to Excel</h4>

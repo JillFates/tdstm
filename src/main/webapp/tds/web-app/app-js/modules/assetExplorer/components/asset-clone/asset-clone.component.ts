@@ -16,7 +16,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 	template: `
         <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="asset-clone-component modal fade in tds-ui-modal-decorator" id="asset-clone-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content resizable tds-angular-component-content"
+                <div class="tds-modal-content resizable tds-angular-component-content"
                      tds-ui-modal-decorator=""
                      [options]="modalOptions"
                      [style.width.px]="750"

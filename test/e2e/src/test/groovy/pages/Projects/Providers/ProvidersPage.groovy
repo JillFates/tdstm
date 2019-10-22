@@ -32,6 +32,10 @@ class ProvidersPage extends Page{
         projectsModule { module ProjectsMenuModule}
         arrayOfProviders {$(class:"k-virtual-content").find(class:"k-grid-table-wrap", role:"presentation").find("tbody", role:"presentation").find("tr")}
 
+        //Confirmation popup
+        confirmation (required: false) {$("div.modal-content")[1]}
+        yesBtn (required: false) {confirmation.find("button.btn-primary", type: "submit")}
+
     }
 
     def filterByName(provName){
@@ -57,6 +61,7 @@ class ProvidersPage extends Page{
 
     def clickOnFirstProviderDeleteActionButton(){
         waitFor{firstProviderDeleteButton.click()}
+        sleep(1000)
     }
 
     /**
@@ -80,8 +85,8 @@ class ProvidersPage extends Page{
             while(providersToDelete!=0)
             {
                 clickOnFirstProviderDeleteActionButton()
-                commonsModule.waitForDialogModalDisplayed()
-                commonsModule.clickOnButtonDialogModalByText("Yes")
+                sleep(2000)
+                yesBtn.click()
                 providersToDelete--
             }
         }

@@ -1,12 +1,12 @@
 <!-- Asset Tags -->
 <tr>
-    <td class="label N" nowrap="nowrap">
+    <th>
         <label>
             Tags
         </label>
-    </td>
-    <td nowrap="nowrap" class="N" colspan="4">
-        <span *ngFor="let tag of assetTags" class="label tag"
+    </th>
+    <td>
+        <span *ngFor="let tag of assetTags" class="badge label tag"
               [ngClass]="tag.css"
               style="">
             {{tag.name}}

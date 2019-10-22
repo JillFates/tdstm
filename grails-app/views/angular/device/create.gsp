@@ -8,7 +8,7 @@
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
 <div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
-     class="modal-content tds-angular-component-content">
+     class="tds-modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
         <h4 class="modal-title">Device Create</h4>
