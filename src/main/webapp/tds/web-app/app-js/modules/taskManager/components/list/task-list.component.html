@@ -16,7 +16,7 @@
 					</select>
 				</clr-select-container>
 			</div>
-			<div class="clr-col-5 checkbox-container">
+			<div class="clr-col-5 checkboxes-container">
                 <clr-checkbox-wrapper>
 					<input clrCheckbox type="checkbox" name="one" id="one" [(ngModel)]="justRemaining" (ngModelChange)="onFiltersChange()">
                     <label>Just Remaining</label>
@@ -33,8 +33,10 @@
 				</clr-checkbox-wrapper>
 			</div>
 
-			<div class="clr-col-4">
-				buttons
+			<div class="clr-col-4 buttons-container">
+				<tds-button [icon]="'plus-circle'" (click)="onCreateTaskHandler()" [title]="'Create Task'" [iconClass]="'is-solid'"></tds-button>
+				<tds-button [icon]="'pencil'" (click)="onBulkActionHandler()" [title]="'Bulk Action'"></tds-button>
+				<tds-button [icon]="'logout'" [disabled]="!areFiltersDirty()" (click)="onClearFiltersHandler()" [title]="'Clear Filters'"></tds-button>
 			</div>
 		</div>
 	</form>
@@ -147,20 +149,12 @@
 				<!-- Toolbar -->
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="button-toolbar">
-						<tds-button-create
-							(click)="onCreateTaskHandler()"
-							[title]="'Create Task'">
-						</tds-button-create>
-						<tds-button-edit
-							(click)="onBulkActionHandler()"
-							[title]="'Bulk Action'">
-						</tds-button-edit>
-						<tds-button-custom
-							icon="times"
-							[disabled]="!areFiltersDirty()"
-							(click)="onClearFiltersHandler()"
-							[title]="'Clear Filters'">
-						</tds-button-custom>
+                        <!--
+						<tds-button [icon]="'plus-circle'" (click)="onCreateTaskHandler()" [title]="'Create Task'" [iconClass]="'is-solid'"></tds-button>
+						<tds-button [icon]="'pencil'" (click)="onBulkActionHandler()" [title]="'Bulk Action'"></tds-button>
+						<tds-button [icon]="'logout'" [disabled]="!areFiltersDirty()" (click)="onClearFiltersHandler()" [title]="'Clear Filters'"></tds-button>
+						-->
+
 						<tds-button-custom
 							icon="refresh"
 							title="Refresh"
@@ -168,6 +162,7 @@
 							class="component-action-reload pull-right"
 							(click)="onFiltersChange()">
 						</tds-button-custom>
+
 					</div>
 				</ng-template>
 				<!-- Row Detail Template -->
