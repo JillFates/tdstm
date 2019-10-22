@@ -213,11 +213,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		linkChunks.push(linksCopy);
 
 		of(...dataChunks)
-			// .pipe(takeUntil(this.unsubscribe$))
 			.subscribe(chunk => this.addNewNodesToDiagram(chunk));
 
 		of(...linkChunks)
-			// .pipe(takeUntil(this.unsubscribe$))
 			.subscribe(chunk => this.addNewLinksToDiagram(chunk));
 
 		this.largeArrayRemaining = false;
