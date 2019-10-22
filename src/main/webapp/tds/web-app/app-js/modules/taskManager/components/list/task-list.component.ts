@@ -61,6 +61,7 @@ export class TaskListComponent {
 	hideGrid: boolean;
 	selectedCustomColumn: any;
 	selectedEvent: any;
+	selectedEventId: any;
 	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
@@ -525,6 +526,7 @@ export class TaskListComponent {
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
+			this.selectedEventId = this.selectedEvent && this.selectedEvent.id || 0;
 		});
 		this.loading = true;
 		const observables = forkJoin(

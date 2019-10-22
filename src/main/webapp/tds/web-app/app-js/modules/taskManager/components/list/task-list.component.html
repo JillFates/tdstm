@@ -1,8 +1,62 @@
-<div class="content body tds-kendo-grid">
+<div class="content body tds-kendo-grid task-list">
+	<form clrForm clrLayout="horizontal" class="">
+		<div>Selected event: {{selectedEvent | json}}</div>
+		<div class="clr-row">
+			<div class="clr-col-4">
+				<clr-select-container class="clr-form-control clr-row">
+					<label>Event: </label>
+					<select clrSelect
+							class="select-event-list"
+							name="selectedEventId"
+							[(ngModel)]="selectedEventId"
+							(ngModelChange)="onEventSelect()">
+						<option
+								*ngFor="let event of eventList"
+								[attr.selected]="selectedEventId === event.id"
+								[value]="event.id">{{ event.name }}</option>
+					</select>
+				</clr-select-container>
+			</div>
+			<div class="clr-col-6">
+				<label for="one">
+					<input
+							type="checkbox"
+							name="one"
+							id="one"
+							[(ngModel)]="justRemaining"
+							(ngModelChange)="onFiltersChange()">
+					Just Remaining
+				</label>
+				<label for="two">
+					<input
+							type="checkbox"
+							name="two"
+							id="two"
+							[(ngModel)]="justMyTasks"
+							(ngModelChange)="onFiltersChange()">
+					Just Mine
+				</label>
+				<label for="three">
+					<input
+							type="checkbox"
+							name="three" id="three"
+							[(ngModel)]="viewUnpublished"
+							(ngModelChange)="onFiltersChange()">
+					View Unpublished
+				</label>
+			</div>
+			<div class="clr-col-2">
+				buttons
+			</div>
+		</div>
+	</form>
 	<section>
 		<div class="box-body box-with-empty-header">
-			<div class="row top-filters">
-				<div class="col-sm-7">
+			<div class="clr-row">
+				<div class="clr-col-7">
+
+
+					<!--
 					<label class="control-label">Event</label>
 					<kendo-dropdownlist
 						style="width: 200px; padding-right: 20px"
@@ -40,8 +94,9 @@
 							(ngModelChange)="onFiltersChange()">
 						View Unpublished
 					</label>
+					-->
 				</div>
-				<div class="col-sm-5 text-right">
+				<div class="col-col-5">
 					<tds-button-custom class="btn-primary"
 														 (click)="onViewTaskGraphHandler()"
 														 title="View Task Graph"
