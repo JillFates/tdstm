@@ -50,24 +50,6 @@ class ControlTagLib {
 		StringBuilder sb = new StringBuilder("\n")
 
 		sb.append('<th class="')
-		// TODO : Determine if the fieldName is used in the LABEL class attribute
-		// sb.append(fieldSpec.field)
-		// if (fieldSpec.imp) {
-		// 	String imp = fieldSpec.imp
-		// 	sb.append(" ${imp}")
-
-
-		// 	// Determines if the imp is I)mportant or C)ritical
-		// 	// if (imp == "Y" || imp == "G") {
-		// 	// 	// Checks if the value for the input was given
-		// 	// 	if (attrs.containsKey("value")) {
-		// 	// 		// If the value for the input is empty, the label will be red.
-		// 	// 		if (attrs.value == null || StringUtil.isBlank(attrs.value.toString())) {
-		// 	// 			sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
-		// 	// 		}
-		// 	// 	}
-		// 	// }
-		// }
 		if (fieldSpec.constraints.required) {
 			sb.append(' required')
 		}
