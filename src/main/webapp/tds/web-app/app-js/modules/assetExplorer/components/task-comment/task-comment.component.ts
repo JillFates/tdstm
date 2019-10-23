@@ -76,6 +76,7 @@ export class TaskCommentComponent implements OnInit {
 		this.showAllComments = false;
 		this.showAllTasks = false;
 		this.createDataGrids();
+		console.log(this.showComment, this.showTask)
 	}
 
 	/**

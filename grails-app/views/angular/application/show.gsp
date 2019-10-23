@@ -63,6 +63,19 @@
 				<button clrTabLink>Tasks</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
+						<div  class="clr-col-12">
+							<g:render 
+								template="/angular/common/commentList" 
+								model="[
+									asset:applicationInstance, 
+									'prefValue': prefValue, 
+									'viewUnpublishedValue': viewUnpublishedValue, 
+									currentUserId: currentUserId,
+									showTask:true,
+									showComment:false,
+								]" >
+							</g:render>
+						</div>
 					</div>
 				</clr-tab-content>
 			</clr-tab>
@@ -77,7 +90,9 @@
 									asset:applicationInstance, 
 									'prefValue': prefValue, 
 									'viewUnpublishedValue': viewUnpublishedValue, 
-									currentUserId: currentUserId
+									currentUserId: currentUserId,
+									showTask:false,
+									showComment:true,
 								]" >
 							</g:render>
 						</div>

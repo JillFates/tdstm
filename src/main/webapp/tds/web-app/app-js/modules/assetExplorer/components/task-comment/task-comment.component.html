@@ -11,7 +11,29 @@
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks ({{dataGridTaskHelper.gridData.data.length}})</label>
+				<div class="clr-row">
+					<div class="grid-label clr-col-4">
+						<strong>Tasks</strong>
+						<span>({{dataGridTaskHelper.gridData.data.length}})</span>
+					</div>
+					<div class="grid-actions clr-col-8">
+						<clr-checkbox-wrapper>
+							<input clrCheckbox [(ngModel)]="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
+							<label>View All Tasks</label>
+						</clr-checkbox-wrapper>
+						<div class="btn-sm">
+							<tds-button icon="plus">Create Task</tds-button>
+							<tds-button
+								[disabled]="!hasFilterApplied('columnModelTaskGrid')"
+								(click)="onClearFilters('columnModelTaskGrid')"
+								icon="close"
+								>Clear filters</tds-button
+							>
+							<tds-button icon="repeat"></tds-button>
+						</div>
+					</div>
+				</div>
+			
 
                 <label class="form-check-label aligned-label" for="showAllTasks">
                     <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
