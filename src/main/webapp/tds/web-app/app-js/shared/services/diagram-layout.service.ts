@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {IGraphTask} from '../../modules/taskManager/model/graph-task.model';
 import {ILinkPath} from '../components/diagram-layout/model/diagram-layout.model';
 
-type FullGraphCache = { data: IGraphTask[], linksPath: ILinkPath[] };
+type FullGraphCache = { requestId: number, isMoveEvent: boolean, data: IGraphTask[], linksPath: ILinkPath[] };
 
 @Injectable({
 	providedIn: 'root'
@@ -16,6 +16,14 @@ export class DiagramLayoutService {
 
 	getFullGraphCache(): FullGraphCache {
 		return Object.assign({}, this.fullGraph);
+	}
+
+	getRequestId(): number {
+		return this.fullGraph.requestId;
+	}
+
+	isCacheFromMoveEvent(): boolean {
+		return this.fullGraph.isMoveEvent;
 	}
 
 	clearFullGraphCache(): void {

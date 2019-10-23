@@ -82,7 +82,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
-	fullView: boolean;
+	isFullView: boolean;
+	isMoveEventReq: boolean;
+	requestId: number;
 
 	constructor(
 			private taskService: TaskService,
@@ -165,7 +167,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				if (this.urlParams && this.urlParams.taskId) {
 					this.loadTasks(this.urlParams.taskId);
 				} else {
-					this.loadFromSelectedEvent(this.selectedEvent.id);
+					this.loadFromSelectedEvent();
 				}
 			});
 	}
@@ -188,19 +190,31 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	loadTasks(taskId: number): void {
 
-		const filters = {
-			myTasks: this.myTasks ? '1' : '0',
-			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
-			viewUnpublished: this.viewUnpublished ? '1' : '0'
-		};
-		this.taskService.findTask(taskId, filters)
-			.pipe(takeUntil(this.unsubscribe$))
-			.subscribe((res: IGraphNode[]) => {
-				if (res && res.length > 0) {
-					this.tasks = res.map(r => r.task);
-					this.generateModel();
-				}
-			});
+		if (this.isFullView
+			&& this.diagramLayoutService.getRequestId() === taskId
+			&& !this.diagramLayoutService.isCacheFromMoveEvent()) {
+			this.generateModelFromCache();
+		} else {
+			const filters = {
+				myTasks: this.myTasks ? '1' : '0',
+				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+				viewUnpublished: this.viewUnpublished ? '1' : '0'
+			};
+			this.taskService.findTask(taskId, filters)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe((res: IGraphNode[]) => {
+					if (res && res.length > 0) {
+						this.tasks = res && res.map(r => r.task);
+						if (this.tasks) {
+							this.diagramLayoutService.clearFullGraphCache();
+							this.requestId = taskId;
+							this.isMoveEventReq = false;
+							this.generateModel();
+						}
+					}
+				},
+					error => console.error(`Could not load tasks ${error}`));
+		}
 	}
 
 	/**
@@ -215,21 +229,42 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Load tasks
-	 * @param {number} moveEventId of moveEvent to load tasks from
+	 * Load tasks from a moveEvent Id
 	 **/
-	loadFromSelectedEvent(moveEventId?: number): void {
-		const filters = {
-			myTasks: this.myTasks ? '1' : '0',
-			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
-			viewUnpublished: this.viewUnpublished ? '1' : '0'
-		};
-		this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
-			.pipe(takeUntil(this.unsubscribe$))
-			.subscribe(res => {
-				this.tasks = res.tasks;
-				this.generateModel();
-			});
+	loadFromSelectedEvent(): void {
+		if (this.isFullView
+			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
+			&& this.diagramLayoutService.isCacheFromMoveEvent()) {
+			this.generateModelFromCache();
+		} else {
+			const filters = {
+				myTasks: this.myTasks ? '1' : '0',
+				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+				viewUnpublished: this.viewUnpublished ? '1' : '0'
+			};
+			this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe(res => {
+					this.tasks = res && res.tasks;
+					if (this.tasks) {
+						this.diagramLayoutService.clearFullGraphCache();
+						this.requestId = this.selectedEvent.id;
+						this.isMoveEventReq = false;
+						this.generateModel();
+					}
+				},
+					error => console.error(`Could not load tasks ${error}`));
+		}
+	}
+
+	/**
+	 * Event selection handler
+	 * @param {IMoveEvent}  moveEvent to load tasks from
+	 **/
+	onEventSelect(moveEvent?: IMoveEvent): void {
+		if (moveEvent) { this.selectedEvent = moveEvent; }
+
+		this.loadFromSelectedEvent();
 	}
 
 	/**
@@ -260,7 +295,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			&& !!this.tasks.find(t => t.id === Number(this.urlParams.taskId))) {
 			this.loadTasks(this.urlParams.taskId);
 		} else {
-			this.loadFromSelectedEvent(this.selectedEvent.id)
+			this.loadFromSelectedEvent()
 		}
 	}
 
@@ -293,8 +328,36 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			}
 		});
 		this.teamHighlights$.next(teams);
-		this.cacheFullGraph({ data: nodeDataArr, linksPath });
+		this.cacheFullGraph({
+			requestId: this.requestId,
+			isMoveEvent: this.isMoveEventReq,
+			data: nodeDataArr,
+			linksPath
+		});
 		this.nodeData$.next({ data: nodeDataArr, linksPath });
+		this.currentUser$.next(this.userContext.user);
+		this.ctxMenuOpts$.next(this.ctxMenuOptions());
+	}
+
+	/**
+	 * generate model to be used by diagram with task specific data
+	 **/
+	generateModelFromCache(): void {
+		if (!this.diagramLayoutService.getRequestId()) { return; }
+		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
+
+		const graphCache = this.diagramLayoutService.getFullGraphCache();
+
+		// Add tasks to nodeData constant
+		// and create linksPath object from number and successors
+		graphCache.data.forEach((t: IGraphTask | any) => {
+			if (t.team && !teams
+				.find(team => t.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
+				teams.push({label: t.team});
+			}
+		});
+		this.teamHighlights$.next(teams);
+		this.viewFullGraphFromCache();
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
 	}
@@ -306,7 +369,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	cacheFullGraph(data: any): void {
 		if (!this.diagramLayoutService.getFullGraphCache() || !this.diagramLayoutService.getFullGraphCache().data) {
 			this.diagramLayoutService.setFullGraphCache(data);
-			this.fullView = true;
+			this.isFullView = true;
 		}
 	}
 
@@ -714,7 +777,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 */
 	onNeighborhood(data?: IGraphTask): void {
 		this.graph.cleanUpDiagram();
-		this.fullView = false;
+		this.isFullView = false;
 		const currentUrl = this.location.path().includes(this.urlParams.taskId) ?
 			this.location.path().replace(this.urlParams.taskId, `${data.id}`)
 			: this.location.path().concat('?', 'taskId', '=', `${data.id}`);
@@ -757,8 +820,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * update cached graph
 	 */
 	updateGraphCache(data: any): void {
-		if (this.fullView) {
-			this.diagramLayoutService.setFullGraphCache(data);
+		if (this.isFullView) {
+			const fullGraph = {
+				requestId: this.diagramLayoutService.getRequestId(),
+				isMoveEvent: this.diagramLayoutService.isCacheFromMoveEvent(),
+				...data
+			};
+			this.diagramLayoutService.setFullGraphCache(fullGraph);
 		}
 	}
 
@@ -776,8 +844,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * View full graph from cache
 	 */
 	viewFullGraphFromCache(): void {
+		this.isFullView = true;
 		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
-		this.fullView = true;
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

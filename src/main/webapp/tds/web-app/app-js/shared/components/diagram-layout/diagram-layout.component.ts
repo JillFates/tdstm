@@ -136,8 +136,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 	constructor(
 		private notifierService: NotifierService,
-		private renderer: Renderer2,
-		private diagramLayoutService: DiagramLayoutService
+		private renderer: Renderer2
 		) {
 		this.onResize();
 	}
@@ -255,10 +254,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Generate Diagram canvas
 	 **/
 	generateDiagram(): void {
+		this.diagram.model.nodeDataArray = [];
 		this.diagram.startTransaction('generateDiagram');
 		this.diagram.initialDocumentSpot = Spot.TopLeft;
 		this.diagram.initialViewportSpot = Spot.TopLeft;
-		this.diagram.undoManager.isEnabled = true;
 		this.diagram.allowZoom = true;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();

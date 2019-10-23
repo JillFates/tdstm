@@ -29,7 +29,7 @@
         valueField="id"
         [ngClass]="'neighborhood-custom-dropdown'"
         [data]="eventList$ | async"
-        (selectionChange)="loadFromSelectedEvent($event)"
+        (selectionChange)="onEventSelect($event)"
         [(ngModel)]="selectedEvent"
         [value]="selectedEvent"
         #eventsDropdown>
