@@ -11,199 +11,200 @@
         <h4 class="modal-title">Device Detail</h4>
     </div>
     <div class="modal-body">
-        <div>
-            <table style="border:0;" class="assetEntity tds-asset-view-content-table" data-id="${assetEntity?.id}">
-
-                <tr>
-                    <td colspan="2" class="dialog-container">
-                        <div class="dialog">
-                            <g:if test="${errors}">
-                                <div id="messageDivId" class="message">${errors}</div>
-                            </g:if>
-                            <table>
+        <clr-tabs>
+			<clr-tab>
+				<button clrTabLink id="link1">Details</button>
+				<clr-tab-content id="content1" *clrIfActive>
+                    <div class="clr-row">
+						<div class="clr-col-10">
+							<g:if test="${errors}">
+								<div id="messageDivId" class="message">${errors}</div>
+							</g:if>
+                            <a (click)="showDetails = !showDetails">Toggle All Details</a>
+                            <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
                                 <tbody>
-                                <tr class="prop">
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntity.assetName}" />
-                                    <td colspan="3" style="font-weight:bold;" class="${standardFieldSpecs.assetName.imp}">${assetEntity.assetName}</td>
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetEntity.description}" />
-                                    <td colspan="3" class="${standardFieldSpecs.description.imp?:''}">${assetEntity.description}</td>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.environment}" value="${assetEntity.environment}" />
-                                    <td></td>
-                                    <td class="label_sm">Source</td>
-                                    <td class="label_sm">Target</td>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}" />
-									<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
-										<tdsAngular:tooltipSpan field="${standardFieldSpecs.manufacturer}">
-											<a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">{{getManufacturer('${assetEntity.manufacturer}')}}</a>
-                                            <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
-										</tdsAngular:tooltipSpan>
-									</td>
+                                    <tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.priority}" value="${assetEntity.priority}" />
-                                    <td class="label ${standardFieldSpecs.locationSource.imp?:''}"
-                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="locationSource" domainField="sourceLocationName" />}"
-                                        nowrap="nowrap">
-                                        <label for="locationSource" data-toggle="popover" data-trigger="hover" data-content="Location">Location</label>
-                                    </td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.locationSource.imp?:''}">${assetEntity.sourceLocationName}</td>
-                                    <td class="valueNW nonVMLabel ${standardFieldSpecs.locationTarget.imp?:''}">${assetEntity.targetLocationName}</td>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}" />
-									    <td class="valueNW ${standardFieldSpecs.model.imp?:''}">
-                                            <tdsAngular:tooltipSpan field="${standardFieldSpecs.model}">
-                                                <a *ngIf="isModelLinkAvailable()"
-                                                   (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
-                                                <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
-                                                <g:if test="${! assetEntity.model?.isValid()}">
-                                                    <span style="color: red;">
-                                                        <b>?</b>
-                                                    </span>
-                                                </g:if>
-                                            </tdsAngular:tooltipSpan> 
-									    </td>
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}" />
-                                   <g:if test="${!(assetEntity.assetType in ['VM'])}">
-                                        <td class="label nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="roomSource" />}"
-                                            nowrap="nowrap">
-                                            <label for="roomSource" data-toggle="popover" data-trigger="hover" data-content="Room">Room</label>
+                                    <tr>
+                                        <tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
+                                        <td>
+                                            <a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
+                                                {{getManufacturer('${assetEntity.manufacturer}')}}
+                                            </a>
+                                            <span *ngIf="!isManufacturerLinkAvailable()">{{getManufacturer('${assetEntity.manufacturer}')}}</span>
                                         </td>
-                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.roomSource.imp?:''}">${roomSource?.roomName}</td>
-                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.roomTarget.imp?:''}">${roomTarget?.roomName}</td>
+                                    </tr>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${asset.priority}" />
+
+                                    <tr class="prop">
+                                        <th>Location</th>
+                                        <td>${assetEntity.sourceLocationName} | ${assetEntity.targetLocationName}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
+                                        <td>
+                                            <a *ngIf="isModelLinkAvailable()"
+                                                    (click)="showModel('${assetEntity.model?.id}','${assetEntity.manufacturer?.id}')" [innerText]="getModelName('${assetEntity.model}')"></a>
+                                            <span *ngIf="!isModelLinkAvailable()">${assetEntity.model}</span>
+                                        </td>
+                                    </tr>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" />
+
+                                    <g:if test="${!(assetEntity.assetType in ['VM'])}">
+                                        <tr>
+                                            <th>Room</th>
+                                            <td>${roomSource?.roomName}| ${roomTarget?.roomName}</td>
+                                        </tr>
                                    </g:if>
 
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}" />
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.os}" value="${assetEntity.os}" />
-                                    <%-- The following fields will be displayed based on the assetType --%>
-                                    <%-- rackable --%>
-									<g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                                        <td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="rackSource" />}"
-                                            nowrap="nowrap" id="rackId">
-                                            <label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cab">Rack/Cab</label>
-                                        </td>
-                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.rackSource.imp?:''}">${assetEntity.rackSource?.tag}</td>
-                                        <td class="valueNW nonVMLabel ${standardFieldSpecs.rackTarget.imp?:''}">${assetEntity.rackTarget?.tag}</td>
-                                    </g:if>
-
-                                    <%-- blade --%>
-                                    <g:if test="${assetEntity.assetType in ['Blade']}">
-                                        <td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId">
-                                            <label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
-                                        </td>
-                                        <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
-                                        <td class="bladeLabel ${standardFieldSpecs.targetChassis.imp?:''}">${targetChassis}</td>
-                                    </g:if>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}" />
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.shortName}" value="${asset.shortName}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.os}" value="${asset.os}" />
 
                                     <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                                        <td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="sourceRackPosition" />}"
-                                            nowrap="nowrap">
-                                            <label for="rackSource" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.sourceRackPosition.tip?: standardFieldSpecs.sourceRackPosition.label}">
-                                                Position
-                                            </label>
-                                        </td>
-                                        <td class="rackLabel valueNW ${standardFieldSpecs.sourceRackPosition.imp?:''}">${assetEntity.sourceRackPosition}</td>
-                                        <td class="rackLabel valueNW ${standardFieldSpecs.targetRackPosition.imp?:''}">${assetEntity.targetRackPosition}</td>
+                                        <tr>
+                                            <th>Rack/Cab</th>
+                                            <td>${assetEntity.rackSource?.tag} | ${assetEntity.rackTarget?.tag}</td>
+                                        </tr>
                                     </g:if>
-
 
                                     <g:if test="${assetEntity.assetType in ['Blade']}">
-                                        <td class="label positionLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="sourceBladePosition" />}"
-                                            nowrap="nowrap">Position</td>
-                                        <td class="bladeLabel ${standardFieldSpecs.sourceBladePosition.imp?:''}">${assetEntity.sourceBladePosition}</td>
-                                        <td class="bladeLabel ${standardFieldSpecs.targetBladePosition.imp?:''}">${assetEntity.targetBladePosition}</td>
+                                        <tr>
+                                            <th>Blade Chassis</th>
+                                            <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis} | ${targetChassis}</td>
+                                        </tr>
                                     </g:if>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}" />
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}" />
-                                    <td class="valueNW ${standardFieldSpecs.retireDate.imp?:''}">
-                                        {{ '${assetEntity?.retireDate}' | tdsDate: userDateFormat }}
-                                    </td>
-                                    <td class="label ${standardFieldSpecs.moveBundle.imp?:''}" nowrap="nowrap">
-                                        <label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-                                            ${standardFieldSpecs.moveBundle.label} : Dep. Group
-                                        </label>
-                                    </td>
-                                    <td class="valueNW ${standardFieldSpecs.moveBundle.imp?:''}">
-                                        ${assetEntity?.moveBundle}
-                                        <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
-                                    </td>
-                                    <td class="label ${standardFieldSpecs.size.imp?:''}"
-                                        [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="size" /> }"
-                                        nowrap="nowrap">
-                                        <label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
-                                            Size/Scale
-                                        </label>
-                                    </td>
-                                    <td nowrap="nowrap" class="sizeScale ${standardFieldSpecs.size.imp?:''}">${assetEntity.size} ${assetEntity.scale?.value()}</td>
-                                </tr>
-                                <tr class="prop">
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.railType}" value="${assetEntity.railType}" />
-                                    <tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}" />
-                                    <td class="valueNW ${standardFieldSpecs.maintExpDate.imp?:''}">
-                                        {{ '${assetEntity?.maintExpDate}' | tdsDate: userDateFormat }}
-                                    </td>
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}" />
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}" />
-                                </tr>
-                                <tr>
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}" />
-                                    <g:if test="! assetEntity.isVM()">
-                                        <td class="label ${standardFieldSpecs.truck.imp?:''}"
-                                            [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="truck" />}"
-                                            nowrap="nowrap">
-                                            <label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
-                                                Truck/Cart/Shelf
-                                            </label>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+
+                                    <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                        <tr>
+                                            <th>Position</th>
+                                            <td>${assetEntity.sourceRackPosition} | ${assetEntity.targetRackPosition}</td>
+                                        </tr>
+                                    </g:if>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" />
+
+                                    <tr>
+                                        <tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}" />
+                                        <td>
+                                            {{ '${assetEntity?.retireDate}' | tdsDate: userDateFormat }}
                                         </td>
-                                        <td class="valueNW ${standardFieldSpecs.truck.imp?:''}">${assetEntity.truck ?: ' '} / ${assetEntity.cart ?: ' '} / ${assetEntity.shelf ?: ' '}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>
+                                            ${standardFieldSpecs.moveBundle.label} : Dep. Group
+                                        </th>
+
+                                        <td>
+                                            ${assetEntity?.moveBundle}
+                                            <tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Size/Scale</th>
+                                        <td>${assetEntity.size} ${assetEntity.scale?.value()}</td>
+                                    </tr>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.railType}" value="${asset.railType}" />
+
+                                    <tr>
+                                        <tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}" />
+                                        <td>
+                                            {{ '${assetEntity?.maintExpDate}' | tdsDate: userDateFormat }}
+                                        </td>
+                                    </tr>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+                                    <tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+
+                                    <g:if test="! assetEntity.isVM()">
+                                        <tr>
+                                            <th>Truck/Cart/Shelf</th>
+                                            <td>${assetEntity.truck ?: ' '} / ${assetEntity.cart ?: ' '} / ${assetEntity.shelf ?: ' '}</td>
+                                        </tr>
                                     </g:if>
-                                    <tdsAngular:showLabelAndField field="${standardFieldSpecs.validation}" value="${assetEntity.validation}" />
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <g:render template="/angular/common/customShow"></g:render>
-                                <g:render template="/angular/common/assetTags"></g:render>
+
+                                    <tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
+
+                                    <g:render template="/angular/common/customShow"></g:render>
+                                    <g:render template="/angular/common/assetTags"></g:render>
                                 </tbody>
                             </table>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" class="dates-info-container">
-                        <table class="dates-info" >
-                            <tr>
-                                <td class="date-created">Date created: ${dateCreated}</td>
-                                <td class="last-updated">Last updated: ${lastUpdated}</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-
-                <tr id="deps">
-                    <g:render template="/angular/common/dependentShow" model="[dependent:dependentAssets, support:supportAssets]"></g:render>
-                </tr>
-                <tr id="commentListId">
-                    <g:render template="/angular/common/commentList" model="['asset':assetEntity, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue, 'hasPublishPermission':hasPublishPermission, 'canEdit': canEdit, currentUserId: currentUserId]"></g:render>
-                </tr>
-            </table>
-
-        </div>
+						</div>
+						<div class="clr-col-12">
+							<table class="dates-info">
+								<tr>
+									<td class="date-created">Date created: ${dateCreated}</td>
+									<td class="last-updated">Last updated: ${lastUpdated}</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</clr-tab-content>
+			</clr-tab>
+            <clr-tab>
+				<button clrTabLink>Supports</button>
+				<clr-tab-content *clrIfActive>
+					<div class="clr-row">
+						<div class="clr-col-12">
+							<g:render 
+								template="/angular/common/supportShow" 
+								model="[supportAssets:supportAssets]" >
+							</g:render>
+						</div>
+					</div>
+				</clr-tab-content>
+			</clr-tab>
+			<clr-tab>
+				<button clrTabLink>Depends On</button>
+				<clr-tab-content *clrIfActive>
+                    <div class="clr-row">
+						<div class="clr-col-12">
+                            <g:render 
+                                template="/angular/common/dependentShow" 
+                                model="[dependent:dependentAssets, support:supportAssets]">
+                            </g:render>
+						</div>
+					</div>
+				</clr-tab-content>
+			</clr-tab>
+			<clr-tab>
+				<button clrTabLink>Tasks</button>
+				<clr-tab-content *clrIfActive>
+					<div class="clr-row">
+					</div>
+				</clr-tab-content>
+			</clr-tab>
+			<clr-tab>
+				<button clrTabLink>Comments</button>
+				<clr-tab-content *clrIfActive>
+                    <div class="clr-row">
+						<div  class="clr-col-12">
+                            <g:render 
+                                template="/angular/common/commentList" 
+                                model="[
+                                    'asset':assetEntity, 
+                                    'prefValue': prefValue, 
+                                    'viewUnpublishedValue': viewUnpublishedValue, 
+                                    'hasPublishPermission':hasPublishPermission, 
+                                    'canEdit': canEdit, currentUserId: currentUserId]">
+                            </g:render>
+						</div>
+					</div>
+				</clr-tab-content>
+			</clr-tab>
+		</clr-tabs>
     </div>
     <div class="modal-footer form-group-center">
         <div class="asset-commands pull-left">
@@ -239,5 +240,21 @@
                 class="pull-right"
                 (click)="cancelCloseDialog()">
         </tds-button-close>
+    </div>
+
+    <div class="modal-sidenav form-group-center">
+        <nav class="modal-sidenav btn-link">
+            <tds-button-edit (click)="showAssetEditView()" tooltip="Edit" icon="pencil"></tds-button-edit>
+            <tds-button-clone (click)="onCloneAsset()" tooltip="Clone" icon="copy"></tds-button-clone>
+            <tds-button-custom (click)="openGraphUrl()" tooltip="Graph" icon="sitemap"></tds-button-custom>
+            <tds:hasPermission permission="${Permission.AssetDelete}">
+                <tds-button-delete
+                        tooltip="Delete Asset"
+                        class="btn-danger"
+                        [permissions]="['${Permission.AssetDelete}']"
+                        (click)="onDeleteAsset()">
+                </tds-button-delete>
+            </tds:hasPermission>
+        </nav>
     </div>
 </div>
