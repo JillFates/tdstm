@@ -75,6 +75,7 @@ export class TaskListComponent {
 	private rowsExpanded: boolean;
 	private rowsExpandedMap: any;
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
+	public isFiltering  = false;
 
 	constructor(
 		private taskService: TaskService,

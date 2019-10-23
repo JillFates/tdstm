@@ -1,4 +1,4 @@
-<div class="content body tds-kendo-grid task-list">
+<div class="content body task-list">
 	<form clrForm clrLayout="horizontal" class="">
 		<div class="clr-row">
 			<div class="clr-col-1">&nbsp;</div>
@@ -65,7 +65,7 @@
 		</div>
 	</form>
 	<section>
-		<div class="box-body box-with-empty-header">
+		<div class="box-body box-with-empty-header tds-kendo-grid">
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
@@ -171,7 +171,7 @@
 						<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
 					</ng-template>
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
+						<div class="has-feedback" *ngIf="isFiltering && column.filterable">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
 								<tds-filter-input
