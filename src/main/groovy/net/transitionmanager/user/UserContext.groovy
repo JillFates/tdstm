@@ -60,7 +60,7 @@ class UserContext {
 		}
 
 		List<Map> alternativeProjectsList = alternativeProjects.collect { Project pr ->
-			[id: pr.id, name: pr.name, logoUrl: projectService.getProjectLogoUrl(pr)]
+			[id: pr.id, name: pr.name, logoUrl: projectService.getProjectLogoUrl(pr), status: pr.status]
 		}
 		return [
 		    user: [
