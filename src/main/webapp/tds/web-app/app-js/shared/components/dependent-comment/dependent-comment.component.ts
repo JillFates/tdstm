@@ -8,7 +8,7 @@ import {AssetComment} from './model/asset-coment.model';
 	template: `
         <div class="modal fade in" id="dependent-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content resizable" [style.width.px]="500">
+                <div class="tds-modal-content resizable" [style.width.px]="500">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                             <span aria-hidden="true">×</span>

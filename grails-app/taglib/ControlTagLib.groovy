@@ -20,6 +20,60 @@ class ControlTagLib {
 	static final String EXACTLY_MIN_MAX_VALIDATION_MESSAGE = 'Value must be exactly {min} character(s).'
 	static final String BETWEEN_MIN_MAX_VALIDATION_MESSAGE = 'Value must be between {min} and {max} characters.'
 
+	def clrRowDetail = { Map attrs -> 
+		Map fieldSpec = attrs.field ?: [:]
+		def fieldValue = attrs.value ?: ""
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrRowDetail> tag requires field=fieldSpec Map')
+		}
+		StringBuilder tr = new StringBuilder("\n")
+		tr.append('<tr')
+		if(fieldValue == '') {
+			tr.append(' class="nodata"')
+		}
+		tr.append('>')
+		out << tr.toString()
+		clrInputLabel.call(attrs)
+		StringBuilder row = new StringBuilder("\n")
+		row.append('<td>')
+		row.append(HtmlUtil.escape(fieldValue))
+		row.append('</td>')
+		row.append('</tr>')
+		out << row.toString()
+	}
+
+	def clrInputLabel = { Map attrs ->
+		Map fieldSpec = attrs.field ?: [:]
+		if (!fieldSpec) {
+			throw new InvalidParamException('<tds:clrInputLabel> tag requires field=fieldSpec Map')
+		}
+		StringBuilder sb = new StringBuilder("\n")
+
+		sb.append('<th class="')
+		if (fieldSpec.constraints.required) {
+			sb.append(' required')
+		}
+		sb.append('">')
+		sb.append("\n")
+
+		// Build the LABEL element
+		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
+		sb.append('<label for="')
+		sb.append(fieldSpec.field)
+		sb.append('"')
+		sb.append(tooltipAttrib(fieldSpec))
+		sb.append(' >')
+		sb.append(HtmlUtil.escape(fieldSpec.label))
+		if (attrs.containsKey("labelSuffix")){
+            sb.append(HtmlUtil.escape(attrs.labelSuffix))
+        }
+
+		sb.append('</label>')
+
+		// Close out the TD
+		sb.append("\n</th>")
+		out << sb.toString()
+	}
 	/**
 	 * Used for wrapping UI elements when no other ControlTag applies.
 	 * This tag deals with adding the tooltip.

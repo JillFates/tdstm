@@ -11,26 +11,30 @@
 
             <!-- Toolbar Template -->
             <ng-template kendoGridToolbarTemplate [position]="'top'">
-                <label class="pad-top-2 pad-left-10 mar-bottom-3 task">Tasks ({{dataGridTaskHelper.gridData.data.length}})</label>
-
-                <label class="form-check-label aligned-label" for="showAllTasks">
-                    <input class="form-check-input aligned-checkbox " [(ngModel)]="showAllTasks" id="showAllTasks" name="showAllTasks" type="checkbox" (change)="reloadTasksGrid()">
-                    View All Tasks
-                </label>
-
-                <label class="form-check-label aligned-label" for="viewUnpublishedCheckboxId"  *ngIf="hasPublishPermission">
-                    <input class="form-check-input aligned-checkbox " (change)="onViewUnpublishedChange()" [(ngModel)]="viewUnpublished" id="viewUnpublishedCheckboxId" name="viewUnpublishedCheckboxId" type="checkbox" (change)="reloadTasksGrid()">
-                    View Unpublished Tasks
-                </label>
-
-                <tds-button-create
-                        class="float-right button-header-grid"
-                        title="Create"
-                        [disabled]="!isTaskCreateAvailable()"
-                        tooltip="Create new task"
-                        (click)="openTaskCreate()">
-                </tds-button-create>
-
+				<div class="clr-row">
+					<div class="grid-label clr-col-4">
+						<strong>Tasks</strong>
+						<span>({{dataGridTaskHelper.gridData.data.length}})</span>
+					</div>
+					<div class="grid-actions clr-col-8">
+						<clr-checkbox-wrapper>
+							<input clrCheckbox name="showAllTasks" type="checkbox" [(ngModel)]="showAllTasks"  (change)="reloadTasksGrid()">
+							<label>View All Tasks</label>
+						</clr-checkbox-wrapper>
+						<clr-checkbox-wrapper>
+							<input clrCheckbox name="viewUnpublished" type="checkbox" [(ngModel)]="viewUnpublished" (change)="onViewUnpublishedChange()">
+							<label>View Unpublished Tasks</label>
+						</clr-checkbox-wrapper>
+						<div class="btn-sm">
+							<tds-button
+								[disabled]="!isTaskCreateAvailable()"
+								(click)="openTaskCreate()"
+								icon="plus"
+								>Create</tds-button
+							>
+						</div>
+					</div>
+				</div>
                 <!--
                 <button (click)="openTaskCreate()"
                         class="btn btn-default float-right mar-right-15 pad-top-2 btn-add"

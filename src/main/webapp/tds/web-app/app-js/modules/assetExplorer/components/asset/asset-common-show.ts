@@ -22,6 +22,7 @@ export class AssetCommonShow implements OnInit {
 	protected mainAsset;
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
+	protected showDetails = false;
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -55,18 +56,21 @@ export class AssetCommonShow implements OnInit {
 
 	cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
+		jQuery('body').removeClass('modal-open');
 	}
 
 	showAssetDetailView(assetClass: string, id: number) {
 		this.dialogService.replace(AssetShowComponent, [
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass }],
+				{provide: 'ID', useValue: id},
+				{provide: 'ASSET', useValue: assetClass}],
 			DIALOG_SIZE.LG);
+		jQuery('body').addClass('modal-open');
 	}
 
 	showDependencyView(assetId: number, dependencyAsset: number) {
 		this.assetService.getDependencies(assetId, dependencyAsset)
 			.subscribe((result) => {
+				jQuery('body').addClass('modal-open');
 				this.dialogService.extra(AssetDependencyComponent, [
 					{ provide: 'ASSET_DEP_MODEL', useValue: result }])
 					.then(res => console.log(res))
@@ -90,6 +94,7 @@ export class AssetCommonShow implements OnInit {
 								name: 'reloadCurrentAssetList'
 							});
 							this.activeDialog.dismiss();
+							jQuery('body').removeClass('modal-open');
 						}
 					}, (error) => console.log(error));
 				}

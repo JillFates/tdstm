@@ -14,7 +14,7 @@ declare var jQuery: any;
 	template: `
         <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in date-range-selector-component" id="date-range-selector-component" data-backdrop="static" tabindex="0" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content" tds-ui-modal-decorator=""
+                <div class="tds-modal-content" tds-ui-modal-decorator=""
                      [options]="modalOptions">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">

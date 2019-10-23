@@ -6,10 +6,9 @@
 <%@page import="grails.converters.JSON"%>
 
 <div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
-	 class="modal-content tds-angular-component-content">
+	 class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
-				aria-hidden="true">×</span></button>
+		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Create</h4>
 	</div>
 	<div class="modal-body">
@@ -248,9 +247,19 @@
 				</table>
 			</form>
 	</div>
-	<div class="modal-footer form-group-center">
-		<button class="btn btn-primary pull-left component-action-update" tabindex="501"  type="button" (click)="submitForm($event)"  [disabled]="!isDependenciesValidForm"><span class="fa fa-fw fa-floppy-o"></span> Create</button>
-
-		<button class="btn btn-default pull-right component-action-cancel" tabindex="502" (click)="onCancelEdit()" type="button"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+	<div class="modal-sidenav form-group-center">
+		<nav class="modal-sidenav btn-link">
+			<tds-button-edit 
+			(click)="submitForm($event)" 
+			tooltip="Create" 
+			icon="floppy"
+			tabindex="501"
+			[disabled]="!isDependenciesValidForm"></tds-button-edit>
+			<tds-button-custom 
+			(click)="onCancelEdit()" 
+			tooltip="Cancel" 
+			tabindex="502"
+			icon="ban"></tds-button-custom>
+		</nav>
 	</div>
 </div>

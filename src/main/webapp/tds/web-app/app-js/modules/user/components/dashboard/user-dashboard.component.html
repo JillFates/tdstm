@@ -1,20 +1,17 @@
 <div class="user-dashboard-component">
 	<form clrForm clrLayout="horizontal" class="project-selection-form">
-		<clr-select-container>
-			<label>Project: </label>
+		<clr-select-container class="project">
+			<label class="title">Project: </label>
 			<select
 				clrSelect
 				class="project-selection"
 				name="selectedProjectID"
 				[(ngModel)]="selectedProjectID"
-				(ngModelChange)="onChangeProject()"
-			>
+				(ngModelChange)="onChangeProject()">
 				<option
 					*ngFor="let project of projectList"
 					[value]="project.id"
-					[attr.selected]="selectedProjectID === project.id"
-					>{{ project.name }}</option
-				>
+					[attr.selected]="selectedProjectID === project.id">{{ project.name }}</option>
 			</select>
 		</clr-select-container>
 	</form>
@@ -24,14 +21,13 @@
 			<kendo-grid [data]="eventList" [selectable]="true">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
-						<div class="grid-label clr-col-6">
-							<strong>Events</strong>
-							<span> - Your assigned events and your team</span>
+						<div class="clr-col-6 grid-header">
+							<label class="title">Events</label>
+							<label class="description">Your assigned events and your team</label>
 						</div>
 						<div class="grid-actions clr-col-6">
 							<clr-radio-wrapper
-								[class.active]="showActiveEvents"
-							>
+								[class.active]="showActiveEvents">
 								<input
 									type="radio"
 									clrRadio
@@ -43,9 +39,7 @@
 								/>
 								<label>Active</label>
 							</clr-radio-wrapper>
-							<clr-radio-wrapper
-								[class.active]="!showActiveEvents"
-							>
+							<clr-radio-wrapper [class.active]="!showActiveEvents">
 								<input
 									type="radio"
 									clrRadio
@@ -57,12 +51,7 @@
 								/>
 								<label>Completed</label>
 							</clr-radio-wrapper>
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchEventsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchEventsForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -102,17 +91,12 @@
 			<kendo-grid [data]="eventNewsList" [selectable]="true">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
-						<div class="grid-label clr-col-8">
-							<strong>Event News</strong>
-							<span> - Active news for your events</span>
+						<div class="clr-col-8 grid-header">
+							<label class="title">Event News</label>
+							<label class="description">Active news for your events</label>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchEventNewsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="fetchEventNewsForGrid()" class="flat" tooltip="Refresh"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -161,12 +145,7 @@
 							<span> - Your applications as an SME or Owner</span>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchApplicationsForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom  icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchApplicationsForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -192,19 +171,12 @@
 			>
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
-						<div class="grid-label clr-col-8">
-							<strong>Active People</strong>
-							<span>
-								- Currently active people on this project</span
-							>
+						<div class="clr-col-8 grid-header">
+							<label class="title">Active People</label>
+							<label class="description">Currently active people on this project</label>
 						</div>
 						<div class="grid-actions clr-col-4">
-							<button
-								class="btn btn-icon btn-link btn-sm"
-								(click)="fetchPeopleForGrid()"
-							>
-								<clr-icon shape="repeat"></clr-icon>
-							</button>
+							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchPeopleForGrid()" class="flat"></tds-button-custom>
 						</div>
 					</div>
 				</ng-template>
@@ -238,17 +210,12 @@
 				<kendo-grid #taskGrid [data]="taskList" [selectable]="true">
 					<ng-template kendoGridToolbarTemplate>
 						<div class="clr-row">
-							<div class="grid-label clr-col-6">
-								<strong>Task Summary</strong>
-								<span> - Active tasks assigned to you</span>
+							<div class="clr-col-6 grid-header">
+								<label class="title">Task Summary</label>
+								<label class="description">Active tasks assigned to you</label>
 							</div>
 							<div class="grid-actions clr-col-6">
-								<button
-									class="btn btn-icon btn-link btn-sm"
-									(click)="fetchTasksForGrid()"
-								>
-									<clr-icon shape="repeat"></clr-icon>
-								</button>
+								<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchTasksForGrid()" class="flat"></tds-button-custom>
 							</div>
 						</div>
 					</ng-template>

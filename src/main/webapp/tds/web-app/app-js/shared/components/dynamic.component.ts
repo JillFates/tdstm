@@ -15,6 +15,8 @@ import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { InputsModule } from '@progress/kendo-angular-inputs';
+import { ClarityModule } from '@clr/angular';
+import { TdsComponentLibraryModule } from 'tds-component-library';
 
 @Component({
 	selector: `empty-component`,
@@ -37,6 +39,8 @@ export class DynamicComponent {
 				DateInputsModule,
 				GridModule,
 				InputsModule,
+				ClarityModule,
+				TdsComponentLibraryModule,
 			].concat(imports),
 			declarations: [
 				compClass
