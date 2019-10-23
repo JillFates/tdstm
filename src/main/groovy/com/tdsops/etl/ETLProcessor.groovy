@@ -1161,6 +1161,34 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this
 	}
 
+	/**
+	 * Returns a field specs definition for a given {@code ETLDomain}
+	 * <pre>
+	 *	iterate {
+	 *		fieldSpec Application each {
+	 *			if (SOURCE.contains(it.label)) {
+	 *				extract it.label load it.fieldName
+	 *			}
+	 *		....
+	 *     }
+	 * }
+	 * </pre>
+	 */
+	List<Map<String, ?>> fieldSpec(ETLDomain domain) {
+
+		if (!domain.isAsset()) {
+			throw ETLProcessorException.domainWithoutFieldSpec(domain)
+		}
+
+		return this.fieldsValidator.lookupFieldSpec(domain).collect {
+			[
+				'name' : it.field,
+				'label': it.label,
+				'type' : it.control
+			]
+		}
+	}
+
 	// ------------------------------------
 	// Support methods
 	// ------------------------------------
