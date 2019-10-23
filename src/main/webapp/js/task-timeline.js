@@ -1,7 +1,7 @@
 
 // global functions for accessing the graph outside the scope of the main function
 var getData = function () { return null }
-var forceDisplay = function () { return null }
+// var forceDisplay = function () { return null }
 var debug = {};
 
 $(document).ready(function () {
@@ -110,30 +110,6 @@ function 	buildGraph(response, status) {
 	// perform all necesary precalculations on the data
 	sanitizeData(items, dependencies);
 
-	// sort the tasks chronologically for the stacking algorithm
-	// items.sort(function (a, b) {
-	// 	var t1 = a.start ? (new Date(a.start)).getTime() : 0;
-	// 	var t2 = b.start ? (new Date(b.start)).getTime() : 0;
-	// 	if (t1 > t2)
-	// 		return 1;
-	// 	else if (t1 < t2)
-	// 		return -1;
-	// 	else if (a.milestone && !b.milestone)
-	// 		return 1;
-	// 	else if (!a.milestone && b.milestone)
-	// 		return -1;
-	// 	else if ((a.predecessors.length + a.successors.length) < (b.predecessors.length + b.successors.length))
-	// 		return 1;
-	// 	else if ((a.predecessors.length + a.successors.length) > (b.predecessors.length + b.successors.length))
-	// 		return -1;
-	// 	else if (a.predecessors.length < b.predecessors.length)
-	// 		return 1;
-	// 	else if (a.predecessors.length > b.predecessors.length)
-	// 		return -1;
-	// 	else
-	// 		return 0;
-	// });
-
 	// set up the ranges for the mini and main graphs
 	var windowWidth = $(window).width(); // the width of the browser window
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
@@ -146,7 +122,7 @@ function 	buildGraph(response, status) {
 	var x1 = d3.time.scale()
 		.domain(x.domain())
 		.range([0, x.range()[1] * zoomScale]);
-    //return
+
 	// perform the stacking layout algorithm then determine the width and height of the graphs
 	var maxStack = calculateStacks();
 	var mainHeight = ((maxStack + 1) * mainRectHeight * 1.5);
@@ -181,7 +157,7 @@ function 	buildGraph(response, status) {
 			miniDrag.tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
 			// if we are outside the brush, we are drawing a new region or setting a new brush position
-			if ((d3.event.sourceEvent.which == 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1])) {
+			if ((d3.event.sourceEvent.which === 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1])) {
 				miniDrag.drawing = 1;
 				miniDrag.tempBrush = brushContainer.append('svg:rect')
 					.attr('class', 'tempBrush hidden')
@@ -538,7 +514,7 @@ function 	buildGraph(response, status) {
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseDate(data.startDate), new Date(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+		.extent([parseDate(data.startDate), parseDate(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
 
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
@@ -1064,6 +1040,8 @@ function 	buildGraph(response, status) {
 
 	// gets the css classes that apply to task @param d
 	function getClasses(d) {
+		var teamSelect = $('#teamSelectId');
+		var searchString = $('#searchBoxId').val();
 		var classString = 'unselectable '
 			+ (d.selected ? 'selected ' : '')
 			+ (d.milestone ? 'milestone ' : '')
@@ -1072,17 +1050,17 @@ function 	buildGraph(response, status) {
 			+ (d.redundant ? 'redundant ' : '')
 			+ (d.cyclical ? 'cyclical ' : '')
 			+ (d.end < now() ? 'past ' : 'future ')
-			+ (d.highlight ? 'highlighted ' : '')
+			+ (d.highlight ? ' highlighted ':'')
 			+ (d.redundant && hideRedundant ? 'hidden ' : '')
 			+ (d.status);
-		if (d.status != 'Completed' && d.end < now())
+		if (d.status !== 'Completed' && d.end < now())
 			classString += ' overdue ';
-		else if (d.status == 'Completed' && d.end > now())
+		else if (d.status === 'Completed' && d.end > now())
 			classString += ' ahead ';
 		else
 			classString += ' ontime ';
-		var teamSelect = $('#teamSelectId');
-		if (teamSelect.val() != 'ALL' && teamSelect.val() != d.role)
+
+		if (teamSelect.val() !== 'ALL' && teamSelect.val() !== d.role && !d.highlight)
 			classString += ' unfocussed ';
 
 		return classString;
@@ -2519,11 +2497,12 @@ function generateGraph(ev) {
 }
 
 // highlight tasks matching the user's regex
-function performSearch() {
+function performSearch(e) {
 	if ($('svg#timelineSVGId') != null) {
+		var ALL = 'ALL';
 		var searchString = $('#searchBoxId').val();
 		var data = getData();
-		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length - 1) == '/');
+		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) === '/' && searchString.charAt(searchString.length - 1) === '/');
 		var isRegex = false;
 		var regex = /.*/;
 
@@ -2544,19 +2523,21 @@ function performSearch() {
 			data.searchFilter = searchString;
 			handleClearFilterStatus();
 
-			_(data.items).forEach(function (task, i) {
-
-				var name = task.comment;
-
-				if (searchString == '') {
-					task.highlight = false;
+			data.tasks.map(function (task, i) {
+				task.highlight = false;
+				var highlight;
+				if (isRegex){
+					highlight = task.name.match(regex);
+				} else if(searchString){
+					highlight = task.name.toLowerCase().indexOf(searchString.toLowerCase()) !== -1;
 				} else {
-					if (isRegex && name.match(regex) != null)
-						task.highlight = true;
-					else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
-						task.highlight = true;
-					else
-						task.highlight = false;
+					highlight = false;
+				}
+
+				if(this.teamSelect.val() !== ALL) {
+					task.highlight = highlight || task.team === this.teamSelect.val();
+				}else {
+					task.highlight = highlight;
 				}
 			});
 			forceDisplay();
@@ -2583,13 +2564,13 @@ function handleClearFilterStatus() {
  * have a Date object in the user's time zone.
  */
 function parseDate(date) {
-	return new Date(date);
-	// var momentTZ = moment().tz(tdsCommon.timeZone());
-	// var localTZOffset = new Date().getTimezoneOffset();'
-	// var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
-	// momentStartDate = momentStartDate.tz("GMT");
-	// momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
-	// return new Date(momentStartDate.valueOf());
+	// return new Date(date);
+	var momentTZ = moment().tz(tdsCommon.timeZone());
+	var localTZOffset = new Date().getTimezoneOffset();
+	var momentStartDate = tdsCommon.parseDateTimeFromZulu(date);
+	momentStartDate = momentStartDate.tz("GMT");
+	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
+	return new Date(momentStartDate.valueOf());
 }
 
 function exportCriticalPath() {
