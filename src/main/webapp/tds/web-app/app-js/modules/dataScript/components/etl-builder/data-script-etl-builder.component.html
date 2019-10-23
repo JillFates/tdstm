@@ -92,7 +92,7 @@
                             <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
                             <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
                                 <button aria-label="Close" class="close" type="button" style="margin-right: 5px; opacity: unset;">
-					                <span aria-hidden="true">×</span>
+					                <clr-icon aria-hidden="true" shape="close"></clr-icon>
 				                </button>
                             </span>
                             <textarea *ngIf="testHasErrors()" class="form-control console"

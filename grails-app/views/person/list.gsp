@@ -120,11 +120,11 @@
 	      <div class="modal-header">
 		     <button id="bulkDeleteCloseAndReloadButton" aria-label="Close"
 					 class="close" type="button" onclick='Person.closePopup()' title="Close">
-				 <span aria-hidden="true">×</span>
+				 <clr-icon aria-hidden="true" shape="close"></clr-icon>
 			 </button>
 			  <button id="bulkDeleteClose" aria-label="Close"
 					  class="close" type="button" data-dismiss="modal" title="Close">
-				  <span aria-hidden="true">×</span>
+				  <clr-icon aria-hidden="true" shape="close"></clr-icon>
 			  </button>
 			  <h4 class="modal-title" id="myModalLabel">Bulk Delete</h4>
 	      </div>

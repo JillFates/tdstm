@@ -16,7 +16,7 @@ import { UIExtraDialog } from '../../../shared/services/ui-dialog.service';
 			<div class="tds-modal-content" [ngStyle]="{'visibility': isVisible ? 'visible' : 'hidden'}">
 				<div class="modal-header">
 					<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-						<span aria-hidden="true">×</span>
+						<clr-icon aria-hidden="true" shape="close"></clr-icon>
 					</button>
 					<h4 class="modal-title">{{title}}</h4>
 				</div>

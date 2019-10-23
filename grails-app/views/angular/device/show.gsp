@@ -6,7 +6,7 @@
 <div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
-            <span aria-hidden="true">×</span>
+            <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
         <h4 class="modal-title">Device Detail</h4>
     </div>

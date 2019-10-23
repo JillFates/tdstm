@@ -14,7 +14,7 @@ import { Permission } from '../../../../../../../shared/model/permission.model';
                 <div class="tds-modal-content">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
                         <h4 class="modal-title">Show Manufacturer</h4>
                     </div>
