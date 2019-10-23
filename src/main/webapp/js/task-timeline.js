@@ -1060,7 +1060,10 @@ function 	buildGraph(response, status) {
 		else
 			classString += ' ontime ';
 
-		if (teamSelect.val() !== 'ALL' && teamSelect.val() !== d.role && !d.highlight)
+		if (
+			( teamSelect.val() !== 'ALL' && teamSelect.val() !== d.role &&  !d.highlight) ||
+			( searchString && !d.highlight )
+		)
 			classString += ' unfocussed ';
 
 		return classString;
