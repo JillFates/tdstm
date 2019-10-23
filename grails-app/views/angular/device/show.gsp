@@ -40,7 +40,7 @@
 
                                     <tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${asset.priority}" />
 
-                                    <tr class="prop">
+                                    <tr>
                                         <th>Location</th>
                                         <td>${assetEntity.sourceLocationName} | ${assetEntity.targetLocationName}</td>
                                     </tr>
@@ -183,6 +183,19 @@
 				<button clrTabLink>Tasks</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
+                        <g:render 
+                            template="/angular/common/commentList" 
+                            model="[
+                                asset:assetEntity, 
+                                prefValue: prefValue, 
+                                viewUnpublishedValue: viewUnpublishedValue,
+                                hasPublishPermission:hasPublishPermission,  
+                                currentUserId: currentUserId,
+                                canEdit: canEdit,
+                                showTask:true,
+                                showComment:false,
+                            ]" >
+                        </g:render>
 					</div>
 				</clr-tab-content>
 			</clr-tab>
@@ -192,14 +205,18 @@
                     <div class="clr-row">
 						<div  class="clr-col-12">
                             <g:render 
-                                template="/angular/common/commentList" 
-                                model="[
-                                    'asset':assetEntity, 
-                                    'prefValue': prefValue, 
-                                    'viewUnpublishedValue': viewUnpublishedValue, 
-                                    'hasPublishPermission':hasPublishPermission, 
-                                    'canEdit': canEdit, currentUserId: currentUserId]">
-                            </g:render>
+								template="/angular/common/commentList" 
+								model="[
+									asset:assetEntity, 
+									prefValue: prefValue, 
+									viewUnpublishedValue: viewUnpublishedValue,
+                                    hasPublishPermission:hasPublishPermission,  
+									currentUserId: currentUserId,
+                                    canEdit: canEdit,
+									showTask:false,
+									showComment:true,
+								]" >
+							</g:render>
 						</div>
 					</div>
 				</clr-tab-content>
@@ -243,18 +260,18 @@
     </div>
 
     <div class="modal-sidenav form-group-center">
-        <nav class="modal-sidenav btn-link">
-            <tds-button-edit (click)="showAssetEditView()" tooltip="Edit" icon="pencil"></tds-button-edit>
-            <tds-button-clone (click)="onCloneAsset()" tooltip="Clone" icon="copy"></tds-button-clone>
-            <tds-button-custom (click)="openGraphUrl()" tooltip="Graph" icon="sitemap"></tds-button-custom>
-            <tds:hasPermission permission="${Permission.AssetDelete}">
-                <tds-button-delete
-                        tooltip="Delete Asset"
-                        class="btn-danger"
-                        [permissions]="['${Permission.AssetDelete}']"
-                        (click)="onDeleteAsset()">
-                </tds-button-delete>
-            </tds:hasPermission>
-        </nav>
-    </div>
+		<nav class="modal-sidenav btn-link">
+			<tds-button-edit (click)="showAssetEditView()" tooltip="Edit" icon="pencil"></tds-button-edit>
+			<tds-button-clone (click)="onCloneAsset()" tooltip="Clone" icon="copy"></tds-button-clone>
+			<tds-button-custom (click)="openGraphUrl()" tooltip="Graph" icon="sitemap"></tds-button-custom>
+			<tds:hasPermission permission="${Permission.AssetDelete}">
+				<tds-button-delete
+						tooltip="Delete Asset"
+						class="btn-danger"
+						[permissions]="['${Permission.AssetDelete}']"
+						(click)="onDeleteAsset()">
+				</tds-button-delete>
+			</tds:hasPermission>
+		</nav>
+	</div>
 </div>

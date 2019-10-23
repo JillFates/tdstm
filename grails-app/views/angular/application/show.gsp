@@ -68,8 +68,8 @@
 								template="/angular/common/commentList" 
 								model="[
 									asset:applicationInstance, 
-									'prefValue': prefValue, 
-									'viewUnpublishedValue': viewUnpublishedValue, 
+									prefValue: prefValue, 
+									viewUnpublishedValue: viewUnpublishedValue, 
 									currentUserId: currentUserId,
 									showTask:true,
 									showComment:false,
@@ -88,8 +88,8 @@
 								template="/angular/common/commentList" 
 								model="[
 									asset:applicationInstance, 
-									'prefValue': prefValue, 
-									'viewUnpublishedValue': viewUnpublishedValue, 
+									prefValue: prefValue, 
+									viewUnpublishedValue: viewUnpublishedValue, 
 									currentUserId: currentUserId,
 									showTask:false,
 									showComment:true,
