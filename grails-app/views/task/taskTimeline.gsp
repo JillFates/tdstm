@@ -45,7 +45,7 @@
 							<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
 						</span>
 						<span class="controlSpan">
-							<form onsubmit="return performSearch()" id="highlightFormId">
+							<form onsubmit="performSearch()" id="highlightFormId" >
 								<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24" />
 								<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 								<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer graphButton" value="Highlight" />

@@ -117,7 +117,7 @@ function 	buildGraph(response, status) {
 	var zoomScale = 2;
 	var d3Linear = getTimeFormatToDraw(parseDate(data.startDate), parseDate(data.endDate),false, data);
 	var x = d3.time.scale()
-		.domain([parseDate(data.startDate), items[items.length - 1].estFinish])
+		.domain([parseDate(data.startDate), parseDate(data.endDate)])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
@@ -514,7 +514,7 @@ function 	buildGraph(response, status) {
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseDate(data.startDate), parseDate(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+		.extent([parseDate(data.startDate), new Date(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
 
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
