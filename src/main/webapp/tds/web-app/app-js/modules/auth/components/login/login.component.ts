@@ -156,7 +156,7 @@ export class LoginComponent implements OnInit {
 		this.onLoginProgress = false;
 		this.userContextModel = userContext;
 		if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
-			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices.length > 0) {
+			if (this.userContextModel.postNotices.length > 0 && this.userContextModel.postNotices.notices.length > 0) {
 				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map((notice: NoticeModel) => {
 					notice.sequence = notice.sequence || 0;
 					return notice;

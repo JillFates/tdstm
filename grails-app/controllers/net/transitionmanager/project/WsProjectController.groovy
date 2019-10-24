@@ -13,12 +13,15 @@ import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
 import org.apache.tomcat.util.descriptor.web.ContextService
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
+
 /**
  * Handles WS calls of the ProjectsService
  */
@@ -92,7 +95,11 @@ class WsProjectController implements ControllerMethods {
 		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
 		// Copy plan methodology field from the default project
 		Project defaultProject = Project.defaultProject
-		List<Map> managers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
+		List<Map> managers = projectDetails.managers.collect { manager ->
+			Party party = GrailsHibernateUtil.unwrapIfProxy(manager.partyIdTo)
+			[name: party.toString(), id: party.id ]
+		}
+
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		params.planMethodology = defaultProject.planMethodology
@@ -146,7 +153,13 @@ class WsProjectController implements ControllerMethods {
 			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
-		List<Map> possibleManagers = projectDetails.managers.collect { it -> [name: it.partyIdTo.toString(), id: it.partyIdTo.id ] }
+		List<Map> possibleManagers = projectDetails.managers.collect { it ->
+			Party party = GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)
+			[
+				name: party.toString(),
+				id: party.id
+			]
+		}
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(defaultProject)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		List availableBundles = moveBundleService.lookupList(project)

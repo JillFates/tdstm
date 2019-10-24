@@ -1,5 +1,6 @@
 package com.tdsops.common.sql
 
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.SizeScale
@@ -7,7 +8,11 @@ import net.transitionmanager.search.FieldSearchData
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class SqlUtilTests extends Specification {
+class SqlUtilTests extends Specification implements DataTest {
+
+	void setupSpec() {
+		mockDomains Application, AssetEntity
+	}
 
 	void testAppendToWhere() {
 		expect:

@@ -1,16 +1,14 @@
 package com.tdsops.common.security.spring
 
-
 import com.tdsops.common.security.SecurityUtil
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
 import net.transitionmanager.security.PasswordService
-import org.springframework.security.authentication.encoding.PasswordEncoder
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
 @CompileStatic
-class TdsPasswordEncoder implements PasswordEncoder {
+class TdsPasswordEncoder {
 	GrailsApplication grailsApplication
 	PasswordService passwordService
 

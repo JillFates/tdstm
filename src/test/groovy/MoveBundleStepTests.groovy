@@ -1,13 +1,16 @@
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import groovy.time.TimeCategory
 import net.transitionmanager.project.MoveBundleStep
 import spock.lang.Specification
 
-@Mock(MoveBundleStep)
-class MoveBundleStepTests extends Specification {
+class MoveBundleStepTests extends Specification implements DataTest {
 
 	private MoveBundleStep mbs
 	private Date now = new Date()
+
+	void setupSpec(){
+		mockDomains MoveBundleStep
+	}
 
 	void setup() {
 		use(TimeCategory) {
