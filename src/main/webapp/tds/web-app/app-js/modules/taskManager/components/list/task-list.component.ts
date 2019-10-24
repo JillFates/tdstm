@@ -706,4 +706,11 @@ export class TaskListComponent {
 			}
 		});
 	}
+
+	/**
+	 * Toggle the flag to show/hide grid filters
+	 */
+	public toggleFiltering() {
+		this.isFiltering = !this.isFiltering;
+	}
 }
