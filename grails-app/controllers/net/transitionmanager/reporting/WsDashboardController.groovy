@@ -59,48 +59,15 @@ class WsDashboardController implements ControllerMethods {
 	 * 		]
 	 * </code>
 	 *
-	 * @param id - the move bundle id
-	 * @param moveEventId
+	 * @param id - The MoveEvent id
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.DashboardMenuView)
-	def bundleData() {
+	def eventData(Long id) {
 		String error = ""
 		Project project = getProjectForWs()
-		def moveEventId = params.moveEventId
-		def moveBundleId = params.id
-		MoveEvent moveEvent
-		MoveBundle moveBundle
-
-		// Validate that the user is legally accessing the proper move event
-		if (! moveEventId.isNumber() ) {
-			error = "Move event id is invalid"
-		} else {
-			moveEvent = MoveEvent.findByIdAndProject(moveEventId, project)
-			if (!moveEvent) {
-				error = "Unable to find referenced move event for your current project"
-			} else {
-				if (!moveBundleId) {
-					// Take the first move bundle in the event
-					if (moveEvent.moveBundles) {
-						moveBundle = moveEvent.moveBundles[0]
-						moveBundleId = moveBundle.id
-					}
-				} else if (!moveBundleId.isNumber()) {
-					error = "Move bundle id is invalid"
-				} else {
-					moveBundle = MoveBundle.findByIdAndProject(moveBundleId, project)
-					if (!moveBundle) {
-						error = "Unable to find referenced move bundle for your current project"
-					}
-				}
-			}
-		}
-		if (error) {
-			renderAsJson(error: error)
-			return
-		}
-		renderAsJson(moveEventService.bundleData(moveEvent, moveBundle))
+		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
+		renderAsJson(moveEventService.eventData(moveEvent))
 	}
 
 	/**

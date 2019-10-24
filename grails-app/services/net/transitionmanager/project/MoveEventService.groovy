@@ -575,64 +575,40 @@ class MoveEventService implements ServiceMethods {
 	}
 
 	/**
-	 * Returns different data used to render the Event Dashboard
-	 * @param moveEvent
-	 * @param moveBundle
-	 * @return
+	 * Returns data used to render the Event Dashboard
+	 * @param moveEvent  The MoveEvent
+	 * @return JSON map
 	 */
-	Map bundleData(MoveEvent moveEvent, MoveBundle moveBundle) {
+	Map eventData(MoveEvent moveEvent) {
 		Date sysTime = TimeUtil.nowGMT()
-
-		Date planSumCompTime
 		MoveEventSnapshot moveEventPlannedSnapshot
-		MoveEventSnapshot moveEventRevisedSnapshot
-		Date revisedComp
 		TimeDuration dayTime
 		String eventString = ""
+        Date eventStartTime = moveEvent.estStartTime
 
-		if (moveEvent) {
+        if (eventStartTime) {
 
-			Map resultMap = jdbcTemplate.queryForMap( """
-					SELECT max(mb.completion_time) as compTime,
-					min(mb.start_time) as startTime
-					FROM move_bundle mb WHERE mb.move_event_id = $moveEvent.id
-				""" )
-
-			planSumCompTime = resultMap?.compTime
-			Date eventStartTime = moveEvent.estStartTime
-			if (eventStartTime || resultMap?.startTime) {
-				if(!eventStartTime){
-					eventStartTime = new Date(resultMap?.startTime?.getTime())
-				}
-				if (eventStartTime>sysTime) {
-					dayTime = TimeCategory.minus(eventStartTime, sysTime)
-					eventString = "Countdown Until Event"
-				} else {
-					dayTime = TimeCategory.minus(sysTime, eventStartTime)
-					eventString = "Elapsed Event Time"
-				}
-			}
-
-			// select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
-			String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-			moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
-			moveEventRevisedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_REVISED] )[0]
-			revisedComp = moveEvent.revisedCompletionTime
-			if (revisedComp) {
-				revisedComp = new Date(revisedComp.time)
-			}
-		}
+            if (eventStartTime>sysTime) {
+                dayTime = TimeCategory.minus(eventStartTime, sysTime)
+                eventString = "Countdown Until Event"
+            } else {
+                dayTime = TimeCategory.minus(sysTime, eventStartTime)
+                eventString = "Elapsed Event Time"
+            }
+        }
+        // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
 		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
 
 		return [snapshot: [
 				revisedComp: moveEvent?.revisedCompletionTime,
-				moveBundleId: moveBundle.id,
 				calcMethod: moveEvent?.calcMethod,
 				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
 				eventStartDate: moveEvent.estStartTime,
 				planSum: [
 						dialInd: moveEventPlannedSnapshot?.dialIndicator,
-						compTime: planSumCompTime,
+						compTime: moveEvent.estCompletionTime,
 						dayTime: eventClockCountdown,
 						eventDescription: moveEvent?.description,
 						eventString: eventString,
