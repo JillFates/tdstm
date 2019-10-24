@@ -1,3 +1,66 @@
+@mixin k-input {
+  .k-input {
+    padding: 0 0.25rem;
+    height: unset;
+  }
+}
+
+kendo-numerictextbox {
+  &.k-widget {
+    ::selection {
+      background-color: unset;
+      color: unset;
+      color: black;
+    }
+    &.form-control {
+      width: 220px;
+
+      @include k-input();
+    }
+  }
+
+  &.form-control {
+    height: unset;
+  }
+
+  &:hover {
+    .k-select {
+      border-color: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+    }
+  }
+
+  &.k-numerictextbox {
+    .k-numeric-wrap {
+      border: unset;
+      color: black;
+      border-bottom: 1px solid #999;
+    }
+
+    .k-state-focused {
+      -webkit-box-shadow: unset;
+      box-shadow: unset;
+      border: unset;
+      border-bottom: 1px solid #0092d1;
+    }
+
+    .k-select {
+      border-color: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+
+      &:hover {
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+  }
+}
+
 kendo-list {
   &.ng-star-inserted {
     .k-list {
@@ -49,10 +112,7 @@ kendo-dropdownlist {
         border-bottom: 1px solid #999;
       }
 
-      .k-input {
-        padding: unset;
-        height: unset;
-      }
+      @include k-input();
 
       .k-icon {
         color: #0092d1;
@@ -83,10 +143,7 @@ kendo-datepicker {
     }
 
     .k-dateinput {
-      .k-input {
-        padding: unset;
-        height: unset;
-      }
+      @include k-input();
     }
 
     .k-picker-wrap {

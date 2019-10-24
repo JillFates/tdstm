@@ -138,6 +138,7 @@
 					</kendo-dropdownlist>
 				</div>
 
+				<%-- TODO: Fix proc: see existing application for example --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
 				
 				<div>
@@ -150,7 +151,10 @@
 					</tds-date-control>
 				</div>
 
+				<%-- TODO: Fix latency: see existing application for example: ? yes no --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}" tabindex="27"  ngmodel="model.asset.latency" blankOptionListText="?" />
+				
+				<%-- TODO: Fix proc: see existing application for example --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tabindex="28" ngmodel="model.asset.startupProc" blankOptionListText="?" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${asset.url}" ngmodel="model.asset.url" tabindex="29"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="30"/>
