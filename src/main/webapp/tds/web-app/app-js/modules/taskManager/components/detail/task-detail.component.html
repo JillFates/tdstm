@@ -6,9 +6,9 @@
              [style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
              [style.height.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_WIDTH">
             <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
+				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
+					<clr-icon aria-hidden="true" shape="close"></clr-icon>
+				</button>
                 <h4 class="modal-title">{{model.title}}</h4>
             </div>
             <div class="modal-body">
@@ -306,9 +306,9 @@
                 </div>
             </div>
             <div class="modal-footer form-group-center">
-                <div class="pull-left" style="display: flex;">
+					<div class="pull-left" style="display: flex;">
                     <button class="btn btn-primary" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
-                        <i class="glyphicon glyphicon-pencil action-button"></i>
+						<clr-icon aria-hidden="true" shape="pencil"></clr-icon>
                         <span>Edit</span>
                     </button>
                     <tds-task-actions
@@ -324,11 +324,11 @@
 										</tds-task-actions>
                 </div>
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-                    <i class="glyphicon glyphicon-trash action-button"></i>
+					<clr-icon aria-hidden="true" shape="trash"></clr-icon>
                     <span>Delete</span>
                 </button>
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-                    <i class="glyphicon glyphicon-ban-circle action-button"></i>
+					<clr-icon aria-hidden="true" shape="ban"></clr-icon>
                     <span>Close</span>
                 </button>
 

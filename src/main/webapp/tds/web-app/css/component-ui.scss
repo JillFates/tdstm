@@ -11,15 +11,14 @@ kendo-grid {
 			background: $color-text-inverse;
 			border: 1px solid $color-head;
 			border-width: 0 0 1px 0;
-			overflow: visible;
+			overflow: hidden;
 		}
 		.k-grid-aria-root{
 			overflow: unset;
 		}
 	}
 	.k-grid-content{
-		min-height: 4rem;
-		max-height: 30rem;
+		min-height: 2rem;
 	}
 	.grid-actions {
 		> .clr-checkbox-wrapper {
@@ -40,4 +39,11 @@ kendo-grid {
 	kendo-grid-list{
 		overflow: visible;
 	}
+}
+
+task-comment kendo-grid.k-grid .k-grid-content{
+	td:nth-child(1) {
+		overflow: visible;
+	}
+	padding-bottom: 4rem;
 }

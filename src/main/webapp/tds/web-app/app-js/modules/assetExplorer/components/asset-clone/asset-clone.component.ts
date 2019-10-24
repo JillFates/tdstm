@@ -24,7 +24,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
                         <h4 class="modal-title">Clone Asset</h4>
                     </div>

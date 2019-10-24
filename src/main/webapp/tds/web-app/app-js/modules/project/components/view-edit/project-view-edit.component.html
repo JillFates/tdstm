@@ -1,7 +1,7 @@
 <div tds-handle-escape (escPressed)="cancelCloseDialog()" style="width:600px" class="tds-modal-content project-view-edit-component" id="project-view-edit-component" data-backdrop="static" tabindex="-1" role="dialog">
      <div class="modal-header">
          <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-             <span aria-hidden="true">×</span>
+			<clr-icon aria-hidden="true" shape="close"></clr-icon>
          </button>
          <h4 class="modal-title">Project {{editing ? "Edit" : "Detail"}}</h4>
      </div>
