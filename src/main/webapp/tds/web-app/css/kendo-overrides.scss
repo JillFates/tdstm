@@ -1,7 +1,9 @@
 @mixin k-input {
   .k-input {
     padding: 0 0.25rem;
-    height: unset;
+    height: 1rem;
+    max-height: 1rem;
+    font-size: 0.541667rem;
   }
 }
 

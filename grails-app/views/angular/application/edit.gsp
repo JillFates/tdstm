@@ -47,25 +47,9 @@
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
-				
-				<%-- <div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
-					<kendo-dropdownlist #controlSme
-							[tabIndex]="8"
-							name="modelAssetSme"
-							[(ngModel)]="persons.sme"
-							(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-							[defaultItem]="defaultItem"
-							[textField]="'fullName'"
-							[valueField]="'personId'"
-							[data]="getPersonList(${personList as JSON})">
-					</kendo-dropdownlist>
-				</div> --%>
-
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
 				
-				<%-- TODO: Come back and style this. --%>
 				<div class="clr-form-control">
 					<div style="display: flex">
 						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
@@ -87,8 +71,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${asset.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="14" tooltipDataPlacement="bottom"/>
 				
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
-				
-				<%-- TODO: Come back and style this. --%>
+
 				<div class="clr-form-control">
 					<div style="display: flex">
 						<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
@@ -106,7 +89,6 @@
 					</kendo-dropdownlist>
 				</div>
 
-				<%-- TODO: Come back and style this. --%>
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 					<kendo-dropdownlist
@@ -122,8 +104,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${asset.license}" ngmodel="model.asset.license" tabindex="19"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
-				
-				<%-- TODO: Come back and style this --%>
+
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 					<kendo-dropdownlist
@@ -146,7 +127,6 @@
 					</tds-date-control>
 				</div>
 
-				<%-- TODO: Style this --%>
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 					<kendo-dropdownlist
@@ -157,7 +137,6 @@
 					</kendo-dropdownlist>
 				</div>
 
-				<%-- TODO: Fix proc: see existing application for example --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
 				
 				<div class="clr-form-control">
@@ -170,15 +149,11 @@
 					</tds-date-control>
 				</div>
 
-				<%-- TODO: Fix latency: see existing application for example: ? yes no --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}" tabindex="27"  ngmodel="model.asset.latency" blankOptionListText="?" />
-				
-				<%-- TODO: Fix proc: see existing application for example --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tabindex="28" ngmodel="model.asset.startupProc" blankOptionListText="?" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${asset.url}" ngmodel="model.asset.url" tabindex="29"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="30"/>
-				
-				<%-- TODO: Style/fix this --%>
+
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
 					<tds-combobox-group
@@ -192,16 +167,15 @@
 					</tds-combobox-group>
 				</div>
 
-				<%-- TODO: Style/fix this --%>
-				<clr-input-container>
+
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
 							class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
 					<span style="margin-left:200px; margin-top: -20px;">m</span>
-				</clr-input-container>
+				</div>
 
-				<%-- TODO: Style/fix this --%>
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 					<tds-combobox-group
@@ -215,7 +189,6 @@
 					</tds-combobox-group>
 				</div>
 
-				<%-- TODO: Fix this --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
 				<div class="clr-form-control">
