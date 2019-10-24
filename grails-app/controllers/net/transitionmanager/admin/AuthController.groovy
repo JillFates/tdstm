@@ -125,7 +125,10 @@ class AuthController implements ControllerMethods {
 			}
 		}
 
-		redirectToLoginForm()
+		// Some reason the url with /tdstm in it gets duplicated with /tdstm/tdstm/...
+		redirect uri: grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
+		// redirectToLoginForm()
+		return
 	}
 
 	/**
