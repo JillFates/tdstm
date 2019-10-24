@@ -36,7 +36,6 @@
 					<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 					<kendo-dropdownlist #controlSme
 							[tabIndex]="8"
-							class="tm-input-control person-list"
 							name="modelAssetSme"
 							[(ngModel)]="persons.sme"
 							(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
@@ -57,7 +56,6 @@
 					<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 					<kendo-dropdownlist  #controlSme2
 						[tabIndex]="12"
-						class="tm-input-control person-list"
 						name="modelAssetSme2"
 						[(ngModel)]="persons.sme2"
 						(selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
@@ -79,7 +77,6 @@
 					<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 					<kendo-dropdownlist
 							[tabIndex]="16"
-							class="tm-input-control"
 							name="modelAssetappOwner"
 							[(ngModel)]="persons.appOwner"
 							(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
@@ -95,7 +92,6 @@
 					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 					<kendo-dropdownlist
 						[tabIndex]="17"
-						class="tm-input-control"
 						name="modelAssetMoveBundle"
 						[data]="model.moveBundleList"
 						[(ngModel)]="model.asset.moveBundle"
@@ -113,7 +109,6 @@
 					<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 					<kendo-dropdownlist
 						[tabIndex]="21"
-						class="tm-input-control"
 						name="modelAssetPlanStatus"
 						[(ngModel)]="model.asset.planStatus"
 						[data]="model.planStatusOptions">
@@ -137,7 +132,6 @@
 					<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 					<kendo-dropdownlist
 							[tabIndex]="24"
-							class="tm-input-control"
 							name="modelAssetValidation"
 							[data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(asset.class).validation.inList as JSON}"
 							[(ngModel)]="model.asset.validation">

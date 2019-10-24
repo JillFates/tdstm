@@ -1,61 +1,125 @@
-kendo-datepicker {
-    &.k-datepicker {
-        display: block;
+kendo-list {
+  &.ng-star-inserted {
+    .k-list {
+      .k-item {
+        line-height: unset;
+        font-weight: normal;
+        white-space: pre;
+        padding: 0px 2px 1px;
+        min-height: 1.2em;
+        overflow-x: hidden;
+      }
 
-        &:hover {
-            .k-select {
-                border-color: unset;
-                background-color: unset;
-                background-image: unset;
-                color: #0092d1;
-            }
-        }
+      .k-item.k-state-selected {
+        color: white;
+        background-color: #0092d1;
+      }
 
-        .k-widget {
-            ::selection {
-                background-color: unset;
-                color: unset;
-                color: black;
-            }
-        }
-
-        .k-dateinput {
-            .k-input {
-                padding: unset;
-                height: unset;
-            }
-        }
-
-        .k-picker-wrap {
-            border-color: unset;
-            border-width: unset;
-            border-style: unset;
-            border-bottom: 1px solid #999;
-            width: 220px;
-        }
-
-        .k-state-focused {
-            -webkit-box-shadow: unset;
-            box-shadow: unset;
-            border: unset;
-            border-color: unset;
-            border-bottom: 1px solid #0092d1;
-        }
-
-        .k-select {
-            border-color: unset;
-            background-color: unset;
-            background-image: unset;
-            color: #0092d1;
-            position: absolute;
-            right: 0px;
-            bottom: 2px;
-
-            &:hover {
-                background-color: unset;
-                background-image: unset;
-                color: #0092d1;
-            }
-        }
+      .k-item.k-state-focused {
+        box-shadow: unset;
+        -webkit-box-shadow: unset;
+      }
     }
+  }
+}
+
+kendo-dropdownlist {
+  &.k-header {
+    border: unset;
+  }
+
+  &.k-dropdown {
+    display: block;
+    width: 220px;
+
+    .k-dropdown-wrap {
+      border-color: unset;
+      color: black;
+      border: unset;
+      border-bottom: 1px solid #999;
+
+      &:hover {
+        border: unset;
+        border-bottom: 1px solid #999;
+      }
+
+      .k-input {
+        padding: unset;
+        height: unset;
+      }
+
+      .k-icon {
+        color: #0092d1;
+      }
+    }
+
+    .k-dropdown-wrap.k-state-focused {
+      -webkit-box-shadow: unset;
+      box-shadow: unset;
+      border: unset;
+      border-bottom: 1px solid #0092d1;
+    }
+  }
+}
+
+kendo-datepicker {
+  &.k-datepicker {
+    display: block;
+
+    &:hover {
+      .k-select {
+        border-color: unset;
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+
+    .k-widget {
+      ::selection {
+        background-color: unset;
+        color: unset;
+        color: black;
+      }
+    }
+
+    .k-dateinput {
+      .k-input {
+        padding: unset;
+        height: unset;
+      }
+    }
+
+    .k-picker-wrap {
+      border-color: unset;
+      border-width: unset;
+      border-style: unset;
+      border-bottom: 1px solid #999;
+      width: 220px;
+    }
+
+    .k-state-focused {
+      -webkit-box-shadow: unset;
+      box-shadow: unset;
+      border: unset;
+      border-color: unset;
+      border-bottom: 1px solid #0092d1;
+    }
+
+    .k-select {
+      border-color: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+      position: absolute;
+      right: 0px;
+      bottom: 2px;
+
+      &:hover {
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+  }
 }
