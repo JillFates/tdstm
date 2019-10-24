@@ -143,8 +143,6 @@ function 	buildGraph(response, status) {
 
 	// populate the Team select
 	var teamSelect = null;
-	// populateTeamSelect();
-
 
 	// stores data and functions used for dragging on the mini graph
 	var miniDrag = {
@@ -604,11 +602,6 @@ function 	buildGraph(response, status) {
 			fullRedraw();
 		});
 
-		// handle when the user changes the team filtering select
-		// teamSelect.on('change', function () {
-		// 	display(true, true);
-		// });
-
 		// bind the zoom button listeners
 		$('#zoomInButtonId').on('click', function () {
 			GraphUtil.timelineZoom(brush, 'in', zoomCallback)
@@ -889,20 +882,17 @@ function 	buildGraph(response, status) {
 		// updates the mini graph
 		miniPolys
 			.attr('class', function (d) { return 'miniItem ' + getClasses(d); });
-
-
-//		if (window.performance && window.performance.now)
-// //			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 	}
 
 	// clears all items from the main group then redraws them
 	function fullRedraw() {
 		itemPolys.selectAll('polygon').remove();
 		itemArrows.selectAll('line').remove();
-		if (GraphUtil.isIE())
+		if (GraphUtil.isIE()) {
 			itemLabels.selectAll('g').remove();
-		else
+		} else {
 			itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); }).remove();
+		}
 		miniPolys.attr('points', function (d) { return getPointsMini(d); });
 		display(true, true);
 	}
@@ -911,8 +901,9 @@ function 	buildGraph(response, status) {
 	function calculateLabelMaxWidths() {
 		$('text.itemLabel').each(function (i, o) {
 			var d = o.__data__
-			if (d.labelWidth == null)
+			if (d.labelWidth == null) {
 				d.labelWidth = o.getBoundingClientRect().width
+			}
 		});
 	}
 
@@ -1063,9 +1054,9 @@ function 	buildGraph(response, status) {
 		if (
 			( teamSelect.val() !== 'ALL' && teamSelect.val() !== d.role &&  !d.highlight) ||
 			( searchString && !d.highlight )
-		)
+		) {
 			classString += ' unfocussed ';
-
+		}
 		return classString;
 	}
 
@@ -2567,7 +2558,6 @@ function handleClearFilterStatus() {
  * have a Date object in the user's time zone.
  */
 function parseDate(date) {
-	// return new Date(date);
 	var momentTZ = moment().tz(tdsCommon.timeZone());
 	var localTZOffset = new Date().getTimezoneOffset();
 	var momentStartDate = tdsCommon.parseDateTimeFromZulu(date);
@@ -2681,7 +2671,6 @@ function getTimeLinePercent(startDate, endDate, percent) {
  * it returns an object that represent the best d3.time.xxx, d3.time.format(xxx) and the tick jump
  */
 function getTimeFormatToDraw(startDate, endDate, increasePer, data) {
-	// debugger;
 	var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 		difference = 0,
 		maxTick = _MAX_TICK_PERFORMANCE,

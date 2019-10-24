@@ -52,7 +52,7 @@ class TimelineService implements ServiceMethods {
 	 * @return List<Task>          a list of tasks
 	 */
 	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
-		List<Task> tasks
+		List<Task> tasks = []
 
 		if (event) {
 			tasks = Task.where {
@@ -61,8 +61,6 @@ class TimelineService implements ServiceMethods {
 					isPublished == true
 				}
 			}.list()
-		} else {
-			tasks = []
 		}
 
 		return tasks
@@ -75,15 +73,13 @@ class TimelineService implements ServiceMethods {
 	 * @return List<TaskDependency>          a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
-		List<TaskDependency> dependencies
+		List<TaskDependency> dependencies = []
 
 		if (tasks) {
 			dependencies = TaskDependency.where {
 				assetComment in tasks
 				predecessor in tasks
 			}.list()
-		} else {
-			dependencies = []
 		}
 
 		return dependencies
