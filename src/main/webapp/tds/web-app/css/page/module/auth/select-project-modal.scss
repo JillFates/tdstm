@@ -5,6 +5,9 @@
   }
   div.project-list-container {
     padding-left: 16px;
+    button.change-project-status__btn {
+      margin-bottom: 10px;
+    }
     label.select-project {
       cursor: pointer;
       span {
