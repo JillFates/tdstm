@@ -20,32 +20,19 @@ import { TDSCustomControl } from '../common/custom-control.component';
 import { ValidationRulesFactoryService } from '../../../services/validation-rules-factory.service';
 import { DateValidationConstraints } from '../../../../shared/model/validation-contraintes.model';
 
-// <kendo-datepicker
-// [title]="title"
-// [min]="minimum"
-// [max]="maximum"
-// [value]="getDateValue(dateValue)"
-// (blur)="onBlur()"
-// [format]="displayFormat"
-// [tabindex]="tabindex"
-// (valueChange)="onValueChange($event)"
-// class="form-control">
-// </kendo-datepicker>
 @Component({
 	selector: 'tds-date-control',
 	template: `
-		<clr-date-container>
-			<label [for]="controlName">{{labelText}}</label>
-			<input 
-				[id]="controlName"
-				[min]="minimum"
-				[max]="maximum"
-				type="date" 
-				clrDate
-				[value]="getDateValue(dateValue)"
-				(valueChange)="onValueChange($event)"
-				[tabindex]="tabindex">
-		</clr-date-container>
+		<kendo-datepicker
+			[title]="title"
+			[min]="minimum"
+			[max]="maximum"
+			[value]="getDateValue(dateValue)"
+			(blur)="onBlur()"
+			[format]="displayFormat"
+			[tabindex]="tabindex"
+			(valueChange)="onValueChange($event)">
+		</kendo-datepicker>
 	`,
 	providers: [
 		{
@@ -61,8 +48,6 @@ import { DateValidationConstraints } from '../../../../shared/model/validation-c
 	]
 })
 export class TDSDateControlComponent extends TDSCustomControl implements OnChanges, OnInit {
-	@Input('controlName') controlName: string;
-	@Input('labelText') labelText: string;
 	@Input('minimum') minimum;
 	@Input('maximum') maximum;
 	@Output() blur: EventEmitter<any> = new EventEmitter();

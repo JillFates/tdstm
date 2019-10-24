@@ -1,0 +1,61 @@
+kendo-datepicker {
+    &.k-datepicker {
+        display: block;
+
+        &:hover {
+            .k-select {
+                border-color: unset;
+                background-color: unset;
+                background-image: unset;
+                color: #0092d1;
+            }
+        }
+
+        .k-widget {
+            ::selection {
+                background-color: unset;
+                color: unset;
+                color: black;
+            }
+        }
+
+        .k-dateinput {
+            .k-input {
+                padding: unset;
+                height: unset;
+            }
+        }
+
+        .k-picker-wrap {
+            border-color: unset;
+            border-width: unset;
+            border-style: unset;
+            border-bottom: 1px solid #999;
+            width: 220px;
+        }
+
+        .k-state-focused {
+            -webkit-box-shadow: unset;
+            box-shadow: unset;
+            border: unset;
+            border-color: unset;
+            border-bottom: 1px solid #0092d1;
+        }
+
+        .k-select {
+            border-color: unset;
+            background-color: unset;
+            background-image: unset;
+            color: #0092d1;
+            position: absolute;
+            right: 0px;
+            bottom: 2px;
+
+            &:hover {
+                background-color: unset;
+                background-image: unset;
+                color: #0092d1;
+            }
+        }
+    }
+}

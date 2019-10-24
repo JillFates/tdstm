@@ -1069,8 +1069,13 @@ tds-ui-dialog #tdsUiDialog {
       height: calc(100vh - 119px);
       width: calc(100vw - 55px);
       padding: 15px 15px 24px 15px; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body input {
-        width: 220px; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-gap: 24px;
+        justify-items: left; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form input {
+          width: 220px; }
       tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list {
         border-collapse: collapse;
         width: 100%; }

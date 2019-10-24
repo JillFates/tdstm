@@ -121,16 +121,16 @@
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="22" tooltipDataPlacement="bottom"/>
-				
-				<%-- TODO: Fix date-control so that the initial bindings work.--%>
-				<tds-date-control 
-					[(ngModel)]="model.asset.retireDate"
-					labelText="Retire Date"
-					controlName="retireDate"
-					name="modelAssetRetireDate"
-					[tabindex]="23"
-					[value]="model.asset.retireDate">
-				</tds-date-control>
+
+				<div>
+					<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
+					<tds-date-control
+						[(ngModel)]="model.asset.retireDate"
+						name="modelAssetRetireDate"
+						[tabindex]="15"
+						[value]="model.asset.retireDate">
+					</tds-date-control>
+				</div>
 
 				<%-- TODO: Style this --%>
 				<div>
@@ -146,15 +146,15 @@
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
 				
-							<%-- TODO: Fix date-control so that the initial bindings work.--%>
-				<tds-date-control 
-					[(ngModel)]="model.asset.maintExpDate"
-					labelText="Maint Expiration"
-					controlName="maintExpiration"
-					name="modelAssetMaintExpDate"
-					[tabindex]="26"
-					[value]="model.asset.maintExpDate">
-				</tds-date-control>
+				<div>
+					<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
+					<tds-date-control
+						[(ngModel)]="model.asset.maintExpDate"
+						name="modelAssetMaintExpDate"
+						[tabindex]="26"
+						[value]="model.asset.maintExpDate">
+					</tds-date-control>
+				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${asset.latency}" tabindex="27"  ngmodel="model.asset.latency" blankOptionListText="?" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${asset.startupProc}" tabindex="28" ngmodel="model.asset.startupProc" blankOptionListText="?" />
@@ -235,7 +235,7 @@
 				tooltip="Save" 
 				icon="floppy"
 				tabindex="501">
-			</tds-button-save>
+			</tds-button-save> 
 			<tds:hasPermission permission="${Permission.AssetDelete}">
 			<tds-button-delete
 					tooltip="Delete Asset"
