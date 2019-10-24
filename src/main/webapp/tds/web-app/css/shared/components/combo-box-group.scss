@@ -1,5 +1,5 @@
 .combo-group {
-  display: flex;
+//   display: flex;
 
   .k-widget {
     &.k-combobox {
@@ -40,18 +40,6 @@
         background-image: unset;
         color: #0092d1;
       }
-    }
-  }
-
-  .fixed {
-    font-weight: normal;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 10px;
-
-    input {
-      margin-right: 0;
     }
   }
 }

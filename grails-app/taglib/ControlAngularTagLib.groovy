@@ -238,12 +238,10 @@ class ControlAngularTagLib {
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
-		// def tdAttr = " data-for='" + attrs.field.field + "' class='" + attrs.field.imp + "' "
-		
-		out <<= '<clr-input-container>'
+		out << '<div class="clr-form-control">'
 		out << inputLabel(attrs)
 		out << inputControl(attrs)
-		out <<= '</clr-input-container>'
+		out << "</div>"
 	}
 
 	/**

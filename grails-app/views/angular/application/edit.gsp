@@ -47,13 +47,30 @@
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
+				
+				<%-- <div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.environment}" value="${asset.environment}"/>
+					<kendo-dropdownlist #controlSme
+							[tabIndex]="8"
+							name="modelAssetSme"
+							[(ngModel)]="persons.sme"
+							(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+							[defaultItem]="defaultItem"
+							[textField]="'fullName'"
+							[valueField]="'personId'"
+							[data]="getPersonList(${personList as JSON})">
+					</kendo-dropdownlist>
+				</div> --%>
+
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
 				
 				<%-- TODO: Come back and style this. --%>
 				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
-					<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
+					<div style="display: flex">
+						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
+						<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap With SME2"></div>
+					</div>
 					<kendo-dropdownlist  #controlSme2
 						[tabIndex]="12"
 						name="modelAssetSme2"
@@ -73,8 +90,10 @@
 				
 				<%-- TODO: Come back and style this. --%>
 				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
-					<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
+					<div style="display: flex">
+						<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
+						<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap With App Owner"></div>
+					</div>
 					<kendo-dropdownlist
 							[tabIndex]="16"
 							name="modelAssetappOwner"
@@ -174,13 +193,13 @@
 				</div>
 
 				<%-- TODO: Style/fix this --%>
-				<div class="clr-form-control">
+				<clr-input-container>
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
-					<input type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
+					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
 							class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
-					<span>m</span>
-				</div>
+					<span style="margin-left:200px; margin-top: -20px;">m</span>
+				</clr-input-container>
 
 				<%-- TODO: Style/fix this --%>
 				<div class="clr-form-control">
@@ -214,9 +233,8 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-					<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
-					duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
-					<span>m</span>
+					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
+					<span style="margin-left:200px; margin-top: -20px;">m</span>
 				</div>
 
 				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>		
