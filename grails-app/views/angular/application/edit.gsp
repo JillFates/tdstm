@@ -32,7 +32,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}" ngmodel="model.asset.appVersion" tabindex="7"/>
 				
 				<%-- TODO: Come back and style this to look like clarity --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 					<kendo-dropdownlist #controlSme
 							[tabIndex]="8"
@@ -51,7 +51,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
 				
 				<%-- TODO: Come back and style this. --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
 					<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap Contacts"></div>
 					<kendo-dropdownlist  #controlSme2
@@ -72,7 +72,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
 				
 				<%-- TODO: Come back and style this. --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${asset.appOwner}"/>
 					<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap Contacts"></div>
 					<kendo-dropdownlist
@@ -88,7 +88,7 @@
 				</div>
 
 				<%-- TODO: Come back and style this. --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${asset.moveBundle?.id}"/>
 					<kendo-dropdownlist
 						[tabIndex]="17"
@@ -105,7 +105,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
 				
 				<%-- TODO: Come back and style this --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 					<kendo-dropdownlist
 						[tabIndex]="21"
@@ -117,7 +117,7 @@
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${asset.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="22" tooltipDataPlacement="bottom"/>
 
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 					<tds-date-control
 						[(ngModel)]="model.asset.retireDate"
@@ -128,7 +128,7 @@
 				</div>
 
 				<%-- TODO: Style this --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 					<kendo-dropdownlist
 							[tabIndex]="24"
@@ -141,7 +141,7 @@
 				<%-- TODO: Fix proc: see existing application for example --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
 				
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 					<tds-date-control
 						[(ngModel)]="model.asset.maintExpDate"
@@ -160,7 +160,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="30"/>
 				
 				<%-- TODO: Style/fix this --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
 					<tds-combobox-group
 							[model]="model.asset.shutdownBy"
@@ -174,7 +174,7 @@
 				</div>
 
 				<%-- TODO: Style/fix this --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 					<input type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
 							class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
@@ -183,7 +183,7 @@
 				</div>
 
 				<%-- TODO: Style/fix this --%>
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 					<tds-combobox-group
 						[model]="model.asset.startupBy"
@@ -199,7 +199,7 @@
 				<%-- TODO: Fix this --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>			
 					<tds-combobox-group
 							[model]="model.asset.testingBy"
@@ -212,7 +212,7 @@
 					</tds-combobox-group>
 				</div>
 
-				<div>
+				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
 					<input type="text" id="testingDuration" class="${standardFieldSpecs.testingDuration.imp?:''}
 					duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
