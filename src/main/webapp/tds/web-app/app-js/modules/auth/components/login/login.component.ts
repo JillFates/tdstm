@@ -87,6 +87,8 @@ export class LoginComponent implements OnInit {
 	 * Get the Login Information and prepare the store subscriber to redirect the user on a Success Login
 	 */
 	ngOnInit(): void {
+		// TODO : call the /ws/user/updateLastPage sync (no path) -- if success route to the user's preferred page otherwise when error then continue with login process
+
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;

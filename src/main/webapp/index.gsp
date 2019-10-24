@@ -1,3 +1,5 @@
+<%@ page import="com.tdsops.common.grails.ApplicationContextHolder" %>
+<%@ page import="net.transitionmanager.security.SecurityService" %>
 <html>
 <head>
 <title>Welcome to Grails</title>
@@ -19,6 +21,13 @@ each to execute its default action:</p>
 	</g:each>
 </ul>
 </div> -->
-<% response.sendRedirect("module/auth/login"); %>
+<%
+	SecurityService securityService = ApplicationContextHolder.getService('securityService')
+	if (securityService.isLoggedIn()) {
+		response.sendRedirect('/tdstm/module/user/dashboard')
+	} else {
+		response.sendRedirect("module/auth/login?index.gsp=1")
+	}
+%>
 </body>
 </html>

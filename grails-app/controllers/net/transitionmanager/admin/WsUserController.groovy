@@ -360,6 +360,22 @@ class WsUserController implements ControllerMethods {
         renderSuccessJson(person)
     }
 
+	/**
+	 * Update the user's account to record when the last page was requested
+	 * @param path - (String) the uri path of the page routed to
+	 * @return : success json if user is logged in otherwise a error json structure
+	 */
+	@Secured('permitAll')
+	def updateLastPage() {
+		if (securityService.isLoggedIn()) {
+			userService.updateLastPageLoad()
+			renderSuccessJson()
+		} else {
+			// This will
+			renderErrorJson()
+		}
+	}
+
 	@HasPermission(Permission.UserGeneralAccess)
 	def saveDateAndTimePreferences() {
 		Map requestParams = request.JSON

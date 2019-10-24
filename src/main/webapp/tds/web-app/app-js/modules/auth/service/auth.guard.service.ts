@@ -36,6 +36,9 @@ export class AuthGuardService implements CanActivate {
 	 * @param state
 	 */
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+
+		// TODO : Need to call /ws/user/updateLastPage sync with path=... -- if error then route to login
+
 		let requiresLicense: boolean = route.data['requiresLicense'];
 		if (requiresLicense && (!this.userContext.licenseInfo || !this.userContext.licenseInfo.license.isValid)) {
 			this.windowService.getWindow().location.href = '/tdstm/errorHandler/licensing';

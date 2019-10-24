@@ -2,6 +2,7 @@ package net.transitionmanager.admin
 
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
@@ -10,7 +11,6 @@ import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.EmailDispatch
@@ -30,6 +30,8 @@ import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.UserLogin
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 
 @Secured('permitAll')
 class AuthController implements ControllerMethods {
@@ -46,25 +48,27 @@ class AuthController implements ControllerMethods {
 	UserService userService
 	MoveEventService moveEventService
 
+	// SpringSecurity logout handlers that will get injected by Spring and is used below in the signOut method
+	def logoutHandlers
+
 	def index() {
 		if (springSecurityService.loggedIn) {
 			redirectToPrefPage()
-		}
-		else {
-			redirect(uri: '/tdstm/module/auth/login')
+		} else {
+			redirect(uri: securityService.loginUrl())
 		}
 	}
 
+	/**
+	 * This is the legacy login method. If the user is logged already then it will redirect the user to their
+	 * preferred page otherwise will redirect them to the new login form in Angular
+	 * @return
+	 */
 	def login() {
-		// Adding the X-Login-URL header so that we can catch it in Ajax calls
-		response.setHeader('X-Login-URL', '/tdstm/module/auth/login')
-
-		redirect(uri: '/tdstm/module/auth/login')
+		index()
 	}
-
 
 	private void redirectToPrefPage() {
-
 		String uri
 		String startPage = userPreferenceService.getPreference(PREF.START_PAGE)
 		if (userPreferenceService.currentProjectId) {
@@ -99,9 +103,13 @@ class AuthController implements ControllerMethods {
 		redirect(uri: uri)
 	}
 
+	/**
+	 * This is the authorization logout method that will terminate the user's application session and records
+	 * in the audit log that the user signed out. It will redirect the user to the login form at the end.
+	 * @return
+	 */
 	def signOut() {
 		// Log the user out of the application
-
 		if (securityService.loggedIn) {
 			String username = securityService.currentUsername
 			auditService.saveUserAudit(UserAuditBuilder.logout())
@@ -110,60 +118,32 @@ class AuthController implements ControllerMethods {
 
 		// redirect to the uri that the Spring Security logout filter is configured for,
 		// and it will redirect to '/' when it's done
+		Authentication auth = SecurityContextHolder.context.authentication
+		if (auth) {
+			logoutHandlers.each  { handler ->
+				handler.logout(request,response,auth)
+			}
+		}
 
-		redirect uri: SpringSecurityUtils.securityConfig.logout.filterProcessesUrl
+		redirectToLoginForm()
 	}
 
+	/**
+	 * Controller method used to handle any unauthorized requests
+	 * @return
+	 */
 	def unauthorized() {
-
+		// TODO : JPM 10/2019 : Should log to the audit log that a user tried to access something without authorization
 		forward controller: 'errorHandler', action:'unauthorized'
 		// flash.message = 'You do not have permission to access this page.'
 		// redirectToPrefPage()
 	}
 
-	/*
-	 *  Action to navigate the admin control home page
+	// TODO: This should be deleted
+	/**
+	 * This was originally meant to be used to determine if the application was in a maint mode where it was running
+	 * but that end users wouldn't have access. Not sure what the status is of this method as of now JPM 10/2019.
 	 */
-	// TODO: This should be deleted
-	def home() {
-		Date dateNow = TimeUtil.nowGMT()
-		long timeNow = dateNow.time
-		def dateNowSQL = TimeUtil.nowGMTSQLFormat()
-
-		// retrieve the list of 20 usernames with the most recent login times
-		def recentUsers = UserLogin.findAllByLastLoginIsNotNull([sort: 'lastPage', order: 'desc'], [max: 20])
-
-		// retrieve the list of events in progress
-		def moveEventsData = []
-
-		for (MoveEvent moveEvent in MoveEvent.list()) {
-			Map<String, Date> eventTimes = moveEventService.getEventTimes(moveEvent.id)
-			Date eventStart = eventTimes.start
-			Date eventCompletion = eventTimes.completion
-			Long completion = eventCompletion?.time
-			if ((completion && completion < timeNow && completion + thirtyDaysInMS > timeNow)) {
-				MoveEventSnapshot snapshot = MoveEventSnapshot.findByMoveEvent(MoveEvent.list()[3], [sort: 'dateCreated', order: 'desc'])
-				String status = ''
-				Integer dialInd = snapshot?.dialIndicator
-				if (dialInd && dialInd < 25) {
-					status = "Red($dialInd)"
-				}
-				else if (dialInd && dialInd >= 25 && dialInd < 50) {
-					status = "Yellow($dialInd)"
-				}
-				else if (dialInd) {
-					status = "Green($dialInd)"
-				}
-				moveEventsData << [moveEvent: moveEvent, status: status, startTime: eventStart, completionTime: eventCompletion]
-			}
-		}
-		// retrieve the list of 10 upcoming bundles
-		def upcomingBundles = MoveBundle.findAll("FROM MoveBundle WHERE startTime>'$dateNowSQL' ORDER BY startTime", [max: 10])
-
-		[recentUsers: recentUsers, moveEventsList: moveEventsData, upcomingBundles: upcomingBundles]
-	}
-
-	// TODO: This should be deleted
 	def maintMode() {
 		//Do nothing
 	}
@@ -176,7 +156,7 @@ class AuthController implements ControllerMethods {
 	}
 
 	/**
-	 * The 2nd step in the passord reset process.
+	 * The 2nd step in the password reset process.
 	 * This will send the email notice to the user and then redirect them to the login form with a flash message
 	 * explaining the next step.
 	 */

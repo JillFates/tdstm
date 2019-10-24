@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.JsonUtil
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpSession
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
 	AuditService auditService
+	GrailsApplication grailsApplication
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	UserService userService
@@ -91,8 +93,9 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
 
+				String redirectUrl = grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
 				signInInfoMap.notices = [
-					redirectUrl: '/module/auth/login'
+					redirectUrl: redirectUrl
 				]
 			} else {
 				userService.updateLastLogin(userLogin)
