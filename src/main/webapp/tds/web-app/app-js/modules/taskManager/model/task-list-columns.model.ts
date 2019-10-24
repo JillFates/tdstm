@@ -9,7 +9,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		locked: false,
 		resizable: false,
 		sortable: false,
-		headerClass: ['no-sort-header']
+		headerClass: ['no-sort-header', 'action-column']
 	},
 	{
 		label: 'Task',

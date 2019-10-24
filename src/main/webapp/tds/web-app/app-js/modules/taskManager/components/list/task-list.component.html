@@ -142,20 +142,24 @@
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div [ngClass]="{'sortable-column' : (column.type !== 'action' && column.sortable !==	false)}">
+						<div *ngIf="column.type !== 'action'" [ngClass]="{'sortable-column' : (column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
+						<clr-icon *ngIf="column.type === 'action'" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
 					</ng-template>
+
 					<!-- edit action column -->
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 						<div class="is-grid-link tds-action-button-set">
 							<tds-button-edit (click)="onOpenTaskEditHandler(dataItem)"></tds-button-edit>
 						</div>
 					</ng-template>
+
 					<!-- task Number -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>
 						<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)">{{dataItem.taskNumber}}</span>
 					</ng-template>
+
 					<!-- asset name -->
 					<ng-template kendoGridCellTemplate *ngIf="currentCustomColumns[column.property] === 'assetName'"
 											 let-dataItem>
