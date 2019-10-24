@@ -51,6 +51,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
 		'FETCH': 'Fetch',
+		'VIEW_NAME': 'View Name',
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
@@ -129,6 +130,10 @@ export const en_DICTIONARY: Object = {
 			'SYSTEM': 'System',
 		},
 		'SYSTEM_VIEW': 'System View',
+		'SAVE_LIST_VIEW': 'Save List View',
+		'SAVE_IN_MY_VIEWS': 'Save in My Views',
+		'OVERRIDE_EXISTING_VIEW_ME': 'Override Existing View (For me)',
+		'OVERRIDE_EXISTING_VIEW_ALL_USERS': 'Override Existing View (All Users)',
 		'BULK_CHANGE' : {
 			'TITLE' : 'Bulk Change',
 			'EDIT': {
