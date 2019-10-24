@@ -109,15 +109,14 @@ class AuthController implements ControllerMethods {
 	 * @return
 	 */
 	def signOut() {
-		// Log the user out of the application
+		// TODO : JPM 10/2019 : Move this logic into the SecurityService 
 		if (securityService.loggedIn) {
 			String username = securityService.currentUsername
 			auditService.saveUserAudit(UserAuditBuilder.logout())
 			log.info 'User {} just logged out of the application', username
 		}
 
-		// redirect to the uri that the Spring Security logout filter is configured for,
-		// and it will redirect to '/' when it's done
+		// Force the logout of the session by directly interacting with SpringSecurity
 		Authentication auth = SecurityContextHolder.context.authentication
 		if (auth) {
 			logoutHandlers.each  { handler ->
@@ -125,9 +124,9 @@ class AuthController implements ControllerMethods {
 			}
 		}
 
-		// Some reason the url with /tdstm in it gets duplicated with /tdstm/tdstm/...
+		// Redirect the user to the system configured login form
+		// Note - Some reason the url with /tdstm in it gets duplicated with /tdstm/tdstm/...
 		redirect uri: grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
-		// redirectToLoginForm()
 		return
 	}
 
