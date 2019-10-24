@@ -24,6 +24,8 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskCreateComponent} from '../create/task-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
+import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
+import { TaskActionInfoModel } from '../../model/task-action-info.model';
 
 @Component({
 	selector: `task-detail`,
@@ -52,6 +54,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	private hasChanges: boolean;
 	private userContext: UserContextModel;
+	taskActionInfoModel: TaskActionInfoModel;
 
 	constructor(
 		private taskDetailModel: TaskDetailModel,
@@ -66,7 +69,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private userContextService: UserContextService) {
 
 		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});
@@ -127,6 +130,10 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
+		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
+			.subscribe((result: TaskActionInfoModel) => {
+			this.taskActionInfoModel = result;
+		});
 	}
 
 	/**
@@ -134,7 +141,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * @param task
 	 */
 	public openTaskDetail(task: any, modalType: ModalType): void {
-		this.close({commentInstance: {id: task.taskId}, shouldOpenTask: true});
+		this.close({commentInstance: {...task, id: task.taskId}, shouldOpenTask: true});
 	}
 
 	public onCollapseTaskDetail(): void {
@@ -360,4 +367,16 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			});
 	}
 
+	/**
+	 * Opens the action summary modal.
+	 */
+	openTaskActionSummaryDetailHandler(): void {
+		this.dialogService.extra(TaskActionSummaryComponent, [
+			{ provide: TaskDetailModel, useValue: this.taskDetailModel }
+		]).then((result) => {
+			// do nothing, modal was closed;
+		}).catch(result => {
+			// do nothing, modal was closed
+		});
+	}
 }

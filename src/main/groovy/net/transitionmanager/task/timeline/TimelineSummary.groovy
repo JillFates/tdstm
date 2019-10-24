@@ -66,6 +66,10 @@ class TimelineSummary {
 		criticalPathRoutes.remove(criticalPathRoute)
 		addCriticalPathRoute(newCriticalPathRoute)
 	}
+
+	Boolean hasCycles(){
+		return !cycles.isEmpty()
+	}
 }
 /**
  * Route for a critical path results.

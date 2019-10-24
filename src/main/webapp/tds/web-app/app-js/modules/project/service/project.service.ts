@@ -8,25 +8,31 @@ import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
 import {ProjectModel} from '../model/project.model';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 
 @Injectable()
 export class ProjectService {
 
 	private jobProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
 	getProjects(): Observable<any> {
 		return this.http.get(`../ws/project/lists`)
 			.map((response: any) => {
-				response.data.activeProjects.forEach((r) => {
-					r.completionDate = ((r.completionDate) ? new Date(r.completionDate) : '');
-					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
+				response.data.activeProjects.forEach((item: any) => {
+					item.completionDate = item.completionDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.completionDate), DateUtils.SERVER_FORMAT_DATE) : '';
+					item.startDate = item.startDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.startDate), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
-				response.data.completedProjects.forEach((r) => {
-					r.completionDate = ((r.completionDate) ? new Date(r.completionDate) : '');
-					r.startDate = ((r.startDate) ? new Date(r.startDate) : '');
+				response.data.completedProjects.forEach((item: any) => {
+					item.completionDate = item.completionDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.completionDate), DateUtils.SERVER_FORMAT_DATE) : '';
+					item.startDate = item.startDate ?
+						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(item.startDate), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return response.data;
 			})
@@ -60,8 +66,12 @@ export class ProjectService {
 	}
 
 	saveProject(model, originalFilename = '', id = ''): Observable<any> {
-		model['originalFilename'] = originalFilename;
-		return this.http.post(`../ws/project/saveProject/${id}`, model)
+		let postModel = JSON.parse(JSON.stringify(model));
+		postModel['originalFilename'] = originalFilename;
+		postModel['planMethodology'] = postModel.planMethodology.field;
+		postModel['partnerIds'] = postModel.partners.map(p => p.id);
+		postModel['collectMetrics'] = postModel.collectMetrics ? true : false;
+		return this.http.post(`../ws/project/saveProject/${id}`, postModel)
 				.map((response: any) => {
 					return response;
 				})

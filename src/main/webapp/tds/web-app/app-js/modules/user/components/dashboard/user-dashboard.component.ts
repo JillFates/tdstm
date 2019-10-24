@@ -23,6 +23,7 @@ import {DIALOG_SIZE} from '../../../../shared/model/constants';
 import {GridComponent} from '@progress/kendo-angular-grid';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {Store} from '@ngxs/store';
+import {SetProject} from '../../../project/actions/project.actions';
 
 @Component({
 	selector: 'user-dashboard',
@@ -33,6 +34,7 @@ export class UserDashboardComponent implements OnInit {
 	public currentPerson;
 	public selectedProject;
 	public projectInstance;
+	public projectLogoId;
 	public movedayCategories;
 	public projectList;
 	public applicationList;
@@ -90,7 +92,9 @@ export class UserDashboardComponent implements OnInit {
 				this.currentPerson = result.person;
 				this.movedayCategories = result.movedayCategories;
 				this.projectInstance = result.projectInstance;
+				this.projectLogoId = result.projectLogoId;
 				this.selectedProject = this.projectInstance;
+				this.store.dispatch(new SetProject({id: this.projectInstance.id, name: this.projectInstance.name, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
 			});
 		this.applicationColumnModel = new ApplicationColumnModel();
 		this.activePersonColumnModel = new ActivePersonColumnModel();
@@ -123,19 +127,29 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openTaskDetailView(comment: any): void {
+		const currentUserId = (
+			this.userContext &&
+			this.userContext.person &&
+			this.userContext.person
+		) ? this.userContext.person.id : null ;
 		let taskDetailModel: TaskDetailModel = {
 			id: comment.taskId,
 			modal: {
 				title: 'Task Detail'
 			},
 			detail: {
-				currentUserId: 5662
+				currentUserId
 			}
 		};
 		this.dialogService.extra(TaskDetailComponent, [
 			{provide: TaskDetailModel, useValue: taskDetailModel}
-		]).then(() => {
-			this.fetchTasksForGrid();
+		]).then((result) => {
+			if (result && result.shouldOpenTask) {
+				this.openTaskDetailView(result.commentInstance)
+			} else {
+				this.fetchTasksForGrid();
+			}
+
 		}).catch(result => {
 			if (!result) {
 				this.fetchTasksForGrid();

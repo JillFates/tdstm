@@ -28,7 +28,7 @@ export const EventRoute: Routes = [
 			page: {
 				title: 'EVENT.LIST',
 				instruction: '',
-				menu: ['EVENT.EVENTS', 'GLOBAL.LIST']
+				menu: ['PLANNING.PLANNING', 'EVENT.LIST']
 			},
 			requiresAuth: true,
 		},
@@ -48,6 +48,7 @@ export const EventRoute: Routes = [
 				menu: ['EVENT.DASHBOARD', 'EVENT.EVENT']
 			},
 			requiresAuth: true,
+			requiresLicense: true
 		},
 		component: EventDashboardComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]

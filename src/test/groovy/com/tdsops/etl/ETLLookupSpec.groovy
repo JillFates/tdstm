@@ -781,9 +781,8 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		when: 'we set a variable with wrong Convention name'
 			etlProcessor.set("variable")
 
-		then: 'an exception should be thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		when: 'we set a correct variable name'
 			etlProcessor.set "variableVar" with 123
@@ -791,19 +790,11 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		then: 'Variable should be set'
 			etlProcessor.binding.getVariable('variableVar') == 123
 
-		when: 'we set a variable with wrong Convention name'
-			etlProcessor.set("variable")
-
-		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
-
-
 		when: 'we set in a number instead of a variable'
 			etlProcessor.set(123)
 
 		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
+			ETLProcessorException e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
 
 
@@ -837,12 +828,11 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 			Element el = etlProcessor.extract(1)
 
 
-		when: 'we set a variable with wrong Convention name'
+		when: 'we set a variable without ending in Var'
 			el.set 'variable'
 
-		then: 'an exception should be thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		when: 'we set a correct variable name'
 			etlProcessor.set 'variableVar' with 123
@@ -850,20 +840,12 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		then: 'Variable should be set'
 			etlProcessor.binding.getVariable('variableVar') == 123
 
-		when: 'we set a variable with wrong Convention name'
-			el.set 'variable'
-
-		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
-
 		when: 'we set in a number instead of a variable'
 			el.set 123
 
 		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
+			ETLProcessorException e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
-
 
 		when: 'we try to re-establish an already existing variable'
 			el.set 'variableVar' load 'custom1' with 'other Value'
@@ -871,7 +853,6 @@ class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 		then: 'Exception should be trhown due that the variable is already defined'
 			e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
-
 	}
 
 	static final String DependencyDataSetContent = """

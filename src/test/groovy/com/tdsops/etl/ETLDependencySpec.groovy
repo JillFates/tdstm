@@ -65,14 +65,14 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 					extract 'mfg' load 'Manufacturer'
 					extract 'model' load 'Model'
 				
-					set assetResultVar with DOMAIN
+					set assetResult with DOMAIN
 					
-					assert assetResultVar.assetName == 'xraysrv01'
-					assert assetResultVar.Name == 'xraysrv01'
-					assert assetResultVar.manufacturer == 'Dell'
-					assert assetResultVar.Manufacturer == 'Dell'
-					assert assetResultVar.model == 'PE2950'
-					assert assetResultVar.Model == 'PE2950'
+					assert assetResult.assetName == 'xraysrv01'
+					assert assetResult.Name == 'xraysrv01'
+					assert assetResult.manufacturer == 'Dell'
+					assert assetResult.Manufacturer == 'Dell'
+					assert assetResult.model == 'PE2950'
+					assert assetResult.Model == 'PE2950'
 				}
 			""".stripIndent())
 
@@ -125,8 +125,8 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				domain Device
 				iterate {
 					extract 'name' load 'Name'
-					set myVar with DOMAIN
-					domain Application with myVar
+					set variable with DOMAIN
+					domain Application with variable
 				}
 			""".stripIndent())
 
@@ -208,8 +208,8 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				read labels
 				iterate {
 					domain Device
-					extract 'name' load 'Name' set nameVar
-					domain Dependency with nameVar
+					extract 'name' load 'Name' set name
+					domain Dependency with name
 				}
 			""".stripIndent())
 
@@ -252,8 +252,8 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 					domain Task
 					extract 1 load 'comment'
-					set assetVar with DOMAIN
-					domain Dependency with assetVar
+					set asset with DOMAIN
+					domain Dependency with asset
 				}
 			""".stripIndent())
 
@@ -295,9 +295,9 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 					domain Device
 					extract 'name' load 'Name'
-					set dependentVar with DOMAIN
+					set dependent with DOMAIN
 					
-					domain Dependency 'Runs On' dependentVar
+					domain Dependency 'Runs On' dependent
 				}
 			""".stripIndent())
 
@@ -339,13 +339,13 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 					domain Device
 					extract 'name' load 'Name'
-					set assetVar with DOMAIN
+					set asset with DOMAIN
 					
 					domain Task
 					extract 1 load 'comment'
-					set dependentVar with DOMAIN
+					set dependent with DOMAIN
 					
-					domain Dependency with assetVar 'Runs On' dependentVar
+					domain Dependency with asset 'Runs On' dependent
 				}
 			""".stripIndent())
 
@@ -392,13 +392,13 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 					domain Device
 					extract 'name' load 'Name'
-					set assetVar with DOMAIN
+					set asset with DOMAIN
 					
 					domain Task
 					extract 1 load 'comment'
-					set dependentVar with DOMAIN
+					set dependent with DOMAIN
 					
-					domain Dependency with assetVar '${dependencyType.value}' dependentVar
+					domain Dependency with asset '${dependencyType.value}' dependent
 				}
 			""".stripIndent())
 
@@ -454,30 +454,30 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 				
 					domain Device
-					extract 'name' load 'Name' set nameVar
-					extract 'mfg' load 'Manufacturer' set mfgVar
-					extract 'model' load 'Model' set modelVar
+					extract 'name' load 'Name' set name
+					extract 'mfg' load 'Manufacturer' set mfg
+					extract 'model' load 'Model' set model
 					
-					find Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar and 'Model' eq modelVar into 'id'
-					elseFind Device by 'Name' eq nameVar and 'Manufacturer' eq mfgVar into 'id'
-					elseFind Device by 'Name' eq nameVar and 'Model' eq modelVar into 'id'
-					elseFind Device by 'Name' eq nameVar into 'id'
+					find Device by 'Name' eq name and 'Manufacturer' eq mfg and 'Model' eq model into 'id'
+					elseFind Device by 'Name' eq name and 'Manufacturer' eq mfg into 'id'
+					elseFind Device by 'Name' eq name and 'Model' eq model into 'id'
+					elseFind Device by 'Name' eq name into 'id'
 					
-					set assetVar with DOMAIN
+					set asset with DOMAIN
 					
 					domain Application
-					extract 'vendor name' load 'Vendor' set vendorVar
-					extract 'technology' load 'Technology' set appTechVar
-					extract 'url' load 'URL' set urlVar
+					extract 'vendor name' load 'Vendor' set vendor
+					extract 'technology' load 'Technology' set appTech
+					extract 'url' load 'URL' set url
 					
-					find Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar and 'URL' eq urlVar into 'id'
-					elseFind Application by 'Vendor' eq vendorVar and 'Technology' eq appTechVar into 'id'
-					elseFind Application by 'Vendor' eq vendorVar and 'URL' eq urlVar into 'id'
-					elseFind Application by 'Vendor' eq vendorVar into 'id'
+					find Application by 'Vendor' eq vendor and 'Technology' eq appTech and 'URL' eq url into 'id'
+					elseFind Application by 'Vendor' eq vendor and 'Technology' eq appTech into 'id'
+					elseFind Application by 'Vendor' eq vendor and 'URL' eq url into 'id'
+					elseFind Application by 'Vendor' eq vendor into 'id'
 					
-					set dependentVar with DOMAIN
+					set dependent with DOMAIN
 					
-					domain Dependency with assetVar '${dependencyType.value}' dependentVar
+					domain Dependency with asset '${dependencyType.value}' dependent
 				}
 			""".stripIndent())
 
@@ -634,31 +634,31 @@ class ETLDependencySpec extends ETLBaseSpec implements DataTest {
 				iterate {
 					// Process Application
 					domain Application
-					extract 'application' load 'Name' set appNameVar
+					extract 'application' load 'Name' set appName
 					extract 'vendor' load 'appVendor'
 				
-					find Application by 'Name' eq appNameVar and 'Vendor' eq 'Microsoft' into 'id'
-					elseFind Application by 'Name' eq appNameVar into 'id'
+					find Application by 'Name' eq appName and 'Vendor' eq 'Microsoft' into 'id'
+					elseFind Application by 'Name' eq appName into 'id'
 				
-					set assetResultVar with DOMAIN
+					set assetResult with DOMAIN
 				
 					// Process Server
 					domain Device
-					extract 'server_name' load 'Name' set srvNameVar
-					extract 'manufacturer' load 'Manufacturer' set mfgNameVar
-					extract 'model' load 'Model' set modelNameVar
-					extract 'server_guid' load 'externalRefId' set extRefIdVar
+					extract 'server_name' load 'Name' set srvName
+					extract 'manufacturer' load 'Manufacturer' set mfgName
+					extract 'model' load 'Model' set modelName
+					extract 'server_guid' load 'externalRefId' set extRefId
 				
-					find Device by 'externalRefId' eq extRefIdVar into 'id' 
-					elseFind Device by 'Name' eq srvNameVar and 'Manufacturer' eq mfgNameVar and 'Model' eq modelNameVar into 'id'
-					elseFind Device by 'Name' eq srvNameVar and 'Manufacturer' eq mfgNameVar into 'id'
-					elseFind Device by 'Name' eq srvNameVar and 'Model' eq modelNameVar into 'id'
-					elseFind Device by 'Name' eq srvNameVar into 'id'
+					find Device by 'externalRefId' eq extRefId into 'id' 
+					elseFind Device by 'Name' eq srvName and 'Manufacturer' eq mfgName and 'Model' eq modelName into 'id'
+					elseFind Device by 'Name' eq srvName and 'Manufacturer' eq mfgName into 'id'
+					elseFind Device by 'Name' eq srvName and 'Model' eq modelName into 'id'
+					elseFind Device by 'Name' eq srvName into 'id'
 				
-					set dependentResultVar with DOMAIN
+					set dependentResult with DOMAIN
 				
 					// Process Dependency with improved domain command
-					domain Dependency with assetResultVar '${dependencyType.value}' dependentResultVar
+					domain Dependency with assetResult '${dependencyType.value}' dependentResult
 				
 					load 'comment' with 'This is pretty cool eh?'
 				}

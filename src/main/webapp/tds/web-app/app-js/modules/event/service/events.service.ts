@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {pathOr} from 'ramda'
@@ -13,6 +13,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 
 /**
  * @name EventsService
@@ -44,7 +45,8 @@ export class EventsService {
 	];
 
 	// Resolve HTTP using the constructor
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
 	/**
@@ -228,11 +230,12 @@ export class EventsService {
 		return this.http.get(`../ws/moveEvent/list`)
 			.map((response: any) => {
 				let eventModels = response && response.status === 'success' && response.data;
+				let userTimeZone = this.preferenceService.getUserTimeZone();
 				eventModels.forEach((r) => {
 					r.estStartTime =  r.estStartTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estStartTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estStartTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 					r.estCompletionTime =  r.estCompletionTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estCompletionTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estCompletionTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return eventModels;
 			})
@@ -266,7 +269,7 @@ export class EventsService {
 		for (i = 0; i < postObject.tagIds.length; i++) {
 			postObject.tagIds[i] = postObject.tagIds[i].id;
 		}
-		return this.http.post(`../ws/moveEvent/saveEvent/${id}`, JSON.stringify(postObject))
+		return this.http.post(`../ws/moveEvent/save/${id}`, JSON.stringify(postObject))
 			.map((response: any) => {
 				return response;
 			})
@@ -274,7 +277,7 @@ export class EventsService {
 	}
 
 	deleteEvent(id): Observable<any> {
-		return this.http.delete(`../ws/moveEvent/deleteEvent/${id}`)
+		return this.http.delete(`../ws/moveEvent/delete/${id}`)
 			.map((response: any) => {
 				return response;
 			})

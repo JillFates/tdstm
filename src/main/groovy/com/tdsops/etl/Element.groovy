@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
  * </pre>
  */
 @Slf4j(value = 'logger')
-class Element implements RangeChecker, ETLCommand {
+class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidator {
 
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
 	public static final String DECIMAL_FORMAT = "#0.00"
@@ -601,13 +601,14 @@ class Element implements RangeChecker, ETLCommand {
 	}
 
 	/**
-	 * prefix a value and load it into a field
-	 * @param el
-	 * @return
+	 * Prefix a value and load it into a field
+	 * @param prefixValue
+	 * @return the element instance that received this command
 	 */
-	Element prepend(Object el) {
-		if (el) {
-			this.value = String.valueOf(el) + this.toString()
+	Element prepend(Object prefixValue) {
+		if (prefixValue) {
+			checkUndefinedLocalVariable(prefixValue)
+			this.value = String.valueOf(prefixValue) + this.toString()
 		}
 
 		return this
@@ -789,10 +790,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return
 	 */
 	Element set(Object variableName) {
-		if (!(variableName instanceof String) ||
-			processor.hasVariable(variableName) ||
-			!processor.binding.isValidETLVariableName(variableName)
-		) {
+		if (!(variableName instanceof String) || processor.hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 
@@ -837,6 +835,7 @@ class Element implements RangeChecker, ETLCommand {
 	 * @return current instance of Element class
 	 */
 	Element concat(String separator, Object... values) {
+		checkUndefinedLocalVariables(values)
 		this.value = ETLTransformation.concat(separator, this.value, values)
 		checkLoadedElement()
 		return this

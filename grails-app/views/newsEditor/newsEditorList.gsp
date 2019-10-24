@@ -385,6 +385,7 @@ $('#reportsMenu').hide();
 						var moveBundle = '${bundleId}';
 
 						$("#newsAndIssuesList").kendoGrid({
+							resizable:true,
 							toolbar: kendo.template('<button type="button" class="btn btn-default action-toolbar-btn" onClick=\"openCreateNewsDialog()\"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create News</button> <div onclick="loadNewsAndIssuesList()" class="action-toolbar-refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>'),
 							dataSource: {
 								type: "json",

@@ -20,7 +20,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.search.AssetCommentQueryBuilder
+import net.transitionmanager.search.TaskQueryBuilder
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
@@ -439,7 +439,8 @@ class CommentService implements ServiceMethods {
 					cssClass: css,
 					statusCss: taskService.getCssClassForStatus(assetComment.status),
 					assignedToName: assetComment.assignedTo ? (assetComment.assignedTo.firstName + " " + assetComment.assignedTo.lastName): "",
-					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13)
+					lastUpdatedDate: TimeUtil.formatDateTime(assetComment.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13),
+					lastUpdatedTimePassed: TimeUtil.elapsed(assetComment.lastUpdated)
 				]
 
 				// Now refine if the task should be sent based on it being new or updated
@@ -867,7 +868,7 @@ class CommentService implements ServiceMethods {
 			params['viewUnpublished'] = false
 		}
 
-		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder)
+		TaskQueryBuilder queryBuilder = new TaskQueryBuilder(project, params, sortIndex, sortOrder)
 		Map queryInfo = queryBuilder.buildQueries()
 
 		if (!queryInfo.invalidCriterion) {

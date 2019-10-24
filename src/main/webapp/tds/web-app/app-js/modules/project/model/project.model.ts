@@ -4,7 +4,7 @@ export class ProjectModel {
 	public description: string;
 	public startDate: Date;
 	public completionDate: Date;
-	public partnerIds: number[];
+	public partners: any[];
 	public projectLogo: any;
 	public projectManagerId: number;
 	public projectCode: string;
@@ -13,8 +13,8 @@ export class ProjectModel {
 	public defaultBundle: any;
 	public defaultBundleName: string;
 	public timeZone: string;
-	public collectMetrics: boolean;
-	public planMethodology: string;
+	public collectMetrics: number;
+	public planMethodology: any;
 }
 
 export class ProjectColumnModel {

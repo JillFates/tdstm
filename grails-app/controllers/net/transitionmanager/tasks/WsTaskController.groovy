@@ -134,7 +134,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 
 	/**
 	 * Sign a Provided Message using the QZCertificate
-	 * @see https://qz.io/wiki/2.0-signing-messages
+	 * @see "https://qz.io/wiki/2.0-signing-messages"
 	 */
 	@HasPermission(Permission.TaskSignMessage)
 	def qzSignMessage() {
@@ -279,15 +279,42 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	def listTasks(ListTaskCommand params) {
 		validateCommandObject(params)
 		Map<String, String> definedSortableFields = [
-			'taskNumber'      : 'taskNumber',
-			'comment'         : 'comment',
-			'assetName'       : 'assetName',
-			'dueDate'         : 'dueDate',
-			'status'          : 'status',
-			'assignedTo'      : 'assignedTo',
-			'instructionsLink': 'instructionsLink',
-			'category'        : 'category',
-			'score'           : 'score'
+				'actFinish'         : 'actFinish',
+				'actStart'          : 'actStart',
+				'apiAction'         : 'apiAction',
+				'assetName'         : 'assetName',
+				'assetType'         : 'assetType',
+				'assignedTo'        : 'assignedTo',
+				'bundle'            : 'bundle',
+				'category'          : 'category',
+				'comment'           : 'comment',
+				'createdBy'         : 'createdBy',
+				'dateCreated'       : 'dateCreated',
+				'dateResolved'      : 'dateResolved',
+				'dueDate'           : 'dueDate',
+				'duration'          : 'duration',
+				'durationScale'     : 'durationScale',
+				'estFinish'         : 'estFinish',
+				'estStart'          : 'estStart',
+				'event'             : 'event',
+				'hardAssigned'      : 'hardAssigned',
+				'instructionsLink'  : 'instructionsLink',
+				'isCriticalPath'    : 'isCriticalPath',
+				'isPublished'       : 'isPublished',
+				'lastUpdated'       : 'lastUpdated',
+				'latestFinish'      : 'latestFinish',
+				'latestStart'       : 'latestStart',
+				'percentageComplete': 'percentageComplete',
+				'priority'          : 'priority',
+				'role'              : 'role',
+				'score'             : 'score',
+				'sendNotification'  : 'sendNotification',
+				'slack'				: 'slack',
+				'status'            : 'status',
+				'statusUpdated'     : 'statusUpdated',
+				'taskNumber'        : 'taskNumber',
+				'taskSpec'          : 'taskSpec',
+				'updatedTime'       : 'statusUpdated'
 		].withDefault { key -> '' }
 
 		Project project = getProjectForWs()
@@ -300,6 +327,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		Integer offset = paginationRowOffset(currentPage, maxRows)
 
 		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
+		userPreferenceService.setPreference(UserPreferenceEnum.MY_TASK, params.justMyTasks)
 		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
 		userPreferenceService.setMoveEventId params.moveEvent
 

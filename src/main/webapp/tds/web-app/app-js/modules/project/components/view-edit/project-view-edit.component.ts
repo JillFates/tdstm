@@ -18,6 +18,7 @@ import {ApiResponseModel} from '../../../../shared/model/ApiResponseModel';
 import {Store} from '@ngxs/store';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {SetProject} from '../../actions/project.actions';
+import {DateUtils} from '../../../../shared/utils/date.utils';
 
 @Component({
 	selector: `project-view-edit-component`,
@@ -36,7 +37,6 @@ export class ProjectViewEditComponent implements OnInit {
 	public possiblePartners;
 	public possibleManagers;
 	public availableBundles;
-	public partnerKey = {};
 	public projectId;
 	public projectLogoId;
 	public projectGUID;
@@ -45,6 +45,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public canEditProject;
 	public editing = false;
 	protected userTimeZone: string;
+	protected userDateFormat: string;
 	public file = new KendoFileUploadBasicConfig();
 	public fetchResult: any;
 	public transformResult: ApiResponseModel;
@@ -74,7 +75,7 @@ export class ProjectViewEditComponent implements OnInit {
 			description: '',
 			startDate: new Date(),
 			completionDate: new Date(),
-			partnerIds: [],
+			partners: [],
 			projectLogo: '',
 			projectManagerId: 0,
 			projectCode: '',
@@ -82,10 +83,11 @@ export class ProjectViewEditComponent implements OnInit {
 			comment: '',
 			defaultBundleName: 'TBD',
 			timeZone: '',
-			collectMetrics: true,
-			planMethodology: ''
+			collectMetrics: 1,
+			planMethodology: {field: '', label: 'Select...'}
 		};
 		this.userTimeZone = this.preferenceService.getUserTimeZone();
+		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
 		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
 		this.file.uploadRestrictions = {
 			allowedExtensions: ['.jpg', '.png', '.gif'],
@@ -97,17 +99,17 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	// This is a work-around for firefox users
-	onOpenStartDatePicker (event) {
+	onOpenStartDatePicker (event): void {
 		event.preventDefault();
 		this.startDatePicker.toggle();
 	}
 
-	onOpenCompletionDatePicker (event) {
+	onOpenCompletionDatePicker (event): void {
 		event.preventDefault();
 		this.completionDatePicker.toggle();
 	}
 
-	public confirmDeleteProject() {
+	public confirmDeleteProject(): void {
 		this.promptService.open(
 			'Confirmation Required',
 			'WARNING: Are you sure you want to delete this project? This cannot be undone.', 'Confirm', 'Cancel')
@@ -119,7 +121,7 @@ export class ProjectViewEditComponent implements OnInit {
 			.catch((error) => console.log(error));
 	}
 
-	private deleteProject() {
+	private deleteProject(): void {
 		this.projectService.deleteProject(this.projectId)
 			.subscribe((result) => {
 				if (result.status === 'success') {
@@ -128,45 +130,49 @@ export class ProjectViewEditComponent implements OnInit {
 			});
 	}
 
-	public switchToEdit() {
+	public switchToEdit(): void {
 		this.editing = true;
 	}
 
-	private getModel(id) {
+	private getModel(id): void {
 		this.projectService.getModelForProjectViewEdit(id)
 			.subscribe((result) => {
 				let data = result.data;
 				let projectModel = this.projectModel;
 				// Fill the model based on the current person.
 				Object.keys(data.projectInstance).forEach((key) => {
-					if (key in projectModel && data.projectInstance[key]) {
+					if (key in projectModel && data.projectInstance[key] !== null) {
 						projectModel[key] = data.projectInstance[key];
 					}
 				});
 				this.projectModel = projectModel;
 				this.possiblePartners = data.possiblePartners;
-				data.possiblePartners.forEach((partner) => {
-					this.partnerKey[partner.id] = partner.name;
-				});
 
 				data.projectPartners.forEach((partner) => {
-					this.projectModel.partnerIds.push(partner.id);
+					this.projectModel.partners.push({id: partner.id, name: partner.name});
 				});
 
-				this.planMethodologies = [];
-				data.planMethodologies.forEach((methodology) => {
-					this.planMethodologies.push(methodology.label);
-				});
-
+				this.planMethodologies = data.planMethodologies ? data.planMethodologies : [];
 				this.possibleManagers = data.possibleManagers ? data.possibleManagers : [];
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
 				this.client = data.client;
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
-				this.projectModel.startDate = new Date(this.projectModel.startDate);
-				this.projectModel.completionDate = new Date(this.projectModel.completionDate);
-				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
+				this.projectModel.startDate = this.projectModel.startDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate)) : null
+				if (this.projectModel.startDate) {
+					this.projectModel.startDate.setHours(0, 0, 0, 0);
+				}
+				this.projectModel.completionDate = this.projectModel.completionDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate)) : null;
+				if (this.projectModel.completionDate) {
+					this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				}
+				let methodologyField = data.projectInstance ? data.projectInstance.planMethodology : '';
+				this.planMethodologies.forEach((methodology) => {
+					if (methodology.field === methodologyField) {
+						this.projectModel.planMethodology = methodology;
+					}
+				});
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
@@ -182,7 +188,7 @@ export class ProjectViewEditComponent implements OnInit {
 			});
 	}
 
-	private updateSavedFields() {
+	private updateSavedFields(): void {
 		this.savedModel = JSON.parse(JSON.stringify(this.projectModel));
 
 		this.clients.forEach((client) => {
@@ -192,8 +198,16 @@ export class ProjectViewEditComponent implements OnInit {
 		});
 	}
 
-	public saveForm() {
-		if (this.validateRequiredFields(this.projectModel)) {
+	public saveForm(): void {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
+			if (this.projectModel.startDate) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+			}
+			if (this.projectModel.completionDate) {
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
@@ -228,10 +242,13 @@ export class ProjectViewEditComponent implements OnInit {
 		return returnVal;
 	}
 
-	openTimezoneModal() {
+	openTimezoneModal(): void {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: true
+		}, {
+			provide: String,
+			useValue: this.projectModel.timeZone
 		}]).then(result => {
 			this.projectModel.timeZone = result.timezone;
 		}).catch(result => {
@@ -268,7 +285,7 @@ export class ProjectViewEditComponent implements OnInit {
 		this.clearFilename();
 	}
 
-	public completeEventHandler(e: SuccessEvent) {
+	public completeEventHandler(e: SuccessEvent): void {
 		let response = e.response.body.data;
 		if (response && response.operation === 'delete') { // file deleted successfully
 			this.clearFilename();
@@ -285,11 +302,21 @@ export class ProjectViewEditComponent implements OnInit {
 		}
 	}
 
-	private clearFilename(e?: any) {
+	private clearFilename(e?: any): void {
 		this.fetchResult = null;
 	}
 
-	onDeleteLogo() {
+	/**
+	 * Handling for partner selection
+	 * @param partner - The partner to modify
+	 * @param selection - The event (Object that will be used to modify the selected partner)
+	 */
+	public onPartnerSelectionChange(partner: any, selection: any): void {
+		partner.id = selection.id;
+		partner.name = selection.name;
+	}
+
+	public onDeleteLogo(): void {
 		this.projectLogoId = 0;
 		this.projectModel.projectLogo = null;
 	}

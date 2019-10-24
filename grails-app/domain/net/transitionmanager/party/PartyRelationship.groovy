@@ -24,6 +24,8 @@ class PartyRelationship implements Serializable {
 
 	static mapping = {
 		version false
+		partyIdFrom fetch: 'join', lazy: false
+		partyIdTo fetch: 'join', lazy: false
 		id composite: ['partyRelationshipType', 'partyIdFrom', 'partyIdTo', 'roleTypeCodeFrom', 'roleTypeCodeTo'],
 		   generator: 'assigned', unique: true
 		columns {

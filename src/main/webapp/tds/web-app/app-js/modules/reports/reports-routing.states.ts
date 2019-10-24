@@ -97,7 +97,7 @@ export const ReportsRoute: Routes = [
 			page: {
 				title: 'REPORTS.TASK_REPORT',
 				instruction: '',
-				menu: ['REPORTS.REPORT', 'REPORTS.TASK_REPORT'],
+				menu: ['REPORTS.REPORTS', 'REPORTS.TASK_REPORT'],
 				topMenu: { parent: TOP_MENU_PARENT_REPORT_SECTION, child: 'menu-reports-task-report', subMenu: true }
 			},
 			requiresAuth: true,

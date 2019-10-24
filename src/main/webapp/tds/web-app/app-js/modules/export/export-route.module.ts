@@ -4,7 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 // Resolves
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 // Components
-import {ExportComponent} from './components/export/export.component';
+import {ExportAssetComponent} from './components/export-asset/export-asset.component';
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 
 /**
@@ -12,30 +12,30 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
  * @class
  * @classdesc To use externally to reference possible state of the Auth Module
  */
-export class AssetExportRouteState {
+export class ExportRouteState {
 	public static readonly ASSET_EXPORT = {
-		url: 'export'
+		url: 'assets'
 	};
 }
 
-export const AssetExportRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: AssetExportRouteState.ASSET_EXPORT.url},
+export const ExportRoute: Routes = [
+	{path: '', pathMatch: 'full', redirectTo: ExportRouteState.ASSET_EXPORT.url},
 	{
-		path: AssetExportRouteState.ASSET_EXPORT.url,
+		path: ExportRouteState.ASSET_EXPORT.url,
 		data: {
 			page: {
-				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: []
+				title: 'ASSET_EXPORT.ASSET_EXPORT', instruction: '', menu: ['ASSETS.ASSETS', 'ASSET_EXPORT.ASSET_EXPORT']
 			}
 		},
-		component: ExportComponent,
+		component: ExportAssetComponent,
 		canActivate: [AuthGuardService, ModuleResolveService]
 	},
 ];
 
 @NgModule({
 	exports: [RouterModule],
-	imports: [RouterModule.forChild(AssetExportRoute)]
+	imports: [RouterModule.forChild(ExportRoute)]
 })
 
-export class AssetExportRouteModule {
+export class ExportRouteModule {
 }

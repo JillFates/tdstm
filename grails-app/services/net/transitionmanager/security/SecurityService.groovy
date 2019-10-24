@@ -1248,11 +1248,17 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			if (params.expiryDate) {
 				dateField = 'Expiry'
 				userLogin.expiryDate = TimeUtil.parseDateTime((String) params.expiryDate)
+			} else {
+				userLogin.expiryDate = null
 			}
+
 
 			if (params.passwordExpirationDate) {
 				dateField = 'Password Expiration'
 				userLogin.passwordExpirationDate = TimeUtil.parseDateTime((String) params.passwordExpirationDate)
+			} else {
+				userLogin.passwordExpirationDate = null
+				userLogin.passwordNeverExpires = true
 			}
 
 			// TODO : should changing the locked out until be allowed?

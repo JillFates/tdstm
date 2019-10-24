@@ -30,7 +30,6 @@ class ETLScriptsDetailsPage extends Page{
 
     def clickOnXButton(){
         waitFor{dsDetailXIcon.click()}
-        commonsModule.waitForDialogModalHidden()
     }
 
     def clickOnEditButton(){

@@ -14,7 +14,6 @@ import {NotifierService} from '../../../../services/notifier.service';
 import {UserContextModel} from '../../../../../modules/auth/model/user-context.model';
 import {PersonModel} from '../../../../components/add-person/model/person.model';
 import {PasswordChangeModel} from '../../model/password-change.model';
-import {DIALOG_SIZE} from '../../../../model/constants';
 import {PageMetadataModel} from '../../model/page-metadata.model';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
@@ -85,6 +84,9 @@ export class HeaderComponent {
 		this.dialogService.extra(UserDateTimezoneComponent, [{
 			provide: Boolean,
 			useValue: false
+		}, {
+			provide: String,
+			useValue: ''
 		}]).catch(result => {
 			console.log('Dismissed Dialog');
 		});

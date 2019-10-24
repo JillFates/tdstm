@@ -1,3 +1,5 @@
+package version.v5_0_0
+
 databaseChangeLog = {
 
 	changeSet(author: 'tpelletier', id: '20190920 TM-15923-1') {

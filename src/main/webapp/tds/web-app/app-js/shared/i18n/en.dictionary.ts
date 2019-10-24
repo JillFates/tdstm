@@ -71,7 +71,9 @@ export const en_DICTIONARY: Object = {
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
 		},
-		'TOTAL': 'Total'
+		'TOTAL': 'Total',
+		'TIMEZONE': 'Time Zone Select',
+		'DATE_FORMAT': 'Date Format'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -145,7 +147,7 @@ export const en_DICTIONARY: Object = {
 		}
 	},
 	'ASSET_EXPORT': {
-		'ASSET_EXPORT': 'Asset Export',
+		'ASSET_EXPORT': 'Export Assets',
 		'SELECT_BUNDLE': 'Select one or more bundles:',
 		'CHOOSE_ITEM': 'Select one or more items to export:',
 		'EXPORT_BUTTON': 'Export Excel',
@@ -205,7 +207,8 @@ export const en_DICTIONARY: Object = {
 				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',
 				'TRANSFORMED_DATA_PREVIEW': 'Transformed Data Preview',
 				'SYNTAX_ERRORS': 'Syntax Errors',
-				'ETL_BUILDER_TITLE': 'ETL Script Designer',
+				'ETL_BUILDER_TITLE': 'ETL Script Edit',
+				'ETL_SCRIPT_EDIT_BUTTON': 'Edit Script',
 				'CONSOLE_TITLE': 'ETL Console',
 				'SAMPLE_DATA_TITLE': 'Sample Data',
 				'TEST': 'Test',
@@ -250,6 +253,7 @@ export const en_DICTIONARY: Object = {
 		'APPLICATION_EVENT_RESULTS': 'Application Event Results'
 	},
 	'PLANNING': {
+		'DASHBOARD': 'Dashboard',
 		'PLANNING': 'Planning',
 		'PRE_EVENT_CHECKLIST': 'Pre-Event Checklist',
 		'BUNDLES': {
@@ -260,10 +264,7 @@ export const en_DICTIONARY: Object = {
 	'PROJECTS': 'Projects',
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
-		'WARNING_VALIDATION_CHANGE': `Changing the validation on a custom field can have adverse effects if
-		the existing data falls outside the new validation ranges.
-		Please proceed with caution, press Confirm to proceed and change the validation settings,
-		or press Cancel to make no changes.`,
+		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,
 		'ASSET_FIELD_SETTING': 'Asset Field Settings',
 		'FIELD_NO_LONGER_EXISTS_ON_DOMAIN': 'Field no longer exists on domain',
 		'ENTER_FIELD_NAME_FILTER': 'Filter by field or label',
@@ -399,6 +400,7 @@ export const en_DICTIONARY: Object = {
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',
 		'NOTICES': 'Notices',
+		'NOTICE_LIST': 'Notice List',
 		'VIEW_HTML': 'View HTML',
 		'AGREEMENT': 'By clicking Accept, you are agreeing to the terms above.',
 		'DO_NOT_SHOW_AGAIN': 'Don\'t show again',

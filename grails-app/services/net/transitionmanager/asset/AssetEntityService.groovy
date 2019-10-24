@@ -1447,7 +1447,7 @@ class AssetEntityService implements ServiceMethods {
 		def assetComment
 		// TODO : JPM 7/2017 : getCommonModelForShows - determine what this AssetComment logic is doing as it looks obsolete
 		if (AssetComment.executeQuery('select count(*) from AssetComment ' +
-			'where assetEntity=?0 and commentType=? and dateResolved=?',
+			'where assetEntity=?0 and commentType=?1 and dateResolved=?2',
 			[assetEntity, 'issue', null])[0])
 		{
 			assetComment = "issue"
@@ -1481,7 +1481,8 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[   assetId: assetEntity?.id,
+		[
+			assetId: assetEntity?.id,
 		    assetComment: assetComment,
 		    assetCommentList: assetCommentList,
 		    dateFormat: userPreferenceService.getDateFormat(),
@@ -3154,7 +3155,9 @@ class AssetEntityService implements ServiceMethods {
 				dependency: dependencyA?.toMap(),
 				dependencyClass: dependencyA?.dependent?.assetClass,
 				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
-				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter),
+				createdBy: dependencyA?.createdBy,
+				updatedBy: dependencyA?.updatedBy
 			],
 			assetB: [
 				name: assetB.assetName,
@@ -3165,7 +3168,9 @@ class AssetEntityService implements ServiceMethods {
 				dependency: dependencyB?.toMap(),
 				dependencyClass: dependencyB?.dependent?.assetClass,
 				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
-				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter),
+				createdBy: dependencyB?.createdBy,
+				updatedBy: dependencyB?.updatedBy,
 			],
 			dataFlowFreq: GormUtil.getConstrainedProperties(AssetDependency).dataFlowFreq.inList,
 			dependencyType: entityInfo(project).dependencyType,

@@ -29,7 +29,7 @@ class CreateEventCommand implements CommandObject{
 	String  runbookBridge2
 	String  videolink
 	Date estCompletionTime = null
-	Date    estStartTime = null
+	Date estStartTime = null
 	Boolean apiActionBypass  = true
 
 	static constraints = {
