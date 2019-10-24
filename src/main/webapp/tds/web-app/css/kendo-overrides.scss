@@ -8,16 +8,16 @@ kendo-list {
         padding: 0px 2px 1px;
         min-height: 1.2em;
         overflow-x: hidden;
-      }
 
-      .k-item.k-state-selected {
-        color: white;
-        background-color: #0092d1;
-      }
+        &.k-state-selected {
+          color: white;
+          background-color: #0092d1;
+        }
 
-      .k-item.k-state-focused {
-        box-shadow: unset;
-        -webkit-box-shadow: unset;
+        &.k-state-focused {
+          box-shadow: unset;
+          -webkit-box-shadow: unset;
+        }
       }
     }
   }
@@ -33,10 +33,16 @@ kendo-dropdownlist {
     width: 220px;
 
     .k-dropdown-wrap {
-      border-color: unset;
-      color: black;
       border: unset;
+      color: black;
       border-bottom: 1px solid #999;
+
+      &.k-state-focused {
+        -webkit-box-shadow: unset;
+        box-shadow: unset;
+        border: unset;
+        border-bottom: 1px solid #0092d1;
+      }
 
       &:hover {
         border: unset;
@@ -51,13 +57,6 @@ kendo-dropdownlist {
       .k-icon {
         color: #0092d1;
       }
-    }
-
-    .k-dropdown-wrap.k-state-focused {
-      -webkit-box-shadow: unset;
-      box-shadow: unset;
-      border: unset;
-      border-bottom: 1px solid #0092d1;
     }
   }
 }

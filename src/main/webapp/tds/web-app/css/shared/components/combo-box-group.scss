@@ -1,0 +1,69 @@
+.combo-group {
+  display: flex;
+
+  .k-widget {
+    &.k-combobox {
+      width: 220px;
+    }
+  }
+
+  .k-combobox {
+    .k-dropdown-wrap {
+      border: unset;
+      color: black;
+      border-bottom: 1px solid #999;
+
+      &.k-state-focused {
+        -webkit-box-shadow: unset;
+        box-shadow: unset;
+        border: unset;
+        border-bottom: 1px solid #0092d1;
+      }
+
+      .k-i-close::before,
+      .k-i-group-delete::before {
+		margin-right: -30px;
+      }
+    }
+
+    .k-select {
+      border-color: unset;
+      background-color: unset;
+      background-image: unset;
+      color: #0092d1;
+      position: absolute;
+      right: 0px;
+      bottom: 2px;
+
+      &:hover {
+        background-color: unset;
+        background-image: unset;
+        color: #0092d1;
+      }
+    }
+  }
+
+  .fixed {
+    font-weight: normal;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+
+    input {
+      margin-right: 0;
+    }
+  }
+}
+
+.combo-group-category {
+  font-weight: bold;
+}
+
+.combo-group-item {
+  margin-left: 10px;
+}
+
+.combo-group-open {
+  width: 250px;
+}

@@ -192,6 +192,7 @@
 					</tds-combobox-group>
 				</div>
 
+				<%-- TODO: Fix this --%>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
 				<div>
@@ -213,8 +214,8 @@
 					duration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
 					<span>m</span>
 				</div>
-				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
-				
+
+				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>		
 			</div>	
 			<g:render template="/angular/common/assetTagsEdit"></g:render>
 			<tds-supports-depends (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>	
