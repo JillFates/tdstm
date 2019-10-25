@@ -14,6 +14,7 @@ import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { IntlModule } from '@progress/kendo-angular-intl';
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { GridModule } from '@progress/kendo-angular-grid';
+import { TabStripModule } from '@progress/kendo-angular-layout';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { ClarityModule } from '@clr/angular';
 import { TdsComponentLibraryModule } from 'tds-component-library';
@@ -34,6 +35,7 @@ export class DynamicComponent {
 				SharedModule,
 				FormsModule,
 				// Import Kendo Modules
+				TabStripModule,
 				DropDownsModule,
 				IntlModule,
 				DateInputsModule,
