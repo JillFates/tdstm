@@ -29,10 +29,11 @@ import {of, ReplaySubject} from 'rxjs';
 import {DiagramContextMenuComponent} from './context-menu/diagram-context-menu.component';
 import {IDiagramContextMenuModel, IDiagramContextMenuOption} from './model/diagram-context-menu.model';
 import {IGraphTask} from '../../../modules/taskManager/model/graph-task.model';
-import {takeUntil} from 'rxjs/operators';
 import {NotifierService} from '../../services/notifier.service';
-import {TaskActionEvents} from '../../../modules/taskManager/components/common/constants/task-action-events.constant';
 import {TaskTeam} from '../../../modules/taskManager/components/common/constants/task-team.constant';
+import {DiagramEvent, DiagramEventAction} from './model/diagram-event.constant';
+import {DiagramLayoutService} from '../../services/diagram-layout.service';
+import {ILinkPath} from './model/diagram-layout.model';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -67,9 +68,31 @@ const enum NodeTemplateEnum {
 				class="overview-container"
 				[class.reset-overview-index]="resetOvIndex"
 				#overviewContainer></div>
-			<div id="node-tooltip" #nodeTooltip>
-				{{tooltipText}}
+			<div id="node-tooltip" class="diagram-card"
+					 [style.background]="getStatusColor(tooltipData?.status)"
+					 #nodeTooltip>
+					<div class="diagram-card-header"
+							 [style.background]="getStatusColor(tooltipData?.status)"
+							 [style.color]="getStatusTextColor(tooltipData?.status)">
+						<h4 class="k-align-self-center"> {{tooltipData?.name}} </h4>
+					</div>
+
+					<div class="diagram-card-content">
+						<div class="row">
+							<div class="col-md-6 k-align-self-center">Status: </div> <div class="col-md-6 k-align-self-center" style="float: right;">{{tooltipData?.status}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6 k-align-self-center">Assigned to: </div> <div class="col-md-6 k-align-self-center" style="float: right;">{{tooltipData?.assignedTo || 'N/A'}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6 k-align-self-center">Team: </div> <div class="col-md-6 k-align-self-center" style="float: right;">{{tooltipData?.team || 'N/A'}}</div>
+						</div>
+						<div class="row">
+							<div class="col-md-6 k-align-self-center">Task Number: </div> <div class="col-md-6 k-align-self-center" style="float: right;">{{tooltipData?.number}}</div>
+						</div>
+					</div>
 			</div>
+			<button id="show-full-graph" *ngIf="showFullGraphBtn" (click)="showFullGraph()">Back to Full Graph</button>
 		</div>`,
 })
 export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestroy {
@@ -79,9 +102,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@Input() layoutOpts: go.Layout;
 	@Input() currentUser: any;
 	@Input() contextMenuOptions: IDiagramContextMenuOption;
-	@Output() nodeClicked: EventEmitter<number> = new EventEmitter<number>();
+	@Output() nodeClicked: EventEmitter<any> = new EventEmitter<any>();
 	@Output() editClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
 	@Output() showTaskDetailsClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
+	@Output() backTofullGraph: EventEmitter<void> = new EventEmitter<void>();
+	@Output() nodeUpdated: EventEmitter<any> = new EventEmitter<any>();
 	@ViewChild('diagramLayout') diagramLayout: ElementRef;
 	@ViewChild('overviewContainer') overviewContainer: ElementRef;
 	@ViewChild('taskCtxMenu') taskCtxMenu: DiagramContextMenuComponent;
@@ -103,7 +128,11 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	largeArrayRemaining: boolean;
 	DATA_CHUNKS_SIZE = 200;
 	unsubscribe$: ReplaySubject<void> = new ReplaySubject();
-	tooltipText: string;
+	tooltipData: IGraphTask;
+	neighborMove: boolean;
+	showFullGraphBtn: boolean;
+	remainingData: any;
+	remainingLinks: any;
 
 	constructor(
 		private notifierService: NotifierService,
@@ -132,7 +161,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	ngAfterViewInit() {
-		this.notifierService.on(TaskActionEvents.NEIGHBORHOOD, () => this.cleanUpDiagram());
 		if (this.nodeData.data && this.nodeData.linksPath) {
 			this.loadAll();
 		}
@@ -154,16 +182,20 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		if (this.nodeData.data.length < 600) {
 			this.myModel = new go.GraphLinksModel(this.nodeData.data, this.nodeData.linksPath);
 		} else {
+			this.remainingData = this.nodeData.data.slice();
+			this.remainingLinks = this.nodeData.linksPath.slice();
 			this.myModel = new go.GraphLinksModel(
-				this.nodeData.data.splice(0, this.DATA_CHUNKS_SIZE),
-				this.nodeData.linksPath.splice(0, this.DATA_CHUNKS_SIZE));
+				this.remainingData.splice(0, this.DATA_CHUNKS_SIZE),
+				this.remainingLinks.splice(0, this.DATA_CHUNKS_SIZE));
 			this.largeArrayRemaining = true;
 		}
 	}
 
+	/**
+	 * Handler for large array of nodes and links, this helps improve rendering times
+	 */
 	handleLargeDataArray(): void {
-		this.largeArrayRemaining = false;
-		this.diagram.removeDiagramListener('AnimationFinished', null);
+		this.diagram.removeDiagramListener(DiagramEvent.ANIMATION_FINISHED, null);
 		const dataCopy = this.nodeData.data.slice();
 		const linksCopy = this.nodeData.linksPath.slice();
 		const dataChunks = [];
@@ -180,21 +212,29 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		linkChunks.push(linksCopy);
 
 		of(...dataChunks)
-			.pipe(takeUntil(this.unsubscribe$))
 			.subscribe(chunk => this.addNewNodesToDiagram(chunk));
 
 		of(...linkChunks)
-			.pipe(takeUntil(this.unsubscribe$))
 			.subscribe(chunk => this.addNewLinksToDiagram(chunk));
+
+		this.largeArrayRemaining = false;
 
 	}
 
+	/**
+	 * Add nodes to diagram programmatically
+	 * @param c
+	 */
 	addNewNodesToDiagram(c: any): void {
 		this.diagram.commitTransaction('add node data');
 		this.myModel.addNodeDataCollection(c);
 		this.diagram.commitTransaction('added new node data');
 	}
 
+	/**
+	 * Add links to diagram programmatically
+	 * @param c
+	 */
 	addNewLinksToDiagram(c: any): void {
 		this.diagram.commitTransaction('add link data');
 		this.myModel.addLinkDataCollection(c);
@@ -214,10 +254,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Generate Diagram canvas
 	 **/
 	generateDiagram(): void {
+		this.diagram.model.nodeDataArray = [];
 		this.diagram.startTransaction('generateDiagram');
 		this.diagram.initialDocumentSpot = Spot.TopLeft;
 		this.diagram.initialViewportSpot = Spot.TopLeft;
-		this.diagram.undoManager.isEnabled = true;
 		this.diagram.allowZoom = true;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
@@ -231,19 +271,56 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.diagramListeners();
 	}
 
+	/**
+	 * Diagram listeners to be used for custom functionality
+	 */
 	diagramListeners(): void {
-		this.diagram.addDiagramListener('AnimationFinished', () => {
-			if (this.largeArrayRemaining) {
-				this.diagram.animationManager.isEnabled = false;
-				this.handleLargeDataArray();
-				setTimeout(() => {
-					this.diagram.animationManager.isEnabled = true;
-				}, 1000);
-			} else {
+			this.diagram.addDiagramListener(DiagramEvent.ANIMATION_FINISHED, () => {
+
+				if (this.neighborMove) {
+					this.neighborMove = false;
+					this.notifierService.broadcast({name: DiagramEventAction.ANIMATION_FINISHED});
+					this.showFullGraphBtn = true;
+				}
+
+				if (this.largeArrayRemaining) {
+					this.diagram.animationManager.isEnabled = false;
+					this.handleLargeDataArray();
+					setTimeout(() => {
+						this.diagram.animationManager.isEnabled = true;
+						this.showFullGraphBtn = false;
+					}, 1000);
+				}
+
+			});
+			if (!this.largeArrayRemaining) {
 				if (this.diagram.linkTemplate.routing !== go.Link.AvoidsNodes) { this.setDiagramLinksTemplate(); }
 				if (!this.diagram.animationManager.isEnabled) { this.diagram.animationManager.isEnabled = true; }
 			}
-		});
+
+			this.diagram.addDiagramListener(DiagramEvent.BACKGROUND_SINGLE_CLICKED, () => {
+				this.hideToolTip();
+				this.diagram.toolManager.contextMenuTool.hideContextMenu();
+			});
+			this.diagram.addDiagramListener(DiagramEvent.BACKGROUND_DOUBLE_CLICKED, () => {
+				this.hideToolTip();
+				this.diagram.toolManager.contextMenuTool.hideContextMenu();
+			});
+			this.diagram.addDiagramListener(DiagramEvent.BACKGROUND_CONTEXT_CLICKED, () => {
+				this.hideToolTip();
+				this.diagram.toolManager.contextMenuTool.hideContextMenu();
+			});
+			this.diagram.addDiagramListener(DiagramEvent.OBJECT_SINGLE_CLICKED, () => {
+				this.hideToolTip();
+				this.diagram.toolManager.contextMenuTool.hideContextMenu();
+			});
+			this.diagram.addDiagramListener(DiagramEvent.OBJECT_DOUBLE_CLICKED, () => {
+				this.hideToolTip();
+				this.diagram.toolManager.contextMenuTool.hideContextMenu();
+			});
+			this.diagram.addDiagramListener(DiagramEvent.OBJECT_CONTEXT_CLICKED, () => {
+				this.hideToolTip();
+			});
 	}
 
 	/**
@@ -252,6 +329,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	onNodeClick(inputEvent: InputEvent, obj: any): void {
 		if (obj && obj.part && obj.part.data) {
 			obj.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
+			this.nodeClicked.emit(obj.part.data);
+			this.neighborMove = true;
 		}
 	}
 
@@ -286,8 +365,15 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 **/
 	setTreeLayout(opts?: any): void {
 		const treeLayout = new go.TreeLayout();
+		treeLayout.treeStyle = go.TreeLayout.StyleLayered;
+		treeLayout.layerStyle = go.TreeLayout.LayerIndividual;
 		treeLayout.angle = 0;
-		treeLayout.layerSpacing = 35;
+		treeLayout.nodeSpacing = 20;
+		treeLayout.sorting = go.TreeLayout.SortingForwards;
+		treeLayout.compaction = go.TreeLayout.CompactionBlock;
+		treeLayout.rowSpacing = 25;
+		treeLayout.rowIndent = 10;
+		treeLayout.layerSpacing = 50;
 		this.diagram.commit(d => d.layout = treeLayout);
 	}
 
@@ -397,6 +483,30 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		selAdornmentShape.fill = null;
 		selAdornmentShape.stroke = 'red';
 		selAdornmentShape.strokeWidth = 4;
+
+		const placeholder = new Placeholder();
+
+		// placeholder.background = 'transparent';
+		// placeholder.visible = true;
+		selAdornmentTemplate.add(selAdornmentShape);
+		selAdornmentTemplate.add(placeholder);
+
+		return selAdornmentTemplate;
+	}
+
+	/**
+	 * Node Adornment template configuration for neighbors
+	 **/
+	neighborAdornmentTemplate(): Adornment {
+		const selAdornmentTemplate = new Adornment(Panel.Auto);
+		selAdornmentTemplate.selectionAdorned = true;
+
+		const selAdornmentShape = new Shape();
+		selAdornmentShape.figure = 'RoundedRectangle';
+		selAdornmentShape.fill = null;
+		selAdornmentShape.stroke = 'red';
+		selAdornmentShape.strokeWidth = 4;
+		selAdornmentShape.strokeDashArray = [3, 2];
 
 		const placeholder = new Placeholder();
 
@@ -631,7 +741,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			let highlightCollection: any;
 
 			if (matches && matches === TaskTeam.ALL_TEAMS) {
-				return;
+				d.clearSelection();
 			} else if (matches === TaskTeam.NO_TEAM_ASSIGNMENT) {
 				highlightCollection = d.nodes.filter(f => !f.data.team);
 			} else {
@@ -736,6 +846,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		node.add(this.iconShape());
 
 		node.add(this.assetIconShape());
+		node.toolTip = this.createTooltip();
 		node.contextMenu = this.contextMenu();
 
 		// if onNodeClick function is assigned directly to click handler
@@ -756,8 +867,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		shape.background = 'red';
 		shape.desiredSize = new go.Size(25, 35);
 		shape.bind(new go.Binding('fill', 'status',
-			(status: string) => this.getStatusColor(status.toLowerCase())));
-		shape.toolTip = this.createTooltip();
+			(status: string) => this.getStatusColor(status)));
+		node.toolTip = this.createTooltip();
 		node.add(shape);
 		node.contextMenu = this.contextMenu();
 
@@ -772,8 +883,16 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Node bubble color based on status
 	 **/
 	getStatusColor(name: string): string {
-		if (!this.stateIcons[name]) { return '#ddd'; }
-		return this.stateIcons[name].background;
+		if (!this.stateIcons[name && name.toLowerCase()]) { return '#ddd'; }
+		return this.stateIcons[name.toLowerCase()].background;
+	}
+
+	/**
+	 * Node bubble color based on status
+	 **/
+	getStatusTextColor(name: string): string {
+		if (!this.stateIcons[name && name.toLowerCase()]) { return '#000'; }
+		return this.stateIcons[name.toLowerCase()].color;
 	}
 
 	/**
@@ -827,13 +946,31 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	updateNode(data: IGraphTask): void {
 		this.diagram.commit(d => {
 			const update = Object.assign({}, data);
-			if (!update.key) { update.key = data.number; }
+			if (!update.key) { update.key = data.id; }
 			const node = d.nodes.filter(f => f.part.data.key === update.key).first();
 			node.part.data = update;
 			node.updateAdornments();
+			this.nodeUpdated.
+			emit({
+				data: d.model.nodeDataArray,
+				linksPath: this.extractLinks(d.links)
+			});
 		});
 	}
 
+	/**
+	 * Extracts links with specified format
+	 * @param links
+	 */
+	extractLinks(links: any): ILinkPath[] {
+		const linksPath = [];
+		links.each((l: go.Link) => linksPath.push({from: l.data.from, to: l.data.to}));
+		return linksPath;
+	}
+
+	/**
+	 * Cleanup diagram canvas
+	 */
 	cleanUpDiagram(): void {
 		this.unsubscribe$.next();
 		this.unsubscribe$.complete();
@@ -841,21 +978,20 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
-	 * Node Context menu containing a variety of operations like 'edit task', 'show task detail', 'start', 'hold', etc
+	 * Node tooltip with feedback about itself when in low or medium scale
 	 **/
 	createTooltip(): any {
 		const $ = go.GraphObject.make;
 		return $(go.HTMLInfo,  // HTML element to contain the context menu
 			{
 				show: (obj: go.GraphObject, diagram: go.Diagram, tool: go.Tool) => this.showTooltip(obj, diagram, tool),
-				hide: () => this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'none'),
 				mainElement: this.nodeTooltip.nativeElement
 			}
 		); // end Adornment
 	}
 
 	/**
-	 * handler to show context menu passing relevant data to context menu component
+	 * handler to show the tooltip on low or medium scale nodes
 	 * @param {GraphObject} obj
 	 * @param {Diagram} diagram
 	 * @param {Tool} tool
@@ -866,8 +1002,33 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'block');
 			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'left', `${mousePt.x + 10}px`);
 			this.renderer.setStyle(this.nodeTooltip.nativeElement, 'top', `${mousePt.y}px`);
-			this.tooltipText = obj.part.data.name;
+			this.tooltipData = obj.part.data;
 		}
+	}
+
+	hideToolTip(): void {
+		this.renderer.setStyle(this.nodeTooltip.nativeElement, 'display', 'none')
+	}
+
+	/**
+	 * Set new adornment for given node
+	 * @param {any} data
+	 */
+	setNeighborAdornment(data: any): void {
+		this.diagram.commit(d => {
+			const node = d.findNodeForKey(data.key);
+			node.selectionAdornmentTemplate = this.neighborAdornmentTemplate();
+			node.updateAdornments();
+			d.select(node.part);
+			d.centerRect(node.actualBounds);
+		})
+	}
+
+	/**
+	 * Returns to view with the full graph displayed
+	 */
+	showFullGraph(): void {
+		this.backTofullGraph.emit();
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
-import {distinctUntilChanged, map, skip} from 'rxjs/operators';
+import {distinctUntilChanged, map, skip, takeUntil} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 import {clone} from 'ramda';
@@ -40,13 +40,15 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Title} from '@angular/platform-browser';
 import {TaskTeam} from '../common/constants/task-team.constant';
+import {DiagramEventAction} from '../../../../shared/components/diagram-layout/model/diagram-event.constant';
+import {DiagramLayoutService} from '../../../../shared/services/diagram-layout.service';
 
 @Component({
 	selector: 'tds-neighborhood',
 	templateUrl: './neighborhood.component.html'
 })
-export class NeighborhoodComponent implements OnInit {
-	tasks: IGraphNode[];
+export class NeighborhoodComponent implements OnInit, OnDestroy {
+	tasks: IGraphTask[];
 	nodeData$: BehaviorSubject<any> = new BehaviorSubject({});
 	ctxMenuOpts$: ReplaySubject<IDiagramContextMenuOption> = new ReplaySubject(2);
 	@ViewChild('graph') graph: DiagramLayoutComponent;
@@ -79,6 +81,10 @@ export class NeighborhoodComponent implements OnInit {
 	selectedTeam: any;
 	currentUser$: ReplaySubject<any> = new ReplaySubject(1);
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
+	unsubscribe$: ReplaySubject<void> = new ReplaySubject(1);
+	isFullView: boolean;
+	isMoveEventReq: boolean;
+	requestId: number;
 
 	constructor(
 			private taskService: TaskService,
@@ -90,9 +96,12 @@ export class NeighborhoodComponent implements OnInit {
 			private notifierService: NotifierService,
 			private location: Location,
 			private translatePipe: TranslatePipe,
-			private titleService: Title
+			private titleService: Title,
+			private diagramLayoutService: DiagramLayoutService
 		) {
-				this.activatedRoute.queryParams.subscribe(params => {
+				this.activatedRoute.queryParams
+					.pipe(takeUntil(this.unsubscribe$))
+					.subscribe(params => {
 					if (params) { this.urlParams = Object.assign({}, params); }
 				});
 	}
@@ -107,8 +116,12 @@ export class NeighborhoodComponent implements OnInit {
 		this.loadUserContext();
 		this.loadFilters();
 		this.loadEventList();
+		this.subscribeToEvents();
 	}
 
+	/**
+	 * Subscribe to events with the notifierService
+	 */
 	subscribeToEvents(): void {
 		this.notifierService
 			.on(TaskActionEvents.START, data => this.start({name: data.name, task: data.node}));
@@ -125,7 +138,7 @@ export class NeighborhoodComponent implements OnInit {
 		this.notifierService
 			.on(TaskActionEvents.EDIT, data => this.editTask({name: data.name, task: data.node}));
 		this.notifierService
-			.on(TaskActionEvents.NEIGHBORHOOD, data => this.onNeighborhood({name: data.name, task: data.node}));
+			.on(TaskActionEvents.NEIGHBORHOOD, data => this.onNeighborhood(data.node));
 		this.notifierService
 			.on(TaskActionEvents.ASSIGN_TO_ME, data => this.assignToMe({name: data.name, task: data.node}));
 		this.notifierService
@@ -141,7 +154,9 @@ export class NeighborhoodComponent implements OnInit {
 			PREFERENCES_LIST.MY_TASKS,
 			PREFERENCES_LIST.MINIMIZE_AUTO_TASKS,
 			PREFERENCES_LIST.VIEW_UNPUBLISHED
-		).subscribe(res => {
+		)
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe(res => {
 				const {myTasks, minimizeAutoTasks, VIEW_UNPUBLISHED} = res;
 				this.myTasks = (myTasks && myTasks === 'true' || myTasks === '1');
 				this.minimizeAutoTasks = (minimizeAutoTasks && (minimizeAutoTasks === 'true' || minimizeAutoTasks === '1'));
@@ -152,7 +167,7 @@ export class NeighborhoodComponent implements OnInit {
 				if (this.urlParams && this.urlParams.taskId) {
 					this.loadTasks(this.urlParams.taskId);
 				} else {
-					this.loadFromSelectedEvent(this.selectedEvent.id);
+					this.loadFromSelectedEvent();
 				}
 			});
 	}
@@ -161,7 +176,9 @@ export class NeighborhoodComponent implements OnInit {
 	 * Load user context
 	 **/
 	loadUserContext(): void {
-		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
+		this.userContextService.getUserContext()
+			.pipe(takeUntil(this.unsubscribe$))
+			.subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
 		});
@@ -173,18 +190,31 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	loadTasks(taskId: number): void {
 
-		const filters = {
-			myTasks: this.myTasks ? '1' : '0',
-			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
-			viewUnpublished: this.viewUnpublished ? '1' : '0'
-		};
-		this.taskService.findTask(taskId, filters)
-			.subscribe((res: IGraphNode[]) => {
-				if (res && res.length > 0) {
-					this.tasks = res;
-					this.generateModel();
-				}
-			});
+		if (this.isFullView
+			&& this.diagramLayoutService.getRequestId() === taskId
+			&& !this.diagramLayoutService.isCacheFromMoveEvent()) {
+			this.generateModelFromCache();
+		} else {
+			const filters = {
+				myTasks: this.myTasks ? '1' : '0',
+				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+				viewUnpublished: this.viewUnpublished ? '1' : '0'
+			};
+			this.taskService.findTask(taskId, filters)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe((res: IGraphNode[]) => {
+					if (res && res.length > 0) {
+						this.tasks = res && res.map(r => r.task);
+						if (this.tasks) {
+							this.diagramLayoutService.clearFullGraphCache();
+							this.requestId = taskId;
+							this.isMoveEventReq = false;
+							this.generateModel();
+						}
+					}
+				},
+					error => console.error(`Could not load tasks ${error}`));
+		}
 	}
 
 	/**
@@ -193,24 +223,48 @@ export class NeighborhoodComponent implements OnInit {
 	loadEventList() {
 			this.eventList$ = this.reportService
 				.getEventList()
-				.pipe(map(res => res.data));
+				.pipe(
+					takeUntil(this.unsubscribe$),
+					map(res => res.data));
 	}
 
 	/**
-	 * Load tasks
-	 * @param {number} moveEventId of moveEvent to load tasks from
+	 * Load tasks from a moveEvent Id
 	 **/
-	loadFromSelectedEvent(moveEventId?: number): void {
-		const filters = {
-			myTasks: this.myTasks ? '1' : '0',
-			minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
-			viewUnpublished: this.viewUnpublished ? '1' : '0'
-		};
-		this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
-		.subscribe(res => {
-			this.tasks = res;
-			this.generateModel();
-		});
+	loadFromSelectedEvent(): void {
+		if (this.isFullView
+			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
+			&& this.diagramLayoutService.isCacheFromMoveEvent()) {
+			this.generateModelFromCache();
+		} else {
+			const filters = {
+				myTasks: this.myTasks ? '1' : '0',
+				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
+				viewUnpublished: this.viewUnpublished ? '1' : '0'
+			};
+			this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe(res => {
+					this.tasks = res && res.tasks;
+					if (this.tasks) {
+						this.diagramLayoutService.clearFullGraphCache();
+						this.requestId = this.selectedEvent.id;
+						this.isMoveEventReq = false;
+						this.generateModel();
+					}
+				},
+					error => console.error(`Could not load tasks ${error}`));
+		}
+	}
+
+	/**
+	 * Event selection handler
+	 * @param {IMoveEvent}  moveEvent to load tasks from
+	 **/
+	onEventSelect(moveEvent?: IMoveEvent): void {
+		if (moveEvent) { this.selectedEvent = moveEvent; }
+
+		this.loadFromSelectedEvent();
 	}
 
 	/**
@@ -238,10 +292,10 @@ export class NeighborhoodComponent implements OnInit {
 		// If actual task used by diagram comes from task manager neighborhood button, then reload
 		// from tasks endpoint, else load tasks from the actual selected event
 		if (this.urlParams && this.urlParams.taskId
-			&& !!this.tasks.find(t => t.task.id === Number(this.urlParams.taskId))) {
+			&& !!this.tasks.find(t => t.id === Number(this.urlParams.taskId))) {
 			this.loadTasks(this.urlParams.taskId);
 		} else {
-			this.loadFromSelectedEvent(this.selectedEvent.id)
+			this.loadFromSelectedEvent()
 		}
 	}
 
@@ -258,25 +312,65 @@ export class NeighborhoodComponent implements OnInit {
 
 		// Add tasks to nodeData constant
 		// and create linksPath object from number and successors
-		tasksCopy.map((t: IGraphNode | any) => {
+		tasksCopy.map((t: IGraphTask | any) => {
 
-			const predecessorIds = t.task.predecessorIds && t.task.predecessorIds;
+			const predecessorIds = t.predecessorIds && t.predecessorIds;
 
-			t.task.key = t.task.id;
-			if (t.task.team && !teams
-				.find(team => t.task.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
-				teams.push({label: t.task.team});
+			t.key = t.id;
+			if (t.team && !teams
+				.find(team => t.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
+				teams.push({label: t.team});
 			}
-			nodeDataArr.push(t.task);
+			nodeDataArr.push(t);
 
 			if (predecessorIds && predecessorIds.length > 0) {
-				linksPath.push(...this.getLinksPathByPredecessorIds(t.task.id, predecessorIds));
+				linksPath.push(...this.getLinksPathByPredecessorIds(t.id, predecessorIds));
 			}
 		});
 		this.teamHighlights$.next(teams);
+		this.cacheFullGraph({
+			requestId: this.requestId,
+			isMoveEvent: this.isMoveEventReq,
+			data: nodeDataArr,
+			linksPath
+		});
 		this.nodeData$.next({ data: nodeDataArr, linksPath });
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
+	}
+
+	/**
+	 * generate model to be used by diagram with task specific data
+	 **/
+	generateModelFromCache(): void {
+		if (!this.diagramLayoutService.getRequestId()) { return; }
+		const teams = [{label: TaskTeam.ALL_TEAMS}, {label: TaskTeam.NO_TEAM_ASSIGNMENT}];
+
+		const graphCache = this.diagramLayoutService.getFullGraphCache();
+
+		// Add tasks to nodeData constant
+		// and create linksPath object from number and successors
+		graphCache.data.forEach((t: IGraphTask | any) => {
+			if (t.team && !teams
+				.find(team => t.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
+				teams.push({label: t.team});
+			}
+		});
+		this.teamHighlights$.next(teams);
+		this.viewFullGraphFromCache();
+		this.currentUser$.next(this.userContext.user);
+		this.ctxMenuOpts$.next(this.ctxMenuOptions());
+	}
+
+	/**
+	 * Creates a cache to hold the full graph so that a new call won't be needed when returning from a neighbor
+	 * @param data
+	 */
+	cacheFullGraph(data: any): void {
+		if (!this.diagramLayoutService.getFullGraphCache() || !this.diagramLayoutService.getFullGraphCache().data) {
+			this.diagramLayoutService.setFullGraphCache(data);
+			this.isFullView = true;
+		}
 	}
 
 	/**
@@ -377,7 +471,7 @@ export class NeighborhoodComponent implements OnInit {
 	getLinksPathByPredecessorIds(taskId: string | number, predecessorIds: number[]): ILinkPath[] {
 		if (predecessorIds && predecessorIds.length > 0) {
 			return predecessorIds
-				.filter(f => !!this.tasks.find(t => t.task.id === f))
+				.filter(f => !!this.tasks.find(t => t.id === f))
 				.map(pre => ({
 				from: pre,
 				to: taskId
@@ -465,6 +559,7 @@ export class NeighborhoodComponent implements OnInit {
 	subscribeToHighlightFilter(): void {
 		this.textFilter
 			.pipe(
+				takeUntil(this.unsubscribe$),
 				skip(2),
 				distinctUntilChanged()
 			).subscribe(text => {
@@ -495,6 +590,7 @@ export class NeighborhoodComponent implements OnInit {
 			};
 
 			this.taskService.updateTaskStatus(payload)
+				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe((result) => {
 					if (result) {
 						this.updateGraphNode(result.assetComment);
@@ -516,6 +612,7 @@ export class NeighborhoodComponent implements OnInit {
 			};
 
 			this.taskService.updateTaskStatus(payload)
+				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe((result) => {
 					if (result) {
 						this.updateGraphNode(result.assetComment);
@@ -538,6 +635,7 @@ export class NeighborhoodComponent implements OnInit {
 			};
 
 			this.taskService.updateTaskStatus(payload)
+				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe((result) => {
 					if (result) {
 						this.updateGraphNode(result.assetComment);
@@ -552,6 +650,7 @@ export class NeighborhoodComponent implements OnInit {
 	 **/
 	invoke(data?: ITaskEvent): void {
 		this.taskService.invokeAction(`${data.task.id}`)
+			.pipe(takeUntil(this.unsubscribe$))
 			.subscribe((result) => {
 				if (result) {
 					this.updateGraphNode(result);
@@ -565,6 +664,7 @@ export class NeighborhoodComponent implements OnInit {
 	reset(data?: ITaskEvent): void {
 
 		this.taskService.resetTaskAction(Number(data.task.id))
+			.pipe(takeUntil(this.unsubscribe$))
 			.subscribe((result) => {
 				if (result) {
 					this.updateGraphNode(result);
@@ -608,6 +708,7 @@ export class NeighborhoodComponent implements OnInit {
 		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
 
 		this.taskService.getTaskDetails(`${data.task.id}`)
+			.pipe(takeUntil(this.unsubscribe$))
 			.subscribe((res) => {
 				let modelHelper = new TaskEditCreateModelHelper(
 					this.userContext.user,
@@ -649,7 +750,9 @@ export class NeighborhoodComponent implements OnInit {
 	showAssetDetail(data: ITaskEvent): void {
 		const asset = data.task.asset;
 		if (asset  && asset.id) {
-			this.taskService.getClassForAsset(`${asset.id}`).subscribe(res => {
+			this.taskService.getClassForAsset(`${asset.id}`)
+				.pipe(takeUntil(this.unsubscribe$))
+				.subscribe(res => {
 				if (res.assetClass) {
 					this.dialogService.open(AssetShowComponent,
 						[UIDialogService,
@@ -672,11 +775,16 @@ export class NeighborhoodComponent implements OnInit {
 	/**
 	 * Open the neighborhood window
 	 */
-	onNeighborhood(data?: ITaskEvent): void {
-		const currentUrl = this.location.path().replace(this.urlParams.taskId, `${data.task.id}`);
+	onNeighborhood(data?: IGraphTask): void {
+		this.graph.cleanUpDiagram();
+		this.isFullView = false;
+		const currentUrl = this.location.path().includes(this.urlParams.taskId) ?
+			this.location.path().replace(this.urlParams.taskId, `${data.id}`)
+			: this.location.path().concat('?', 'taskId', '=', `${data.id}`);
 		this.location.go(currentUrl);
-		this.urlParams.taskId = data.task.id;
-		this.loadTasks(Number(data.task.id));
+		this.urlParams.taskId = data.id;
+		this.loadTasks(Number(data.id));
+		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => this.graph.setNeighborAdornment(data));
 	}
 
 	/**
@@ -690,6 +798,7 @@ export class NeighborhoodComponent implements OnInit {
 			};
 
 			this.taskService.assignToMe(payload)
+				.pipe(takeUntil(this.unsubscribe$))
 				.subscribe((result) => {
 					if (result) {
 						data.task.assignedTo = result.assignedToName;
@@ -708,6 +817,20 @@ export class NeighborhoodComponent implements OnInit {
 	}
 
 	/**
+	 * update cached graph
+	 */
+	updateGraphCache(data: any): void {
+		if (this.isFullView) {
+			const fullGraph = {
+				requestId: this.diagramLayoutService.getRequestId(),
+				isMoveEvent: this.diagramLayoutService.isCacheFromMoveEvent(),
+				...data
+			};
+			this.diagramLayoutService.setFullGraphCache(fullGraph);
+		}
+	}
+
+	/**
 	 * Clear text filter
 	 */
 	clearTextFilter(): void {
@@ -715,6 +838,21 @@ export class NeighborhoodComponent implements OnInit {
 		this.highlightFilterText.nativeElement.nodeValue = '';
 		this.filterText = '';
 		this.textFilter.next(null);
+	}
+
+	/**
+	 * View full graph from cache
+	 */
+	viewFullGraphFromCache(): void {
+		this.isFullView = true;
+		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	ngOnDestroy(): void {
+		this.unsubscribe$.next();
+		this.unsubscribe$.complete();
+		this.diagramLayoutService.clearFullGraphCache();
 	}
 
 }
