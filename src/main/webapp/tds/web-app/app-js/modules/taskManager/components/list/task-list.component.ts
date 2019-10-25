@@ -200,6 +200,8 @@ export class TaskListComponent {
 					});
 				} else if (result.shouldOpenTask) {
 					this.onOpenTaskDetailHandler(result.commentInstance);
+				} else if (result.shouldEdit) {
+					this.onOpenTaskEditHandler(result.id);
 				} else {
 					this.search(parseInt(taskRow.id, 0));
 				}
