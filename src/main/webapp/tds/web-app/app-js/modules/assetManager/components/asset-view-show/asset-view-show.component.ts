@@ -140,35 +140,38 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-		let params = {
-			offset: this.gridState.skip,
-			limit: this.gridState.take,
-			sortDomain: this.model.schema.sort.domain,
-			sortProperty: this.model.schema.sort.property,
-			sortOrder: this.model.schema.sort.order,
-			filters: {
-				domains: this.model.schema.domains,
-				columns: this.model.schema.columns
+		// Timeout exists so assetExplorerViewGrid gets created first
+		setTimeout(() => {
+			let params = {
+				offset: this.gridState.skip,
+				limit: this.gridState.take,
+				sortDomain: this.model.schema.sort.domain,
+				sortProperty: this.model.schema.sort.property,
+				sortOrder: this.model.schema.sort.order,
+				filters: {
+					domains: this.model.schema.domains,
+					columns: this.model.schema.columns
+				}
+			};
+
+			if (this.hiddenFilters) {
+				this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
+
+				let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
+				if (justPlanning !== null) {
+					this.assetExplorerViewGrid.justPlanning = justPlanning;
+				}
 			}
-		};
 
-		if (this.hiddenFilters) {
-			this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
-
-			let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
-			if (justPlanning !== null) {
-				this.assetExplorerViewGrid.justPlanning = justPlanning;
+			if (this.justPlanning) {
+				params['justPlanning'] = true;
 			}
-		}
 
-		if (this.justPlanning) {
-			params['justPlanning'] = true;
-		}
-
-		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
-			this.data = result;
-			jQuery('[data-toggle="popover"]').popover();
-		}, err => console.log(err));
+			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
+				this.data = result;
+				jQuery('[data-toggle="popover"]').popover();
+			}, err => console.log(err));
+		});
 	}
 
 	public onEdit(): void {
