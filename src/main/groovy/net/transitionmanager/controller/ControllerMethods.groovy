@@ -340,6 +340,14 @@ trait ControllerMethods {
 	}
 
 	/**
+	 * Used to determine if the current request is Ajax or not
+	 * @return true if the request is Ajax or otherwise false
+	 */
+	boolean isAjaxRequest() {
+		return WebUtil.isAjax(request)
+	}
+
+	/**
 	 * Used by the various Exception Handler methods to appropriately respond to exceptions
 	 * @param e - the Exception that was returned back to the controller
 	 * @param viewName - the name of the view page to rendered if it was a page request (assuming the controller = errorHandler)

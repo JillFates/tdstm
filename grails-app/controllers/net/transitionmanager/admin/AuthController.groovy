@@ -109,7 +109,7 @@ class AuthController implements ControllerMethods {
 	 * @return
 	 */
 	def signOut() {
-		// TODO : JPM 10/2019 : Move this logic into the SecurityService 
+		// TODO : JPM 10/2019 : Move this logic into the SecurityService
 		if (securityService.loggedIn) {
 			String username = securityService.currentUsername
 			auditService.saveUserAudit(UserAuditBuilder.logout())
@@ -124,10 +124,13 @@ class AuthController implements ControllerMethods {
 			}
 		}
 
-		// Redirect the user to the system configured login form
-		// Note - Some reason the url with /tdstm in it gets duplicated with /tdstm/tdstm/...
-		redirect uri: grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
-		return
+		if (isAjaxRequest()) {
+			renderSuccessJson()
+		} else {
+			// Redirect the user to the system configured login form
+			// Note - Some reason the url with /tdstm in it gets duplicated with /tdstm/tdstm/...
+			redirect uri: grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
+		}
 	}
 
 	/**
