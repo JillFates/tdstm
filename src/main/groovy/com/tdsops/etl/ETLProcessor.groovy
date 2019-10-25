@@ -1659,7 +1659,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * and an instance of SecureASTCustomizer.
 	 * @see CompilerConfiguration* @see SecureASTCustomizer* @see ImportCustomizer* @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {

@@ -66,7 +66,7 @@ class ApiActionScriptEvaluator {
 	 * @see ImportCustomizer
 	 * @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
