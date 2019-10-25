@@ -223,41 +223,6 @@
 			</clr-tab>
 		</clr-tabs>
     </div>
-    <div class="modal-footer form-group-center">
-        <div class="asset-commands pull-left">
-            <tds-button-edit
-                    tooltip="Edit Asset"
-                    class="btn-primary"
-                    [permissions]="['${Permission.AssetEdit}']"
-                    (click)="showAssetEditView()">
-            </tds-button-edit>
-
-            <tds-button-clone
-                    (click)="onCloneAsset()"
-                    [permissions]="['${Permission.AssetCreate}']">
-            </tds-button-clone>
-
-            <tds-button-custom
-                    icon="sitemap"
-                    title="Arch Graph"
-                    (click)="openGraphUrl()">
-            </tds-button-custom>
-        </div>
-
-        <tds:hasPermission permission="${Permission.AssetDelete}">
-            <tds-button-delete
-                    tooltip="Delete Asset"
-                    class="btn-danger"
-                    [permissions]="['${Permission.AssetDelete}']"
-                    (click)="onDeleteAsset()">
-            </tds-button-delete>
-        </tds:hasPermission>
-
-        <tds-button-close
-                class="pull-right"
-                (click)="cancelCloseDialog()">
-        </tds-button-close>
-    </div>
 
     <div class="modal-sidenav form-group-center">
 		<nav class="modal-sidenav btn-link">

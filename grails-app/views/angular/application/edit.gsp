@@ -30,8 +30,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" ngmodel="model.asset.appFunction" tabindex="5"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userCount}" value="${asset.userCount}"  ngmodel="model.asset.userCount" tabindex="6" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${asset.appVersion}" ngmodel="model.asset.appVersion" tabindex="7"/>
-				
-				<%-- TODO: Come back and style this to look like clarity --%>
+
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${asset.sme}"/>
 					<kendo-dropdownlist #controlSme
@@ -69,7 +68,6 @@
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${asset.criticality}" tabindex="13"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${asset.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="14" tooltipDataPlacement="bottom"/>
-				
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${asset.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
 
 				<div class="clr-form-control">
@@ -227,13 +225,13 @@
 				tabindex="501">
 			</tds-button-save> 
 			<tds:hasPermission permission="${Permission.AssetDelete}">
-			<tds-button-delete
+				<tds-button-delete
 					tooltip="Delete Asset"
 					class="btn-danger"
 					[permissions]="['${Permission.AssetDelete}']"
 					(click)="onDeleteAsset()"
-						tabindex="502">
-			</tds-button-delete>
+					tabindex="502">
+				</tds-button-delete>
 			</tds:hasPermission>
 			<tds-button-cancel
 					tooltip="Cancel Edit"

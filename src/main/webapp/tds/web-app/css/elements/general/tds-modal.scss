@@ -29,6 +29,17 @@ tds-ui-dialog {
 					input {
 						width: 220px;
 					}
+
+					.truck-input-container {
+						display: flex;
+						justify-content: space-between;
+						flex-wrap: nowrap;
+						
+						input {
+							width: 66px;
+							margin-right: 10px;
+						}
+					}
 				}
 
 				.tdr-detail-list {
