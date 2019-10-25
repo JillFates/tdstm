@@ -4,15 +4,17 @@ import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '
 // State
 import {Logout} from '../action/login.actions';
 import {Store} from '@ngxs/store';
+import {SetPageChange} from '../action/page.actions';
+import {UserContextState} from '../state/user-context.state';
 // Services
 import {PermissionService} from '../../../shared/services/permission.service';
-// Others
-import { Observable} from 'rxjs';
 import {WindowService} from '../../../shared/services/window.service';
-import {UserContextModel} from '../model/user-context.model';
 import {UserContextService} from './user-context.service';
-import {UserContextState} from '../state/user-context.state';
 import {PageService} from './page.service';
+// Models
+import {UserContextModel} from '../model/user-context.model';
+// Others
+import {Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 @Injectable()
@@ -34,17 +36,22 @@ export class AuthGuardService implements CanActivate {
 	 * @param state
 	 */
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
-		let guard = [
-			this.pageService.updateLastPage(`module${state.url}`),
+		let requestedPath = `/module${state.url}`;
+
+		let guardRequests = [
+			this.pageService.updateLastPage(requestedPath),
 			this.permissionService.getPermissions()
 		];
-		return Observable.forkJoin(guard).pipe(
+
+		return Observable.forkJoin(guardRequests).pipe(
 			map(([successToSaveLastPage, permissions]) => {
 				if (!successToSaveLastPage) {
 					console.error('AuthGuardService:', 'Session has expired');
 					this.store.dispatch(new Logout());
 					return Observable.of(false);
 				}
+				// Save last Page Requested
+				this.store.dispatch(new SetPageChange({path: requestedPath}));
 
 				this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 				let requiresLicense: boolean = route.data['requiresLicense'];

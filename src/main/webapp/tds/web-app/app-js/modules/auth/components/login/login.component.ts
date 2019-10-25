@@ -12,6 +12,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PostNoticesManagerService} from '../../service/post-notices-manager.service';
 import {RouterUtils} from '../../../../shared/utils/router.utils';
 import {WindowService} from '../../../../shared/services/window.service';
+import {PageService} from '../../service/page.service';
 import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
 // Components
 import {MandatoryNoticesComponent} from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
@@ -23,7 +24,7 @@ import {UserContextModel} from '../../model/user-context.model';
 import {NoticeModel, Notices} from '../../../noticeManager/model/notice.model';
 // Others
 import {Observable} from 'rxjs';
-import {withLatestFrom} from 'rxjs/operators';
+import {map, withLatestFrom} from 'rxjs/operators';
 
 @Component({
 	selector: 'tds-login',
@@ -79,6 +80,7 @@ export class LoginComponent implements OnInit {
 		private router: Router,
 		private notifierService: NotifierService,
 		private dialogService: UIDialogService,
+		private pageService: PageService,
 		private postNoticesManager: PostNoticesManagerService,
 		private windowService: WindowService) {
 	}
@@ -87,16 +89,25 @@ export class LoginComponent implements OnInit {
 	 * Get the Login Information and prepare the store subscriber to redirect the user on a Success Login
 	 */
 	ngOnInit(): void {
-		// TODO : call the /ws/user/updateLastPage sync (no path) -- if success route to the user's preferred page otherwise when error then continue with login process
-
-		// Get Login Information
-		this.loginService.getLoginInfo().subscribe((response: any) => {
-			this.loginInfo = response;
-			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
-			this.setFocus();
-		});
-
-		this.getCurrentUserSnapshot();
+		let loginRequests = [
+			this.pageService.updateLastPage(),
+			this.loginService.getLoginInfo()
+		];
+		Observable.forkJoin(loginRequests).pipe(
+			map(([successToSaveLastPage, loginInfo]) => {
+				// If session is still active, redirect user to his last page saved
+				if (successToSaveLastPage) {
+					this.getCurrentUserSnapshot();
+				} else {
+					// If not, we ensure the session start from scratch
+					this.destroyInitialSession();
+					// Get Login Information
+					this.loginInfo = loginInfo;
+					this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
+					this.setFocus();
+				}
+			})
+		).subscribe();
 	}
 
 	/**

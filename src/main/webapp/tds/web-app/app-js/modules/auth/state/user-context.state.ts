@@ -7,6 +7,7 @@ import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired, Post
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
 import {SetProject} from '../../project/actions/project.actions';
+import {SetPageChange} from '../action/page.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
@@ -154,4 +155,23 @@ export class UserContextState {
 		);
 	}
 
+	/**
+	 * Set the new Latest Page to the context
+	 * @param ctx
+	 * @param payload
+	 */
+	@Action(SetPageChange)
+	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
+		const state = ctx.getState();
+		return this.userService.getLicenseInfo().pipe(
+			tap(result => {
+				let notices = state.notices;
+				notices.redirectUrl = payload.path;
+				ctx.setState({
+					...state,
+					notices: notices
+				});
+			}),
+		);
+	}
 }
