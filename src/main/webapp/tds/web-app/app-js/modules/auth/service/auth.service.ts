@@ -16,10 +16,12 @@ import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {PostNoticesManagerService} from './post-notices-manager.service';
 import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
+// import {Router} from "@angular/router";
 
 export enum AUTH_API_URLS {
 	SIGN_IN = '/tdstm/auth/signIn',
-	LOG_OUT = '/tdstm/auth/signOut'
+	LOG_OUT = '/tdstm/auth/signOut',
+	LOGIN_PAGE = '/tdstm/module/auth/login'
 }
 
 @Injectable()
@@ -31,6 +33,7 @@ export class AuthService {
 		private userService: UserService,
 		private windowService: WindowService,
 		private postNoticesManagerService: PostNoticesManagerService,
+		// private router: Router,
 		private store: Store) {
 	}
 
@@ -99,7 +102,8 @@ export class AuthService {
 		localStorage.removeItem(APP_STATE_KEY);
 		return this.http.get(AUTH_API_URLS.LOG_OUT).pipe(
 			map(() => {
-				this.windowService.getWindow().location.href = '/tdstm/module/auth/login';
+				this.windowService.getWindow().location.href = AUTH_API_URLS.LOGIN_PAGE;
+				// this.router.navigate([AUTH_API_URLS.LOGIN_PAGE]);
 				return true;
 			})
 		);

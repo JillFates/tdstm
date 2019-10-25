@@ -10,6 +10,7 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
 import net.transitionmanager.project.ProjectLogo
+import net.transitionmanager.session.SessionContext
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -363,16 +364,21 @@ class WsUserController implements ControllerMethods {
 	/**
 	 * Update the user's account to record when the last page was requested
 	 * @param path - (String) the uri path of the page routed to
-	 * @return : success json if user is logged in otherwise a error json structure
+	 * @return : json {"successful":true|false} if user is logged in otherwise a error json structure
 	 */
 	@Secured('permitAll')
 	def updateLastPage() {
 		if (securityService.isLoggedIn()) {
 			userService.updateLastPageLoad()
-			renderSuccessJson()
+			renderAsJson(successful:true)
 		} else {
-			// This will
-			renderErrorJson()
+			// Record the page request (path) to the session if the user isn't logged in so that we can redirect
+			// them later after login.
+			String path = params.get('path')
+			if (path) {
+				SessionContext.setLastPageRequested(session, path)
+			}
+			renderAsJson(successful:false)
 		}
 	}
 

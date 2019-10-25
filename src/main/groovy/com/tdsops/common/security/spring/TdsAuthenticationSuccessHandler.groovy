@@ -21,8 +21,10 @@ import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.session.SessionContext
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.savedrequest.DefaultSavedRequest
 import org.springframework.util.Assert
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
@@ -117,7 +119,27 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				} else if (userLogin.forcePasswordChange == 'Y') {
 					redirectUri = "/module/auth/changePassword"
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
+					// The following will attempt to get the URL to redirect the user to. This will either be the page requested by the user when there was
+					// no session. We'll look for those we capture through the Angular app and if not found, then check what Spring captured for any legacy
+					// page requests. If we find neither then we'll get the user's preferred page.
+					redirectUri = SessionContext.getLastPageRequested(request.getSession())
+					if (!redirectUri) {
+						// Get the Spring Security last page request
+						redirectUri = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
+
+						// Ignore any Ajax requested pages (yeah, Spring records those too)
+						if (redirectUri?.startsWith('/ws/')) {
+							redirectUri = ''
+						}
+
+						// Set to the user's preferred page as last ditch option
+						if (!redirectUri) {
+							redirectUri = redirectToPrefPage(project)
+						}
+					}
+
+					// TODO : JPM 10/2019 : Do not believe that SAVED_MODULE_REQUEST is used anywhere and should be removed
+					request.getSession().setAttribute('SAVED_MODULE_REQUEST', null)
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page only if the user has a selected project.

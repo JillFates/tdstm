@@ -27,7 +27,7 @@ export class PageService {
 
 		return this.http.get(pathUrl).pipe(
 			map((result: any) => {
-				return result && result.status === 'success';
+				return result.successful;
 			})
 		);
 	}
