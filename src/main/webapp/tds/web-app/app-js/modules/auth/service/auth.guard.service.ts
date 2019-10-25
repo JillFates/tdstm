@@ -35,7 +35,7 @@ export class AuthGuardService implements CanActivate {
 	 * @param route
 	 * @param state
 	 */
-	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {
+	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 		let requestedPath = `/module${state.url}`;
 
 		let guardRequests = [
@@ -43,7 +43,7 @@ export class AuthGuardService implements CanActivate {
 			this.permissionService.getPermissions()
 		];
 
-		return Observable.forkJoin(guardRequests).pipe(
+		let guardResults = Observable.forkJoin(guardRequests).pipe(
 			map(([successToSaveLastPage, permissions]) => {
 				if (!successToSaveLastPage) {
 					console.error('AuthGuardService:', 'Session has expired');
@@ -80,5 +80,16 @@ export class AuthGuardService implements CanActivate {
 				return Observable.of(false);
 			})
 		);
+
+		// Need to convert the Observable back to a Promise that canActivate requires
+		return new Promise((resolve) => {
+			return guardResults.subscribe((result: any) => {
+				if (result.value) {
+					resolve(true);
+				} else {
+					resolve(false);
+				}
+			})
+		});
 	}
 }
