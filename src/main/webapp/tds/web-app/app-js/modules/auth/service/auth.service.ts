@@ -10,10 +10,12 @@ import {USER_CONTEXT_REQUEST, UserContextModel} from '../model/user-context.mode
 // Services
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from './user.service';
+import {WindowService} from '../../../shared/services/window.service';
 // Other
 import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {PostNoticesManagerService} from './post-notices-manager.service';
+import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
 
 export enum AUTH_API_URLS {
 	SIGN_IN = '/tdstm/auth/signIn',
@@ -27,6 +29,7 @@ export class AuthService {
 		private http: HttpClient,
 		private permissionService: PermissionService,
 		private userService: UserService,
+		private windowService: WindowService,
 		private postNoticesManagerService: PostNoticesManagerService,
 		private store: Store) {
 	}
@@ -93,8 +96,10 @@ export class AuthService {
 	 * GET Logout user by calling api endpoint
 	 */
 	public logout(): Observable<boolean> {
+		localStorage.removeItem(APP_STATE_KEY);
 		return this.http.get(AUTH_API_URLS.LOG_OUT).pipe(
 			map(() => {
+				this.windowService.getWindow().location.href = '/tdstm/module/auth/login';
 				return true;
 			})
 		);
