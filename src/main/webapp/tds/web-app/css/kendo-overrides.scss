@@ -49,7 +49,7 @@ kendo-numerictextbox {
     }
 
     .k-select {
-      border-color: unset;
+      border: unset;
       background-color: unset;
       background-image: unset;
       color: #0092d1;
@@ -129,7 +129,7 @@ kendo-datepicker {
 
     &:hover {
       .k-select {
-        border-color: unset;
+        border: unset;
         background-color: unset;
         background-image: unset;
         color: #0092d1;
@@ -148,6 +148,10 @@ kendo-datepicker {
       @include k-input();
     }
 
+    .k-dateinput-wrap {
+      border: unset;
+    }
+
     .k-picker-wrap {
       border-color: unset;
       border-width: unset;
@@ -160,12 +164,10 @@ kendo-datepicker {
       -webkit-box-shadow: unset;
       box-shadow: unset;
       border: unset;
-      border-color: unset;
-      border-bottom: 1px solid #0092d1;
     }
 
     .k-select {
-      border-color: unset;
+      border: unset;
       background-color: unset;
       background-image: unset;
       color: #0092d1;
