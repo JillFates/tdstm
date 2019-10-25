@@ -721,6 +721,148 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-14454')
+	void 'test can check in DOMAIN variable contains a property'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'appVendor'
+					extract 'location' load 'environment'
+
+					if ( CE == 'Microsoft'){
+						if (DOMAIN.hasProperty('appVendor')){
+							load 'Name' with DOMAIN['Vendor']
+						}
+						
+					} else {
+						if (DOMAIN.hasProperty('environment')){
+							load 'Name' with DOMAIN['Environment']
+						}
+					}
+				}
+			""".stripIndent())
+
+		then: 'Results should contain domain results associated'
+			assertWith(etlProcessor.finalResult()) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					fieldNames == ['appVendor', 'environment', 'assetName'] as Set
+					assertWith(fieldLabelMap) {
+						assetName == 'Name'
+						environment == 'Environment'
+						appVendor == 'Vendor'
+					}
+					data.size() == 2
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.appVendor) {
+							value == 'Microsoft'
+							originalValue == 'Microsoft'
+						}
+						assertWith(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						assertWith(fields.assetName) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+					}
+
+					assertWith(data[1], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 2
+						assertWith(fields.appVendor) {
+							value == 'Mozilla'
+							originalValue == 'Mozilla'
+						}
+						assertWith(fields.environment) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+						assertWith(fields.assetName) {
+							value == 'ACME Data Center'
+							originalValue == 'ACME Data Center'
+						}
+					}
+				}
+			}
+	}
+
+	@See('TM-14454')
+	void 'test can throws an Exception if DOMAIN variable is invoked incorrectly with a not previously defined local variable'() {
+
+		given:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				applicationDataSet,
+				new DebugConsole(buffer: new StringBuilder()),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'appVendor'
+					extract 'location' load 'environment'
+
+					if ( CE == 'Microsoft'){
+						if (DOMAIN.hasProperty('appVendor')){ 
+							load 'Name' with DOMAIN.appVendor
+						}
+						
+					} else {
+						if (DOMAIN.hasProperty(environment)){ // Not previously defined local variable!
+							load 'Name' with DOMAIN.environment
+						}
+							
+					}
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('environment').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'appVendor'
+					extract 'location' load 'environment'
+
+					if ( CE == 'Microsoft'){
+						if (DOMAIN.hasProperty('appVendor')){ 
+							load 'Name' with DOMAIN.appVendor
+						}
+						
+					} else {
+						if (DOMAIN.hasProperty('environment')){ 
+							load 'Name' with DOMAIN[environment] // Not previously defined local variable!
+						}
+					}
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('environment').message
+	}
+
 	void 'test can load a field using SOURCE.property'() {
 
 		given:
