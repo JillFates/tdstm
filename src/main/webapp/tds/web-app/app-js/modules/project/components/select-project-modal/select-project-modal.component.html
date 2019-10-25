@@ -13,12 +13,19 @@
               class="form-horizontal"
 			  #form='ngForm'>
 			<div class="project-list-container">
-				<div *ngFor="let project of projects; let idx = index;">
-					<label for="project{{project.id}}" class="select-project">
-						<input id="project{{project.id}}" type="radio" value="{{project.id}}" name="projectId" [(ngModel)]="selectedProjectId" >
-						<span>{{project.name}}</span>
-					</label>
-				</div>
+
+				<button class="btn btn-primary change-project-status__btn" (click)="changeProjectStatus()">
+					Show {{(selectedProjectStatus === projectType.COMPLETED)? 'Active': 'Completed'}} Projects
+				</button>
+
+				<ng-container *ngFor="let project of projects; let idx = index;">
+					<div *ngIf="project.status == selectedProjectStatus">
+						<label for="project{{project.id}}" class="select-project">
+							<input id="project{{project.id}}" type="radio" value="{{project.id}}" name="projectId" [(ngModel)]="selectedProjectId" >
+							<span>{{project.name}}</span>
+						</label>
+					</div>
+				</ng-container>
 			</div>
         </form>
     </div>

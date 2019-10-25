@@ -10,6 +10,10 @@ import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/p
 import {PostNotices} from '../../../auth/action/login.actions';
 
 // Model
+enum ProjectType {
+	ACTIVE = 'active',
+	COMPLETED = 'completed'
+};
 
 @Component({
 	selector: 'tds-select-project-modal',
@@ -17,6 +21,8 @@ import {PostNotices} from '../../../auth/action/login.actions';
 })
 export class SelectProjectModalComponent {
 	public selectedProjectId: any = null;
+	public projectType = ProjectType;
+	public selectedProjectStatus = this.projectType.ACTIVE;
 
 	constructor(
 		private projects: any[],
@@ -58,4 +64,10 @@ export class SelectProjectModalComponent {
 		this.activeDialog.close({success: false});
 	}
 
+	/**
+	 * Changes Project Status
+	 */
+	public changeProjectStatus(): void {
+		this.selectedProjectStatus = (this.selectedProjectStatus === this.projectType.ACTIVE) ? this.projectType.COMPLETED : this.projectType.ACTIVE;
+	}
 }

@@ -63,7 +63,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			List<Project> alternativeProjects = null
 			Project project = securityService.userCurrentProject
 			if (!project) {
-				List<Project> accessibleProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE, null, userLogin)
+				List<Project> accessibleProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ANY, null, userLogin)
 				switch (accessibleProjects.size()) {
 					// If they have access to no project, add the error and return.
 					case 0:
