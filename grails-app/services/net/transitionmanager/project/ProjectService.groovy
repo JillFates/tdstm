@@ -72,10 +72,14 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import org.apache.commons.lang3.time.DateUtils
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class ProjectService implements ServiceMethods {
 
@@ -171,7 +175,11 @@ class ProjectService implements ServiceMethods {
 		Map searchParams=[:], UserLogin userLogin = null) {
 
 		def projectIds = []
-		def timeNow = new Date()
+
+		// Convert the current time to beginning of the day adjusted to GMT so projects from today are considered active
+		SimpleDateFormat sdf = new SimpleDateFormat(TimeUtil.FORMAT_DATE_ISO8601)
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+		Date today = sdf.parse(sdf.format(DateUtils.truncate(TimeUtil.nowGMT(), Calendar.DAY_OF_MONTH)))
 
 		if (!userLogin) {
 			userLogin = securityService.userLogin
@@ -250,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					ge("completionDate", timeNow)
+					gt("completionDate", today)
 				} else {
-					lt('completionDate', timeNow)
+					le('completionDate', today)
 				}
 			}
 

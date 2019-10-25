@@ -161,10 +161,14 @@ export class ProjectViewEditComponent implements OnInit {
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
 				this.savedProjectLogoId = this.projectLogoId;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
-				this.projectModel.startDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate));
-				this.projectModel.startDate.setHours(0, 0, 0, 0);
-				this.projectModel.completionDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate));
-				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate = this.projectModel.startDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate)) : null
+				if (this.projectModel.startDate) {
+					this.projectModel.startDate.setHours(0, 0, 0, 0);
+				}
+				this.projectModel.completionDate = this.projectModel.completionDate ? DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate)) : null;
+				if (this.projectModel.completionDate) {
+					this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				}
 				let methodologyField = data.projectInstance ? data.projectInstance.planMethodology : '';
 				this.planMethodologies.forEach((methodology) => {
 					if (methodology.field === methodologyField) {

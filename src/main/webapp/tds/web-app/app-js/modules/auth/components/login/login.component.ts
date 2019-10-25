@@ -16,7 +16,6 @@ import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider'
 // Components
 import {MandatoryNoticesComponent} from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
 import {StandardNoticesComponent} from '../../../noticeManager/components/standard-notices/standard-notices.component';
-import {SelectProjectModalComponent} from '../../../project/components/select-project-modal/select-project-modal.component';
 // Models
 import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
 import {UserContextModel} from '../../model/user-context.model';
@@ -94,13 +93,6 @@ export class LoginComponent implements OnInit {
 			this.setFocus();
 		});
 
-		this.getCurrentUserSnapshot();
-	}
-
-	/**
-	 * Validate the current status of the User Context
-	 */
-	private getCurrentUserSnapshot(): void {
 		// If the session has already a value, redirect the user
 		this.userContextModel = this.store.selectSnapshot(UserContextState.getUserContext);
 		if (this.userContextModel !== null) {
@@ -163,22 +155,8 @@ export class LoginComponent implements OnInit {
 	private validateLogin(userContext: UserContextModel): void {
 		this.onLoginProgress = false;
 		this.userContextModel = userContext;
-
-		if (this.userContextModel.alternativeProjects && this.userContextModel.alternativeProjects.length > 0) {
-			setTimeout(() => {
-				this.dialogService.open(SelectProjectModalComponent, [{
-					provide: Array,
-					useValue: this.userContextModel.alternativeProjects
-				}]).then(result => {
-					if (result.success) {
-						setTimeout(() => {
-							this.getCurrentUserSnapshot();
-						}, 1000);
-					}
-				});
-			});
-		} else if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
-			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices && this.userContextModel.postNotices.notices.length > 0) {
+		if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
+			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices.length > 0) {
 				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map((notice: NoticeModel) => {
 					notice.sequence = notice.sequence || 0;
 					return notice;

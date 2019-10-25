@@ -673,10 +673,18 @@ class LicenseAdminService extends LicenseCommonService implements InitializingBe
 	 */
 	String getLicenseRequestBody(DomainLicense lic) {
 		String buff
+
+		String guid = "N/A"
+		Project prj = lic.projectInstance
+		if(prj) {
+			guid = prj.guid
+		}
+
 		if(lic) {
 			String body = """
 				|from: ${lic.email}
 				|Website Name: ${lic.websitename}
+				|GUID: ${guid}
 				|
 				|${lic.toEncodedMessage(grailsApplication)}
 			""".stripMargin().trim()

@@ -4,16 +4,14 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.TimeUtil
-import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
 import grails.gorm.transactions.Transactional
+import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationFailureHandler
+import grails.web.mapping.LinkGenerator
 import groovy.transform.CompileStatic
 import net.transitionmanager.exception.WrappedAuthenticationException
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.SecurityService
-import grails.web.mapping.LinkGenerator
-import grails.web.mvc.FlashScope
-import  org.grails.web.servlet.mvc.GrailsWebRequest
+import net.transitionmanager.security.UserLogin
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.authentication.BadCredentialsException
@@ -23,7 +21,6 @@ import org.springframework.security.authentication.LockedException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.util.Assert
-import org.springframework.web.context.request.RequestContextHolder
 
 import javax.security.auth.login.AccountExpiredException
 import javax.servlet.ServletException
@@ -32,7 +29,6 @@ import javax.servlet.http.HttpServletResponse
 
 import static org.quartz.DateBuilder.IntervalUnit.MINUTE
 import static org.quartz.DateBuilder.futureDate
-
 /**
  * @author <a href='mailto:burt@agileorbit.com'>Burt Beckwith</a>
  */
@@ -65,7 +61,7 @@ class TdsAuthenticationFailureHandler extends AjaxAwareAuthenticationFailureHand
 			userMsg = messageSource.getMessage('userLogin.accountDisabled.message', null, LocaleContextHolder.locale)
 		}
 		else if (e instanceof BadCredentialsException) {
-			userMsg = 'Username and password are required'
+			userMsg = messageSource.getMessage('userLogin.username.password.invalid.message', null, LocaleContextHolder.locale)
 		}
 		else if (e instanceof UsernameNotFoundException) {
 		}
