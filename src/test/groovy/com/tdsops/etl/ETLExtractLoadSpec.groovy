@@ -3204,7 +3204,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 
 		then: 'A console content could be recovered after processing an ETL Script'
-			etlProcessor.debugConsole.buffer.toString().contains('fields=[[assetName:[init:xraysrv01, value:xraysrv01]]]')
+			etlProcessor.debugConsole.buffer.toString().contains('fields=[[assetName:xraysrv01]]')
 
 		cleanup:
 			if (fileName) {
