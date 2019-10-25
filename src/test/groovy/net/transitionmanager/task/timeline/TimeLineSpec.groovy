@@ -1218,8 +1218,4 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				latestFinishDate == null
 			}
 	}
-
-	private Date hourInDay(String dateTime) {
-		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
-	}
 }
