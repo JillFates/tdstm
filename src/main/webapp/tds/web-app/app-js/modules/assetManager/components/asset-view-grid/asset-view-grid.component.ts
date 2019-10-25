@@ -93,7 +93,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() hiddenFilters = false;
 
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
-	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
+	// @ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
 	private showFullTags = false;
 	@Input()
@@ -700,7 +700,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	 * Gather the List of Selected Items for the Bulk Process
 	 */
-	public onClickBulkButton(): void {
+	public onClickBulkButton(tdsBulkChangeButton: BulkChangeButtonComponent): void {
 		this.bulkCheckboxService.getBulkSelectedItems({
 			viewId: this._viewId,
 			model: this.model,
@@ -710,7 +710,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe((results: any) => {
 				this.bulkItems = [...results.selectedAssetsIds];
 				this.selectedAssetsForBulk = [...results.selectedAssets];
-				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+				tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
 			}, (err) => console.log('Error:', err));
 	}
 

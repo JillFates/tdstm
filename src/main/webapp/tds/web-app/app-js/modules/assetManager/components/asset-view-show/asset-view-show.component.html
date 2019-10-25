@@ -2,7 +2,11 @@
 	<section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
 		<div class="button-bar text-right">
 			<div>
-				<tds-button-custom [flat]="true" icon="repeat"></tds-button-custom>
+				<!-- Refresh button -->
+				<tds-button-custom [flat]="true"
+													 [icon]="'repeat'"
+													 (click)="onQuery()">
+				</tds-button-custom>
 <!--				<tds-radial-progress class="inline-progress"-->
 <!--														 style="top: 4px; width: 30px; min-height: unset; min-width: unset; height: unset;"-->
 <!--														 [percent]="50"-->
@@ -13,7 +17,12 @@
 			<!-- New buttons -->
 			<div class="inline">
 				<label class="clr-control-label inline">Saved Views: </label>
-				<tds-button-custom icon="add-text"></tds-button-custom>
+				<!-- Asset Views dropdown -->
+				<tds-asset-view-selector #select="tdsAssetViewSelector"></tds-asset-view-selector>
+				<!-- Save / Save As button -->
+				<tds-asset-show-save-button style="margin-left: 12px"
+																		[config]="config">
+				</tds-asset-show-save-button>
 				<input id="justPlanning" type="checkbox" name="justPlanning"
 							 class="component-action-just-planning"
 							 [(ngModel)]="justPlanning">
@@ -22,11 +31,23 @@
 				</label>
 			</div>
 			<div class="inline float-right">
-				<tds-button-custom icon="plus-circle"></tds-button-custom>
-				<tds-button-custom icon="logout"></tds-button-custom>
-				<tds-button-custom icon="pencil"></tds-button-custom>
-				<tds-button-custom icon="cog"></tds-button-custom>
-				<tds-button-custom icon="download"></tds-button-custom>
+				<!-- Create button -->
+				<tds-button-custom [icon]="'plus-circle'"></tds-button-custom>
+				<tds-button-custom [icon]="'logout'"></tds-button-custom>
+				<!-- Bulk Change button -->
+				<tds-bulk-change-button #tdsBulkChangeButton
+																*ngIf="getGridConfig()"
+																[enabled]="getGridConfig() && getGridConfig().hasSelectedItems"
+																[showDelete]="true"
+																[showEdit]="true"
+																[bulkChangeType]="bulkChangeType"
+																(clickBulk)="onClickBulkButton()"
+																(operationResult)="onBulkOperationResult($event)">
+				</tds-bulk-change-button>
+				<!-- Configure/Edit view button -->
+				<tds-button-custom [icon]="'cog'" (click)="onEdit()"></tds-button-custom>
+				<!-- Export button -->
+				<tds-button-custom [icon]="'download'" (click)="onExport()"></tds-button-custom>
 			</div>
 			<!-- Save/Save As button -->
 			<!--
@@ -75,13 +96,13 @@
 			<!-- Edit (cog) button -->
 			<!--<tds-button-custom *ngIf="config.isEditAvailable"
 												 isIconButton="true"
-												 icon="cog"
+												 [icon]="cog"
 												 tooltip="Configure"
 												 class="pull-right"
 												 (click)="onEdit()">
 			</tds-button-custom>-->
 		</div>
-		<div class="box-body" style="padding-top: 0px">
+		<div class="box-body">
 			<asset-explorer-view-grid
 				#assetExplorerViewGrid
 				[hiddenFilters]="hiddenFilters"
