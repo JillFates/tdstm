@@ -67,7 +67,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
-		this.modalOptions = { isResizable: true, isCentered: true };
+		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 
@@ -452,7 +452,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {boolean}
 	 */
 	public isFormInvalid(): boolean {
-		return !this.taskEditCreateForm.form.valid ||
+		return this.taskEditCreateForm.form && !this.taskEditCreateForm.form.valid ||
 			this.hasInvalidFields() ||
 			!(this.taskEditCreateForm.form.dirty || this.hasModelChanges)
 	}
@@ -478,7 +478,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		}
 
 		const errors =  (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect' : true}  : null;
-		this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
+		this.taskEditCreateForm.form && this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
 	}
 
 	/**

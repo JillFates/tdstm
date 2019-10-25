@@ -1,6 +1,7 @@
 package net.transitionmanager.task.timeline
 
 import com.tdsops.tm.enums.domain.AssetCommentStatus
+import com.tdssrc.grails.TimeUtil
 import groovy.time.TimeCategory
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -194,10 +195,18 @@ class TaskVertex {
 	 * It is defined by {@code AssetCommentStatus#STARTED} and
 	 * {@code AssetCommentStatus#HOLD}
 	 * @return true if {@code TaskVertex#status} is in
-	 * 		[{@code AssetCommentStatus#STARTED}, {@code AssetCommentStatus#HOLD}]
+	 * 		[{@code AssetCommentStatus#STARTED},
+	 * 		{@code AssetCommentStatus#HOLD},
+	 * 		{@code AssetCommentStatus#COMPLETED},
+	 * 		{@code AssetCommentStatus#TERMINATED}]
 	 */
 	Boolean hasStarted() {
-		return status in [AssetCommentStatus.STARTED, AssetCommentStatus.HOLD]
+		return status in [
+			AssetCommentStatus.STARTED,
+			AssetCommentStatus.HOLD,
+			AssetCommentStatus.COMPLETED,
+			AssetCommentStatus.TERMINATED
+		]
 	}
 
 	/**
@@ -239,9 +248,20 @@ class TaskVertex {
 	Boolean isCriticalPath() {
 		return criticalPath
 	}
-
+	/**
+	 * Calculates Slack time based on {@code TaskVertex#status}
+	 * or based on the difference between {@code TaskVertex#earliestStartDate}
+	 * and {@code TaskVertex#latestStartDate}
+	 *
+	 * @return slack size in minutes
+	 */
 	Integer getSlack() {
-		return (hasStarted() || hasFinished()) ? 0 : (latestStart - earliestStart)
+		Integer slack = 0
+		if (!hasStarted()) {
+			slack = TimeUtil.minutesElapsed(earliestStartDate, latestStartDate)
+		}
+
+		return slack
 	}
 
 	/**

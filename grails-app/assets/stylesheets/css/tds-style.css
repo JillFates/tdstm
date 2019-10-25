@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css);
@@ -6,6 +7,7 @@
 /* Alert MSG */
 /* LOGIN */
 /* Prelogin Message */
+/* Clarity */
 .dropdown-menu > li > a {
   padding: 0 20px;
   line-height: 35px;
@@ -24,6 +26,12 @@
     margin: 0; }
     .modal-dialog .modal-content .modal-footer .btn {
       margin: 0.25rem 0.5rem 0.25rem 0; }
+
+.content-header > h1 {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 24px;
+  color: #18394B; }
 
 .clr-form.is-fullwidth {
   width: 100%; }
@@ -45,6 +53,7 @@
 
 /* General Elements */
 div.cookbook_recipes_editor div.alert {
+  font-size: 14px;
   position: fixed;
   width: 300px;
   left: 50%;
@@ -53,6 +62,13 @@ div.cookbook_recipes_editor div.alert {
   z-index: 100;
   padding: 5px 15px;
   text-align: center; }
+  div.cookbook_recipes_editor div.alert button.close {
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    font-size: 25px;
+    color: #000;
+    height: 10px; }
 
 div.cookbook_recipes_editor div.alert {
   -webkit-transition: all ease 0.5s;
@@ -183,7 +199,13 @@ svg {
   border: none !important; }
 
 div.modal-dialog {
-  padding: 0px; }
+  padding: 0px;
+  margin: unset !important;
+  visibility: visible; }
+  div.modal-dialog.modal-xlg {
+    width: 1065px; }
+  div.modal-dialog.modal-xxl {
+    width: 1350px; }
   div.modal-dialog div.modal-content {
     border-radius: 0px;
     border: 0px; }
@@ -207,18 +229,54 @@ div.modal-dialog {
         opacity: 1;
         color: #fff; }
       div.modal-dialog div.modal-content div.modal-header button.close:hover {
-        opacity: .5;
+        opacity: 0.5;
         color: #fff; }
-      div.modal-dialog div.modal-content div.modal-header h3, div.modal-dialog div.modal-content div.modal-header h4 {
+      div.modal-dialog div.modal-content div.modal-header h3,
+      div.modal-dialog div.modal-content div.modal-header h4 {
         font-size: 16px !important;
         font-weight: bold !important;
         line-height: inherit !important;
         font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif !important; }
+      div.modal-dialog div.modal-content div.modal-header .tool-box {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center; }
+        div.modal-dialog div.modal-content div.modal-header .tool-box .full-screen,
+        div.modal-dialog div.modal-content div.modal-header .tool-box .restore-screen,
+        div.modal-dialog div.modal-content div.modal-header .tool-box .close-screen {
+          background: transparent;
+          margin-left: 10px;
+          border: 0;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-pack: center;
+          -ms-flex-pack: center;
+          justify-content: center;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center; }
+          div.modal-dialog div.modal-content div.modal-header .tool-box .full-screen span,
+          div.modal-dialog div.modal-content div.modal-header .tool-box .restore-screen span,
+          div.modal-dialog div.modal-content div.modal-header .tool-box .close-screen span {
+            color: #fff; }
     div.modal-dialog div.modal-content div.modal-footer.form-group-center {
       text-align: center; }
 
 div.ui-front {
   z-index: 1050; }
+
+div.modal.no-background {
+  background: transparent !important; }
+
+div.modal.dialog-draggable-no-background {
+  background: transparent !important; }
 
 /* This will be only used to override buttons elements in certain dialogs */
 div.ui-dialog-content div.buttons .btn.btn-default {
@@ -992,7 +1050,86 @@ form .btn-with-close-icon .fa-close {
 div.dates-info-container {
   padding: 4px 0 !important; }
 
-/* Exclusive for AngularJS*/
+tds-ui-dialog #tdsUiDialog {
+  background: transparent;
+  padding: 0 !important;
+  margin: 0; }
+  tds-ui-dialog #tdsUiDialog .modal-dialog {
+    background: #fff;
+    position: fixed !important;
+    top: 45px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    overflow: hidden !important;
+    width: unset !important;
+    padding-left: 40px !important; }
+    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body {
+      max-height: calc(100vh - 119px);
+      height: calc(100vh - 119px);
+      width: calc(100vw - 55px);
+      padding: 15px 15px 24px 15px; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        grid-gap: 24px;
+        justify-items: left; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form input {
+          width: 220px; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list {
+        border-collapse: collapse;
+        width: 100%; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
+          border: 1px solid #ccc;
+          border-width: 0 0 1px 0;
+          line-height: 16px; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
+            text-align: right;
+            background-color: transparent;
+            font-size: 14px;
+            color: #18394b;
+            width: 20%;
+            min-width: 100px;
+            text-overflow: ellipsis; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
+            font-size: 14px;
+            color: #000; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
+          display: none; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n+16) {
+          display: block; }
+    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav {
+      position: absolute;
+      top: 0;
+      width: 40px;
+      bottom: 0;
+      left: 0;
+      padding-top: 24px;
+      border: solid 1px #ccc;
+      border-width: 0 1px 0 0; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .btn {
+        color: #808080; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .button-label {
+        display: none; }
+
+tds-ui-dialog .close {
+  opacity: 1; }
+  tds-ui-dialog .close .btn {
+    color: #808080; }
+  tds-ui-dialog .close .button-label {
+    display: none; }
+
+.tds-modal-content {
+  background: #fff; }
+  .tds-modal-content .modal-header {
+    padding: 24px; }
+    .tds-modal-content .modal-header .modal-title {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 26px; }
+
+/* Exclusive for AngularJS */
 .asset-tag-selector-component {
   margin: 0 5% 0 0;
   position: relative;
@@ -1023,7 +1160,7 @@ div.dates-info-container {
         font-family: FontAwesome;
         color: black;
         font-size: 14px;
-        content: "\f00d"; }
+        content: ""; }
       .asset-tag-selector-component .k-widget li span {
         margin-right: unset; }
       .asset-tag-selector-component .k-widget li span:not(.k-select) div {
@@ -1092,36 +1229,36 @@ div.dates-info-container {
 .striked-tag-item {
   text-decoration: line-through; }
 
-/*Move into colors after merge with David Branch*/
+/*Move into colors after merge with David Branch */
 .tag-black {
   background-color: black !important; }
 
 .tag-grey {
-  background-color: #e6e6e6 !important; }
+  background-color: #CCCCCC !important; }
 
 .tag-red {
   background-color: #f2d9e1 !important; }
 
 .tag-orange {
-  background-color: #f2e8d9 !important; }
+  background-color: #FAD7C3 !important; }
 
 .tag-yellow {
-  background-color: #eaf2d9 !important; }
+  background-color: #FAF0C3 !important; }
 
 .tag-green {
-  background-color: #d9f2d9 !important; }
+  background-color: #DFF0D0 !important; }
 
 .tag-cyan {
-  background-color: #d9f2ec !important; }
+  background-color: #E1F1F6 !important; }
 
 .tag-blue {
-  background-color: #d9e8f2 !important; }
+  background-color: #D3D7FA !important; }
 
 .tag-purple {
-  background-color: #dad9f2 !important; }
+  background-color: #EADEF5 !important; }
 
 .tag-pink {
-  background-color: #efd9f2 !important; }
+  background-color: #F9C7D3 !important; }
 
 .tag-white {
   background-color: white !important; }
@@ -1129,21 +1266,21 @@ div.dates-info-container {
 .tag-unselected {
   background-color: unset !important; }
 
-.asset-tag-selector-component-content .label.tag {
-  display: inline-block;
-  margin-right: 2px;
-  margin-bottom: 2px;
-  vertical-align: baseline;
-  text-align: center;
-  width: inherit;
-  height: 28px;
-  font-weight: 600;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 7px;
-  font-size: 13px;
-  font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
-  color: #656565 !important; }
+.asset-tag-selector-component-content {
+  line-height: 21px;
+    line-height-height: 21px;
+    line-height-font-weight: 600;
+    line-height-padding-left: 10px;
+    line-height-padding-right: 10px;
+    line-height-font-size: 11px;
+    line-height-color: #333 !important; }
+  .asset-tag-selector-component-content .label.tag {
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: 2px;
+    vertical-align: baseline;
+    text-align: center;
+    width: inherit; }
 
 .main-header.header-component {
   display: block;

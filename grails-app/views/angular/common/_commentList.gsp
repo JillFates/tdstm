@@ -1,5 +1,7 @@
 <td colspan="2" id="commentsInnerList">
 	<task-comment
+			[show-comment]="${showComment}"
+			[show-task]="${showTask}"
 			[asset-id]="${asset.id}"
 			[has-publish-permission]="${hasPublishPermission}"
 	 		[can-edit-comments]="${canEdit}"

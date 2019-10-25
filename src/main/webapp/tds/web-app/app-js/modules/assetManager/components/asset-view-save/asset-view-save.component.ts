@@ -9,10 +9,10 @@ import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-        <div class="modal-content asset-explorer-view-save-component">
+        <div class="tds-modal-content asset-explorer-view-save-component">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                    <clr-icon aria-hidden="true" shape="close"></clr-icon>
                 </button>
                 <h4 class="modal-title">Save List View</h4>
             </div>
@@ -52,16 +52,18 @@ import {Permission} from '../../../../shared/model/permission.model';
                     </div>
                 </form>
             </div>
-            <div class="modal-footer form-group-center">
-                <tds-button-save
-                        class="btn-primary pull-left"
+            <div class="modal-sidenav btn-link">
+				<tds-button
+					icon="floppy"
                         (click)="confirmCloseDialog()"
-                        [disabled]="!isValid()">
-                </tds-button-save>
-                <tds-button-cancel
-                        (click)="cancelCloseDialog()"
-                        class="pull-right">
-                </tds-button-cancel>
+                        [disabled]="!isValid()" title="Save">Save
+                </tds-button>
+                <tds-button
+					icon="ban"
+						(click)="cancelCloseDialog()"
+						title="Cancel"
+                        >Cancel
+                </tds-button>
             </div>
         </div>
 	`

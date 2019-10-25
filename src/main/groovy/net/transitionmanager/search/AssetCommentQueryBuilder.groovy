@@ -245,7 +245,7 @@ class AssetCommentQueryBuilder {
 	 * Create the where clause for handling time scale values.
 	 */
 	Closure timeScaleBuilder = { String field, Map fieldMap ->
-		TimeScale timeScaleValue = TimeScale.fromLabel(requestParams[field])
+		TimeScale timeScaleValue = TimeScale.fromLabel(requestParams[field].toUpperCase())
 		if (timeScaleValue == null) {
 			invalidCriterion = true
 		} else {

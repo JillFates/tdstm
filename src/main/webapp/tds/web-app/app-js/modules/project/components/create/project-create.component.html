@@ -1,7 +1,7 @@
 <div tds-handle-escape (escPressed)="cancelCloseDialog()" style="width:600px" class="project-create-component modal-content" id="project-create-component">
     <div class="modal-header">
         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">×</span>
+            <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
         <h4 class="modal-title">Project Create</h4>
     </div>
@@ -72,8 +72,16 @@
                         <tr class="prop">
                             <td valign="top" class="name">Associated Partners:</td>
                             <td valign="top" class="value">
-                                <kendo-dropdownlist style="display: block; margin-bottom: 2px" *ngFor="let partnerId of projectModel.partnerIds; let i = index" [data]="partners" [ngModel]="partnerId" (selectionChange)="partnerId = $event" [valuePrimitive]="true" [textField]="'name'" [valueField]="'id'"></kendo-dropdownlist>
-                                <button class="btn btn-secondary" (click)="projectModel.partnerIds.push(0)">Add Partner</button>
+                                <div *ngFor="let partner of projectModel.partners; let i = index">
+                                    <kendo-dropdownlist style="display: block; margin-bottom: 2px"
+                                                        [ngModel]="partner"
+                                                        (selectionChange)="onPartnerSelectionChange(partner, $event)"
+                                                        [name]="'partner_' + i"
+                                                        [data]="partners"
+                                                        [textField]="'name'"
+                                                        [valueField]="'id'"></kendo-dropdownlist>
+                                </div>
+                                <button class="btn btn-secondary" (click)="projectModel.partners.push({id:0, name:''})">Add Partner</button>
                             </td>
                         </tr>
 

@@ -6,7 +6,7 @@
 </style>
 <div class="modal fade in data-script-etl-builder-component tds-ui-modal-decorator" id="etlBuilder" data-backdrop="static" tds-handle-escape (escPressed)="cancelCloseDialog($event)" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-lg" role="document">
-		<div #resizableForm class="modal-content resizable"
+		<div #resizableForm class="tds-modal-content resizable"
              tds-ui-modal-decorator=""
              [isWindowMaximized]="isWindowMaximized"
              [options]="modalOptions">
@@ -92,7 +92,7 @@
                             <span class="pull-left" style="color: #a94442;"><b>{{ 'DATA_INGESTION.DATASCRIPT.DESIGNER.SYNTAX_ERRORS' | translate }}</b></span>
                             <span class="pull-right" style="cursor: pointer;" (click)="closeErrors()">
                                 <button aria-label="Close" class="close" type="button" style="margin-right: 5px; opacity: unset;">
-					                <span aria-hidden="true">×</span>
+					                <clr-icon aria-hidden="true" shape="close"></clr-icon>
 				                </button>
                             </span>
                             <textarea *ngIf="testHasErrors()" class="form-control console"

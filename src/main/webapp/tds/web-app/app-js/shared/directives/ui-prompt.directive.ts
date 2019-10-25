@@ -15,9 +15,11 @@ declare var jQuery: any;
 	template: `
         <div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button (click)="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <div class="tds-modal-content">
+					<div class="modal-header">
+						<button aria-label="Close" class="close" type="button" (click)="cancel()">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
+						</button>
                         <h4 class="modal-title">{{title}}</h4>
                     </div>
                     <div class="modal-body">
@@ -29,8 +31,8 @@ declare var jQuery: any;
                         </form>
                     </div>
                     <div class="modal-footer form-group-center">
-                        <button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
-                        <button (click)="cancel()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}</button>
+						<tds-button theme="primary" (click)="confirm()" [icon]="!hideIconButtons && 'check'">{{confirmLabel}}</tds-button>
+						<tds-button (click)="cancel()" [icon]="!hideIconButtons && 'ban'" data-dismiss="modal">{{cancelLabel}}</tds-button>
                     </div>
                 </div>
             </div>

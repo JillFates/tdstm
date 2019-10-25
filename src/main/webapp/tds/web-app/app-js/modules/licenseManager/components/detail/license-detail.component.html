@@ -1,6 +1,8 @@
-<div tds-autofocus class="modal-content data-script-view-edit-component" >
+<div tds-autofocus class="tds-modal-content data-script-view-edit-component" >
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+		<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+			<clr-icon aria-hidden="true" shape="close"></clr-icon>
+		</button>
 		<h4 class="modal-title">{{ (editMode ? 'LICENSE.LICENSE_EDIT' : 'LICENSE.LICENSE_DETAIL') | translate }}</h4>
 	</div>
 	<div class="modal-body">
