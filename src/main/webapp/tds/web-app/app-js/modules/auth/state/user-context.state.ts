@@ -163,15 +163,11 @@ export class UserContextState {
 	@Action(SetPageChange)
 	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
 		const state = ctx.getState();
-		return this.userService.getLicenseInfo().pipe(
-			tap(result => {
-				let notices = state.notices;
-				notices.redirectUrl = payload.path;
-				ctx.setState({
-					...state,
-					notices: notices
-				});
-			}),
-		);
+		let notices = state.notices;
+		notices.redirectUrl = payload.path;
+		ctx.setState({
+			...state,
+			notices: notices
+		});
 	}
 }
