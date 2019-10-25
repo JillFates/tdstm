@@ -3,6 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
+import {pathOr} from 'ramda';
 import {
 	CellClickEvent,
 	DetailCollapseEvent,
@@ -712,5 +713,11 @@ export class TaskListComponent {
 	 */
 	public toggleFiltering() {
 		this.isFiltering = !this.isFiltering;
+	}
+
+	public filterCounter(): number {
+		const filters = pathOr([], ['state', 'filter', 'filters'], this.grid);
+
+		return filters.length;
 	}
 }

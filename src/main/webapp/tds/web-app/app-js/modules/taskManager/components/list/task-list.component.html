@@ -145,7 +145,10 @@
 						<div *ngIf="column.type !== 'action'" [ngClass]="{'sortable-column' : (column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
-						<clr-icon *ngIf="column.type === 'action'" (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
+						<span *ngIf="column.type === 'action'">
+							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
+							<span *ngIf="isFiltering" class="badge badge-orange">{{filterCounter()}}</span>
+						</span>
 					</ng-template>
 
 					<!-- edit action column -->
@@ -176,7 +179,8 @@
 					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div class="has-feedback" *ngIf="isFiltering && column.filterable">
+<!--						has-feedback-->
+						<div *ngIf="isFiltering && column.filterable">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
 								<tds-filter-input
