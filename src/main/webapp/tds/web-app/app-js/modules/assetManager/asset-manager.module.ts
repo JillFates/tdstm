@@ -36,8 +36,8 @@ import {AssetViewExportComponent} from './components/asset-view-export/asset-vie
 import {AssetViewGridComponent} from './components/asset-view-grid/asset-view-grid.component';
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
-import {ExportComponent} from './components/asset-export/export.component';
-import {ExportAssetService} from './service/export-asset.service';
+// import {ExportComponent} from './components/asset-export/export.component';
+// import {ExportAssetService} from './service/export-asset.service';
 import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/asset-view-show-save-button.component';
 
 @NgModule({
@@ -68,7 +68,7 @@ import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/a
 		AssetViewGridComponent,
 		AssetViewShowComponent,
 		AssetViewShowSaveButtonComponent,
-		ExportComponent
+		// ExportComponent
 	],
 	providers: [
 		// Resolve
@@ -81,7 +81,7 @@ import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/a
 		CustomDomainService,
 		AssetExplorerService,
 		TagService,
-		ExportAssetService,
+		// ExportAssetService,
 		AssetGlobalFiltersService
 	],
 	exports: [],
