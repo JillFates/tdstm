@@ -27,6 +27,7 @@ import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import { BulkActionResult, BulkChangeType } from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-entity.model';
 
 declare var jQuery: any;
 
@@ -57,6 +58,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
 	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
+	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
@@ -409,5 +411,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	getGridConfig(): any {
 		return this.assetExplorerViewGrid && this.assetExplorerViewGrid.getDynamicConfiguration();
+	}
+
+	onCreateAsset(assetEntityType: ASSET_ENTITY_DIALOG_TYPES): void {
+		this.assetExplorerViewGrid.onCreateAsset(assetEntityType);
 	}
 }

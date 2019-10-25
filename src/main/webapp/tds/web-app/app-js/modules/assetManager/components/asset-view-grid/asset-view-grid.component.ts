@@ -381,7 +381,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	 * display the create asset modal
 	 */
-	protected onCreateAsset(assetEntityType: string): void {
+	public onCreateAsset(assetEntityType: string): void {
 		if (!assetEntityType) {
 			return;
 		}
