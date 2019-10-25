@@ -109,8 +109,9 @@ class WsProjectController implements ControllerMethods {
 
 		userPreferenceService.setCurrentProjectId(project.id)
 		PartyGroup company = securityService.userLoginPerson.company
+		PartyGroup projectOwner = projectService.getOwner(project)
 		String companyId = company.id
-		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(company)
+		Map projectDetails = projectService.getCompanyPartnerAndManagerDetails(projectOwner)
 
 		// Save and load various user preferences
 		userPreferenceService.setCurrentProjectId(project.id)
