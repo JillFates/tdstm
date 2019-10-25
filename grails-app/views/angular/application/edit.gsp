@@ -172,7 +172,6 @@
 							<div class="clr-form-control">
 								<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 								<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-										class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 										[(ngModel)]="model.asset.shutdownDuration" size="7"/>
 								<span style="margin-left:200px; margin-top: -20px;">m</span>
 							</div>
