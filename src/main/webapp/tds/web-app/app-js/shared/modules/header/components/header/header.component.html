@@ -1,12 +1,12 @@
 <header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav">
     <nav class="navbar navbar-static-top">
-        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': !userContext.licenseInfo?.license.isManager}">
+        <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': userContext.licenseInfo && !userContext.licenseInfo.license.isManager}">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
                     <i class="fa fa-bars"></i>
                 </button>
                 <!-- LOGO -->
-                <img id="logo-header" [src]="userContext.project.logoUrl ? userContext.project.logoUrl : '/tdstm/assets/images/TMHeaderLogo_v4.7.png'" alt="TransitionManager" border="0" />
+                <img id="logo-header" [src]="userContext.project && userContext.project.logoUrl ? userContext.project.logoUrl : '/tdstm/assets/images/TMHeaderLogo_v4.7.png'" alt="TransitionManager" border="0" />
             </div>
 
             <tds-tranman-menu></tds-tranman-menu>
@@ -23,7 +23,7 @@
                             <span *ngIf="userContext.bundle"> : {{userContext.bundle.name}}</span>
                         </a>
                     </li>
-                    <li *ngIf="!userContext.licenseInfo?.license.isManager && !userContext.licenseInfo?.license.isValid">
+                    <li *ngIf="userContext.licenseInfo && !userContext.licenseInfo.license.isManager && !userContext.licenseInfo.license.isValid">
                         <tds-license-warning></tds-license-warning>
                     </li>
                     <!-- User Account Menu -->

@@ -30,6 +30,7 @@ export class UserService {
 				if (response && response.status === 'success') {
 					return response.data;
 				}
+				return null;
 			}).catch((error: any) => error);
 	}
 }

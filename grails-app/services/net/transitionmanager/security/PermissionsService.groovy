@@ -31,29 +31,26 @@ class PermissionsService {
 	void update(Map params){
 
 		def paramList = params.column
-		jdbcTemplate.update("delete from role_permissions")
+		RolePermissions.executeUpdate('delete from RolePermissions')
+
 		for (Permissions permission in Permissions.list()) {
+
 			for (String role in Permissions.Roles.NAMES) {
 				def param = params['role_' + permission.id + '_' + role]
+
 				if (param == "on") {
 					def rolePermissions = new RolePermissions(role: role, permission: permission)
-
-					if (!rolePermissions.save()) {
-						println "Error while updating rolePermissions : $rolePermissions"
-						rolePermissions.errors.each { println it }
-					}
+					rolePermissions.save()
 				}
 			}
 		}
+
 		for(String id in paramList){
 			Permissions permissions = Permissions.get(id)
+
 			if(permissions){
 				permissions.description = params["description_"+id]
-				if(!permissions.save()){
-					permissions.errors.allErrors.each {
-						println it
-					}
-				}
+				permissions.save()
 			}
 		}
 	}
