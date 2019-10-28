@@ -210,9 +210,9 @@
 								<span style="margin-left:200px; margin-top: -20px;">m</span>
 							</div>
 
-							<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>		
-							<g:render template="/angular/common/assetTagsEdit"></g:render>
+							<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
 						</div>
+						<g:render template="/angular/common/assetTagsEdit"></g:render>
 					</ng-template>
 				</kendo-tabstrip-tab>
 
