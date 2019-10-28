@@ -64,6 +64,9 @@ class DataScript {
     String sampleFilename = ''
     String originalSampleFilename = ''
 
+	// Flag to indicate that the ETL Script when used will automatically Import and Post the transformation results
+	Boolean isAutoProcess = false
+
     static belongsTo = [project: Project, provider: Provider ]
 
     static constraints = {
@@ -75,6 +78,7 @@ class DataScript {
         etlSourceCode nullable: true
         sampleFilename  blank: true, size: 0..255
         originalSampleFilename  blank: true, size: 0..255
+		isAutoProcess nullable: false
     }
 
     static mapping = {
