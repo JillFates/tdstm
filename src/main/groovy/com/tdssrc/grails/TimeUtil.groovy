@@ -655,7 +655,7 @@ class TimeUtil {
 		ZoneOffset offset = zonedDateTime.getOffset()
 
 
-		// For undetermined reasons, 'Z' is returned for 0:00 offsets. Make sure to handle this case appropriately.
+		// For undetermined reasons, 'Z' is returned for some 0:00 offsets. Make sure to handle this case appropriately.
 		return (offset.id == 'Z') ? GMT_OFFSET : String.format("%s", offset)
 
 	}
