@@ -83,7 +83,6 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				}
 			}
 
-
 			// This map will contain all the user-related data that needs to be sent in the response's payload.
 			Map signInInfoMap = [
 				userContext: userService.getUserContext(alternativeProjects).toMap(),
@@ -91,7 +90,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			]
 
 			if (securityService.shouldLockoutAccount(userLogin)) {
-				// lock account
+				// Lockout the user account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
 
@@ -119,24 +118,9 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				} else if (userLogin.forcePasswordChange == 'Y') {
 					redirectUri = "/module/auth/changePassword"
 				} else {
-					// The following will attempt to get the URL to redirect the user to. This will either be the page requested by the user when there was
-					// no session. We'll look for those we capture through the Angular app and if not found, then check what Spring captured for any legacy
-					// page requests. If we find neither then we'll get the user's preferred page.
-					redirectUri = SessionContext.getLastPageRequested(request.getSession())
-					if (!redirectUri) {
-						// Get the Spring Security last page request
-						redirectUri = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
-
-						// Ignore any Ajax requested pages (yeah, Spring records those too)
-						if (redirectUri?.startsWith('/ws/')) {
-							redirectUri = ''
-						}
-
-						// Set to the user's preferred page as last ditch option
-						if (!redirectUri) {
-							redirectUri = redirectToPrefPage(project)
-						}
-					}
+					// The following will attempt to get the URL to redirect the user to from the /ws/user/lastPageUpdate
+					// endpoint. If one was not set then we'll set the user's preferred page.
+					redirectUri = SessionContext.getLastPageRequested(request.getSession()) ?: redirectToPrefPage(project)
 
 					// TODO : JPM 10/2019 : Do not believe that SAVED_MODULE_REQUEST is used anywhere and should be removed
 					request.getSession().setAttribute('SAVED_MODULE_REQUEST', null)
