@@ -147,7 +147,8 @@
 						</div>
 						<span *ngIf="column.type === 'action'">
 							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
-							<span *ngIf="isFiltering" class="badge badge-orange">{{filterCounter()}}</span>
+							<span *ngIf="filterCounter(); let counter"
+								  class="badge badge-orange">{{counter}}</span>
 						</span>
 					</ng-template>
 

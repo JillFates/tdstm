@@ -500,8 +500,9 @@ export class TaskListComponent {
 		if (filterColumn.property.startsWith('userSelectedCol')) {
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
-		const filters = this.grid.getFilter(filterColumn);
-		this.grid.state.filter = filters;
+		const result = this.grid.getFilter(filterColumn);
+		result.filters = result.filters.filter((filter: any) => filter.value);
+		this.grid.state.filter = result;
 		// reset pagination to be on page 1
 		this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 	}
@@ -715,6 +716,9 @@ export class TaskListComponent {
 		this.isFiltering = !this.isFiltering;
 	}
 
+	/**
+	 * Get the current number of filters selected
+	 */
 	public filterCounter(): number {
 		const filters = pathOr([], ['state', 'filter', 'filters'], this.grid);
 
