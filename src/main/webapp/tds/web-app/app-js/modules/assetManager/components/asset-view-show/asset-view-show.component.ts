@@ -415,5 +415,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	onCreateAsset(assetEntityType: ASSET_ENTITY_DIALOG_TYPES): void {
 		this.assetExplorerViewGrid.onCreateAsset(assetEntityType);
+		this.assetExplorerViewGrid.setCreatebuttonState(assetEntityType);
 	}
 }

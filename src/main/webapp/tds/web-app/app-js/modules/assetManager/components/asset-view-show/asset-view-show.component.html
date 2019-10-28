@@ -34,7 +34,26 @@
 			</div>
 			<div class="inline float-right">
 				<!-- Create button -->
-				<tds-button-custom [icon]="'plus-circle'" (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)"></tds-button-custom>
+				<clr-dropdown>
+					<tds-button clrDropdownTrigger
+						[type]="'button'"
+						[icon]="'plus-circle'">
+					</tds-button>
+					<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
+							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE);">
+							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE);">
+							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
+						</li>
+						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE);">
+							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
+						</li>
+					</clr-dropdown-menu>
+				</clr-dropdown>
 				<tds-button-custom [icon]="'logout'"></tds-button-custom>
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton

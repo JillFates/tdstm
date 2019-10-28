@@ -574,7 +574,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}).catch( error => console.log('error', error));
 	}
 
-	protected setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
+	public setCreatebuttonState(state: ASSET_ENTITY_DIALOG_TYPES) {
 		if (this._viewId === this.ASSET_ENTITY_MENU.All_ASSETS) {
 			this.createButtonState = state;
 		}
