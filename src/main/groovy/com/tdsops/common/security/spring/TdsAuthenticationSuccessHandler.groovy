@@ -42,6 +42,40 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 	UserService userService
 	NoticeService noticeService
 
+	// This is a list of the legacy pages that we can allow the user to redirect to after login. Spring Security
+	// records all page requests when the user is not logged in, including Ajax calls. Therefore we need this list
+	// to know what are acceptable to route to post login. As we refactor the pages to Angular they should be removed
+	// from this list.
+	static final List<String> LEGACY_PAGE_LIST = [
+			'/admin/exportAccounts',
+			'/admin/home',
+			'/admin/importAccounts',
+			'/assetEntity/architectureViewer',
+			'/assetEntity/assetImport',
+			'/assetEntity/assetOptions',
+			'/assetEntity/importTask',
+			'/cookbook/index#/generationHistory/359/actions',
+			'/cookbook/index#/recipes/gentasks/start',
+			'/dataTransferBatch/list',
+			'/manufacturer/list',
+			'/model/importExport',
+			'/model/list',
+			'/moveBundle/dependencyConsole',
+			'/moveEvent/exportRunbook',
+			'/newsEditor/newsEditorList',
+			'/partyGroup/list',
+			'/permissions/show',
+			'/person/list',
+			'/person/manageProjectStaff',
+			'/project/userActivationEmailsForm',
+			'/rackLayouts/create',
+			'/room/list?viewType=list',
+			'/task/listUserTasks',
+			'/task/taskGraph?initSession=true',
+			'/task/taskTimeline',
+			'/userLogin/list'
+	]
+
 	@Transactional
 	void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
 			throws ServletException, IOException {
@@ -120,10 +154,15 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				} else {
 					// The following will attempt to get the URL to redirect the user to from the /ws/user/lastPageUpdate
 					// endpoint. If one was not set then we'll set the user's preferred page.
-					redirectUri = SessionContext.getLastPageRequested(request.getSession()) ?: redirectToPrefPage(project)
-
-					// TODO : JPM 10/2019 : Do not believe that SAVED_MODULE_REQUEST is used anywhere and should be removed
-					request.getSession().setAttribute('SAVED_MODULE_REQUEST', null)
+					redirectUri = SessionContext.getLastPageRequested(request.getSession())
+					if (! redirectUri) {
+						String springLastUriRequest = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
+						if (springLastUriRequest in LEGACY_PAGE_LIST) {
+							redirectUri = '/tdstm' + springLastUriRequest
+						} else {
+							redirectUri = redirectToPrefPage(project)
+						}
+					}
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page only if the user has a selected project.
