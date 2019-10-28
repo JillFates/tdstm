@@ -26,7 +26,6 @@
 				<kendo-tabstrip-tab [title]="'Details'" [selected]="true">
 					<ng-template kendoTabContent>
 						<div class="grid-form">
-
 							<div class="clr-form-control">
 								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
 								<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
