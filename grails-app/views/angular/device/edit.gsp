@@ -229,8 +229,9 @@
                             </div>
 
                             <div class="clr-form-control">
-                                <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset.size}"/>
-                                
+								<label>
+									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+								</label>
                                 <kendo-numerictextbox
                                     [tabIndex]="31"
                                     name="deviceSize"
@@ -239,7 +240,16 @@
                                     [autoCorrect]=true
                                     [(ngModel)]="model.asset.size">
                                 </kendo-numerictextbox>
-                            </div>
+                                <kendo-dropdownlist
+                                    [tabIndex]="35"
+                                    class="tm-input-control"
+                                    name="modelAssetScaleName"
+                                    [data]="${SizeScale.getAsJsonList() as JSON}"
+                                    [(ngModel)]="model.asset.scale"
+                                    [textField]="'text'"
+                                    [valueField]="'value'">
+                                </kendo-dropdownlist>
+							</div>
 
                             <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="32" ngmodel="model.asset.assetTag"/>
                             <div class="clr-form-control">
@@ -261,19 +271,6 @@
                                     name="modelAssetPlanStatus"
                                     [data]="model.planStatusOptions"
                                     [(ngModel)]="model.asset.planStatus">
-                                </kendo-dropdownlist>
-                            </div>
-
-                            <div class="clr-form-control">
-                                <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset.scale}"/>
-                                <kendo-dropdownlist
-                                    [tabIndex]="35"
-                                    class="tm-input-control"
-                                    name="modelAssetScaleName"
-                                    [data]="${SizeScale.getAsJsonList() as JSON}"
-                                    [(ngModel)]="model.asset.scale"
-                                    [textField]="'text'"
-                                    [valueField]="'value'">
                                 </kendo-dropdownlist>
                             </div>
 

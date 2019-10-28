@@ -13,7 +13,7 @@
 				<button clrTabLink id="link1">Details</button>
 				<clr-tab-content id="content1" *clrIfActive>
                     <div class="clr-row">
-						<div class="clr-col-10">
+						<div class="clr-col-12">
 							<g:if test="${errors}">
 								<div id="messageDivId" class="message">${errors}</div>
 							</g:if>
@@ -25,8 +25,6 @@
 									<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-
-
 
 									<tr>
 										<th>									

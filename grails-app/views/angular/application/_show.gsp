@@ -77,7 +77,7 @@
 		</tr>
 		<tr>
 			<tds:clrInputLabel field="${standardFieldSpecs.url}" value="${asset.url}"/>
-			<td class="valueNW ${standardFieldSpecs.url.imp}" ><tds:textAsLink  text="${asset.url}" target="_new"/></td>
+			<td><tds:textAsLink  text="${asset.url}" target="_new"/></td>
 		</tr>
 		<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 		<tr>
