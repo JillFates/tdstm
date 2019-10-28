@@ -373,13 +373,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Determines which save operation to call based on the button id.
-	 */
-	public save(saveButtonId: string) {
-		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
-	}
-
-	/**
 	 * Determines if primary button can be Save or Save all based on permissions.
 	 */
 	public getSaveButtonId(): string {

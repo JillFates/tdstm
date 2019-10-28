@@ -39,6 +39,7 @@ import {AssetViewManagerComponent} from './components/asset-view-manager/asset-v
 // import {ExportComponent} from './components/asset-export/export.component';
 // import {ExportAssetService} from './service/export-asset.service';
 import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/asset-view-show-save-button.component';
+import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
 
 @NgModule({
 	imports: [
@@ -68,6 +69,7 @@ import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/a
 		AssetViewGridComponent,
 		AssetViewShowComponent,
 		AssetViewShowSaveButtonComponent,
+		AssetViewShowCreateButtonComponent,
 		// ExportComponent
 	],
 	providers: [

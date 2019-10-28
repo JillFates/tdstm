@@ -23,7 +23,9 @@
 				</tds-asset-view-selector>
 				<!-- Save / Save As button -->
 				<tds-asset-show-save-button style="margin-left: 12px"
-																		[config]="config">
+																		[config]="config"
+																		(save)="onSave()"
+																		(saveAs)="onSaveAs()">
 				</tds-asset-show-save-button>
 				<input id="justPlanning" type="checkbox" name="justPlanning"
 							 class="component-action-just-planning"
@@ -34,26 +36,10 @@
 			</div>
 			<div class="inline float-right">
 				<!-- Create button -->
-				<clr-dropdown>
-					<tds-button clrDropdownTrigger
-						[type]="'button'"
-						[icon]="'plus-circle'">
-					</tds-button>
-					<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
-							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE);">
-							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE);">
-							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE);">
-							<a [ngClass]="{'create-selected': assetExplorerViewGrid.createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
-						</li>
-					</clr-dropdown-menu>
-				</clr-dropdown>
+				<tds-asset-show-create-button style="margin-left: 12px"
+																			[createButtonState]="assetExplorerViewGrid.createButtonState"
+																			(createAsset)="onCreateAsset($event)">
+				</tds-asset-show-create-button>
 				<tds-button-custom [icon]="'logout'"></tds-button-custom>
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
@@ -70,32 +56,6 @@
 				<!-- Export button -->
 				<tds-button-custom [icon]="'download'" (click)="onExport()"></tds-button-custom>
 			</div>
-			<!-- Save/Save As button -->
-			<!--
-			<div class="btn-group"
-					 *ngIf="config.canShowSaveButton">
-				<tds-button-save
-					(click)="save(config.saveButtonId)"
-					[ngClass]="{'btn-default':!config.isDirty,'btn-success':config.isDirty}"
-					[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS') "
-					[attr.id]="config.saveButtonId">
-				</tds-button-save>
-				<button type="button" class="btn dropdown-toggle"
-								[ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
-								data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<span class="caret asset-view-show-caret"></span>
-					<span class="sr-only">Toggle Dropdown</span>
-				</button>
-				<ul class="dropdown-menu">
-					<li *ngIf="config.canSave">
-						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
-					</li>
-					<li *ngIf="config.canSaveAs">
-						<a (click)="onSaveAs()">{{ 'GLOBAL.SAVE_AS' | translate }}</a>
-					</li>
-				</ul>
-			</div>
-			-->
 
 			<!-- Favorite button -->
 			<!--<tds-button-custom
@@ -106,22 +66,11 @@
 				(click)="onFavorite()">
 			</tds-button-custom>-->
 
-			<!--	Export button	-->
-			<!--<tds-button-export (click)="onExport()" [id]="'btnExport'"></tds-button-export>-->
-
 			<!-- Asset Views dropdown -->
 			<!--<tds-asset-view-selector
 				#select="tdsAssetViewSelector">
 			</tds-asset-view-selector>-->
 
-			<!-- Edit (cog) button -->
-			<!--<tds-button-custom *ngIf="config.isEditAvailable"
-												 isIconButton="true"
-												 [icon]="cog"
-												 tooltip="Configure"
-												 class="pull-right"
-												 (click)="onEdit()">
-			</tds-button-custom>-->
 		</div>
 		<div class="box-body">
 			<asset-explorer-view-grid
