@@ -33,7 +33,9 @@ class SearchBundlesSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(1500)
         planningModule.goToListBundles()
+        sleep(3000)
     }
 
     def setup() {
@@ -50,7 +52,6 @@ class SearchBundlesSpec extends GebReportingSpec {
             at ListBundlesPage
         when: 'The user filter Bundles by name'
             filterByName baseName
-            selectFilter()
         then: 'The Bundles Listed contain the specified text'
             validateFilteredByName(baseName)
     }
@@ -60,30 +61,15 @@ class SearchBundlesSpec extends GebReportingSpec {
             clearNameFilter()
         when: 'The user filter Bundles by name'
             filterByDesc baseName
-            selectDescFilter()
         then: 'The Bundles Listed contain the specified text'
             validateFilteredByDesc(baseName)
     }
 
-    def "3. Filter by Planning"(){
-        given: 'The user is in Bundle List'
-            clearDescription()
-        when: 'The user filters by Planning bundles'
-            clickPlanningFilter()
-        then: 'All the bundles listed (if any )are planning bundles'
-            validateFilteredByPlanning(true) || validatePagerInfo("No items to display")
-    }
 
-    def "4. Filter by non Planning"(){
-        when: 'The user filters by Planning bundles'
-            clickNonPlanningFilter()
-        then: 'All the bundles listed (if any )are planning bundles'
-             validateFilteredByPlanning(false) || validatePagerInfo("No items to display")
-    }
 
     def "5. Filter by asset quantity"(){
         when: 'The user filters by Asset quantity'
-            clearPlanningFilter()
+            clearDescription()
             filterByQuantity("0"+qty)
         then: 'Either no results are returned or every listed bundle has the given number of assets'
             validateAssetQtyFilter(qty) || validatePagerInfo("No items to display")
@@ -111,7 +97,7 @@ class SearchBundlesSpec extends GebReportingSpec {
             filterByName(nonExName)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
        }
 
     def "9. Filter by non-existent description"(){
@@ -120,7 +106,7 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDesc(nonExName)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
     }
 
     def "10. Negative start date scenario"(){
@@ -129,7 +115,7 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDate((today-9000).format("MM/dd/YYYY"),true)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
     }
 
     def "11. Negative completion date scenario"(){
@@ -138,6 +124,6 @@ class SearchBundlesSpec extends GebReportingSpec {
              filterByDate((today-9000).format("MM/dd/YYYY"),false)
         then: 'There are no rows returned'
             numberOfRows()==0
-            validatePagerInfo("No items to display")
+            validatePagerInfo("No records available.")
        }
 }

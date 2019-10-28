@@ -57,7 +57,6 @@ class TdsLocalAuthenticationFilter extends GrailsUsernamePasswordAuthenticationF
 
 			setDetails(request, authRequest)
 
-
 			UsernamePasswordAuthenticationToken authentication =
 					(UsernamePasswordAuthenticationToken)authenticationManager.authenticate(authRequest)
 			return new UsernamePasswordAuthorityAuthenticationToken(authentication, authRequest)

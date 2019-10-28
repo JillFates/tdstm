@@ -44,7 +44,7 @@ class ETLScriptsCreationSpec extends GebReportingSpec{
         given: 'The User landed on the Menu Page after login'
             at MenuPage
         when: 'The user goes to the ETLScripts page'
-            projectsModule.goToETLScripts()
+            waitFor{ projectsModule.goToETLScripts()}
 
         then: 'The ETLScripts Page loads with no problem'
             at ETLScriptsPage
@@ -55,10 +55,12 @@ class ETLScriptsCreationSpec extends GebReportingSpec{
             at ETLScriptsPage
         when: 'The user clicks the Create ETLScripts Button'
             createBtn.click()
-
-        then: 'The pop up loads with no problem and it is closed again'
             at CreateETLScriptsPage
+
+        then: 'The pop up loads with no problem'
             waitFor{datascriptXIcon.click()}
+        and: 'And it is closed again'
+            !datascriptXIcon.displayed
     }
 
     def "3. Create a ETLScripts"() {
