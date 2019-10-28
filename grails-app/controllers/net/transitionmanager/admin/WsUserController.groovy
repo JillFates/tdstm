@@ -375,7 +375,7 @@ class WsUserController implements ControllerMethods {
 			// Record the page request (path) to the session if the user isn't logged in so that we can redirect
 			// them later after login.
 			String path = params.get('path')
-			if (path && ! isAjaxRequest()) {
+			if (path) {
 				SessionContext.setLastPageRequested(session, path)
 			}
 			renderAsJson(successful:false)
