@@ -7,7 +7,7 @@ import modules.CommonsModule
 class ETLScriptsDesignerPage extends Page{
 
     static at = {
-        modalTitle.text().trim().contains("ETL Script Designer")
+        modalTitle.text().trim().contains("ETL Script Edit")
     }
 
     static content = {

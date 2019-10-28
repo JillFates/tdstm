@@ -7,7 +7,7 @@ class CreateETLScriptsPage extends Page{
 
     static at = {
         title == "ETL Scripts"
-        modaltitle.text() == "Create ETL Script"
+        modaltitle.text() == "ETL Script Create"
         providerDdownName.text() == "Provider: *"
         datascriptDesc.text() == "Description:"
         datascriptName.text() == "Name: *"
