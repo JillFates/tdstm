@@ -151,8 +151,7 @@
 						</div>
 						<span *ngIf="column.type === 'action'">
 							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
-							<span *ngIf="filterCounter(); let counter"
-								  class="badge badge-orange">{{counter}}</span>
+							<span *ngIf="filterCounter(); let counter" class="badge badge-orange">{{counter}}</span>
 						</span>
 					</ng-template>
 
@@ -183,9 +182,21 @@
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
 						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
 					</ng-template>
-					<!-- status -->
-					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-						<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
+
+					<ng-template kendoGridCellTemplate *ngIf="column.type !== 'action'" let-dataItem>
+						<div [ngSwitch]="column.property">
+							<span *ngSwitchCase="'status'">
+								<span [ngClass]="'status status-' + dataItem[column.property]" [ngSwitch]="dataItem[column.property]">
+									<clr-icon *ngSwitchCase="'Ready'" shape="thumbs-up" class="is-solid"></clr-icon>
+									<clr-spinner *ngSwitchCase="'Started'" clrInline class="static"></clr-spinner>
+									<clr-icon *ngSwitchCase="'Hold'" shape="pause" class="is-solid"></clr-icon>
+									<clr-icon *ngSwitchCase="'Completed'" shape="check" class="is-solid"></clr-icon>
+									<clr-icon *ngSwitchDefault shape="minus" class="is-solid"></clr-icon>
+								</span>
+								{{ dataItem[column.property] }}
+							</span>
+							<span *ngSwitchDefault>{{ dataItem[column.property] }}</span>
+						</div>
 					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
