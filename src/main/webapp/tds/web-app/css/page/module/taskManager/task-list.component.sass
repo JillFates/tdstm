@@ -23,6 +23,8 @@
     .k-grid
       .k-grid-header
         height: unset
+  .badge
+    padding: 0
   .task-action-buttons
     display: inline
   .box-body.tds-kendo-grid
@@ -81,7 +83,15 @@
     justify-content: space-around
   .actions-primary-page-container
     display: flex
-    justify-content: center
+    justify-content: space-between
+    align-items: flex-end
+    .left-container
+      display: flex
+      .check-container
+        display: flex
+        align-items: flex-end
+        clr-checkbox-wrapper
+          margin-right: 15px
   .actions-secondary-page-container
     display: flex
     justify-content: flex-end
