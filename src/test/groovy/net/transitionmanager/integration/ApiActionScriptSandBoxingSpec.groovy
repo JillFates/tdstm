@@ -1,7 +1,6 @@
 package net.transitionmanager.integration
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.MessageSourceService
 import net.transitionmanager.person.Person
@@ -34,10 +33,9 @@ import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 
-@TestMixin(GrailsUnitTestMixin)
-class ApiActionScriptSandBoxingSpec extends Specification {
+class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
-	static doWithSpring = {
+	Closure doWithSpring() {{ ->
 		messageSourceService(MessageSourceService) { bean ->
 			messageSource = ref('messageSource')
 		}
@@ -49,7 +47,7 @@ class ApiActionScriptSandBoxingSpec extends Specification {
 		taskFacade(TaskFacade) { bean ->
 			bean.scope = 'prototype'
 		}
-	}
+	}}
 
 	void 'test can evaluate a PRE script using the default compiler configuration'() {
 

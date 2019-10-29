@@ -7,7 +7,7 @@ export class LicenseColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 108,
+				width: 52,
 				locked: true
 			}, {
 				label: 'Client',

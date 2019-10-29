@@ -1,12 +1,12 @@
 package net.transitionmanager.service
 
-import grails.test.mixin.TestFor
+
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.person.UserPreferenceService
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
-@TestFor(UserPreferenceService)
-class UserPreferenceServiceSpec extends Specification {
+class UserPreferenceServiceSpec extends Specification implements ServiceUnitTest<UserPreferenceService>{
 
     void '01. Test depGraph validator'() {
         setup: 'Given a basic dep graph JSON structure'

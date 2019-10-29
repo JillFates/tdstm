@@ -71,7 +71,9 @@ export const en_DICTIONARY: Object = {
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
 		},
-		'TOTAL': 'Total'
+		'TOTAL': 'Total',
+		'TIMEZONE': 'Time Zone Select',
+		'DATE_FORMAT': 'Date Format'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -205,7 +207,8 @@ export const en_DICTIONARY: Object = {
 				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',
 				'TRANSFORMED_DATA_PREVIEW': 'Transformed Data Preview',
 				'SYNTAX_ERRORS': 'Syntax Errors',
-				'ETL_BUILDER_TITLE': 'ETL Script Designer',
+				'ETL_BUILDER_TITLE': 'ETL Script Edit',
+				'ETL_SCRIPT_EDIT_BUTTON': 'Edit Script',
 				'CONSOLE_TITLE': 'ETL Console',
 				'SAMPLE_DATA_TITLE': 'Sample Data',
 				'TEST': 'Test',

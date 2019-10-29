@@ -49,32 +49,44 @@ class TimelineService implements ServiceMethods {
 	 *
 	 * @param moveEvent the event to retrieve tasks for
 	 * @param viewUnpublished show only published tasks or all tasks
-	 * @return List<Task>      a list of tasks
+	 * @return List<Task> a list of tasks
 	 */
 	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
+		List<Task> tasks
 
-		if (!event)
-			return []
+		if ( event ) {
+			tasks = Task.where {
+				moveEvent == event
+				if (!viewUnpublished) {
+					isPublished == true
+				}
+			}.list()
+		} else {
+			tasks = []
+		}
 
-		return Task.where {
-			moveEvent == event
-			if (!viewUnpublished) {
-				isPublished == true
-			}
-		}.list()
+		return tasks
 	}
 
 	/**
 	 * Used to get the list of task dependencies for a given list of tasks
 	 *
-	 * @param List <AssetComment>  a list of tasks
-	 * @return List<TaskDependency>      a list of the dependencies associated to the tasks
+	 * @param List <AssetComment> a list of tasks
+	 * @return List<TaskDependency> a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
-		return TaskDependency.where {
-			assetComment in tasks
-			predecessor in tasks
-		}.list()
+		List<TaskDependency> dependencies
+
+		if ( tasks ) {
+			dependencies = TaskDependency.where {
+				assetComment in tasks
+				predecessor in tasks
+			}.list()
+		} else {
+			dependencies = []
+		}
+
+		return dependencies
 	}
 	/**
 	 * Execute critical path analysis using an instance of {@code TaskTimeLineGraph}

@@ -654,9 +654,22 @@ class TimeUtil {
 		ZonedDateTime zonedDateTime = date.atZone(zone)
 		ZoneOffset offset = zonedDateTime.getOffset()
 
-		return String.format("%s", offset)
+
+		// For undetermined reasons, 'Z' is returned for some 0:00 offsets. Make sure to handle this case appropriately.
+		return (offset.id == 'Z') ? GMT_OFFSET : String.format("%s", offset)
+
 	}
 
+	/**
+	 *  This method determines the amount of minutes elapsed between two dates
+	 *
+	 * @param start an instance of {@code Date}
+	 * @param end another instance of {@code Date}
+	 * @return elapsed minutes between start and end parameters
+	 */
+	static int minutesElapsed(Date start, Date end) {
+		return elapsed (start, end, GRANULARITY_MINUTES)
+	}
 	/**
 	 * This method determines the elapsed time between two dates and
 	 * returns the value using the given granularity (D|H|M|S).

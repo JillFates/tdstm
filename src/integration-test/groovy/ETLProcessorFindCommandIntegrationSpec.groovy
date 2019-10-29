@@ -1050,8 +1050,8 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			""".stripIndent())
 
 		then: 'It throws an Exception because project when the whenNotFound was incorrectly configured'
-			MissingPropertyException e = thrown MissingPropertyException
-			e.message == "No such property: Unknown for class: com.tdsops.etl.WhenNotFoundElement"
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == "No such property: Unknown"
 
 		cleanup:
 			if(fileName){
@@ -1114,15 +1114,15 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 
 					extract 'AssetDependencyId' load 'id'
                     extract 'AssetId' load 'asset'
-					extract 'AssetName' set primaryNameVar
-					extract 'AssetType' set primaryTypeVar
+					extract 'AssetName' set primaryName
+					extract 'AssetType' set primaryType
 
 					find Application by 'id' eq DOMAIN.asset into 'asset'
-                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryTypeVar into 'asset'
+                    elseFind Application by 'assetName' eq SOURCE.AssetName and 'assetClass' eq primaryType into 'asset'
                     elseFind Application by 'assetName' eq SOURCE.DependentName into 'asset'
 
                     whenFound 'asset' update {
-                        assetName primaryNameVar
+                        assetName primaryName
                     }
 				}
 			""".stripIndent())

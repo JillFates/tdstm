@@ -36,6 +36,7 @@ export const TaskManagerRoute: Routes = [
 				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-task-manager', subMenu: true}
 			},
 			requiresAuth: true,
+			requiresLicense: true
 		},
 		component: TaskListComponent,
 		canActivate: [

@@ -198,7 +198,7 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 			}
 	}
 
-	void 'test can throw an exception creating a DataviewSpec with extra incorrect filters'() {
+	void 'test no exception is thrown when creating a DataviewSpec with extra incorrect filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
@@ -221,12 +221,13 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 		when: 'a dataviewSpec is created'
 			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
 
-		then: 'an InvalidParamException is thrown'
-			InvalidParamException e = thrown InvalidParamException
-			e.message == "Unresolved domain application and field assetName"
+		then: 'no exception is thrown'
+			noExceptionThrown()
+		and: 'the dataviewSpec is not null'
+			dataviewSpec != null
 	}
 
-	void 'test can throw an exception creating a DataviewSpec with extra unknown filters'() {
+	void 'test no exception is thrown when creating a DataviewSpec with extra unknown filters'() {
 
 		given: 'an instance of DataviewUserParamsCommand with named filters added'
 			DataviewUserParamsCommand command = allAssetsDataviewMap as DataviewUserParamsCommand
@@ -248,9 +249,9 @@ class DataviewSpecSpec extends Specification implements FieldSpecValidateableTra
 
 		when: 'a dataviewSpec is created'
 			DataviewSpec dataviewSpec = new DataviewSpec(command, dataview, fieldSpecProject)
-
-		then: 'an InvalidParamException is thrown'
-			InvalidParamException e = thrown InvalidParamException
-			e.message == "Field Spec 'unknown' not found"
+		then: 'no exception is thrown'
+			noExceptionThrown()
+		and: 'the dataviewSpec is not null'
+			dataviewSpec != null
 	}
 }

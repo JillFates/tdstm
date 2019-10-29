@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 /**
  * Represents the properties of a method available in the Dictionary of an connector class
  */
-@ToString(includes='name,method,description', includeNames=true, includeFields=true)
+@ToString(includes='name,apiMethod,description', includeNames=true, includeFields=true)
 @CompileStatic
 class DictionaryItem {
 	String apiMethod

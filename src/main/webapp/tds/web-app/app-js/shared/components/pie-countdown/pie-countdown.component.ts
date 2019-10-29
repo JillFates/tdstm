@@ -3,6 +3,9 @@ import {CountDownItem} from './model/pie-countdown.model';
 
 import {PreferenceService, PREFERENCES_LIST} from '../../services/preference.service';
 
+/**
+ * Also known as timer component.
+ */
 @Component({
 	selector: 'tds-pie-countdown',
 	template: `
@@ -92,13 +95,12 @@ export class PieCountdownComponent implements OnInit {
 			refreshPref = this.refreshPreference;
 		}
 		this.preferenceService.setPreference(refreshPref, timerOption.seconds)
-			.subscribe(() => {
-				this.selectedTimerOption = {seconds : 0, description: ''};
-				setTimeout(() => {
-					this.selectedTimerOption = timerOption;
-					this.setCurrentInterval(this.selectedTimerOption.seconds);
-				}, 0)
-			});
+			.subscribe(() => {/* saved preference */});
+		this.selectedTimerOption = {seconds : 0, description: ''};
+		setTimeout(() => {
+			this.selectedTimerOption = timerOption;
+			this.setCurrentInterval(this.selectedTimerOption.seconds);
+		}, 0);
 		this.valueChange.emit(timerOption);
 	}
 
@@ -108,7 +110,6 @@ export class PieCountdownComponent implements OnInit {
 	*/
 	getTimerClass(): string {
 		const seconds = this.selectedTimerOption && this.selectedTimerOption.seconds || '';
-
 		return seconds ? `timer-${seconds}-seconds` : '';
 	}
 

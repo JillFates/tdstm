@@ -39,6 +39,10 @@
 									<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
 									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
 								</div>
+								<div *ngIf="column.type === 'boolean'">
+									<kendo-dropdownlist [data]="booleanFilterData" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-dropdownlist>
+									<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 10px; line-height: 30px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
+								</div>
 							</div>
 						</ng-template>
 
@@ -47,6 +51,10 @@
 									<tds-button-edit  (click)="openLicenseViewEdit(dataItem, true)"></tds-button-edit>
 									<tds-button-delete (click)="onDelete(dataItem)"></tds-button-delete>
 							</div>
+						</ng-template>
+
+						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
+							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate *ngIf="column.property === 'type'" let-dataItem>

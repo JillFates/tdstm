@@ -15,7 +15,7 @@ import { TaskService } from '../../service/task.service';
 import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGINATION_OPTIONS, LOADER_IDLE_PERIOD,
 	ModalType
 } from '../../../../shared/model/constants';
 import { forkJoin } from 'rxjs';
@@ -42,6 +42,7 @@ import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 
 @Component({
 	selector: 'task-list',
@@ -78,12 +79,13 @@ export class TaskListComponent {
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
+		private loaderService: UILoaderService,
 		private store: Store,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
-		this.gridDefaultSort = [{ field: 'taskNumber', dir: 'asc' }];
+		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;
@@ -649,6 +651,14 @@ export class TaskListComponent {
 					});
 				}
 			});
+		this.loaderService.stopProgress();
+
+		setTimeout(() => {
+			if (this.loading) {
+				this.loaderService.initProgress();
+				this.loaderService.toggle();
+			}
+		}, LOADER_IDLE_PERIOD * 10);
 	}
 
 	/**

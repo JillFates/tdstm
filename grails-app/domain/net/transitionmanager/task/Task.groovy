@@ -4,9 +4,14 @@ import com.tdsops.tm.enums.domain.AssetCommentType
 import org.apache.commons.lang3.StringUtils
 
 class Task extends AssetComment {
+
 	Task() {
 		super()
 		commentType = AssetCommentType.TASK
+	}
+
+	static constraints = {
+		actStart nullable: true
 	}
 
 	static mapping = {
