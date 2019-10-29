@@ -1,12 +1,31 @@
 <div class="content body task-list">
 	<form clrForm clrLayout="horizontal" class="">
 		<div class="clr-row">
-			<div class="clr-col-2 page-title" >
+			<div class="clr-col-12 page-header" >
 				<h1>Task Manager</h1>
+				<div>
+					<tds-button [icon]="'organization'" (click)="onViewTaskGraphHandler()" [title]="'View Task Graph'"></tds-button>
+					<tds-button [icon]="'list'" (click)="onViewTimelineHandler()" [title]="'View Timeline'"></tds-button>
+				</div>
+                <div class="refresh-container">
+					<div class="refresh-control">
+						<tds-pie-countdown
+								[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+								(timeout)="search()"
+								[hideRefresh]="true"
+								[customOptions]="[{seconds: 0, description: 'Manual'},
+																		{seconds: 60, description: '1 Min'},
+																		{seconds: 120, description: '2 Min'},
+																		{seconds: 180, description: '3 Min'},
+																		{seconds: 240, description: '4 Min'},
+																		{seconds: 300, description: '5 Min'}]">
+						</tds-pie-countdown>
+					</div>
+					<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="onFiltersChange()" class="flat" tooltip="Refresh"></tds-button-custom>
+				</div>
 			</div>
+            <!--
             <div class="clr-col-9 actions-primary-page-container">
-				<tds-button [icon]="'organization'" (click)="onViewTaskGraphHandler()" [title]="'View Task Graph'"></tds-button>
-				<tds-button [icon]="'list'" (click)="onViewTimelineHandler()" [title]="'View Timeline'"></tds-button>
 			</div>
 			<div class="clr-col-1 actions-secondary-page-container">
 				<div class="refresh-control">
@@ -24,6 +43,7 @@
 				</div>
 				<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="onFiltersChange()" class="flat" tooltip="Refresh"></tds-button-custom>
 			</div>
+			-->
 		</div>
 
 		<div class="clr-row">
