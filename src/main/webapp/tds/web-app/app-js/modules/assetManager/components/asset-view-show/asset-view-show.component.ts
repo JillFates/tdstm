@@ -58,7 +58,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
 	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
-	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
@@ -241,7 +240,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 					this.select.loadData();
 				});
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

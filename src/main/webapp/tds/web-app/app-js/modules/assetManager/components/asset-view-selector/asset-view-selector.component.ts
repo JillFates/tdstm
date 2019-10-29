@@ -41,9 +41,9 @@ import { Router } from '@angular/router';
 				</span>
 			</ng-template>
 			<ng-template kendoDropDownListHeaderTemplate>
-				<div class="has-feedback" style="margin-top:-20px;">
+				<div class="asset-view-selector has-feedback">
 					<input #viewSelectorFilter
-								 (focusout)="onFocusOut()"
+								 (focusout)="onFocusOut($event)"
 								 type="text"
 								 class="form-control"
 								 (keyup)="onSearch()"
@@ -55,18 +55,19 @@ import { Router } from '@angular/router';
 				</div>
 			</ng-template>
 			<ng-template kendoDropDownListItemTemplate let-dataItem>
-				<div class="container" *ngIf="!dataItem.default; else default">
-					<div class="row" (click)="onFolderClick(dataItem)">
+				<div class="section-container" *ngIf="!dataItem.default; else default">
+					<div class="folder-row" (click)="onFolderClick(dataItem)">
 						<i class="fa" [ngClass]="getFolderStyle(dataItem)"></i> {{dataItem.name}}
-<!--						<span class="label label-primary pull-right">{{dataItem.items.length}}</span>-->
+						<span class="badge label-primary pull-right">{{dataItem.views.length}}</span>
 					</div>
-					<div class="row" style="margin-top:5px;" *ngIf="dataItem.open">
+					<div class="option-row" *ngIf="dataItem.open">
 						<li *ngIf="isCreateVisible(dataItem)">
-							<a (click)="onCreateNew(dataItem)" class="btn"><i class="fa fa-plus-square"></i> Create New</a>
+							<a (click)="onCreateNew(dataItem)" class="btn btn-sm">
+								<i class="fa fa-plus-square"></i> Create New</a>
 						</li>
 						<li>
-							<ul style="padding-left:10px;margin-top:5px;word-wrap:break-word" *ngFor="let value of dataItem.items">
-								<a [routerLink]="['/asset','views',value.id,'show']" (click)="onFocusOut()">
+							<ul *ngFor="let value of dataItem.views">
+								<a [routerLink]="['/asset','views',value.id,'show']" (click)="onFocusOut($event)">
 									<i class="fa fa-file-text-o"></i> {{value.name}}</a>
 							</ul>
 						</li>
@@ -77,13 +78,7 @@ import { Router } from '@angular/router';
 			</ng-template>
 		</kendo-dropdownlist>
 	`,
-	encapsulation: ViewEncapsulation.None,
-	styles: [
-			`ul.k-list .k-item.k-state-selected, ul.k-list .k-item.k-state-selected:hover {
-          color: #656565;
-          background-color: #ededed;
-      }`
-	]
+	encapsulation: ViewEncapsulation.None
 })
 export class AssetViewSelectorComponent implements AfterViewInit {
 	@Input() open ? = false;
@@ -109,8 +104,6 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		service.getReports().subscribe((result) => {
 			this.data = result;
 			this.reports = result.slice();
-			console.log(this.data);
-			console.log(this.reports);
 		});
 	}
 
@@ -146,7 +139,7 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 		let regex = new RegExp(this.searchFilterSelector, 'i');
 		this.data = this.reports.map((reportGrp) => {
 			let item = { ...reportGrp };
-			item.items = item.items.filter(report => regex.test(report.name));
+			item.views = item.views.filter(report => regex.test(report.name));
 			return item;
 		});
 	}
@@ -196,9 +189,9 @@ export class AssetViewSelectorComponent implements AfterViewInit {
 	}
 
 	protected onFocusOut($event): void {
-		// if (this.dropdown.isOpen) {
-		// 	this.selectedItem = this.defaultItem.name;
-		// 	this.onToggle();
-		// }
+		if (this.dropdown.isOpen) {
+			this.selectedItem = this.defaultItem.name;
+			this.onToggle();
+		}
 	}
 }
