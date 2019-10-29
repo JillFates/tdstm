@@ -41,7 +41,7 @@
 							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="5" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 							
 							<div class="clr-form-control">
-								<label>
+								<label class="${standardFieldSpecs.size.imp?:''}">
 									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 								</label>
 								<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="6" value="${asset.size}" ngmodel="model.asset.size"/>

@@ -148,7 +148,7 @@
                                     </tr>
 
                                     <tr>
-                                        <th [ngClass]="{'highField': <tdsAngular:highlightedField fieldSpec="${standardFieldSpecs}" asset="${assetEntity}" fieldName="size" /> }">Size/Scale</th>
+                                        <th class="${standardFieldSpecs.size.imp?:''}">Size/Scale</th>
                                         <td>${assetEntity.size} ${assetEntity.scale?.value()}</td>
                                     </tr>
 

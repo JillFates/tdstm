@@ -49,7 +49,7 @@
                             </div>
 
                             <div class="clr-form-control">
-								<label>
+								<label class="${standardFieldSpecs.size.imp?:''}">
 									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 								</label>
                                 <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="7" value="${assetInstance.size}" ngmodel="model.asset.size"/>&nbsp;

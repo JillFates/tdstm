@@ -78,7 +78,7 @@
 		<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 		<tr>
 			<tds:clrInputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
-			<td class="valueNW ${standardFieldSpecs.shutdownBy.imp}" nowrap="nowrap">
+			<td nowrap="nowrap">
 				<g:if test="${shutdownById == -1}">
 					${shutdownBy}
 				</g:if>
