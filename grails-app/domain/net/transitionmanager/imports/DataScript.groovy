@@ -33,7 +33,7 @@ enum DataScriptMode {
 
 class DataScript {
 	 static enum PROPS {
-		 id, name, description, target, mode, etlSourceCode, provider, dateCreated,
+		 id, name, description, target, mode, isAutoProcess, etlSourceCode, provider, dateCreated,
 		 lastUpdated, sampleFilename, originalSampleFilename
 	 }
 	 static Set<PROPS> MINIMAL_INFO = [ PROPS.id, PROPS.name ]
@@ -49,7 +49,7 @@ class DataScript {
     // principle domain or list of domains involved in the ETL.
     String target
 
-    DataScriptMode mode
+    DataScriptMode mode = DataScriptMode.IMPORT
 
     // The etl will contain the source code which will be compiled and executed. Eventually the
     // source code will be broken out and revisioned like how it is done in Recipes.
