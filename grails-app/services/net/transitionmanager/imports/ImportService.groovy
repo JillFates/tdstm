@@ -2441,7 +2441,7 @@ class ImportService implements ServiceMethods {
 						}
 
 						// Attempt to save the record
-						if (!assetDep.save(flush:true, failOnError: false)) {
+						if (!assetDep.save(flush:true, failOnError: false, deepValidate:false)) {
 							dependencyError "Dependency save failed for row $rowNum : ${GormUtil.allErrorsString(assetDep)}"
 							continue
 						}
