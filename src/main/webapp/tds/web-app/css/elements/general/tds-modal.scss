@@ -18,7 +18,7 @@ tds-ui-dialog {
         max-height: calc(100vh - 56px - 48px);
         height: calc(100vh - 35px - 35px);
         width: calc(100vw - 40px - 35px - 35px - 22px);
-        padding: 15px 20px 24px 22px;
+        padding: 15px 20px 150px 22px;
 
         .grid-form {
           display: grid;
@@ -43,8 +43,17 @@ tds-ui-dialog {
         }
 
         .tdr-detail-list {
+          display: flex;
+          // display: table;
+          // table-layout: fixed;
           border-collapse: collapse;
           width: 100%;
+
+          div {
+            display: flex;
+            width: 50%
+          }
+
           tr {
             border: 1px solid $color-border;
             border-width: 0 0 1px 0;
@@ -54,8 +63,10 @@ tds-ui-dialog {
               background-color: transparent;
               font-size: 14px;
               color: $color-active-dark3;
-              width: 20%;
-              min-width: 100px;
+              // width: 20%;
+              min-width: 150px;
+              width: 150px;
+              max-width: 150px;
               text-overflow: ellipsis;
             }
 
