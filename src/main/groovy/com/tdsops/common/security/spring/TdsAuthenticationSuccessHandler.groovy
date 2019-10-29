@@ -54,8 +54,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			'/assetEntity/assetImport',
 			'/assetEntity/assetOptions',
 			'/assetEntity/importTask',
-			'/cookbook/index#/generationHistory/359/actions',
-			'/cookbook/index#/recipes/gentasks/start',
+			'/cookbook/index',
 			'/dataTransferBatch/list',
 			'/manufacturer/list',
 			'/model/importExport',
@@ -69,9 +68,9 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			'/person/manageProjectStaff',
 			'/project/userActivationEmailsForm',
 			'/rackLayouts/create',
-			'/room/list?viewType=list',
+			'/room/list',
 			'/task/listUserTasks',
-			'/task/taskGraph?initSession=true',
+			'/task/taskGraph',
 			'/task/taskTimeline',
 			'/userLogin/list'
 	]
@@ -157,7 +156,8 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					redirectUri = SessionContext.getLastPageRequested(request.getSession())
 					if (! redirectUri) {
 						String springLastUriRequest = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
-						if (springLastUriRequest in LEGACY_PAGE_LIST) {
+						// Check if the URL recorded by Spring matches those we know to be legacy web pages
+						if (LEGACY_PAGE_LIST.find {it.startsWith(springLastUriRequest) }) {
 							redirectUri = '/tdstm' + springLastUriRequest
 						} else {
 							redirectUri = redirectToPrefPage(project)

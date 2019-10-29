@@ -12,7 +12,7 @@ class SessionContext {
 	 * @param value
 	 */
 	static void set(HttpSession session, String key, Object value) {
-		session[key] = value
+		session.setAttribute(key, value)
 	}
 
 	/**
@@ -22,7 +22,7 @@ class SessionContext {
 	 * @return
 	 */
 	static Object get(HttpSession session, String key) {
-		session[key]
+		session.getAttribute(key)
 	}
 
 	/**
