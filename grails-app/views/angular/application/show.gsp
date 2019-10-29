@@ -1,6 +1,7 @@
 <%@page import="net.transitionmanager.asset.Application"%>
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
+<%@page import="grails.converters.JSON"%>
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 

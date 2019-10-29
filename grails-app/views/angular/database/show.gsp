@@ -35,7 +35,7 @@
                                     <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
                                     <tr>
-                                        <th>
+                                        <th class="${standardFieldSpecs.size.imp?:''}">
                                             ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
                                         </th>
                                         <td>${asset?.size}&nbsp;${asset.scale?.value()}</td>
@@ -47,7 +47,7 @@
                                     </tr>
 
                                     <tr>
-                                        <th>
+                                        <th class="${standardFieldSpecs.moveBundle.imp?:''}">
                                             ${standardFieldSpecs.moveBundle.label} : Dep. Group
                                         </th>
                                         <td>

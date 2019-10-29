@@ -49,7 +49,10 @@ class ControlTagLib {
 		}
 		StringBuilder sb = new StringBuilder("\n")
 
+		def imp = fieldSpec.imp;
+
 		sb.append('<th class="')
+		sb.append(imp);
 		if (fieldSpec.constraints.required) {
 			sb.append(' required')
 		}
@@ -58,12 +61,16 @@ class ControlTagLib {
 
 		// Build the LABEL element
 		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
+		
+		// sb.append('<span style="display: inline-block; width: 16px; height: 16px; border-radius:50%; margin-right:15px" class="')
+		// sb.append(imp)
+		// sb.append('"></span>')
 
 		sb.append(HtmlUtil.escape(fieldSpec.label))
 		if (attrs.containsKey("labelSuffix")){
             sb.append(HtmlUtil.escape(attrs.labelSuffix))
         }
-		
+
 		// Close out the TD
 		sb.append("\n</th>")
 		out << sb.toString()

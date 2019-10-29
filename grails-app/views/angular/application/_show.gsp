@@ -38,7 +38,7 @@
 			</td>
 		</tr>
 		<tr>
-			<th>
+			<th class="${standardFieldSpecs.moveBundle.imp?:''}">
 				${standardFieldSpecs.moveBundle.label} : Dep. Group
 			</th>
 			<td>
