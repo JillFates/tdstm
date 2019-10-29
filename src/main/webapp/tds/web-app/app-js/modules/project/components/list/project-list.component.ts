@@ -85,13 +85,6 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				});
 			}
 		});
-		this.router.events.subscribe((event: Event) => {
-				if (event instanceof NavigationEnd && event.url.includes('show=') && this.projectToOpen) {
-					setTimeout(() => {
-						this.showProject(this.projectToOpen);
-					});
-				}
-		});
 	}
 
 	protected toggleShowActive(): void {

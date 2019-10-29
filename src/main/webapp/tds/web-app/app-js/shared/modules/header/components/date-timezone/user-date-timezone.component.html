@@ -3,7 +3,7 @@
         <div class="tds-modal-content" tds-ui-modal-decorator="">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
-                <h4 class="modal-title">Date and Timezone</h4>
+                <h4 class="modal-title">{{ 'GLOBAL.TIMEZONE' | translate }}</h4>
             </div>
             <div class="modal-body">
                 <form id="userTimezoneForm">
@@ -18,7 +18,7 @@
                                 [valueField]="'code'"
                                 (valueChange)="onTimezoneSelected($event)">
                         </kendo-dropdownlist>
-                        <b *ngIf="!shouldReturnData" style="padding-left: 30px">Date Format:</b>
+                        <b *ngIf="!shouldReturnData" style="padding-left: 30px">{{ 'GLOBAL.DATE_FORMAT' | translate }}:</b>
                         <kendo-dropdownlist
                                 *ngIf="!shouldReturnData"
                                 id="dateTimeFormat"
@@ -55,7 +55,7 @@
                 </form>
 
                 <div class="modal-footer form-group-center">
-					<tds-button theme="primary" (click)="onSave()" icon="floppy">Save</tds-button>
+					<tds-button theme="primary" (click)="onSave()" icon="floppy">{{ 'GLOBAL.SAVE' | translate }}</tds-button>
 					<tds-button (click)="cancelCloseDialog()" icon="ban">{{'GLOBAL.CLOSE' | translate }}</tds-button>
                 </div>
             </div>

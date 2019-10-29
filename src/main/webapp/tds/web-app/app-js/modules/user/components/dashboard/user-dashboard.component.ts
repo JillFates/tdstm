@@ -25,16 +25,18 @@ import { DIALOG_SIZE } from '../../../../shared/model/constants';
 import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Store } from '@ngxs/store';
+import {SetProject} from '../../../project/actions/project.actions';
 
 @Component({
 	selector: 'user-dashboard',
-	templateUrl: 'user-dashboard.component.html',
+	templateUrl: 'user-dashboard.component.html'
 })
 export class UserDashboardComponent implements OnInit {
 	public currentPerson;
 	public selectedProjectID;
 	public selectedProject;
 	public projectInstance;
+	public projectLogoId;
 	public movedayCategories;
 	public projectList;
 	public applicationList;
@@ -63,19 +65,16 @@ export class UserDashboardComponent implements OnInit {
 		private taskService: TaskService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private store: Store
-	) {
-		this.store
-			.select(state => state.TDSApp.userContext)
-			.subscribe((userContext: UserContextModel) => {
-				this.userContext = userContext;
-			});
+		private store: Store) {
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 
 	ngOnInit() {
 		this.notifierService.broadcast({
 			name: 'notificationHeaderTitleChange',
-			title: 'User Dashboard for ' + this.userContext.person.fullName,
+			title: 'User Dashboard for ' + this.userContext.person.fullName
 		});
 
 		this.populateData();
@@ -109,8 +108,10 @@ export class UserDashboardComponent implements OnInit {
 				this.currentPerson = result.person;
 				this.movedayCategories = result.movedayCategories;
 				this.projectInstance = result.projectInstance;
+				this.projectLogoId = result.projectLogoId;
 				this.selectedProject = this.projectInstance;
 				this.selectedProjectID = this.projectInstance.id;
+				this.store.dispatch(new SetProject({id: this.projectInstance.id, name: this.projectInstance.name, logoUrl: this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId : ''}));
 			});
 		this.applicationColumnModel = new ApplicationColumnModel();
 		this.activePersonColumnModel = new ActivePersonColumnModel();
@@ -142,27 +143,34 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openTaskDetailView(comment: any): void {
+		const currentUserId = (
+			this.userContext &&
+			this.userContext.person &&
+			this.userContext.person
+		) ? this.userContext.person.id : null ;
 		let taskDetailModel: TaskDetailModel = {
 			id: comment.taskId,
 			modal: {
-				title: 'Task Detail',
+				title: 'Task Detail'
 			},
 			detail: {
-				currentUserId: 5662,
-			},
+				currentUserId
+			}
 		};
-		this.dialogService
-			.extra(TaskDetailComponent, [
-				{ provide: TaskDetailModel, useValue: taskDetailModel },
-			])
-			.then(() => {
+		this.dialogService.extra(TaskDetailComponent, [
+			{provide: TaskDetailModel, useValue: taskDetailModel}
+		]).then((result) => {
+			if (result && result.shouldOpenTask) {
+				this.openTaskDetailView(result.commentInstance)
+			} else {
 				this.fetchTasksForGrid();
-			})
-			.catch(result => {
-				if (!result) {
-					this.fetchTasksForGrid();
-				}
-			});
+			}
+
+		}).catch(result => {
+			if (!result) {
+				this.fetchTasksForGrid();
+			}
+		});
 	}
 
 	public updateTaskStatus(id, status): void {
@@ -220,24 +228,16 @@ export class UserDashboardComponent implements OnInit {
 
 	private launchManageStaff(id): void {
 		if (id) {
-			this.dialogService
-				.extra(
-					UserManageStaffComponent,
-					[
-						{ provide: 'id', useValue: id },
-						{ provide: PersonModel, useValue: {} },
-					],
-					false,
-					false
-				)
-				.then((result: any) => {
-					console.log(result);
-				})
-				.catch(result => {
-					if (result) {
-						console.error(result);
-					}
-				});
+			this.dialogService.extra(UserManageStaffComponent, [
+				{provide: 'id', useValue: id},
+				{provide: PersonModel, useValue: {}}
+			], false, false).then( (result: any)  => {
+				console.log(result);
+			}).catch(result => {
+				if (result) {
+					console.error(result);
+				}
+			});
 		}
 	}
 
@@ -246,14 +246,10 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public openAssetDialog(id, assetClass): void {
-		this.dialogService.open(
-			AssetShowComponent,
-			[
-				{ provide: 'ID', useValue: id },
-				{ provide: 'ASSET', useValue: assetClass },
-			],
-			DIALOG_SIZE.LG
-		);
+		this.dialogService.open(AssetShowComponent, [
+			{provide: 'ID', useValue: id},
+			{provide: 'ASSET', useValue: assetClass}
+		], DIALOG_SIZE.LG);
 	}
 
 	public handlePersonClicked(event): void {

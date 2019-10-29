@@ -57,10 +57,10 @@ class NewsEditorController implements ControllerMethods, PaginationMethods {
 			if (defaultEvent) {
 				moveEvent = MoveEvent.get(defaultEvent)
 				if (moveEvent?.projectId != project.id) {
-					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+					moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 				}
 			} else {
-				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ? order by me.name asc",[project])
+				moveEvent = MoveEvent.find("from MoveEvent me where me.project = ?0 order by me.name asc",[project])
 			}
 		}
 

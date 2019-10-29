@@ -1,13 +1,16 @@
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import groovy.time.TimeCategory
 import net.transitionmanager.project.MoveBundleStep
 import net.transitionmanager.project.StepSnapshot
 import spock.lang.Specification
 
-@Mock(StepSnapshot)
-class StepSnapshotTests extends Specification {
+class StepSnapshotTests extends Specification implements DataTest{
 
 	private StepSnapshot ss
+
+	void setupSpec(){
+		mockDomains StepSnapshot
+	}
 
 	void setup() {
 		def now = new Date()

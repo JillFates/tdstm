@@ -2,23 +2,26 @@ package net.transitionmanager.domain.constraint
 
 import com.tdsops.tm.enums.domain.AuthenticationMethod
 import com.tdssrc.grails.StringUtil
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.action.Credential
-import net.transitionmanager.party.PartyGroup
-import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
 import net.transitionmanager.common.Timezone
+import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.validation.Errors
 import org.springframework.validation.MapBindingResult
 import spock.lang.Specification
 
-@Mock([PartyGroup, Project, Provider, Credential, Timezone])
-class OfSameProjectConstraintSpec extends Specification {
+class OfSameProjectConstraintSpec extends Specification implements DataTest {
 
 	OfSameProjectConstraint ofSameProjectConstraint
 	Credential credential1
 	Credential credential2
+
+	void setupSpec(){
+		mockDomains PartyGroup, Project, Provider, Credential, Timezone
+	}
 
 	def setup() {
 		ofSameProjectConstraint = new OfSameProjectConstraint(this.class, 'project', true, null)

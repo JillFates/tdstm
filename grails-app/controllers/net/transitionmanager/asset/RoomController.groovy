@@ -1,28 +1,26 @@
 package net.transitionmanager.asset
 
-
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.RackService
+import net.transitionmanager.asset.RoomService
 import net.transitionmanager.command.RoomCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.model.Model
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.asset.RackService
-import net.transitionmanager.asset.RoomService
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoomController implements ControllerMethods {
@@ -325,7 +323,7 @@ class RoomController implements ControllerMethods {
 			assetsInRack.findAll{ it.assetType != 'Blade' }.each { assetEntity ->
 				spaceUsed += assetEntity?.model?.usize ? assetEntity?.model?.usize : 1
 				def powerConnectors = AssetCableMap.executeQuery(
-					'FROM AssetCableMap WHERE assetFromPort.type=? AND assetFrom=?', ["Power", assetEntity])
+					'FROM AssetCableMap WHERE assetFromPort.type=? AND assetFrom=?0', ["Power", assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def rackPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if (powerConnectorsAssigned) {
@@ -384,7 +382,7 @@ class RoomController implements ControllerMethods {
 				thisRackUsedSpace + " used of " + thisRackTotalSpace + " RU"
 			assets.each { asset->
 				def assetPowerCabling = AssetCableMap.executeQuery(
-					'FROM AssetCableMap cap WHERE cap.assetFromPort.type = ? AND cap.assetFrom = ?',["Power",asset])
+					'FROM AssetCableMap cap WHERE cap.assetFromPort.type = ?0 AND cap.assetFrom = ?1',["Power",asset])
 				def powerConnectors = assetPowerCabling.size()
 				def powerConnectorsAssigned = assetPowerCabling.findAll{it.toPower != null && it.toPower != '' }.size()
 				
@@ -579,7 +577,7 @@ class RoomController implements ControllerMethods {
 			def posResult = retrieveRackPosDetails(assetEntity, assetPos, prevUsize, location, rack)
 				usedRacks += posResult.assetUsize
 
-				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ? AND cap.assetFrom = ? ",["Power",assetEntity])
+				def powerConnectors = AssetCableMap.findAll("FROM AssetCableMap cap WHERE cap.toPower is not null AND cap.assetFromPort.type = ?0 AND cap.assetFrom = ?1 ",["Power",assetEntity])
 				def powerConnectorsAssigned = powerConnectors.size()
 				def totalPower = assetEntity.model?.powerDesign ? assetEntity.model?.powerDesign : 0
 				if (powerConnectorsAssigned) {

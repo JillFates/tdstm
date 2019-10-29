@@ -1,48 +1,42 @@
-import grails.test.mixin.TestFor
+import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.person.PersonService
 import spock.lang.Specification
+import spock.lang.Unroll
 
-@TestFor(PersonService)
-class PersonServiceTests extends Specification {
+class PersonServiceTests extends Specification implements ServiceUnitTest<PersonService> {
 
-	private int count = 0
-
-	void testParseName() {
+	@Unroll
+	void "testParseName #name parses to first: #first, midle: #middle, last: #last, and suffix: #suffix"() {
 		expect:
-		validName('John', 'John')
-		validName('John Martin', 'John', '', 'Martin')
-		validName('John Van Zant', 'John', '', 'Van Zant')
-		validName('Martin, John', 'John', '', 'Martin')
-		validName('John P. Martin', 'John', 'P.', 'Martin')
-		validName('John P. Martin Sr', 'John', 'P.', 'Martin', 'Sr')
-		validName('John P. Van Zant Sr', 'John', 'P.', 'Van Zant', 'Sr')
-		validName('John P. Martin, Sr', 'John', 'P.', 'Martin', 'Sr')
-		validName('John P. T. Martin, Sr', 'John', 'P. T.', 'Martin', 'Sr')
-		validName('John P. T. Martin Sr', 'John', 'P. T.', 'Martin', 'Sr')
-		validName('Martin, John P.', 'John', 'P.', 'Martin')
-		validName('Martin, John P. T.', 'John', 'P. T.', 'Martin')
-		validName('Van Zant, John P. T.', 'John', 'P. T.', 'Van Zant')
+			Map map = service.parseName(name)
+
+			map.first == first
+			map.middle == middle
+			map.last == last
+			map.suffix == suffix
+		where:
+			name                    || first  | middle  | last       | suffix
+			'John'                  || 'John' | ''      | ''         | ''
+			'John Martin'           || 'John' | ''      | 'Martin'   | ''
+			'John Van Zant'         || 'John' | ''      | 'Van Zant' | ''
+			'Martin, John'          || 'John' | ''      | 'Martin'   | ''
+			'John P. Martin'        || 'John' | 'P.'    | 'Martin'   | ''
+			'John P. Martin Sr'     || 'John' | 'P.'    | 'Martin'   | 'Sr'
+			'John P. Van Zant Sr'   || 'John' | 'P.'    | 'Van Zant' | 'Sr'
+			'John P. Martin, Sr'    || 'John' | 'P.'    | 'Martin'   | 'Sr'
+			'John P. T. Martin, Sr' || 'John' | 'P. T.' | 'Martin'   | 'Sr'
+			'John P. T. Martin Sr'  || 'John' | 'P. T.' | 'Martin'   | 'Sr'
+			'Martin, John P.'       || 'John' | 'P.'    | 'Martin'   | ''
+			'Martin, John P. T.'    || 'John' | 'P. T.' | 'Martin'   | ''
+			'Van Zant, John P. T.'  || 'John' | 'P. T.' | 'Van Zant' | ''
 	}
 
 	void testLastNameWithSuffix() {
 		expect:
-		"Martin, Sr." == service.lastNameWithSuffix(last: 'Martin', suffix: 'Sr.')
-		"Martin" == service.lastNameWithSuffix(last: 'Martin', suffix: '')
-		"Martin" == service.lastNameWithSuffix(last: 'Martin')
-		"" == service.lastNameWithSuffix(last: '')
-		"" == service.lastNameWithSuffix([:])
-	}
-
-	private boolean validName(String name, String first, String middle = '', String last = '', String suffix = '') {
-		count++
-
-		Map map = service.parseName(name)
-
-		assert map.first == first
-		assert map.last == last
-		assert map.middle == middle
-		assert map.suffix == suffix
-
-		true
+			"Martin, Sr." == service.lastNameWithSuffix(last: 'Martin', suffix: 'Sr.')
+			"Martin" == service.lastNameWithSuffix(last: 'Martin', suffix: '')
+			"Martin" == service.lastNameWithSuffix(last: 'Martin')
+			"" == service.lastNameWithSuffix(last: '')
+			"" == service.lastNameWithSuffix([:])
 	}
 }

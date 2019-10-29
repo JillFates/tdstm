@@ -479,7 +479,7 @@ class PersonService implements ServiceMethods {
 					map.suffix = s
 					// Split the rest to be mapped out below
 					//println "b) splitting ${split[0]}"
-					split = split[0].split("\\s+").collect { it.trim() }
+					split = split[0].split(/\s+/).collect { it.trim() }
 					//println "b) split ($split) isa ${split.getClass()}"
 				}
 				else {
@@ -490,10 +490,9 @@ class PersonService implements ServiceMethods {
 				log.error 'parseName("{}") encountered multiple commas that is not handled', name
 				return null
 			}
-		}
-		else {
+		} else {
 			// Must be first [middle] last so parse and handle below
-			split = name.split("\\s+").collect { it.trim() }
+			split = name.split(/\s+/).collect { it.trim() }
 			//println "0) split ($split) isa ${split.getClass()}"
 		}
 
@@ -512,8 +511,8 @@ class PersonService implements ServiceMethods {
 			// See if last field is a suffix
 			if (size > 1 && SUFFIXES.contains(split[-1].toLowerCase())) {
 				size--
-				map.suffix = split[size]
-				split.pop()
+				map.suffix = split.removeLast()
+
 				//println "3) split ($split) isa ${split.getClass()}"
 
 			}
@@ -521,11 +520,15 @@ class PersonService implements ServiceMethods {
 			// Check to see if we have a middle name or a compound name
 			if (size >= 2) {
 				//println "4) split ($split) isa ${split.getClass()}"
-				String last = split.pop()
-				if (COMPOUND_NAMES.contains(split[-1].toLowerCase())) {
-					last = split.pop() + ' ' + last
+				String last = split[-2]
+
+				if (COMPOUND_NAMES.contains(last.toLowerCase())) {
+					map.last = last + ' ' + split.removeLast()
+					split.removeLast()
+				} else {
+					map.last = split.removeLast()
 				}
-				map.last = last
+
 				map.middle = split.join(' ')
 				size = 0
 			}
@@ -535,12 +538,11 @@ class PersonService implements ServiceMethods {
 				map.last = split.join(' ')
 			}
 
-		}
-		else {
+		} else {
 			// Deal with Last Suff, First Middle
 
 			// Parse the Last Name element
-			List<String> last = split[0].split("\\s+").collect { it.trim() }
+			List<String> last = split[0].split(/\s+/).collect { it.trim() }
 			size = last.size()
 			if (size > 1 && SUFFIXES.contains(last[-1].toLowerCase())) {
 				size--
@@ -550,7 +552,7 @@ class PersonService implements ServiceMethods {
 			map.last = last.join(' ')
 
 			// Parse the First Name element
-			List<String> first = split[1].split("\\s+").collect { it.trim() }
+			List<String> first = split[1].split(/\s+/).collect { it.trim() }
 			map.first = first[0]
 			first = first.tail()
 			if (first.size() >= 1) {
@@ -1524,7 +1526,7 @@ class PersonService implements ServiceMethods {
 			UserLogin user = person.userLogin
 			if (user) {
 				boolean hasShowAllProj = securityService.hasPermission(user, Permission.ProjectShowAll)
-				if (hasShowAllProj && (person.company.id == projectService.getOwner(project).id || person.company.id == project.client.id)) {
+				if (hasShowAllProj && (person?.company?.id == projectService.getOwner(project)?.id || person?.company?.id == project?.client?.id)) {
 					hasAccess = true
 				} else if (hasShowAllProj) {
 					// Check if person is staff for a partner on the project

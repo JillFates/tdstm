@@ -114,7 +114,7 @@ class MoveBundleService implements ServiceMethods {
 				JOIN project p ON p.project_id = me.project_id
 				JOIN move_bundle mb ON mb.move_event_id = me.move_event_id
 				JOIN asset_transition atr ON atr.move_bundle_id = mb.move_bundle_id AND atr.voided=0
-			WHERE me.move_event_id=? AND atr.is_non_applicable = 0
+			WHERE me.move_event_id=?0 AND atr.is_non_applicable = 0
 				GROUP BY mb.move_bundle_id, atr.state_to
 			ORDER BY mb.move_bundle_id,started asc''', NumberUtil.toLong(moveEventId))
 
@@ -185,7 +185,7 @@ class MoveBundleService implements ServiceMethods {
 		}
 
 		try {
-			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ? WHERE moveBundle = ?",
+			AssetEntity.executeUpdate("UPDATE AssetEntity SET moveBundle = ?0 WHERE moveBundle = ?1",
 					[project.defaultBundle, moveBundle])
 			// remove bundle-associated data
 			userPreferenceService.removeBundleAssociatedPreferences(securityService.userLogin)
@@ -371,7 +371,7 @@ class MoveBundleService implements ServiceMethods {
 		def planningMoveBundles = allMoveBundles.findAll{return it.useForPlanning}
 		List<AssetOptions> planStatusOptions = assetOptionsService.findAllByType(AssetOptions.AssetOptionsType.STATUS_OPTION)
 		def assetDependencyList = AssetDependencyBundle.executeQuery(
-				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?', [project])
+				'SELECT distinct(dependencyBundle) FROM AssetDependencyBundle WHERE project=?0', [project])
 
 		// JPM - don't think that this is required
 		// def personList = partyRelationshipService.getCompanyStaff(project.client?.id)

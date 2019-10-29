@@ -111,7 +111,7 @@ div.onepage {
 						<tr>
 							<th>
 								<a href="javascript:void(0);" class="inlineLink"
-                                   data-asset-class="${application.app.assetClass}" data-asset-id="${application.app.id}">${application.app.assetName}</a>
+                                   data-asset-class="${application.app.assetClass.name()}" data-asset-id="${application.app.id}">${application.app.assetName}</a>
 									<g:if test="${application.app.moveBundle?.useForPlanning}"> (${application.app.moveBundle})</g:if>
 									- Supports ${application.supportAssets.size()} , Depends on ${application.dependentAssets.size()}
 							</th>

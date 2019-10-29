@@ -10,12 +10,14 @@
                             <li class="menu-child-item menu-admin-portal">
                                 <g:link controller="admin" action="home">Admin Portal</g:link>
                             </li>
-                            <tds:hasPermission permission="${Permission.LicenseAdministration}">
-                                <li class="menu-child-item menu-admin-license-admin">
-                                    <a href="/tdstm/module/license/admin/list">License Admin</a>
-                                </li>
-                            </tds:hasPermission>
-                            <g:if test="${isLicenseManagerEnabled}">
+                            <g:if test="${ ! isLicenseManagerEnabled }">
+                                <tds:hasPermission permission="${Permission.LicenseAdministration}">
+                                    <li class="menu-child-item menu-admin-license-admin">
+                                        <a href="/tdstm/module/license/admin/list">License Admin</a>
+                                    </li>
+                                </tds:hasPermission>
+                            </g:if>
+                            <g:if test="${ isLicenseManagerEnabled }">
                                 <li class="menu-child-item menu-admin-license-manager">
                                     <a href="/tdstm/app/license/manager/list">License Manager</a>
                                 </li>
@@ -28,11 +30,12 @@
                                     <g:link controller="permissions" action="show">Role Permissions</g:link>
                                 </tds:hasPermission>
                             </li>
-                            <li class="menu-child-item menu-admin-asset-options">
-                                <g:link controller="assetEntity" action="assetOptions">Asset Options</g:link>
-                            </li>
-                            <li class="divider"></li>
-                            <li class="menu-child-item menu-list-companies">
+                            <g:if test="${ ! isLicenseManagerEnabled }">
+                                <li class="menu-child-item menu-admin-asset-options">
+                                    <g:link controller="assetEntity" action="assetOptions">Asset Options</g:link>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="menu-child-item menu-list-companies">
                                 <g:link controller="partyGroup" action="list">List Companies</g:link>
                             </li>
                             <li class="menu-child-item menu-list-staff">
@@ -63,11 +66,12 @@
                             </li>
                             <li class="menu-child-item menu-sync-libraries">
                                 <g:link controller="model" action="importExport">Export Mfg & Models</g:link>
-                            </li>
+                            </li></g:if>
                         </ul>
                     </li>
                 </tds:hasPermission>
-                <li class="dropdown menu-parent-projects">
+                <g:if test="${ ! isLicenseManagerEnabled }">
+                    <li class="dropdown menu-parent-projects">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects</a>
                     <ul class="dropdown-menu menu-item-expand" role="menu">
                         <li class="menu-child-item menu-projects-active-projects">
@@ -197,29 +201,29 @@
                             <tds:hasPermission permission="${Permission.AssetExport}">
                                 <li class="menu-child-item menu-parent-assets-export-assets">
                                     <a href="/tdstm/module/export/assets">Export Assets</a>
-%{--                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>--}%
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetImport}">
-                                <li class="menu-child-item menu-parent-assets-import-assets-etl">
-                                    <g:link controller="module" action="importbatch" id="assets">Import ETL</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetImport}">
-                                <li class="menu-child-item menu-parent-assets-import-assets">
-                                    <g:link controller="assetEntity" action="assetImport">Import PMXL</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.DataTransferBatchView}">
-                                <li class="menu-child-item menu-parent-assets-manage-dep-batches">
-                                    <g:link class="mmlink" controller="module" action="importbatch" id="list">
-                                        Manage ETL Batch Import
-                                    </g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.AssetImport}">
-                                <li class="menu-child-item menu-parent-assets-manage-batches">
-                                    <g:link controller="dataTransferBatch" action="list">Manage PMXL Batch Import</g:link>
+    %{--                                    <g:link controller="assetEntity" action="exportAssets">Export Assets</g:link>--}%
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.AssetImport}">
+                                    <li class="menu-child-item menu-parent-assets-import-assets-etl">
+                                        <g:link controller="module" action="importbatch" id="assets">Import ETL</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.AssetImport}">
+                                    <li class="menu-child-item menu-parent-assets-import-assets">
+                                        <g:link controller="assetEntity" action="assetImport">Import PMXL</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.DataTransferBatchView}">
+                                    <li class="menu-child-item menu-parent-assets-manage-dep-batches">
+                                        <g:link class="mmlink" controller="module" action="importbatch" id="list">
+                                            Manage ETL Batch Import
+                                        </g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.AssetImport}">
+                                    <li class="menu-child-item menu-parent-assets-manage-batches">
+                                        <g:link controller="dataTransferBatch" action="list">Manage PMXL Batch Import</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>
@@ -261,39 +265,41 @@
                     <li class="dropdown menu-parent-tasks">
                         <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                            <li class="menu-child-item menu-parent-tasks-my-tasks">
-                                <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
-                            </li>
-                            <tds:hasPermission permission="${Permission.TaskManagerView}">
-                                <li class="menu-child-item menu-parent-tasks-task-manager">
-                                    <g:link controller="module" action="taskManager" id="list">Task Manager</g:link>
+                                <li class="menu-child-item menu-parent-tasks-my-tasks">
+                                    <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
                                 </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.TaskGraphView}">
-                                <li class="menu-child-item menu-parent-tasks-task-graph">
-                                    <g:link controller="task" action="taskGraph" params="[initSession:true]">Task Graph</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.TaskGraphView}">
+                                <tds:hasPermission permission="${Permission.TaskManagerView}">
+                                    <g:if test="${isLicenseValid}">
+                                    <li class="menu-child-item menu-parent-tasks-task-manager">
+                                        <g:link controller="module" action="taskManager" id="list">Task Manager</g:link>
+                                    </li>
+                                </g:if>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.TaskGraphView}">
+                                    <li class="menu-child-item menu-parent-tasks-task-graph">
+                                        <g:link controller="task" action="taskGraph" params="[initSession:true]">Task Graph</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-gojs-graph">
                                     <g:link controller="module" action="neighborhood">GoJS Graph</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskTimelineView}">
-                                <li class="menu-child-item menu-parent-tasks-task-timeline">
-                                    <g:link controller="task" action="taskTimeline">Task Timeline</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.RecipeView}">
-                                <li class="menu-child-item menu-parent-tasks-cookbook">
-                                    <g:link controller="cookbook" action="index">Cookbook</g:link>
-                                </li>
-                            </tds:hasPermission>
-                            <tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
-                                <li class="menu-child-item menu-parent-tasks-generation-history">
-                                    <a href="/tdstm/cookbook/index#/generationHistory">Generation History</a>
-                                </li>
-                            </tds:hasPermission>
+                                    <li class="menu-child-item menu-parent-tasks-task-timeline">
+                                        <g:link controller="task" action="taskTimeline">Task Timeline</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.RecipeView}">
+                                    <li class="menu-child-item menu-parent-tasks-cookbook">
+                                        <g:link controller="cookbook" action="index">Cookbook</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                                <tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
+                                    <li class="menu-child-item menu-parent-tasks-generation-history">
+                                        <a href="/tdstm/cookbook/index#/generationHistory">Generation History</a>
+                                    </li>
+                                </tds:hasPermission>
 
                             <tds:hasPermission permission="${Permission.RecipeGenerateTasks}">
                                 <li class="menu-child-item menu-parent-tasks-import-tasks">
@@ -315,9 +321,11 @@
                                     <a href="/tdstm/module/planning/dashboard">Planning Dashboard</a>
                                 </li>
                             </tds:hasPermission>
-                            <li class="menu-child-item menu-parent-dashboard-event-dashboard">
-                                <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
-                            </li>
+                            <g:if test="${isLicenseValid}">
+                                <li class="menu-child-item menu-parent-dashboard-event-dashboard">
+                                        <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
+                                </li>
+                            </g:if>
                             <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">
                                 <li class="menu-child-item"><g:link controller="cartTracking" action="cartTracking" >Cart Tracker</g:link></li>
@@ -354,13 +362,14 @@
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.ReportViewEventDay}">
                                 <li class="divider"></li>
-                                <li class="menu-child-item menu-reports-application-migration">
-                                    <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
-                                </li>
-                            </tds:hasPermission>
-                        </ul>
-                    </li>
-                </tds:hasPermission>
+                                    <li class="menu-child-item menu-reports-application-migration">
+                                        <g:link controller="module" action="reports" id="applicationEventResults" elementId="applicationEventResults">Application Event Results</g:link>
+                                    </li>
+                                </tds:hasPermission>
+                            </ul>
+                        </li>
+                    </tds:hasPermission>
+                </g:if>
             </ul>
         </g:if>
     </div>

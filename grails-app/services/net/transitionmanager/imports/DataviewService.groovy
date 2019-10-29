@@ -137,7 +137,7 @@ class DataviewService implements ServiceMethods {
 		validateDataviewUpdateAccessOrException(id, dataviewJson, dataview)
 
 		dataview.with {
-			reportSchema = dataviewJson.schema
+			reportSchema = dataviewJson.schema.toString()
 			isShared = dataviewJson.isShared
 		}
 
