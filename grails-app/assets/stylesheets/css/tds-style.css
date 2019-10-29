@@ -1067,7 +1067,7 @@ tds-ui-dialog #tdsUiDialog {
       max-height: calc(100vh - 56px - 48px);
       height: calc(100vh - 35px - 35px);
       width: calc(100vw - 40px - 35px - 35px - 22px);
-      padding: 15px 20px 24px 22px; }
+      padding: 15px 20px 150px 22px; }
       tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1087,28 +1087,50 @@ tds-ui-dialog #tdsUiDialog {
           tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form .truck-input-container input {
             width: 66px;
             margin-right: 10px; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list {
-        border-collapse: collapse;
-        width: 100%; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
-          border: 1px solid #ccc;
-          border-width: 0 0 1px 0;
-          line-height: 16px; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
-            text-align: right;
-            background-color: transparent;
-            font-size: 14px;
-            color: #18394b;
-            width: 20%;
-            min-width: 100px;
-            text-overflow: ellipsis; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
-            font-size: 14px;
-            color: #000; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
-          display: none; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
-          display: block; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column {
+          width: 50%; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column tr {
+            width: 100%; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column {
+          width: 100%; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column tr {
+            width: 48%; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        border: 1px solid #ccc;
+        border-width: 0 0 1px 0;
+        line-height: 16px; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
+          display: block;
+          text-align: right;
+          background-color: transparent;
+          font-size: 14px;
+          color: #18394b;
+          min-width: 150px;
+          width: 150px;
+          max-width: 150px;
+          text-overflow: ellipsis; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
+          display: block;
+          font-size: 14px;
+          color: #000; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
+        display: none; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex; }
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer,
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav {
       position: absolute;

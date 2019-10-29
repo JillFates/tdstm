@@ -25,7 +25,7 @@
 							</g:if>
                             <a (click)="showDetails = !showDetails">Toggle All Details</a>
                             <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-                                <tbody>
+                                <tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
 									<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
@@ -48,17 +48,9 @@
 									<tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
 									<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
-									<g:render template="/angular/common/assetTags"></g:render>
 								</tbody>
 							</table>
-						</div>
-						<div class="clr-col-12">
-							<table class="dates-info">
-								<tr>
-									<td class="date-created">Date created: ${dateCreated}</td>
-									<td class="last-updated">Last updated: ${lastUpdated}</td>
-								</tr>
-							</table>
+							<g:render template="/angular/common/assetTags"></g:render>
 						</div>
 					</div>
 				</clr-tab-content>

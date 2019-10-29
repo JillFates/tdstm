@@ -58,18 +58,12 @@ class ControlTagLib {
 
 		// Build the LABEL element
 		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
-		sb.append('<label for="')
-		sb.append(fieldSpec.field)
-		sb.append('"')
-		sb.append(tooltipAttrib(fieldSpec))
-		sb.append(' >')
+
 		sb.append(HtmlUtil.escape(fieldSpec.label))
 		if (attrs.containsKey("labelSuffix")){
             sb.append(HtmlUtil.escape(attrs.labelSuffix))
         }
-
-		sb.append('</label>')
-
+		
 		// Close out the TD
 		sb.append("\n</th>")
 		out << sb.toString()

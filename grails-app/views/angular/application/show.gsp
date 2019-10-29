@@ -29,6 +29,7 @@
 								<div id="messageDivId" class="message">${errors}</div>
 							</g:if>
 							<g:render template="/angular/application/show" model="[asset:applicationInstance]" ></g:render>
+							<g:render template="/angular/common/assetTags"></g:render>
 						</div>
 					</div>
 				</clr-tab-content>

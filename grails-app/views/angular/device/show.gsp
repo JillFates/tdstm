@@ -28,7 +28,7 @@
 							</g:if>
                             <a (click)="showDetails = !showDetails">Toggle All Details</a>
                             <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-                                <tbody>
+                                <tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
                                     <tds:clrRowDetail field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
                                     <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
@@ -142,9 +142,10 @@
                                     <tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
                                     <g:render template="/angular/common/customShow"></g:render>
-                                    <g:render template="/angular/common/assetTags"></g:render>
+                                    
                                 </tbody>
                             </table>
+                            <g:render template="/angular/common/assetTags"></g:render>
 						</div>
 					</div>
 				</clr-tab-content>
