@@ -478,7 +478,9 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		}
 
 		const errors =  (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect' : true}  : null;
-		this.taskEditCreateForm.form && this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
+		if (this.taskEditCreateForm.form) {
+			this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
+		}
 	}
 
 	/**
