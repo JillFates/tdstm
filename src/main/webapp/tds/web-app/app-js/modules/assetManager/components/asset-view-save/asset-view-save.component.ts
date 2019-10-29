@@ -1,12 +1,15 @@
 import {AfterViewInit, Component} from '@angular/core';
-import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { ViewModel, ViewGroupModel } from '../../../assetExplorer/model/view.model';
-import { AssetExplorerService } from '../../service/asset-explorer.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
-import { AlertType } from '../../../../shared/model/alert.model';
+import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {ViewModel, ViewGroupModel} from '../../../assetExplorer/model/view.model';
+import {AssetExplorerService} from '../../service/asset-explorer.service';
+import {NotifierService} from '../../../../shared/services/notifier.service';
+import {AlertType} from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
+
+
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
@@ -18,60 +21,80 @@ import {UserContextService} from '../../../auth/service/user-context.service';
                 <h4 class="modal-title">Save List View</h4>
             </div>
             <div class="modal-body">
-                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment" #noticeForm='ngForm'>
+                <form name="noticeForm" role="form" data-toggle="validator" class="form-horizontal left-alignment"
+                      #noticeForm='ngForm'>
                     <div class="box-body">
-                        <div >
+                        <div>
                             <label for="name" class="col-sm-3 control-label">
-	                            {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}:
+                                {{ 'ASSET_EXPLORER.SYSTEM_VIEW' | translate }}:
                             </label>
                         </div>
                         <div class="form-group" style="padding-left:160px;">
-	                        <div *ngIf="hasMaintainAssetList()">
-                                <div class="radio" style="min-height: 140px">
+                            <div *ngIf="hasMaintainAssetList() && !isDefaultProject">
+                                <div class="radio">
                                     <div>
-	                                	<label>
-                                        	<input type="radio" [disabled]="model.isSystem" name="shared">
-                                        	<span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
-                                    	</label>
+                                        <label>
+                                            <input type="radio"
+                                                   name="radio-mode"
+                                                   [value]="MODES.SMV"
+                                                   (change) = "onChangeMode()"
+                                                   [(ngModel)]="mode"
+                                                   checked>
+                                            <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
+                                        </label>
                                     </div>
                                     <div class="col-sm-9" >
                                         <label for="name" style="padding: 0;font-weight: bold">
                                             {{ 'GLOBAL.VIEW_NAME' | translate }}:*
                                         </label>
-                                        <input type="text" (keyup)="onNameChanged()" name="name" id="name" class="form-control" placeholder="View Name" [(ngModel)]="model.name" required>
-                                        <span *ngIf="!isUnique" class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
+                                        <input type="text"
+                                               name="name"
+                                               id="name"
+                                               class="form-control"
+                                               placeholder="View Name"
+                                               [disabled]="!isSaveInMyViewMode()"
+                                               (keyup)="onNameChanged()"
+                                               [(ngModel)]="model.name"
+                                               required>
+                                        <span *ngIf="!isUnique"
+                                              class="error">{{'DATA_INGESTION.DATA_VIEW' | translate }} name must be unique</span>
 
-                                        <div class="checkbox" >
-                                            <label [ngClass]="{'disabled-input' : model.isSystem}">
-                                                <input type="checkbox" name="shared">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="shared" [disabled]="!isSaveInMyViewMode()" [(ngModel)]="model.isShared">
                                                 <span>{{ 'GLOBAL.SHARE_WITH_USERS' | translate }}</span>
                                             </label>
                                         </div>
-                                        <div class="checkbox" (click)="onFavorite()">
-                                            <i class="fa fa-star-o text-yellow" style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:30px;position: relative"
-                                               [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite}"></i>
+                                        <div class="checkbox" (click)="onFavorite()" disabled>
+                                            <i class="fa fa-star-o text-yellow"
+                                               style="margin-left: -43px;padding:0 10px 10px 10px;font-size: 20px;top:2px;left:30px;position: relative"
+                                               [ngClass]="{'fa-star':model.isFavorite,'fa-star-o':!model.isFavorite,'disabled':!isSaveInMyViewMode()} "></i>
                                             <label style="margin-left:5px">
-                                                <input type="checkbox" name="favorite" style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}</label>
+                                                <input type="checkbox" name="favorite" [disabled]="!isSaveInMyViewMode()"
+                                                       style="visibility:hidden"> {{ 'GLOBAL.ADD_FAVORITES' | translate }}
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
-	                        </div>
-	                        <div *ngIf="hasMaintainAssetList()">
-                                <div class="radio">
-                                    <label for="overrideMe" >
-                                        <input id="overrideMe"  type="radio" [disabled]="model.isSystem" name="shared">
+                            </div>
+                            <div *ngIf="hasMaintainAssetList() && !isDefaultProject">
+                                <div class="radio" style="position:inherit">
+                                    <label for="overrideMe">
+                                        <input id="overrideMe" type="radio" name="radio-mode" [value]="MODES.OEVM" (change) = "onChangeMode()"
+                                               [(ngModel)]="mode">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
                                     </label>
                                 </div>
-	                        </div>
-	                        <div *ngIf="hasMaintainSystemList()">
+                            </div>
+                            <div *ngIf="hasMaintainSystemList()">
                                 <div class="radio">
                                     <label for="overrideAll">
-                                        <input id="overrideAll" type="radio" [disabled]="model.isSystem" name="shared">
+                                        <input id="overrideAll" type="radio" name="radio-mode" [value]="MODES.OEVA" (change) = "onChangeMode()"
+                                               [(ngModel)]="mode">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
                                     </label>
                                 </div>
-	                        </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -94,6 +117,14 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	public model: ViewModel;
 	private preModel: ViewModel;
 	public isUnique = true;
+	private readonly MODES = {
+		SMV: 'SMV',
+		OEVM: 'OEVM',
+		OEVA: 'OEVA'
+	};
+	public mode = this.MODES.SMV;
+	private isDefaultProject = false;
+
 	constructor(
 		model: ViewModel,
 		private favorites: ViewGroupModel,
@@ -104,7 +135,12 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		private notifier: NotifierService) {
 		this.preModel = model;
 		this.startModel(model);
-
+		this.userContextService
+			.getUserContext()
+			.subscribe(userContext => {
+				this.isDefaultProject = userContext.project.id === DEFAULT_PROJECT.id;
+				this.mode = this.isDefaultProject ? this.MODES.OEVA :  this.MODES.SMV;
+			})
 	}
 
 	ngAfterViewInit(): void {
@@ -118,9 +154,24 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public confirmCloseDialog() {
+		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
+			this.startModel(this.preModel);
+		}
 		this.assetExpService.saveReport(this.model)
 			.subscribe(result => result && this.activeDialog.close(result),
-			error => this.activeDialog.dismiss(error));
+				error => this.activeDialog.dismiss(error));
+	}
+
+	public isSaveInMyViewMode(): boolean {
+		return this.mode === this.MODES.SMV;
+	}
+
+	public isOverrideForMeMode(): boolean {
+		return this.mode === this.MODES.OEVM;
+	}
+
+	public isOverrideAllUsersMode(): boolean {
+		return this.mode === this.MODES.OEVM;
 	}
 
 	public isValid(): boolean {
@@ -128,15 +179,15 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public startModel(model) {
-		this.model = { ...model };
+		this.model = {...model};
 		if (this.model.id) {
-			this.model.name = `Copy of ${this.model.name}`;
-			this.model.id = null;
-			this.model.isSystem = false;
-			this.model.isFavorite = false;
+			const changes = {
+				name: `Copy of ${this.model.name}`
+			};
+			this.model = {...this.model, ...changes};
 		}
 		if (this.model.isSystem) {
-			this.model.isShared = false;
+			this.model = {...this.model, isShared: false};
 		}
 	}
 
@@ -174,6 +225,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public onFavorite() {
+		if(!this.isSaveInMyViewMode()){
+			return;
+		}
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
@@ -195,6 +249,12 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	}
 
+	public onChangeMode() {
+		if (this.mode !== this.MODES.SMV) {
+			this.model.name = this.preModel.name;
+		}
+	}
+
 	public onNameChanged() {
 		this.validateUniquenessDataViewByName(this.model.name);
 	}
@@ -208,6 +268,5 @@ export class AssetViewSaveComponent implements AfterViewInit {
 				.subscribe((isUnique: boolean) => this.isUnique = isUnique,
 					(error) => console.log(error.message));
 		}
-
 	}
 }
