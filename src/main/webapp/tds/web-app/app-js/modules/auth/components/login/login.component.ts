@@ -281,7 +281,8 @@ export class LoginComponent implements OnInit {
 	private navigateTo() {
 		this.redirectUser = true;
 		if (RouterUtils.isAngularRoute(this.userContextModel.notices.redirectUrl)) {
-			this.router.navigate(RouterUtils.getAngularRoute(this.userContextModel.notices.redirectUrl));
+			let routeObject = RouterUtils.getAngularRoute(this.userContextModel.notices.redirectUrl);
+			this.router.navigate(routeObject.path, {queryParams: routeObject.queryString});
 		} else {
 			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(this.userContextModel.notices.redirectUrl);
 		}

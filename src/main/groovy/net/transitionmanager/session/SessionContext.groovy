@@ -3,7 +3,7 @@ package net.transitionmanager.session
 import javax.servlet.http.HttpSession
 
 class SessionContext {
-	static final String LAST_PAGE_REQUESTED = 'LAST_PAGE_REQUESTED'
+	static final String LAST_PAGE_REQUESTED = 'net.transitionmanager.LAST_PAGE_REQUESTED'
 
 	/**
 	 * Used to add / set a variable to the session
