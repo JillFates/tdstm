@@ -157,7 +157,7 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 					if (! redirectUri) {
 						String springLastUriRequest = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
 						// Check if the URL recorded by Spring matches those we know to be legacy web pages
-						if (LEGACY_PAGE_LIST.find {it.startsWith(springLastUriRequest) }) {
+						if ( springLastUriRequest && LEGACY_PAGE_LIST.find { it.startsWith(springLastUriRequest) }) {
 							redirectUri = '/tdstm' + springLastUriRequest
 						} else {
 							redirectUri = redirectToPrefPage(project)
