@@ -1,8 +1,10 @@
 <div class="content body task-list">
 	<form clrForm clrLayout="horizontal" class="">
 		<div class="clr-row">
-			<div class="clr-col-1">&nbsp;</div>
-            <div class="clr-col-10 actions-primary-page-container">
+			<div class="clr-col-2 page-title" >
+				<h1>Task Manager</h1>
+			</div>
+            <div class="clr-col-9 actions-primary-page-container">
 				<tds-button [icon]="'organization'" (click)="onViewTaskGraphHandler()" [title]="'View Task Graph'"></tds-button>
 				<tds-button [icon]="'list'" (click)="onViewTimelineHandler()" [title]="'View Timeline'"></tds-button>
 			</div>
