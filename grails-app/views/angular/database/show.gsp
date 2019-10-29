@@ -8,7 +8,14 @@
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
-        <h4 class="modal-title">Database Detail</h4>
+		<div class="modal-title-container">
+			<div class="badge modal-badge" style="">D</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
+		<p class="modal-description">${asset.description}</p>
     </div>
     <div class="modal-body">
         <clr-tabs>
@@ -22,9 +29,7 @@
 							</g:if>
                             <a (click)="showDetails = !showDetails">Toggle All Details</a>
                             <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-                                <tbody>
-                                    <tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
-                                    <tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
+                                <tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
                                     <tds:clrRowDetail field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
                                     <tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
                                     <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
@@ -73,23 +78,24 @@
                                     </tr>
 
                                     <g:render template="/angular/common/customShow" model="[asset:asset, project:project]"></g:render>
-                                    <g:render template="/angular/common/assetTags"></g:render>
                                 </tbody>
                             </table>
-						</div>
-						<div class="clr-col-12">
-							<table class="dates-info">
-								<tr>
-									<td class="date-created">Date created: ${dateCreated}</td>
-									<td class="last-updated">Last updated: ${lastUpdated}</td>
-								</tr>
-							</table>
+							<g:render template="/angular/common/assetTags"></g:render>
 						</div>
 					</div>
 				</clr-tab-content>
 			</clr-tab>
             <clr-tab>
-				<button clrTabLink>Supports</button>
+				<button clrTabLink>Supports
+					<span class="badge">
+						<g:if test="${supportAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${supportAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
 						<div class="clr-col-12">
@@ -102,7 +108,16 @@
 				</clr-tab-content>
 			</clr-tab>
 			<clr-tab>
-				<button clrTabLink>Depends On</button>
+				<button clrTabLink>Depends On 
+					<span class="badge">
+						<g:if test="${dependentAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${dependentAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
                     <div class="clr-row">
 						<div class="clr-col-12">

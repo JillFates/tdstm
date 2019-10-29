@@ -1,107 +1,175 @@
 tds-ui-dialog {
-	#tdsUiDialog {
-		background: transparent;
-		padding: 0 !important;
-		margin: 0;
-		.modal-dialog {
-			background: $color-text-inverse;
-			position: fixed !important;
-			top: 45px !important;
-			left: 0 !important;
-			right: 0 !important;
-			bottom: 0 !important;
-			overflow: hidden !important;
-			width: unset !important;
-			padding-left: 40px !important;
-			.modal-header {
-			}
-			.modal-body {
-				max-height: calc(100vh - 119px);
-				height: calc(100vh - 119px);
-				width: calc(100vw - 55px);
-				padding:15px 15px 24px 15px;
+  #tdsUiDialog {
+    padding: 0 !important;
+    margin: 0;
+    .modal-dialog {
+      background: $color-text-inverse;
+      position: fixed !important;
+      top: 56px !important;
+      left: 35px !important;
+      right: 35px !important;
+      bottom: 48px !important;
+      overflow: hidden !important;
+      width: unset !important;
+      padding-left: 40px !important;
+      .modal-header {
+      }
+      .modal-body {
+        max-height: calc(100vh - 56px - 48px);
+        height: calc(100vh - 35px - 35px);
+        width: calc(100vw - 40px - 35px - 35px - 22px);
+        padding: 15px 20px 150px 22px;
 
-				.grid-form {
-					display: grid;
-					grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-					grid-gap: 24px;
-					justify-items: left;
+        .grid-form {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          grid-gap: 24px;
+          justify-items: left;
 
-					input {
-						width: 220px;
-					}
-				}
+          input {
+            width: 220px;
+          }
 
-				.tdr-detail-list {
-					border-collapse: collapse;
-					width: 100%;
-					tr {
-						border: 1px solid $color-border;
-						border-width: 0 0 1px 0;
-						line-height: 16px;
-						th {
-							text-align: right;
-							background-color: transparent;
-							font-size: 14px;
-							color: $color-active-dark3;
-							width: 20%;
-							min-width: 100px;
-							text-overflow: ellipsis;
-						}
+          .truck-input-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
 
-						td {
-							font-size: 14px;
-							color: $color--black;
-						}
-					}
-					&:not(.all-details) {
-						tr{
-							display: none;
-						}
-						tr:not(.nodata):nth-child(-n+16){
-							display:block;
-						}
-					}
-				}
-			}
-			.modal-sidenav {
-				position: absolute;
-				top: 0;
-				width: 40px;
-				bottom: 0;
-				left: 0;
-				padding-top: 24px;
-				border: solid 1px $color-border;
-				border-width: 0 1px 0 0;
-				.btn {
-					color: $color-icon;
-				}
-				.button-label {
-					display: none;
-				}
-			}
-		}
-	}
-	.close {
-		opacity: 1;
-		.btn {
-			color: $color-icon;
-		}
-		.button-label {
-			display: none;
-		}
-	}
+            input {
+              width: 66px;
+              margin-right: 10px;
+            }
+          }
+        }
+
+        .tdr-detail-list {
+          tbody {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            &.one-column {
+              width: 50%;
+              
+              tr {
+                width: 100%;
+              }
+            }
+            
+            &.two-column {
+              width: 100%;
+
+              tr {
+                width: 48%;
+              }
+            }
+          }
+
+          tr {
+            display: flex;
+            border: 1px solid $color-border;
+            border-width: 0 0 1px 0;
+            line-height: 16px;
+            th {
+              display: block;
+              text-align: right;
+              background-color: transparent;
+              font-size: 14px;
+              color: $color-active-dark3;
+              // width: 20%;
+              min-width: 150px;
+              width: 150px;
+              max-width: 150px;
+              text-overflow: ellipsis;
+            }
+
+            td {
+              display: block;
+              font-size: 14px;
+              color: $color--black;
+            }
+          }
+          &:not(.all-details) {
+            tr {
+              display: none;
+            }
+            tr:not(.nodata):nth-child(-n + 16) {
+              display: flex;
+            }
+          }
+        }
+      }
+      .modal-footer,
+      .modal-sidenav {
+        position: absolute;
+        top: 0;
+        width: 40px;
+        bottom: 0;
+        left: 0;
+        padding-top: 24px;
+        border: solid 1px $color-border;
+        border-width: 0 1px 0 0;
+        .btn {
+          color: $color-icon;
+        }
+        .button-label {
+          display: none;
+        }
+      }
+    }
+  }
+  .close {
+    opacity: 1;
+    .btn {
+      color: $color-icon;
+    }
+    .button-label {
+      display: none;
+    }
+  }
 }
 
 .tds-modal-content {
-	background: $color-text-inverse;
-	.modal-header {
-		padding: 24px;
-		.modal-title {
-			font-style: normal;
-			font-weight: 500;
-			font-size: 22px;
-			line-height: 26px;
-		}
-	}
+  background: $color-text-inverse;
+  .modal-header {
+    padding: 24px;
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+
+      .modal-badge {
+        width: 23px;
+        height: 23px;
+        border-radius: 100%;
+        font-size: 14px;
+      }
+
+      .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px;
+      }
+
+      .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: $color-icon;
+        margin-right: 10px;
+      }
+
+      .modal-subbadge {
+        background-color: #f38b00;
+      }
+    }
+
+    .modal-description {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      color: black;
+    }
+  }
 }

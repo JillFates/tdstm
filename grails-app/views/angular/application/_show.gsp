@@ -1,9 +1,7 @@
 <%@page defaultCodec="html" %>
 <a (click)="showDetails = !showDetails">Toggle All Details</a>
 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-	<tbody>
-		<tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
-		<tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
+	<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
 		<tds:clrRowDetail field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" />
@@ -41,9 +39,7 @@
 		</tr>
 		<tr>
 			<th>
-				<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-					${standardFieldSpecs.moveBundle.label} : Dep. Group
-				</label>
+				${standardFieldSpecs.moveBundle.label} : Dep. Group
 			</th>
 			<td>
 				${asset?.moveBundle}
@@ -135,7 +131,6 @@
 		</tr>
 		<tds:clrRowDetail field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" />
 		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
-        <g:render template="/angular/common/assetTags"></g:render>
 	</tbody>
 </table>
 

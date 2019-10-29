@@ -1051,24 +1051,23 @@ div.dates-info-container {
   padding: 4px 0 !important; }
 
 tds-ui-dialog #tdsUiDialog {
-  background: transparent;
   padding: 0 !important;
   margin: 0; }
   tds-ui-dialog #tdsUiDialog .modal-dialog {
     background: #fff;
     position: fixed !important;
-    top: 45px !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
+    top: 56px !important;
+    left: 35px !important;
+    right: 35px !important;
+    bottom: 48px !important;
     overflow: hidden !important;
     width: unset !important;
     padding-left: 40px !important; }
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body {
-      max-height: calc(100vh - 119px);
-      height: calc(100vh - 119px);
-      width: calc(100vw - 55px);
-      padding: 15px 15px 24px 15px; }
+      max-height: calc(100vh - 56px - 48px);
+      height: calc(100vh - 35px - 35px);
+      width: calc(100vw - 40px - 35px - 35px - 22px);
+      padding: 15px 20px 150px 22px; }
       tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1076,28 +1075,63 @@ tds-ui-dialog #tdsUiDialog {
         justify-items: left; }
         tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form input {
           width: 220px; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list {
-        border-collapse: collapse;
-        width: 100%; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
-          border: 1px solid #ccc;
-          border-width: 0 0 1px 0;
-          line-height: 16px; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
-            text-align: right;
-            background-color: transparent;
-            font-size: 14px;
-            color: #18394b;
-            width: 20%;
-            min-width: 100px;
-            text-overflow: ellipsis; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
-            font-size: 14px;
-            color: #000; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
-          display: none; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n+16) {
-          display: block; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form .truck-input-container {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+          justify-content: space-between;
+          -ms-flex-wrap: nowrap;
+          flex-wrap: nowrap; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form .truck-input-container input {
+            width: 66px;
+            margin-right: 10px; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column {
+          width: 50%; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column tr {
+            width: 100%; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column {
+          width: 100%; }
+          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column tr {
+            width: 48%; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        border: 1px solid #ccc;
+        border-width: 0 0 1px 0;
+        line-height: 16px; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
+          display: block;
+          text-align: right;
+          background-color: transparent;
+          font-size: 14px;
+          color: #18394b;
+          min-width: 150px;
+          width: 150px;
+          max-width: 150px;
+          text-overflow: ellipsis; }
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
+          display: block;
+          font-size: 14px;
+          color: #000; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
+        display: none; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex; }
+    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer,
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav {
       position: absolute;
       top: 0;
@@ -1107,8 +1141,10 @@ tds-ui-dialog #tdsUiDialog {
       padding-top: 24px;
       border: solid 1px #ccc;
       border-width: 0 1px 0 0; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer .btn,
       tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .btn {
         color: #808080; }
+      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer .button-label,
       tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .button-label {
         display: none; }
 
@@ -1123,11 +1159,38 @@ tds-ui-dialog .close {
   background: #fff; }
   .tds-modal-content .modal-header {
     padding: 24px; }
-    .tds-modal-content .modal-header .modal-title {
+    .tds-modal-content .modal-header .modal-title-container {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center; }
+      .tds-modal-content .modal-header .modal-title-container .modal-badge {
+        width: 23px;
+        height: 23px;
+        border-radius: 100%;
+        font-size: 14px; }
+      .tds-modal-content .modal-header .modal-title-container .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+      .tds-modal-content .modal-header .modal-title-container .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: #808080;
+        margin-right: 10px; }
+      .tds-modal-content .modal-header .modal-title-container .modal-subbadge {
+        background-color: #f38b00; }
+    .tds-modal-content .modal-header .modal-description {
       font-style: normal;
-      font-weight: 500;
-      font-size: 22px;
-      line-height: 26px; }
+      font-weight: 400;
+      font-size: 12px;
+      color: black; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
