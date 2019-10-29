@@ -70,13 +70,17 @@
 	</form>
 	<section>
 		<div class="box-body box-with-empty-header tds-kendo-grid" [ngClass]="{'is-filtering': isFiltering}">
+			<!--
+				[pageSize]="grid.state.take"
+				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
+			-->
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
 				class="task-grid"
 				[data]="grid.gridData"
-				[pageSize]="grid.state.take"
 				[skip]="grid.state.skip"
+				[pageSize]="grid.state.take"
 				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 				(pageChange)="onPageChangeHandler($event)"
 				[filterable]="true"
@@ -200,7 +204,6 @@
 					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
-<!--						has-feedback-->
 						<div *ngIf="isFiltering && column.filterable">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
@@ -214,6 +217,20 @@
 						</div>
 					</ng-template>
 				</kendo-grid-column>
+
+				<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+					<div class="clr-col-4"></div>
+					<div class="clr-col-8">
+						<tds-grid-pager
+								[total]="total"
+								[totalPages]="totalPages"
+								[currentPage]="currentPage"
+								[pageSizes]="GRID_DEFAULT_PAGINATION_OPTIONS"
+								(pageChange)="onPageChangeHandler($event)">
+						</tds-grid-pager>
+					</div>
+				</ng-template>
+
 			</kendo-grid>
 		</div>
 	</section>

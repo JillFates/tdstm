@@ -724,4 +724,12 @@ export class TaskListComponent {
 
 		return filters.length;
 	}
+
+	/**
+	 * pageChangeTaskGrid
+	 */
+	public pageChangeTaskGrid(event: PageChangeEvent): void {
+		// this.tasksPage = event;
+		// this.loadTasksGrid();
+	}
 }
