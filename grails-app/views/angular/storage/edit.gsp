@@ -55,7 +55,7 @@
                             </div>
 
                             <div class="clr-form-control">
-                                ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+                                <label>${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}</label>
                                 <tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="7" value="${asset.size}" ngmodel="model.asset.size"/>
                                 <kendo-dropdownlist
                                     [tabIndex]="8"

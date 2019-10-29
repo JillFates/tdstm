@@ -1096,7 +1096,7 @@ tds-ui-dialog #tdsUiDialog {
             color: #000; }
         tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
           display: none; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n+16) {
+        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
           display: block; }
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav {
       position: absolute;
@@ -1123,11 +1123,35 @@ tds-ui-dialog .close {
   background: #fff; }
   .tds-modal-content .modal-header {
     padding: 24px; }
-    .tds-modal-content .modal-header .modal-title {
+    .tds-modal-content .modal-header .modal-title-container {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center;
+      -webkit-box-pack: center;
+      -ms-flex-pack: center;
+      justify-content: center; }
+      .tds-modal-content .modal-header .modal-title-container .modal-badge {
+        width: 23px;
+        height: 23px;
+        border-radius: 100%; }
+      .tds-modal-content .modal-header .modal-title-container .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px; }
+      .tds-modal-content .modal-header .modal-title-container .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        background-color: #808080; }
+    .tds-modal-content .modal-header .modal-description {
       font-style: normal;
-      font-weight: 500;
-      font-size: 22px;
-      line-height: 26px; }
+      font-weight: 400;
+      font-size: 12px; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {

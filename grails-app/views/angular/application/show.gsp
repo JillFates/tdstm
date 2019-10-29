@@ -7,7 +7,15 @@
 <div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="cancelCloseDialog()"></tds-button-close>
-		<h4 class="modal-title">Application Detail</h4>
+		<%-- TODO: Implement badge with correct color and rounded corners. --%>
+		<div class="modal-title-container">
+			<div class="badge modal-badge" style="">A</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
+		<p class="modal-description">${asset.description}</p>
 	</div>
 
 	<div class="modal-body">
@@ -22,19 +30,20 @@
 							</g:if>
 							<g:render template="/angular/application/show" model="[asset:applicationInstance]" ></g:render>
 						</div>
-						<div class="clr-col-12">
-							<table class="dates-info">
-								<tr>
-									<td class="date-created">Date created: ${dateCreated}</td>
-									<td class="last-updated">Last updated: ${lastUpdated}</td>
-								</tr>
-							</table>
-						</div>
 					</div>
 				</clr-tab-content>
 			</clr-tab>
 			<clr-tab>
-				<button clrTabLink>Supports</button>
+				<button clrTabLink>Supports
+					<span class="badge">
+						<g:if test="${supportAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${supportAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
 						<div class="clr-col-12">
@@ -47,7 +56,16 @@
 				</clr-tab-content>
 			</clr-tab>
 			<clr-tab>
-				<button clrTabLink>Depends On</button>
+				<button clrTabLink>Depends On 
+					<span class="badge">
+						<g:if test="${dependentAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${dependentAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
 						<div class="clr-col-12">

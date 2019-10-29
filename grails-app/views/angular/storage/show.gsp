@@ -4,8 +4,14 @@
 
 <div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span  aria-hidden="true">×</span></button>
-		<h4 class="modal-title">Logical Storage Detail</h4>
+		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
+		<div class="modal-title-container">
+			<div class="badge modal-badge" style="">S</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
 	</div>
 	<div class="modal-body">
 		<clr-tabs>
@@ -20,8 +26,6 @@
                             <a (click)="showDetails = !showDetails">Toggle All Details</a>
                             <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
                                 <tbody>
-									<tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
-									<tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
 									<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
@@ -60,7 +64,16 @@
 				</clr-tab-content>
 			</clr-tab>
             <clr-tab>
-				<button clrTabLink>Supports</button>
+				<button clrTabLink>Supports
+					<span class="badge">
+						<g:if test="${supportAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${supportAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
 					<div class="clr-row">
 						<div class="clr-col-12">
@@ -73,7 +86,16 @@
 				</clr-tab-content>
 			</clr-tab>
 			<clr-tab>
-				<button clrTabLink>Depends On</button>
+				<button clrTabLink>Depends On 
+					<span class="badge">
+						<g:if test="${dependentAssets.size() > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${dependentAssets.size()}
+						</g:else>
+					 </span>
+				</button>
 				<clr-tab-content *clrIfActive>
                     <div class="clr-row">
 						<div class="clr-col-12">

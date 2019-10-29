@@ -2,8 +2,6 @@
 <a (click)="showDetails = !showDetails">Toggle All Details</a>
 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 	<tbody>
-		<tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
-		<tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" />
