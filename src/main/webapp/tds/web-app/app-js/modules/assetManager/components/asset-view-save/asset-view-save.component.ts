@@ -132,13 +132,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.model.isFavorite) {
 			this.model.isFavorite = false;
 			if (this.model.id) {
-				const reportIndex = this.favorites.items.findIndex(x => x.id === this.model.id);
+				const reportIndex = this.favorites.views.findIndex(x => x.id === this.model.id);
 				if (reportIndex !== -1) {
-					this.favorites.items.splice(reportIndex, 1);
+					this.favorites.views.splice(reportIndex, 1);
 				}
 			}
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.favorites.items.length + 1)) {
+			if (this.assetExpService.hasMaximumFavorites(this.favorites.views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

@@ -1,5 +1,6 @@
 <div class="asset-explorer-view-show-component content body">
-	<section class="page-asset-explorer-config" *ngIf="getDynamicConfiguration(); let config">
+	<section *ngIf="getDynamicConfiguration(); let config"
+					 class="page-asset-explorer-config">
 		<div class="button-bar text-right">
 			<div>
 				<!-- Refresh button -->
@@ -13,20 +14,31 @@
 <!--														 size="small"></tds-radial-progress>-->
 			</div>
 		</div>
+
 		<div class="button-bar">
-			<!-- New buttons -->
 			<div class="inline">
-				<label class="clr-control-label inline">Saved Views: </label>
+
 				<!-- Asset Views dropdown -->
-				<tds-asset-view-selector #select="tdsAssetViewSelector"
-																 style="display: inline-block">
+				<tds-asset-view-selector #select="tdsAssetViewSelector">
 				</tds-asset-view-selector>
+
 				<!-- Save / Save As button -->
-				<tds-asset-show-save-button style="margin-left: 12px"
-																		[config]="config"
+				<tds-asset-show-save-button [config]="config"
 																		(save)="onSave()"
 																		(saveAs)="onSaveAs()">
 				</tds-asset-show-save-button>
+
+				<!-- Favorite button -->
+				<tds-button-custom
+					[flat]="true"
+					[icon]="'star'"
+					[iconClass]="model.isFavorite ? 'is-solid' : ''"
+					[tooltip]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+					class="favorite-button text-yellow"
+					(click)="onFavorite()">
+				</tds-button-custom>
+
+				<!-- Just Planning checkbox -->
 				<input id="justPlanning" type="checkbox" name="justPlanning"
 							 class="component-action-just-planning"
 							 [(ngModel)]="justPlanning">
@@ -34,13 +46,15 @@
 					Just Planning
 				</label>
 			</div>
+
 			<div class="inline float-right">
 				<!-- Create button -->
-				<tds-asset-show-create-button style="margin-left: 12px"
-																			[createButtonState]="assetExplorerViewGrid.createButtonState"
+				<tds-asset-show-create-button [createButtonState]="assetExplorerViewGrid.createButtonState"
 																			(createAsset)="onCreateAsset($event)">
 				</tds-asset-show-create-button>
+
 				<tds-button-custom [icon]="'logout'"></tds-button-custom>
+
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
 																*ngIf="getGridConfig()"
@@ -51,25 +65,13 @@
 																(clickBulk)="onClickBulkButton()"
 																(operationResult)="onBulkOperationResult($event)">
 				</tds-bulk-change-button>
+
 				<!-- Configure/Edit view button -->
 				<tds-button-custom [icon]="'cog'" (click)="onEdit()"></tds-button-custom>
+
 				<!-- Export button -->
 				<tds-button-custom [icon]="'download'" (click)="onExport()"></tds-button-custom>
 			</div>
-
-			<!-- Favorite button -->
-			<!--<tds-button-custom
-				[icon]="model.isFavorite ? 'star' : 'star-o'"
-				[title]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
-				class="text-yellow"
-				isIconButton="true"
-				(click)="onFavorite()">
-			</tds-button-custom>-->
-
-			<!-- Asset Views dropdown -->
-			<!--<tds-asset-view-selector
-				#select="tdsAssetViewSelector">
-			</tds-asset-view-selector>-->
 
 		</div>
 		<div class="box-body">
