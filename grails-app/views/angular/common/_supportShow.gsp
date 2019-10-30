@@ -5,7 +5,7 @@
 			<strong>Supports</strong>
 		</div>
 	</div>
-	<table style="border-collapse:collapse">
+	<table>
 		<thead>
 			<tr>
 				<th>Class</th>

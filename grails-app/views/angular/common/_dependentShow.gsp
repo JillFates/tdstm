@@ -5,7 +5,7 @@
 			<strong>Depends On</strong>
 		</div>
 	</div>
-	<table class="support-depends-table" style="border-collapse:collapse">
+	<table>
 		<thead>
 			<tr>
 				<th>Class</th>
