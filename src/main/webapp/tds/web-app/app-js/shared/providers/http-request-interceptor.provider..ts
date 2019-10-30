@@ -29,7 +29,7 @@ import {WindowService} from '../services/window.service';
 // Other
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
-import {RouterUtils} from '../utils/router.utils';
+import {AuthRouteStates} from '../../modules/auth/auth-route.module';
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
 export const APPLICATION_JSON = 'application/json';
@@ -138,10 +138,13 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 			try {
 				let bodyResponse = response.body;
 				if (bodyResponse.status === ERROR_STATUS) {
-					this.notifierService.broadcast({
-						name: AlertType.DANGER,
-						message: bodyResponse.errors
-					});
+					// drop any error from some pages
+					if (this.router.url !== '/' + AuthRouteStates.LOGIN.url) {
+						this.notifierService.broadcast({
+							name: AlertType.DANGER,
+							message: bodyResponse.errors
+						});
+					}
 					this.notifierService.broadcast({
 						name: 'httpRequestHandlerCompletedWithErrors',
 					});

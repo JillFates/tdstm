@@ -18,7 +18,7 @@ export class PostNoticesManagerService {
 
 	getNotices(): Observable<any> {
 		// if notices already exists, return the collection
-		if (this.postNotices !== null) {
+		if (this.postNotices && this.postNotices !== null  && this.postNotices.length > 0) {
 			return Observable.of(this.postNotices);
 		}
 

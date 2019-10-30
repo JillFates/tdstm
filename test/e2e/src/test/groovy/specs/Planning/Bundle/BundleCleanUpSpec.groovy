@@ -35,7 +35,9 @@ class BundleCleanUpSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(1500)
         planningModule.goToListBundles()
+        sleep(1500)
         at ListBundlesPage
 
     }
@@ -55,12 +57,8 @@ class BundleCleanUpSpec extends GebReportingSpec {
         confirmDeletion()
         at ListBundlesPage
         filterByName baseName
-        selectFilter()
-        if (isPlanning) {
-            clickPlanningFilter()
-        } else {
-            clickNonPlanningFilter()
-        }
+        selectPlanningOption(isPlanning)
+
     }
 
     def deleteBundles(isPlanning = false) {
@@ -79,8 +77,7 @@ class BundleCleanUpSpec extends GebReportingSpec {
             at ListBundlesPage
         when: 'The user filters QAE2E bundles'
             filterByName baseName
-            selectFilter()
-            clickPlanningFilter()
+            selectPlanningOption(true)
         then: 'The user deletes planning bundles if  more than one is listed'
             deleteBundles(true)
      }
@@ -90,9 +87,8 @@ class BundleCleanUpSpec extends GebReportingSpec {
             at ListBundlesPage
         when: 'The user filters QAE2E NON planning bundles'
             filterByName baseName
-            selectFilter()
             clearPlanningFilter()
-            clickNonPlanningFilter()
+            selectPlanningOption(false)
         then: 'If more than 2 non-planning bundles are listed, the excess bundles are deleted'
             deleteBundles(false)
     }

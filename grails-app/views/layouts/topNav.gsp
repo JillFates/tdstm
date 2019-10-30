@@ -16,7 +16,6 @@
     int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-    def isLicenseValid = licenseAdminService.isValid()
 
     def buildInfo = environmentService.getVersionText()
 %>
@@ -121,7 +120,7 @@
                         <g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                     </g:if>
                     <g:else>
-                        <g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled, isLicenseValid: isLicenseValid]"  />
+                        <g:render template="/layouts/tranmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveBundle:moveBundle, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
                     </g:else>
 
 

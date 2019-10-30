@@ -30,7 +30,7 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        projectsModule.goToETLScripts()
+        waitFor{projectsModule.goToETLScripts()}
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
@@ -67,11 +67,11 @@ class ETLScriptsEditionSpec extends GebReportingSpec{
     }
 
     def "2. The user closes the ETLScripts by the X button"() {
-        given: 'The user is on the Provider Detail pop up'
+        given: 'The user is on the ETL Details pop up'
             at ETLScriptsDetailsPage
         when: 'The user clicks the X icon'
             clickOnXButton()
-        then:'We are back to the Providers Page'
+        then:'We are back to the ETL Scripts Page'
             at ETLScriptsPage
     }
 
