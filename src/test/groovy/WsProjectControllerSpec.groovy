@@ -1,20 +1,19 @@
 import com.tdsops.tm.enums.domain.ProjectSortProperty
 import com.tdsops.tm.enums.domain.ProjectStatus
 import com.tdsops.tm.enums.domain.SortOrder
-import grails.test.mixin.TestFor
+import grails.testing.web.controllers.ControllerUnitTest
 import net.transitionmanager.party.PartyGroup
 import net.transitionmanager.project.Project
-import net.transitionmanager.security.UserLogin
-import net.transitionmanager.project.WsProjectController
 import net.transitionmanager.project.ProjectService
+import net.transitionmanager.project.WsProjectController
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.quartz.DateBuilder
 import test.AbstractUnitSpec
 
 import static org.quartz.DateBuilder.newDate
 
-@TestFor(WsProjectController)
-class WsProjectControllerSpec extends AbstractUnitSpec {
+class WsProjectControllerSpec extends AbstractUnitSpec implements ControllerUnitTest<WsProjectController> {
 
 	void testUserProjects() {
 		given:

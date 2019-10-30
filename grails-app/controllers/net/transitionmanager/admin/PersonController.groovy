@@ -93,7 +93,6 @@ class PersonController implements ControllerMethods, PaginationMethods {
 
 	@HasPermission(Permission.PersonStaffList)
 	def listJson(Long id) {
-
 		String sortOrder  = paginationSortOrder('sord')
 		int maxRows = paginationMaxRowValue('rows')
 		int currentPage = paginationPage()

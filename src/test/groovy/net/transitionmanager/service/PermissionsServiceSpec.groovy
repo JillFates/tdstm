@@ -8,7 +8,7 @@ import net.transitionmanager.security.RolePermissions
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 
-class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService>{
+class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService> {
 
 	void setupSpec() {
 		mockDomains Permissions, RolePermissions

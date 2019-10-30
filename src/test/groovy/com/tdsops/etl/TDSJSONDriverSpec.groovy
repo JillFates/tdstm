@@ -2,24 +2,15 @@ package com.tdsops.etl
 
 import getl.data.Field
 import getl.exception.ExceptionGETL
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.exception.EmptyResultException
 import spock.lang.See
 
-@Mock([AssetEntity])
-class TDSJSONDriverSpec extends ETLBaseSpec {
+class TDSJSONDriverSpec extends ETLBaseSpec implements DataTest{
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
+	void setupSpec(){
+		mockDomains AssetEntity
 	}
 
 	void 'test can read fields from a plain JSON array'() {
@@ -40,7 +31,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields[3].name == 'vendor name'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -64,7 +55,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			fields[3].name == 'vendor name'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -92,7 +83,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			e.message == "Unable to parse attribute names due to JSON structure at rootNode '"
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-16277')
@@ -109,7 +100,7 @@ class TDSJSONDriverSpec extends ETLBaseSpec {
 			e.message == "JSON data file contains no data"
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	static final String RootApplicationDataSet = """
