@@ -14,7 +14,6 @@ kendo-grid {
 
       .k-header {
         > .k-link {
-          // margin: 0 0 0 -12px;
           margin: unset;
           padding: 0 0 5px 0;
         }
@@ -39,7 +38,7 @@ kendo-grid {
     th {
       font-weight: 500;
       font-size: 11px;
-      line-height: 13px;
+      line-height: 12px;
       padding: 0 0 5px 12px;
       color: #3c8dbc;
     }
