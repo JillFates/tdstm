@@ -1,21 +1,20 @@
 package net.transitionmanager.asset
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetType
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
+import net.transitionmanager.imports.DataviewService
+import net.transitionmanager.party.PartyRelationshipService
+import net.transitionmanager.person.Person
 import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
-import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.service.ServiceMethods
-
 /**
  * The application service handles the logic for CRUD applications
  *
@@ -26,6 +25,7 @@ class ApplicationService implements ServiceMethods {
 	AssetEntityService       assetEntityService
 	ControllerService        controllerService
 	PartyRelationshipService partyRelationshipService
+	DataviewService          dataviewService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
@@ -94,13 +94,27 @@ class ApplicationService implements ServiceMethods {
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
 		Map commonModel = this.getCommonModel(false, project, app, params)
+		List fields =  dataviewService.fetch(DataViewMap.APPLICATIONS.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
 
-		return [applicationInstance: app, appMoveEvent: appMoveEvent, appMoveEventlist: appMoveEventlist, smeId: app?.sme?.id, sme2Id: app?.sme2?.id,
-		        moveEventList: moveEventList, shutdownBy: shutdownBy, startupBy: startupBy, testingBy: testingBy,
-		        shutdownById: shutdownById, startupById: startupById, testingById: testingById,
-				availableRoles: availableRoles, partyGroupList: partyGroupList, staffTypes: GormUtil.getConstrainedProperties(Person).staffType.inList,
-		        personList: personList, currentUserId: securityService.currentPersonId] +
-				commonModel
+		return [
+				   applicationInstance: app,
+				   appMoveEvent       : appMoveEvent,
+				   appMoveEventlist   : appMoveEventlist,
+				   smeId              : app?.sme?.id,
+				   sme2Id             : app?.sme2?.id,
+				   moveEventList      : moveEventList,
+				   shutdownBy         : shutdownBy,
+				   startupBy          : startupBy,
+				   testingBy          : testingBy,
+				   shutdownById       : shutdownById,
+				   startupById        : startupById,
+				   testingById        : testingById,
+				   availableRoles     : availableRoles,
+				   partyGroupList     : partyGroupList,
+				   staffTypes         : GormUtil.getConstrainedProperties(Person).staffType.inList,
+				   personList         : personList, currentUserId: securityService.currentPersonId,
+				   fields             : fields
+			   ] + commonModel
 
 	}
 
