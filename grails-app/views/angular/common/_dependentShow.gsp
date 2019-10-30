@@ -1,5 +1,9 @@
 <%@page defaultCodec="html" %>
-<h1>Is dependent on:</h1>
+<div class="clr-row">
+	<div class="grid-label clr-col-4">
+		<strong>Is dependent on</strong>
+	</div>
+</div>
 <table class="support-depends-table" style="border-collapse:collapse">
 	<thead>
 		<tr>
