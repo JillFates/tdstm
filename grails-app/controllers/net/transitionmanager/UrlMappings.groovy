@@ -734,6 +734,11 @@ class UrlMappings {
 			action = [POST:"updateAccountAdmin"]
 		}
 
+		"/ws/user/updateLastPage" {
+			controller = "wsUser"
+			action = [GET:"updateLastPage"]
+		}
+
 		"/ws/progress" {
 			controller = "wsProgress"
 			action = [GET:"list"]
