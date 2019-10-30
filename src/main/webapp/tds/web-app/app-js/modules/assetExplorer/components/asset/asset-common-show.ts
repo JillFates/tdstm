@@ -109,4 +109,12 @@ export class AssetCommonShow implements OnInit {
 	openGraphUrl() {
 		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
 	}
+
+	scroll(event: MouseEvent, el: HTMLElement, scrollingEl: HTMLElement) {
+		const activeTab = document.getElementsByClassName('btn btn-link nav-link active').item(0);
+		activeTab.classList.remove('active');
+		const target = event.srcElement as HTMLElement;
+		target.classList.add('active');
+		scrollingEl.scrollTop = el.offsetTop;
+	}
 }

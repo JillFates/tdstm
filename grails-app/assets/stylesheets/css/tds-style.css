@@ -1063,6 +1063,9 @@ tds-ui-dialog #tdsUiDialog {
     overflow: hidden !important;
     width: unset !important;
     padding-left: 40px !important; }
+    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-header .active {
+      -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
+      box-shadow: 0 -3px 0 #0077b8 inset; }
     tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body {
       max-height: calc(100vh - 56px - 48px);
       height: calc(100vh - 35px - 35px);

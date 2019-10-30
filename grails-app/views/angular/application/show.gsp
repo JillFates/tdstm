@@ -17,26 +17,10 @@
 			<div class="badge modal-subbadge">9</div>
 		</div>
 		<p class="modal-description">${asset.description}</p>
-	</div>
-
-	<div class="modal-body">
-		<clr-tabs>
-			<clr-tab>
-				<button clrTabLink id="link1">Details</button>
-				<clr-tab-content id="content1" *clrIfActive>
-					<div class="clr-row">
-						<div class="clr-col-12">
-							<g:if test="${errors}">
-								<div id="messageDivId" class="message">${errors}</div>
-							</g:if>
-							<g:render template="/angular/application/show" model="[asset:applicationInstance]" ></g:render>
-							<g:render template="/angular/common/assetTags"></g:render>
-						</div>
-					</div>
-				</clr-tab-content>
-			</clr-tab>
-			<clr-tab>
-				<button clrTabLink>Supports
+		<ul class="nav">
+			<li class="nav-item"><button (click)="scroll($event, details, scrolling)" class="btn btn-link nav-link active">Details</button></li>
+			<li class="nav-item">
+				<button (click)="scroll($event, supports, scrolling)" class="btn btn-link nav-link">Supports 					
 					<span class="badge">
 						<g:if test="${supportAssets.size() > 99}">
 							99+
@@ -44,21 +28,11 @@
 						<g:else>
 							${supportAssets.size()}
 						</g:else>
-					 </span>
+					</span>
 				</button>
-				<clr-tab-content *clrIfActive>
-					<div class="clr-row">
-						<div class="clr-col-12">
-							<g:render 
-								template="/angular/common/supportShow" 
-								model="[supportAssets:supportAssets]" >
-							</g:render>
-						</div>
-					</div>
-				</clr-tab-content>
-			</clr-tab>
-			<clr-tab>
-				<button clrTabLink>Depends On 
+			</li>
+			<li class="nav-item">
+				<button (click)="scroll($event, depends, scrolling)" class="btn btn-link nav-link">Depends On
 					<span class="badge">
 						<g:if test="${dependentAssets.size() > 99}">
 							99+
@@ -66,60 +40,70 @@
 						<g:else>
 							${dependentAssets.size()}
 						</g:else>
-					 </span>
+					</span>
 				</button>
-				<clr-tab-content *clrIfActive>
-					<div class="clr-row">
-						<div class="clr-col-12">
-							<g:render 
-								template="/angular/common/dependentShow" 
-								model="[dependentAssets:dependentAssets, assetEntity: applicationInstance]" >
-							</g:render>
-						</div>
-					</div>
-				</clr-tab-content>
-			</clr-tab>
-			<clr-tab>
-				<button clrTabLink>Tasks</button>
-				<clr-tab-content *clrIfActive>
-					<div class="clr-row">
-						<div  class="clr-col-12">
-							<g:render 
-								template="/angular/common/commentList" 
-								model="[
-									asset:applicationInstance, 
-									prefValue: prefValue, 
-									viewUnpublishedValue: viewUnpublishedValue, 
-									currentUserId: currentUserId,
-									showTask:true,
-									showComment:false,
-								]" >
-							</g:render>
-						</div>
-					</div>
-				</clr-tab-content>
-			</clr-tab>
-			<clr-tab>
-				<button clrTabLink>Comments</button>
-				<clr-tab-content *clrIfActive>
-					<div class="clr-row">
-						<div  class="clr-col-12">
-							<g:render 
-								template="/angular/common/commentList" 
-								model="[
-									asset:applicationInstance, 
-									prefValue: prefValue, 
-									viewUnpublishedValue: viewUnpublishedValue, 
-									currentUserId: currentUserId,
-									showTask:false,
-									showComment:true,
-								]" >
-							</g:render>
-						</div>
-					</div>
-				</clr-tab-content>
-			</clr-tab>
-		</clr-tabs>
+			</li>
+			<li class="nav-item"><button (click)="scroll($event, tasks, scrolling)" class="btn btn-link nav-link">Tasks</button></li>
+			<li class="nav-item"><button (click)="scroll($event, comments, scrolling)" class="btn btn-link nav-link">Comments</button></li>
+		</ul>
+	</div>
+
+	<div class="modal-body" #scrolling>
+		<div #details class="clr-row">
+			<div class="clr-col-12">
+				<g:if test="${errors}">
+					<div id="messageDivId" class="message">${errors}</div>
+				</g:if>
+				<g:render template="/angular/application/show" model="[asset:applicationInstance]" ></g:render>
+				<g:render template="/angular/common/assetTags"></g:render>
+			</div>
+		</div>
+		<div #supports class="clr-row">
+			<div class="clr-col-12">
+				<g:render 
+					template="/angular/common/supportShow" 
+					model="[supportAssets:supportAssets]" >
+				</g:render>
+			</div>
+		</div>
+		<div #depends class="clr-row">
+			<div class="clr-col-12">
+				<g:render 
+					template="/angular/common/dependentShow" 
+					model="[dependentAssets:dependentAssets, assetEntity: applicationInstance]" >
+				</g:render>
+			</div>
+		</div>
+		<div #tasks class="clr-row">
+			<div  class="clr-col-12">
+				<g:render 
+					template="/angular/common/commentList" 
+					model="[
+						asset:applicationInstance, 
+						prefValue: prefValue, 
+						viewUnpublishedValue: viewUnpublishedValue, 
+						currentUserId: currentUserId,
+						showTask:true,
+						showComment:false,
+					]" >
+				</g:render>
+			</div>
+		</div>
+		<div #comments class="clr-row">
+			<div  class="clr-col-12">
+				<g:render 
+					template="/angular/common/commentList" 
+					model="[
+						asset:applicationInstance, 
+						prefValue: prefValue, 
+						viewUnpublishedValue: viewUnpublishedValue, 
+						currentUserId: currentUserId,
+						showTask:false,
+						showComment:true,
+					]" >
+				</g:render>
+			</div>
+		</div>
 	</div>
 
 	<div class="modal-sidenav form-group-center">

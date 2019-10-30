@@ -13,6 +13,9 @@ tds-ui-dialog {
       width: unset !important;
       padding-left: 40px !important;
       .modal-header {
+        .active {
+          box-shadow: 0 -3px 0 #0077b8 inset;
+        }
       }
       .modal-body {
         max-height: calc(100vh - 56px - 48px);
