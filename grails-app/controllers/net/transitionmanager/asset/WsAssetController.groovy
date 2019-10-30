@@ -228,9 +228,10 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		Map model = [
-			asset       : asset,
-			taskCount   : taskService.countByAssetEntity(asset),
-			commentCount: commentService.countByAssetEntity(asset)
+			asset           : asset,
+			dependencyBundle: AssetDependencyBundle.findByAsset(asset).dependencyBundle,
+			taskCount       : taskService.countByAssetEntity(asset),
+			commentCount    : commentService.countByAssetEntity(asset)
 		]
 
 		String domainName = asset.assetClass.toString()
