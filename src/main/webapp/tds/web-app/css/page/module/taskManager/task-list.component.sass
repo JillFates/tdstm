@@ -1,6 +1,7 @@
 .task-list
   font-family: Roboto
   padding-top: 10px
+  height: 90vh
   form
     padding-top: 0
   $primary-fore-color: #18394B
@@ -27,7 +28,12 @@
     padding: 0
   .task-action-buttons
     display: inline
+  .grid-container
+    height: 88%
+    .task-grid
+      height: 100%
   .box-body.tds-kendo-grid
+    height: 100%
     .k-grid
       .k-filter-row
         td
@@ -87,6 +93,8 @@
     align-items: flex-end
     .left-container
       display: flex
+      clr-select-container
+        margin-top: 10px
       .check-container
         display: flex
         align-items: flex-end
