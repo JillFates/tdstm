@@ -75,3 +75,10 @@ a{
 		max-width: 100%;
 	}
 }
+
+kendo-popup {
+	.clr-control-container {
+		max-height: 400px;
+		overflow: auto;
+	}
+}

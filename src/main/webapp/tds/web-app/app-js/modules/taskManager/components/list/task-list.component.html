@@ -88,20 +88,27 @@
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
 				(cellClick)="onCellClickHandler($event)">
+
 				<!-- Column Menu -->
 				<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
-					<div class="k-column-list">
-						<label *ngFor="let custom of allAvailableCustomColumns;"
-									 [ngClass]="{'invisible': custom.property === currentCustomColumns[column.field]}"
-									 class="k-column-list-item ng-star-inserted">
-							<input type="radio"
-										 value="{{custom.property}}"
-										 (ngModelChange)="onCustomColumnChange(column.field, custom, service)"
-										 [(ngModel)]="selectedCustomColumn[column.field]">
-							<span class="k-checkbox-label"> {{custom.label}} </span>
-						</label>
+					<div class="dropdown-menu">
+						<clr-radio-container>
+							<clr-radio-wrapper
+									class="k-column-list-item"
+									*ngFor="let menu of allAvailableCustomColumns"
+									[ngClass]="{'invisible': menu.property === currentCustomColumns[column.field]}">
+								<input type="radio"
+									   clrRadio
+									   value="{{menu.property}}"
+									   (ngModelChange)="onCustomColumnChange(column.field, menu, service)"
+									   [(ngModel)]="selectedCustomColumn[column.field]"
+									   [name]="menu.property" />
+								<label>{{ menu.label }}</label>
+							</clr-radio-wrapper>
+						</clr-radio-container>
 					</div>
 				</ng-template>
+
 				<!-- Toolbar -->
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="button-toolbar">
