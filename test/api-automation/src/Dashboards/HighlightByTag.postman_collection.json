@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "656236d3-b398-47c9-8e51-322bf556fe58",
+		"_postman_id": "1601c6ca-4ecf-4486-8b03-0ade7025f6ae",
 		"name": "Highliht by Tag",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -61,43 +61,67 @@
 			"response": []
 		},
 		{
-			"name": "set current project",
+			"name": "Set current project",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
-						"type": "text/javascript",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{projectId}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
@@ -477,5 +501,6 @@
 			"value": "4",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
