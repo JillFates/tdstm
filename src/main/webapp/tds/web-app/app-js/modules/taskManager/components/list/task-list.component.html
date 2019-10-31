@@ -35,7 +35,7 @@
 								class="select-event-list"
 								name="selectedEventId"
 								[(ngModel)]="selectedEventId"
-								(ngModelChange)="onEventSelect()">
+								(ngModelChange)="onEventSelect($event)">
 							<option
 									*ngFor="let event of eventList"
 									[attr.selected]="selectedEventId === event.id"
@@ -70,10 +70,6 @@
 	</form>
 	<section class="grid-container">
 		<div class="box-body box-with-empty-header tds-kendo-grid" [ngClass]="{'is-filtering': isFiltering}">
-			<!--
-				[pageSize]="grid.state.take"
-				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
-			-->
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
