@@ -18,9 +18,9 @@
 		</div>
 		<p class="modal-description">${asset.description}</p>
 		<ul class="nav">
-			<li class="nav-item"><button (click)="scroll($event, details, scrolling)" class="btn btn-link nav-link active">Details</button></li>
+			<li class="nav-item"><button (click)="scrollTo($event, details, scrolling)" class="btn btn-link nav-link active">Details</button></li>
 			<li class="nav-item">
-				<button (click)="scroll($event, supports, scrolling)" class="btn btn-link nav-link">Supports 					
+				<button (click)="scrollTo($event, supports, scrolling)" class="btn btn-link nav-link">Supports 					
 					<span class="badge">
 						<g:if test="${supportAssets.size() > 99}">
 							99+
@@ -32,7 +32,7 @@
 				</button>
 			</li>
 			<li class="nav-item">
-				<button (click)="scroll($event, depends, scrolling)" class="btn btn-link nav-link">Depends On
+				<button (click)="scrollTo($event, depends, scrolling)" class="btn btn-link nav-link">Depends On
 					<span class="badge">
 						<g:if test="${dependentAssets.size() > 99}">
 							99+
@@ -43,8 +43,8 @@
 					</span>
 				</button>
 			</li>
-			<li class="nav-item"><button (click)="scroll($event, tasks, scrolling)" class="btn btn-link nav-link">Tasks</button></li>
-			<li class="nav-item"><button (click)="scroll($event, comments, scrolling)" class="btn btn-link nav-link">Comments</button></li>
+			<li class="nav-item"><button (click)="scrollTo($event, tasks, scrolling)" class="btn btn-link nav-link">Tasks</button></li>
+			<li class="nav-item"><button (click)="scrollTo($event, comments, scrolling)" class="btn btn-link nav-link">Comments</button></li>
 		</ul>
 	</div>
 
