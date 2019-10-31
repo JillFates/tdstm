@@ -10,8 +10,16 @@
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Create</h4>
+		<tds-tab-scroller>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Details</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Supports/Depends</button>
+			</tds-scroller-item>
+		</tds-tab-scroller>
 	</div>
-	<div class="modal-body">
+	<div class="modal-body" tdsScrollContainer style="position: relative">
 		<form 
 			clrForm
 			name="form" 
@@ -22,213 +30,203 @@
 			#form="ngForm" 
 			novalidate
 			clrLayout="vertical">
-			<kendo-tabstrip [keepTabContent]="true">
-				<kendo-tabstrip-tab [title]="'Details'" [selected]="true">
-					<ng-template kendoTabContent>
-						<div class="grid-form">
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
-								<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${assetInstance.assetName}" ngmodel="model.asset.assetName"/>
-							</div>
+			<div tdsScrollSection class="grid-form">
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${assetInstance.assetName}" ngmodel="model.asset.assetName"/>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
-								<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="2" value="${assetInstance.description}" ngmodel="model.asset.description" />
-							</div>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance.description}"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="2" value="${assetInstance.description}" ngmodel="model.asset.description" />
+				</div>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${assetInstance.appVendor}" ngmodel="model.asset.appVendor" tabindex="3"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}" ngmodel="model.asset.supportType" tabindex="4"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${assetInstance.appFunction}" ngmodel="model.asset.appFunction" tabindex="5"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userCount}" value="${assetInstance.userCount}"  ngmodel="model.asset.userCount" tabindex="6" tooltipDataPlacement="bottom"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${assetInstance.appVersion}" ngmodel="model.asset.appVersion" tabindex="7"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${assetInstance.appVendor}" ngmodel="model.asset.appVendor" tabindex="3"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetInstance.supportType}" ngmodel="model.asset.supportType" tabindex="4"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${assetInstance.appFunction}" ngmodel="model.asset.appFunction" tabindex="5"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userCount}" value="${assetInstance.userCount}"  ngmodel="model.asset.userCount" tabindex="6" tooltipDataPlacement="bottom"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVersion}" value="${assetInstance.appVersion}" ngmodel="model.asset.appVersion" tabindex="7"/>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${assetInstance.sme}"/>
-								<kendo-dropdownlist #controlSme
-										[tabIndex]="8"
-										name="modelAssetSme"
-										[(ngModel)]="persons.sme"
-										(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-										[defaultItem]="defaultItem"
-										[textField]="'fullName'"
-										[valueField]="'personId'"
-										[data]="getPersonList(${personList as JSON})">
-								</kendo-dropdownlist>
-							</div>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.sme}" value="${assetInstance.sme}"/>
+					<kendo-dropdownlist #controlSme
+							[tabIndex]="8"
+							name="modelAssetSme"
+							[(ngModel)]="persons.sme"
+							(selectionChange)="onAddPerson($event,'application', 'sme',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+							[defaultItem]="defaultItem"
+							[textField]="'fullName'"
+							[valueField]="'personId'"
+							[data]="getPersonList(${personList as JSON})">
+					</kendo-dropdownlist>
+				</div>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${assetInstance.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${assetInstance.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
-							
-							<div class="clr-form-control">
-								<div style="display: flex">
-									<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${assetInstance.sme2}"/>
-									<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap With SME2"></div>
-								</div>
-								<kendo-dropdownlist  #controlSme2
-									[tabIndex]="12"
-									name="modelAssetSme2"
-									[(ngModel)]="persons.sme2"
-									(selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-									[defaultItem]="defaultItem"
-									[textField]="'fullName'"
-									[valueField]="'personId'"
-									[data]="getPersonList(${personList as JSON})">
-								</kendo-dropdownlist>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${assetInstance.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${assetInstance.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
+				
+				<div class="clr-form-control">
+					<div style="display: flex">
+						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${assetInstance.sme2}"/>
+						<div class="swapper-image" (click)="shufflePerson('sme', 'sme2')" title="Swap With SME2"></div>
+					</div>
+					<kendo-dropdownlist  #controlSme2
+						[tabIndex]="12"
+						name="modelAssetSme2"
+						[(ngModel)]="persons.sme2"
+						(selectionChange)="onAddPerson($event,'application', 'sme2',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+						[defaultItem]="defaultItem"
+						[textField]="'fullName'"
+						[valueField]="'personId'"
+						[data]="getPersonList(${personList as JSON})">
+					</kendo-dropdownlist>
+				</div>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="13"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${assetInstance.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="14" tooltipDataPlacement="bottom"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${assetInstance.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="13"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${assetInstance.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="14" tooltipDataPlacement="bottom"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${assetInstance.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
+					
+				<div class="clr-form-control">
+				<div style="display: flex">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${assetInstance.appOwner}"/>
+					<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap With App Owner"></div>
+				</div>
+					<kendo-dropdownlist
+							[tabIndex]="16"
+							name="modelAssetappOwner"
+							[(ngModel)]="persons.appOwner"
+							(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
+							[defaultItem]="defaultItem"
+							[textField]="'fullName'"
+							[valueField]="'personId'"
+							[data]="getPersonList(${personList as JSON})">
+					</kendo-dropdownlist>
+				</div>
+
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
+					<kendo-dropdownlist
+						[tabIndex]="17"
+						name="modelAssetMoveBundle"
+						[data]="moveBundleList"
+						[(ngModel)]="model.asset.moveBundle"
+						[textField]="'name'"
+						[valueField]="'id'">
+					</kendo-dropdownlist>
+				</div>
 								
-							<div class="clr-form-control">
-							<div style="display: flex">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${assetInstance.appOwner}"/>
-								<div class="swapper-image" (click)="shufflePerson('sme2', 'appOwner')" title="Swap With App Owner"></div>
-							</div>
-								<kendo-dropdownlist
-										[tabIndex]="16"
-										name="modelAssetappOwner"
-										[(ngModel)]="persons.appOwner"
-										(selectionChange)="onAddPerson($event,'application', 'appOwner',${partyGroupList as JSON}, ${availableRoles as JSON}, ${staffTypes as JSON})"
-										[defaultItem]="defaultItem"
-										[textField]="'fullName'"
-										[valueField]="'personId'"
-										[data]="getPersonList(${personList as JSON})">
-								</kendo-dropdownlist>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${assetInstance.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${assetInstance.license}" ngmodel="model.asset.license" tabindex="19"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${assetInstance.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetInstance.dependencyBundle?.value}"/>
-								<kendo-dropdownlist
-									[tabIndex]="17"
-									name="modelAssetMoveBundle"
-									[data]="moveBundleList"
-									[(ngModel)]="model.asset.moveBundle"
-									[textField]="'name'"
-									[valueField]="'id'">
-								</kendo-dropdownlist>
-							</div>
-											
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${assetInstance.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${assetInstance.license}" ngmodel="model.asset.license" tabindex="19"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${assetInstance.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
+					<kendo-dropdownlist
+						[tabIndex]="21"
+						name="modelAssetPlanStatus"
+						[(ngModel)]="model.asset.planStatus"
+						[data]="model.planStatusOptions">
+					</kendo-dropdownlist>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetInstance.planStatus}"/>
-								<kendo-dropdownlist
-									[tabIndex]="21"
-									name="modelAssetPlanStatus"
-									[(ngModel)]="model.asset.planStatus"
-									[data]="model.planStatusOptions">
-								</kendo-dropdownlist>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${assetInstance.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="22" tooltipDataPlacement="bottom"/>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRtoDesc}" value="${assetInstance.drRtoDesc}" ngmodel="model.asset.drRtoDesc" tabindex="22" tooltipDataPlacement="bottom"/>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
+					<tds-date-control
+						[(ngModel)]="model.asset.retireDate"
+						name="modelAssetRetireDate"
+						[tabindex]="15"
+						[value]="model.asset.retireDate">
+					</tds-date-control>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetInstance.retireDate}"/>
-								<tds-date-control
-									[(ngModel)]="model.asset.retireDate"
-									name="modelAssetRetireDate"
-									[tabindex]="15"
-									[value]="model.asset.retireDate">
-								</tds-date-control>
-							</div>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"/>
+					<kendo-dropdownlist
+							[tabIndex]="24"
+							name="modelAssetValidation"
+							[data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetInstance.class).validation.inList as JSON}"
+							[(ngModel)]="model.asset.validation">
+					</kendo-dropdownlist>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.validation}" value="${assetInstance.validation}"/>
-								<kendo-dropdownlist
-										[tabIndex]="24"
-										name="modelAssetValidation"
-										[data]="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetInstance.class).validation.inList as JSON}"
-										[(ngModel)]="model.asset.validation">
-								</kendo-dropdownlist>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
+				
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
+					<tds-date-control
+						[(ngModel)]="model.asset.maintExpDate"
+						name="modelAssetMaintExpDate"
+						[tabindex]="26"
+						[value]="model.asset.maintExpDate">
+					</tds-date-control>
+				</div>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
-							
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
-								<tds-date-control
-									[(ngModel)]="model.asset.maintExpDate"
-									name="modelAssetMaintExpDate"
-									[tabindex]="26"
-									[value]="model.asset.maintExpDate">
-								</tds-date-control>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${assetInstance.latency}" tabindex="27"  ngmodel="model.asset.latency" blankOptionListText="?" />
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}" tabindex="28" ngmodel="model.asset.startupProc" blankOptionListText="?" />
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="29"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="30"/>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.latency}" value="${assetInstance.latency}" tabindex="27"  ngmodel="model.asset.latency" blankOptionListText="?" />
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupProc}" value="${assetInstance.startupProc}" tabindex="28" ngmodel="model.asset.startupProc" blankOptionListText="?" />
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.url}" value="${assetInstance.url}" ngmodel="model.asset.url" tabindex="29"/>
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetInstance.externalRefId}" ngmodel="model.asset.externalRefId" tabindex="30"/>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${assetInstance.shutdownBy}"/>
+					<tds-combobox-group
+							[model]="model.asset.shutdownBy"
+							(modelChange)="model.asset.shutdownBy.id = $event"
+							(isFixedChange)="model.asset.shutdownFixed = $event"
+							[isFixed]="${assetInstance.shutdownFixed}"
+							[namedStaff]="${personList as JSON}"
+							tabindex="31"
+							[team]="${availableRoles as JSON}">
+					</tds-combobox-group>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownBy}" value="${assetInstance.shutdownBy}"/>
-								<tds-combobox-group
-										[model]="model.asset.shutdownBy"
-										(modelChange)="model.asset.shutdownBy.id = $event"
-										(isFixedChange)="model.asset.shutdownFixed = $event"
-										[isFixed]="${assetInstance.shutdownFixed}"
-										[namedStaff]="${personList as JSON}"
-										tabindex="31"
-										[team]="${availableRoles as JSON}">
-								</tds-combobox-group>
-							</div>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${assetInstance.shutdownDuration}"/>
+					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
+							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
+					<span style="margin-left:200px; margin-top: -20px;">m</span>
+				</div>
 
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${assetInstance.startupBy}"/>
+					<tds-combobox-group
+						[model]="model.asset.startupBy"
+						(modelChange)="model.asset.startupBy.id = $event"
+						(isFixedChange)="model.asset.startupFixed = $event"
+						[isFixed]="${assetInstance.startupFixed}"
+						[namedStaff]="${personList as JSON}"
+						[team]="${availableRoles as JSON}"
+						tabindex="33">
+					</tds-combobox-group>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${assetInstance.shutdownDuration}"/>
-								<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-										[(ngModel)]="model.asset.shutdownDuration" size="7"/>
-								<span style="margin-left:200px; margin-top: -20px;">m</span>
-							</div>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${assetInstance.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${assetInstance.startupBy}"/>
-								<tds-combobox-group
-									[model]="model.asset.startupBy"
-									(modelChange)="model.asset.startupBy.id = $event"
-									(isFixedChange)="model.asset.startupFixed = $event"
-									[isFixed]="${assetInstance.startupFixed}"
-									[namedStaff]="${personList as JSON}"
-									[team]="${availableRoles as JSON}"
-									tabindex="33">
-								</tds-combobox-group>
-							</div>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${assetInstance.testingBy}"/>			
+					<tds-combobox-group
+							[model]="model.asset.testingBy"
+							(modelChange)="model.asset.testingBy.id = $event"
+							(isFixedChange)="model.asset.testingFixed = $event"
+							[isFixed]="${assetInstance.testingFixed}"
+							[namedStaff]="${personList as JSON}"
+							[team]="${availableRoles as JSON}"
+							tabindex="35">
+					</tds-combobox-group>
+				</div>
 
-							<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${assetInstance.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
+				<div class="clr-form-control">
+					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${assetInstance.testingDuration}"/>
+					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
+					<span style="margin-left:200px; margin-top: -20px;">m</span>
+				</div>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${assetInstance.testingBy}"/>			
-								<tds-combobox-group
-										[model]="model.asset.testingBy"
-										(modelChange)="model.asset.testingBy.id = $event"
-										(isFixedChange)="model.asset.testingFixed = $event"
-										[isFixed]="${assetInstance.testingFixed}"
-										[namedStaff]="${personList as JSON}"
-										[team]="${availableRoles as JSON}"
-										tabindex="35">
-								</tds-combobox-group>
-							</div>
+				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:assetInstance]"></g:render>                   
+			</div>
+			<g:render template="/angular/common/assetTagsEdit"></g:render>
 
-							<div class="clr-form-control">
-								<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${assetInstance.testingDuration}"/>
-								<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
-								<span style="margin-left:200px; margin-top: -20px;">m</span>
-							</div>
-
-							<g:render template="/angular/common/customEdit" model="[assetEntityInstance:assetInstance]"></g:render>                   
-						</div>
-						<g:render template="/angular/common/assetTagsEdit"></g:render>
-					</ng-template>
-				</kendo-tabstrip-tab>
-				<kendo-tabstrip-tab [title]="'Supports / Depends'">
-					<ng-template kendoTabContent>
-						<tds-supports-depends (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
-					</ng-template>
-				</kendo-tabstrip-tab>
-			</kendo-tabstrip>
+			<tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 		</form>
 	</div>
 	<div class="modal-sidenav form-group-center">

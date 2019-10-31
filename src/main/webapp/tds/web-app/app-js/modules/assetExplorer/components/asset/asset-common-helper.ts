@@ -9,12 +9,4 @@ export class AssetCommonHelper {
 		const isImportantClass = 'YG'.indexOf(importanceClass.toUpperCase()) !== -1;
 		return isImportantClass && Boolean(value) === false;
 	}
-
-	static scrollTo(event: MouseEvent, el: HTMLElement, scrollingEl: HTMLElement) {
-		const activeTab = document.getElementsByClassName('btn btn-link nav-link active').item(0);
-		activeTab.classList.remove('active');
-		const target = event.srcElement as HTMLElement;
-		target.classList.add('active');
-		scrollingEl.scrollTop = el.offsetTop;
-	}
 }

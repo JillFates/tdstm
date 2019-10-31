@@ -109,8 +109,4 @@ export class AssetCommonShow implements OnInit {
 	openGraphUrl() {
 		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
 	}
-
-	scrollTo(event: MouseEvent, el: HTMLElement, scrollingEl: HTMLElement): void {
-		AssetCommonHelper.scrollTo(event, el, scrollingEl);
-	}
 }

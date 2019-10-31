@@ -10,17 +10,19 @@
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="cancelCloseDialog()"></tds-button-close>
 		<%-- TODO: Implement badge with correct color and rounded corners. --%>
 		<div class="modal-title-container">
-			<div class="badge modal-badge" style="">A</div>
+			<div class="badge modal-badge">A</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
 			<%-- TODO: Update Subtitle content with field --%>
 			<div class="modal-subtitle">Subtitle content</div>
 			<div class="badge modal-subbadge">9</div>
 		</div>
 		<p class="modal-description">${asset.description}</p>
-		<ul class="nav">
-			<li class="nav-item"><button (click)="scrollTo($event, details, scrolling)" class="btn btn-link nav-link active">Details</button></li>
-			<li class="nav-item">
-				<button (click)="scrollTo($event, supports, scrolling)" class="btn btn-link nav-link">Supports 					
+		<tds-tab-scroller>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Details</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Supports 					
 					<span class="badge">
 						<g:if test="${supportAssets.size() > 99}">
 							99+
@@ -30,9 +32,9 @@
 						</g:else>
 					</span>
 				</button>
-			</li>
-			<li class="nav-item">
-				<button (click)="scrollTo($event, depends, scrolling)" class="btn btn-link nav-link">Depends On
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Depends On 					
 					<span class="badge">
 						<g:if test="${dependentAssets.size() > 99}">
 							99+
@@ -42,14 +44,18 @@
 						</g:else>
 					</span>
 				</button>
-			</li>
-			<li class="nav-item"><button (click)="scrollTo($event, tasks, scrolling)" class="btn btn-link nav-link">Tasks</button></li>
-			<li class="nav-item"><button (click)="scrollTo($event, comments, scrolling)" class="btn btn-link nav-link">Comments</button></li>
-		</ul>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Tasks</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Comments</button>
+			</tds-scroller-item>
+		</tds-tab-scroller>
 	</div>
 
-	<div class="modal-body" #scrolling>
-		<div #details class="clr-row">
+	<div class="modal-body" tdsScrollContainer style="position: relative">
+		<div tdsScrollSection class="clr-row">
 			<div class="clr-col-12">
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
@@ -58,7 +64,7 @@
 				<g:render template="/angular/common/assetTags"></g:render>
 			</div>
 		</div>
-		<div #supports class="clr-row">
+		<div tdsScrollSection class="clr-row">
 			<div class="clr-col-12">
 				<g:render 
 					template="/angular/common/supportShow" 
@@ -66,7 +72,7 @@
 				</g:render>
 			</div>
 		</div>
-		<div #depends class="clr-row">
+		<div tdsScrollSection class="clr-row">
 			<div class="clr-col-12">
 				<g:render 
 					template="/angular/common/dependentShow" 
@@ -74,7 +80,7 @@
 				</g:render>
 			</div>
 		</div>
-		<div #tasks class="clr-row">
+		<div tdsScrollSection class="clr-row">
 			<div  class="clr-col-12">
 				<g:render 
 					template="/angular/common/commentList" 
@@ -89,7 +95,7 @@
 				</g:render>
 			</div>
 		</div>
-		<div #comments class="clr-row">
+		<div tdsScrollSection class="clr-row">
 			<div  class="clr-col-12">
 				<g:render 
 					template="/angular/common/commentList" 

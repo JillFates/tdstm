@@ -13,6 +13,7 @@ tds-ui-dialog {
       width: unset !important;
       padding-left: 40px !important;
       .modal-header {
+        // This is necessary to fix a bug with the clarity tabs classes.
         .active {
           box-shadow: 0 -3px 0 #0077b8 inset;
         }
