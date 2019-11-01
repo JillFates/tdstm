@@ -1,25 +1,22 @@
 package com.tdsops.etl
 
+import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdssrc.grails.NumberUtil
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.Database
-import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import com.tdssrc.grails.NumberUtil
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.See
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -28,8 +25,7 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>warn</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model, AssetOptions])
-class ETLFindSpec extends ETLBaseSpec {
+class ETLFindSpec extends ETLBaseSpec implements DataTest{
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -40,16 +36,8 @@ class ETLFindSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model, AssetOptions
 		String.mixin StringAppendElement
 	}
 
@@ -198,7 +186,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -296,7 +284,7 @@ class ETLFindSpec extends ETLBaseSpec {
 				get('Application', [new FindCondition('id', '152255')]) == [152255l]
 			}
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -421,7 +409,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [with] keyword is not found"() {
@@ -513,7 +501,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found"() {
@@ -605,7 +593,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [into] keyword is not found in find with multiple fields"() {
@@ -645,7 +633,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void "test exception when [find operation] keywords are not found"(){
@@ -738,7 +726,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([AssetEntity, AssetDependency])
@@ -881,7 +869,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName)  fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([AssetEntity, AssetDependency])
@@ -1026,7 +1014,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName)  fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName)  fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([AssetEntity, AssetDependency])
@@ -1131,7 +1119,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property Name with loaded Data Value for a findId'() {
@@ -1204,7 +1192,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if script find to a domain Property and it was not defined in the ETL Processor'() {
@@ -1243,7 +1231,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if find command uses an invalid Find Operator'() {
@@ -1282,7 +1270,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find multiple asset entities for a domain Property Name with loaded Data Value and use a warn message'() {
@@ -1439,7 +1427,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can collect error messages in find command'() {
@@ -1541,7 +1529,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can trows an Exception if try to use FINDINGS incorrectly based on its results'() {
@@ -1650,7 +1638,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([Room])
@@ -1771,7 +1759,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([AssetEntity, Room])
@@ -1857,7 +1845,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can throw an Exception if the find/elseFind command is incorrectly formatted'() {
@@ -1923,7 +1911,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using integer transformation'() {
@@ -2015,7 +2003,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find element using number transformation'() {
@@ -2105,7 +2093,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 0 results'() {
@@ -2192,7 +2180,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with 1 result'() {
@@ -2293,7 +2281,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can find a domain Property and create the target property automatically with more than 1 results'() {
@@ -2394,7 +2382,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-10678')
@@ -2635,7 +2623,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2759,7 +2747,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2881,7 +2869,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -2996,7 +2984,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3096,7 +3084,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3196,7 +3184,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3298,7 +3286,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -3404,7 +3392,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3453,7 +3441,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3502,7 +3490,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3634,7 +3622,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-11262')
@@ -3766,7 +3754,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 			}
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -3886,7 +3874,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-9493')
@@ -4009,7 +3997,7 @@ class ETLFindSpec extends ETLBaseSpec {
 			etlProcessor.findCache == null
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 
@@ -4045,7 +4033,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 
 		where:
@@ -4120,7 +4108,7 @@ class ETLFindSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 }

@@ -1859,9 +1859,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		RoleType.executeQuery('''
 			from RoleType
 			where id not in (select roleType.id from PartyRole
-			                 where party=?
+			                 where party=?0
 			                 group by roleType.id)
-			  and (type = ? OR type = ?)
+			  and (type = ?1 OR type = ?2)
 			order by description
 		''', [person, RoleType.TYPE_TEAM, RoleType.TYPE_SECURITY])
 	}

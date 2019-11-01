@@ -260,6 +260,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	// ------------------------------------
 	// ETL DSL methods
 	// ------------------------------------
+
+	/**
+	 * Traps ETL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	domain aBogusVariableName
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element domain(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
@@ -763,10 +776,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return
 	 */
 	Map<String, ?> set(final Object variableName) {
-		if (!(variableName instanceof String) ||
-			hasVariable(variableName) ||
-			!binding.isValidETLVariableName(variableName)
-		) {
+		if (!(variableName instanceof String) || hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 		doSet((String) variableName)
@@ -1697,6 +1707,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
+		configuration.scriptBaseClass = ETProcessorBaseScript.class.name
 		return configuration
 	}
 

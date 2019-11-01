@@ -13,8 +13,8 @@ export class ProjectModel {
 	public defaultBundle: any;
 	public defaultBundleName: string;
 	public timeZone: string;
-	public collectMetrics: boolean;
-	public planMethodology: string;
+	public collectMetrics: number;
+	public planMethodology: any;
 }
 
 export class ProjectColumnModel {

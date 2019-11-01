@@ -1,33 +1,29 @@
 package com.tdsops.etl
 
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.Issue
 import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  * Test about ETLProcessor commands:
  * <ul>
  *     <li><b>lookup</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
-class ETLLookupSpec extends ETLBaseSpec {
+class ETLLookupSpec extends ETLBaseSpec implements DataTest {
 
 
 	Project GMDEMO
@@ -35,17 +31,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
 		String.mixin StringAppendElement
 	}
 
@@ -96,7 +83,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			e.message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'unknown').message
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP found to check results'() {
@@ -178,7 +165,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@Issue("https://support.transitionmanager.com/browse/TM-10625")
@@ -237,7 +224,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used LOOKUP notFound to check results'() {
@@ -315,7 +302,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test that when the lookup finds previous results that the current result is the earlier one'() {
@@ -397,7 +384,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('Repeated asset') == 2
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test lookup with multiple criteria'() {
@@ -465,7 +452,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test can lookup results and used !LOOKUP to check results'() {
@@ -542,7 +529,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@See('TM-15257')
@@ -620,7 +607,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			etlProcessor.debugConsole.content().count('found=true') == 1
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([Application])
@@ -733,7 +720,7 @@ class ETLLookupSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if(fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if(fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	void 'test the ETLProcessorResult lookupInReference method'() {
@@ -794,9 +781,8 @@ class ETLLookupSpec extends ETLBaseSpec {
 		when: 'we set a variable with wrong Convention name'
 			etlProcessor.set("variable")
 
-		then: 'an exception should be thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		when: 'we set a correct variable name'
 			etlProcessor.set "variableVar" with 123
@@ -804,19 +790,11 @@ class ETLLookupSpec extends ETLBaseSpec {
 		then: 'Variable should be set'
 			etlProcessor.binding.getVariable('variableVar') == 123
 
-		when: 'we set a variable with wrong Convention name'
-			etlProcessor.set("variable")
-
-		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
-
-
 		when: 'we set in a number instead of a variable'
 			etlProcessor.set(123)
 
 		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
+			ETLProcessorException e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
 
 
@@ -850,12 +828,11 @@ class ETLLookupSpec extends ETLBaseSpec {
 			Element el = etlProcessor.extract(1)
 
 
-		when: 'we set a variable with wrong Convention name'
+		when: 'we set a variable without ending in Var'
 			el.set 'variable'
 
-		then: 'an exception should be thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		when: 'we set a correct variable name'
 			etlProcessor.set 'variableVar' with 123
@@ -863,20 +840,12 @@ class ETLLookupSpec extends ETLBaseSpec {
 		then: 'Variable should be set'
 			etlProcessor.binding.getVariable('variableVar') == 123
 
-		when: 'we set a variable with wrong Convention name'
-			el.set 'variable'
-
-		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
-			ETLProcessorException.invalidSetParameter().message == e.message
-
 		when: 'we set in a number instead of a variable'
 			el.set 123
 
 		then: 'an exception should be thrown'
-			e = thrown ETLProcessorException
+			ETLProcessorException e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
-
 
 		when: 'we try to re-establish an already existing variable'
 			el.set 'variableVar' load 'custom1' with 'other Value'
@@ -884,7 +853,6 @@ class ETLLookupSpec extends ETLBaseSpec {
 		then: 'Exception should be trhown due that the variable is already defined'
 			e = thrown ETLProcessorException
 			ETLProcessorException.invalidSetParameter().message == e.message
-
 	}
 
 	static final String DependencyDataSetContent = """

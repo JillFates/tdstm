@@ -1,6 +1,5 @@
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.SecurityRole
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
@@ -18,9 +17,11 @@ import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
@@ -35,9 +36,11 @@ import test.helper.ApiCatalogTestHelper
 @Integration
 @Rollback
 class TaskServiceIntTests extends Specification{
-    CustomDomainService customDomainService
-    TaskService taskService
-    SecurityService securityService
+    CustomDomainService   customDomainService
+    TaskService           taskService
+    SecurityService       securityService
+    ProjectService        projectService
+    UserPreferenceService userPreferenceService
 
     ApiCatalogTestHelper apiCatalogTestHelper
     AssetTestHelper assetTestHelper
@@ -327,6 +330,20 @@ class TaskServiceIntTests extends Specification{
                     status: AssetCommentStatus.PENDING
             ).save()
             final assetCommentId1 = task.id
+
+            adminPerson = personTestHelper.createStaff(projectService.getOwner(project))
+            assert adminPerson
+
+            // projectService.addTeamMember(project, adminPerson, ['PROJ_MGR'])
+            UserLogin adminUser = personTestHelper.createUserLoginWithRoles(adminPerson, ["${SecurityRole.ROLE_ADMIN}"])
+            assert adminUser
+            assert adminUser.username
+
+            // logs the admin user into the system
+            securityService.assumeUserIdentity(adminUser.username, false)
+            // println "Performed securityService.assumeUserIdentity(adminUser.username) with ${adminUser.username}"
+            assert securityService.isLoggedIn()
+            userPreferenceService.setCurrentProjectId(project.id)
 
         when: 'updating estimated start and finish time'
             AssetComment assetComment = taskService.changeEstTime(assetCommentId1, 1)

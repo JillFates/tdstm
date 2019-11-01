@@ -14,6 +14,7 @@ import { ComboBoxComponent } from '@progress/kendo-angular-dropdowns';
                             (filterChange)="onFilterChange($event)"
                             (valueChange)="onValueChange($event)"
                             [popupSettings]="{popupClass: 'combo-group-open'}"
+							[tabindex]="tabIndex"
                             name="comboGroup">
                 <ng-template kendoComboBoxItemTemplate let-dataItem>
                     <div *ngIf="dataItem.category === CATEGORY_BY_REFERENCE" >
@@ -43,6 +44,7 @@ export class TDSComboBoxGroupComponent implements OnInit {
 	@ViewChild('innerComboBoxGroup', { static: false }) innerComboBoxGroup: ComboBoxComponent;
 	@Output() modelChange = new EventEmitter<string>();
 	@Output() isFixedChange = new EventEmitter<number>();
+	@Input() tabIndex = 0;
 	@Input('model') model: any;
 	@Input('namedStaff') namedStaff: any;
 	@Input('team') team: any;

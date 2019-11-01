@@ -24,39 +24,25 @@ declare var jQuery: any;
 			<ng-container *ngIf="pageMetaData">
 				<h1>
 					{{ pageMetaData.title | translate }}
-					<small *ngIf="pageMetaData.instruction">{{
-						pageMetaData.instruction | translate
-					}}</small>
+					<small *ngIf="pageMetaData.instruction">{{pageMetaData.instruction | translate}}</small>
 				</h1>
 				<div
 					class="breadcrumb licensing-banner-message"
-					*ngIf="
-						userContext.licenseInfo.license &&
-						userContext.licenseInfo.license.banner
-					"
-				>
+					*ngIf="userContext.licenseInfo?.license && userContext.licenseInfo?.license.banner">
 					<div class="callout">
-						{{ userContext.licenseInfo.license.banner }}
+						{{ userContext.licenseInfo?.license.banner }}
 					</div>
 				</div>
-				<!--<ol class="breadcrumb">
-					<li
-						*ngFor="let menu of pageMetaData.menu; let last = last"
-						[ngClass]="{ active: last }"
-					>
-						<a
-							*ngIf="!last && menu.navigateTo"
-							[routerLink]="menu.navigateTo"
-							>{{ menu.text || menu | translate }}</a
-						>
-						<a *ngIf="!last && !menu.navigateTo">{{
-							menu.text || menu | translate
-						}}</a>
+				<ol class="breadcrumb">
+					<li *ngFor="let menu of pageMetaData.menu; let last = last" [ngClass]="{ active: last }">
+						<a *ngIf="!last && menu.navigateTo"
+							[routerLink]="menu.navigateTo">{{ menu.text || menu | translate }}</a>
+						<a *ngIf="!last && !menu.navigateTo">{{menu.text || menu | translate}}</a>
 						<ng-container *ngIf="last">
 							{{ menu.text || menu | translate }}
 						</ng-container>
 					</li>
-				</ol>-->
+				</ol>
 			</ng-container>
 		</section>
 		<tds-ui-dialog></tds-ui-dialog>

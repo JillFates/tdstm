@@ -1,24 +1,27 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
 import net.transitionmanager.dataImport.SearchQueryHelper
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
-@Mock([AssetEntity, Room, Model, Rack])
-class ETLFetchSpec extends ETLBaseSpec {
+class ETLFetchSpec extends ETLBaseSpec implements DataTest {
 
 	ETLProcessor processor
 	ETLFieldsValidator validator
 	Long projectId = 54321
 	Project project
+
+	void setupSpec(){
+		mockDomains AssetEntity, Room, Model, Rack
+	}
 
 	def setup() {
 		validator = createDomainClassFieldsValidator()

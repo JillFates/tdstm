@@ -1,13 +1,13 @@
 package net.transitionmanager.asset
 
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdssrc.grails.GormUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetType
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
-import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.AppMoveEvent
@@ -15,6 +15,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import net.transitionmanager.service.ServiceMethods
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 /**
  * The application service handles the logic for CRUD applications
  *
@@ -25,7 +26,6 @@ class ApplicationService implements ServiceMethods {
 	AssetEntityService       assetEntityService
 	ControllerService        controllerService
 	PartyRelationshipService partyRelationshipService
-	DataviewService          dataviewService
 
 	/**
 	 * Provides a list all applications associate to the specified bundle or if id=0 then it returns all unassigned
@@ -76,7 +76,7 @@ class ApplicationService implements ServiceMethods {
 	 * @return a map of the properties
 	 */
 	Map getModelForShow(Project ignored, Application app, Map params) {
-		Project project = app.project
+		Project project = GrailsHibernateUtil.unwrapIfProxy(app.project)
 
 		def appMoveEvent = AppMoveEvent.findAllByApplication(app)
 		def appMoveEventlist = AppMoveEvent.findAllByApplication(app)?.value
@@ -94,7 +94,6 @@ class ApplicationService implements ServiceMethods {
 		def availableRoles = partyRelationshipService.getStaffingRoles()
 		def partyGroupList = partyRelationshipService.getCompaniesList()
 		Map commonModel = this.getCommonModel(false, project, app, params)
-		List fields =  dataviewService.fetch(DataViewMap.APPLICATIONS.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
 
 		return [
 				   applicationInstance: app,
@@ -112,8 +111,8 @@ class ApplicationService implements ServiceMethods {
 				   availableRoles     : availableRoles,
 				   partyGroupList     : partyGroupList,
 				   staffTypes         : GormUtil.getConstrainedProperties(Person).staffType.inList,
-				   personList         : personList, currentUserId: securityService.currentPersonId,
-				   fields             : fields
+				   personList         : personList,
+				   currentUserId      : securityService.currentPersonId
 			   ] + commonModel
 
 	}
