@@ -21,10 +21,14 @@
 		</tds-tab-scroller>
     </div>
     <div class="modal-body create" tdsScrollContainer style="position: relative">
-        <form name="form" (ngSubmit)="form.form.valid && onCreate()"
-                class="asset-entry-form"
-                [ngClass]="{'form-submitted': form && form.submitted}"
-                role="form" #form="ngForm" novalidate>
+        <form 
+            name="form" 
+            (ngSubmit)="form.form.valid && onCreate()"
+            class="asset-entry-form"
+            [ngClass]="{'form-submitted': form && form.submitted}"
+            role="form" 
+            #form="ngForm" 
+            novalidate>
             <div tdsScrollSection class="grid-form">
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
@@ -85,7 +89,7 @@
 
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${assetInstance.rateOfChange}"  />
-                    <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${assetInstance.rateOfChange}" tabindex="12" ngmodel="model.asset.rateOfChange"/>
+                    <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" value="${assetInstance.rateOfChange}" tabindex="12" ngmodel="model.asset.rateOfChange"/>
                 </div>
 
                 <div class="clr-form-control">

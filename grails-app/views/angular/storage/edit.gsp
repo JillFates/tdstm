@@ -10,7 +10,14 @@
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
                 aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Storage Edit</h4>
+        <div class="modal-title-container">
+			<div class="badge modal-badge" style="">S</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
+		<p class="modal-description">${asset.description}</p>
         <tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>
@@ -22,15 +29,13 @@
     </div>
     <div class="modal-body edit" tdsScrollContainer style="position: relative">
         <form 
-            clrForm
             name="form" 
             (ngSubmit)="form.form.valid && onUpdate()"
             class="asset-entry-form"
             [ngClass]="{'form-submitted': form && form.submitted}"
             role="form" 
             #form="ngForm" 
-            novalidate
-            clrLayout="vertical">
+            novalidate>
             <div tdsScrollSection class="grid-form">
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
@@ -90,7 +95,7 @@
 
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}"/>
-                    <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${asset.rateOfChange}" tabindex="12" ngmodel="model.asset.rateOfChange"/>
+                    <tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" tabindex="12" ngmodel="model.asset.rateOfChange"/>
                 </div>    
 
                 <div class="clr-form-control">         

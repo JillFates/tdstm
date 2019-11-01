@@ -23,15 +23,13 @@
     </div>
     <div class="modal-body create" tdsScrollContainer style="position: relative">
         <form 
-            clrForm
             name="form"
             (ngSubmit)="form.form.valid && onCreate()"
             class="asset-entry-form"
             [ngClass]="{'form-submitted': form && form.submitted}"
             role="form" 
             #form="ngForm"
-            novalidate
-            clrLayout="vertical">
+            novalidate>
             <div tdsScrollSection class="grid-form">
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance.assetName}"/>
@@ -88,8 +86,8 @@
                             (valueChange)="onRoomSourceValueChange($event)">
                     </kendo-dropdownlist>
                     <span *ngIf="model.asset.roomSource && model.asset.roomSource.id === -1" class="newRoomS">
-                        <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" size="10" tabindex="8" placeholder="Location" ngmodel="model.asset.locationSource"></tdsAngular:inputControl>
-                        <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" size="10" tabindex="9" placeholder="Room Name" ngmodel="model.asset.newRoomSource"></tdsAngular:inputControl>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.locationSource}" tabindex="8" placeholder="Location" ngmodel="model.asset.locationSource"></tdsAngular:inputControl>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.roomSource}" tabindex="9" placeholder="Room Name" ngmodel="model.asset.newRoomSource"></tdsAngular:inputControl>
                     </span>
 
                     <div *ngIf="showRackFields">
@@ -105,12 +103,12 @@
                                     [valueField]="'id'">
                             </kendo-dropdownlist>
                             <span *ngIf="model.asset.rackSource && model.asset.rackSource.id === -1">
-                                <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" size="20" tabindex="11" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
+                                <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" tabindex="11" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
                             </span>
                         </div>
 
                         <div *ngIf="showRackSourceInput === 'new'">
-                            <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" size="20" tabindex="12" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
+                            <tdsAngular:inputControl field="${standardFieldSpecs.rackSource}" tabindex="12" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackSource"></tdsAngular:inputControl>
                         </div>
                     </div>
 
@@ -127,7 +125,7 @@
                             </kendo-dropdownlist>
                         </div>
                         <div *ngIf="model.asset.sourceChassis && model.asset.sourceChassis.id > 0" >
-                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceBladePosition}" size="10" tabindex="13" value="${assetInstance.sourceBladePosition}" ngmodel="model.asset.sourceBladePosition"></tdsAngular:inputControl>
+                            <tdsAngular:inputControl field="${standardFieldSpecs.sourceBladePosition}" tabindex="13" value="${assetInstance.sourceBladePosition}" ngmodel="model.asset.sourceBladePosition"></tdsAngular:inputControl>
                         </div>
                     </div>
 
@@ -135,7 +133,7 @@
                         <label class="${standardFieldSpecs.sourceRackPosition.imp?:''}">Position</label>
                         <div *ngIf="showRackFields">
                             <div *ngIf="(showRackSourceInput === 'new' || (model.asset.rackSource && (model.asset.rackSource.id === -1 || model.asset.rackSource.id > 0)))" >
-                                <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}" size="10" tabindex="14" placeholder="U Position" value="${assetInstance.sourceRackPosition}" ngmodel="model.asset.sourceRackPosition"></tdsAngular:inputControl>
+                                <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}" tabindex="14" placeholder="U Position" value="${assetInstance.sourceRackPosition}" ngmodel="model.asset.sourceRackPosition"></tdsAngular:inputControl>
                             </div>
                         </div>
                     </div>
@@ -155,8 +153,8 @@
                         (valueChange)="onRoomTargetValueChange($event)">
                     </kendo-dropdownlist>
                     <span *ngIf="model.asset.roomTarget && model.asset.roomTarget.id === -1" class="newRoomT">
-                        <tdsAngular:inputControl field="${standardFieldSpecs.locationTarget}" size="10" tabindex="16" placeholder="Location" ngmodel="model.asset.locationTarget"></tdsAngular:inputControl>
-                        <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" size="10" tabindex="17" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.locationTarget}" tabindex="16" placeholder="Location" ngmodel="model.asset.locationTarget"></tdsAngular:inputControl>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" tabindex="17" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
                     </span>
 
                     <div *ngIf="showRackFields">
@@ -172,12 +170,12 @@
                                     [valueField]="'id'">
                             </kendo-dropdownlist>
                             <span *ngIf="model.asset.rackTarget && model.asset.rackTarget.id === -1">
-                                <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="19" placeholder="New Rack Name"value=""ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
+                                <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" tabindex="19" placeholder="New Rack Name"value=""ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
                             </span>
                         </div>
 
                         <div *ngIf="showRackTargetInput === 'new'">
-                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" size="20" tabindex="20" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
+                            <tdsAngular:inputControl field="${standardFieldSpecs.rackTarget}" tabindex="20" placeholder="New Rack Name" value="" ngmodel="model.asset.newRackTarget"></tdsAngular:inputControl>
                         </div>
                     </div>
 
@@ -185,7 +183,7 @@
                         <label class="${standardFieldSpecs.targetRackPosition.imp?:''}">Position</label>
                         <div *ngIf="showRackFields">
                             <div *ngIf="(showRackSourceInput === 'new' || (model.asset.rackSource && (model.asset.rackSource.id === -1 || model.asset.rackSource.id > 0)))" >
-                                <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}" size="10" tabindex="14" placeholder="U Position" value="${assetInstance.targetRackPosition}" ngmodel="model.asset.targetRackPosition"></tdsAngular:inputControl>
+                                <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}" tabindex="14" placeholder="U Position" value="${assetInstance.targetRackPosition}" ngmodel="model.asset.targetRackPosition"></tdsAngular:inputControl>
                             </div>
                         </div>
                     </div>
@@ -309,9 +307,9 @@
                 <div class="clr-form-control">
                     <tdsAngular:inputLabel field="${standardFieldSpecs.truck}" value="${assetInstance.truck}"/>
                     <div class="truck-input-container">
-                        <tdsAngular:inputControl field="${standardFieldSpecs.truck}" size="3" tabindex="38" value="${assetInstance.truck}" ngmodel="model.asset.truck"/>
-                        <tdsAngular:inputControl field="${standardFieldSpecs.cart}" size="3" tabindex="39" value="${assetInstance.cart}" ngmodel="model.asset.cart"/>
-                        <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" size="2" tabindex="40" value="${assetInstance.shelf}" ngmodel="model.asset.shelf"/>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.truck}" tabindex="38" value="${assetInstance.truck}" ngmodel="model.asset.truck"/>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.cart}" tabindex="39" value="${assetInstance.cart}" ngmodel="model.asset.cart"/>
+                        <tdsAngular:inputControl field="${standardFieldSpecs.shelf}" tabindex="40" value="${assetInstance.shelf}" ngmodel="model.asset.shelf"/>
                     </div>
                 </div>
 

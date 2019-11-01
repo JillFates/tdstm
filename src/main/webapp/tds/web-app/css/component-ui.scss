@@ -13,15 +13,15 @@ kendo-grid {
 			border-width: 0 0 1px 0;
 			overflow: hidden;
 		}
-		.k-grid-aria-root{
+		.k-grid-aria-root {
 			overflow: unset;
 		}
-		.grid-label{
+		.grid-label {
 			font-size: 18px;
 			line-height: 48px;
 		}
 	}
-	.k-grid-content{
+	.k-grid-content {
 		min-height: 2rem;
 	}
 	.grid-actions {
@@ -40,14 +40,29 @@ kendo-grid {
 		}
 	}
 	.k-grid-aria-root,
-	kendo-grid-list{
+	kendo-grid-list {
 		overflow: visible;
 	}
 }
 
-task-comment kendo-grid.k-grid .k-grid-content{
+task-comment kendo-grid.k-grid .k-grid-content {
 	td:nth-child(1) {
 		overflow: visible;
 	}
 	padding-bottom: 4rem;
+}
+
+.user-dashboard-component {
+	kendo-grid.k-grid {
+		.grid-label {
+			font-size: 14px;
+			line-height: 24px;
+			> span {
+				font-weight: normal;
+				font-size: 10px;
+				line-height: 16px;
+				margin-left: 5px;
+			}
+		}
+	}
 }

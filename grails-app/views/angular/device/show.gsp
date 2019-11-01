@@ -11,10 +11,10 @@
         <div class="modal-title-container">
             <div class="badge modal-badge" style="">D</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
-			<%-- TODO: Update Subtitle content with field --%>
 			<div class="modal-subtitle">Subtitle content</div>
 			<div class="badge modal-subbadge">9</div>
 		</div>
+        <p class="modal-description">${asset.description}</p>
         <tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>

@@ -9,7 +9,7 @@ html {
 body div.content-wrapper {
 	background: #fff;
 }
-a{
+a {
 	cursor: pointer;
 }
 .content-header {
@@ -37,12 +37,6 @@ a{
 		.btn {
 			margin: 0.25rem 0.5rem 0.25rem 0;
 		}
-	}
-}
-
-.clr-form-control {
-	.clr-form-control {
-		margin-top: unset;
 	}
 }
 
@@ -90,15 +84,23 @@ kendo-popup {
 }
 
 .clr-control-label {
-  margin: 0px 5px;
+	margin: 0px 5px;
 }
 
 // Custom styles
 .clr-control-label-sm {
-  font-weight: 400;
-  font-size: 13px;
+	font-weight: 400;
+	font-size: 13px;
 }
 
 .clr-margin-top-lg {
-  margin-top: 30px;
+	margin-top: 30px;
+}
+.grid-actions {
+	text-align: right;
+	.clr-radio-wrapper {
+		.clr-control-label {
+			display: inline-block;
+		}
+	}
 }

@@ -10,10 +10,17 @@
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Create</h4>
+		<tds-tab-scroller>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Details</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Supports/Depends</button>
+			</tds-scroller-item>
+		</tds-tab-scroller>
 	</div>
 	<div class="modal-body create" tdsScrollContainer style="position: relative">
 		<form 
-			clrForm
 			name="form" 
 			(ngSubmit)="form.form.valid && onCreate()"
 			class="asset-entry-form"
@@ -164,7 +171,7 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${assetInstance.shutdownDuration}"/>
 					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
+							[(ngModel)]="model.asset.shutdownDuration"/>
 					<span>m</span>
 				</div>
 
@@ -198,7 +205,7 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${assetInstance.testingDuration}"/>
-					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
+					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"/>
 					<span>m</span>
 				</div>
 
