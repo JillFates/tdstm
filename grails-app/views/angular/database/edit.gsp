@@ -19,7 +19,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
 	</div>
-	<div class="modal-body" tdsScrollContainer style="position: relative">
+	<div class="modal-body edit" tdsScrollContainer style="position: relative">
 		<form 
 			clrForm
 			name="form" 

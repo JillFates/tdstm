@@ -18,11 +18,21 @@ tds-ui-dialog {
           box-shadow: 0 -3px 0 #0077b8 inset;
         }
       }
-      .modal-body {
-        max-height: calc(100vh - 56px - 48px);
-        height: calc(100vh - 35px - 35px);
+      .modal-body { 
         width: calc(100vw - 40px - 35px - 35px - 22px);
-        padding: 15px 20px 150px 22px;
+        padding: 15px 20px 0 22px;
+
+        &.show {
+          max-height: calc(100vh - 300px);
+        }
+
+        &.create {
+          max-height: calc(100vh - 245px);
+        }
+
+        &.edit {
+          max-height: calc(100vh - 245px);
+        }
 
         .grid-form {
           display: grid;
