@@ -422,7 +422,7 @@ export class AssetViewConfigComponent implements OnInit {
 			}
 
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

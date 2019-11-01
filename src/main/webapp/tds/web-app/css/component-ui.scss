@@ -16,6 +16,10 @@ kendo-grid {
 		.k-grid-aria-root{
 			overflow: unset;
 		}
+		.grid-label{
+			font-size: 18px;
+			line-height: 48px;
+		}
 	}
 	.k-grid-content{
 		min-height: 2rem;

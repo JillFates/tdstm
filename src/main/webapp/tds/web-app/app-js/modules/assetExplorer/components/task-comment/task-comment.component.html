@@ -2,7 +2,7 @@
     <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
         <kendo-grid
                 *ngIf="dataGridTaskHelper"
-                class="task-comment-grid"
+                class="tds-table"
                 [data]="dataGridTaskHelper.gridData"
                 [sort]="dataGridTaskHelper.state.sort"
                 [sortable]="{mode:'single'}"
@@ -14,7 +14,6 @@
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
 						<strong>Tasks</strong>
-						<span class="badge">{{dataGridTaskHelper.gridData.data.length}}</span>
 					</div>
 					<div class="grid-actions clr-col-8">
 						<clr-checkbox-wrapper>
@@ -79,7 +78,7 @@
     <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
         <kendo-grid
                 *ngIf="dataGridCommentHelper"
-                class="task-comment-grid"
+                class="tds-table"
                 [data]="dataGridCommentHelper.gridData"
                 [sort]="dataGridCommentHelper.state.sort"
                 [sortable]="{mode:'single'}"
@@ -91,7 +90,6 @@
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
 						<strong>Comments</strong>
-						<span class="badge">{{dataGridCommentHelper.gridData.data.length}}</span>
 					</div>
 					<div class="grid-actions clr-col-8">
 						<clr-checkbox-wrapper>
@@ -121,7 +119,7 @@
 
                 <!-- Header Template -->
                 <ng-template kendoGridHeaderTemplate>
-                    {{column.label}}>
+                    {{column.label}}
                 </ng-template>
 
                 <!-- Action -->

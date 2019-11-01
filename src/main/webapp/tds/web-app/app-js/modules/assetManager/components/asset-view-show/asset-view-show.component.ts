@@ -25,6 +25,9 @@ import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import { BulkActionResult, BulkChangeType } from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-entity.model';
 
 declare var jQuery: any;
 
@@ -54,9 +57,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
+	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
-	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent
+	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -235,7 +240,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 					this.select.loadData();
 				});
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
@@ -367,18 +372,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Determines which save operation to call based on the button id.
-	 */
-	public save(saveButtonId: string) {
-		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
-	}
-
-	/**
 	 * Determines if primary button can be Save or Save all based on permissions.
 	 */
 	public getSaveButtonId(): string {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
+
 	/**
 	 * Group all the dynamic information required by the view in just one function
 	 * @return {any} Object with the values required dynamically by the view
@@ -392,5 +391,22 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
 		}
+	}
+
+	onClickBulkButton(): void {
+		this.assetExplorerViewGrid.onClickBulkButton(this.tdsBulkChangeButton);
+	}
+
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		this.assetExplorerViewGrid.onBulkOperationResult(operationResult);
+	}
+
+	getGridConfig(): any {
+		return this.assetExplorerViewGrid && this.assetExplorerViewGrid.getDynamicConfiguration();
+	}
+
+	onCreateAsset(assetEntityType: ASSET_ENTITY_DIALOG_TYPES): void {
+		this.assetExplorerViewGrid.onCreateAsset(assetEntityType);
+		this.assetExplorerViewGrid.setCreatebuttonState(assetEntityType);
 	}
 }

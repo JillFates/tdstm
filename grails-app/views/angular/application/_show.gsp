@@ -1,9 +1,7 @@
 <%@page defaultCodec="html" %>
 <a (click)="showDetails = !showDetails">Toggle All Details</a>
 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-	<tbody>
-		<tds:clrRowDetail field="${standardFieldSpecs.assetName}" value="${asset.assetName}" />
-		<tds:clrRowDetail field="${standardFieldSpecs.description}" value="${asset.description}" />
+	<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
 		<tds:clrRowDetail field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 		<tds:clrRowDetail field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" />
@@ -40,10 +38,8 @@
 			</td>
 		</tr>
 		<tr>
-			<th>
-				<label for="moveBundle" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip?:standardFieldSpecs.moveBundle.label}">
-					${standardFieldSpecs.moveBundle.label} : Dep. Group
-				</label>
+			<th class="${standardFieldSpecs.moveBundle.imp?:''}">
+				${standardFieldSpecs.moveBundle.label} : Dep. Group
 			</th>
 			<td>
 				${asset?.moveBundle}
@@ -77,12 +73,12 @@
 		</tr>
 		<tr>
 			<tds:clrInputLabel field="${standardFieldSpecs.url}" value="${asset.url}"/>
-			<td class="valueNW ${standardFieldSpecs.url.imp}" ><tds:textAsLink  text="${asset.url}" target="_new"/></td>
+			<td><tds:textAsLink  text="${asset.url}" target="_new"/></td>
 		</tr>
 		<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 		<tr>
 			<tds:clrInputLabel field="${standardFieldSpecs.shutdownBy}" value="${asset.shutdownBy}"/>
-			<td class="valueNW ${standardFieldSpecs.shutdownBy.imp}" nowrap="nowrap">
+			<td nowrap="nowrap">
 				<g:if test="${shutdownById == -1}">
 					${shutdownBy}
 				</g:if>
@@ -135,7 +131,6 @@
 		</tr>
 		<tds:clrRowDetail field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}" />
 		<g:render template="/angular/common/customShow" model="[asset:asset,customs:customs]"></g:render>
-        <g:render template="/angular/common/assetTags"></g:render>
 	</tbody>
 </table>
 

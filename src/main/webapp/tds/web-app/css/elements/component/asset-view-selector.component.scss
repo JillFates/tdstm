@@ -1,0 +1,51 @@
+kendo-popup {
+  .asset-view-selector {
+    margin-top: -28px;
+    > input {
+      height: 15px;
+      // width: inherit;
+    }
+    > i.fa-search {
+      line-height: inherit;
+      top: 3px;
+    }
+  }
+
+  .section-container {
+    width: 100%;
+    margin-left: -2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-bottom: -1px;
+    padding-bottom: 5px;
+
+    .folder-row {
+      color: #656565;
+      .badge {
+        margin-top: 2px
+      }
+    }
+
+    .option-row {
+      margin-top:5px;
+      .btn-sm {
+        border: 0;
+        margin: 0;
+        &:hover {
+          background-color: inherit;
+        }
+      }
+      ul {
+        padding-left:10px;
+        margin-top:5px;
+        word-wrap:break-word;
+      }
+    }
+  }
+
+  .k-item.k-state-selected {
+    .section-container {
+      background-color: #ededed;
+    }
+  }
+}

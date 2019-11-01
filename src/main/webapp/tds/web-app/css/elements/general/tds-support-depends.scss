@@ -1,0 +1,113 @@
+@mixin grid-label {
+  .grid-label {
+    font-size: 18px;
+    line-height: 48px;
+  }
+}
+
+kendo-grid {
+  &.tds-table {
+    @include grid-label();
+
+    .k-grid-header {
+      background: unset;
+
+      .k-header {
+        > .k-link {
+          margin: unset;
+          padding: 0 0 5px 0;
+        }
+      }
+    }
+
+    .k-grid-header-wrap {
+      background: unset;
+    }
+
+    .k-icon {
+      font-size: unset;
+    }
+  }
+}
+
+.tds-table {
+  @include grid-label();
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    th {
+      font-weight: 500;
+      font-size: 11px;
+      line-height: 12px;
+      padding: 0 0 5px 12px;
+      color: #3c8dbc;
+    }
+
+    tbody {
+      tr {
+        cursor: pointer;
+
+        td {
+          font-size: 11px;
+          color: #333333;
+          border-style: solid;
+          border-color: #d9e4ea;
+          padding: 0 0 0 12px;
+
+          &:first-child {
+            border-width: 1px 0 1px 1px;
+          }
+
+          &:not(:first-child):not(:last-child) {
+            border-width: 1px 0;
+          }
+
+          &:last-child {
+            border-width: 1px 1px 1px 0;
+          }
+        }
+
+        td .status {
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+          text-align: center;
+          line-height: 13px;
+          border: 1px solid $color-icon;
+          border-radius: 3px;
+          background: $color-border;
+
+          clr-icon {
+            color: $color-text-inverse;
+            width: 12px;
+            height: 12px;
+            margin-bottom: 1px;
+          }
+          &.status-Ready {
+            background: $color-success;
+          }
+          &.status-Started {
+            background: transparent;
+            border: 0;
+            clr-spinner {
+              width: 16px;
+              height: 16px;
+            }
+          }
+          &.status-Hold {
+            background: $color-hold;
+          }
+          &.status-Completed {
+            background: $color-info;
+          }
+          &.status-Pending clr-icon {
+            color: $color-icon;
+          }
+          &.status-Warning {
+            background: $color-warning;
+          }
+        }
+      }
+    }
+  }
+}

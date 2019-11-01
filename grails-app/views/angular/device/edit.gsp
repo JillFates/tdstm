@@ -12,8 +12,16 @@
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
         <h4 class="modal-title">Device Edit</h4>
+        <tds-tab-scroller>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Details</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Supports/Depends</button>
+			</tds-scroller-item>
+		</tds-tab-scroller>
     </div>
-    <div class="modal-body">
+    <div class="modal-body edit" tdsScrollContainer style="position: relative">
         <form 
             clrForm
             name="form" 
@@ -24,7 +32,7 @@
             #form="ngForm" 
             novalidate
             clrLayout="vertical">
-            <div class="grid-form">
+            <div tdsScrollSection class="grid-form">
                 <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetName}" value="${asset.assetName}" ngmodel="model.asset.assetName" tabindex="1"/>
                 <tdsAngular:inputLabelAndField field="${standardFieldSpecs.description}" value="${asset.description}" ngmodel="model.asset.description" tabindex="2"/>
                 
@@ -43,8 +51,8 @@
                 <tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="4" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
                         
                 <div class="clr-form-control">
-                    <label>Source</label>
-                    <label for="locationSourceId">Location/Room</label>
+                    <label class="${standardFieldSpecs.locationSource.imp?:''}">Source</label>
+                    <label for="locationSourceId" class="${standardFieldSpecs.locationSource.imp?:''}">Location/Room</label>
                     <kendo-dropdownlist
                             [tabIndex]="5"
                             class="tm-input-control"
@@ -61,7 +69,7 @@
                     </span>
 
                     <div *ngIf="showRackFields">
-                        <label>Rack/Cabinet</label>
+                        <label class="${standardFieldSpecs.rackSource.imp?:''}">Rack/Cabinet</label>
                         <div *ngIf="showRackSourceInput === 'select'">
                             <kendo-dropdownlist
                                     [tabIndex]="8"
@@ -83,7 +91,7 @@
                     </div>
 
                     <div *ngIf="showBladeFields">
-                        <label>Blade Chassis</label>
+                        <label class="${standardFieldSpecs.sourceBladePosition.imp?:''}">Blade Chassis</label>
                         <div *ngIf="showBladeSourceInput === 'select'">
                             <kendo-dropdownlist
                                 class="tm-input-control"
@@ -100,7 +108,7 @@
                     </div>
 
                     <div *ngIf="showBladeFields || showRackFields">
-                        <label>Position</label>
+                        <label class="${standardFieldSpecs.sourceRackPosition.imp?:''}">Position</label>
                         <div *ngIf="showRackFields">
                             <div *ngIf="(showRackSourceInput === 'new' || (model.asset.rackSource && (model.asset.rackSource.id === -1 || model.asset.rackSource.id > 0)))" >
                                 <tdsAngular:inputControl field="${standardFieldSpecs.sourceRackPosition}" size="10" tabindex="12" placeholder="U Position" value="${asset.sourceRackPosition}" ngmodel="model.asset.sourceRackPosition"></tdsAngular:inputControl>
@@ -110,8 +118,8 @@
                 </div>
 
                 <div class="clr-form-control">
-                    <label>Target</label>
-                    <label for="locationSourceId">Location/Room</label>
+                    <label class="${standardFieldSpecs.locationTarget.imp?:''}">Target</label>
+                    <label for="locationSourceId" class="${standardFieldSpecs.locationTarget.imp?:''}">Location/Room</label>
                     <kendo-dropdownlist
                         [tabIndex]="13"
                         class="tm-input-control"
@@ -127,8 +135,8 @@
                         <tdsAngular:inputControl field="${standardFieldSpecs.roomTarget}" size="10" tabindex="15" placeholder="Room Name" ngmodel="model.asset.newRoomTarget"></tdsAngular:inputControl>
                     </span>
 
-                     <div *ngIf="showRackFields">
-                        <label for="rackSourceId">Rack/Cabinet</label>
+                    <div *ngIf="showRackFields">
+                        <label for="rackSourceId" class="${standardFieldSpecs.rackTarget.imp?:''}">Rack/Cabinet</label>
                         <div *ngIf="showRackTargetInput === 'select'">
                             <kendo-dropdownlist
                                     [tabIndex]="16"
@@ -150,7 +158,7 @@
                     </div>
 
                     <div *ngIf="showBladeFields">
-                        <label>Blade Chassis</label>
+                        <label class="${standardFieldSpecs.targetBladePosition.imp?:''}">Blade Chassis</label>
                         <div *ngIf="showBladeTargetInput === 'select'">
                             <kendo-dropdownlist
                                     class="tm-input-control"
@@ -169,7 +177,7 @@
                     </div>
 
                     <div *ngIf="showBladeFields || showRackFields">
-                        <label>Position</label>
+                        <label class="${standardFieldSpecs.targetRackPosition.imp?:''}">Position</label>
                         <div *ngIf="showRackFields">
                             <div *ngIf="(showRackTargetInput === 'new' || (model.asset.rackTarget && (model.asset.rackTarget.id === -1 || model.asset.rackTarget.id > 0)))">
                                 <tdsAngular:inputControl field="${standardFieldSpecs.targetRackPosition}" placeholder="U Position" size="10" tabindex="21" value="${asset.targetRackPosition}"  ngmodel="model.asset.targetRackPosition"></tdsAngular:inputControl>
@@ -226,8 +234,9 @@
                 </div>
 
                 <div class="clr-form-control">
-                    <tdsAngular:inputLabel field="${standardFieldSpecs.size}" value="${asset.size}"/>
-                    
+                    <label class="${standardFieldSpecs.size.imp?:''}">
+                        ${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+                    </label>
                     <kendo-numerictextbox
                         [tabIndex]="31"
                         name="deviceSize"
@@ -236,6 +245,15 @@
                         [autoCorrect]=true
                         [(ngModel)]="model.asset.size">
                     </kendo-numerictextbox>
+                    <kendo-dropdownlist
+                        [tabIndex]="35"
+                        class="tm-input-control"
+                        name="modelAssetScaleName"
+                        [data]="${SizeScale.getAsJsonList() as JSON}"
+                        [(ngModel)]="model.asset.scale"
+                        [textField]="'text'"
+                        [valueField]="'value'">
+                    </kendo-dropdownlist>
                 </div>
 
                 <tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" tabindex="32" ngmodel="model.asset.assetTag"/>
@@ -258,19 +276,6 @@
                         name="modelAssetPlanStatus"
                         [data]="model.planStatusOptions"
                         [(ngModel)]="model.asset.planStatus">
-                    </kendo-dropdownlist>
-                </div>
-
-                <div class="clr-form-control">
-                    <tdsAngular:inputLabel field="${standardFieldSpecs.scale}" value="${asset.scale}"/>
-                    <kendo-dropdownlist
-                        [tabIndex]="35"
-                        class="tm-input-control"
-                        name="modelAssetScaleName"
-                        [data]="${SizeScale.getAsJsonList() as JSON}"
-                        [(ngModel)]="model.asset.scale"
-                        [textField]="'text'"
-                        [valueField]="'value'">
                     </kendo-dropdownlist>
                 </div>
 
@@ -323,7 +328,8 @@
             </div>
 
             <g:render template="/angular/common/assetTagsEdit"></g:render>
-            <tds-supports-depends (initDone)="onInitDependenciesDone($event)" [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
+        
+            <tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)" [(model)]="model"  (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
         </form>
     </div>
     <div class="modal-sidenav form-group-center">

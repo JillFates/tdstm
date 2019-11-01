@@ -10,8 +10,16 @@
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Edit</h4>
+		<tds-tab-scroller>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Details</button>
+			</tds-scroller-item>
+			<tds-scroller-item>
+				<button tdsScrollerLink>Supports/Depends</button>
+			</tds-scroller-item>
+		</tds-tab-scroller>
 	</div>
-	<div class="modal-body">
+	<div class="modal-body edit" tdsScrollContainer style="position: relative">
 		<form 
 			clrForm 
 			name="form" 
@@ -21,8 +29,8 @@
 			role="form" 
 			#form="ngForm" 
 			novalidate
-			clrLayout="vertical">
-			<div class="grid-form">
+			clrLayout="vertical">	
+			<div tdsScrollSection class="grid-form">
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetName}" value="${asset.assetName}" ngmodel="model.asset.assetName" tabindex="1"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.description}" value="${asset.description}" ngmodel="model.asset.description" size="50" tabindex="2"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" ngmodel="model.asset.appVendor" tabindex="3"/>
@@ -48,7 +56,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
-				
+						
 				<div class="clr-form-control">
 					<div style="display: flex">
 						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
@@ -98,7 +106,7 @@
 						[valueField]="'id'">
 					</kendo-dropdownlist>
 				</div>
-				
+						
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${asset.license}" ngmodel="model.asset.license" tabindex="19"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
@@ -165,11 +173,9 @@
 					</tds-combobox-group>
 				</div>
 
-
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-							class="${standardFieldSpecs.shutdownDuration.imp?:''} duration"
 							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
 					<span style="margin-left:200px; margin-top: -20px;">m</span>
 				</div>
@@ -208,10 +214,11 @@
 					<span style="margin-left:200px; margin-top: -20px;">m</span>
 				</div>
 
-				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>		
-			</div>	
+				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>
+			</div>
 			<g:render template="/angular/common/assetTagsEdit"></g:render>
-			<tds-supports-depends (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>	
+
+			<tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>	
 		</form>
 	</div>
 	<div class="modal-sidenav form-group-center">
