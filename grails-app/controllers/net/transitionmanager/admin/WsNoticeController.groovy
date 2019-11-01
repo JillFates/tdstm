@@ -11,6 +11,7 @@ import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
+import net.transitionmanager.security.UserLogin
 
 import javax.servlet.http.HttpSession
 
@@ -107,7 +108,15 @@ class WsNoticeController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.UserGeneralAccess)
 	def fetchPostLoginNotices() {
-		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), getProjectForWs(), request.getSession())
+		Project project = getProjectForWs()
+		if (session.getAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES) == null) {
+			UserLogin userLogin = securityService.userLogin
+			boolean hasUnacknowledgedNotices = noticeService.hasUnacknowledgedNoticesForLogin(project, session, userLogin.person)
+			if (hasUnacknowledgedNotices) {
+				request.getSession().setAttribute(SecurityUtil.HAS_UNACKNOWLEDGED_NOTICES, true)
+			}
+		}
+		List<Notice> notices = noticeService.fetchPostLoginNotices(currentPerson(), project, session)
 		Map result = [
 			notices: notices,
 			redirectUri: session[SecurityUtil.REDIRECT_URI]

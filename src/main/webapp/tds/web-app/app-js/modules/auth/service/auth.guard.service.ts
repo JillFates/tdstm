@@ -26,7 +26,6 @@ export class AuthGuardService implements CanActivate {
 		private windowService: WindowService,
 		private router: Router,
 		private store: Store) {
-		this.getUserContext();
 	}
 
 	/**
@@ -36,6 +35,7 @@ export class AuthGuardService implements CanActivate {
 	 * @param state
 	 */
 	canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | boolean {
+		this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 		let requiresLicense: boolean = route.data['requiresLicense'];
 		if (requiresLicense && (!this.userContext.licenseInfo || !this.userContext.licenseInfo.license.isValid)) {
 			this.windowService.getWindow().location.href = '/tdstm/errorHandler/licensing';
@@ -61,9 +61,5 @@ export class AuthGuardService implements CanActivate {
 			this.windowService.getWindow().location.href = '/tdstm/module/auth/login';
 			return Observable.of(true);
 		});
-	}
-
-	protected getUserContext(): void {
-		this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 	}
 }

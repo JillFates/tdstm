@@ -174,28 +174,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 * Open view to edit task details
 	 */
 	public editTaskDetail(): void {
-		this.model.modal = {
-			title: 'Edit Task',
-			type: ModalType.EDIT
-		};
-
-		this.dialogService.extra(TaskEditComponent,
-			[
-				{provide: TaskDetailModel, useValue: clone(this.model)}
-			], false, false)
-			.then(result => {
-				if (result) {
-					if (result.isDeleted) {
-						this.close({id: this.taskDetailModel, isDeleted: true})
-						return;
-					}
-
-					this.hasChanges = true;
-					this.loadTaskDetail();
-				}
-			}).catch(result => {
-			this.dismiss(this.hasChanges);
-		});
+		this.close({id: this.taskDetailModel, shouldEdit: true});
 	}
 
 	/**
