@@ -985,6 +985,33 @@ div.graphContainer.fullscreen {
 .nav-tabs-custom > .nav-tabs > li.active {
   border-top-color: #3c8dbc; }
 
+/* Cookbook Tabs  to Clarity */
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a {
+  border: 0px;
+  background: none;
+  color: #444;
+  margin-left: 10px;
+  margin-right: 10px; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child {
+  margin-left: 0px; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover {
+  -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
+  box-shadow: 0 -3px 0 #0077b8 inset;
+  -webkit-transition: -webkit-box-shadow .2s ease-in;
+  transition: -webkit-box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a {
+  -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
+  box-shadow: 0 -3px 0 #0077b8 inset;
+  -webkit-transition: -webkit-box-shadow .2s ease-in;
+  transition: -webkit-box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in;
+  transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
 form.left-alignment div.form-group input[type="text"] {
   height: 34px;
   padding-left: 10px; }
