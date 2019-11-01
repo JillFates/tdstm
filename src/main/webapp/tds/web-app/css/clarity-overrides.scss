@@ -82,6 +82,13 @@ a{
 	}
 }
 
+kendo-popup {
+	.clr-control-container {
+		max-height: 400px;
+		overflow: auto;
+	}
+}
+
 .clr-control-label {
   margin: 0px 5px;
 }
