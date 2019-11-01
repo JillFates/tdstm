@@ -1,29 +1,11 @@
-<header
-	class="main-header header-component"
-	*ngIf="!pageMetaData.hideTopNav || !userContext"
->
+<header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav || !userContext">
 	<nav class="navbar navbar-static-top">
-		<div
-			class="container menu-top-container"
-			[ngClass]="{
-				'menu-top-container-full-menu':
-					userContext.licenseInfo &&
-					!userContext.licenseInfo.license.isManager
-			}"
-		>
+		<div class="container menu-top-container" [ngClass]="{ 'menu-top-container-full-menu': userContext?.licenseInfo && !userContext.licenseInfo?.license?.isManager}">
 			<div class="navbar-header branding">
-				<img
-					[src]="userContext.project.logoUrl"
-					alt="Transition Manager Logo"
-				/>
+				<img [src]="userContext.project.logoUrl" alt="Transition Manager Logo" />
 			</div>
 
-			<button
-				type="button"
-				class="navbar-toggle collapsed"
-				data-toggle="collapse"
-				data-target="#mobile-nav"
-			>
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mobile-nav">
 				<i class="fa fa-bars"></i>
 			</button>
 
@@ -34,70 +16,34 @@
 						<!-- Notifications Menu -->
 						<li class="notifications-menu">
 							<span class="tds-nav-item" id="nav-project-name">
-								<span *ngIf="userContext.project">{{
-									userContext.project.name
-								}}</span>
-								<span *ngIf="userContext.event">
-									: {{ userContext.event.name }}</span
-								>
-								<span *ngIf="userContext.bundle">
-									: {{ userContext.bundle.name }}</span
-								>
+								<span *ngIf="userContext.project">{{userContext.project.name}}</span>
+								<span *ngIf="userContext.event"> : {{ userContext.event.name }}</span>
+								<span *ngIf="userContext.bundle"> : {{ userContext.bundle.name }}</span>
 							</span>
 						</li>
-						<li
-							*ngIf="
-								!userContext.licenseInfo.license.isManager &&
-								!userContext.licenseInfo.license.isValid
-							"
-						>
+						<li *ngIf="!userContext.licenseInfo?.license.isManager && !userContext.licenseInfo?.license.isValid">
 							<tds-license-warning></tds-license-warning>
 						</li>
 						<!-- User Account Menu -->
 						<li class="dropdown user user-menu">
 							<!-- Menu Toggle Button -->
-							<a
-								href="#"
-								class="dropdown-toggle"
-								data-toggle="dropdown"
-								[title]="userContext.person.fullName"
-							>
-								<span class="user-name">{{
-									getUserIconText()
-								}}</span>
-								<span class="user-menu-text"
-									>Account Options</span
-								>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" [title]="userContext.person.fullName">
+								<span class="user-name">{{getUserIconText()}}</span>
+								<span class="user-menu-text">Account Options</span>
 							</a>
 							<ul class="dropdown-menu">
 								<li class="menu-child-item">
-									<a
-										(click)="openEditPersonModal()"
-										style="cursor: pointer;"
-										>Account Details</a
-									>
+									<a (click)="openEditPersonModal()" style="cursor: pointer;">Account Details</a>
 								</li>
 								<li class="menu-child-item">
-									<a
-										(click)="openDateTimezoneModal()"
-										style="cursor: pointer;"
-										>Date and Timezone</a
-									>
+									<a (click)="openDateTimezoneModal()" style="cursor: pointer;">Date and Timezone</a>
 								</li>
 								<li class="menu-child-item">
-									<a
-										(click)="openPrefModal()"
-										style="cursor: pointer;"
-										>Edit Preferences</a
-									>
+									<a (click)="openPrefModal()" style="cursor: pointer;">Edit Preferences</a>
 								</li>
 								<li class="divider"></li>
 								<li class="menu-child-item">
-									<a
-										(click)="logOut()"
-										style="cursor: pointer;"
-										>Sign Out</a
-									>
+									<a (click)="logOut()" style="cursor: pointer;">Sign Out</a>
 								</li>
 							</ul>
 						</li>

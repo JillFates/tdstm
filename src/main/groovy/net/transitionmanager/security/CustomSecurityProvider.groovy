@@ -1,6 +1,8 @@
 package net.transitionmanager.security
 
 import com.tdsops.common.security.SecurityUtil
+import com.tdsops.common.security.spring.TdsPasswordEncoder
+import com.tdsops.common.security.spring.TdsSaltSource
 import com.tdsops.common.security.spring.TdsUserDetails
 import grails.compiler.GrailsCompileStatic
 import org.springframework.beans.factory.annotation.Value
@@ -13,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails
 @GrailsCompileStatic
 class CustomSecurityProvider extends DaoAuthenticationProvider {
 	PasswordService passwordService
+	TdsPasswordEncoder tdsPasswordEncoder
+	TdsSaltSource tdsSaltSource
 
 	@Value('${tdstm.security.localUser.forceUseNewEncryption}')
 	boolean forceUseNewEncryption
@@ -21,8 +25,8 @@ class CustomSecurityProvider extends DaoAuthenticationProvider {
 	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
 		Object salt = null;
 
-		if (this.saltSource != null) {
-			salt = this.saltSource.getSalt(userDetails);
+		if (this.tdsSaltSource != null) {
+			salt = this.tdsSaltSource.getSalt(userDetails);
 		}
 
 		if (authentication.getCredentials() == null) {
@@ -37,7 +41,7 @@ class CustomSecurityProvider extends DaoAuthenticationProvider {
 
 
 
-		if (!passwordEncoder.isPasswordValid(userDetails.getPassword(), presentedPassword, salt)) {
+		if (!tdsPasswordEncoder.isPasswordValid(userDetails.getPassword(), presentedPassword, salt)) {
 			logger.debug("Authentication failed: password does not match stored value");
 
 			throw new BadCredentialsException(messages.getMessage(

@@ -11,7 +11,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	template: `
         <div class="tds-modal-content">
             <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
                 <h4 class="modal-title">Export to Excel</h4>
             </div>
             <div class="modal-body">

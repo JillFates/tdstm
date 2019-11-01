@@ -2,6 +2,8 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
+import { ClarityModule } from '@clr/angular';
+import { TdsComponentLibraryModule } from 'tds-component-library';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
@@ -42,6 +44,8 @@ import {AssetViewManagerComponent} from './components/asset-view-manager/asset-v
 		SharedModule,
 		FormsModule,
 		AssetExplorerModule,
+		ClarityModule,
+		TdsComponentLibraryModule,
 		// Kendo
 		DropDownListModule,
 		GridModule,

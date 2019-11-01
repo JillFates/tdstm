@@ -197,18 +197,14 @@ class DataviewSpec {
 
 	/**
 	 * Lookup {@code FieldSpec} from {@code FieldSpecProject}.
-	 * If it did not find a valid instance of {@code FieldSpec} then it throws Exception
+	 * If it did not find a valid instance of {@code FieldSpec} then null is returned.
 	 * @param fieldSpecProject an instance of {@code FieldSpecProject} used to lookup a {@code FieldSpec}
 	 * @param domain an asset entity domain String value
 	 * @param fieldName an asset entity field name String value
 	 * @return an instance of {@code FieldSpec}
 	 */
 	private FieldSpec lookupFieldSpec(FieldSpecProject fieldSpecProject, String domain, String fieldName) {
-		FieldSpec fieldSpec = fieldSpecProject?.getFieldSpec(domain, fieldName)
-		if (!fieldSpec) {
-			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
-		}
-		return fieldSpec
+		return fieldSpecProject?.getFieldSpec(domain, fieldName)
 	}
 
 

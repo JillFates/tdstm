@@ -1,6 +1,5 @@
 tds-ui-dialog {
 	#tdsUiDialog {
-		background: transparent;
 		padding: 0 !important;
 		margin: 0;
 		.modal-dialog {
@@ -20,6 +19,28 @@ tds-ui-dialog {
 				height: calc(100vh - 119px);
 				width: calc(100vw - 55px);
 				padding:15px 15px 24px 15px;
+
+				.grid-form {
+					display: grid;
+					grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+					grid-gap: 24px;
+					justify-items: left;
+
+					input {
+						width: 220px;
+					}
+
+					.truck-input-container {
+						display: flex;
+						justify-content: space-between;
+						flex-wrap: nowrap;
+						
+						input {
+							width: 66px;
+							margin-right: 10px;
+						}
+					}
+				}
 
 				.tdr-detail-list {
 					border-collapse: collapse;
@@ -55,6 +76,7 @@ tds-ui-dialog {
 
 				}
 			}
+			.modal-footer,
 			.modal-sidenav {
 				position: absolute;
 				top: 0;

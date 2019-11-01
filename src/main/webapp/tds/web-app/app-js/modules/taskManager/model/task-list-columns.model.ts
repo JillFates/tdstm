@@ -23,7 +23,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Description',
 		property: 'comment',
 		type: 'text',
-		width: 200,
+		width: 240,
 		locked: false,
 		filterable: true
 	},

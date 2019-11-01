@@ -186,6 +186,7 @@
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${assetInstance.shutdownFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="36"
 														[team]="${availableRoles as JSON}">
 												</tds-combobox-group>
 											</td>
@@ -208,6 +209,7 @@
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${assetInstance.startupFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="18"
 														[team]="${availableRoles as JSON}"></tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${assetInstance.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="27"/>
@@ -219,6 +221,7 @@
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${assetInstance.testingFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="36"
 														[team]="${availableRoles as JSON}">
                                                 </tds-combobox-group>
 											</td>

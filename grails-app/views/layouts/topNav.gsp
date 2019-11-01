@@ -1,5 +1,6 @@
 <%@ page import="net.transitionmanager.security.Permission" %>
 <g:set var="licenseCommonService" bean="licenseCommonService"/>
+<g:set var="licenseAdminService" bean="licenseAdminService"/>
 <g:set var="environmentService" bean="environmentService"/>
 <!DOCTYPE html>
 <html>
@@ -15,6 +16,8 @@
     int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+    def isLicenseValid = licenseAdminService.isValid()
+
     def buildInfo = environmentService.getVersionText()
 %>
 <head>
@@ -191,7 +194,7 @@
 								</sec:ifLoggedIn>
 							</ul>
 						</div>
-						
+
 						<g:if test="${isLicenseManagerEnabled}">
 							<g:render template="/layouts/licmanMenu" model="[currProject:currProject, partyGroup: partyGroup, room:room, moveEvent:moveEvent, isLicenseManagerEnabled:isLicenseManagerEnabled]"  />
 						</g:if>

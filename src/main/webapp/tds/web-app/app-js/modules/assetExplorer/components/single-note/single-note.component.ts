@@ -13,7 +13,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
                 <div class="tds-modal-content resizable" [style.width.px]="500">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
                         <h4 class="modal-title">{{singleNoteModel.modal.title}}</h4>
                     </div>
