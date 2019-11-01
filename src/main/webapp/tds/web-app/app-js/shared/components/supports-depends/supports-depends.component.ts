@@ -34,7 +34,7 @@ declare var jQuery: any;
 					<div class="grid-label clr-col-4">
 						<strong>Supports</strong>
 					</div>
-					<div class="grid-actions clr-col-8">			
+					<div class="grid-actions clr-col-8">
 						<div class="btn-sm">
 							<tds-button-add
 								[tooltip]="'Add link to Support Asset'"
@@ -152,7 +152,7 @@ declare var jQuery: any;
 					<div class="grid-label clr-col-4">
 						<strong>Dependent On</strong>
 					</div>
-					<div class="grid-actions clr-col-8">	
+					<div class="grid-actions clr-col-8">
 						<div class="btn-sm">
 							<tds-button-add
 								class="float-right button-header-grid"
@@ -162,8 +162,8 @@ declare var jQuery: any;
 							</tds-button-add>
 						</div>
 					</div>
-				</div> 
-            </ng-template>
+				</div>
+			</ng-template>
 
             <!-- Columns -->
             <kendo-grid-column *ngFor="let column of supportOnColumnModel.columns"

@@ -1,65 +1,19 @@
-<div class="content body tds-kendo-grid">
-	<section>
-		<div class="box-body box-with-empty-header">
-			<div class="row top-filters">
-				<div class="col-sm-7">
-					<label class="control-label">Event</label>
-					<kendo-dropdownlist
-						style="width: 200px; padding-right: 20px"
-						name="eventList"
-						class="form-control event-dropdown"
-						[data]="eventList"
-						[textField]="'name'"
-						[valueField]="'id'"
-						[(ngModel)]="selectedEvent"
-						(valueChange)="onEventSelect()">
-					</kendo-dropdownlist>
-					<label for="one">
-						<input
-							type="checkbox"
-							name="one"
-							id="one"
-							[(ngModel)]="justRemaining"
-							(ngModelChange)="onFiltersChange()">
-						Just Remaining
-					</label>
-					<label for="two">
-						<input
-							type="checkbox"
-							name="two"
-							id="two"
-							[(ngModel)]="justMyTasks"
-							(ngModelChange)="onFiltersChange()">
-						Just Mine
-					</label>
-					<label for="three">
-						<input
-							type="checkbox"
-							name="three" id="three"
-							[(ngModel)]="viewUnpublished"
-							(ngModelChange)="onFiltersChange()">
-						View Unpublished
-					</label>
+<div class="content body task-list">
+	<form clrForm clrLayout="horizontal" class="">
+		<div class="clr-row">
+			<div class="clr-col-12 page-header" >
+				<h1>Task Manager</h1>
+				<div>
+					<tds-button [icon]="'organization'" (click)="onViewTaskGraphHandler()" [title]="'View Task Graph'"></tds-button>
+					<tds-button [icon]="'list'" (click)="onViewTimelineHandler()" [title]="'View Timeline'"></tds-button>
 				</div>
-				<div class="col-sm-5 text-right">
-					<tds-button-custom class="btn-primary"
-														 (click)="onViewTaskGraphHandler()"
-														 title="View Task Graph"
-														 tooltip="View Task Graph"
-														 icon="sitemap">
-					</tds-button-custom>
-					<tds-button-custom class="btn-primary"
-														 (click)="onViewTimelineHandler()"
-														 title="View Timeline"
-														 tooltip="View Timeline"
-														 icon="table">
-					</tds-button-custom>
+                <div class="refresh-container">
 					<div class="refresh-control">
 						<tds-pie-countdown
-							[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
-							(timeout)="search()"
-							[hideRefresh]="true"
-							[customOptions]="[{seconds: 0, description: 'Manual'},
+								[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+								(timeout)="search()"
+								[hideRefresh]="true"
+								[customOptions]="[{seconds: 0, description: 'Manual'},
 																		{seconds: 60, description: '1 Min'},
 																		{seconds: 120, description: '2 Min'},
 																		{seconds: 180, description: '3 Min'},
@@ -67,15 +21,62 @@
 																		{seconds: 300, description: '5 Min'}]">
 						</tds-pie-countdown>
 					</div>
+					<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="onFiltersChange()" class="flat" tooltip="Refresh"></tds-button-custom>
 				</div>
 			</div>
+		</div>
+
+		<div class="clr-row">
+			<div class="clr-col-12 actions-primary-page-container">
+				<div class="left-container">
+					<clr-select-container class="clr-form-control clr-row">
+						<label class="label-event-list">Event: </label>
+						<select clrSelect
+								class="select-event-list"
+								name="selectedEventId"
+								[(ngModel)]="selectedEventId"
+								(ngModelChange)="onEventSelect($event)">
+							<option
+									*ngFor="let event of eventList"
+									[attr.selected]="selectedEventId === event.id"
+									[value]="event.id">{{ event.name }}</option>
+						</select>
+					</clr-select-container>
+					<div class="check-container">
+						<clr-checkbox-wrapper>
+							<input clrCheckbox type="checkbox" name="justRemaining" id="justRemaining" [(ngModel)]="justRemaining" (ngModelChange)="onFiltersChange()">
+							<label>Just Remaining</label>
+						</clr-checkbox-wrapper>
+
+							<clr-checkbox-wrapper>
+							<input clrCheckbox type="checkbox" name="justMine" id="justMine" [(ngModel)]="justMyTasks" (ngModelChange)="onFiltersChange()">
+							<label>Just Mine</label>
+						</clr-checkbox-wrapper>
+
+						<clr-checkbox-wrapper>
+							<input clrCheckbox type="checkbox" name="viewUnpublished" id="viewUnpublished" [(ngModel)]="viewUnpublished" (ngModelChange)="onFiltersChange()">
+							<label>View Unpublished</label>
+						</clr-checkbox-wrapper>
+					</div>
+				</div>
+				<div>
+					<tds-button [icon]="'plus-circle'" (click)="onCreateTaskHandler()" [title]="'Create Task'" [iconClass]="'is-solid'"></tds-button>
+					<tds-button [icon]="'pencil'" (click)="onBulkActionHandler()" [title]="'Bulk Action'"></tds-button>
+					<tds-button [icon]="'times'" [disabled]="!areFiltersDirty()" (click)="onClearFiltersHandler()" [title]="'Clear Filters'"></tds-button>
+				</div>
+			</div>
+
+		</div>
+	</form>
+	<section class="grid-container">
+		<div class="box-body box-with-empty-header tds-kendo-grid" [ngClass]="{'is-filtering': isFiltering}">
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
 				class="task-grid"
 				[data]="grid.gridData"
-				[pageSize]="grid.state.take"
 				[skip]="grid.state.skip"
+				[pageSize]="grid.state.take"
 				[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 				(pageChange)="onPageChangeHandler($event)"
 				[filterable]="true"
@@ -87,44 +88,30 @@
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
 				(cellClick)="onCellClickHandler($event)">
+
 				<!-- Column Menu -->
 				<ng-template kendoGridColumnMenuTemplate let-service="service" let-column="column">
-					<div class="k-column-list">
-						<label *ngFor="let custom of allAvailableCustomColumns;"
-									 [ngClass]="{'invisible': custom.property === currentCustomColumns[column.field]}"
-									 class="k-column-list-item ng-star-inserted">
-							<input type="radio"
-										 value="{{custom.property}}"
-										 (ngModelChange)="onCustomColumnChange(column.field, custom, service)"
-										 [(ngModel)]="selectedCustomColumn[column.field]">
-							<span class="k-checkbox-label"> {{custom.label}} </span>
-						</label>
+					<div class="dropdown-menu">
+						<clr-radio-container>
+							<clr-radio-wrapper
+									class="k-column-list-item"
+									*ngFor="let menu of allAvailableCustomColumns"
+									[ngClass]="{'invisible': menu.property === currentCustomColumns[column.field]}">
+								<input type="radio"
+									   clrRadio
+									   value="{{menu.property}}"
+									   (ngModelChange)="onCustomColumnChange(column.field, menu, service)"
+									   [(ngModel)]="selectedCustomColumn[column.field]"
+									   [name]="menu.property" />
+								<label>{{ menu.label }}</label>
+							</clr-radio-wrapper>
+						</clr-radio-container>
 					</div>
 				</ng-template>
+
 				<!-- Toolbar -->
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="button-toolbar">
-						<tds-button-create
-							(click)="onCreateTaskHandler()"
-							[title]="'Create Task'">
-						</tds-button-create>
-						<tds-button-edit
-							(click)="onBulkActionHandler()"
-							[title]="'Bulk Action'">
-						</tds-button-edit>
-						<tds-button-custom
-							icon="times"
-							[disabled]="!areFiltersDirty()"
-							(click)="onClearFiltersHandler()"
-							[title]="'Clear Filters'">
-						</tds-button-custom>
-						<tds-button-custom
-							icon="refresh"
-							title="Refresh"
-							isIconButton="true"
-							class="component-action-reload pull-right"
-							(click)="onFiltersChange()">
-						</tds-button-custom>
 					</div>
 				</ng-template>
 				<!-- Row Detail Template -->
@@ -166,20 +153,32 @@
 													 [columnMenu]="column.columnMenu">
 					<!-- Header -->
 					<ng-template kendoGridHeaderTemplate>
-						<div [ngClass]="{'sortable-column' : (column.type !== 'action' && column.sortable !==	false)}">
+						<div *ngIf="column.type !== 'action'" [ngClass]="{'sortable-column' : (column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
+						<span *ngIf="column.type === 'action'">
+							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
+							<span *ngIf="filterCounter(); let counter" class="badge badge-orange">{{counter}}</span>
+						</span>
 					</ng-template>
+
 					<!-- edit action column -->
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
-						<div class="is-grid-link tds-action-button-set">
-							<tds-button-edit (click)="onOpenTaskEditHandler(dataItem)"></tds-button-edit>
+						<div class="btn-link">
+							<clr-dropdown>
+								<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
+								<clr-dropdown-menu *clrIfOpen>
+									<a clrDropdownItem (click)="onOpenTaskEditHandler(dataItem)">Edit Asset</a>
+								</clr-dropdown-menu>
+							</clr-dropdown>
 						</div>
 					</ng-template>
+
 					<!-- task Number -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>
 						<span class="is-grid-link" (click)="onOpenTaskDetailHandler(dataItem)">{{dataItem.taskNumber}}</span>
 					</ng-template>
+
 					<!-- asset name -->
 					<ng-template kendoGridCellTemplate *ngIf="currentCustomColumns[column.property] === 'assetName'"
 											 let-dataItem>
@@ -190,12 +189,25 @@
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'updatedTime'" let-dataItem>
 						<span class="task-updated-cell {{dataItem.updatedClass}} overflow-ellipsis">{{dataItem.updatedTime}}</span>
 					</ng-template>
-					<!-- status -->
-					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status'" let-dataItem>
-						<span class="task-status-cell {{dataItem.taskStatus}}">{{dataItem.status}}</span>
+
+					<ng-template kendoGridCellTemplate *ngIf="column.type !== 'action'" let-dataItem>
+						<div [ngSwitch]="column.property">
+							<span *ngSwitchCase="'status'">
+								<span [ngClass]="'status status-' + dataItem[column.property]" [ngSwitch]="dataItem[column.property]">
+									<clr-icon *ngSwitchCase="'Ready'" shape="thumbs-up" class="is-solid"></clr-icon>
+									<clr-spinner *ngSwitchCase="'Started'" clrInline class="static"></clr-spinner>
+									<clr-icon *ngSwitchCase="'Hold'" shape="pause" class="is-solid"></clr-icon>
+									<clr-icon *ngSwitchCase="'Completed'" shape="check" class="is-solid"></clr-icon>
+									<clr-icon *ngSwitchDefault shape="minus" class="is-solid"></clr-icon>
+								</span>
+								{{ dataItem[column.property] }}
+							</span>
+							<span *ngSwitchDefault>{{ dataItem[column.property] }}</span>
+						</div>
 					</ng-template>
+
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div class="has-feedback" *ngIf="column.filterable" style="margin-bottom: 5px;">
+						<div *ngIf="isFiltering && column.filterable">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
 								<tds-filter-input
@@ -208,6 +220,21 @@
 						</div>
 					</ng-template>
 				</kendo-grid-column>
+
+				<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+					<div class="clr-col-4"></div>
+					<div class="clr-col-8">
+						<tds-grid-pager
+								[total]="total"
+								[totalPages]="totalPages"
+								[currentPage]="currentPage"
+								[pageSize]="pageSize"
+								[pageSizes]="GRID_DEFAULT_PAGINATION_OPTIONS"
+								(pageChange)="onPageChangeHandler($event)">
+						</tds-grid-pager>
+					</div>
+				</ng-template>
+
 			</kendo-grid>
 		</div>
 	</section>

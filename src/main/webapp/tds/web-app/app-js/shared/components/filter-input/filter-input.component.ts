@@ -32,12 +32,22 @@ import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
 				[placeholder]="placeholder"
 				input-paste (onPaste)="onPaste($event)"
 				class="form-control">
-			<span *ngIf="filterInput.value"
+			<div class="icon-container">
+				<clr-icon shape="times-circle"
+                          *ngIf="filterInput.value"
+                          (click)="onClearFilter()"
+                          class="clear-filter component-action-clear-filter">
+				</clr-icon>
+			</div>
+			<!--
+			form-control-feedback
+            <span *ngIf="filterInput.value"
 				(click)="onClearFilter()"
 				[title]="'GLOBAL.CLEAR_FILTER' | translate"
 				class="clear-filter fa fa-times form-control-feedback component-action-clear-filter"
 				aria-hidden="true">
 			</span>
+			-->
 		</div>
 	`
 })

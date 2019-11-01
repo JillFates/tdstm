@@ -211,6 +211,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		CircleCountdownComponent
 	],
 	exports: [
+		TdsComponentLibraryModule,
 		UILoaderDirective,
 		UIAutofocusDirective,
 		UIHandleEscapeDirective,

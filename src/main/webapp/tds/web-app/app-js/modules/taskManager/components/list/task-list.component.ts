@@ -3,6 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
+import {pathOr} from 'ramda';
 import {
 	CellClickEvent,
 	DetailCollapseEvent,
@@ -62,6 +63,7 @@ export class TaskListComponent {
 	hideGrid: boolean;
 	selectedCustomColumn: any;
 	selectedEvent: any;
+	selectedEventId: any;
 	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
@@ -74,6 +76,7 @@ export class TaskListComponent {
 	private rowsExpanded: boolean;
 	private rowsExpandedMap: any;
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
+	public isFiltering  = false;
 
 	constructor(
 		private taskService: TaskService,
@@ -122,7 +125,8 @@ export class TaskListComponent {
 	/**
 	 * On Event select change.
 	 */
-	onEventSelect(): void {
+	onEventSelect(selected: any): void {
+		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 0));
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 		this.onFiltersChange();
 	}
@@ -387,10 +391,8 @@ export class TaskListComponent {
 				column.filter = '';
 			});
 		if (this.grid.state.filter && this.grid.state.filter.filters.length) {
-			this.grid.state.filter.filters
-				.forEach((filter: FilterDescriptor) => {
-					filter.value = '';
-				});
+			this.grid.state.filter.filters = [];
+			this.isFiltering = false;
 			// reset pagination to be on page 1
 			this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 		}
@@ -497,8 +499,9 @@ export class TaskListComponent {
 		if (filterColumn.property.startsWith('userSelectedCol')) {
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
-		const filters = this.grid.getFilter(filterColumn);
-		this.grid.state.filter = filters;
+		const result = this.grid.getFilter(filterColumn);
+		result.filters = result.filters.filter((filter: any) => filter.value);
+		this.grid.state.filter = result;
 		// reset pagination to be on page 1
 		this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 	}
@@ -527,6 +530,7 @@ export class TaskListComponent {
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 			this.selectedEvent = userContext.event;
+			this.selectedEventId = this.selectedEvent && this.selectedEvent.id || 0;
 		});
 		this.loading = true;
 		const observables = forkJoin(
@@ -702,5 +706,29 @@ export class TaskListComponent {
 				observer.complete();
 			}
 		});
+	}
+
+	/**
+	 * Toggle the flag to show/hide grid filters
+	 */
+	public toggleFiltering() {
+		this.isFiltering = !this.isFiltering;
+	}
+
+	/**
+	 * Get the current number of filters selected
+	 */
+	public filterCounter(): number {
+		const filters = pathOr([], ['state', 'filter', 'filters'], this.grid);
+
+		return filters.length;
+	}
+
+	/**
+	 * pageChangeTaskGrid
+	 */
+	public pageChangeTaskGrid(event: PageChangeEvent): void {
+		// this.tasksPage = event;
+		// this.loadTasksGrid();
 	}
 }
