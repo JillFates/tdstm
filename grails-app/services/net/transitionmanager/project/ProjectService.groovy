@@ -258,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					gt("completionDate", today)
+					ge("completionDate", today)
 				} else {
-					le('completionDate', today)
+					lt('completionDate', today)
 				}
 			}
 
