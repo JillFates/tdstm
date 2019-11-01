@@ -60,7 +60,8 @@ kendo-numerictextbox {
 		}
 	}
 }
-.k-grid {
+
+kendo-grid.k-grid {
 	kendo-dropdownlist.k-dropdown, 
 	kendo-combobox.k-combobox{
 		.k-dropdown-wrap {
@@ -85,6 +86,9 @@ kendo-numerictextbox {
 		.k-select{
 			background:transparent;
 		}
+	}
+	.k-grid-table tr td:nth-child(-n+2){
+		overflow: visible;
 	}
 }
 
