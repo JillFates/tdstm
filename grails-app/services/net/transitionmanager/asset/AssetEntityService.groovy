@@ -7,6 +7,7 @@ import com.tdsops.tm.enums.domain.AssetCableStatus
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
+import com.tdsops.tm.enums.domain.DataViewMap
 import com.tdsops.tm.enums.domain.SizeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdsops.tm.enums.domain.ValidationType
@@ -30,6 +31,7 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.exception.InvalidRequestException
 import net.transitionmanager.exception.LogicException
 import net.transitionmanager.exception.UnauthorizedException
+import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.person.Person
@@ -159,6 +161,7 @@ class AssetEntityService implements ServiceMethods {
     def                 commentService
 	def                 tagAssetService
 	AssetOptionsService assetOptionsService
+	DataviewService     dataviewService
 
 	/**
 	 * This map contains a key for each asset class and a list of their
@@ -1472,6 +1475,7 @@ class AssetEntityService implements ServiceMethods {
 
 		def customFields = getCustomFieldsSettings(project, assetEntity.assetClass.toString(), true)
 		def assetCommentList = []
+		List fields =  dataviewService.fetch(DataViewMap.ASSETS.id).toMap(securityService.currentPersonId).schema.columns.collect{it.label}
 
         if(securityService.hasPermission(Permission.TaskView)) {
             assetCommentList = taskService.findAllByAssetEntity(assetEntity)
@@ -1481,25 +1485,27 @@ class AssetEntityService implements ServiceMethods {
             assetCommentList.addAll(commentService.findAllByAssetEntity(assetEntity))
         }
 
-		[   assetId: assetEntity?.id,
-		    assetComment: assetComment,
-		    assetCommentList: assetCommentList,
-		    dateFormat: userPreferenceService.getDateFormat(),
+		[
+			assetId               : assetEntity?.id,
+			assetComment          : assetComment,
+			assetCommentList      : assetCommentList,
+			dateFormat            : userPreferenceService.getDateFormat(),
 			dependencyBundleNumber: depBundle,
-			dependentAssets: dependentAssets,
-			errors: params.errors,
-			escapedName: getEscapedName(assetEntity),
-			prefValue: prefValue,
-			project: project,
-			client: project.client,
-			redirectTo: params.redirectTo,
-			supportAssets: supportAssets,
-			viewUnpublishedValue: viewUnpublishedValue,
-			hasPublishPermission: securityService.hasPermission(Permission.TaskPublish),
-			customs: customFields,
-			dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
-			lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
-			standardFieldSpecs: standardFieldSpecs
+			dependentAssets       : dependentAssets,
+			errors                : params.errors,
+			escapedName           : getEscapedName(assetEntity),
+			prefValue             : prefValue,
+			project               : project,
+			client                : project.client,
+			redirectTo            : params.redirectTo,
+			supportAssets         : supportAssets,
+			viewUnpublishedValue  : viewUnpublishedValue,
+			hasPublishPermission  : securityService.hasPermission(Permission.TaskPublish),
+			customs               : customFields,
+			dateCreated           : TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.dateCreated, formatter),
+			lastUpdated           : TimeUtil.formatDateTimeWithTZ(userTzId, assetEntity.lastUpdated, formatter),
+			standardFieldSpecs    : standardFieldSpecs,
+			fields                : fields
 		]
 	}
 
