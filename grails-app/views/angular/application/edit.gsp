@@ -9,7 +9,14 @@
 	 class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
-		<h4 class="modal-title">Application Edit</h4>
+		<div class="modal-title-container">
+			<div class="badge modal-badge">A</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
+		<p class="modal-description">${asset.description}</p>
 		<tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>
@@ -21,18 +28,16 @@
 	</div>
 	<div class="modal-body edit" tdsScrollContainer style="position: relative">
 		<form 
-			clrForm 
 			name="form" 
 			(ngSubmit)="form.form.valid && onUpdate()"
 			class="asset-entry-form"
 			[ngClass]="{'form-submitted': form && form.submitted}"
 			role="form" 
 			#form="ngForm" 
-			novalidate
-			clrLayout="vertical">	
+			novalidate>	
 			<div tdsScrollSection class="grid-form">
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetName}" value="${asset.assetName}" ngmodel="model.asset.assetName" tabindex="1"/>
-				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.description}" value="${asset.description}" ngmodel="model.asset.description" size="50" tabindex="2"/>
+				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.description}" value="${asset.description}" ngmodel="model.asset.description" tabindex="2"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" ngmodel="model.asset.appVendor" tabindex="3"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset.supportType}" ngmodel="model.asset.supportType" tabindex="4"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appFunction}" value="${asset.appFunction}" ngmodel="model.asset.appFunction" tabindex="5"/>
@@ -176,8 +181,8 @@
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.shutdownDuration}" value="${asset.shutdownDuration}"/>
 					<input clrInput type="text" id="shutdownDuration" name="shutdownDuration" tabindex="32"
-							[(ngModel)]="model.asset.shutdownDuration" size="7"/>
-					<span style="margin-left:200px; margin-top: -20px;">m</span>
+							[(ngModel)]="model.asset.shutdownDuration"/>
+					<span>m</span>
 				</div>
 
 				<div class="clr-form-control">
@@ -210,8 +215,8 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.testingDuration}" value="${asset.testingDuration}"/>
-					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"  size="7"/>
-					<span style="margin-left:200px; margin-top: -20px;">m</span>
+					<input class="clr-input" type="text" id="testingDuration" name="testingDuration" [(ngModel)]="model.asset.testingDuration" tabindex="36"/>
+					<span>m</span>
 				</div>
 
 				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:asset]"></g:render>

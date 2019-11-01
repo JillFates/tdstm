@@ -1,186 +1,247 @@
 tds-ui-dialog {
-  #tdsUiDialog {
-    padding: 0 !important;
-    margin: 0;
-    .modal-dialog {
-      background: $color-text-inverse;
-      position: fixed !important;
-      top: 56px !important;
-      left: 35px !important;
-      right: 35px !important;
-      bottom: 48px !important;
-      overflow: hidden !important;
-      width: unset !important;
-      padding-left: 40px !important;
-      .modal-header {
-        // This is necessary to fix a bug with the clarity tabs classes.
-        .active {
-          box-shadow: 0 -3px 0 #0077b8 inset;
-        }
-      }
-      .modal-body { 
-        width: calc(100vw - 40px - 35px - 35px - 22px);
-        padding: 15px 20px 0 22px;
-
-        &.show {
-          max-height: calc(100vh - 300px);
-        }
-
-        &.create {
-          max-height: calc(100vh - 245px);
-        }
-
-        &.edit {
-          max-height: calc(100vh - 245px);
-        }
-
-        .grid-form {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          grid-gap: 24px;
-          justify-items: left;
-
-          input {
-            width: 220px;
-          }
-
-          .truck-input-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-
-            input {
-              width: 66px;
-              margin-right: 10px;
-            }
-          }
-        }
-
-        .tdr-detail-list {
-          tbody {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            &.one-column {
-              width: 48%;
-              
-              tr {
-                width: 100%;
-              }
-            }
-            
-            &.two-column {
-              width: 100%;
-
-              tr {
-                width: 48%;
-              }
-            }
-          }
-
-          tr {
-            display: flex;
-            border: 1px solid $color-border;
-			border-width: 0 0 1px 0;
-			th,
-			td{
-        		display: block;
-				font-size: 14px;
-				padding: 0 8px;
+	#tdsUiDialog {
+		padding: 0 !important;
+		margin: 0;
+		.modal-dialog {
+			background: $color-text-inverse;
+			position: fixed !important;
+			top: 56px !important;
+			left: 35px !important;
+			right: 35px !important;
+			bottom: 48px !important;
+			overflow: hidden !important;
+			width: unset !important;
+			padding-left: 40px !important;
+			.modal-header {
+				// This is necessary to fix a bug with the clarity tabs classes.
+				.active {
+					box-shadow: 0 -3px 0 #0077b8 inset;
+				}
 			}
-            th {
-              background-color: transparent;
-              color: $color-active-dark3;
-              width: 150px;
-              text-overflow: ellipsis;
-            }
+			.modal-body {
+				width: calc(100vw - 40px - 35px - 35px - 22px);
+				padding: 15px 20px 0 22px;
 
-            td {
-              color: $color--black;
-            }
-          }
-          &:not(.all-details) {
-            tr {
-              display: none;
-            }
-            tr:not(.nodata):nth-child(-n + 16) {
-              display: flex;
-            }
-          }
-        }
-      }
-      .modal-footer,
-      .modal-sidenav {
-        position: absolute;
-        top: 0;
-        width: 40px;
-        bottom: 0;
-        left: 0;
-        padding-top: 24px;
-        border: solid 1px $color-border;
-        border-width: 0 1px 0 0;
-        .btn {
-          color: $color-icon;
-        }
-        .button-label {
-          display: none;
-        }
-      }
-    }
-  }
-  .close {
-    opacity: 1;
-    .btn {
-      color: $color-icon;
-    }
-    .button-label {
-      display: none;
-    }
-  }
+				&.show {
+					max-height: calc(100vh - 300px);
+				}
+
+				&.edit {
+					max-height: calc(100vh - 300px);
+				}
+
+				&.create {
+					max-height: calc(100vh - 245px);
+				}
+
+				.grid-form {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					column-gap: 20px;
+
+					.clr-form-control {
+						display: flex;
+						flex-direction: unset;
+						-webkit-box-orient: unset;
+						margin-top: unset;
+						align-items: unset;
+						-webkit-box-align: unset;
+						-webkit-box-direction: unset;
+
+						label {
+							max-width: unset;
+              margin-bottom: unset;
+              min-width: 150px;
+							width: 150px;
+							padding: 0 8px;
+							font-size: 14px;
+						}
+
+						.clr-input {
+              font-size: 14px;
+              flex-grow: 1;
+						}
+
+						.clr-input-wrapper {
+							max-height: unset;
+						}
+
+						clr-input-container {
+							&.clr-form-control {
+								display: block;
+								flex-grow: 1;
+								margin-top: unset;
+
+								.clr-control-container {
+									width: 100%;
+
+									.clr-input {
+										width: 100%;
+									}
+								}
+							}
+						}
+
+						tds-date-control {
+							display: block;
+							flex-grow: 1;
+
+							.k-datepicker {
+								width: unset;
+							}
+						}
+
+						tds-number-control {
+							display: block;
+							flex-grow: 1;
+						}
+
+						.combo-group .k-widget.k-combobox,
+						.k-combobox {
+							width: unset;
+						}
+
+						kendo-dropdownlist.k-dropdown {
+							flex-grow: 1;
+						}
+					}
+
+					.truck-input-container {
+						display: flex;
+						justify-content: space-between;
+						flex-wrap: nowrap;
+
+						input {
+							width: calc(((48% - 150px) / 3) - 10px);
+							// margin-right: 10px;
+						}
+					}
+				}
+
+				.tdr-detail-list {
+					tbody {
+						display: flex;
+						flex-wrap: wrap;
+						justify-content: space-between;
+						&.one-column {
+							width: 48%;
+
+							tr {
+								width: 100%;
+							}
+						}
+
+						&.two-column {
+							width: 100%;
+
+							tr {
+								width: 48%;
+							}
+						}
+					}
+
+					tr {
+						display: flex;
+						border: 1px solid $color-border;
+						border-width: 0 0 1px 0;
+						th,
+						td {
+							display: block;
+							font-size: 14px;
+							padding: 0 8px;
+						}
+						th {
+							background-color: transparent;
+							color: $color-active-dark3;
+							width: 150px;
+							text-overflow: ellipsis;
+						}
+						td {
+							color: $color--black;
+						}
+					}
+					&:not(.all-details) {
+						tr {
+							display: none;
+						}
+						tr:not(.nodata):nth-child(-n + 16) {
+							display: flex;
+						}
+					}
+				}
+			}
+			.modal-footer,
+			.modal-sidenav {
+				position: absolute;
+				top: 0;
+				width: 40px;
+				bottom: 0;
+				left: 0;
+				padding-top: 24px;
+				border: solid 1px $color-border;
+				border-width: 0 1px 0 0;
+				.btn {
+					color: $color-icon;
+				}
+				.button-label {
+					display: none;
+				}
+			}
+		}
+	}
+	.close {
+		opacity: 1;
+		.btn {
+			color: $color-icon;
+		}
+		.button-label {
+			display: none;
+		}
+	}
 }
 
 .tds-modal-content {
-  background: $color-text-inverse;
-  .modal-header {
-    padding: 24px;
-    .modal-title-container {
-      display: flex;
-      align-items: center;
+	background: $color-text-inverse;
+	.modal-header {
+		padding: 24px;
+		.modal-title-container {
+			display: flex;
+			align-items: center;
 
-      .modal-badge {
-        width: 23px;
-        height: 23px;
-        border-radius: 100%;
-        font-size: 14px;
-      }
+			.modal-badge {
+				width: 23px;
+				height: 23px;
+				border-radius: 100%;
+				font-size: 14px;
+			}
 
-      .modal-title {
-        font-style: normal;
-        font-weight: 500;
-        font-size: 22px;
-        line-height: 26px;
-        margin-right: 10px;
-      }
+			.modal-title {
+				font-style: normal;
+				font-weight: 500;
+				font-size: 22px;
+				line-height: 26px;
+				margin-right: 10px;
+			}
 
-      .modal-subtitle {
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 16px;
-        color: $color-icon;
-        margin-right: 10px;
-      }
+			.modal-subtitle {
+				font-style: normal;
+				font-weight: normal;
+				font-size: 14px;
+				line-height: 16px;
+				color: $color-icon;
+				margin-right: 10px;
+			}
 
-      .modal-subbadge {
-        background-color: #f38b00;
-      }
-    }
+			.modal-subbadge {
+				background-color: #f38b00;
+			}
+		}
 
-    .modal-description {
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      color: black;
-    }
-  }
+		.modal-description {
+			font-style: normal;
+			font-weight: 400;
+			font-size: 12px;
+			color: black;
+		}
+	}
 }

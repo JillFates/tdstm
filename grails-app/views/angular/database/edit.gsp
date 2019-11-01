@@ -9,7 +9,14 @@
 	 class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
-		<h4 class="modal-title">Database Edit</h4>
+		<div class="modal-title-container">
+			<div class="badge modal-badge" style="">D</div>
+			<h4 class="modal-title">${asset.assetName}</h4>
+			<%-- TODO: Update Subtitle content with field --%>
+			<div class="modal-subtitle">Subtitle content</div>
+			<div class="badge modal-subbadge">9</div>
+		</div>
+		<p class="modal-description">${asset.description}</p>
 		<tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>
@@ -21,16 +28,14 @@
 	</div>
 	<div class="modal-body edit" tdsScrollContainer style="position: relative">
 		<form 
-			clrForm
 			name="form" 
 			(ngSubmit)="form.form.valid && onUpdate()"
 			class="asset-entry-form"
 			[ngClass]="{'form-submitted': form && form.submitted}"
 			role="form" 
 			#form="ngForm" 
-			novalidate
-			clrLayout="vertical">
-			<div class="grid-form" >
+			novalidate>
+			<div tdsScrollSection class="grid-form" >
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${asset?.assetName}"/>
 					<tdsAngular:inputControl field="${standardFieldSpecs.assetName}" tabindex="1" value="${asset.assetName}" ngmodel="model.asset.assetName"/>
@@ -38,8 +43,8 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${asset?.description}"/>
-					<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="2" value="${asset.description}" ngmodel="model.asset.description" />
-				</div>tdsScrollSection
+					<tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="2" value="${asset.description}" ngmodel="model.asset.description" />
+				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" tabindex="3" ngmodel="model.asset.dbFormat"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${asset?.supportType}" ngmodel="model.asset.supportType" tabindex="4" />
@@ -49,7 +54,7 @@
 					<label class="${standardFieldSpecs.size.imp?:''}">
 						${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 					</label>
-					<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="6" value="${asset.size}" ngmodel="model.asset.size"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="6" value="${asset.size}" ngmodel="model.asset.size"/>
 					<kendo-dropdownlist
 						[tabIndex]="7"
 						class="tm-input-control"
@@ -88,7 +93,7 @@
 				<%-- Can combine? --%>
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${asset?.rateOfChange}"/>
-					<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="10" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" tabindex="10" value="${asset.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
 				</div>
 
 				<div class="clr-form-control">

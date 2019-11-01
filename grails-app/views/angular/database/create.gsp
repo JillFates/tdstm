@@ -20,15 +20,13 @@
 	</div>
 	<div class="modal-body create" tdsScrollContainer style="position: relative">
 		<form 
-			clrForm
 			name="form" 
 			(ngSubmit)="form.form.valid && onCreate()"
 			class="asset-entry-form"
 			[ngClass]="{'form-submitted': form && form.submitted}"
 			role="form" 
 			#form="ngForm" 
-			novalidate
-			clrLayout="vertical">
+			novalidate>
 			<div tdsScrollSection class="grid-form">
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.assetName}" value="${assetInstance?.assetName}"/>
@@ -37,7 +35,7 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.description}" value="${assetInstance?.description}"/>
-					<tdsAngular:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="2" value="${assetInstance.description}" ngmodel="model.asset.description" />
+					<tdsAngular:inputControl field="${standardFieldSpecs.description}" tabindex="2" value="${assetInstance.description}" ngmodel="model.asset.description" />
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${assetInstance.dbFormat}" tabindex="3" ngmodel="model.asset.dbFormat"/>
@@ -48,7 +46,7 @@
 					<label class="${standardFieldSpecs.size.imp?:''}">
 						${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 					</label>
-					<tdsAngular:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="6" value="${assetInstance.size}" ngmodel="model.asset.size"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.size}" tabindex="6" value="${assetInstance.size}" ngmodel="model.asset.size"/>
 					<kendo-dropdownlist
 						[tabIndex]="7"
 						class="tm-input-control"
@@ -86,7 +84,7 @@
 
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${assetInstance?.rateOfChange}"/>
-					<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="10" value="${assetInstance.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
+					<tdsAngular:inputControl field="${standardFieldSpecs.rateOfChange}" tabindex="10" value="${assetInstance.rateOfChange}" ngmodel="model.asset.rateOfChange"/>
 				</div>
 
 				<div class="clr-form-control">

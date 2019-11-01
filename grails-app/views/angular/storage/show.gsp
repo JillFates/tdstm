@@ -12,6 +12,7 @@
 			<div class="modal-subtitle">Subtitle content</div>
 			<div class="badge modal-subbadge">9</div>
 		</div>
+		<p class="modal-description">${asset.description}</p>
 		<tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>

@@ -15,8 +15,6 @@ kendo-numerictextbox {
 			color: black;
 		}
 		&.form-control {
-			width: 220px;
-
 			@include k-input();
 		}
 	}
@@ -35,7 +33,6 @@ kendo-numerictextbox {
 	}
 
 	&.k-numerictextbox {
-		width: 220px;
 		.k-numeric-wrap {
 			border: unset;
 			color: black;
@@ -124,7 +121,6 @@ kendo-dropdownlist {
 	&.k-combobox,
 	&.k-dropdown {
 		display: block;
-		width: 220px;
 
 		.k-dropdown-wrap {
 			border: unset;
@@ -187,7 +183,6 @@ kendo-datepicker {
 			border-width: unset;
 			border-style: unset;
 			border-bottom: 1px solid #999;
-			width: 220px;
 		}
 
 		.k-state-focused {
