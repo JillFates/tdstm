@@ -119,7 +119,7 @@ class MoveEventService implements ServiceMethods {
 		List<Long> tagEventIdsToAdd = eventCommand.tagIds
 		// If the event had already some tags, filter those out so we don't add them twice.
 		if (existingTagEvents) {
-			tagEventIdsToAdd = eventCommand.tagIds.collect { Long tagId -> !existingTagEvents.contains(tagId)}
+			tagEventIdsToAdd = eventCommand.tagIds.findAll { Long tagId -> !existingTagEvents.contains(tagId)}
 		}
 		if (tagEventIdsToAdd) {
 			tagEventService.applyTags(project, tagEventIdsToAdd, moveEvent)
