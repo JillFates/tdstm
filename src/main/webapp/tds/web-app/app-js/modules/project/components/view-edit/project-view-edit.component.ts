@@ -9,7 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ProjectModel} from '../../model/project.model';
+import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
@@ -69,34 +69,37 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.projectModel = new ProjectModel();
-		let defaultProject = {
-			clientId: 0,
-			projectName: '',
-			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
-			partners: [],
-			projectLogo: '',
-			projectManagerId: 0,
-			projectCode: '',
-			projectType: 'Standard',
-			comment: '',
-			defaultBundleName: 'TBD',
-			timeZone: '',
-			collectMetrics: 1,
-			planMethodology: {field: '', label: 'Select...'}
-		};
-		this.userTimeZone = this.preferenceService.getUserTimeZone();
-		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
-		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
-		this.file.uploadRestrictions = {
-			allowedExtensions: ['.jpg', '.png', '.gif'],
-			maxFileSize: 50000
-		};
-		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
-		this.getModel(this.projectId);
-		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe(() => {
+				this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
+				this.userTimeZone = this.preferenceService.getUserTimeZone();
+				this.projectModel = new ProjectModel();
+				let defaultProject = {
+					clientId: 0,
+					projectName: '',
+					description: '',
+					startDate: new Date(),
+					completionDate: new Date(),
+					partners: [],
+					projectLogo: '',
+					projectManagerId: 0,
+					projectCode: '',
+					projectType: 'Standard',
+					comment: '',
+					defaultBundleName: 'TBD',
+					timeZone: '',
+					collectMetrics: 1,
+					planMethodology: {field: '', label: 'Select...'}
+				};
+				this.projectModel = Object.assign({}, defaultProject, this.projectModel);
+				this.file.uploadRestrictions = {
+					allowedExtensions: ['.jpg', '.png', '.gif'],
+					maxFileSize: 50000
+				};
+				this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
+				this.getModel(this.projectId);
+				this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+			});
 	}
 
 	// This is a work-around for firefox users
