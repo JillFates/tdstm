@@ -1,5 +1,7 @@
 package net.transitionmanager.search
 
+import com.tdssrc.grails.DateTimeFilterUtil
+import grails.util.Pair
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.grails.ApplicationContextHolder
 import com.tdsops.common.sql.SqlUtil
@@ -15,7 +17,7 @@ import net.transitionmanager.security.SecurityService
 import net.transitionmanager.person.UserPreferenceService
 import org.apache.commons.lang3.BooleanUtils
 
-class AssetCommentQueryBuilder {
+class TaskQueryBuilder {
 
 	/**
 	 * Some fields will require additional joins. This list keep track of all
@@ -84,7 +86,7 @@ class AssetCommentQueryBuilder {
 	 * @param sortOrder - asc/desc order for sorting the results.
 	 * @param viewUnpublished - when set to true, this flag will limit the results to only those that are unpublished.
 	 */
-	AssetCommentQueryBuilder(Project project, Map params, String sortIndex, String sortOrder) {
+	TaskQueryBuilder(Project project, Map params, String sortIndex, String sortOrder) {
 		this.project = project
 		this.sortIndex = sortIndex
 		this.sortOrder = sortOrder
@@ -164,7 +166,7 @@ class AssetCommentQueryBuilder {
 				}
 				// Add the where clause for this field.
 				if (fieldInfo.containsKey('builder')) {
-					fieldInfo['builder'](param, fieldInfo)
+					fieldInfo.builder.call(param, fieldInfo)
 				}
 
 				// If the filter was invalid, stop processing.
@@ -228,6 +230,26 @@ class AssetCommentQueryBuilder {
 	}
 
 	/**
+	 * Construct an expression for date / datetime fields using the date filtering expressions. If the filter is invalid
+	 * then the builder will do nothing vs causing a user input error.
+	 */
+	Closure dateBuilder = { String field, Map fieldMap ->
+		try {
+			Pair<Date, Date> dateRange = DateTimeFilterUtil.parseUserEntry(requestParams[field])
+			String property = fieldMap['property']
+			String from = "${field}_FROM"
+			String to = "${field}_TO"
+			whereClauses << "$property between :$from and :$to"
+			whereParams[from] = dateRange.getaValue()
+			whereParams[to] = dateRange.getbValue()
+		} catch (e) {
+			// We will just exit because the filter was not yet parsible -- That can be implemented in the parseUserEntry instead of here...
+			// TODO : Throw new InvalidGridFilterException when this is implemented
+			invalidCriterion = true
+		}
+	}
+
+	/**
 	 * Construct an expression 'role like %someValue%.
 	 */
 	Closure roleLikeBuilder = { String field, Map fieldMap ->
@@ -287,9 +309,13 @@ class AssetCommentQueryBuilder {
 
 	/**
 	 * Construct a clause 'field = true' or 'field = false'
+	 * If the filter value entered by the user can not be resolved as a boolean type then the criteria will just be
+	 * ignored. This will allow the user to type T, tr, tru, or true, in order to get to a valid boolean string value
+	 * without getting an error message in the UI.
 	 */
 	Closure boolEqBuilder = { String field, Map fieldMap ->
-		Boolean value = StringUtil.toBoolean(requestParams[field])
+		Boolean value = StringUtil.toBoolean(requestParams[field])	// 1, 0, t, f, y, n, true, false, yes, no
+
 		if (value == null) {
 			invalidCriterion = true
 		} else {
@@ -343,7 +369,7 @@ class AssetCommentQueryBuilder {
 			case "dueOpenIssue":
 				whereClauses << "ac.dueDate < :filterToday"
 				whereParams['filterToday'] = today
-		// 'break' intentionally omitted.
+				// 'break' intentionally omitted.
 
 			case "openIssue" :
 				whereClauses << "ac.category IN (:discoveryCategories)"
@@ -438,9 +464,9 @@ class AssetCommentQueryBuilder {
 	 * NOTE: Please, don't use .withDefault. This object will receive
 	 * the request's param map, which contains keys other than valid fields.
 	 */
-	Map fieldsInfoMap = [
-		'actStart'          : [property: 'ac.actStart', builder: likeBuilder, type: Date],
-		'actFinish'         : [property: 'ac.dateResolved', builder: likeBuilder, type: Date],
+	final Map fieldsInfoMap = [
+		'actStart'          : [property: 'ac.actStart', builder: dateBuilder, type: Date],
+		'actFinish'         : [property: 'ac.dateResolved', builder: dateBuilder, type: Date],
 		'apiAction'         : [property: 'ac.apiAction.name', builder: likeBuilder],
 		'assetName'         : [property: 'ac.assetEntity.assetName', builder: likeBuilder],
 		'assetType'         : [property: 'ac.assetEntity.assetType', builder: likeBuilder],
@@ -450,39 +476,37 @@ class AssetCommentQueryBuilder {
 		'bundle'            : [property: 'bundle.name', builder: likeBuilder, joinTable: 'ac.assetEntity.moveBundle bundle'],
 		'category'          : [property: 'ac.category', builder: likeBuilder],
 		'comment'           : [property: 'ac.comment', builder: likeBuilder],
-		'commentType'       : [property: 'ac.commentType', builder: likeBuilder],
 		'createdBy'         : [property: SqlUtil.personFullName('createdBy', 'ac'), builder: likeBuilder],
-		'dateCreated'       : [property: 'ac.dateCreated', builder: likeBuilder, type: Date],
-		'dateResolved'      : [property: 'ac.dateResolved', builder: likeBuilder, type: Date],
-		'displayOption'     : [property: 'ac.displayOption', builder: likeBuilder],
-		'dueDate'           : [property: 'ac.dueDate', builder: likeBuilder, type: Date],
+		'dateCreated'       : [property: 'ac.dateCreated', builder: dateBuilder, type: Date],
+		'dateResolved'      : [property: 'ac.dateResolved', builder: dateBuilder, type: Date],
+		'dueDate'           : [property: 'ac.dueDate', builder: dateBuilder, type: Date],
 		'durationScale'     : [property: 'ac.durationScale', builder: timeScaleBuilder],
 		'duration'          : [property: 'ac.duration', builder: likeBuilder],
-		'estStart'          : [property: 'ac.estStart', builder: likeBuilder, type: Date],
-		'estFinish'         : [property: 'ac.estFinish', builder: likeBuilder, type: Date],
+		'estStart'          : [property: 'ac.estStart', builder: dateBuilder, type: Date],
+		'estFinish'         : [property: 'ac.estFinish', builder: dateBuilder, type: Date],
 		'event'             : [property: 'ac.moveEvent.name', builder: likeBuilder, joinTable: 'ac.moveEvent'],
 		'filter'            : [builder: filterBuilder],
 		'hardAssigned'      : [property: 'ac.hardAssigned', builder: eqBuilder],
 		'instructionsLink'  : [property: 'ac.instructionsLink', builder: likeBuilder],
+		'isCriticalPath'    : [property: 'ac.isCriticalPath', builder: boolEqBuilder],
 		'isPublished'       : [property: 'ac.isPublished', builder: boolEqBuilder],
 		'isResolved'        : [property: 'ac.dateResolved', builder: zeroIsNullBuilder],
-		'hardAssigned'      : [property: 'ac.hardAssigned', builder: eqBuilder, type: Integer],
 		'justActionable'    : [property: 'ac.status', builder: inListIfSet, values: AssetCommentStatus.ActionableStatusCodes],
 		'justMyTasks'       : [builder: justMyTasksBuilder],
 		'justRemaining'     : [property: 'ac.status', builder: notEqIfSetBuilder, value: AssetCommentStatus.COMPLETED],
+		'lastUpdated'       : [property: 'ac.lastUpdated', builder: dateBuilder, type: Date],
+		'latestFinish'      : [property: 'ac.lastUpdated', builder: dateBuilder, type: Date],
+		'latestStart'       : [property: 'ac.lastUpdated', builder: dateBuilder, type: Date],
 		'moveEvent'         : [property: 'ac.moveEvent.id', builder: moveEventBuilder, joinTable: 'ac.moveEvent'],
 		'priority'          : [property: 'ac.priority', builder: likeBuilder, type: Integer],
-		'resolution'        : [property: 'ac.resolution', builder: likeBuilder],
-		'resolvedBy'        : [property: SqlUtil.personFullName('resolvedBy', 'ac'), builder: likeBuilder],
 		'role'              : [property: 'ac.role', builder: roleLikeBuilder],
 		'sendNotification'  : [property: 'ac.sendNotification', builder: boolEqBuilder],
 		'status'            : [property: 'ac.status', builder: likeBuilder],
-		'statusUpdated'     : [property: 'ac.statusUpdated', builder: likeBuilder, type: Date],
+		'statusUpdated'     : [property: 'ac.statusUpdated', builder: dateBuilder, type: Date],
 		'percentageComplete': [property: 'ac.percentageComplete', builder: eqBuilder, type: Integer],
 		'taskSpec'          : [property: 'ac.taskSpec', builder: eqBuilder, type: Integer],
 		'taskNumber'        : [property: 'ac.taskNumber', builder: likeBuilder, type: Integer],
-		'viewUnpublished'   : [builder: viewUnpublishedBuilder],
-		'lastUpdated'       : [property: 'ac.lastUpdated', builder: likeBuilder, type: Date]
+		'viewUnpublished'   : [builder: viewUnpublishedBuilder].asImmutable()
 	]
 
 }

@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
 	public loginModel: IFormLoginModel = {
 		authority: '',
 		username: '',
-		password: '',
+		password: ''
 	};
 	/**
 	 * To show loader and disable the login button
@@ -93,9 +93,7 @@ export class LoginComponent implements OnInit {
 		// Get Login Information
 		this.loginService.getLoginInfo().subscribe((response: any) => {
 			this.loginInfo = response;
-			this.store.dispatch(
-				new LoginInfo({ buildVersion: this.loginInfo.buildVersion })
-			);
+			this.store.dispatch(new LoginInfo({buildVersion: this.loginInfo.buildVersion}));
 			this.setFocus();
 		});
 
@@ -114,28 +112,17 @@ export class LoginComponent implements OnInit {
 		setTimeout(() => {
 			let selector = '.username';
 			if (this.loginInfo && this.loginInfo.config) {
-				if (
-					this.loginInfo.config.authorityPrompt ===
-					this.authorityOptions.SELECT
-				) {
+				if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
 					this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
 					this.loginModel.authority = this.defaultAuthorityItem;
 					selector = '.k-dropdown-wrap';
-				} else if (
-					this.loginInfo.config.authorityPrompt ===
-					this.authorityOptions.PROMPT
-				) {
+				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
 					selector = '.authority';
-				} else if (
-					this.loginInfo.config.authorityPrompt ===
-					this.authorityOptions.HIDDEN
-				) {
+				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.HIDDEN) {
 					this.loginModel.authority = this.loginInfo.config.authorityName;
 				}
 			}
-			let inputField: HTMLElement = <HTMLElement>(
-				document.querySelectorAll(selector)[0]
-			);
+			let inputField: HTMLElement = <HTMLElement>document.querySelectorAll(selector)[0];
 			if (inputField) {
 				inputField.focus();
 			}
@@ -146,10 +133,7 @@ export class LoginComponent implements OnInit {
 	 * Dispatch Action Login
 	 */
 	public onLogin(): void {
-		if (
-			this.loginModel.username === '' ||
-			this.loginModel.password === ''
-		) {
+		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
 		} else {
 			this.onLoginProgress = true;
@@ -181,7 +165,7 @@ export class LoginComponent implements OnInit {
 			this.userContextModel.notices.redirectUrl
 		) {
 			if (
-				this.userContextModel.postNotices &&
+				this.userContextModel.postNotices.length > 0 &&
 				this.userContextModel.postNotices.notices.length > 0
 			) {
 				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map(
@@ -269,13 +253,9 @@ export class LoginComponent implements OnInit {
 	 */
 	private filterPostNotices(mandatory: boolean): any[] {
 		return this.userContextModel.postNotices.notices
-			.filter(notice =>
-				mandatory
-					? notice.needAcknowledgement
-					: !notice.needAcknowledgement
-			)
+			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
-				return { ...notice, notShowAgain: false };
+				return {...notice, notShowAgain: false};
 			});
 	}
 
@@ -285,20 +265,10 @@ export class LoginComponent implements OnInit {
 	 */
 	private navigateTo() {
 		this.redirectUser = true;
-		if (
-			RouterUtils.isAngularRoute(
-				this.userContextModel.notices.redirectUrl
-			)
-		) {
-			this.router.navigate(
-				RouterUtils.getAngularRoute(
-					this.userContextModel.notices.redirectUrl
-				)
-			);
+		if (RouterUtils.isAngularRoute(this.userContextModel.notices.redirectUrl)) {
+			this.router.navigate(RouterUtils.getAngularRoute(this.userContextModel.notices.redirectUrl));
 		} else {
-			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(
-				this.userContextModel.notices.redirectUrl
-			);
+			this.windowService.getWindow().location.href = RouterUtils.getLegacyRoute(this.userContextModel.notices.redirectUrl);
 		}
 	}
 

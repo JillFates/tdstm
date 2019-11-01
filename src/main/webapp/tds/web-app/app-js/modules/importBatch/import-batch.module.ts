@@ -2,8 +2,11 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-// Shared
+// Modules
 import {SharedModule} from '../../shared/shared.module';
+import {ClarityModule} from '@clr/angular';
+import {TdsComponentLibraryModule} from 'tds-component-library';
+
 // Kendo
 import {GridModule} from '@progress/kendo-angular-grid';
 import {DateInputsModule} from '@progress/kendo-angular-dateinputs';
@@ -38,6 +41,9 @@ import {ImportAssetsComponent} from './components/import-assets/import-assets.co
 		DateInputsModule,
 		UploadModule,
 		LayoutModule,
+		// Claritys
+		ClarityModule,
+		TdsComponentLibraryModule,
 		// Route
 		ImportBatchRouteModule
 	],

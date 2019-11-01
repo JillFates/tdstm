@@ -21,7 +21,7 @@ class PermissionsService {
 			fetch: [
 				rolePermissions: 'join'
 			]
-		)
+		).unique()
 	}
 
 	/**
@@ -31,10 +31,13 @@ class PermissionsService {
 	void update(Map params){
 
 		def paramList = params.column
-		jdbcTemplate.update("delete from role_permissions")
+		RolePermissions.deleteAll()
+
 		for (Permissions permission in Permissions.list()) {
+
 			for (String role in Permissions.Roles.NAMES) {
 				def param = params['role_' + permission.id + '_' + role]
+
 				if (param == "on") {
 					def rolePermissions = new RolePermissions(role: role, permission: permission)
 
@@ -45,10 +48,13 @@ class PermissionsService {
 				}
 			}
 		}
+
 		for(String id in paramList){
 			Permissions permissions = Permissions.get(id)
+
 			if(permissions){
 				permissions.description = params["description_"+id]
+
 				if(!permissions.save()){
 					permissions.errors.allErrors.each {
 						println it

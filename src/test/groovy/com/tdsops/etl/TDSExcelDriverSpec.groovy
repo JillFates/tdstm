@@ -1,26 +1,13 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.AssetEntity
 import getl.data.Field
-import grails.test.mixin.Mock
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
+import grails.testing.gorm.DataTest
+import net.transitionmanager.asset.AssetEntity
 
-@Mock([AssetEntity])
-class TDSExcelDriverSpec extends ETLBaseSpec {
+class TDSExcelDriverSpec extends ETLBaseSpec implements DataTest {
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
-	def setup() {
-
+	void setupSpec() {
+		mockDomains AssetEntity
 	}
 
 	void 'test can read fields using the default sheet with 0 ordinal position'() {
@@ -51,7 +38,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 			tdsExcelDriver.fieldsMap[0][3].name == 'location'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 
@@ -85,7 +72,7 @@ class TDSExcelDriverSpec extends ETLBaseSpec {
 			tdsExcelDriver.fieldsMap['Applications'][3].name == 'location'
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 
 	}
 

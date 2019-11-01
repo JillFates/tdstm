@@ -20,7 +20,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
-import net.transitionmanager.search.AssetCommentQueryBuilder
+import net.transitionmanager.search.TaskQueryBuilder
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.security.SecurityService
@@ -868,7 +868,7 @@ class CommentService implements ServiceMethods {
 			params['viewUnpublished'] = false
 		}
 
-		AssetCommentQueryBuilder queryBuilder = new AssetCommentQueryBuilder(project, params, sortIndex, sortOrder)
+		TaskQueryBuilder queryBuilder = new TaskQueryBuilder(project, params, sortIndex, sortOrder)
 		Map queryInfo = queryBuilder.buildQueries()
 
 		if (!queryInfo.invalidCriterion) {
@@ -903,5 +903,17 @@ class CommentService implements ServiceMethods {
 				isPublished == true
 			}
 		}.list()
+	}
+
+	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
 	}
 }

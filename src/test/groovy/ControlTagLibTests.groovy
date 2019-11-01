@@ -1,17 +1,17 @@
 //import com.tdssrc.grails.TimeUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+
+
+import com.tdsops.tm.enums.ControlType
+import grails.testing.web.taglib.TagLibUnitTest
+import org.apache.commons.lang3.StringUtils
+import test.AbstractUnitSpec
+
 //import net.transitionmanager.domain.UserLogin
 //import net.transitionmanager.domain.UserPreference
 //import net.transitionmanager.service.UserPreferenceService
-import org.apache.commons.lang3.StringUtils
-import spock.lang.Ignore
-import test.AbstractUnitSpec
-import com.tdsops.tm.enums.ControlType
 
-@TestFor(ControlTagLib)
 // @Mock([UserLogin, UserPreference])
-class ControlTagLibTests extends AbstractUnitSpec {
+class ControlTagLibTests extends AbstractUnitSpec implements TagLibUnitTest<ControlTagLib>{
 
 	// The <tds:inputControl> taglet HTML mockup
 	private static final String inputControlTagTemplate =

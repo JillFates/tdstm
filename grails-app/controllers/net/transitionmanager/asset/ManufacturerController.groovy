@@ -173,7 +173,7 @@ class ManufacturerController implements ControllerMethods, PaginationMethods {
 			manufacturers = Model.executeQuery('select m.manufacturer From Model m group by m.manufacturer order by m.manufacturer.name')
 		} else {
 			manufacturers = Model.executeQuery(
-					'select m.manufacturer From Model m where m.assetType = ? ' +
+					'select m.manufacturer From Model m where m.assetType = ?0 ' +
 					'group by m.manufacturer order by m.manufacturer.name',
 					[assetType])
 		}

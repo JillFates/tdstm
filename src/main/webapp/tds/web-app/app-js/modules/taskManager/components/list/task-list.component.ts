@@ -85,7 +85,7 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
-		this.gridDefaultSort = [{ field: 'taskNumber', dir: 'asc' }];
+		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;

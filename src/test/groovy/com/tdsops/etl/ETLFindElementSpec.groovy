@@ -1,25 +1,22 @@
 package com.tdsops.etl
 
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
 import com.tdssrc.grails.JsonUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
 import net.transitionmanager.project.Project
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
-@TestFor(AssetEntity)
-@TestMixin([DomainClassUnitTestMixin])
-@Mock([AssetOptions, AssetDependency])
-class ETLFindElementSpec extends ETLBaseSpec {
+class ETLFindElementSpec extends ETLBaseSpec implements DataTest  {
 
 	ETLProcessor processor
 	ETLFieldsValidator validator
 
+	def setupSpec(){
+		mockDomains AssetEntity, AssetOptions, AssetDependency
+	}
 	def setup() {
 		validator = createDomainClassFieldsValidator()
 		processor = new ETLProcessor(
@@ -110,10 +107,10 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLFindElement find = new ETLFindElement(processor, domainClass, 1)
 
 		and: 'an Element class as a local variable'
-			Element srcNameVar = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
+			Element srcName = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
 
 		and: 'it adds an eq statement'
-			find.by aPropertyName eq srcNameVar
+			find.by aPropertyName eq srcName
 
 		expect:
 			assertWith(find.currentFind.statement, FindStatementBuilder) {
@@ -135,10 +132,10 @@ class ETLFindElementSpec extends ETLBaseSpec {
 			ETLFindElement find = new ETLFindElement(processor, domainClass, 1)
 
 		and: 'an Element class as a local variable'
-			Element srcIPVar = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
+			Element srcIP = new Element(originalValue: aConditionValue, value: aConditionValue, processor: processor)
 
 		and: 'it appends an eq statement'
-			find.by 'assetName' eq 'zulu01' and aPropertyName eq srcIPVar
+			find.by 'assetName' eq 'zulu01' and aPropertyName eq srcIP
 
 		expect:
 			assertWith(find.currentFind.statement, FindStatementBuilder) {

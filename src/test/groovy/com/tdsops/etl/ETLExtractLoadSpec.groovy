@@ -10,7 +10,7 @@ import getl.json.JSONDataset
 import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
@@ -19,8 +19,6 @@ import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
@@ -30,7 +28,6 @@ import org.apache.http.client.utils.DateUtils
 import spock.lang.See
 import spock.lang.Shared
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -41,8 +38,7 @@ import spock.util.mop.ConfineMetaClassChanges
  *     <li><b>ignore record</b></li>
  * </ul>
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions])
-class ETLExtractLoadSpec extends ETLBaseSpec {
+class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 	@Shared
 	Map conParams = [path: "${TFS.systemPath}/test_path_csv", createPath: true, extension: 'csv', codePage: 'utf-8']
@@ -63,17 +59,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 	Project GMDEMO
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Files, Room, Manufacturer, MoveBundle, Rack, Model, AssetOptions
 		csvConnection = new CSVConnection(config: conParams.extension, path: conParams.path, createPath: true)
 		jsonConnection = new JSONConnection(config: 'json')
 		FileUtils.ValidPath(conParams.path)
@@ -318,7 +305,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		then: 'An MissingMethodException exception is thrown'
 			ETLProcessorException exception = thrown ETLProcessorException
-			exception.message == 'No such property: invalid'
+			exception.message == 'Unrecognized command invalid with args [on]'
 	}
 
 	void 'test can read labels from dataSource and create a map of columns'() {
@@ -810,12 +797,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					domain Application
 					iterate {
 						extract 'vendor name'
-						def myLocalVar = CE
+						def myLocal = CE
 
-						if ( myLocalVar == 'Microsoft'){
-							load 'appVendor' with myLocalVar
+						if ( myLocal == 'Microsoft'){
+							load 'appVendor' with myLocal
 						} else {
-							load 'environment' with myLocalVar
+							load 'environment' with myLocal
 						}
 					}
 				""".stripIndent())
@@ -1120,7 +1107,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1301,7 +1288,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			fileSystemService.deleteTemporaryFile(fileName)
+			fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
 
 	@ConfineMetaClassChanges([Room])
@@ -1353,7 +1340,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1460,7 +1447,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1484,16 +1471,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'vendor name' load 'appVendor'
 					if (DOMAIN.appVendor.unknownMethod('Mi')){
-						set environmentVar with 'Production'
+						set environment with 'Production'
 					} else {
-						set environmentVar with 'Development'
+						set environment with 'Development'
 					}
 				}
 			""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (java.lang.String) values: [Mi]'
+			e.message == 'No signature of method: java.lang.String.unknownMethod() is applicable for argument types: (String) values: [Mi]'
 	}
 
 	void 'test can evaluate a value loaded into the SOURCE.property'() {
@@ -1569,16 +1556,16 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					extract 'vendor name' load 'appVendor'
 					if (!SOURCE.technology.unknownMethod('NGM')){
-						set environmentVar with 'Production'
+						set environment with 'Production'
 					} else {
-						set environmentVar with 'Development'
+						set environment with 'Development'
 					}
 				}
 			""".stripIndent())
 
 		then: 'An ETLProcessorException is thrown'
 			MissingMethodException e = thrown MissingMethodException
-			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (java.lang.String) values: [NGM]'
+			e.message == 'No signature of method: com.tdsops.etl.SourceField.unknownMethod() is applicable for argument types: (String) values: [NGM]'
 	}
 
 	void 'test can ignore current row based on some condition'() {
@@ -1880,8 +1867,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				iterate {
 					domain Device
-					set myLocalVar with 'Custom Name'
-					load 'Name' with myLocalVar
+					set myLocal with 'Custom Name'
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -1914,7 +1901,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -1940,8 +1927,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				iterate {
 					domain Device
-					set myLocalVar with SOURCE.'name'
-					load 'Name' with myLocalVar
+					set myLocal with SOURCE.'name'
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -1974,7 +1961,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2001,8 +1988,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 					domain Device
 					extract 'type' load 'environment'
-					set myLocalVar with DOMAIN.environment
-					load 'Name' with myLocalVar
+					set myLocal with DOMAIN.environment
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -2043,7 +2030,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2071,12 +2058,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					extract 'name' load 'Name'
 					load 'custom1' with 'abc'
 
-					extract 'mfg' set myMfgVar
-					myMfgVar += " (" + extract('type') + ")"
-					load 'Manufacturer' with myMfgVar
+					extract 'mfg' set myMfg
+					myMfg += " (" + extract('type') + ")"
+					load 'Manufacturer' with myMfg
 
-					set anotherVar with 'xyzzy'
-					load 'custom2' with anotherVar
+					set another with 'xyzzy'
+					load 'custom2' with another
 				}
 			""".stripIndent())
 
@@ -2133,7 +2120,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2193,7 +2180,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2218,10 +2205,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				console on
 				read labels
-				set myLocalVar with 'Custom Name'
+				set myLocal with 'Custom Name'
 				iterate {
 					domain Device
-					load 'Name' with myLocalVar
+					load 'Name' with myLocal
 				}
 			""".stripIndent())
 
@@ -2254,48 +2241,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
-	void 'test can throw an Exception if variable names does not end with Var postfix'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				name,mfg,model,type
-				xraysrv01,Dell,PE2950,Server
-				zuludb01,HP,BL380,Blade
-				""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				GroovyMock(DebugConsole),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-				console on
-				read labels
-				set myLocalVariable with 'Custom Name'
-				iterate {
-					domain Device
-					load 'Name' with myLocalVar
-				}
-			""".stripIndent())
-
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == ETLProcessorException.missingPropertyException('myLocalVariable').message
-
-		cleanup:
-			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
-			}
-	}
-
-	void 'test can throw an Exception if variable names is used incorrectly in second time'() {
+	void 'test can not throw an Exception if variable names is used incorrectly in second time'() {
 
 		given:
 			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
@@ -2316,20 +2266,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 			etlProcessor.evaluate("""
 				console on
 				read labels
-				set myLocalVar with 'Custom Name'
+				set myLocal with 'Custom Name'
 				iterate {
 					domain Device
-					set myLocalVar with 'Another value'
+					set myLocal with 'Another value'
 				}
 			""".stripIndent())
 
-		then: 'An ETLProcessorException is thrown'
-			ETLProcessorException e = thrown ETLProcessorException
-			e.message == ETLProcessorException.invalidSetParameter().message
+		then: 'no exception is thrown'
+			noExceptionThrown()
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2393,7 +2342,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2444,7 +2393,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2494,7 +2443,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2551,7 +2500,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2618,8 +2567,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 					read labels
 					iterate {
 						domain Application
-						set envVar with 'Prod'
-						extract 'vendor name' transform with append('-', envVar) load 'environment'
+						set env with 'Prod'
+						extract 'vendor name' transform with append('-', env) load 'environment'
 					}
 				""".stripIndent())
 
@@ -2675,15 +2624,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Device
-							extract 'ip' transform with lowercase() set ipVar
-							extract 'srv' set srvVar
+							extract 'ip' transform with lowercase() set ip
+							extract 'srv' set srv
 
-							lookup 'assetName' with srvVar
+							lookup 'assetName' with srv
 							if ( LOOKUP.notFound() ) {
 								// Set the server name first time seen
-								load 'Name' with srvVar
+								load 'Name' with srv
 							}
-							load 'IP Address' transform with append(', ', ipVar)
+							load 'IP Address' transform with append(', ', ip)
 						}
 					""".stripIndent())
 
@@ -2735,7 +2684,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2755,15 +2704,15 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 						read labels
 						iterate {
 							domain Application
-							set envVar with 'Prod'
+							set env with 'Prod'
 
-							load 'Name' with append('-', envVar)
+							load 'Name' with append('-', env)
 						}
 					""".stripIndent())
 
 		then: 'exception should be thrown'
 			ETLProcessorException e = thrown ETLProcessorException
-			e.message == 'No such property: append'
+			e.message == 'Unrecognized command append with args [-, Prod]'
 	}
 
 	@See('TM-11530')
@@ -2788,18 +2737,18 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				read labels
 				domain Application
 				iterate {
-					extract 'firstname' set firstNameVar
-					//assert firstNameVar == 'Tony'
+					extract 'firstname' set firstName
+					//assert firstName == 'Tony'
 					
-					extract 'lastname' set lastNameVar
-					//assert lastNameVar == 'Baker'
+					extract 'lastname' set lastName
+					//assert lastName == 'Baker'
 					
-					set fullNameVar with firstNameVar + ' ' + lastNameVar
-					//assert firstNameVar == 'Tony'
-					//assert lastNameVar == 'Baker'
-					//assert fullNameVar == 'Tony Baker'
+					set fullName with firstName + ' ' + lastName
+					//assert firstName == 'Tony'
+					//assert lastName == 'Baker'
+					//assert fullName == 'Tony Baker'
 					
-					load 'description' with fullNameVar
+					load 'description' with fullName
 				}
 				""".stripIndent())
 
@@ -2823,7 +2772,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2852,8 +2801,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 				iterate {
 				   extract 'name' load 'assetName'
 				   extract 'cpu' load 'custom1' when populated
-				   extract 'description' set descVar
-				   load 'description' with descVar when populated
+				   extract 'description' set desc
+				   load 'description' with desc when populated
 				   extract 'nothingThere' load 'custom2' when populated
 				   extract 'retire date' transform with toDate() load 'Retire Date' when populated
 				}
@@ -2912,7 +2861,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -2982,7 +2931,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3026,7 +2975,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3065,7 +3014,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3104,7 +3053,211 @@ class ETLExtractLoadSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can define variables without ending in Var'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					ACME
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					read labels
+					domain Application
+					iterate {
+						extract 'name' load 'assetName'
+						set appVersion with '1.0.0'  
+					}
+			'''.stripIndent())
+
+		then: 'Results should contain Device Name assigment'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							originalValue == 'ACME'
+							value == 'ACME'
+						}
+					}
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+				}
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can define variables without ending in Var for Element'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+					name
+					ACME
+			'''.stripIndent())
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GroovyMock(Project),
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate('''
+					read labels
+					domain Application
+					iterate {
+						extract 'name' set appVersion
+						load 'assetName' with appVersion
+						load 'appVersion' with '1.0.0'  
+					}
+			'''.stripIndent())
+
+		then: 'Results should contain Device Name assigment'
+			assertWith(etlProcessor.finalResult()) {
+				assertWith(domains[0], DomainResult) {
+					assertWith(data[0], RowResult) {
+						op == ImportOperationEnum.INSERT.toString()
+						rowNum == 1
+						assertWith(fields.assetName) {
+							originalValue == 'ACME'
+							value == 'ACME'
+						}
+					}
+					domain == ETLDomain.Application.name()
+					data.size() == 1
+				}
+				domains.size() == 1
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-15154')
+	void 'test can throw an Exception if variable names does exists in several scenarios'() {
+
+		given:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+				""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				GroovyMock(DebugConsole),
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			ETLProcessorException e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' transform with append('::', variable) 
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' transform with concat('-', variable) 
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' prepend variable
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Device
+					extract 'name' load 'assetName'
+					find Device by 'assetName', 'description' with variable, 'DESC' into 'assetName'
+				}
+			""".stripIndent())
+
+		then: 'An ETLProcessorException is thrown'
+			e = thrown ETLProcessorException
+			e.message == ETLProcessorException.missingPropertyException('variable').message
+
+		cleanup:
+			if (fileName) {
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 }

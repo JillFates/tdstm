@@ -6,6 +6,7 @@
 				<!-- Refresh button -->
 				<tds-button-custom [flat]="true"
 													 [icon]="'repeat'"
+													 [tooltip]="'Refresh View'"
 													 (click)="onQuery()">
 				</tds-button-custom>
 <!--				<tds-radial-progress class="inline-progress"-->
@@ -53,7 +54,11 @@
 																			(createAsset)="onCreateAsset($event)">
 				</tds-asset-show-create-button>
 
-				<tds-button-custom [icon]="'logout'"></tds-button-custom>
+				<!-- Export button -->
+				<tds-button-custom [icon]="'logout'"
+													 (click)="onExport()"
+													 [tooltip]="'Export View'">
+				</tds-button-custom>
 
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
@@ -67,10 +72,10 @@
 				</tds-bulk-change-button>
 
 				<!-- Configure/Edit view button -->
-				<tds-button-custom [icon]="'cog'" (click)="onEdit()"></tds-button-custom>
+				<tds-button-custom [icon]="'cog'" (click)="onEdit()"
+													 [tooltip]="'Configure View'">
+				</tds-button-custom>
 
-				<!-- Export button -->
-				<tds-button-custom [icon]="'download'" (click)="onExport()"></tds-button-custom>
 			</div>
 
 		</div>
