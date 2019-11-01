@@ -9,6 +9,7 @@ import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bul
 	template: `
 		<tds-button-custom
 			[icon]="'pencil'"
+			[tooltip]="'Bulk Edit'"
 			[id]="'btnBulkChange'"
 			(click)="onClick()"
 			[disabled]="!enabled">

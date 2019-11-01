@@ -6,12 +6,14 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 	template: `
 		<div *ngIf="config.canShowSaveButton" class="btn-group">
 			<tds-button [ngClass]="{'btn-secondary':!config.isDirty,'btn-success':config.isDirty}"
-									[small]="'small'" [id]="config.saveButtonId"
+									[id]="config.saveButtonId"
+									[icon]="'add-text'"
+									[title]="config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')"
 									(click)="saveClick(config.saveButtonId)">
-				{{config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')}}
+<!--				{{config.canSave ? translateService.transform('GLOBAL.SAVE') : translateService.transform('GLOBAL.SAVE_AS')}}-->
 			</tds-button>
 			<clr-dropdown>
-				<tds-button icon="angle down" clrDropdownTrigger></tds-button>
+				<tds-button [title]="''" icon="angle down" clrDropdownTrigger></tds-button>
 				<clr-dropdown-menu clrPosition="bottom-left" *clrIfOpen>
 					<li *ngIf="config.canSave">
 						<a (click)="onSave()">{{ 'GLOBAL.SAVE' | translate }}</a>
