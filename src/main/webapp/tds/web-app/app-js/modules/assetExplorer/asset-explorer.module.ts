@@ -41,8 +41,6 @@ import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
 import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
-import { ClarityModule } from '@clr/angular';
-import { TdsComponentLibraryModule } from 'tds-component-library';
 
 @NgModule({
 	imports: [
@@ -55,9 +53,7 @@ import { TdsComponentLibraryModule } from 'tds-component-library';
 		GridModule,
 		SortableModule,
 		IntlModule,
-		DateInputsModule,
-		ClarityModule,
-		TdsComponentLibraryModule
+		DateInputsModule
 	],
 	declarations: [
 		AssetShowComponent,

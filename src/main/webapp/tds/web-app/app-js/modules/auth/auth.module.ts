@@ -5,8 +5,6 @@ import { FormsModule } from '@angular/forms';
 // Modules
 import { SharedModule } from '../../shared/shared.module';
 import { AuthRouteModule } from './auth-route.module';
-import { ClarityModule } from '@clr/angular';
-import { TdsComponentLibraryModule } from 'tds-component-library';
 // Services
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './service/auth.service';
@@ -28,10 +26,6 @@ import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		// Kendo
-		// Claritys
-		ClarityModule,
-		TdsComponentLibraryModule,
 		// Route
 		AuthRouteModule,
 	],

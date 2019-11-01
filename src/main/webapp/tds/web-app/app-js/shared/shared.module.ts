@@ -211,7 +211,6 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		CircleCountdownComponent
 	],
 	exports: [
-		TdsComponentLibraryModule,
 		UILoaderDirective,
 		UIAutofocusDirective,
 		UIHandleEscapeDirective,
@@ -278,7 +277,9 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DiagramLayoutComponent,
 		FontAwesomeModule,
 		CircleCountdownComponent,
-		TdsComponentLibraryModule
+		TdsComponentLibraryModule,
+		// Clarity
+		ClarityModule,
 	],
 	entryComponents: [
 		DynamicComponent,
