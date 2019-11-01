@@ -5,4 +5,5 @@ export class PageMetadataModel {
 	public menu: Array<string>;
 	public topMenu: any;
 	public hideTopNav = false;
+	public hideBreadcrumb = false;
 }
