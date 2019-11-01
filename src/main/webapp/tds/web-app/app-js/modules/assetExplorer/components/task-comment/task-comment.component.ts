@@ -257,6 +257,8 @@ export class TaskCommentComponent implements OnInit {
 							.then(() => this.createDataGrids())
 					} else if (result.commentInstance) {
 						this.openTaskDetail(result);
+					} else if (result.shouldEdit) {
+						this.openTaskEdit({commentInstance: {id: result.id.id}});
 					}
 				}
 
@@ -301,6 +303,8 @@ export class TaskCommentComponent implements OnInit {
 								this.deleteTaskComment(dataItem).then(() => this.createDataGrids())
 							} else if (result.commentInstance) {
 								this.openTaskDetail(result);
+							} else {
+								this.reloadTasksGrid();
 							}
 						}
 

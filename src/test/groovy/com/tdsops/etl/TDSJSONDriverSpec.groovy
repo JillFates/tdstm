@@ -1,8 +1,11 @@
 package com.tdsops.etl
 
 import getl.data.Field
+import getl.exception.ExceptionGETL
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.exception.EmptyResultException
+import spock.lang.See
 
 class TDSJSONDriverSpec extends ETLBaseSpec implements DataTest{
 
@@ -56,6 +59,49 @@ class TDSJSONDriverSpec extends ETLBaseSpec implements DataTest{
 
 	}
 
+	@See('TM-16277')
+	void 'test can throw an exception if json content is incorrect'() {
+		given:
+			def (String fileName, DataSetFacade dataSetFacade) = buildJSONDataSet(
+				"""
+					"devices": [
+					   { 
+						  "vm id": 123,
+						  "attribs": {
+							 "memory": 4096,
+							 "cpu": 2,
+							 "hostname": 'zulu01',
+						  }
+					   }
+					]"""
+			)
+		when:
+			dataSetFacade.fields()
+
+		then: 'An ETLProcessorException is thrown'
+			ExceptionGETL e = thrown ExceptionGETL
+			e.message == "Unable to parse attribute names due to JSON structure at rootNode '"
+
+		cleanup:
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+	}
+
+	@See('TM-16277')
+	void 'test can throw an exception id json content is empty'() {
+		given:
+			def (String fileName, DataSetFacade dataSetFacade) = buildJSONDataSet(
+				''
+			)
+		when:
+			dataSetFacade.fields()
+
+		then: 'An ETLProcessorException is thrown'
+			EmptyResultException e = thrown EmptyResultException
+			e.message == "JSON data file contains no data"
+
+		cleanup:
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
+	}
 
 	static final String RootApplicationDataSet = """
 		[

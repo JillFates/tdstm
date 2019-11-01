@@ -240,15 +240,15 @@
 		// fits the graph into the centered position where everything is visible
 		function getDefaultPosition () {
 			// temporarily get rid of the scale and translate to simplify calculations
-			zoomBehavior.translate([0, 0]).scale(1).event(background)
+			zoomBehavior.translate([0, 0]).scale(1).event(background);
 
 			// determine new scale and translate based on the graph size and canvas size
-			var graphBounds = graph0.getBoundingClientRect()
-			var xScale = widthCurrent / graphBounds.width
-			var yScale = heightCurrent / graphBounds.height
-			var newScale = Math.min(xScale, yScale)
-			var newTop = (heightCurrent / 2) + (newScale * graphBounds.height / 2)
-			var newLeft = (widthCurrent / 2) - (newScale * graphBounds.width / 2)
+			var graphBounds = graph0.getBoundingClientRect();
+			var xScale = widthCurrent / graphBounds.width;
+			var yScale = heightCurrent / graphBounds.height;
+			var newScale = Math.min(xScale, yScale);
+			var newTop = (heightCurrent / 2) + (newScale * graphBounds.height / 2);
+			var newLeft = (widthCurrent / 2) - (newScale * graphBounds.width / 2);
 
 			// set the new scale and translate
 			zoomBehavior
