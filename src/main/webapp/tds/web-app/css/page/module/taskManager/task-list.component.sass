@@ -4,8 +4,11 @@
   height: 90vh
   form
     padding-top: 0
-  $primary-fore-color: #18394B
-  $secondary-fore-color: #3C8DBC
+  $secondary-fore-color: #18394B
+  .btn-link
+    .contextual-menu
+      clr-icon
+        color: #000
   .refresh-container
     display: flex
   .page-header
@@ -43,6 +46,7 @@
         padding: unset
         .grid-filter-icon
           cursor: pointer
+          color: $secondary-fore-color
         .k-icon.k-i-sort-asc-sm, .k-icon.k-i-sort-desc-sm
           margin-right: 10px !important
           color: $secondary-fore-color
@@ -66,7 +70,7 @@
         font-weight: 500
         font-size: 12px
         line-height: 16px
-        color: $primary-fore-color
+        color: $secondary-fore-color
         padding-right: unset
   tds-button
     button

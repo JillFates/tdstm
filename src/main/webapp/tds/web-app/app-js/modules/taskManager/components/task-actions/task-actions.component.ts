@@ -23,7 +23,7 @@ export interface TaskActionsOptions {
 	selector: 'tds-task-actions',
 	template: `
 		<!-- Main content -->
-		<div class="task-actions-component">
+		<div class="task-actions-componenthttp://localhost:8080/tdstm/module/taskManager/list">
             <tds-button *ngIf="showStart()" (click)="onStart()" theme="success">
 				Start
 			</tds-button>

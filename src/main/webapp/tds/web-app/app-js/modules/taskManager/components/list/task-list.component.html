@@ -166,7 +166,7 @@
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 						<div class="btn-link">
 							<clr-dropdown>
-								<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+								<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
 								<clr-dropdown-menu *clrIfOpen>
 									<a clrDropdownItem (click)="onOpenTaskEditHandler(dataItem)">Edit Asset</a>
 								</clr-dropdown-menu>
