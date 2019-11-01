@@ -1,11 +1,13 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.ETLProcessor
 import groovy.util.logging.Slf4j
-import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.ProgressService
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.security.UserLogin
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
+
 /**
  * ETL Transform Data Job
  */
@@ -27,7 +29,9 @@ class ETLTransformDataJob {
 		JobDataMap dataMap = context.mergedJobDataMap
 		long projectId = dataMap.getLongValue('projectId')
 		String filename = dataMap.getString('filename')
+		Boolean sendNotification = dataMap.getBooleanValue('sendNotification')
 		String progressKey = dataMap.getString('progressKey')
+		UserLogin userLogin = (UserLogin)dataMap.get('userLogin')
 
 		try {
 			if (dataMap.containsKey('scriptFilename')) {
@@ -42,7 +46,7 @@ class ETLTransformDataJob {
 				long dataScriptId = dataMap.getLongValue('dataScriptId')
 
 				log.info('ETLTransformDataJob started for dataScriptId: {}', dataScriptId)
-				Map result = dataImportService.transformEtlData(projectId, dataScriptId, filename, progressKey)
+				Map result = dataImportService.transformEtlData(projectId, userLogin, dataScriptId, filename, sendNotification, progressKey)
 				log.info('ETL transform data execution result: {}', result)
 			}
 		} catch (Throwable e) {

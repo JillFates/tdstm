@@ -537,18 +537,14 @@ application id,vendor name,technology,location
 			ProgressCallback callback = Mock(ProgressCallback)
 
 		when: 'Service executes the script with incorrect syntax'
-			def (ETLProcessor etlProcessor, String outputFilename) = service.executeAndSaveResultsInFile(
+			ETLProcessorResult results = service.executeAndRetrieveResults(
 				GMDEMO,
 				54321l,
 				script,
 				fileSystemService.getTemporaryFullFilename(applicationDataSetFileName),
 				callback)
 
-		then: 'Service result a valid filename with results'
-			outputFilename != null
-
-		and: 'Service result returns the instance of ETLProcessor and its results'
-			def results = etlProcessor.finalResult()
+		then: 'Service result returns the instance of ETLProcessor and its results'
 			results.domains.size() == 1
 
 			results.domains[0].domain == ETLDomain.Application.name()
@@ -609,14 +605,7 @@ application id,vendor name,technology,location
 				1 * reportProgress(50, false, RUNNING, '')
 				1 * reportProgress(100, false, RUNNING, '')
 				1 * reportProgress(100, true, RUNNING, '')
-				1 * reportProgress(100, true, COMPLETED, { it != null })
 			}
-
-		cleanup:
-			if (outputFilename) {
-				fileSystemService.deleteTemporaryFile(outputFilename)
-			}
-
 	}
 
 	static Map fieldSpecsMap = [

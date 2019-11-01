@@ -568,6 +568,16 @@ class RowResult {
 		this.errorCount = fieldData.errors.size()
 	}
 
+	/**
+	 * Returns <tt>true</tt> if {@code RowResult#fields} Map contains a mapping for the specified
+	 * fieldName.
+	 * @param fieldName a String field Name
+	 * @return true if {@code RowResult#fields} Map fieldName key
+	 */
+	Boolean containsKey(String fieldName){
+		return fields.containsKey(fieldName)
+	}
+
 	void addFoundElement(FoundElement foundElement){
 		FieldResult fieldData = findOrCreateFieldData(foundElement.fieldDefinition)
 		fieldData.addFoundElement(foundElement)
