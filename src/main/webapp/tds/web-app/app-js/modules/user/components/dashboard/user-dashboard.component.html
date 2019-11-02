@@ -314,56 +314,44 @@
 						*ngFor="let column of taskColumnModel.columns"
 						field="{{ column.property }}"
 						format="{{ column.format }}"
-						[width]="
-							!column.width ? COLUMN_MIN_WIDTH : column.width
-						"
-						[class]="
-							column.property == 'status' ? 'status-column' : ''
-						"
-					>
-						<ng-template kendoGridHeaderTemplate>{{
-							column.label
-						}}</ng-template>
+						[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
+						[class]="column.property == 'status' ? 'status-column' : ''">
+						<ng-template kendoGridHeaderTemplate>{{ column.label }}</ng-template>
 
-						<ng-template
-							kendoGridCellTemplate
-							let-dataItem
-							let-rowIndex="rowIndex"
-						>
-							<div
-								class="optionsButton"
-								*ngIf="column.property == 'action'"
-							>
-								<span
-									class="glyphicon glyphicon-option-vertical"
-									(click)="
-										items = [{ text: 'Data goes here' }]
-									"
-								></span>
+						<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+
+							<div class="optionsButton" *ngIf="column.property == 'action'">
+								<span class="glyphicon glyphicon-option-vertical" (click)="items = [{ text: 'Data goes here' }]"></span>
 							</div>
-							<a
-								*ngIf="column.property == 'related'"
-								(click)="
-									openAssetDialog(
-										dataItem.assetId,
-										dataItem.assetClass
-									)
-								"
-								>{{ dataItem[column.property] }}</a
-							>
+
+							<a *ngIf="column.property == 'related'" (click)="openAssetDialog(dataItem.assetId, dataItem.assetClass)">
+								{{ dataItem[column.property] }}
+							</a>
+
+							<!--
 							<span
-								*ngIf="
-									column.property != 'action' &&
-									column.property != 'related'
-								"
-								[class]="
-									column.property == 'status'
-										? dataItem.css
-										: ''
-								"
-							>
+								*ngIf="column.property != 'action' && column.property != 'related'"
+								[class]="column.property == 'status' ? dataItem.css : '' ">
 								{{ dataItem[column.property] }}
 							</span>
+							-->
+							<span *ngIf="!['action', 'related', 'status'].includes(column.property)">
+								{{ dataItem[column.property] }}
+							</span>
+
+							<div [ngSwitch]="column.property">
+								<span *ngSwitchCase="'status'">
+									<span [ngClass]="'status status-' + dataItem[column.property]" [ngSwitch]="dataItem[column.property]">
+										<clr-icon *ngSwitchCase="'Ready'" shape="thumbs-up" class="is-solid"></clr-icon>
+										<clr-spinner *ngSwitchCase="'Started'" clrInline class="static"></clr-spinner>
+										<clr-icon *ngSwitchCase="'Hold'" shape="pause" class="is-solid"></clr-icon>
+										<clr-icon *ngSwitchCase="'Completed'" shape="check" class="is-solid"></clr-icon>
+										<clr-icon *ngSwitchDefault shape="minus" class="is-solid"></clr-icon>
+									</span>
+									{{ dataItem[column.property] }}
+								</span>
+								<span *ngSwitchDefault>{{ dataItem[column.property] }}</span>
+							</div>
 						</ng-template>
 					</kendo-grid-column>
 				</kendo-grid>
