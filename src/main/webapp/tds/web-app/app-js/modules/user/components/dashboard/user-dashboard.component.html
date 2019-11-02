@@ -165,6 +165,37 @@
 				</kendo-grid>
 			</div>
 
+			<div class="active-people-table">
+				<kendo-grid
+						[data]="activePersonList"
+						[selectable]="true"
+						(cellClick)="handlePersonClicked($event)"
+						class="clickable-grid tds-table">
+					<ng-template kendoGridToolbarTemplate>
+						<div class="clr-row">
+							<div class="clr-col-8 grid-header">
+								<label class="title">Active People</label>
+								<label class="description">Currently active people on this project</label>
+							</div>
+							<div class="grid-actions clr-col-4">
+								<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchPeopleForGrid()" class="flat"></tds-button-custom>
+							</div>
+						</div>
+					</ng-template>
+
+					<!-- Configured View Columns (*ngFor) -->
+					<kendo-grid-column
+							*ngFor="let column of activePersonColumnModel.columns"
+							field="{{ column.property }}"
+							format="{{ column.format }}"
+							[width]="!column.width ? COLUMN_MIN_WIDTH : column.width" >
+						<ng-template kendoGridHeaderTemplate>{{
+							column.label
+							}}</ng-template>
+					</kendo-grid-column>
+				</kendo-grid>
+			</div>
+
 		</div>
 	</div>
 	<div class="clr-row">
