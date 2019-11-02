@@ -18,7 +18,7 @@
 
 	<div class="clr-row">
 		<div class="clr-col-6 event-list">
-			<kendo-grid [data]="eventList" [selectable]="true">
+			<kendo-grid [data]="eventList" [selectable]="true" class="tds-table">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
 						<div class="clr-col-6 grid-header">
@@ -87,8 +87,9 @@
 			</kendo-grid>
 		</div>
 
-		<div class="clr-col-6">
-			<kendo-grid [data]="eventNewsList" [selectable]="true">
+		<div class="clr-col-6 table-containers">
+			<div class="event-news-table">
+				<kendo-grid [data]="eventNewsList" [selectable]="true"  class="tds-table">
 				<ng-template kendoGridToolbarTemplate>
 					<div class="clr-row">
 						<div class="clr-col-8 grid-header">
@@ -132,67 +133,38 @@
 					</ng-template>
 				</kendo-grid-column>
 			</kendo-grid>
+			</div>
 
-			<kendo-grid
-				[data]="applicationList"
-				[selectable]="true"
-				(cellClick)="handleApplicationClicked($event)"
-			>
-				<ng-template kendoGridToolbarTemplate>
-					<div class="clr-row">
-						<div class="grid-label clr-col-8">
-							<strong>Applications</strong>
-							<span> - Your applications as an SME or Owner</span>
+			<div class="applications-table">
+				<kendo-grid
+						[data]="applicationList"
+						[selectable]="true"
+						(cellClick)="handleApplicationClicked($event)" class="tds-table">
+					<ng-template kendoGridToolbarTemplate>
+						<div class="clr-row">
+							<div class="grid-label clr-col-8">
+								<strong>Applications</strong>
+								<span> - Your applications as an SME or Owner</span>
+							</div>
+							<div class="grid-actions clr-col-4">
+								<tds-button-custom  icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchApplicationsForGrid()" class="flat"></tds-button-custom>
+							</div>
 						</div>
-						<div class="grid-actions clr-col-4">
-							<tds-button-custom  icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchApplicationsForGrid()" class="flat"></tds-button-custom>
-						</div>
-					</div>
-				</ng-template>
+					</ng-template>
 
-				<!-- Configured View Columns (*ngFor) -->
-				<kendo-grid-column
-					*ngFor="let column of applicationColumnModel.columns"
-					field="{{ column.property }}"
-					format="{{ column.format }}"
-					[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
-				>
-					<ng-template kendoGridHeaderTemplate>{{
-						column.label
-					}}</ng-template>
-				</kendo-grid-column>
-			</kendo-grid>
+					<!-- Configured View Columns (*ngFor) -->
+					<kendo-grid-column
+							*ngFor="let column of applicationColumnModel.columns"
+							field="{{ column.property }}"
+							format="{{ column.format }}"
+							[width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+						<ng-template kendoGridHeaderTemplate>{{
+							column.label
+							}}</ng-template>
+					</kendo-grid-column>
+				</kendo-grid>
+			</div>
 
-			<kendo-grid
-				[data]="activePersonList"
-				[selectable]="true"
-				(cellClick)="handlePersonClicked($event)"
-				class="clickable-grid"
-			>
-				<ng-template kendoGridToolbarTemplate>
-					<div class="clr-row">
-						<div class="clr-col-8 grid-header">
-							<label class="title">Active People</label>
-							<label class="description">Currently active people on this project</label>
-						</div>
-						<div class="grid-actions clr-col-4">
-							<tds-button-custom icon="repeat" [displayLabel]="false" tooltip="Refresh" [flat]="true" (click)="fetchPeopleForGrid()" class="flat"></tds-button-custom>
-						</div>
-					</div>
-				</ng-template>
-
-				<!-- Configured View Columns (*ngFor) -->
-				<kendo-grid-column
-					*ngFor="let column of activePersonColumnModel.columns"
-					field="{{ column.property }}"
-					format="{{ column.format }}"
-					[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
-				>
-					<ng-template kendoGridHeaderTemplate>{{
-						column.label
-					}}</ng-template>
-				</kendo-grid-column>
-			</kendo-grid>
 		</div>
 	</div>
 	<div class="clr-row">
@@ -207,7 +179,7 @@
 			</kendo-contextmenu>
 
 			<div #taskGridContainer>
-				<kendo-grid #taskGrid [data]="taskList" [selectable]="true">
+				<kendo-grid #taskGrid [data]="taskList" [selectable]="true" class="tds-table">
 					<ng-template kendoGridToolbarTemplate>
 						<div class="clr-row">
 							<div class="clr-col-6 grid-header">
