@@ -27,8 +27,6 @@ import {DialogsModule} from '@progress/kendo-angular-dialog';
 import {TaskViewToggleComponent} from './components/common/task-view-toggle.component';
 import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
-import { ClarityModule } from '@clr/angular';
-
 @NgModule({
 	imports: [
 		// Angular
@@ -45,8 +43,6 @@ import { ClarityModule } from '@clr/angular';
 		InputsModule,
 		DateInputsModule,
 		DialogsModule,
-		// Clarity
-		ClarityModule,
 		TooltipModule,
 		// Route
 		TaskManagerRouteModule,

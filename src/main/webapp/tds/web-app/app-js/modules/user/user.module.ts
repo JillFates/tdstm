@@ -20,8 +20,6 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { PopupModule } from '@progress/kendo-angular-popup';
 import { InputsModule } from '@progress/kendo-angular-inputs';
 import { ContextMenuModule } from '@progress/kendo-angular-menu';
-// Clarity
-import { ClarityModule } from '@clr/angular';
 
 // Components
 import { UserListComponent } from './components/list/user-list.component';
@@ -48,8 +46,6 @@ import { UserService } from './service/user.service';
 		InputsModule,
 		DateInputsModule,
 		ContextMenuModule,
-		// Clarity
-		ClarityModule,
 		// Route
 		UserRouteModule,
 	],
