@@ -19,13 +19,13 @@ tds-ui-dialog {
 				}
 
 				.badge {
-          a {
-            color: white;
+					a {
+						color: white;
 
-            &:hover {
-              color: #0077b8;
-            }
-          }
+						&:hover {
+							color: #0077b8;
+						}
+					}
 				}
 			}
 			.modal-body {
@@ -55,11 +55,11 @@ tds-ui-dialog {
 				.grid-form {
 					display: grid;
 					grid-template-columns: 49% 49%;
-          column-gap: 2%;
-          
-          .k-input {
-            font-size: 14px;
-          }
+					column-gap: 2%;
+
+					.k-input {
+						font-size: 14px;
+					}
 
 					.clr-form-control {
 						display: flex;
@@ -227,9 +227,21 @@ tds-ui-dialog {
 				border-width: 0 1px 0 0;
 				.btn {
 					color: $color-icon;
+					height: 40px;
+					margin: 0;
 				}
 				.button-label {
 					display: none;
+				}
+
+				&.btn-link {
+					.selected-button {
+						.btn {
+							border: unset;
+							color: white;
+							border-radius: unset;
+						}
+					}
 				}
 			}
 		}

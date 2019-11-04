@@ -139,9 +139,14 @@
 	</div>
 	<div class="modal-sidenav form-group-center">
 		<nav class="modal-sidenav btn-link">
+			<tds-button-edit
+				theme="primary" 
+				icon="pencil"
+				class="selected-button">
+			</tds-button-edit>
 			<tds-button-save 
 				(click)="submitForm($event)" 
-				[disabled]="!isDependenciesValidForm" 
+				[disabled]="!(this.isDirty() && this.form.valid)"
 				[permissions]="['${Permission.AssetEdit}']" 
 				tooltip="Save" 
 				icon="floppy"
