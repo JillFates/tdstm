@@ -17,6 +17,16 @@ tds-ui-dialog {
 				.active {
 					box-shadow: 0 -3px 0 #0077b8 inset;
 				}
+
+				.badge {
+          a {
+            color: white;
+
+            &:hover {
+              color: #0077b8;
+            }
+          }
+				}
 			}
 			.modal-body {
 				width: calc(100vw - 40px - 35px - 35px - 22px);
@@ -45,7 +55,11 @@ tds-ui-dialog {
 				.grid-form {
 					display: grid;
 					grid-template-columns: 49% 49%;
-					column-gap: 2%;
+          column-gap: 2%;
+          
+          .k-input {
+            font-size: 14px;
+          }
 
 					.clr-form-control {
 						display: flex;

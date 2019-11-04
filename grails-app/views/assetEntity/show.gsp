@@ -181,6 +181,7 @@
 						<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.moveBundle}">
 							${assetEntity?.moveBundle}
 						</tds:tooltipSpan>
+						<g:if test="${dependencyBundleNumber}">:</g:if>
 						<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/>
 					</td>
 						<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">

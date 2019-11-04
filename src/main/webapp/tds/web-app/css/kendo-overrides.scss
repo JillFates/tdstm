@@ -188,9 +188,7 @@ kendo-datepicker {
 		}
 
 		.k-picker-wrap {
-			border-color: unset;
-			border-width: unset;
-			border-style: unset;
+			border: unset;
 			border-bottom: 1px solid #999;
 		}
 
@@ -198,6 +196,7 @@ kendo-datepicker {
 			-webkit-box-shadow: unset;
 			box-shadow: unset;
 			border: unset;
+			border-bottom: 1px solid #0092d1;
 		}
 
 		.k-select {

@@ -43,6 +43,7 @@
 			</th>
 			<td>
 				${asset?.moveBundle}
+				<g:if test="${dependencyBundleNumber}">:</g:if>
 				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 			</td>
 		</tr>

@@ -8,9 +8,8 @@
 		<div class="modal-title-container">
 			<div class="badge modal-badge" style="">S</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
-			<%-- TODO: Update Subtitle content with field --%>
-			<div class="modal-subtitle">Subtitle content</div>
-			<div class="badge modal-subbadge">9</div>
+			<div class="modal-subtitle">${asset?.moveBundle}</div>
+			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
 		<p class="modal-description">${asset.description}</p>
 		<tds-tab-scroller>
@@ -61,17 +60,18 @@
 						<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
 						<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
 						<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-
+						
 						<tr>
 							<th class="${standardFieldSpecs.moveBundle.imp?:''}">									
 								${standardFieldSpecs.moveBundle.label} : Dep. Group
 							</th>
 							<td>
 								${filesInstance?.moveBundle}
+								<g:if test="${dependencyBundleNumber}">:</g:if>
 								<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
 							</td>
 						</tr>
-
+						
 						<tds:clrRowDetail field="${standardFieldSpecs.size}" value="${asset.size}" />
 						<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 						<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />

@@ -11,9 +11,8 @@
 		<div class="modal-title-container">
 			<div class="badge modal-badge" style="">D</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
-			<%-- TODO: Update Subtitle content with field --%>
-			<div class="modal-subtitle">Subtitle content</div>
-			<div class="badge modal-subbadge">9</div>
+			<div class="modal-subtitle">${asset?.moveBundle}</div>
+			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
 		<p class="modal-description">${asset.description}</p>
 		<tds-tab-scroller>
@@ -83,10 +82,11 @@
 							</th>
 							<td>
 								${asset?.moveBundle}
+								<g:if test="${dependencyBundleNumber}">:</g:if>
 								<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/>
 							</td>
 						</tr>
-
+						
 						<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
 
 						<tr>
