@@ -516,7 +516,7 @@ class TimeUtilTests extends AbstractUnitSpec implements DataTest, ControllerUnit
 			'Etc/GMT-14'                     | '+14:00'              | '+14:00'
 			'Pacific/Tongatapu'              | '+13:00'              | '+13:00'
 			'Pacific/Chatham'                | '+12:45'              | '+13:45'
-			'Pacific/Fiji'                   | '+12:00'              | '+12:00'
+			'Pacific/Fiji'                   | '+12:00'              | '+13:00'
 			'Pacific/Guadalcanal'            | '+11:00'              | '+11:00'
 			'Australia/Lord_Howe'            | '+10:30'              | '+11:00'
 			'Pacific/Guam'                   | '+10:00'              | '+10:00'
