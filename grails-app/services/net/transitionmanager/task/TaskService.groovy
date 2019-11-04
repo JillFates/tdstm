@@ -5171,7 +5171,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			results.each { field ->
 				if (field[0] == null || field[0] == '') {
 					if (teamTaskMap[RoleType.NO_ROLE] == null) {
-						teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount: 0, teamDoneCount: 0, role: [id: RoleType.NO_ROLE, description: 'Not Assigned']]
+						teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount: 0, teamDoneCount: 0, role: [id: RoleType.NO_ROLE, description: 'No Team Assigned']]
 					}
 					teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] = teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] + field[1]
 					teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] = teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] + field[2]

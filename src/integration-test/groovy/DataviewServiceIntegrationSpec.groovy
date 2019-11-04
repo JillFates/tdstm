@@ -44,7 +44,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, project, dataviewJson)
 		then: 'throws domain update exception'
 			DomainUpdateException e = thrown()
-			e.message ==~ /.*Property name of class net.transitionmanager.imports.Dataview with value \[.+\] must be unique.*/
+			e.message ==~ /.*Property name with value \[.+\] must be unique.*/
 	}
 
 	void '4. Test that unique name validation with duplicate name within same project returns false'() {

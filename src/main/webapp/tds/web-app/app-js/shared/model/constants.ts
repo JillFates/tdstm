@@ -17,6 +17,7 @@ export const PROGRESSBAR_INTERVAL_TIME = 1 * 1000; // Seconds
 // Pagination
 export const GRID_DEFAULT_PAGINATION_OPTIONS = [25, 50, 100];
 export const GRID_DEFAULT_PAGE_SIZE = 25;
+export const LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY = 'licenseManager.list.pageSize';
 
 // KENDO UPLOAD FILE
 export const REMOVE_FILENAME_PARAM = 'filename';

@@ -86,6 +86,9 @@ export class DateUtils {
 	 * @returns {Date} The date adjusted to GMT (Timezone remains the same)
 	 */
 	public static adjustDateTimezoneOffset(sourceTime: Date): Date {
+		if (!sourceTime) {
+			return null;
+		}
 		let adjustedTime = new Date ( sourceTime );
 		adjustedTime.setMinutes ( sourceTime.getMinutes() + sourceTime.getTimezoneOffset() );
 		return adjustedTime;
@@ -223,7 +226,7 @@ export class DateUtils {
 	 * @returns {string}
 	 */
 	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
-		const defaultFormat = 'MM/dd/yyy';
+		const defaultFormat = 'MM/dd/yyyy';
 
 		const dateFormats = {
 			'DD/MM/YYYY' : 'dd/MM/yyyy',

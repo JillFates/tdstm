@@ -667,7 +667,7 @@ class CustomDomainService implements ServiceMethods {
      * @see CustomDomainService#fieldSpecsWithCommon(Project)
      */
     FieldSpecProject createFieldSpecProject(Project project){
-        return  new FieldSpecProject(this.fieldSpecsWithCommon(project))
+        return new FieldSpecProject(this.fieldSpecsWithCommon(project))
     }
 
     /**

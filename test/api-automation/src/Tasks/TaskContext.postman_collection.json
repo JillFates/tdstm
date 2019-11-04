@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "7f578833-f9ff-4b70-821a-99e36cff44da",
+		"_postman_id": "7be5a61b-f007-49f8-9656-5b7979937705",
 		"name": "Set task context",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -61,85 +61,67 @@
 			"response": []
 		},
 		{
-			"name": "set current project",
+			"name": "Set current project",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "61811bcc-2082-41cd-842f-dde12dba00ee",
-						"type": "text/javascript",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"",
-							"pm.test(\"Project Details is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Details\");",
-							"});",
-							"",
-							"pm.test(\"Proj Name is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Name\");",
-							"});",
-							"",
-							"pm.test(\"Proj Description is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Description\");",
-							"});",
-							"pm.test(\"Proj Client is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Client\");",
-							"});",
-							"",
-							"pm.test(\"Proj Code is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Code:\");",
-							"});",
-							"",
-							"",
-							"pm.test(\"Proj Type is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Type:\");",
-							"});",
-							"",
-							"",
-							"pm.test(\"Comment is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Comment:\");",
-							"});",
-							"pm.test(\"Start Date is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Start Date:\");",
-							"});",
-							"",
-							"pm.test(\"Completion Date is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Completion Date:\");",
-							"});",
-							"",
-							"pm.test(\"Associated partner is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Associated Partner(s):\");",
-							"});",
-							""
-						]
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{projectId}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
@@ -152,7 +134,6 @@
 					"listen": "test",
 					"script": {
 						"id": "f8f383fe-6062-4b1e-8792-b808b9474fe8",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -171,7 +152,8 @@
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -212,7 +194,6 @@
 					"listen": "test",
 					"script": {
 						"id": "285820bb-8c55-4b3b-bb18-3d49ba36d5fb",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -232,7 +213,8 @@
 							"}); ",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -262,7 +244,6 @@
 					"listen": "test",
 					"script": {
 						"id": "445749b0-c639-4bc1-a866-a341004cf47f",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -271,7 +252,8 @@
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -311,7 +293,6 @@
 					"listen": "test",
 					"script": {
 						"id": "bdc0b5fd-08b4-4f12-8669-e80936ee68e1",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -327,7 +308,8 @@
 							"    pm.environment.set(\"eventId\", eventId);",
 							"",
 							"}); "
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -356,7 +338,6 @@
 					"listen": "test",
 					"script": {
 						"id": "67afe231-4998-4ba5-a2cf-f6dfd4607b97",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -370,7 +351,8 @@
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -414,7 +396,6 @@
 					"listen": "test",
 					"script": {
 						"id": "b5fa7862-2176-4d58-bd9f-c891541654a8",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"The tag and Contexts are correct\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -439,7 +420,8 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -479,7 +461,6 @@
 					"listen": "test",
 					"script": {
 						"id": "ceff77c3-18c1-4950-b866-4a4f98705a8d",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -492,7 +473,8 @@
 							"    var data = jsonData.data;",
 							"    pm.expect(data).to.eql({});",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -537,7 +519,6 @@
 					"listen": "test",
 					"script": {
 						"id": "3a69a307-909b-42d0-8c4a-c5c1530f5228",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"The context is empty\", function () {",
 							"    var response = pm.response.json();",
@@ -554,7 +535,8 @@
 							"pm.test(\"Success\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -594,7 +576,6 @@
 					"listen": "test",
 					"script": {
 						"id": "b7ebb0f0-a9fb-4226-a224-84ace90719fb",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -613,7 +594,8 @@
 							"pm.globals.unset(\"recipeID\");",
 							"pm.globals.unset(\"recipeVersion\");",
 							"pm.globals.unset(\"eventId\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -685,5 +667,6 @@
 			"value": "2445",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

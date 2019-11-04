@@ -24,8 +24,8 @@ export class TaskCategoryComponent {
 		'Category',
 		'Percent completed',
 		'Task completed',
-		'Estimated Start',
-		'Estimated Completion',
+		'Earliest Start',
+		'Latest Finish',
 		'Actual Start',
 		'Actual Completion',
 	];
