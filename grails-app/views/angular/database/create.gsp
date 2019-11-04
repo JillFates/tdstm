@@ -18,7 +18,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
 	</div>
-	<div class="modal-body create" tdsScrollContainer style="position: relative">
+	<div class="modal-body no-description" tdsScrollContainer style="position: relative">
 		<form 
 			name="form" 
 			(ngSubmit)="form.form.valid && onCreate()"

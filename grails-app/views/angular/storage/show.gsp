@@ -49,7 +49,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
 	</div>
-	<div class="modal-body show" tdsScrollContainer style="position: relative">
+	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div class="clr-col-12">
 				<g:if test="${errors}">

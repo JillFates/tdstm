@@ -22,22 +22,30 @@ tds-ui-dialog {
 				width: calc(100vw - 40px - 35px - 35px - 22px);
 				padding: 15px 20px 0 22px;
 
-				&.show {
+				&.has-description {
 					max-height: calc(100vh - 300px);
 				}
 
-				&.edit {
-					max-height: calc(100vh - 300px);
-				}
-
-				&.create {
+				&.no-description {
 					max-height: calc(100vh - 245px);
+				}
+
+				.source-target-wrapper {
+					flex-grow: 1;
+					margin: 5px 0;
+
+					.header-label {
+						width: 100%;
+						margin-bottom: 5px;
+						padding: 0 8px;
+						font-size: 14px;
+					}
 				}
 
 				.grid-form {
 					display: grid;
-					grid-template-columns: 1fr 1fr;
-					column-gap: 20px;
+					grid-template-columns: 49% 49%;
+					column-gap: 2%;
 
 					.clr-form-control {
 						display: flex;
@@ -50,16 +58,23 @@ tds-ui-dialog {
 
 						label {
 							max-width: unset;
-              margin-bottom: unset;
-              min-width: 150px;
+							margin-bottom: unset;
+							min-width: 150px;
 							width: 150px;
 							padding: 0 8px;
 							font-size: 14px;
 						}
 
+						.clr-checkbox-wrapper {
+							.clr-control-label {
+								min-width: unset;
+								width: unset;
+							}
+						}
+
 						.clr-input {
-              font-size: 14px;
-              flex-grow: 1;
+							font-size: 14px;
+							flex-grow: 1;
 						}
 
 						.clr-input-wrapper {
@@ -82,18 +97,20 @@ tds-ui-dialog {
 							}
 						}
 
-						tds-date-control {
+						.ng-star-inserted,
+						tds-combobox,
+						tds-combobox-group {
+							flex-grow: 1;
+						}
+
+						tds-date-control,
+						tds-number-control {
 							display: block;
 							flex-grow: 1;
 
 							.k-datepicker {
 								width: unset;
 							}
-						}
-
-						tds-number-control {
-							display: block;
-							flex-grow: 1;
 						}
 
 						.combo-group .k-widget.k-combobox,
@@ -103,17 +120,17 @@ tds-ui-dialog {
 
 						kendo-dropdownlist.k-dropdown {
 							flex-grow: 1;
+							align-self: flex-end;
 						}
 					}
 
 					.truck-input-container {
 						display: flex;
-						justify-content: space-between;
-						flex-wrap: nowrap;
-
-						input {
-							width: calc(((48% - 150px) / 3) - 10px);
-							// margin-right: 10px;
+						flex-grow: 1;
+						.clr-form-control {
+							+ .clr-form-control {
+								margin-left: 10px;
+							}
 						}
 					}
 				}
@@ -123,10 +140,12 @@ tds-ui-dialog {
 						display: flex;
 						flex-wrap: wrap;
 						justify-content: space-between;
-						&.one-column {
-							width: 48%;
 
-							tr {
+						&.one-column {
+							width: 49%;
+
+							tr,
+							.source-target-wrapper {
 								width: 100%;
 							}
 						}
@@ -134,8 +153,19 @@ tds-ui-dialog {
 						&.two-column {
 							width: 100%;
 
-							tr {
-								width: 48%;
+							tr,
+							.source-target-wrapper {
+								width: 49%;
+
+								tr {
+									width: 100%;
+								}
+							}
+
+							.source-target-wrapper {
+								+ .source-target-wrapper {
+									margin-left: 2%;
+								}
 							}
 						}
 					}
@@ -154,6 +184,7 @@ tds-ui-dialog {
 							background-color: transparent;
 							color: $color-active-dark3;
 							width: 150px;
+							min-width: 150px;
 							text-overflow: ellipsis;
 						}
 						td {

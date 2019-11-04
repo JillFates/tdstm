@@ -26,7 +26,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
 	</div>
-	<div class="modal-body edit" tdsScrollContainer style="position: relative">
+	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<form 
 			name="form" 
 			(ngSubmit)="form.form.valid && onUpdate()"

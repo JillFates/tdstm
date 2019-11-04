@@ -51,7 +51,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
     </div>
-    <div class="modal-body show" tdsScrollContainer style="position: relative">
+    <div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <div tdsScrollSection class="clr-row">
             <div class="clr-col-12">
                 <g:if test="${errors}">
@@ -75,58 +75,68 @@
 
                         <tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${asset.priority}" />
 
-                        <tr [ngStyle]="{'order': showDetails ? 1 : unset}">
-                            <th class="${standardFieldSpecs.locationSource.imp?:''}">Source Location</th>
-                            <td>${assetEntity.sourceLocationName}</td>
-                        </tr>
-
-                        <g:if test="${!(assetEntity.assetType in ['VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 3 : unset}">
-                                <th class="${standardFieldSpecs.roomSource.imp?:''}">Source Room</th>
-                                <td>${roomSource?.roomName}</td>
+                        <div class="source-target-wrapper">
+                            <tr>
+                                <th class="${standardFieldSpecs.locationSource.imp?:''} header-label">Source</th>
                             </tr>
-                        </g:if>
-
-                        
-                        <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 5 : unset}">
-                                <th class="${standardFieldSpecs.rackSource.imp?:''}">Source Rack/Cab</th>
-                                <td>${assetEntity.rackSource?.tag}</td>
+                            <tr>
+                                <th class="${standardFieldSpecs.locationSource.imp?:''}">Source Location</th>
+                                <td>${assetEntity.sourceLocationName}</td>
                             </tr>
-                        </g:if>
 
-                        <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 7 : unset}">
-                                <th class="${standardFieldSpecs.sourceRackPosition.imp?:''}">Source Position</th>
-                                <td>${assetEntity.sourceRackPosition}</td>
+                            <g:if test="${!(assetEntity.assetType in ['VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.roomSource.imp?:''}">Source Room</th>
+                                    <td>${roomSource?.roomName}</td>
+                                </tr>
+                            </g:if>
+
+                            
+                            <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.rackSource.imp?:''}">Source Rack/Cab</th>
+                                    <td>${assetEntity.rackSource?.tag}</td>
+                                </tr>
+                            </g:if>
+
+                            <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.sourceRackPosition.imp?:''}">Source Position</th>
+                                    <td>${assetEntity.sourceRackPosition}</td>
+                                </tr>
+                            </g:if>
+                        </div>
+
+                        <div class="source-target-wrapper">
+                            <tr>
+                                <th colspan="2" class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
                             </tr>
-                        </g:if>
-
-                        <tr [ngStyle]="{'order': showDetails ? 2 : unset}">
-                            <th class="${standardFieldSpecs.locationSource.imp?:''}">Target Location</th>
-                            <td>${assetEntity.targetLocationName}</td>
-                        </tr>
-
-                        <g:if test="${!(assetEntity.assetType in ['VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 4 : unset}">
-                                <th class="${standardFieldSpecs.roomSource.imp?:''}">Target Room</th>
-                                <td>${roomTarget?.roomName}</td>
+                            <tr>
+                                <th class="${standardFieldSpecs.locationTarget.imp?:''}">Target Location</th>
+                                <td>${assetEntity.targetLocationName}</td>
                             </tr>
-                        </g:if>
 
-                        <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 6 : unset}">
-                                <th class="${standardFieldSpecs.rackSource.imp?:''}">Target Rack/Cab</th>
-                                <td>${assetEntity.rackTarget?.tag}</td>
-                            </tr>
-                        </g:if>
+                            <g:if test="${!(assetEntity.assetType in ['VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.roomTarget.imp?:''}">Target Room</th>
+                                    <td>${roomTarget?.roomName}</td>
+                                </tr>
+                            </g:if>
 
-                        <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
-                            <tr [ngStyle]="{'order': showDetails ? 8 : unset}">
-                                <th class="${standardFieldSpecs.sourceRackPosition.imp?:''}">Target Position</th>
-                                <td>${assetEntity.targetRackPosition}</td>
-                            </tr>
-                        </g:if>
+                            <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.rackTarget.imp?:''}">Target Rack/Cab</th>
+                                    <td>${assetEntity.rackTarget?.tag}</td>
+                                </tr>
+                            </g:if>
+
+                            <g:if test="${!(assetEntity.assetType in ['Blade','VM'])}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.targetRackPosition.imp?:''}">Target Position</th>
+                                    <td>${assetEntity.targetRackPosition}</td>
+                                </tr>
+                            </g:if>
+                        </div>
 
                         <tr>
                             <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
