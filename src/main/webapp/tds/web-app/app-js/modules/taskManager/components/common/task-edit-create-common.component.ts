@@ -32,6 +32,7 @@ declare var jQuery: any;
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('taskEditCreateForm') public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
+	@ViewChild('dueDate') dueDate;
 
 	protected modalType = ModalType;
 	protected dateFormat: string;
@@ -342,7 +343,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				this.hasModelChanges = true;
 			}
 		}).catch(result => {
-			console.log('Dismissed Dialog');
+			// console.log('Dismissed Dialog');
 		});
 	}
 
@@ -534,6 +535,11 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 							this.modelHelper.generateNotes(this.model.notesList), null, null);
 				}
 			});
+	}
+
+	onOpenDueDate(event) {
+		event.preventDefault();
+		this.dueDate.toggle();
 	}
 
 }
