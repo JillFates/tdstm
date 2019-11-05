@@ -1,0 +1,65 @@
+/* Cookbook */
+.cookbook_recipes_editor {
+  .gridStyle {
+    border: none;
+    background: none;
+    .ngTopPanel {
+      background: none;
+      .ngHeaderCell {
+        .ngVerticalBar  {
+          margin-top: 10px;
+          height: 13px !important;
+          background-color: #656565;
+        }
+        .ngHeaderText {
+          text-align: center;
+          font-weight: 500;
+          font-size: 11px;
+          color: #3c8dbc;
+        }
+      }
+    }
+    .ngRow {
+      border: 1px solid #d9e4ea;
+      background: none;
+      &.selected {
+        background-color: #c9dde1;
+      }
+      .ngVerticalBar {
+        width: 0px !important;
+      }
+    }
+  }
+}
+.taskGeneration {
+  .container-fluid {
+    padding-left: 0px;
+  }
+  .tm-asset-tag-selector-container {
+    label {
+      display: block;
+    }
+    .asset-tag-selector-component {
+      max-width: unset;
+      width: 100%;
+
+      .k-widget {
+        width: 100%;
+        max-width: unset;
+
+        .k-multiselect-wrap {
+          ul {
+            max-width: 90%;
+          }
+        }
+      }
+    }
+  }
+  .settings-container {
+    padding-top: 28px;
+  }
+  .settings-container.recipe-editor {
+    height: 82px;
+    padding-top: 23px;
+  }
+}
