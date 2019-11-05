@@ -32,38 +32,24 @@
   .task-action-buttons
     display: inline
   .grid-container
-    height: 88%
+    height: 85%
     .task-grid
       height: 100%
+      max-height: 100%
+      display: -webkit-box
   .box-body.tds-kendo-grid
     height: 100%
-    .k-grid
-      .k-filter-row
-        td
-          padding-top: 0
+    max-height: 100%
+    kendo-grid
+      .k-grid-toolbar
+        padding-top: 0
       .k-grid-header
-        height: 36px
-        padding: unset
-        .grid-filter-icon
-          cursor: pointer
-          color: $secondary-fore-color
-        .k-icon.k-i-sort-asc-sm, .k-icon.k-i-sort-desc-sm
-          margin-right: 10px !important
-          color: $secondary-fore-color
-          font-size: 16px
-        .k-grid-filter
-          padding: 2px
-          align-items: flex-start
-        th
-          padding: unset
-          line-height: unset
+        .k-header
+          vertical-align: middle
+          padding: 0 12px
+        .k-header.action-column
           .k-link
-            margin: unset
-        th.action-column
-          a
-            padding-left: 0
-            padding-top: 2px
-            padding-bottom: 12px
+            text-overflow: unset
     .sortable-column
       label
         font-style: normal
@@ -72,6 +58,8 @@
         line-height: 16px
         color: $secondary-fore-color
         padding-right: unset
+        margin-bottom: 1px
+        margin-top: 1px
   tds-button
     button
       color: unset

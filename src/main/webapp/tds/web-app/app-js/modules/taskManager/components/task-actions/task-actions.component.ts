@@ -23,7 +23,7 @@ export interface TaskActionsOptions {
 	selector: 'tds-task-actions',
 	template: `
 		<!-- Main content -->
-		<div class="task-actions-componenthttp://localhost:8080/tdstm/module/taskManager/list">
+		<section class="task-actions-component btn-group btn-sm btn-link">
             <tds-button *ngIf="showStart()" (click)="onStart()" theme="success">
 				Start
 			</tds-button>
@@ -47,7 +47,7 @@ export interface TaskActionsOptions {
             </tds-button>
             <div *ngIf="showDelayActions && showDelay()"
                  class="task-action-buttons">
-                <span style="margin-right:16px">Delay for:</span>
+                <span class="delay">Delay for:</span>
                 <tds-button (click)="onDelay(1)">
                     1 day
                 </tds-button>
@@ -58,7 +58,7 @@ export interface TaskActionsOptions {
                     7 days
                 </tds-button>
             </div>
-		</div>
+		</section>
 	`,
 })
 export class TaskActionsComponent implements OnInit, OnChanges {
