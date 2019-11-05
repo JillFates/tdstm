@@ -931,6 +931,28 @@ digraph runbook {
 		render retMap as JSON
 	}
 
+	@HasPermission(Permission.TaskTimelineView)
+	def taskTimeline() {
+		licenseAdminService.checkValidForLicenseOrThrowException()
+		Project project = controllerService.getProjectForPage(this, 'to use the task timeline')
+		if (!project) return
+
+		// if user used the event selector on the page, update their preferences with the new event
+		if (params.moveEventId && params.moveEventId.isLong()) {
+			userPreferenceService.setPreference(PREF.MOVE_EVENT, params.moveEventId)
+		}
+
+		// handle move events
+		def moveEvents = MoveEvent.findAllByProject(project)
+		def eventPref = userPreferenceService.getPreference(PREF.MOVE_EVENT) ?: '0'
+		long selectedEventId = eventPref.isLong() ? eventPref.toLong() : 0
+
+		// handle the view unpublished checkbox
+		def viewUnpublished = userPreferenceService.getPreference(PREF.VIEW_UNPUBLISHED) == 'true' ? '1' : '0'
+
+		return [moveEvents:moveEvents, selectedEventId:selectedEventId, viewUnpublished:viewUnpublished]
+	}
+
 	@HasPermission([Permission.TaskCreate, Permission.TaskEdit])
 	def editTask() {
 		Project project = controllerService.getProjectForPage(this)
