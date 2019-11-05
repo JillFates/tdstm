@@ -145,7 +145,8 @@ export enum LicenseType {
 
 export enum LicenseStatus {
 	PENDING = 'PENDING',
-	ACTIVE = 'ACTIVE'
+	ACTIVE 	= 'ACTIVE',
+	TERMINATED = 'TERMINATED'
 }
 
 export enum LicenseEnvironment {

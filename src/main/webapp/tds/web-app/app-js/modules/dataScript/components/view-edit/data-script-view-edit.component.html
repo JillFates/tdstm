@@ -98,7 +98,7 @@
 			(click)="changeToEditDataScript()" [disabled]="!isUpdateAvailable()" class="btn-primary pull-left" title="Edit Name">
 		</tds-button-edit>
 
-		<tds-button-custom *ngIf="modalType === actionTypes.VIEW" [icon]="'eye'"
+		<tds-button-custom *ngIf="modalType === actionTypes.VIEW" [icon]="'file-code-o'"
 			(click)="onDataScriptDesigner()" class="btn-primary pull-left" title="{{'DATA_INGESTION.DATASCRIPT.DESIGNER.ETL_SCRIPT_EDIT_BUTTON' | translate }}">
 		</tds-button-custom>
 

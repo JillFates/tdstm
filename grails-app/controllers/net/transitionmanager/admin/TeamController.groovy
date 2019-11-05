@@ -26,7 +26,12 @@ class TeamController implements ControllerMethods {
 	 */
     @HasPermission(Permission.RoleTypeView)
     def list() {
-        [roleTypeInstanceList: roleTypeService.list(RoleType.TYPE_TEAM)]
+		List teams = roleTypeService.list(RoleType.TYPE_TEAM)
+		if (params.containsKey('json')) {
+			renderAsJson( teams.collect { [id: it.id, title: it.description] } )
+		} else {
+			[roleTypeInstanceList: teams]
+		}
     }
 
 	/**

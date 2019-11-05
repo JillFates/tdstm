@@ -31,7 +31,7 @@ class ETLScriptsListSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        projectsModule.goToETLScripts()
+        waitFor{projectsModule.goToETLScripts()}
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage
@@ -71,7 +71,7 @@ class ETLScriptsListSpec extends GebReportingSpec{
         then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
-
+/*
     def "2. The User finds a ETLScript filtering by date created"() {
         given: 'The User is in ETLScript list page'
             at ETLScriptsPage
@@ -80,7 +80,7 @@ class ETLScriptsListSpec extends GebReportingSpec{
         then: 'At least one ETLScript row should be displayed'
             getDSRowsSize() >= 1
     }
-
+*/
     def "3. The User finds a ETLScripts already created filtering by description"() {
         given: 'The User is in ETLScripts list page'
             at ETLScriptsPage

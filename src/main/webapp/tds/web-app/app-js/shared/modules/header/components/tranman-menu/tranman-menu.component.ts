@@ -30,10 +30,12 @@ export class TranmanMenuComponent implements OnInit {
 	 * Set My Task count
 	 */
 	ngOnInit(): void {
-		this.taskService.retrieveUserToDoCount()
-			.subscribe(result => {
-				this.taskTodoCount = result.count;
-			});
+		if (this.userContext.project) {
+			this.taskService.retrieveUserToDoCount()
+				.subscribe(result => {
+					this.taskTodoCount = result.count;
+				});
+		}
 	}
 
 	protected getUserContext(): void {

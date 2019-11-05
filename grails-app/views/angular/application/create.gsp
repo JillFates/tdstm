@@ -20,13 +20,13 @@
 		</tds-tab-scroller>
 	</div>
 	<div class="modal-body no-description" tdsScrollContainer style="position: relative">
-		<form 
-			name="form" 
+		<form
+			name="form"
 			(ngSubmit)="form.form.valid && onCreate()"
 			class="asset-entry-form"
 			[ngClass]="{'form-submitted': form && form.submitted}"
-			role="form" 
-			#form="ngForm" 
+			role="form"
+			#form="ngForm"
 			novalidate>
 			<div tdsScrollSection class="grid-form">
 				<div class="clr-form-control">
@@ -51,7 +51,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${assetInstance.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${assetInstance.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${assetInstance.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
-				
+
 				<div class="clr-form-control">
 					<div style="display: flex">
 						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${assetInstance.sme2}"/>
@@ -72,7 +72,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.criticality}" value="${assetInstance.criticality}" tabindex="13"  ngmodel="model.asset.criticality"  blankOptionListText="Please Select..."/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.useFrequency}"  value="${assetInstance.useFrequency}" ngmodel="model.asset.useFrequency" tabindex="14" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appSource}" value="${assetInstance.appSource}" ngmodel="model.asset.appSource" tabindex="15"/>
-					
+
 				<div class="clr-form-control">
 				<div style="display: flex">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.appOwner}" value="${assetInstance.appOwner}"/>
@@ -101,7 +101,7 @@
 						[valueField]="'id'">
 					</kendo-dropdownlist>
 				</div>
-								
+
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${assetInstance.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${assetInstance.license}" ngmodel="model.asset.license" tabindex="19"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${assetInstance.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
@@ -139,7 +139,7 @@
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${assetInstance.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
-				
+
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetInstance.maintExpDate}"/>
 					<tds-date-control
@@ -191,7 +191,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${assetInstance.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
 				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${assetInstance.testingBy}"/>			
+					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${assetInstance.testingBy}"/>
 					<tds-combobox-group
 							[model]="model.asset.testingBy"
 							(modelChange)="model.asset.testingBy.id = $event"
@@ -209,7 +209,7 @@
 					<span>m</span>
 				</div>
 
-				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:assetInstance]"></g:render>                   
+				<g:render template="/angular/common/customEdit" model="[assetEntityInstance:assetInstance]"></g:render>
 			</div>
 			<g:render template="/angular/common/assetTagsEdit"></g:render>
 
@@ -218,15 +218,15 @@
 	</div>
 	<div class="modal-sidenav form-group-center">
 		<nav class="modal-sidenav btn-link">
-			<tds-button-edit 
-			(click)="submitForm($event)" 
-			tooltip="Create" 
+			<tds-button-edit
+			(click)="submitForm($event)"
+			tooltip="Create"
 			icon="floppy"
 			tabindex="501"
 			[disabled]="!isDependenciesValidForm"></tds-button-edit>
-			<tds-button-custom 
-			(click)="onCancelEdit()" 
-			tooltip="Cancel" 
+			<tds-button-custom
+			(click)="onCancelEdit()"
+			tooltip="Cancel"
 			tabindex="502"
 			icon="ban"></tds-button-custom>
 		</nav>

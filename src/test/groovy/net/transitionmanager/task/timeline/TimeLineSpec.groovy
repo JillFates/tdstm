@@ -26,11 +26,6 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	@Shared
 	Project project
 
-	@Shared
-	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
-
-	@Shared
-	String aDay = '06/22/2018'
 	/**
 	 * Common TaskVertex Ids used in several test cases.
 	 */
@@ -1222,9 +1217,5 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				latestStartDate == null
 				latestFinishDate == null
 			}
-	}
-
-	private Date hourInDay(String dateTime) {
-		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
 	}
 }

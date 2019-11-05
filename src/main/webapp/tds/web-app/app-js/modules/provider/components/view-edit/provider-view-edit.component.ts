@@ -184,7 +184,7 @@ export class ProviderViewEditComponent implements OnInit {
 	 */
 	private getModalTitle(modalType: ActionType): string {
 		if (modalType === ActionType.CREATE) {
-			return 'Create Provider';
+			return 'Provider Create';
 		}
 		return (modalType === ActionType.EDIT ? 'Provider Edit' : 'Provider Detail' );
 	}

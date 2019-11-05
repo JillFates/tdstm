@@ -31,7 +31,7 @@ class PermissionsService {
 	void update(Map params){
 
 		def paramList = params.column
-		RolePermissions.deleteAll()
+		RolePermissions.executeUpdate('delete from RolePermissions')
 
 		for (Permissions permission in Permissions.list()) {
 
@@ -40,11 +40,7 @@ class PermissionsService {
 
 				if (param == "on") {
 					def rolePermissions = new RolePermissions(role: role, permission: permission)
-
-					if (!rolePermissions.save()) {
-						println "Error while updating rolePermissions : $rolePermissions"
-						rolePermissions.errors.each { println it }
-					}
+					rolePermissions.save()
 				}
 			}
 		}
@@ -54,12 +50,7 @@ class PermissionsService {
 
 			if(permissions){
 				permissions.description = params["description_"+id]
-
-				if(!permissions.save()){
-					permissions.errors.allErrors.each {
-						println it
-					}
-				}
+				permissions.save()
 			}
 		}
 	}

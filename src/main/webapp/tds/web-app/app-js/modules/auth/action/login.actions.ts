@@ -23,3 +23,7 @@ export class Permissions {
 export class LicenseInfo {
 	static readonly type = '[Auth] getLicenseInfo';
 }
+
+export class PostNotices {
+	static readonly type = '[Auth] PostNotices';
+}

@@ -28,7 +28,7 @@ declare var jQuery: any;
 				</h1>
 				<div
 					class="breadcrumb licensing-banner-message"
-					*ngIf="userContext.licenseInfo?.license && userContext.licenseInfo?.license.banner">
+					*ngIf="userContext.licenseInfo && userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
 					<div class="callout">
 						{{ userContext.licenseInfo?.license.banner }}
 					</div>

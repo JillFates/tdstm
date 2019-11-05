@@ -21,11 +21,16 @@ import {
 	TaskColumnModel,
 } from '../../model/user-dashboard-columns.model';
 import { COLUMN_MIN_WIDTH } from '../../../dataScript/model/data-script.model';
-import { DIALOG_SIZE } from '../../../../shared/model/constants';
+import { DIALOG_SIZE , ModalType} from '../../../../shared/model/constants';
 import { GridComponent } from '@progress/kendo-angular-grid';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
+import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
+import {clone} from 'ramda';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'user-dashboard',
@@ -65,6 +70,7 @@ export class UserDashboardComponent implements OnInit {
 		private taskService: TaskService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
+		private translate: TranslatePipe,
 		private store: Store) {
 		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
@@ -162,6 +168,8 @@ export class UserDashboardComponent implements OnInit {
 		]).then((result) => {
 			if (result && result.shouldOpenTask) {
 				this.openTaskDetailView(result.commentInstance)
+			} else if (result && result.shouldEdit) {
+				this.openTaskEditView(result.id);
 			} else {
 				this.fetchTasksForGrid();
 			}
@@ -171,6 +179,36 @@ export class UserDashboardComponent implements OnInit {
 				this.fetchTasksForGrid();
 			}
 		});
+	}
+
+	public openTaskEditView(comment: any): void {
+		let taskDetailModel: TaskDetailModel = new TaskDetailModel();
+		this.taskService.getTaskDetails(comment.id)
+			.subscribe((res) => {
+				let modelHelper = new TaskEditCreateModelHelper(
+					this.userContext.timezone,
+					this.userContext.dateFormat,
+					this.taskService,
+					this.dialogService,
+					this.translate);
+				taskDetailModel.detail = res;
+				taskDetailModel.modal = {
+					title: 'Task Edit',
+					type: ModalType.EDIT
+				};
+				let model = modelHelper.getModelForDetails(taskDetailModel);
+				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
+				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
+				model.modal = taskDetailModel.modal;
+				this.dialogService.extra(TaskEditComponent, [
+					{ provide: TaskDetailModel, useValue: clone(model) }
+				], false, false)
+					.then(result => {
+						this.fetchTasksForGrid();
+					}).catch(result => {
+					this.fetchTasksForGrid();
+				});
+			});
 	}
 
 	public updateTaskStatus(id, status): void {

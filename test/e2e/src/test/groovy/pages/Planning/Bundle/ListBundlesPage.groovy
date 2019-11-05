@@ -10,53 +10,53 @@ class ListBundlesPage extends Page {
     static at = {
         listBundlesPageTitle.text() == "Bundle List"
         listBundlesPageBreadcrumbs[0].text()   == "Planning"
-        listBundlesPageBreadcrumbs[1].text()   == "Bundles"
-        listBundlesPageBreadcrumbs[2].text()   == "List"
+        listBundlesPageBreadcrumbs[1].text()   == "Bundle List"
+
     }
 
     static content = {
         listBundlesPageTitle { $("section", class:"content-header").find("h1")}
         planningModule { module PlanningMenuModule}
-        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li a")}
+        listBundlesPageBreadcrumbs { $("ol", class:"breadcrumb").find("li")}
         createButton {$("button",class:"action-toolbar-btn")}
-        rows {$("[role='rowgroup']")}
-        individualRows {$("tbody>tr")}
+        rows (required:false) {$('tdoby',role="presentation")}
+        individualRows (required:false) {$('table.k-grid-table').find('tr',role:'row')}
         individualBundles (required: false) {$("a.cell-url-element")}
         commonsModule {module CommonsModule}
         firstBundleListed {$("tbody > tr:nth-child(1)").find("a")}
         tickIcon {$("span.glyphicon-ok")}
-        pagerInfo {$(".k-pager-info")}
+        pagerInfo {$(".k-grid-norecords")}
 
         //filters section
         filterRow {$("tr.k-filter-row")}
         nameFilterKind {$("span.k-select")[2]}
         descFilterKind {$("span.k-select")[3]}
-        nameFilter {filterRow.find("[data-text-field='name']")}
-        descriptionFilter {filterRow.find("[data-text-field='description']")}
+        nameFilter {filterRow.find("[placeholder='Filter Name']")}
+        descriptionFilter {filterRow.find("[placeholder='Filter Description']")}
         planningFilterWrapper {$(".k-operator-hidden")}
-        isPlanningRadio {filterRow.find("label", text: contains("is true"))}
-        isNonPlanningRadio {filterRow.find("label", text: contains("is false"))}
-        clearPlanningFilter {planningFilterWrapper.find("button.k-button", title:"Clear")}
+        isPlanningOptionsContainer (required:false) {$("kendo-popup")}
+        planSelect (required:false)  {$("span", role:"listbox")}
+        isPlanningSelector {filterRow.find("kendo-dropdownlist")}
+        clearPlanningFilter {$("span.form-control-feedback")[1]}
         nameFilterWrapper {$("span.k-filtercell")[1]}
-        clearName {nameFilterWrapper.find("button.k-button")}
+        clearName {$("span.form-control-feedback")[0]}
         descFilterWrapper {$("span.k-filtercell")[2]}
-        clearDesc {descFilterWrapper.find("button.k-button")}
-        clearAssetQtty {filterRow.find("[title='Clear']")[4]}
+        clearDesc {$("span.form-control-feedback")[0]}
+        clearAssetQtty {filterRow.find("span.form-control-feedback")[0]}
         clearStarting {filterRow.find("[title='Clear']")[5]}
         clearCompletion {filterRow.find("[title='Clear']")[6]}
-        qttyFilter {filterRow.find("input.k-formatted-value.k-input")[1]}
+        qttyFilter {filterRow.find("input.k-input", placeholder:"Filter Asset Quantity")}
         qttyFilterFocused{filterRow.find("[data-role='numerictextbox']")[1]}
         editedQty {filterRow.find("span.k-state-focused")}
-        startDate {$("[data-role='datepicker']")[0]}
-        completionDate {$("[data-role='datepicker']")[1]}
+        startDate {$('input.k-input')[1]}
+        completionDate {$('input.k-input')[2]}
+        noRecordsMsg (required:false) {$('tr.k-grid-norecords')}
     }
 
     def filterByQuantity(qtty){
         qttyFilter.click()
-        qttyFilterFocused=qtty
-        //This is necessary for the filter will not be applied until the focus is moved away
-        //from the field. Tabbing does not work in this case, so just clicking elsewhere
-        nameFilter.click()
+        qttyFilter = qtty
+
     }
 
     /**
@@ -102,7 +102,7 @@ class ListBundlesPage extends Page {
     def validateFilteredByDesc(name){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!individualRows[i].find("td")[2].text().contains("QAE2E")){
+            if(!individualRows[i].find("td")[1].text().contains("QAE2E")){
                 validation=false
             }
         }
@@ -111,28 +111,43 @@ class ListBundlesPage extends Page {
 
     def validateBundleIsListed(bName){
         filterByName(bName)
+        sleep(1000)
         numberOfRows()==1
     }
 
+    def validateBundleIsNotListed(bName){
+        filterByName(bName)
+        sleep(2000)
+        noRecordsMsg.displayed
+    }
+
     def verifyRowsDisplayed(){
-        selectFilter()
+
         numberOfRows()>0
     }
+    /**
+     * Selects planning or non-planing option according to parameter received
+     * @param plan
+     */
+    def selectPlanningOption(plan){
+        isPlanningSelector.click()
+        if(plan == true){
+            planSelect<< Keys.chord(Keys.DOWN)
 
-    def clickNonPlanningFilter(){
-       isNonPlanningRadio.click()
+        }else{
+            planSelect<< Keys.chord(Keys.DOWN)
+            planSelect<< Keys.chord(Keys.DOWN)
+        }
+        planSelect<< Keys.chord(Keys.ENTER)
     }
 
-    def clickPlanningFilter(){
-        isPlanningRadio.click()
-    }
 
     def clearPlanningFilter(){
         clearPlanningFilter.click()
     }
 
     def clearNameFilter(){
-        clearName.click()
+       waitFor{ clearName.click()}
     }
 
     def clearDescription(){
@@ -152,18 +167,16 @@ class ListBundlesPage extends Page {
     }
 
     def clickCreate(){
-        createButton.click()
+        waitFor{createButton.click()}
     }
 
     def numberOfRows(){
-        individualBundles.size()
+        individualRows.size()
     }
 
     def filterByName(name){
         nameFilter=name
-        //This tab is necessary for the filter will not be applied until the focus is moved away
-        //from the field
-        nameFilter<< Keys.chord(Keys.TAB)
+        sleep(1000)
     }
 
     /**
@@ -179,10 +192,7 @@ class ListBundlesPage extends Page {
         descriptionFilter<< Keys.chord(Keys.TAB)
     }
 
-    def selectFilter(){
-        nameFilterKind.click()
-        waitFor{$("li.k-item", text:"Contains").click()}
-    }
+
 
     /**
      * selecta the filter type for description
@@ -195,8 +205,8 @@ class ListBundlesPage extends Page {
     }
 
     def clickOnBundle(){
-        def bundleLocator = "('tbody.tr')"
-        $(".cell-url-element")[0].click()
+        $('kendo-grid-list').find('a')[0].click()
+        sleep(1500)
     }
 
     /**
@@ -210,12 +220,13 @@ class ListBundlesPage extends Page {
     }
 
     def validateFilteredDescription(desc){
-        rows.find("[role='gridcell']")[2].text()==desc
+        individualRows.find("[role='gridcell']")[1].text()==desc
     }
 
     def selectByName(name){
         filterByName(name)
         $("a.cell-url-element", text:name).click()
+        sleep(1000)
     }
 
     /**
@@ -226,7 +237,7 @@ class ListBundlesPage extends Page {
      */
 
     def validateBundleRowData(data){
-        validateFilteredDescription(data[1])&& validatePlanningTick(data[3])
+        validateFilteredDescription(data[1])
     }
 
     /**
@@ -249,7 +260,7 @@ class ListBundlesPage extends Page {
     def validateAssetQtyFilter(qty){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find(("[role='gridcell']")[3]).contains(qty)) {
+            if(!individualRows[i].find(("[role='gridcell']")[3]).contains(qty)) {
                 validation=false
                 break;
             }
@@ -280,9 +291,9 @@ class ListBundlesPage extends Page {
     def validateStartDate(dte){
         def validation=true
         for (int i=1;i<numberOfRows();i++){
-            if(!rows[i].find("[role='gridcell']")[5].text().contains(dte)) {
+            if(!individualRows[i].find("[role='gridcell']")[5].text().contains(dte)) {
                 validation=false
-                break;
+                break
             }
         }
         return validation

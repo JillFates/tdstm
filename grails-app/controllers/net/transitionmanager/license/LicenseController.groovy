@@ -16,7 +16,6 @@ class LicenseController implements ControllerMethods {
 	 * @return JSON structure
 	 */
 	def info() {
-		println "in info() "
 		Project project = getProjectForWs()
 		Map licenseInfo = licenseAdminService.licenseInfo(project)
 

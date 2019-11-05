@@ -168,14 +168,22 @@ class UserLogin {
 	// Set a cleartext password on the UserLogin that will be hash. Note that the domain will
 	// create a password history record automatically in the post insert/update events
 	String applyPassword(String unhashedPassword) {
-		if (!isLocal) {
+		if ( !isLocal ) {
 			throw new DomainUpdateException('The user password is not managed in the application')
 		}
-		password = encryptPassword(unhashedPassword)
-		failedLoginAttempts = 0
-		lockedOutUntil = null
+
+		/*
+		 * oluna: oh this was nasty and unexpected:
+		 * We cannot use the internal properties if we expect the dirty checking to work!!!!
+		 * this is why when we tryied to save the password only it never worked!
+		 * https://github.com/grails/grails-data-mapping/issues/1097
+		 */
+		setPassword( encryptPassword(unhashedPassword) )
+		setFailedLoginAttempts( 0 )
+		setLockedOutUntil( null )
+
 		//We remove the forcePassword Change Flag After the password was set
-		forcePasswordChange = 'N'
+		setForcePasswordChange( 'N' )
 
 		return password
 	}

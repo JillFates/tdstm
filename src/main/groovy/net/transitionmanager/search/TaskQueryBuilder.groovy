@@ -94,11 +94,9 @@ class TaskQueryBuilder {
 		whereClauses = ["ac.project = :project"]
 		whereParams = ['project': project]
 		joinTables = ["AssetComment ac"]
-
-		if (!params.containsKey("commentType")) {
-			whereClauses << "ac.commentType = :commentType"
-			whereParams['commentType'] = AssetCommentType.TASK
-		}
+		// Make sure we query for Tasks only.
+		whereClauses << "ac.commentType = :commentType"
+		whereParams['commentType'] = AssetCommentType.TASK
 	}
 
 	/**
