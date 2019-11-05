@@ -537,31 +537,46 @@ class MoveEventService implements ServiceMethods {
 
 
 	/**
-	 * Find different stats for the given event, grouped by category.
-	 * @param project
-	 * @param moveEventId
+	 * Find the stats for all the task categories on the event.
+	 * @param project  The {@code Project} to which the event belongs to.
+	 * @param moveEventId  The id of the event.
 	 * @return a list with the task category stats
 	 */
 	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
 		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
-		// Query the database for the min/max dates for tasks in the event grouped by category.
+		// Query the database for the min/max values and counts for the tasks in the event, grouped by category.
 		String hql = """
-				select 
-					ac.category,
-					min(ac.actStart),
-					max(ac.dateResolved),
-					min(ac.estStart),
-					max(ac.estFinish),
-					max(ac.duration),
-					ac.durationScale,
-					count(*),
-					sum(case when ac.status = 'Completed' then 1 else 0 end),
-					case when (count(*) > 0) then (sum(case when ac.status = 'Completed' then 1 else 0 end)/count(*)*100) else 100 end
-				from AssetComment ac
-					where moveEvent =:moveEvent
-				group by ac.category
-			"""
+					select 
+						t.category as category,
+						min(t.actStart) as minActStart,
+						min(t.estStart) as minEstStart,
+						max(t.dateResolved) as maxActFinish,
+						max(t.latestFinish) as maxPlannedFinish,
+						max( case when t.dateResolved is null 
+							then 
+								case when t.actStart is null 
+								then 
+									case when t.latestStart >= NOW() then 
+										FROM_UNIXTIME( UNIX_TIMESTAMP(t.latestStart) + COALESCE(t.duration,0)*60 )
+									else
+										FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) + COALESCE(t.duration,0)*60 )
+									end
+								else
+									FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 ) 
+								end
+							else
+							  null
+							end
+						) as maxEstFinish,
+						sum(case when t.dateResolved is null then 1 else 0 end) as remainingTasks,
+						sum(case when t.dateResolved is not null then 1 else 0 end) as completedTasks,
+						case when (count(*) > 0) then (sum(case when t.dateResolved is not null then 1 else 0 end)/count(*)*100) else 100 end as percComp,
+						count(*) as totalTasks
+						from Task t
+						where t.moveEvent =:moveEvent
+					group by t.category
+				"""
 
 		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
@@ -570,17 +585,17 @@ class MoveEventService implements ServiceMethods {
 			// Only add to the results if there are any tasks for the category
 			if (categoryStats[7] ) {
 				stats << [
-					"category": 	categoryStats[0],
-					"actStart": 	categoryStats[1],
-					"actFinish": 	categoryStats[2],
-					"estStart": 	categoryStats[3],
-					"estFinish": 	categoryStats[4],
-					"maxRemaining":	categoryStats[5],
-					"maxRScale":	categoryStats[6],
-					"tskTot": 		categoryStats[7],
-					"tskComp": 		categoryStats[8],
-					"percComp": 	categoryStats[9],
-					"color":		calculateColumnColor(categoryStats, moveEvent)
+					"category": 			categoryStats[0],
+					"minActStart": 			categoryStats[1],
+					"minEstStart": 			categoryStats[2],
+					"maxActFinish": 		categoryStats[3],
+					"maxPlannedFinish": 	categoryStats[4],
+					"maxEstFinish": 		categoryStats[5],
+					"remainingTasks":		categoryStats[6],
+					"completedTasks": 		categoryStats[7],
+					"percComp": 			categoryStats[8],
+					"totalTasks": 			categoryStats[9],
+					"color":				calculateColumnColor(categoryStats)
 				]
 			}
 			// Sort by the category "natural" sort order
@@ -592,57 +607,23 @@ class MoveEventService implements ServiceMethods {
 
 	/**
 	 * Returns the color that the column should have for the given category in the Event Dashboard.
-	 * @See TM-15896
-	 * @param categoryStats  The category properties
-	 * @param moveEvent  The event to which the category properties belong
-	 * @return  The calculated color for the category column.
+	 * @See TM-15896/ TM-16319
+	 * @param categoryStats - The properties for the category
+	 * @return - The calculated color for the category column.
 	 */
-	private String calculateColumnColor(categoryStats, MoveEvent moveEvent) {
+	private String calculateColumnColor(categoryStats) {
+		Long remainingTasks = categoryStats[6]
+		Date maxPlannedFinish = categoryStats[4]
+		Date maxActualFinish = categoryStats[3]
+		Date maxEstFinish = categoryStats[5]
 
-		Date actualStart = categoryStats[1]
-		Date actualFinish = categoryStats[2]
-
-		// If tasks estimated start or completion are blank, use the Event estimated start and completion
-		Date estimatedStart = categoryStats[3] ?: moveEvent.estStartTime
-		Date estimatedFinish = categoryStats[4] ?: moveEvent.estCompletionTime
-
-		Date now = new Date()
-
-		Long totalTasks = categoryStats[7]
-		Long completedTasks = categoryStats[8]
-		Long percentCompleted = categoryStats[9]
-
-		long longestRemainingInMillis = getLongestRemainingInMillis(categoryStats[5], categoryStats[6])
-
-		// default is green
-		String color = "green"
-		if (completedTasks == totalTasks && actualFinish < estimatedFinish) {
-			color = "#24488a" // completed-blue
+		String color = ""
+		if ((remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) || (remainingTasks > 0 && maxEstFinish <= maxPlannedFinish)) {
+			color = "green"
+		} else if (remainingTasks == 0 && maxActualFinish > maxPlannedFinish) {
+			color = "red"
 		} else {
-			if (estimatedFinish < now && percentCompleted < 100) {
-				color = "red" // past completed time and tasks remain
-			} else {
-				if (longestRemainingInMillis && estimatedFinish < new Date(now.getTime() + longestRemainingInMillis)) {
-					color = "#FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
-				}
-			}
-		}
-		return color
-	}
-
-	/**
-	 * Calculates the longest remaining time for a task in milliseconds, or returns 0 if parameters are empty or null.
-	 * @param maxRemaining
-	 * @param maxRScale
-	 * @return  The max remaining time in milliseconds, or zero if anything is empty or null.
-	 */
-	private long getLongestRemainingInMillis(maxRemaining, TimeScale maxRScale) {
-
-		if (!maxRemaining || !maxRScale) {
-			return 0
-		} else {
-			return maxRScale.toMinutes(maxRemaining) * 60000
+			color = "yellow"
 		}
 	}
-
 }

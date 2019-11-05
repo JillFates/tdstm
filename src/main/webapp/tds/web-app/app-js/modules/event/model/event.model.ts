@@ -77,13 +77,13 @@ export enum CatagoryRowType {
 
 export interface CategoryTask {
 	percComp: string;
-	tskTot: string;
-	tskComp: string;
+	totalTasks: string;
+	completedTasks: string;
 	category: string;
-	actStart: string;
-	actFinish: string;
-	estStart: string;
-	estFinish: string;
+	minActStart: string;
+	maxActFinish: string;
+	minEstStart: string;
+	maxEstFinish: string;
 }
 
 export class EventPlanStatus {
