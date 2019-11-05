@@ -30,7 +30,7 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
                             </label>
                         </div>
                         <div class="form-group" style="padding-left:160px;">
-                            <div *ngIf="hasMaintainAssetList() && !isDefaultProject">
+                            <div *ngIf="hasMaintainAssetList()">
                                 <div class="radio">
                                     <div>
                                         <label>
@@ -43,7 +43,7 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
                                             <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
                                         </label>
                                     </div>
-                                    <div class="col-sm-9" >
+                                    <div class="col-sm-9" style="padding-left:20px">
                                         <label for="name" style="padding: 0;font-weight: bold">
                                             {{ 'GLOBAL.VIEW_NAME' | translate }}:*
                                         </label>
@@ -250,9 +250,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public onChangeMode() {
-		if (this.mode !== this.MODES.SMV) {
-			this.model.name = this.preModel.name;
-		}
+		// if (this.mode !== this.MODES.SMV) {
+		// 	this.model.name = this.preModel.name;
+		// }
 	}
 
 	public onNameChanged() {
