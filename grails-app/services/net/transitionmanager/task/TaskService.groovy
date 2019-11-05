@@ -5419,6 +5419,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 	}
 
 	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.TASK
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.TASK)
+	}
+
+	/**
 	 * Fills the methodParams with the Label of the fieldName and the contextDesc that gives a user readable name
 	 * to be consistent with the API Action Parameters dialog
 	 * @param project where we are getting the fieldSpecs

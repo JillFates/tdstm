@@ -236,7 +236,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 	}
 
 	private getModalTitle(): void {
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Action' : (this.modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Action Create' : (this.modalType === ActionType.EDIT ? 'Action Edit' : 'Action Detail');
 	}
 
 	/**

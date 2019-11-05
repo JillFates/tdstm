@@ -3,7 +3,8 @@
         <div class="tds-modal-content" tds-ui-modal-decorator="">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
-                <h4 class="modal-title">{{ 'GLOBAL.TIMEZONE' | translate }}</h4>
+                <h4 *ngIf="!shouldReturnData" class="modal-title">{{ 'GLOBAL.DATE_TIMEZONE' | translate }}</h4>
+                <h4 *ngIf="shouldReturnData" class="modal-title">{{ 'GLOBAL.TIMEZONE' | translate }}</h4>
             </div>
             <div class="modal-body">
                 <form id="userTimezoneForm">

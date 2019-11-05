@@ -73,7 +73,6 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	 */
 	protected onEdit(): void {
 		this.loadCommentCategories();
-		this.singleCommentModel.modal.title = 'Edit Comment';
 		this.singleCommentModel.modal.type = ModalType.EDIT;
 	}
 
@@ -130,6 +129,27 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 		} else {
 			this.dismiss();
 		}
+	}
+
+	/**
+	 * Based on modalType action returns the corresponding title
+	 * @param {ModalType} modalType
+	 * @returns {string}
+	 */
+	getModalTitle(modalType: ModalType): string {
+		if (modalType === ModalType.EDIT) {
+			return this.translatePipe.transform('COMMENT.EDIT_COMMENT');
+		}
+
+		if (modalType === ModalType.CREATE) {
+			return this.translatePipe.transform('COMMENT.CREATE_COMMENT');
+		}
+
+		if (modalType === ModalType.VIEW) {
+			return this.translatePipe.transform('COMMENT.SHOW_COMMENT');
+		}
+
+		return '';
 	}
 
 	protected isCommentEditAvailable(): boolean {

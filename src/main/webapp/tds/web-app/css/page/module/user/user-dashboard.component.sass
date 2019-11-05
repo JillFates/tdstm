@@ -55,15 +55,18 @@
 		margin-left: 5px
 	.kendo-grid-toolbar__refresh-btn
 		margin: 0
-	.event-list .k-grid
-		max-height: 100%
-		min-height: 100%
+	.event-list
+		max-height: 600px
+		.k-grid
+			height: 100%
+			.k-grid-aria-root
+				height: 80%
 	.task-summary .k-grid
 		max-height: 800px
 		min-height: 200px
 	.k-grid
-		margin-top: 24px
-		max-height: 400px
+		//margin-top: 24px
+		//max-height: 400px
 		.k-plus::before
 			font-family: fontawesome
 			content: "\f101"!important
@@ -83,12 +86,10 @@
 		tr.k-detail-row div
 			display: inline
 		td
-			padding: 2px 6px
+			padding: 2px 12px
 		.status-column
 			padding: 0
 			text-overflow: unset
-			span
-				padding: 1000% 38px 1000% 6px
 			.task_hold
 				background-color: #FFFF33 !important
 				color: black
@@ -142,3 +143,10 @@
 	.k-grid.clickable-grid
 		td
 			cursor: pointer
+	.table-containers
+		max-height: 600px
+		.event-news-table, .applications-table, .active-people-table
+			.k-grid
+				.k-grid-aria-root
+					max-height: 200px
+

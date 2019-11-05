@@ -285,7 +285,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 		}
 
 		if (modalType === ActionType.Create) {
-			return this.translate.transform('NOTICE.CREATE_NOTICE');
+			return this.translate.transform('NOTICE.NOTICE_CREATE');
 		}
 
 		if (modalType === ActionType.View) {

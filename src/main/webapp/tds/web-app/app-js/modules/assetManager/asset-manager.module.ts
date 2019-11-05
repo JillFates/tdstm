@@ -2,8 +2,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
-import { ClarityModule } from '@clr/angular';
-import { TdsComponentLibraryModule } from 'tds-component-library';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
@@ -37,6 +35,10 @@ import {AssetViewGridComponent} from './components/asset-view-grid/asset-view-gr
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
 import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
+// import {ExportComponent} from './components/asset-export/export.component';
+// import {ExportAssetService} from './service/export-asset.service';
+import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/asset-view-show-save-button.component';
+import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
 
 @NgModule({
 	imports: [
@@ -45,8 +47,6 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		SharedModule,
 		FormsModule,
 		AssetExplorerModule,
-		ClarityModule,
-		TdsComponentLibraryModule,
 		// Kendo
 		DropDownListModule,
 		GridModule,
@@ -65,7 +65,10 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		AssetViewExportComponent,
 		AssetViewGridComponent,
 		AssetViewShowComponent,
-		ArchitectureGraphComponent
+		ArchitectureGraphComponent,
+		AssetViewShowSaveButtonComponent,
+		AssetViewShowCreateButtonComponent,
+		// ExportComponent
 	],
 	providers: [
 		// Resolve
@@ -78,6 +81,7 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		CustomDomainService,
 		AssetExplorerService,
 		TagService,
+		// ExportAssetService,
 		AssetGlobalFiltersService
 	],
 	exports: [],

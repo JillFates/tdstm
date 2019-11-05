@@ -5,7 +5,7 @@
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <clr-icon aria-hidden="true" shape="close"></clr-icon>
                 </button>
-                <h4 class="modal-title">{{'ASSET_EXPLORER.DEPENDENCY_DETAIL'|translate}}</h4>
+                <h4 class="modal-title">{{(!isEditing ? 'ASSET_EXPLORER.DEPENDENCY_DETAIL' : 'ASSET_EXPLORER.DEPENDENCY_EDIT')|translate}}</h4>
             </div>
             <div class="modal-body comment-dialog-content">
                 <table class="table table-striped" style="border: 0px; margin-bottom: 0px;">

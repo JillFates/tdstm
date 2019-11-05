@@ -16,7 +16,7 @@ export class ViewModel {
 
 export class ViewGroupModel {
 	name: string;
-	items: Array<ViewModel>;
+	views: Array<ViewModel>;
 	open: boolean;
 	type: ViewType;
 }

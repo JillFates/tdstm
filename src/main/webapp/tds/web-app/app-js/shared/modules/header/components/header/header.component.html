@@ -21,7 +21,7 @@
 								<span *ngIf="userContext.bundle"> : {{ userContext.bundle.name }}</span>
 							</span>
 						</li>
-						<li *ngIf="!userContext.licenseInfo?.license.isManager && !userContext.licenseInfo?.license.isValid">
+						<li *ngIf="userContext.licenseInfo && !userContext.licenseInfo.license.isManager && !userContext.licenseInfo.license.isValid">
 							<tds-license-warning></tds-license-warning>
 						</li>
 						<!-- User Account Menu -->

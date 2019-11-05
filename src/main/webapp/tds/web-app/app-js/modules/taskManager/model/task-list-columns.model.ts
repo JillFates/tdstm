@@ -5,17 +5,17 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: '',
 		property: 'actionColumn',
 		type: 'action',
-		width: 30,
+		width: 60,
 		locked: false,
 		resizable: false,
 		sortable: false,
-		headerClass: ['no-sort-header']
+		headerClass: ['no-sort-header', 'action-column']
 	},
 	{
 		label: 'Task',
 		property: 'taskNumber',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		filterable: true
 	},
@@ -49,16 +49,15 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Updated',
 		property: 'updatedTime',
 		type: 'text',
-		width: 100,
-		locked: false,
-		cellClass: 'task-updated',
-		sortable: false
+		width: 180,
+		filterable: false,
+		locked: false
 	},
 	{
 		label: 'Due Date',
 		property: 'dueDate',
 		type: 'text',
-		width: 100,
+		width: 180,
 		locked: false,
 		filterable: true
 	},
@@ -66,7 +65,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Status',
 		property: 'status',
 		type: 'text',
-		width: 80,
+		width: 180,
 		locked: false,
 		cellClass: 'task-status',
 		filterable: true
@@ -102,14 +101,14 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		label: 'Suc.',
 		property: 'assetName',
 		type: 'number',
-		width: 80,
+		width: 180,
 		locked: false
 	},
 	{
 		label: 'Score',
 		property: 'score',
 		type: 'number',
-		width: 60,
+		width: 180,
 		locked: false
 	},
 ];

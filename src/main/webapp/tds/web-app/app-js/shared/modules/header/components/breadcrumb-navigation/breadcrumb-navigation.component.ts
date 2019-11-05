@@ -20,7 +20,7 @@ declare var jQuery: any;
 	selector: 'tds-breadcrumb-navigation',
 	template: `
 		<!-- Content Header (Page header) -->
-		<section class="content-header" *ngIf="!pageMetaData.hideTopNav">
+		<section class="content-header" *ngIf="!pageMetaData.hideTopNav && !pageMetaData.hideBreadcrumb">
 			<ng-container *ngIf="pageMetaData">
 				<h1>
 					{{ pageMetaData.title | translate }}
@@ -28,7 +28,7 @@ declare var jQuery: any;
 				</h1>
 				<div
 					class="breadcrumb licensing-banner-message"
-					*ngIf="userContext.licenseInfo?.license && userContext.licenseInfo?.license.banner">
+					*ngIf="userContext.licenseInfo && userContext.licenseInfo.license && userContext.licenseInfo.license.banner">
 					<div class="callout">
 						{{ userContext.licenseInfo?.license.banner }}
 					</div>
@@ -120,11 +120,12 @@ export class BreadcrumbNavigationComponent {
 			if (event.event.url.indexOf('/auth/') >= 0) {
 				this.pageMetaData.hideTopNav = true;
 			}
+			this.pageMetaData.hideBreadcrumb = event.event.url.indexOf('/taskManager/') >= 0;
 		});
 
 		this.notifierService.on('notificationRouteNavigationEnd', event => {
 			if (event.route.snapshot.data && event.route.snapshot.data.page) {
-				this.pageMetaData = event.route.snapshot.data.page;
+				this.pageMetaData = {...event.route.snapshot.data.page, hideBreadcrumb: this.pageMetaData.hideBreadcrumb};
 				const { report } = event.route.snapshot.data;
 				this.pageMetaData.id = report && report.id;
 				// Set Title

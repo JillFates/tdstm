@@ -91,7 +91,9 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	private registerListeners(): void {
 		this.openNotifier = this.notifierService.on('dialog.open', event => {
 			// make sure UI has no other open dialog
-			this.tdsUiDialog.modal('hide');
+			if (this.tdsUiDialog) {
+				this.tdsUiDialog.modal('hide');
+			}
 			if (this.cmpRef) {
 				this.cmpRef.destroy();
 				this.reject('OTHER_DIALOG_OPENED');

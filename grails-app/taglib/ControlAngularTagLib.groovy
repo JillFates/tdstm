@@ -55,13 +55,15 @@ class ControlAngularTagLib {
 			throw new InvalidParamException('<tdsAngular:inputLabel> tag requires field=fieldSpec Map')
 		}
 		StringBuilder sb = new StringBuilder("\n")
-
+		def imp = fieldSpec.imp;
 		// Build the LABEL element
 		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
-		sb.append(' >')
+		sb.append(' class="')
+		sb.append(imp)
+		sb.append('">')
 		sb.append('<span ')
 		sb.append(tooltipAttrib(fieldSpec))
 		sb.append(' >')

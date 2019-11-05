@@ -18,7 +18,7 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
 						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 							<clr-icon aria-hidden="true" shape="close"></clr-icon>
 						</button>
-                        <h4 class="modal-title">Create Person</h4>
+                        <h4 class="modal-title">Person Create</h4>
                     </div>
                     <div class="modal-body">
                         <div class="modal-body-container">

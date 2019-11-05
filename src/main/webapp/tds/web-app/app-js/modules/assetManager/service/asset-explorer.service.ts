@@ -31,22 +31,22 @@ export class AssetExplorerService {
 				let folders = [
 					{
 						name: 'All',
-						items: reportGroupModel,
+						views: reportGroupModel,
 						open: true,
 						type: ViewType.ALL
 					}, {
 						name: 'Favorites',
-						items: reportGroupModel.filter(r => r['isFavorite']),
+						views: reportGroupModel.filter(r => r['isFavorite']),
 						open: false,
 						type: ViewType.FAVORITES
 					}, {
 						name: 'My Views',
-						items: reportGroupModel.filter(r => r['isOwner']),
+						views: reportGroupModel.filter(r => r['isOwner']),
 						open: false,
 						type: ViewType.MY_VIEWS
 					}, {
 						name: 'Shared Views',
-						items: reportGroupModel.filter(r => r['isShared']),
+						views: reportGroupModel.filter(r => r['isShared']),
 						open: false,
 						type: ViewType.SHARED_VIEWS
 					}
@@ -54,7 +54,7 @@ export class AssetExplorerService {
 				if (this.permissionService.hasPermission(Permission.AssetExplorerSystemList)) {
 					folders.push({
 						name: 'System Views',
-						items: reportGroupModel.filter(r => r['isSystem']),
+						views: reportGroupModel.filter(r => r['isSystem']),
 						open: false,
 						type: ViewType.SYSTEM_VIEWS
 					});

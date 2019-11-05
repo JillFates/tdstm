@@ -40,6 +40,7 @@
 						<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
 							${filesInstance?.moveBundle}
 						</tds:tooltipSpan>
+						<g:if test="${dependencyBundleNumber}">:</g:if>
 						<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${filesInstance.assetName}"/>
 					</td>
 				</tr>

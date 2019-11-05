@@ -28,10 +28,12 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-export,
 		tds-button-filter,
 		tds-button-save,
-		tds-button-undo
+		tds-button-undo,
+		tds-button-script
 	`,
 	template: `
 		<tds-button
+				[ngClass]="hostClasses.length ? hostClasses.value : ''"
 				[id]="id"
 				[type]="type"
 				[theme]="theme"
@@ -42,7 +44,8 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 				[icon]="icon || button.icon || ''"
 				[title]="tooltip || button.tooltip || ''"
 				[disabled]="disabled || !hasAllPermissions"
-				[tabindex]="tabindex">
+				[tabindex]="tabindex"
+				[iconClass]="iconClass">
 			{{ displayLabel ? titleButton : '' }}
 		</tds-button>
 	`,
@@ -55,6 +58,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 	@Input() displayLabel = true;
 	@Input() flat: boolean;
 	@Input() icon = '';
+	@Input() iconClass = '';
 	@Input() iconPrefixVendor = '';
 	@Input() id = '';
 	@Input() inverse: boolean;
@@ -82,7 +86,6 @@ export class TDSActionButton implements OnInit, OnChanges {
 	*/
 	ngOnInit() {
 		this.hostClasses = this.elementRef.nativeElement.classList || [];
-
 		this.buttonSelectorName = this.elementRef.nativeElement.localName;
 		this.button = this.buttonsFactoryService.create(this.buttonSelectorName, this.permissions || []);
 		this.hasAllPermissions = this.button.hasAllPermissions;

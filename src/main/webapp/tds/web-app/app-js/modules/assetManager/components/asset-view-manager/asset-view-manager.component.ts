@@ -58,7 +58,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		const lastFolder = this.dictionary.get(LAST_SELECTED_FOLDER);
 		this.selectFolder(lastFolder || this.reportGroupModels.find((r) => r.open));
 		this.gridColumns =  AssetViewManagerColumnsHelper.setColumnAsSorted(preferences[PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT]);
-		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
+		this.selectedFolder.views = SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
 	}
 
 	protected selectFolder(folderOpen: ViewGroupModel): void {
@@ -69,7 +69,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		if (this.selectedFolder) {
 			this.selectedFolder.open = true;
 		}
-		this.selectedFolder.items = SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
+		this.selectedFolder.views = SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 	}
 
 	public onClearTextFilter(): void {
@@ -120,7 +120,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 				this.reportGroupModels = result as ViewGroupModel[];
 				this.selectedFolder = this.reportGroupModels.find((r) => r.open);
 
-				this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
+				this.selectedFolder.views =  SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 			});
 	}
 
@@ -131,7 +131,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(() => console.log('Saving sort preference'), (err) => console.log(err.message || err));
 
-		this.selectedFolder.items =  SortUtils.sort(this.selectedFolder.items, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
+		this.selectedFolder.views =  SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault());
 		return ;
 	}
 
@@ -166,7 +166,7 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 				this.loadData();
 			});
 		} else {
-			if (this.assetExpService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExpService.hasMaximumFavorites(this.reportGroupModels.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'

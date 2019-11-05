@@ -10,94 +10,11 @@
 		[sort]="gridState.sort"
 		[pageSize]="gridState.take"
 		[resizable]="true"
-		[pageable]="{ pageSizes: maxOptions, info: true}"
+		[pageable]="{ pageSizes: maxOptions, info: true }"
 		(dataStateChange)="dataStateChange($event)"
 		(columnResize)="onWidthChange($event)"
 		(cellClick)="cellClick($event)"
 		[rowClass]="rowCallbackClass">
-
-		<!-- Header Toolbar -->
-		<ng-template kendoGridToolbarTemplate [position]="'top'" class="header-section">
-			<div class="col-sm-6 bulkchange-section">
-				<div class="btn-group btn-between-space-5"
-				     *ngIf="config.displayCreateButton">
-
-					<button type="button" [disabled]="!config.canCreateAssets"
-					        [attr.data-toggle]="_viewId === ASSET_ENTITY_MENU.All_ASSETS ? 'dropdown' : ''"
-					        class="btn btn-default dropdown-toggle tds-button-toolbar"
-					        (click)="_viewId !== ASSET_ENTITY_MENU.All_ASSETS && onCreateAsset(createButtonState)">
-						{{ 'GLOBAL.CREATE' | translate }}
-					</button>
-
-					<button type="button" class="btn btn-default dropdown-toggle tds-button-toolbar" [disabled]="!config.canCreateAssets"
-					        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<span class="caret"></span>
-						<span class="sr-only">Toggle Dropdown</span>
-					</button>
-					<ul class="dropdown-menu">
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.APPLICATION)">
-							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.APPLICATION}">{{ 'ASSETS.APPLICATION' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DATABASE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DATABASE)">
-							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DATABASE}">{{ 'ASSETS.DATABASE' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.DEVICE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.DEVICE)">
-							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.DEVICE}">{{ 'ASSETS.DEVICE' | translate }}</a>
-						</li>
-						<li (click)="onCreateAsset(ASSET_ENTITY_DIALOG_TYPES.STORAGE); setCreatebuttonState(ASSET_ENTITY_DIALOG_TYPES.STORAGE)">
-							<a [ngClass]="{'create-selected': createButtonState === ASSET_ENTITY_DIALOG_TYPES.STORAGE}">{{ 'ASSETS.STORAGE' | translate }}</a>
-						</li>
-					</ul>
-				</div>
-				<tds-bulk-change-button #tdsBulkChangeButton
-				                        [enabled]="config.hasSelectedItems"
-				                        [showDelete]="true"
-				                        [showEdit]="true"
-				                        [bulkChangeType]="bulkChangeType"
-				                        (clickBulk)="onClickBulkButton()"
-				                        (operationResult)="onBulkOperationResult($event)"></tds-bulk-change-button>
-				<div *ngIf="config.hasSelectedItems && config.getSelectedItemsCount; let counter" class="bulk-change-counter">
-					<span class="badge badge-light">{{counter}}</span><label>{{ (counter === 1 ? 'ASSETS.SINGLE_NAME' : 'ASSETS.PLURAL_NAME') | translate }} selected</label>
-				</div>
-				<div class="checkbox just-planning">
-					<input id="justPlanning" type="checkbox" (change)="onChangeJustPlanning($event.currentTarget.checked)"
-					       [(ngModel)]="justPlanning" name="justPlanning" class="component-action-just-planning">
-					<label style="margin-left: 4px;" for="justPlanning">Just Planning</label>
-				</div>
-			</div>
-			<div class="col-sm-6 filters-section">
-				<div *ngIf="hiddenFilters; then hiddenFiltersButton else clearFilters"></div>
-				<ng-template #clearFilters>
-					<tds-button-custom
-							class="component-action-clear-filters"
-							id="btnClean"
-							icon="times"
-							title="Clear filters"
-							[disabled]="!config.hasFilterApplied"
-							(click)="onClearFilters()">
-					</tds-button-custom>
-				</ng-template>
-				<ng-template #hiddenFiltersButton>
-					<tds-button-custom
-							class="component-action-clear-filters"
-							id="btnCleanHiddenFilters"
-							icon="eye-close"
-							title="Clear filters"
-							tooltip="Clear filters and Hidden Fields"
-							iconPrefixVendor="glyphicon glyphicon-"
-							[disabled]="!config.hasFilterApplied"
-							(click)="onClearHiddenFilters()">
-					</tds-button-custom>
-				</ng-template>
-				<tds-button-custom
-					icon="refresh"
-					title="Refresh"
-					isIconButton="true"
-					class="component-action-reload pull-righ"
-					(click)="onReload()">
-				</tds-button-custom>
-			</div>
-		</ng-template>
 
 		<!-- Select All column -->
 		<kendo-grid-column title=""
@@ -139,44 +56,20 @@
 			             let-dataItem
 			             let-rowIndex="rowIndex"
 			             let-isComment="dataItem.taskAndCommentFlags.comment"
-			             let-isIssue="dataItem.taskAndCommentFlags.issue">
-				<div class="tds-action-button-set">
-					<tds-button-edit  
-						(click)="showAssetEditView(dataItem, rowIndex)" 
-						tooltip="Edit Asset"
-						[disabled]="!isEditAvailable()">
-					</tds-button-edit>
-					<tds-button-custom 
-						tooltip="Create Task" 
-						icon="file-text-o" 
-						*ngIf="!isIssue" 
-						[disabled]="!isTaskCreateAvailable()"
-						(click)="createTask(dataItem, rowIndex)"
-						>
-					</tds-button-custom>
-					<tds-button-custom 
-						tooltip="List Tasks" 
-						icon="list-alt" 
-						*ngIf="isIssue" 
-						(click)="showTask(dataItem, rowIndex)">
-					</tds-button-custom>
-					<tds-button-custom 
-						tooltip="Create Comment" 
-						icon="comment-o" 
-						*ngIf="!isComment" 
-						[disabled]="!isCommentCreateAvailable()"
-						(click)="createComment(dataItem, rowIndex)">
-					</tds-button-custom>
-					<tds-button-custom 
-						tooltip="Show Comments" 
-						icon="comments-o" 
-						*ngIf="isComment" 
-						(click)="showComment(dataItem, rowIndex)">
-					</tds-button-custom>
-					<tds-button-clone  
-						(click)="showAssetCloneView(dataItem, rowIndex)"
-						[disabled]="!isAssetCloneAvailable()">
-					</tds-button-clone>
+						 let-isIssue="dataItem.taskAndCommentFlags.issue">
+				<div class="action-button btn-group btn-link">
+					
+					<clr-dropdown>
+						<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+						<clr-dropdown-menu *clrIfOpen  clrPosition="bottom-left">
+							<a clrDropdownItem (click)="showAssetEditView(dataItem, rowIndex)" [disabled]="!isEditAvailable()">Edit Asset</a>
+							<a clrDropdownItem (click)="createTask(dataItem, rowIndex)" *ngIf="!isIssue" [disabled]="!isTaskCreateAvailable()">Create Task</a>
+							<a clrDropdownItem (click)="showTask(dataItem, rowIndex)" *ngIf="isIssue">List Task</a>
+							<a clrDropdownItem (click)="createComment(dataItem, rowIndex)" *ngIf="!isComment" [disabled]="!isCommentCreateAvailable()">Create Comment</a>
+							<a clrDropdownItem (click)="showComment(dataItem, rowIndex)" *ngIf="isComment">Show Comments</a>
+							<a clrDropdownItem (click)="showAssetCloneView(dataItem, rowIndex)" [disabled]="!isAssetCloneAvailable()">Clone</a>
+						</clr-dropdown-menu>
+					</clr-dropdown>
 				</div>
 			</ng-template>
 		</kendo-grid-command-column>

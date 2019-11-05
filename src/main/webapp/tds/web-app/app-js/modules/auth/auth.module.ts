@@ -5,8 +5,6 @@ import { FormsModule } from '@angular/forms';
 // Modules
 import { SharedModule } from '../../shared/shared.module';
 import { AuthRouteModule } from './auth-route.module';
-import { ClarityModule } from '@clr/angular';
-import { TdsComponentLibraryModule } from 'tds-component-library';
 // Services
 import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from './service/auth.service';
@@ -21,6 +19,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { StandardNoticesComponent } from '../noticeManager/components/standard-notices/standard-notices.component';
 import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import {SelectProjectModalComponent} from '../project/components/select-project-modal/select-project-modal.component';
 
 @NgModule({
 	imports: [
@@ -28,10 +27,6 @@ import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory
 		CommonModule,
 		SharedModule,
 		FormsModule,
-		// Kendo
-		// Claritys
-		ClarityModule,
-		TdsComponentLibraryModule,
 		// Route
 		AuthRouteModule,
 	],
@@ -50,7 +45,13 @@ import { MandatoryNoticesComponent } from '../noticeManager/components/mandatory
 		ChangePasswordComponent,
 		StandardNoticesComponent,
 		MandatoryNoticesComponent,
+		SelectProjectModalComponent
 	],
-	entryComponents: [StandardNoticesComponent, MandatoryNoticesComponent],
+	entryComponents: [
+		StandardNoticesComponent,
+		MandatoryNoticesComponent,
+		SelectProjectModalComponent
+	]
 })
-export class AuthModule {}
+export class AuthModule {
+}

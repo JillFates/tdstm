@@ -82,6 +82,7 @@
 				<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
 					${applicationInstance?.moveBundle}
 				</tds:tooltipSpan>
+				<g:if test="${dependencyBundleNumber}">:</g:if>
 				<tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/>
 			</td>
 

@@ -434,7 +434,7 @@ class CommentService implements ServiceMethods {
 				boolean status = assetComment.commentType == AssetCommentType.TASK && !assetComment.isResolved()
 
 				map = [
-					assetComment: assetComment,
+					assetComment: assetComment.taskToMap(),
 					status: status,
 					cssClass: css,
 					statusCss: taskService.getCssClassForStatus(assetComment.status),
@@ -903,5 +903,17 @@ class CommentService implements ServiceMethods {
 				isPublished == true
 			}
 		}.list()
+	}
+
+	/**
+	 *
+	 *  Counts All tasks by an assetEntity.
+	 *
+	 *  A Task instance is an AssetComment instance with AssetComment#commentType equals to AssetCommentType.COMMENT
+	 *
+	 * @param assetEntity The asset to look up the count of tasks for.
+	 */
+	def countByAssetEntity(AssetEntity assetEntity) {
+		AssetComment.countByAssetEntityAndCommentType(assetEntity, AssetCommentType.COMMENT)
 	}
 }

@@ -731,9 +731,11 @@ class UserService implements ServiceMethods {
 	 * - MoveBundle
 	 * - Timezone
 	 * - Date Format
+	 * @param alternativeProjects - a list of projects the user has access to. This is useful when
+	 *         logging in with no CURR_PROJ preference.
 	 * @return a UserContext instance that gathers the user's most relevant information.
 	 */
-	UserContext getUserContext() {
+	UserContext getUserContext(List<Project> alternativeProjects = null) {
 		Project project = securityService.getUserCurrentProject()
 		UserLogin userLogin = securityService.getUserLogin()
 		Person person = securityService.loadCurrentPerson()
@@ -758,6 +760,8 @@ class UserService implements ServiceMethods {
 
 			logoUrl = projectService.getProjectLogoUrl(project)
 
+		} else if (!alternativeProjects) {
+			alternativeProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE, null, userLogin)
 		}
 
 		String timezone = userPreferenceService.getTimeZone(userLogin, TimeUtil.defaultTimeZone)
@@ -773,7 +777,8 @@ class UserService implements ServiceMethods {
 			moveBundle: moveBundle,
 			timezone: timezone,
 			dateFormat: dateFormat,
-			logoUrl: logoUrl
+			logoUrl: logoUrl,
+			alternativeProjects: alternativeProjects
 		]
 		return new UserContext(contextParams)
 	}
