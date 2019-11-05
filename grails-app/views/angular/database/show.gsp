@@ -4,7 +4,7 @@
 <%@page defaultCodec="html" %>
 
 <div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
-    <div class="modal-header">
+    <div class="modal-header" [ngClass]="{'modal-header-height':showDetails}">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
@@ -14,8 +14,8 @@
 			<div class="modal-subtitle">${asset?.moveBundle}</div>
 			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
-		<p class="modal-description">${asset.description}</p>
-		<tds-tab-scroller>
+		<p class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">${asset.description}</p>
+		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>
 			</tds-scroller-item>
@@ -50,14 +50,14 @@
 				<button tdsScrollerLink>Comments</button>
 			</tds-scroller-item>
 		</tds-tab-scroller>
+		<tds-diagram-layout *ngIf="showDetails" class="header-graph"></tds-diagram-layout>
     </div>
-    <div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+    <div class="modal-body" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
-			<div class="clr-col-12">
+			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
-				<a (click)="showDetails = !showDetails">Toggle All Details</a>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
 						<tds:clrRowDetail field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
@@ -112,6 +112,13 @@
 					</tbody>
 				</table>
 				<g:render template="/angular/common/assetTags"></g:render>
+				<a (click)="showDetails = !showDetails" class="show-hide-link">
+					<span *ngIf="!showDetails">View All Fields</span>
+					<span *ngIf="showDetails">Hide Additional Fields</span>
+				</a>
+			</div>
+			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
+				<tds-diagram-layout></tds-diagram-layout>
 			</div>
 		</div>
 

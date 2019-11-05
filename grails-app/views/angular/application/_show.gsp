@@ -1,5 +1,4 @@
 <%@page defaultCodec="html" %>
-<a (click)="showDetails = !showDetails">Toggle All Details</a>
 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 	<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
 		<tds:clrRowDetail field="${standardFieldSpecs.appVendor}" value="${asset.appVendor}" />
