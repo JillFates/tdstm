@@ -1,7 +1,7 @@
 package specs.Planning.Bundle
 
 /**
- * This Spec test bndle deleta and cancel delete for both planning and non planning bundles
+ * This Spec test bundle delete and cancel delete for both planning and non planning bundles
  * @author ingrid
  */
 
@@ -38,14 +38,16 @@ class BundleDeleteSpec extends GebReportingSpec {
         to LoginPage
         login()
         at MenuPage
+        sleep(2000)
         planningModule.goToListBundles()
+        sleep(2000)
         at ListBundlesPage
         // create a planning bundle to be deleted
         clickCreate()
         at CreateBundlePage
         enterBundleData bundleData1
+        clickPlanning() // make it planning
         clickSave()
-        at BundleDetailPage
         at MenuPage
         planningModule.goToListBundles()
         // create a non planning bundle to be deleted
@@ -53,9 +55,7 @@ class BundleDeleteSpec extends GebReportingSpec {
         clickCreate()
         at CreateBundlePage
         enterBundleData bundleData2
-        clickPlanning() // make it non planning
         clickSave()
-        at BundleDetailPage
         at MenuPage
         planningModule.goToListBundles()
     }
@@ -74,16 +74,16 @@ class BundleDeleteSpec extends GebReportingSpec {
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
             filterByName bundleData1[0]
-            selectFilter()
-            clickPlanningFilter()
+            selectPlanningOption(true)
             clickOnBundle()
             at BundleDetailPage
             bundleName=getDataDisplayed()[0]
         when: 'The user clicks on Delete and cancels'
             cancelDeletion()
+            closeModal()
         then: 'The bundle is listed in Bundle list Page'
-            goToListbundles()
             at ListBundlesPage
+            clearNameFilter()
             validateBundleIsListed(bundleName)
     }
 
@@ -91,33 +91,30 @@ class BundleDeleteSpec extends GebReportingSpec {
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
             filterByName bundleData1[0]
-            selectFilter()
-            clickPlanningFilter()//if i get at least two rows i can proceed
+            clearPlanningFilter()
             clickOnBundle()
             at BundleDetailPage
-        when: 'The user clicks on Cancel and confirms'
+        when: 'The user clicks on Delete and confirms'
             confirmDeletion()
-        then: 'The bundle is not deleted'
             at ListBundlesPage
+            clearNameFilter()
             filterByName bundleData1[0]
-            selectFilter()
-            clickPlanningFilter()
-            !validateBundleIsListed(bundleName)
+        then: 'The bundle is deleted'
+            validateBundleIsNotListed(bundleName)
     }
 
     def "3. The user filters non-planning bundles"() {
         given: 'The user is in a non-planning bundle detail page'
             at ListBundlesPage
             filterByName bundleData2[0]
-            selectFilter()
-            clickNonPlanningFilter()
+            selectPlanningOption(false)
             clickOnBundle()
             at BundleDetailPage
             bundleName=getDataDisplayed()[0]
         when: 'The user clicks on Delete and cancels'
             cancelDeletion()
+            closeModal()
         then: 'The bundle is listed in Bundle list Page'
-            goToListbundles()
             at ListBundlesPage
             validateBundleIsListed(bundleName)
     }
@@ -126,17 +123,15 @@ class BundleDeleteSpec extends GebReportingSpec {
         given: 'The user is in a planning bundle detail page'
             at ListBundlesPage
             filterByName bundleData2[0]
-            selectFilter()
-            clickNonPlanningFilter()
+            selectPlanningOption(false)
             clickOnBundle()
             at BundleDetailPage
         when: 'The user clicks on Cancel and confirms'
             confirmDeletion()
-        then: 'The bundle is not deleted'
             at ListBundlesPage
             filterByName bundleData2[0]
-            selectFilter()
-            clickPlanningFilter()
-            !validateBundleIsListed(bundleName)
+            selectPlanningOption(false)
+        then: 'The bundle is not deleted'
+            validateBundleIsNotListed(bundleName)
     }
 }

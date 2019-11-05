@@ -96,26 +96,37 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	public cancel(): void {
+		this.checkMultipleModals();
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	public dismiss(): void {
+		this.checkMultipleModals();
 		this.reject();
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	public confirm(): void {
+		this.checkMultipleModals();
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
+	}
+
+	public checkMultipleModals() {
+		let modals = jQuery('div.modal.fade.in');
+		if (modals.length > 1) {
+			setTimeout( () => {
+				const body = document.getElementsByTagName('body')[0];
+				body.className += ' modal-open';
+			}, 500);
+		}
 	}
 }
 
 @Injectable()
 export class UIPromptService {
-	constructor(private notifier: NotifierService) {
-
-	}
+	constructor(private notifier: NotifierService) {}
 
 	/**
 	 * Method to open a dialog, returns a Promise that gonna be resolved ou rejected based on the UIActiveDialog Action

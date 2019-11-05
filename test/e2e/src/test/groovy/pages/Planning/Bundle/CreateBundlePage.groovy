@@ -1,6 +1,7 @@
 package pages.Planning.Bundle
 
 import geb.Page
+import geb.*
 
 /**
  * This class represents the Bundle creation pages, where the form
@@ -11,31 +12,33 @@ import geb.Page
 class CreateBundlePage extends Page {
 
     static at = {
-        createBundlesPageTitle.text() == "Create Bundle"
+        createBundlesPageTitle.text() == "Bundle Create"
         bundleCreateForm.displayed
     }
 
     static content = {
-        createBundlesPageTitle { $("section", class:"content-header").find("h1")}
-        bundleCreateForm {$("[name='bundleCreateForm']")}
+        createBundlesPageTitle { bundleCreateForm.find("h4")}
+        bundleCreateForm {$("#bundle-create-component")}
         nameField {$("#name")}
         descriptionField {$("#description")}
-        fromDropDown {$("#sourceRoomId")}
+        fromDropDown {$("kendo-dropdownlist#sourceRoomId")}
         toDropDown {$("#targetRoomId")}
-        startTimeDatePicker {$("input#startTime")}
-        comptimeDatePicker {$("input#completionTime")}
-        projectMgrDropDown {$("#projectManagerId")}
-        eventMgrDropdown {$("#moveManagerId")}
-        orderDropDown {$("#operationalOrder")}
-        workFlowDropDown {$("#workflowCode")}
+        startTimeDatePicker {$("[name='startTime']")}
+        comptimeDatePicker {$("[name='completionTime']")}
+
+        orderDropDown {$("#operationalOrderId")}
         usePlanningCheck {$("#useForPlanning")}
-        saveButton {$("input.save")}
+        saveButton {$("button.tds-button-save")}
         errorMessages {$("div.errors")}
 
     }
 
     def clickSave(){
         saveButton.click()
+    }
+
+    def validateSaveIsDisabled(){
+        $('tds-button-save.btn-primary.pull-left.tds-generic-button.tds-action-button--disabled').displayed
     }
 
     def enterName(text){
@@ -48,7 +51,6 @@ class CreateBundlePage extends Page {
     def enterBundleData(dataList){
         nameField=dataList[0]
         descriptionField=dataList[1]
-        workFlowDropDown=dataList[2]
     }
 
     def clickPlanning(){
@@ -62,8 +64,8 @@ class CreateBundlePage extends Page {
     def validatePresentFields(){
         def allFieldsPresent=true
         def fieldList=[nameField,descriptionField,fromDropDown,toDropDown,startTimeDatePicker,
-                       comptimeDatePicker,comptimeDatePicker,projectMgrDropDown,orderDropDown,
-                       workFlowDropDown,usePlanningCheck,saveButton]
+                       comptimeDatePicker,comptimeDatePicker,orderDropDown,
+                       usePlanningCheck,saveButton]
         for (it in fieldList) {
             if (!it.displayed) {
                 allFieldsPresent=false

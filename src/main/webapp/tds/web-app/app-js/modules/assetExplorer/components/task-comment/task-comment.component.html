@@ -128,7 +128,7 @@
 						<clr-dropdown>
 							<tds-button icon="ellipsis-vertical" title="Actions" clrDropdownTrigger></tds-button>
 							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="openTaskComment(dataItem)" [disabled]="!isCommentEditAvailable()">Edit Comment</a>
+								<a clrDropdownItem (click)="openTaskComment(dataItem, modalType.EDIT)" [disabled]="!isCommentEditAvailable()">Edit Comment</a>
 								<a clrDropdownItem (click)="onDelete(dataItem)" [disabled]="!isCommentDeleteAvailable()">Delete Comment</a>
 							</clr-dropdown-menu>
 						</clr-dropdown>

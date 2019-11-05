@@ -16,7 +16,6 @@
     int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
-    def isLicenseValid = licenseAdminService.isValid()
 
     def buildInfo = environmentService.getVersionText()
 %>

@@ -1,13 +1,15 @@
 
 // global functions for accessing the graph outside the scope of the main function
 var getData = function () { return null }
-var forceDisplay = function () { return null }
+// var forceDisplay = function () { return null }
 var debug = {};
 
 $(document).ready(function () {
 	// check keyup on the search field for the enter key
+	$('#baselinePlanButton').hide();
+
 	$('#searchBoxId').keyup(function (e) {
-		if (e.keyCode == 13)
+		if (e.keyCode === 13)
 			$('#SubmitButtonId').submit();
 	});
 
@@ -18,9 +20,21 @@ $(document).ready(function () {
 		$(this).children().first().attr('disabled', 'disabled');
 	});
 
+	loadTeams();
+
+	$('#moveEventId option[value="349"]').attr("selected",true);
+
+	$("input[name=mode]").on('change', function(ev) {
+		if(ev && ev.target && ev.target.value === 'C'){
+			$('#baselinePlanButton').hide();
+		}else {
+			$('#baselinePlanButton').show();
+		}
+		generateGraph();
+	});
+
 	generateGraph();
 });
-
 
 function displayWarningOrErrorMsg(isCyclical) {
 	var message = d3.select('div.body')
@@ -40,7 +54,7 @@ function displayWarningOrErrorMsg(isCyclical) {
  * @param response
  * @param status
  */
-function buildGraph(response, status) {
+function 	buildGraph(response, status) {
 
 	// show the loading spinner
 	$('#spinnerId').css('display', 'block');
@@ -58,10 +72,10 @@ function buildGraph(response, status) {
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
 	var ready = false;
-
+	var items = data.tasks;
 	// if the event has no tasks show an error message and exit
-	if (data.items.size() == 0) {
-		displayWarningOrErrorMsg(false)
+	if (items.length === 0 ) {
+		displayWarningOrErrorMsg(false);
 		return;
 	}
 
@@ -79,7 +93,6 @@ function buildGraph(response, status) {
 	var scrollingLabelsPerformanceCutoff = 50;
 
 	// data received from the server
-	var items = data.items;
 	var starts = data.starts;
 	var dependencies = [];
 	var siblingGroups = [];
@@ -97,38 +110,14 @@ function buildGraph(response, status) {
 	// perform all necesary precalculations on the data
 	sanitizeData(items, dependencies);
 
-	// sort the tasks chronologically for the stacking algorithm
-	items.sort(function (a, b) {
-		var t1 = a.start ? (new Date(a.start)).getTime() : 0;
-		var t2 = b.start ? (new Date(b.start)).getTime() : 0;
-		if (t1 > t2)
-			return 1;
-		else if (t1 < t2)
-			return -1;
-		else if (a.milestone && !b.milestone)
-			return 1;
-		else if (!a.milestone && b.milestone)
-			return -1;
-		else if ((a.predecessors.length + a.successors.length) < (b.predecessors.length + b.successors.length))
-			return 1;
-		else if ((a.predecessors.length + a.successors.length) > (b.predecessors.length + b.successors.length))
-			return -1;
-		else if (a.predecessors.length < b.predecessors.length)
-			return 1;
-		else if (a.predecessors.length > b.predecessors.length)
-			return -1;
-		else
-			return 0;
-	});
-
 	// set up the ranges for the mini and main graphs
 	var windowWidth = $(window).width(); // the width of the browser window
 	var graphPageOffset = $('div.body').offset().left; // the left offset of the graph on the page
 	var graphExtraPadding = 10; // extra padding width for the graph on the page
 	var zoomScale = 2;
-	var d3Linear = getTimeFormatToDraw(parseStartDate(data.startDate), items[items.length - 1].end);
+	var d3Linear = getTimeFormatToDraw(parseDate(data.startDate), parseDate(data.endDate),false, data);
 	var x = d3.time.scale()
-		.domain([parseStartDate(data.startDate), items[items.length - 1].end])
+		.domain([parseDate(data.startDate), parseDate(data.endDate)])
 		.range([0, windowWidth - graphPageOffset * 2 - graphExtraPadding]);
 	var x1 = d3.time.scale()
 		.domain(x.domain())
@@ -154,8 +143,6 @@ function buildGraph(response, status) {
 
 	// populate the Team select
 	var teamSelect = null;
-	populateTeamSelect();
-
 
 	// stores data and functions used for dragging on the mini graph
 	var miniDrag = {
@@ -168,7 +155,7 @@ function buildGraph(response, status) {
 			miniDrag.tempBrushXInitial = d3.mouse(chart.node())[0] - margin.left;
 
 			// if we are outside the brush, we are drawing a new region or setting a new brush position
-			if ((d3.event.sourceEvent.which == 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1])) {
+			if ((d3.event.sourceEvent.which === 1) && (x.invert(miniDrag.tempBrushXInitial + 4) < brush.extent()[0] || x.invert(miniDrag.tempBrushXInitial - 4) > brush.extent()[1])) {
 				miniDrag.drawing = 1;
 				miniDrag.tempBrush = brushContainer.append('svg:rect')
 					.attr('class', 'tempBrush hidden')
@@ -310,7 +297,7 @@ function buildGraph(response, status) {
 			chart.classed('dragging', false);
 			chart.classed('resizing', false);
 		}
-	}
+	};
 
 	// Sets the custom dragging behavior
 	mainDrag.behavior = d3.behavior.drag()
@@ -321,7 +308,11 @@ function buildGraph(response, status) {
 
 	// gets the container that will hold the svg
 	svgContainer = d3.select('div#svgContainerId')
-		.style('display', null)
+		.style('display', null);
+
+
+	// Remove the svg to rebuild it
+	$('#timelineSVGId').remove();
 
 	// construct the SVG
 	chart = svgContainer
@@ -447,7 +438,9 @@ function buildGraph(response, status) {
 		mainMinuteAxis: mainTranslator.append('svg:g')
 			.attr('transform', 'translate(0,0.5)')
 			.attr('class', 'main axis minute')
-			.call(axisDefs.x1MainGraphAxis),
+			.call(function(a, b){
+			    axisDefs.x1MainGraphAxis(a, b);
+            }),
 
 		miniMinuteAxis: mini.append('svg:g')
 			.attr('transform', 'translate(0,' + miniHeight + ')')
@@ -459,7 +452,6 @@ function buildGraph(response, status) {
 			.attr('class', 'axis hour')
 			.call(axisDefs.xHourAxis)
 	}
-
 
 	// construct the line representing the current time
 	var mainNowLine = mainTranslator.append('svg:line')
@@ -520,7 +512,7 @@ function buildGraph(response, status) {
 		.x(x)
 		.on("brush", brushed)
 		.on("brushend", brushedEnd)
-		.extent([parseStartDate(data.startDate), new Date(Math.min(parseStartDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
+		.extent([parseDate(data.startDate), new Date(Math.min(parseDate(data.startDate).getTime() + d3Linear.zoomTime, x.domain()[1].getTime()))])
 
 	var extentWidth = x(brush.extent()[1]) - x(brush.extent()[0]);
 	zoomScale = extentWidth / width;
@@ -610,11 +602,6 @@ function buildGraph(response, status) {
 			fullRedraw();
 		});
 
-		// handle when the user changes the team filtering select
-		teamSelect.on('change', function () {
-			display(true, true);
-		});
-
 		// bind the zoom button listeners
 		$('#zoomInButtonId').on('click', function () {
 			GraphUtil.timelineZoom(brush, 'in', zoomCallback)
@@ -630,21 +617,6 @@ function buildGraph(response, status) {
 			display(false, true, true);
 			display(false, true, true);
 		}
-	}
-
-	// populate the team select
-	function populateTeamSelect() {
-		teamSelect = $("#teamSelectId")
-		teamSelect.children().remove();
-		teamSelect.append('<option value="ALL">All Teams</option>');
-		teamSelect.append('<option value="NONE">No Team Assignment</option>');
-		teamSelect.append('<option disabled>──────────</option>');
-
-		$.each(data.roles, function (index, team) {
-			teamSelect.append('<option value="' + team + '">' + team + '</option>');
-		});
-
-		teamSelect.val('ALL');
 	}
 
 	// called when the brush is dragged
@@ -698,7 +670,7 @@ function buildGraph(response, status) {
 
 			// update the scales for the axis
 
-			var innerTimeLine = getTimeFormatToDraw(parseStartDate(brush.extent()[0]), parseStartDate(brush.extent()[1]), true);
+			var innerTimeLine = getTimeFormatToDraw(parseDate(brush.extent()[0]), parseDate(brush.extent()[1]), true);
 			axisDefs.x1MainGraphAxis.ticks(innerTimeLine.time, innerTimeLine.tick);
 			axisDefs.x1MainGraphAxis.tickFormat(innerTimeLine.format);
 
@@ -722,7 +694,7 @@ function buildGraph(response, status) {
 					+ (p.x + p.w) + ',' + p.y2 + ' '
 					+ p.x2 + ',' + (p.y + p.h) + ' '
 					+ p.x + ',' + (p.y + p.h) + ' ';
-			})
+			});
 		polys.attr('class', function (d) { return 'mainItem ' + getClasses(d); });
 
 		// add any task polys in the new domain extents
@@ -748,8 +720,8 @@ function buildGraph(response, status) {
 			.html(function (d) {
 				return d.number
 					+ ': ' + d.name
-					+ ' - ' + ((d.assignedTo != 'null') ? (d.assignedTo) : ('Unassigned'))
-					+ ' - ' + d.status;
+					+ ' - ' + (d.assignedTo ? d.assignedTo : 'Unassigned')
+					+ ' - ' + d.status
 			});
 
 		polys.exit().remove();
@@ -771,7 +743,7 @@ function buildGraph(response, status) {
 					var end = x1(d.successor.end);
 					var highest = start + (end - start) * 0.25;
 					return Math.round(Math.min(highest, start + anchorOffset));
-				})
+				});
 
 		if (resized)
 			lines
@@ -826,7 +798,7 @@ function buildGraph(response, status) {
 			labels.attr('class', function (d) { return 'itemLabel unselectable mainItem ' + getClasses(d); });
 
 			// update the item labels' children
-			itemLabels.selectAll('text')
+			itemLabels.selectAll('text');
 
 			// add any labels in the new domain extents
 			labels.enter()
@@ -840,7 +812,6 @@ function buildGraph(response, status) {
 				.attr('width', function (d) { return Math.max(0, d.points.w - anchorOffset); })
 				.attr('height', function (d) { return d.points.h; })
 				.text(function (d) { return d.number + ': ' + d.name; });
-
 
 			if (scaled || resized)
 				GraphUtil.forceReflow(itemLabels)
@@ -911,20 +882,17 @@ function buildGraph(response, status) {
 		// updates the mini graph
 		miniPolys
 			.attr('class', function (d) { return 'miniItem ' + getClasses(d); });
-
-
-		if (window.performance && window.performance.now)
-			console.log('display(' + resized + ') took ' + (performance.now() - startTime) + ' ms');
 	}
 
 	// clears all items from the main group then redraws them
 	function fullRedraw() {
 		itemPolys.selectAll('polygon').remove();
 		itemArrows.selectAll('line').remove();
-		if (GraphUtil.isIE())
+		if (GraphUtil.isIE()) {
 			itemLabels.selectAll('g').remove();
-		else
+		} else {
 			itemLabels.selectAll(function () { return this.getElementsByTagName("foreignObject"); }).remove();
+		}
 		miniPolys.attr('points', function (d) { return getPointsMini(d); });
 		display(true, true);
 	}
@@ -933,8 +901,9 @@ function buildGraph(response, status) {
 	function calculateLabelMaxWidths() {
 		$('text.itemLabel').each(function (i, o) {
 			var d = o.__data__
-			if (d.labelWidth == null)
+			if (d.labelWidth == null) {
 				d.labelWidth = o.getBoundingClientRect().width
+			}
 		});
 	}
 
@@ -1062,6 +1031,8 @@ function buildGraph(response, status) {
 
 	// gets the css classes that apply to task @param d
 	function getClasses(d) {
+		var teamSelect = $('#teamSelectId');
+		var searchString = $('#searchBoxId').val();
 		var classString = 'unselectable '
 			+ (d.selected ? 'selected ' : '')
 			+ (d.milestone ? 'milestone ' : '')
@@ -1070,24 +1041,28 @@ function buildGraph(response, status) {
 			+ (d.redundant ? 'redundant ' : '')
 			+ (d.cyclical ? 'cyclical ' : '')
 			+ (d.end < now() ? 'past ' : 'future ')
-			+ (d.highlight ? 'highlighted ' : '')
+			+ (d.highlight ? ' highlighted ':'')
 			+ (d.redundant && hideRedundant ? 'hidden ' : '')
 			+ (d.status);
-		if (d.status != 'Completed' && d.end < now())
+		if (d.status !== 'Completed' && d.end < now())
 			classString += ' overdue ';
-		else if (d.status == 'Completed' && d.end > now())
+		else if (d.status === 'Completed' && d.end > now())
 			classString += ' ahead ';
 		else
 			classString += ' ontime ';
-		var teamSelect = $('#teamSelectId');
-		if (teamSelect.val() != 'ALL' && teamSelect.val() != d.role)
-			classString += ' unfocussed ';
 
+		if (
+			( teamSelect.val() !== 'ALL' && teamSelect.val() !== d.role &&  !d.highlight) ||
+			( searchString && !d.highlight )
+		) {
+			classString += ' unfocussed ';
+		}
 		return classString;
 	}
 
 	// gets the points string for task polygons
 	function getPoints(d) {
+		// debugger;
 		var points = {};
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var x = x1(d.start);
@@ -1105,17 +1080,20 @@ function buildGraph(response, status) {
 
 	// gets the points string for mini polygons
 	function getPointsMini(d) {
+
+		if( !(d.start instanceof Date)) d.start = new Date(d.start);
+
 		var taskHeight = useHeights ? Math.max(1, d.height) : 1;
 		var offset = Math.floor((taskHeight - 1) / 2);
 		var xa = Math.floor(x(d.start));
 		var ya = (d.stack - offset) * (miniRectHeight) + 1;
 		var w = Math.max(Math.floor(x(d.end)) - Math.floor(x(d.start)) - miniRectStroke, 1);
 		var h = (miniRectHeight) * taskHeight - miniRectStroke;
-		return xa + ',' + ya + ' '
+		var result =  xa + ',' + ya + ' '
 			+ (xa + w) + ',' + ya + ' '
 			+ (xa + w) + ',' + (ya + h) + ' '
 			+ xa + ',' + (ya + h) + ' ';
-
+		return result;
 	}
 
 	// used to get the offset used for dependency arrows' links to the task rects
@@ -1462,7 +1440,22 @@ function buildGraph(response, status) {
 	 - corrects any impossible start times for tasks */
 	function sanitizeData(tasks, dependencies) {
 
+
 		data.searchFilter = '';
+
+        // convert all data to its proper format
+        if (data.startDate === undefined) {
+            data.items.forEach( task => {
+                if (task.estStart != undefined) {
+                    if (data.startDate == undefined || task.estStart < data.startDate) {
+                        data.startDate = new Date(task.estStart);
+                    }
+                }
+            });
+            //data.startDate = new Date(Date.now());
+        }
+        let startTime = parseDate(data.startDate);
+        let endTime = parseDate(data.endDate);
 
 		for (var i = 0; i < items.length; ++i) {
 			items[i].successors = [];
@@ -1470,34 +1463,37 @@ function buildGraph(response, status) {
 			items[i].redundantSuccessors = [];
 			items[i].redundantPredecessors = [];
 		}
+        // if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
+        for (let c = 0; c < data.cycles.size(); c++) {
+            let cycle = data.cycles[c];
+            let firstId = parseInt(cycle[0]);
+            let lastId = parseInt(cycle[cycle.size() - 1]);
+            let firstNode = items[binarySearch(items, firstId, 0, items.length - 1)];
+            let lastNode = items[binarySearch(items, lastId, 0, items.length - 1)];
 
-		// if there are any cyclical structures, remove one of the dependencies and mark it as cyclical
-		for (var i = 0; i < Object.keys(data.cyclicals).size(); i++) {
-			var key = parseInt(Object.keys(data.cyclicals)[i]);
-			var predecessor = items[binarySearch(items, key, 0, items.length - 1)];
-			var stack = data.cyclicals[Object.keys(data.cyclicals)[i]];
-			for (var j = 0; j < stack.size(); ++j) {
-				var node = items[binarySearch(items, stack[j], 0, items.length - 1)];
-				if (node.predecessorIds.indexOf(key) != -1) {
-					// construct a dependency object and move the predecessorId to the redundant list
-					var depObject = { "predecessor": predecessor, "successor": node, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
-					depObject.root = predecessor.root;
-					predecessor.redundantSuccessors.push(depObject);
-					node.redundantPredecessors.push(depObject);
-					dependencies.push(depObject);
-					node.predecessorIds.splice(node.predecessorIds.indexOf(key), 1);
-				}
-			}
-		}
+            let depObject = { "predecessor": lastNode, "successor": firstNode, "modifier": "hidden", "selected": false, "redundant": true, "cyclical": true };
+            depObject.root = lastNode.root;
+            lastNode.redundantSuccessors.push(depObject);
+            firstNode.redundantPredecessors.push(depObject);
+            dependencies.push(depObject);
+            //firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
+            firstNode.predecessorIds.splice(firstNode.predecessorIds.indexOf(lastId), 1);
 
-		// if there are cyclical structures, tell the user that the data might be inaccurate
-		if (Object.keys(data.cyclicals).size() > 0)
+        }
+
+
+
+
+        // if there are cyclical structures, tell the user that the data might be inaccurate
+		if (data.cycles.length > 0){
 			alert("This task data contains cyclical dependency structures, so the resulting timeline may not be entirely accurate. Dependencies that create cyclical structures will be displayed as green lines.");
+		}
 
 		// if there is more than 1 start task, create a fake root task
 		data.root = null;
 		if (starts.size() > 1) {
-			var earliest = starts[0].startInitial;
+			// debugger;
+            var earliest = starts[0].startInitial;
 			for (var i = 0; i < starts.size(); i++) {
 				var task = items[binarySearch(items, starts[i], 0, items.length - 1)];
 				task.predecessorIds.push(-10);
@@ -1505,25 +1501,35 @@ function buildGraph(response, status) {
 			}
 			var root = {};
 			root.id = -10;
-			root.name = 'root';
+			root.comment = 'root';
 			root.root = true;
-			root.startInitial = 0;
-			root.endInitial = 0;
+
+
+			root.estStart = startTime;
+            root.estFinish = new Date(startTime.getTime() + 1);
 			root.predecessorIds = [];
 			items = [root].concat(items);
 			data.root = root;
 		} else if (items.size() > 0) {
+			// debugger;
 			data.root = items[binarySearch(items, starts[0], 0, items.length - 1)];
 		}
 
-		// convert all data to its proper format
-		var startTime = parseStartDate(data.startDate);
-		for (var i = 0; i < items.length; ++i) {
-			items[i].milestone = (items[i].startInitial == items[i].endInitial);
-			items[i].startInitial = new Date(startTime.getTime() + (items[i].startInitial) * 60000);
-			items[i].endInitial = new Date(startTime.getTime() + (items[i].endInitial + items[i].milestone) * 60000);
-			items[i].start = null;
-			items[i].end = null;
+        let unknownStarts = [];
+
+		for (let i = 0; i < items.length; ++i) {
+		    if (!items[i].estStart) {
+                unknownStarts.push(i);
+            }
+            items[i].milestone = (items[i].duration === 0);
+            if (items[i].estStart) {
+                items[i].estStart = new Date(items[i].estStart);
+            }
+            if (items[i].estFinish) {
+                items[i].estFinish = new Date(items[i].estFinish);
+            }
+            items[i].start = items[i].estStart;
+			items[i].end = items[i].estFinish;
 			items[i].exChild = null;
 			items[i].exParent = null;
 			items[i].endOfExclusive = null;
@@ -1539,6 +1545,12 @@ function buildGraph(response, status) {
 			items[i].siblingGroupParents = [];
 			items[i].childGroups = [];
 		}
+		s
+		// if there are undefined start dates and no cycles, alert the user
+        if (unknownStarts.size() > 0 || !data.startDate || !data.endDate) {
+            alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+            return;
+        }
 
 		// generate dependencies in a separate loop to ensure no dependencies pointing to removed tasks are created
 		for (var i = 0; i < items.length; ++i)
@@ -2070,7 +2082,6 @@ function buildGraph(response, status) {
 					}
 
 					/*
-					 console.log('BEFORE READDING DUPLICATES FOR ' + items[i].name)
 					 display(newList, groups);
 					 */
 
@@ -2100,12 +2111,10 @@ function buildGraph(response, status) {
 					}
 
 					/*
-					 console.log('AFTER READDING DUPLICATES FOR ' + items[i].name)
 					 display(newList, groups);
 					 */
 
 					function display(list, groups) {
-						console.log('--------------------------------------------');
 						for (var j = 0; j < list.length; ++j) {
 							var output = list[j].id + ' : ';
 							for (var k = 0; k < groups.length; ++k) {
@@ -2114,10 +2123,8 @@ function buildGraph(response, status) {
 								else
 									output += '\t.';
 							}
-							output += '\t:' + list[j].name;
-							console.log('\t > ' + output);
+							output += '\t:' + list[j].comment;
 						}
-						console.log('--------------------------------------------');
 					}
 
 					// match the actual successor order to the calculated order
@@ -2195,8 +2202,6 @@ function buildGraph(response, status) {
 
 		function outputChildMatrix(node) {
 			var successors = getSuccessors(node);
-			console.log('child matrix for node [' + node.id + '] ' + node.name);
-			console.log('----------------------');
 			for (var i = 0; i < successors.size(); ++i) {
 				var node = successors[i];
 				var output = node.id + ' : ';
@@ -2206,9 +2211,7 @@ function buildGraph(response, status) {
 					else
 						output += '\t.';
 				}
-				console.log('\t > ' + output + ' "' + node.name + '"');
 			}
-			console.log('----------------------');
 		}
 
 		/*	compares two tasks, returning true if they have the same siblingGroups.
@@ -2251,8 +2254,9 @@ function buildGraph(response, status) {
 						isExclusive = true;
 					}
 				} else {
-					getPredecessors(c).forEach(function (p) {
-						if (set.indexOf(p) == -1)
+					var predecessors =getPredecessors(c)
+					predecessors.map(function (p) {
+						if (set.indexOf(p) === -1)
 							isExclusive = false;
 					});
 				}
@@ -2356,29 +2360,8 @@ function buildGraph(response, status) {
 
 	// ensures times are correct
 	function calculateTimes(task, checking) {
-		if (!task.start) {
-			if (task.predecessors.length == 0) {
-				task.start = task.startInitial;
-			} else {
-				checking.push(task);
-				var latest = 0;
-				for (var i = 0; i < task.predecessors.length; ++i) {
-					var tmp = calculateTimes(task.predecessors[i].predecessor, checking);
-					if (tmp > latest)
-						latest = tmp;
-				}
-				checking.pop(task);
-				task.start = latest;
-			}
-		}
-		if (!task.end) {
-			if (task.root) {
-				task.start = new Date(task.start.getTime() - 2);
-				task.end = new Date(task.start.getTime() - 1);
-			} else {
-				task.end = new Date(task.start.getTime() + (task.endInitial.getTime() - task.startInitial.getTime()));
-			}
-		}
+		task.start = parseDate(task.estStart);
+		task.end = parseDate(task.estFinish);
 		return task.end;
 	}
 
@@ -2415,40 +2398,105 @@ function buildGraph(response, status) {
 
 function submitForm() {
 	$('.chart').remove();
-	d3.select('#svgContainerId').style('display', 'none')
+	d3.select('#svgContainerId').style('display', 'none');
 	generateGraph($('#moveEventId').val());
 }
+
+// populate the team select
+function populateTeamSelect(roles) {
+	teamSelect = $("#teamSelectId");
+	teamSelect.children().remove();
+	teamSelect.append('<option value="ALL">All Teams</option>');
+	teamSelect.append('<option value="NONE">No Team Assignment</option>');
+	teamSelect.append('<option disabled>──────────</option>');
+
+	roles.forEach(function (team) {
+		teamSelect.append('<option value="' + team.id + '">' + team.title + '</option>');
+	});
+
+	teamSelect.val('ALL');
+}
+
+function loadTeams() {
+	$('#spinnerId').css('display', 'block');
+	var url = tdsCommon.createAppURL('/team/list?json');
+	jQuery.ajax({
+		dataType: 'json',
+		url: url,
+		type: 'GET',
+		complete: function (data) {
+			var roles = JSON.parse(data.responseText);
+			populateTeamSelect(roles);
+			$('#spinnerId').css('display', 'none');
+		}
+	});
+
+}
+
+function baseLine(){
+    var id = $('#moveEventId').val();
+
+    var params = {id:id};
+    params.viewUnpublished = $('#viewUnpublishedId').is(':checked');
+
+    $('#spinnerId').css('display', 'block');
+
+    var url;
+
+    url = tdsCommon.createAppURL('/wsTimeline/baseline');
+    jQuery.ajax({
+        dataType: 'json',
+        url: url,
+        data:params,
+        type: 'POST',
+        complete: function (ev) {
+        	var msgObj = JSON.parse(ev.responseText);
+        	if(msgObj && msgObj.message) {
+				alert(msgObj.message);
+			}
+        	generateGraph();
+			$('#spinnerId').css('display', 'none');
+        }
+    });
+}
+
+
 
 
 /**
  * Call the REST API to grab the data to generate the Timeline
  */
-function generateGraph(event) {
-	var params = {};
+function generateGraph(ev) {
+    var id = $('#moveEventId').val();
+    var mode = $("input[name=mode]:checked").val();
+    var viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
-	if (event != 0) {
-		params = { 'moveEventId': event };
-	}
+    $('#spinnerId').css('display', 'block');
 
-	params.viewUnpublished = $('#viewUnpublishedId').is(':checked') ? '1' : '0';
+    var params = {
+        id:id,
+        mode:mode,
+        viewUnpublished:viewUnpublished
+    };
 
-	$('#spinnerId').css('display', 'block');
+    var queryParams = $.param(params);
 
-	jQuery.ajax({
-		dataType: 'json',
-		url: 'taskTimelineData',
-		data: params,
-		type: 'GET',
-		complete: buildGraph
-	});
+    var url = tdsCommon.createAppURL('/wsTimeline/timeline?'+queryParams);
+    jQuery.ajax({
+        dataType: 'json',
+        url: url,
+        type: 'GET',
+        complete: buildGraph
+    });
 }
 
 // highlight tasks matching the user's regex
-function performSearch() {
+function performSearch(e) {
 	if ($('svg#timelineSVGId') != null) {
+		var ALL = 'ALL';
 		var searchString = $('#searchBoxId').val();
 		var data = getData();
-		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) == '/' && searchString.charAt(searchString.length - 1) == '/');
+		var hasSlashes = (searchString.length > 0) && (searchString.charAt(0) === '/' && searchString.charAt(searchString.length - 1) === '/');
 		var isRegex = false;
 		var regex = /.*/;
 
@@ -2469,19 +2517,21 @@ function performSearch() {
 			data.searchFilter = searchString;
 			handleClearFilterStatus();
 
-			_(data.items).forEach(function (task, i) {
-
-				var name = task.name;
-
-				if (searchString == '') {
-					task.highlight = false;
+			data.tasks.map(function (task, i) {
+				task.highlight = false;
+				var highlight;
+				if (isRegex){
+					highlight = task.name.match(regex);
+				} else if(searchString){
+					highlight = task.name.toLowerCase().indexOf(searchString.toLowerCase()) !== -1;
 				} else {
-					if (isRegex && name.match(regex) != null)
-						task.highlight = true;
-					else if (!isRegex && name.toLowerCase().indexOf(searchString.toLowerCase()) != -1)
-						task.highlight = true;
-					else
-						task.highlight = false;
+					highlight = false;
+				}
+
+				if(this.teamSelect.val() !== ALL) {
+					task.highlight = highlight || task.team === this.teamSelect.val();
+				}else {
+					task.highlight = highlight;
 				}
 			});
 			forceDisplay();
@@ -2507,10 +2557,10 @@ function handleClearFilterStatus() {
  * Parse start date that comes in zulu format and apply the time zone offset to
  * have a Date object in the user's time zone.
  */
-function parseStartDate(startDate) {
+function parseDate(date) {
 	var momentTZ = moment().tz(tdsCommon.timeZone());
 	var localTZOffset = new Date().getTimezoneOffset();
-	var momentStartDate = tdsCommon.parseDateTimeFromZulu(startDate);
+	var momentStartDate = tdsCommon.parseDateTimeFromZulu(date);
 	momentStartDate = momentStartDate.tz("GMT");
 	momentStartDate = momentStartDate.add(momentTZ.utcOffset() + localTZOffset, 'minutes');
 	return new Date(momentStartDate.valueOf());
@@ -2620,8 +2670,7 @@ function getTimeLinePercent(startDate, endDate, percent) {
  * It calculate the tick number based on two dates
  * it returns an object that represent the best d3.time.xxx, d3.time.format(xxx) and the tick jump
  */
-function getTimeFormatToDraw(startDate, endDate, increasePer) {
-
+function getTimeFormatToDraw(startDate, endDate, increasePer, data) {
 	var msConversion = [_MS_PER_MIN, _MS_PER_HOUR, _MS_PER_DAY, _MS_PER_WEEK, _MS_PER_MONTH, _MS_PER_YEAR],
 		difference = 0,
 		maxTick = _MAX_TICK_PERFORMANCE,

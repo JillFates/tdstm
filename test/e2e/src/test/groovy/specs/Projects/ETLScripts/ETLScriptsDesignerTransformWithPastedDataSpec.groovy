@@ -36,7 +36,7 @@ class ETLScriptsDesignerTransformWithPastedDataSpec extends GebReportingSpec{
         login()
 
         at MenuPage
-        projectsModule.goToETLScripts()
+        waitFor{projectsModule.goToETLScripts()}
         at ETLScriptsPage
         createBtn.click()
         at CreateETLScriptsPage

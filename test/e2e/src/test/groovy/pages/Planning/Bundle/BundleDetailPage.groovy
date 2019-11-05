@@ -16,39 +16,49 @@ class BundleDetailPage extends Page {
     }
 
     static content = {
-        bundleDetailPageTitle { $("section", class:"content-header").find("h1")}
+        bundleDetailPageTitle { $("bundle-view-edit-component").find("h4")}
         details {$("div.steps_table")[0]}
 
         creationMessage {details.find("div.message")}
         nameValue {details.find(".name", text:"Name:").next()}
-        workFlowCodeValue {details.find(".name", text:"WorkFlow Code").next()}
+
         descriptionValue {details.find(".name", text:"Description:").next()}
         planningModule {module PlanningMenuModule }
         menuModule {module MenuModule }
-        planningCheck {$("input#useForPlanning")}
+        planningCheck {$("input#useForPlanning")[0]}
         listbundles {$("a.list")}
         message {$("div.message")}
         startTime {$(".name", text:"Start Time:")next()}
         completionTime {$(".name", text: "Completion Time:").next()}
         //buttons section
         btnsContainer {$("form")}
-        editBtn {$("input.edit")[0]}
-        deleteBtn {btnsContainer.find("[name='_action_Delete']")}
+        editBtn {$('tds-button-edit')}
+        deleteBtn {$('tds-button-delete')}
+        deleteBundleAndAssets {$("button.btn-danger")}
+        //Confirnation popup
+        confirmBtn (required:false){$('button.btn.btn-primary.pull-left')[2]}
+        cancelBtn  (required:false) { $('button.btn.btn-default.pull-right')}
+        closeButton {$('tds-button-close')}
+    }
+
+    def closeModal(){
+        waitFor{closeButton.click()}
+        sleep(2000)
     }
 
     def cancelDeletion(){
-        withConfirm(false) {deleteBtn.click() }
+        waitFor{deleteBtn.click()}
+        waitFor{ cancelBtn.click()}
     }
+
     def confirmDeletion(){
-        withConfirm(true) {deleteBtn.click() }
+        waitFor{deleteBtn.click()}
+        sleep(1000)
+        waitFor{confirmBtn.click()}
     }
 
     def clickDelete(){
         delete.click()
-    }
-
-    def goToListbundles(){
-        listbundles.click()
     }
 
     def clickEdit(){
@@ -59,9 +69,21 @@ class BundleDetailPage extends Page {
         planningCheck.value()
     }
 
+    def validateNameDescription(data){
+        def allFieldsAsExpected=true
+        def dispData=[nameValue.text(),descriptionValue.text()]
+        for (it in dispData) {
+            if (!data.contains(it)) {
+                allFieldsAsExpected=false
+                break
+            }
+        }
+        allFieldsAsExpected
+    }
+
     def validateDataDisplayed(data){
         def allFieldsAsExpected=true
-        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
+        def dispData=[nameValue.text(),descriptionValue.text()]
         if(isPlanning()!=data[3]){
             allFieldsAsExpected=false
         }else{
@@ -83,7 +105,7 @@ class BundleDetailPage extends Page {
      * Returns bundle data displayed
      */
     def getDataDisplayed(){
-        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text(),isPlanning()]
+        def dispData=[nameValue.text(),descriptionValue.text(),isPlanning()]
         dispData
     }
     /**
@@ -91,8 +113,8 @@ class BundleDetailPage extends Page {
      * @param origData     *
      */
     def dataIsEdited(origData){
-        def dispData=[nameValue.text(),descriptionValue.text(),workFlowCodeValue.text()]
-        assert(isPlanning()!=origData[3])
+        def dispData=[nameValue.text(),descriptionValue.text()]
+        //assert(isPlanning()!=origData[3])
         assert(origData[0]+" Edited"== dispData[0])
         assert(origData[1]+" Edited"== dispData[1])
         assert(origData[2]== dispData[2])
@@ -103,6 +125,11 @@ class BundleDetailPage extends Page {
 
     def validateUpdateMesage(name){
        message.text()=="MoveBundle "+name+" updated"
+    }
+
+    def nameDescriptionEdited(origData){
+        def dispData=[nameValue.text(),descriptionValue.text()]
+        (origData[0]+" Edited"== dispData[0]) && (origData[1]+" Edited"== dispData[1])
     }
 }
 

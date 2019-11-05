@@ -19,15 +19,15 @@ class TdsPasswordEncoder {
 	boolean isPasswordValid(String encPass, String rawPass, salt) {
 
 		// checkPassword
-
 		if (encodePassword(rawPass, salt) == encPass) {
 			return true
 		}
 
-		if (SecurityUtil.encryptLegacy(rawPass) != encPass) {
-			return false
+		// check using the legacy method
+		if (SecurityUtil.encryptLegacy(rawPass) == encPass) {
+			return true
 		}
 
-		return true
+		return false
 	}
 }
