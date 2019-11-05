@@ -8,6 +8,7 @@ import com.tdsops.common.sql.SqlUtil
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.Color
 import com.tdsops.tm.enums.domain.SizeScale
+import com.tdsops.tm.enums.domain.ViewSaveAsOptionEnum
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
@@ -37,6 +38,7 @@ import net.transitionmanager.service.dataview.DataviewSpec
 import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
+import org.apache.poi.ss.usermodel.DataValidation
 import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
@@ -118,10 +120,31 @@ class DataviewService implements ServiceMethods {
 		if (!dataview) {
 			throw VIEW_NOT_FOUND_EXCEPTION
 		} else {
-			validateDataviewViewAccessOrException(id, dataview);
+			validateDataviewViewAccessOrException(id, dataview)
 		}
 
 		return dataview
+	}
+
+	Map generateSaveOptions(Dataview dataview, Project project) {
+		List saveAsOptions = []
+		if (project && !project.defaultProject) {
+			saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())
+			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
+				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
+			}
+		}
+		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && project.defaultProject)
+			|| (securityService.hasPermission('AssetExplorerOverrideAllUserProject') && !project.defaultProject)) {
+			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
+				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
+			}
+		}
+		return [
+			"save": dataview.person == securityService.loadCurrentPerson() && securityService.hasPermission('AssetExplorerEdit'),
+			"saveAs": securityService.hasPermission('AssetExplorerSaveAs'),
+			"saveAsOptions": saveAsOptions
+		]
 	}
 
 	/**
