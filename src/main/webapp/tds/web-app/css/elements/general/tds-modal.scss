@@ -13,6 +13,11 @@ tds-ui-dialog {
 			width: unset !important;
 			padding-left: 40px !important;
 
+			// This is necessary to fix a bug with the clarity tabs classes.
+			.active {
+				box-shadow: 0 -3px 0 #0077b8 inset;
+			}
+
 			.modal-body {
 				width: calc(100vw - 40px - 35px - 35px - 22px);
 				padding: 15px 20px 0 22px;
@@ -240,7 +245,7 @@ tds-ui-dialog {
 				border: solid 1px $color-border;
 				border-width: 0 1px 0 0;
 				.btn {
-					color: $color-icon;
+					color: $color--black;
 					height: 40px;
 					margin: 0;
 				}
@@ -274,17 +279,16 @@ tds-ui-dialog {
 .tds-modal-content {
 	background: $color-text-inverse;
 
+	&:focus {
+		outline: unset;
+	}
+
 	.modal-header-height {
 		height: 182px;
 	}
 
 	.modal-header {
 		padding: 24px;
-
-		// This is necessary to fix a bug with the clarity tabs classes.
-		.active {
-			box-shadow: 0 -3px 0 #0077b8 inset;
-		}
 
 		.modal-title-container {
 			display: flex;
