@@ -1127,3 +1127,9 @@ span#addAkaId.addAkaDisabled {
 span#addAkaId:not(.addAkaDisabled) {
 	cursor: pointer;
 }
+
+
+/** Clarity **/
+.btn img {
+    margin-top: -3px;
+}
