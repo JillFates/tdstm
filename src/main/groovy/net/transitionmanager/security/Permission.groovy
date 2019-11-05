@@ -42,6 +42,8 @@ interface Permission {
 			AssetExplorerSystemDelete     =	'AssetExplorerSystemDelete',
 			AssetExplorerSystemEdit		  = 'AssetExplorerSystemEdit',
 			AssetExplorerSystemSaveAs     = 'AssetExplorerSystemSaveAs',
+			AssetExplorerOverrideAllUserGlobal = 'AssetExplorerOverrideAllUserGlobal',
+			AssetExplorerOverrideAllUserProject = 'AssetExplorerOverrideAllUserProject',
 			AssetExplorerPublish     	  = 'AssetExplorerPublish',
 			AssetExplorerUnPublish        = 'AssetExplorerUnPublish',
 			AssetImport                   = 'AssetImport',
