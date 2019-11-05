@@ -155,7 +155,6 @@ declare var jQuery: any;
 					<div class="grid-actions clr-col-8">
 						<div class="btn-sm">
 							<tds-button-add
-								class="float-right button-header-grid"
 								[tooltip]="'Add link to Dependent Asset'"
 								id="dependent-support"
 								(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
