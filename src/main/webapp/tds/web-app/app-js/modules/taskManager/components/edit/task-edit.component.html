@@ -194,7 +194,9 @@
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="dueDate"
+                                                                #dueDate
                                                                 [format]="getDateTimeFormat()"
+                                                                (open)="onOpenDueDate($event)"
                                                                 [(ngModel)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>
