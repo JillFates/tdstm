@@ -1659,7 +1659,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * and an instance of SecureASTCustomizer.
 	 * @see CompilerConfiguration* @see SecureASTCustomizer* @see ImportCustomizer* @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -1687,13 +1687,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,  List, ArrayList, Set, HashSet,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
 				Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
 			].asImmutable()
 		}
