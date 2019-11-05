@@ -556,7 +556,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
 				stripIndent(), ETLProcessor.defaultCompilerConfiguration())
 
-		then: 'a MultipleCompilationErrorsException exception is thrown'
+		then: 'a  no exception is thrown'
 			noExceptionThrown()
 		when: 'A script with a set is allowed'
 			evaluator.evaluate("""
@@ -565,7 +565,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
 				stripIndent(), ETLProcessor.defaultCompilerConfiguration())
 
-		then: 'a MultipleCompilationErrorsException exception is thrown'
+		then: 'a no exception is thrown'
 			noExceptionThrown()
 	}
 
