@@ -17,7 +17,9 @@
 		<p class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">${asset.description}</p>
 		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">
 			<tds-scroller-item>
-				<button tdsScrollerLink>Details</button>
+				<button tdsScrollerLink>
+					{{ showDetails ? "Details" : "Summary"}}
+				</button>
 			</tds-scroller-item>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Supports 					
