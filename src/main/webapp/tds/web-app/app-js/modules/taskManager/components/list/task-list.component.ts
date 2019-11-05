@@ -644,6 +644,13 @@ export class TaskListComponent {
 					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
 				} else {
 					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+					for (let id in this.rowsExpandedMap) {
+						if (id && this.rowsExpandedMap.hasOwnProperty(id) && this.rowsExpandedMap[id]) {
+							let rowObject = new DetailExpandEvent(id);
+							rowObject.dataItem = {id: this.grid.gridData.data[+id].id};
+							this.onRowDetailExpandHandler(rowObject);
+						}
+					}
 				}
 			});
 	}
