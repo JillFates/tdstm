@@ -9,7 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ProjectModel} from '../../model/project.model';
+import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
@@ -39,6 +39,7 @@ export class ProjectViewEditComponent implements OnInit {
 	public availableBundles;
 	public projectId;
 	public projectLogoId;
+	public savedProjectLogoId;
 	public projectGUID;
 	public dateCreated;
 	public lastUpdated;
@@ -68,34 +69,37 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.projectModel = new ProjectModel();
-		let defaultProject = {
-			clientId: 0,
-			projectName: '',
-			description: '',
-			startDate: new Date(),
-			completionDate: new Date(),
-			partners: [],
-			projectLogo: '',
-			projectManagerId: 0,
-			projectCode: '',
-			projectType: 'Standard',
-			comment: '',
-			defaultBundleName: 'TBD',
-			timeZone: '',
-			collectMetrics: true,
-			planMethodology: ''
-		};
-		this.userTimeZone = this.preferenceService.getUserTimeZone();
-		this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
-		this.projectModel = Object.assign({}, defaultProject, this.projectModel);
-		this.file.uploadRestrictions = {
-			allowedExtensions: ['.jpg', '.png', '.gif'],
-			maxFileSize: 50000
-		};
-		this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
-		this.getModel(this.projectId);
-		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+		this.preferenceService.getUserDatePreferenceAsKendoFormat()
+			.subscribe(() => {
+				this.userDateFormat = this.preferenceService.getUserDateFormat().toUpperCase();
+				this.userTimeZone = this.preferenceService.getUserTimeZone();
+				this.projectModel = new ProjectModel();
+				let defaultProject = {
+					clientId: 0,
+					projectName: '',
+					description: '',
+					startDate: new Date(),
+					completionDate: new Date(),
+					partners: [],
+					projectLogo: '',
+					projectManagerId: 0,
+					projectCode: '',
+					projectType: 'Standard',
+					comment: '',
+					defaultBundleName: 'TBD',
+					timeZone: '',
+					collectMetrics: 1,
+					planMethodology: {field: '', label: 'Select...'}
+				};
+				this.projectModel = Object.assign({}, defaultProject, this.projectModel);
+				this.file.uploadRestrictions = {
+					allowedExtensions: ['.jpg', '.png', '.gif'],
+					maxFileSize: 50000
+				};
+				this.file.uploadSaveUrl = '../ws/fileSystem/uploadImageFile'
+				this.getModel(this.projectId);
+				this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+			});
 	}
 
 	// This is a work-around for firefox users
@@ -141,7 +145,7 @@ export class ProjectViewEditComponent implements OnInit {
 				let projectModel = this.projectModel;
 				// Fill the model based on the current person.
 				Object.keys(data.projectInstance).forEach((key) => {
-					if (key in projectModel && data.projectInstance[key]) {
+					if (key in projectModel && data.projectInstance[key] !== null) {
 						projectModel[key] = data.projectInstance[key];
 					}
 				});
@@ -152,22 +156,24 @@ export class ProjectViewEditComponent implements OnInit {
 					this.projectModel.partners.push({id: partner.id, name: partner.name});
 				});
 
-				this.planMethodologies = [];
-				data.planMethodologies.forEach((methodology) => {
-					this.planMethodologies.push(methodology.label);
-				});
-
+				this.planMethodologies = data.planMethodologies ? data.planMethodologies : [];
 				this.possibleManagers = data.possibleManagers ? data.possibleManagers : [];
 				this.projectManagers = data.projectManagers ? data.projectManagers : [];
 				this.clients = data.clients ? data.clients : [];
 				this.client = data.client;
 				this.projectLogoId = data.projectLogoForProject ? data.projectLogoForProject.id : 0;
+				this.savedProjectLogoId = this.projectLogoId;
 				this.projectModel.clientId = data.client ? data.client.id : 0;
 				this.projectModel.startDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.startDate));
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.completionDate = DateUtils.adjustDateTimezoneOffset(new Date(this.projectModel.completionDate));
 				this.projectModel.completionDate.setHours(0, 0, 0, 0);
-				this.projectModel.planMethodology = data.projectInstance ? data.projectInstance.planMethodology : '';
+				let methodologyField = data.projectInstance ? data.projectInstance.planMethodology : '';
+				this.planMethodologies.forEach((methodology) => {
+					if (methodology.field === methodologyField) {
+						this.projectModel.planMethodology = methodology;
+					}
+				});
 				this.projectGUID = data.projectInstance ? data.projectInstance.guid : '';
 				this.dateCreated = data.projectInstance ? data.projectInstance.dateCreated : '';
 				this.lastUpdated = data.projectInstance ? data.projectInstance.lastUpdated : '';
@@ -194,11 +200,14 @@ export class ProjectViewEditComponent implements OnInit {
 	}
 
 	public saveForm(): void {
-		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
-			this.projectModel.startDate.setHours(0, 0, 0, 0);
-			this.projectModel.completionDate.setHours(0, 0, 0, 0);
-			this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
-			this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)
+			&& this.validatePartners(this.projectModel.partners)) {
+			if (this.projectModel.startDate.getHours() > 0 || this.projectModel.completionDate.getHours() > 0) {
+				this.projectModel.startDate.setHours(0, 0, 0, 0);
+				this.projectModel.completionDate.setHours(0, 0, 0, 0);
+				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
+				this.projectModel.completionDate.setMinutes(this.projectModel.completionDate.getMinutes() - this.projectModel.completionDate.getTimezoneOffset());
+			}
 			if (this.projectModel.projectLogo && this.projectModel.projectLogo.name) {
 				this.projectModel.projectLogo = this.projectModel.projectLogo.name;
 			}
@@ -207,12 +216,34 @@ export class ProjectViewEditComponent implements OnInit {
 					this.updateSavedFields();
 					this.editing = false;
 					this.projectLogoId = result.data.projectLogoForProject ? result.data.projectLogoForProject.id : 0;
+					this.savedProjectLogoId = this.projectLogoId;
 					this.retrieveImageTimestamp = (new Date()).getTime();
 
 					this.store.dispatch(new SetProject({id: this.projectId, name: this.projectModel.projectName, logoUrl:  this.projectLogoId ? '/tdstm/project/showImage/' + this.projectLogoId + '?' + this.retrieveImageTimestamp : ''}));
 				}
 			});
 		}
+	}
+
+	/**
+	 * Validates that there are no duplicate partners and no blank partners in the partner list
+	 * @param partnerList - The list of partners from the project model
+	 */
+	public validatePartners(partnerList: any[]): boolean {
+		let partners = [...partnerList];
+		partners.sort((a, b) => (a.id > b.id) ? 1 : -1);
+		let i = 1;
+		for (i = 0; i < partners.length; i++) {
+			if (!partners[i].id) {
+				alert('Partner cannot be blank.');
+				return false;
+			}
+			if (i !== partners.length - 1 && partners[i].id === partners[i + 1].id) {
+				alert('Duplicate partners are not allowed.');
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -342,6 +373,7 @@ export class ProjectViewEditComponent implements OnInit {
 					if (confirm) {
 						this.editing = false;
 						this.projectModel = JSON.parse(JSON.stringify(this.savedModel));
+						this.projectLogoId = this.savedProjectLogoId;
 					}
 				})
 				.catch((error) => console.log(error));

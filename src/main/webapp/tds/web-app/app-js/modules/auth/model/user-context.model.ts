@@ -14,6 +14,7 @@ export class UserContextModel {
 		redirectUrl?: string;
 	};
 	error?: string;
+	alternativeProjects?: [];
 }
 
 export enum USER_CONTEXT_REQUEST {

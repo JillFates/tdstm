@@ -24,7 +24,6 @@ export class AuthRouteStates {
 }
 
 export const LoginRoute: Routes = [
-	{path: '', pathMatch: 'full', redirectTo: AuthRouteStates.LOGIN.url},
 	{
 		path: AuthRouteStates.LOGIN.url,
 		data: {
@@ -54,6 +53,10 @@ export const LoginRoute: Routes = [
 			}
 		},
 		component: ChangePasswordComponent
+	},
+	{
+		path: '**',
+		redirectTo: AuthRouteStates.LOGIN.url
 	}
 ];
 

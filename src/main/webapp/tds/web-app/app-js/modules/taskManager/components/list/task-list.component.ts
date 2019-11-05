@@ -83,7 +83,7 @@ export class TaskListComponent {
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
-		this.gridDefaultSort = [{ field: 'taskNumber', dir: 'asc' }];
+		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;
@@ -640,13 +640,17 @@ export class TaskListComponent {
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
-				// silently load all task action info model, this to improve the performance when opening the task detail row.
 				if (taskId && taskId >= 0) {
 					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
 				} else {
-					result.rows.forEach(taskRow => {
-						this.loadTaskInfoModel(taskRow.id, true).subscribe(() => {/* loaded */});
-					});
+					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+					for (let id in this.rowsExpandedMap) {
+						if (id && this.rowsExpandedMap.hasOwnProperty(id) && this.rowsExpandedMap[id]) {
+							let rowObject = new DetailExpandEvent(id);
+							rowObject.dataItem = {id: this.grid.gridData.data[+id].id};
+							this.onRowDetailExpandHandler(rowObject);
+						}
+					}
 				}
 			});
 	}

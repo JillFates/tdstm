@@ -14,5 +14,4 @@ class CalculateTimelineCommandObject extends ReadTimelineCommandObject {
 	Boolean isRecalculate() {
 		return mode == 'R'
 	}
-
 }

@@ -46,6 +46,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showActive: boolean;
 	private projectToOpen: number;
+	private pageURL: string;
 	private projectOpen = false;
 
 	constructor(
@@ -67,6 +68,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.pageURL = this.router.url;
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
@@ -77,20 +79,23 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngAfterContentInit() {
-		this.route.queryParams.subscribe((params) => {
-			if (params['show']) {
-				setTimeout(() => {
-					this.projectToOpen = +params['show'];
+		this.projectToOpen = +this.route.snapshot.queryParams['show'];
+
+		this.router.events.subscribe(e => {
+			if (this.pageURL === this.router.url) {
+				if (e instanceof NavigationEnd && this.projectToOpen && !this.projectOpen) {
+					this.projectToOpen = this.projectToOpen;
 					this.showProject(this.projectToOpen);
-				});
+				}
+			} else {
+				this.pageURL = '';
 			}
 		});
-		this.router.events.subscribe((event: Event) => {
-				if (event instanceof NavigationEnd && event.url.includes('show=') && this.projectToOpen) {
-					setTimeout(() => {
-						this.showProject(this.projectToOpen);
-					});
-				}
+
+		this.route.queryParams.subscribe((params) => {
+			if (this.projectToOpen && !this.projectOpen) {
+				this.showProject(this.projectToOpen);
+			}
 		});
 	}
 

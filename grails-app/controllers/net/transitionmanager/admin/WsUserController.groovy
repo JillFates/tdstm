@@ -9,6 +9,8 @@ import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventStaff
+import net.transitionmanager.project.ProjectLogo
+import net.transitionmanager.session.SessionContext
 import net.transitionmanager.task.AssetComment
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.ProjectStatus
@@ -98,19 +100,25 @@ class WsUserController implements ControllerMethods {
 
 	/**
 	 * Used by the User Dashboard
-	 * @param id - ID of the user requested
-	 * @return Success structure with person, projects, project instance, and moveday categories
+	 * @param id - ID of the project requested
+	 * @return Success structure with person, projects, project instance, project logo ID and moveday categories
 	 */
-	def modelForUserDashboard(String id) {
+	def modelForUserDashboard(Long id) {
 		Project project
 		Person person = currentPerson()
 
-		if(id && id != "undefined") {
-			project = Project.findById(id.toLong())
-			userPreferenceService.setCurrentProjectId(project.id)
+		if (id) {
+			if (projectService.hasAccessToProject(id)) {
+				project = Project.findById(id)
+				userPreferenceService.setCurrentProjectId(project.id)
+			} else {
+				throw new InvalidParamException('Current user does not have access to project with ID ' + id)
+			}
 		} else {
 			project = getProjectForWs()
 		}
+
+		ProjectLogo projectLogo = ProjectLogo.findByProject(project)
 
 		List projects = [project]
 		List userProjects = projectService.getUserProjects(securityService.hasPermission(Permission.ProjectShowAll), ProjectStatus.ACTIVE)
@@ -122,6 +130,7 @@ class WsUserController implements ControllerMethods {
 				person: person,
 				projects: projects,
 				projectInstance: project,
+				projectLogoId: projectLogo?.id,
 				movedayCategories: AssetComment.moveDayCategories
 		)
 	}
@@ -351,6 +360,27 @@ class WsUserController implements ControllerMethods {
         Person person = personService.updatePerson(settings, true)
         renderSuccessJson(person)
     }
+
+	/**
+	 * Update the user's account to record when the last page was requested
+	 * @param path - (String) the uri path of the page routed to
+	 * @return : json {"successful":true|false} if user is logged in otherwise a error json structure
+	 */
+	@Secured('permitAll')
+	def updateLastPage() {
+		if (securityService.isLoggedIn()) {
+			userService.updateLastPageLoad()
+			renderAsJson(successful:true)
+		} else {
+			// Record the page request (path) to the session if the user isn't logged in so that we can redirect
+			// them later after login.
+			String path = params.get('path')
+			if (path) {
+				SessionContext.setLastPageRequested(session, path)
+			}
+			renderAsJson(successful:false)
+		}
+	}
 
 	@HasPermission(Permission.UserGeneralAccess)
 	def saveDateAndTimePreferences() {

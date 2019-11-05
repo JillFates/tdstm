@@ -524,14 +524,14 @@ class SqlUtil {
 	 */
 	private static void buildInList(FieldSearchData fieldSearchData, String inOp) {
 		def values = []
+
 		fieldSearchData.filter.split('\\|').eachWithIndex{ String value, int index ->
 			// Use underscores to avoid issues when handling sme, potentially conflicting with sme2
 			String namedParameter = "${fieldSearchData.columnAlias}__" + index
 			values << ':' + namedParameter
 			fieldSearchData.addSqlSearchParameter(namedParameter, escapeStringParameter(value))
 		}
-
-		fieldSearchData.sqlSearchExpression = fieldSearchData.whereProperty + ' ' + inOp + ' (' + values.join(', ') + ')'
+		fieldSearchData.sqlSearchExpression = "COALESCE(${fieldSearchData.whereProperty},'') $inOp" + ' (' + values.join(', ') + ')'
 	}
 
 	/**

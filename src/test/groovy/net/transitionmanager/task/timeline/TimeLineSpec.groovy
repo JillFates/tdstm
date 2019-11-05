@@ -9,8 +9,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import java.text.SimpleDateFormat
-
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
@@ -24,11 +22,6 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	@Shared
 	Project project
 
-	@Shared
-	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
-
-	@Shared
-	String aDay = '06/22/2018'
 	/**
 	 * Common TaskVertex Ids used in several test cases.
 	 */
@@ -1150,7 +1143,5 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
-	private Date hourInDay(String dateTime) {
-		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
-	}
+
 }

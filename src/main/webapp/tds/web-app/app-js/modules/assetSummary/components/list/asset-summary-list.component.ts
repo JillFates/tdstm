@@ -95,6 +95,11 @@ export class AssetSummaryListComponent implements OnInit {
 			this.gridData = data;
 
 			// Get the list
+			this.total.application.total = 0;
+			this.total.server.total = 0;
+			this.total.device.total = 0;
+			this.total.database.total = 0;
+			this.total.storage.total = 0;
 			this.gridData.forEach((item: any) => {
 				this.total.application.total += item.application.count;
 				this.total.server.total += item.server.count;

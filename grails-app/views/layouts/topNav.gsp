@@ -1,5 +1,6 @@
 <%@ page import="net.transitionmanager.security.Permission" %>
 <g:set var="licenseCommonService" bean="licenseCommonService"/>
+<g:set var="licenseAdminService" bean="licenseAdminService"/>
 <g:set var="environmentService" bean="environmentService"/>
 <!DOCTYPE html>
 <html>
@@ -15,6 +16,7 @@
     int minPasswordLength = tds.minPasswordLength()
     // Only for environments where the License Manager is true Enabled
     def isLicenseManagerEnabled = licenseCommonService.isManagerEnabled()
+
     def buildInfo = environmentService.getVersionText()
 %>
 <head>
