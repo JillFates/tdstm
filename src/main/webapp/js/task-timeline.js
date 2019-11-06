@@ -77,11 +77,8 @@ function 	buildGraph(response, status) {
 		displayWarningOrErrorMsg(false);
 		return;
 	}
-	if(
-		!data.startDate ||
-		!data.endDate
-	) {
-        return alert('The tasks do not have start and end Date. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');
+	if (!data.startDate || !data.endDate) {
+        return alert('The event is missing the start and/or end date. Please update the event dates and then perform a baseline before continuing.');
 	}
 
 	var items = data.tasks;
