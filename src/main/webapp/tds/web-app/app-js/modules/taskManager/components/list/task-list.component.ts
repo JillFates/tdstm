@@ -335,6 +335,9 @@ export class TaskListComponent {
 	 * @param $event: any
 	 */
 	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.loadTaskInfoModel($event.dataItem.id).subscribe(() => {
+			// loaded.
+		});
 		this.rowsExpandedMap[$event.index] = true;
 	}
 
@@ -666,5 +669,28 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return this.taskActionInfoModels.get(taskId);
+	}
+
+	/**
+	 * Loads Task action information model into the Models Map.
+	 */
+	private loadTaskInfoModel(taskId: string, forceReload = false): Observable<TaskActionInfoModel> {
+		if (!isNaN(taskId as any)) {
+			taskId = taskId.toString();
+		}
+		return new Observable(observer => {
+			if (!this.taskActionInfoModels.has(taskId) || forceReload) {
+				this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+					.subscribe((result: TaskActionInfoModel) => {
+						const taskActionInfoModel = result;
+						this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+						observer.next(result);
+						observer.complete();
+					});
+			} else {
+				observer.next(this.taskActionInfoModels.get(taskId));
+				observer.complete();
+			}
+		});
 	}
 }
