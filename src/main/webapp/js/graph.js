@@ -304,9 +304,9 @@ var GraphUtil = (function ($) {
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
 		if ($('#fullscreenButtonId').hasClass('showMenu'))
-			$('#fullscreenButtonId').children('h4').html('Show Menu');
+			$('#fullscreenButtonId').html('Show Menu');
 		else
-			$('#fullscreenButtonId').children('h4').html('Normal View');
+			$('#fullscreenButtonId').html('Normal View');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -314,7 +314,7 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
-		$('#fullscreenButtonId').children('h4').html('Full Screen');
+		$('#fullscreenButtonId').html('Full Screen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();
 	}
@@ -368,11 +368,11 @@ var GraphUtil = (function ($) {
 		if($('#dependenciesPanelId').size() == 0)
 			return
 		if($('#dependenciesPanelId').has_scrollbar()) {
-			$('.dependency_panel_action_buttons').css('position', 'absolute');
-			$('.dependency_panel_action_buttons').css('bottom', '0');
+			// $('.dependency_panel_action_buttons').css('position', 'absolute');
+			// $('.dependency_panel_action_buttons').css('bottom', '0');
 		} else {
-			$('.dependency_panel_action_buttons').css('position', '');
-			$('.dependency_panel_action_buttons').css('bottom', '5px');
+			// $('.dependency_panel_action_buttons').css('position', '');
+			// $('.dependency_panel_action_buttons').css('bottom', '5px');
 		}
 	};
 

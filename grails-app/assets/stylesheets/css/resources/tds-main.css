@@ -932,11 +932,6 @@ br.page-break-after {
 	width: 300px;
 	height: 20px;
 }
-.tabs .tabControls {
-	display: inline;
-	width: 100px;
-	height: 20px;
-}
 
 .disabledButton input{
 	color:gray;

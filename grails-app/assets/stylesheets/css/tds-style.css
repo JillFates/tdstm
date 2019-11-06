@@ -750,16 +750,22 @@ div.graphContainer {
           height: 22px; }
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
-      border: 1px solid #008000;
+      border: 1px solid #0077b8;
       margin-left: 0px;
       margin-top: 0px;
       padding: 5px;
       background-color: white;
       position: absolute;
       padding-top: 10px;
-      z-index: 1; }
+      z-index: 1;
+      overflow-y: scroll;
+      height: 430px;
+      max-height: 430px; }
+      div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
+        width: 0px; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
-        display: block; }
+        display: block;
+        z-index: 1000; }
       div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
         display: none; }
       div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
@@ -866,7 +872,7 @@ div.graphContainer {
         text-align: center;
         width: 40px; }
   div.graphContainer div#svgContainerId {
-    border: 1px solid green;
+    border: 1px solid #0077b8;
     border-width: 1px;
     padding: 0px !important;
     margin: 0px !important;
@@ -900,8 +906,6 @@ div.graphContainer.fullscreen {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
-      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId #fullscreenButtonId {
-        background-image: url(../icons/layout_content.png); }
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
       top: 25px;
@@ -2202,8 +2206,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
   cursor: pointer; }
 
 div #dependecy-control {
-  height: calc(100% - 30px);
+  height: calc(100% - 50px);
   overflow: auto; }
+  div #dependecy-control::-webkit-scrollbar {
+    width: 0px; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;
