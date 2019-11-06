@@ -8,6 +8,7 @@ import com.tdsops.etl.ProgressCallback
 import com.tdsops.etl.RowResult
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.FileSystemUtil
@@ -24,6 +25,8 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
@@ -76,6 +79,8 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	ProjectService projectService
 	AssetService assetService
 	CustomDomainService customDomainService
+	EmailDispatchService emailDispatchService
+	ImportBatchService importBatchService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -708,6 +713,11 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
 
+		batch.refresh()
+		if (batch.sendNotification) {
+			sendNotification(batch, context)
+		}
+
 		//log.info "processBatch({}) finished in {} and processed {} records", batchId, stopwatch.endDuration(), rowsProcessed
 
 		// TODO : JPM 3/2018 : Fix the batch status update after processing
@@ -925,6 +935,65 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		} else {
 			log.info "Record saved in database ID: ${record?.id}"
 		}
+	}
+
+	@Transactional(noRollbackFor=[Throwable])
+	void sendNotification(ImportBatch batch, Map context) {
+
+		try {
+			// Check if all the ImportBatch records created together in the auto-process
+			// are already finished
+			int count = ImportBatch.where {
+				groupGuid == batch.groupGuid
+				id != batch.id
+				status in [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.RUNNING]
+			}.count()
+
+			if (count == 0){
+
+				Map<String, ?> batchesWithSummary = importBatchService.findBatchesWithSummary(batch.project, null, null, batch.groupGuid)
+				List<Map<String, ?>> batchesModel = batchesWithSummary.values().collect { Map<String, ?> batchSummary ->
+					[
+						id       : batchSummary.id,
+						status   : batchSummary.status.label,
+						domain   : batchSummary.domainClassName,
+						records  : batchSummary.recordsSummary.count,
+						processed: batchSummary.recordsSummary.processed,
+						pending  : batchSummary.recordsSummary.pending,
+						erred    : batchSummary.recordsSummary.erred,
+						ignored  : batchSummary.recordsSummary.ignored,
+						inserted : batchSummary.recordsSummary.inserted,
+						updated  : batchSummary.recordsSummary.updated,
+						deleted  : batchSummary.recordsSummary.deleted,
+						unchanged: batchSummary.recordsSummary.unchanged,
+						tbd      : batchSummary.recordsSummary.tbd
+					]
+				}
+
+				String paramsJson = ([batches: batchesModel] as JSON).toString()
+				EmailDispatch ed = new EmailDispatch()
+				ed.origin = EmailDispatchOrigin.TASK
+				ed.subject = 'TransitionManager Import Batch Summary'
+				ed.bodyTemplate = 'batchPostingResults'
+				ed.paramsJson = paramsJson
+				ed.fromAddress = context.whom.email
+				ed.toAddress = context.whom.email
+				ed.toPerson = context.whom
+				ed.createdBy = context.whom
+
+				if (ed.validate()){
+					ed.save()
+					emailDispatchService.createEmailJob(ed, [
+						person : context.whom.email,
+					])
+				}
+			}
+
+		} catch(Throwable throwable){
+
+			log.error ExceptionUtil.stackTraceToString("Failed to send email notification for import batch processing for batchId: ${batch.id} and groupGuid: ${batch.groupGuid}", throwable), throwable
+		}
+
 	}
 
 	/**
@@ -1789,11 +1858,11 @@ class DataImportService implements ServiceMethods, EventPublisher {
 	 * @param project
 	 * @param dataScriptId
 	 * @param filename
-	 * @param sendResultsByEmail
+	 * @param sendNotification
 	 * @return Map - containing the progress key created to monitor the job execution progress
 	 */
 	@NotTransactional()
-	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename, Boolean sendResultsByEmail = false) {
+	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename, Boolean sendNotification = false) {
 		DataScript dataScript = null
 		String errorMsg = null
 
@@ -1834,7 +1903,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 		trigger.jobDataMap.dataScriptId = dataScriptId
 		trigger.jobDataMap.filename = filename
 		trigger.jobDataMap.progressKey = key
-		trigger.jobDataMap.sendResultsByEmail = sendResultsByEmail
+		trigger.jobDataMap.sendNotification = sendNotification
 		trigger.jobDataMap.userLogin = securityService.loadCurrentPerson().userLogin
 		trigger.setJobName('ETLTransformDataJob')
 		trigger.setJobGroup('tdstm-etl-transform-data')
