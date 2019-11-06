@@ -1,5 +1,14 @@
 /* Cookbook */
 
+.cookbook_recipes_editor,
+.recipeDetail {
+  .clr-select-wrapper {
+    display: block;
+    select {
+      display: inherit;
+    }
+  }
+}
 .taskGeneration {
   .container-fluid {
     padding-left: 0px;
