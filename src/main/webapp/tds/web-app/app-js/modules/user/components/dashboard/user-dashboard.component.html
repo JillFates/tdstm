@@ -228,8 +228,7 @@
 							let dataItem;
 							let rowIndex = rowIndex
 						"
-						class="btn-group btn-link btn-sm"
-					>
+						class="btn-group btn-link btn-sm">
 						<button
 							class="btn btn-primary"
 							*ngIf="
@@ -316,10 +315,10 @@
 						format="{{ column.format }}"
 						[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
 						[class]="column.property == 'status' ? 'status-column' : ''">
+
 						<ng-template kendoGridHeaderTemplate>{{ column.label }}</ng-template>
 
 						<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
-
 							<div class="optionsButton" *ngIf="column.property == 'action'">
 								<span class="glyphicon glyphicon-option-vertical" (click)="items = [{ text: 'Data goes here' }]"></span>
 							</div>
@@ -328,13 +327,6 @@
 								{{ dataItem[column.property] }}
 							</a>
 
-							<!--
-							<span
-								*ngIf="column.property != 'action' && column.property != 'related'"
-								[class]="column.property == 'status' ? dataItem.css : '' ">
-								{{ dataItem[column.property] }}
-							</span>
-							-->
 							<span *ngIf="!['action', 'related', 'status'].includes(column.property)">
 								{{ dataItem[column.property] }}
 							</span>
@@ -350,9 +342,9 @@
 									</span>
 									{{ dataItem[column.property] }}
 								</span>
-								<span *ngSwitchDefault>{{ dataItem[column.property] }}</span>
 							</div>
 						</ng-template>
+
 					</kendo-grid-column>
 				</kendo-grid>
 
