@@ -18,9 +18,8 @@
                             <tr class="no-grow-container">
                                 <td class="task-details" colspan="2">
                                     <div class="btn-collapsed-fixed-right">
-                                        <button class="btn btn-default" (click)="onCollapseTaskDetail()">
-                                            <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
-                                        </button>
+                                        <tds-button-collapse [displayLabel]="false"  *ngIf="!collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-collapse>
+                                        <tds-button-expand  [displayLabel]="false" *ngIf="collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-expand>
                                     </div>
                                     <div class="dialog">
                                         <table>

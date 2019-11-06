@@ -29,7 +29,9 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-filter,
 		tds-button-save,
 		tds-button-undo,
-		tds-button-script
+		tds-button-script,
+		tds-button-collapse,
+		tds-button-expand
 	`,
 	template: `
 		<tds-button
