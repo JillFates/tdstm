@@ -576,17 +576,17 @@ class MoveEventService implements ServiceMethods {
 						else
 						  null
 						end
-					) as estFinish,
+					) as maxEstFinish,
 					sum( case when t.dateResolved is null then 1 else 0 end ) as remainingTasks,
 					sum( case when t.dateResolved is null then 0 else 1 end ) as completedTasks,
 					count(*) as totalTasks
-				from AssetComment t
+				from Task t
 				where t.moveEvent =:moveEvent 
 					and t.category is not null
 					${ (! viewUnpublished ? 'and t.isPublished = true' : '') }
 				group by t.category
 				order by minEstStart, category
-			""".stripIndent().toString()
+			"""
 
 		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
