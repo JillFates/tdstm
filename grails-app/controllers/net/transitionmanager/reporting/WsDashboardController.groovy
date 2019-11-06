@@ -16,7 +16,7 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-
+import net.transitionmanager.command.dashboard.InsightDataCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
@@ -24,7 +24,6 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
@@ -33,10 +32,11 @@ import org.springframework.jdbc.core.JdbcTemplate
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class WsDashboardController implements ControllerMethods {
 
-	JdbcTemplate jdbcTemplate
-	TaskService taskService
-	MoveEventService moveEventService
+	JdbcTemplate        jdbcTemplate
+	TaskService         taskService
+	MoveEventService    moveEventService
 	CustomDomainService customDomainService
+	InsightService      insightService
 
 	/**
 	 * Returns the data used to render the Event Dashboard including the work flow steps and the statistics of
@@ -629,5 +629,24 @@ class WsDashboardController implements ControllerMethods {
 				analysis : analysis,
 				execution : execution
 		])
+	}
+
+	/**
+	 * Action to return data for the Insight dashboard.
+	 *
+	 * @return returns a JSON map of data containing assetsByVendor, dependenciesByVendor, topTags, and applicationsGroupedByDependencies
+	 */
+	def insightData() {
+		InsightDataCommand context = populateCommandObject(InsightDataCommand)
+		validateCommandObject(context)
+
+		Project project = securityService.userCurrentProject
+
+		render view: "/common/mapAsJson", model: [data: [
+			assetsByVendor                   : insightService.assetsByVendor(project, context.max),
+			dependenciesByVendor             : insightService.dependenciesByVendor(project, context.max),
+			topTags                          : insightService.topTags(project, context.max),
+			applicationsGroupedByDependencies: insightService.applicationsGroupedByDependencies(project, context.lowRange, context.highRange),
+		]]
 	}
 }
