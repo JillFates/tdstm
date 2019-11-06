@@ -31,6 +31,7 @@ export const TDSAppRoute: Routes = [
 	{path: 'reports', loadChildren: '../modules/reports/reports.module#ReportsModule'},
 	{path: 'taskManager', loadChildren: '../modules/taskManager/task-manager.module#TaskManagerModule'},
 	{path: 'export', loadChildren: '../modules/export/export.module#ExportModule'},
+	{path: '**', redirectTo: 'auth' },
 ];
 
 @NgModule({

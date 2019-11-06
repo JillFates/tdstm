@@ -16,6 +16,7 @@ import {UserService} from './service/user.service';
 import {AuthGuardService} from './service/auth.guard.service';
 import {LoginService} from './service/login.service';
 import {PermissionService} from '../../shared/services/permission.service';
+import {PageService} from './service/page.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
@@ -42,7 +43,8 @@ import {SelectProjectModalComponent} from '../project/components/select-project-
 		PermissionService,
 		UserContextService,
 		AuthGuardService,
-		LoginService
+		LoginService,
+		PageService
 	],
 	declarations: [
 		LoginComponent,

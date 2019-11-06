@@ -19,7 +19,7 @@ export class RouterUtils {
 		if (!value || value.length === 0) {
 			return false;
 		}
-		if (value.indexOf('module') >= 0) {
+		if (value.indexOf('/module/') >= 0) {
 			return true;
 		}
 		return false;
@@ -29,13 +29,24 @@ export class RouterUtils {
 	 * Creates from an string a valid Angular Route
 	 * @param value of the full URL
 	 */
-	public static getAngularRoute(value: string): string[] {
+	public static getAngularRoute(value: string): any {
 		let fullPath = [];
+		let queryParams = {};
 		const angularPath = value.split('/module/')[1];
 		angularPath.split('/').forEach((path) => {
+			// Strip off the ?queryString if it exists
+			if (path.lastIndexOf('?') > 0) {
+				let matches = path.split('?');
+				path = matches[0];
+				matches[1].split('&').forEach( (nameValue) => {
+					let match = nameValue.split('=');
+					queryParams[match[0]] = match[1];
+				});
+			}
 			fullPath.push(path);
 		});
-		return fullPath;
+
+		return {path:fullPath, queryString:queryParams};
 	}
 
 	public static getLegacyRoute(value: string): string {

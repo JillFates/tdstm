@@ -8,6 +8,7 @@ import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.JsonUtil
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.web.authentication.AjaxAwareAuthenticationSuccessHandler
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -20,8 +21,10 @@ import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.security.SecurityService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
+import net.transitionmanager.session.SessionContext
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
+import org.springframework.security.web.savedrequest.DefaultSavedRequest
 import org.springframework.util.Assert
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
@@ -33,10 +36,44 @@ import javax.servlet.http.HttpSession
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
 	AuditService auditService
+	GrailsApplication grailsApplication
 	SecurityService securityService
 	UserPreferenceService userPreferenceService
 	UserService userService
 	NoticeService noticeService
+
+	// This is a list of the legacy pages that we can allow the user to redirect to after login. Spring Security
+	// records all page requests when the user is not logged in, including Ajax calls. Therefore we need this list
+	// to know what are acceptable to route to post login. As we refactor the pages to Angular they should be removed
+	// from this list.
+	static final List<String> LEGACY_PAGE_LIST = [
+			'/admin/exportAccounts',
+			'/admin/home',
+			'/admin/importAccounts',
+			'/assetEntity/architectureViewer',
+			'/assetEntity/assetImport',
+			'/assetEntity/assetOptions',
+			'/assetEntity/importTask',
+			'/cookbook/index',
+			'/dataTransferBatch/list',
+			'/manufacturer/list',
+			'/model/importExport',
+			'/model/list',
+			'/moveBundle/dependencyConsole',
+			'/moveEvent/exportRunbook',
+			'/newsEditor/newsEditorList',
+			'/partyGroup/list',
+			'/permissions/show',
+			'/person/list',
+			'/person/manageProjectStaff',
+			'/project/userActivationEmailsForm',
+			'/rackLayouts/create',
+			'/room/list',
+			'/task/listUserTasks',
+			'/task/taskGraph',
+			'/task/taskTimeline',
+			'/userLogin/list'
+	]
 
 	@Transactional
 	void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth)
@@ -79,7 +116,6 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				}
 			}
 
-
 			// This map will contain all the user-related data that needs to be sent in the response's payload.
 			Map signInInfoMap = [
 				userContext: userService.getUserContext(alternativeProjects).toMap(),
@@ -87,12 +123,13 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 			]
 
 			if (securityService.shouldLockoutAccount(userLogin)) {
-				// lock account
+				// Lockout the user account
 				userService.lockoutAccountByInactivityPeriod(userLogin)
 				setAccountLockedOutAttribute(request)
 
+				String redirectUrl = grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)
 				signInInfoMap.notices = [
-					redirectUrl: '/module/auth/login'
+					redirectUrl: redirectUrl
 				]
 			} else {
 				userService.updateLastLogin(userLogin)
@@ -114,7 +151,18 @@ class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHand
 				} else if (userLogin.forcePasswordChange == 'Y') {
 					redirectUri = "/module/auth/changePassword"
 				} else {
-					redirectUri = authentication.savedUrlForwardURI ?: authentication.targetUri ?: redirectToPrefPage(project)
+					// The following will attempt to get the URL to redirect the user to from the /ws/user/lastPageUpdate
+					// endpoint. If one was not set then we'll set the user's preferred page.
+					redirectUri = SessionContext.getLastPageRequested(request.getSession())
+					if (! redirectUri) {
+						String springLastUriRequest = ((DefaultSavedRequest)request.getSession().getAttribute('SPRING_SECURITY_SAVED_REQUEST'))?.servletPath
+						// Check if the URL recorded by Spring matches those we know to be legacy web pages
+						if ( springLastUriRequest && LEGACY_PAGE_LIST.find { it.startsWith(springLastUriRequest) }) {
+							redirectUri = '/tdstm' + springLastUriRequest
+						} else {
+							redirectUri = redirectToPrefPage(project)
+						}
+					}
 				}
 
 				// check if user has unacknowledged notices, if so, redirect user to notices page only if the user has a selected project.
