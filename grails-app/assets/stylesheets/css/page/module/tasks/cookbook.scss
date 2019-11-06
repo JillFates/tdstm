@@ -1,5 +1,32 @@
 /* Cookbook */
 
+.code-diff-modal {
+  .modal-dialog {
+    width: 1060px;
+  }
+}
+
+.modal-dialog-fullscreen {
+  .tds-modal-content {
+    height: 100%;
+    .modal-body {
+      max-height: 100%;
+      .CodeMirror {
+        height: 100% !important;
+        .CodeMirror-linenumber {
+          margin-top: -4px;
+        }
+      }
+    }
+  }
+}
+
+.code-editor-modal {
+  .modal-body {
+    padding: 15px !important;
+  }
+}
+
 .cookbook_recipes_editor,
 .recipeDetail {
   .clr-select-wrapper {
