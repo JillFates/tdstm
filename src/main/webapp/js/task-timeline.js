@@ -78,7 +78,7 @@ function 	buildGraph(response, status) {
 		return;
 	}
 	if (!data.startDate || !data.endDate) {
-        return alert('The event is missing the start and/or end date. Please update the event dates and then perform a baseline before continuing.');
+        return alert('The event is missing the start and/or end dates. Please update the event dates and then perform a baseline of the plan before continuing.');
 	}
 
 	var items = data.tasks;
