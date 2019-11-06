@@ -16,16 +16,16 @@
                     <table style="border: 0;" class="full-height">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
-                                <td class="task-details" colspan="2">
+                                <td colspan="2">
                                     <div class="btn-collapsed-fixed-right">
                                         <tds-button-collapse [displayLabel]="false"  *ngIf="!collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-collapse>
                                         <tds-button-expand  [displayLabel]="false" *ngIf="collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-expand>
                                     </div>
                                     <div class="dialog">
-                                        <table>
+                                        <table class="task-details">
                                             <tbody>
                                                 <tr class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label style="min-width: 104px;"><span>Task # {{model.taskNumber}}</span></label>
                                                     </td>
                                                     <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
@@ -33,15 +33,15 @@
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Person</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.assignedTo && model.assignedTo.text || ''}}</span></td>
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Team</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.assignedTeam && model.assignedTeam.text || ''}}</span></td>
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Event</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.event && model.event.text || ''}}</span></td>
@@ -50,36 +50,36 @@
 
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-	                                                <td class="label N" nowrap="nowrap">
+	                                                <td class="N" nowrap="nowrap">
                                                         <label><span>Fixed Assignment</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.hardAssigned}}</span></td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Send Notification</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <span>{{ model.sendNotification }}</span>
                                                     </td>
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Action</span></label>
                                                     </td>
                                                     <td class="valueNW"><a (click)="openTaskActionSummaryDetailHandler()">{{model.apiAction && model.apiAction.text || ''}}</a></td>
                                                 </tr>
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Category</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.category}}</span></td>
-                                                    <td class="label url N" nowrap="nowrap">
+                                                    <td class="url N" nowrap="nowrap">
                                                         <label><span>Asset class</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <span>{{ model.assetClass && model.assetClass.text || ''}}</span>
                                                     </td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Asset</span></label>
                                                     </td>
                                                     <td class="valueNW"><a (click)="onOpenLinkAsset()">{{model.asset && model.asset.text}}</a></td>
@@ -87,19 +87,19 @@
 
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label url N" nowrap="nowrap">
+                                                    <td class="url N" nowrap="nowrap">
                                                         <label><span>Instruction Link</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <span><tds-url-viewer *ngIf="model.instructionLink" [model]="model.instructionLink"></tds-url-viewer></span>
                                                     </td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Priority</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.priority}}</span></td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Due Date</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.dueDate || ''}}</span></td>
@@ -107,17 +107,17 @@
 
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Estimated Duration</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.durationText}}</span>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Estimated Start</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.estimatedStart || ''}}</span></td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Estimated Finish</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.estimatedFinish || ''}}</span></td>
@@ -126,18 +126,18 @@
 
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Actual Start</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.actualStart || ''}}</span></td>
 
-                                                     <td class="label N" nowrap="nowrap">
+                                                     <td class="N" nowrap="nowrap">
 														<label><span>Actual Finish</span></label>
 														</td>
 														<td class="valueNW"><span>{{model.actualFinish || ''}}</span>
                                                      </td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Actual Duration</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.actualDuration}}</span></td>
@@ -149,21 +149,21 @@
 
                                                 </tr>
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                     <td class="label N" nowrap="nowrap">
+                                                     <td class="N" nowrap="nowrap">
 													  <label><span>Status</span></label>
 												  </td>
 												  <td class="valueNW task-{{model.status |  lowercase}}">
 													  <span>{{model.status}}</span>
 												  </td>
 
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                         <label><span>Duration Delta</span></label>
                                                     </td>
                                                     <td class="valueNW"><span>{{model.durationDelta}}</span></td>
                                                 </tr>
 
                                                 <tr *ngIf="!collapsedTaskDetail" class="prop">
-                                                    <td class="label N" nowrap="nowrap">
+                                                    <td class="N" nowrap="nowrap">
                                                          <label><span>Completion %:</span></label>
                                                     </td>
                                                     <td class="valueNW">
