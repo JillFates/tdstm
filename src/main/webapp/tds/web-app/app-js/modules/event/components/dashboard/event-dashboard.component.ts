@@ -109,7 +109,8 @@ export class EventDashboardComponent implements OnInit {
 					id,
 					this.userTimeZone,
 					this.eventDetails.moveEvent.estStartTime,
-					this.eventDetails.moveEvent.estCompletionTime)
+					this.eventDetails.moveEvent.estCompletionTime,
+					this.includeUnpublished)
 				.subscribe((data: any[]) => {
 					this.taskCategories = data;
 				});
