@@ -77,6 +77,14 @@ class MoveEventService implements ServiceMethods {
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
 														'actStart', 'actFinish']
 
+	// Positions in query results for the getTaskCategoriesStats method
+	private static final Integer MAX_ACTUAL_FINISH = 3
+	private static final Integer MAX_PLANNED_FINISH = 4
+	private static final Integer MAX_EST_FINISH = 5
+	private static final Integer REMAINING_TASKS = 6
+	private static final Integer COMPLETED_TASKS = 7
+	private static final Integer TOTAL_TASKS = 8
+
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
 	TagEventService       tagEventService
@@ -89,7 +97,6 @@ class MoveEventService implements ServiceMethods {
 		save me, true
 		me
 	}
-
 
 	/**
 	 * Create or update a MoveEvent based on the given CommandObject.
@@ -537,71 +544,70 @@ class MoveEventService implements ServiceMethods {
 
 
 	/**
-	 * Find the stats for all the task categories on the event.
+	 * Find the stats for all the tasks by category for the event
 	 * @param project  The {@code Project} to which the event belongs to.
-	 * @param moveEventId  The id of the event.
+	 * @param eventId  The id of the event
+	 * @param viewUnpublished - flag to indicate if unpublished tasks should be included in the results when true
 	 * @return a list with the task category stats
 	 */
-	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
+	List<Map> getTaskCategoriesStats(Project project, Long eventId, Boolean viewUnpublished) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
-		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
+		MoveEvent moveEvent = get(MoveEvent, eventId, project, true)
 		// Query the database for the min/max values and counts for the tasks in the event, grouped by category.
 		String hql = """
-					select 
-						t.category as category,
-						min(t.actStart) as minActStart,
-						min(t.estStart) as minEstStart,
-						max(t.dateResolved) as maxActFinish,
-						max(t.latestFinish) as maxPlannedFinish,
-						max( case when t.dateResolved is null 
+				select 
+					t.category as category,
+					min(case when t.actStart is null then t.dateResolved else t.actStart end) as minActualStart,
+					min(t.estStart) as minEstStart,
+					max(t.dateResolved) as maxActualFinish,
+					max(t.latestFinish) as maxPlannedFinish,
+					max( case when t.dateResolved is null 
+						then 
+							case when t.actStart is null 
 							then 
-								case when t.actStart is null 
-								then 
-									case when t.latestStart >= NOW() then 
-										FROM_UNIXTIME( UNIX_TIMESTAMP(t.latestStart) + COALESCE(t.duration,0)*60 )
-									else
-										FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) + COALESCE(t.duration,0)*60 )
-									end
+								case when t.latestStart >= NOW() then 
+									FROM_UNIXTIME( UNIX_TIMESTAMP(t.latestStart) + COALESCE(t.duration,0)*60 )
 								else
-									FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 ) 
+									FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) + COALESCE(t.duration,0)*60 )
 								end
 							else
-							  null
+								FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 ) 
 							end
-						) as maxEstFinish,
-						sum(case when t.dateResolved is null then 1 else 0 end) as remainingTasks,
-						sum(case when t.dateResolved is not null then 1 else 0 end) as completedTasks,
-						case when (count(*) > 0) then (sum(case when t.dateResolved is not null then 1 else 0 end)/count(*)*100) else 100 end as percComp,
-						count(*) as totalTasks
-						from Task t
-						where t.moveEvent =:moveEvent
-					group by t.category
-				"""
+						else
+						  null
+						end
+					) as estFinish,
+					sum( case when t.dateResolved is null then 1 else 0 end ) as remainingTasks,
+					sum( case when t.dateResolved is null then 0 else 1 end ) as completedTasks,
+					count(*) as totalTasks
+				from AssetComment t
+				where t.moveEvent =:moveEvent 
+					and t.category is not null
+					${ (! viewUnpublished ? 'and t.isPublished = true' : '') }
+				group by t.category
+				order by minEstStart, category
+			""".stripIndent().toString()
 
 		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
 		List<Map> stats = []
-		taskCategoriesStatsList.each { categoryStats ->
-			// Only add to the results if there are any tasks for the category
-			if (categoryStats[7] ) {
-				stats << [
-					"category": 			categoryStats[0],
-					"minActStart": 			categoryStats[1],
-					"minEstStart": 			categoryStats[2],
-					"maxActFinish": 		categoryStats[3],
-					"maxPlannedFinish": 	categoryStats[4],
-					"maxEstFinish": 		categoryStats[5],
-					"remainingTasks":		categoryStats[6],
-					"completedTasks": 		categoryStats[7],
-					"percComp": 			categoryStats[8],
-					"totalTasks": 			categoryStats[9],
-					"color":				calculateColumnColor(categoryStats)
-				]
-			}
-			// Sort by the category "natural" sort order
-			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
-		}
+		Date now = new Date()
 
+		taskCategoriesStatsList.each { categoryStats ->
+			stats << [
+				"category": 			categoryStats[0],
+				"minActStart": 			categoryStats[1],
+				"minEstStart": 			categoryStats[2],
+				"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
+				"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
+				"maxEstFinish": 		categoryStats[MAX_EST_FINISH],
+				"remainingTasks":		categoryStats[REMAINING_TASKS],
+				"completedTasks": 		categoryStats[COMPLETED_TASKS],
+				"totalTasks": 			categoryStats[TOTAL_TASKS],
+				"percComp": 			Math.round(categoryStats[COMPLETED_TASKS] / categoryStats[TOTAL_TASKS] * 100),
+				"color":				calculateColumnColor(categoryStats, now)
+			]
+		}
 		return stats
 	}
 
@@ -611,19 +617,22 @@ class MoveEventService implements ServiceMethods {
 	 * @param categoryStats - The properties for the category
 	 * @return - The calculated color for the category column.
 	 */
-	private String calculateColumnColor(categoryStats) {
-		Long remainingTasks = categoryStats[6]
-		Date maxPlannedFinish = categoryStats[4]
-		Date maxActualFinish = categoryStats[3]
-		Date maxEstFinish = categoryStats[5]
+	private String calculateColumnColor(Object[] categoryStats, Date now) {
+		Long remainingTasks = categoryStats[REMAINING_TASKS]
+		Date maxPlannedFinish = categoryStats[MAX_PLANNED_FINISH]
+		Date maxActualFinish = categoryStats[MAX_ACTUAL_FINISH]
+		Date maxEstFinish = categoryStats[MAX_EST_FINISH]
 
 		String color = ""
-		if ((remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) || (remainingTasks > 0 && maxEstFinish <= maxPlannedFinish)) {
+		if (remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) {
+			color = '#24488A'
+		} else if (remainingTasks > 0 && maxEstFinish <= maxPlannedFinish) {
 			color = "green"
-		} else if (remainingTasks == 0 && maxActualFinish > maxPlannedFinish) {
+		} else if ( (remainingTasks == 0 && maxActualFinish > maxPlannedFinish) || ( remainingTasks > 0 && maxPlannedFinish < now ) ) {
 			color = "red"
 		} else {
 			color = "yellow"
 		}
+		return color
 	}
 }

@@ -33,7 +33,7 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
-	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/moveEvent/taskCategoriesStats`;
+	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/event/taskCategoriesStats`;
 	private readonly categories = [
 		'Step',
 		'',
@@ -384,8 +384,8 @@ export class EventsService {
  	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Category status details
 	*/
-	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
+	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any, viewUnpublished: boolean): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}?viewUnpublished=${viewUnpublished ? 1 : 0}`)
 			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}

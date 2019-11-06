@@ -1,6 +1,6 @@
 <div class="event-resume-component" *ngIf="event">
     <div class="event-description">{{event.description}}</div>
-    <div class="event-start-date">{{event.startDate | tdsDateTime: userTimeZone: dateTimeFormat}}</div>
+    <div class="event-start-date">{{event.startDatePrefix}} {{event.startDate | tdsDateTime: userTimeZone: dateTimeFormat}}</div>
     <div class="event-daytime">{{event.dayTime}}</div>
     <div class="after-results">
         <div class="event-units">
