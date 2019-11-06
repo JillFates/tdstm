@@ -946,6 +946,7 @@ td .label_sm {
 }
 
 .tabInner {
+	margin-top: 10px;
 	clear: both;
 	border: 1px solid #aaa;
 	overflow: hidden;

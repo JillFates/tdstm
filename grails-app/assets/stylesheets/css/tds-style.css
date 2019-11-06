@@ -200,7 +200,6 @@ svg {
 
 div.modal-dialog {
   padding: 0px;
-  margin: unset !important;
   visibility: visible; }
   div.modal-dialog.modal-xlg {
     width: 1065px; }
@@ -750,16 +749,22 @@ div.graphContainer {
           height: 22px; }
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
-      border: 1px solid #008000;
+      border: 1px solid #0077b8;
       margin-left: 0px;
       margin-top: 0px;
       padding: 5px;
       background-color: white;
       position: absolute;
       padding-top: 10px;
-      z-index: 1; }
+      z-index: 1;
+      overflow-y: scroll;
+      height: 430px;
+      max-height: 430px; }
+      div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
+        width: 0px; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
-        display: block; }
+        display: block;
+        z-index: 1000; }
       div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
         display: none; }
       div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
@@ -866,7 +871,7 @@ div.graphContainer {
         text-align: center;
         width: 40px; }
   div.graphContainer div#svgContainerId {
-    border: 1px solid green;
+    border: 1px solid #0077b8;
     border-width: 1px;
     padding: 0px !important;
     margin: 0px !important;
@@ -900,8 +905,6 @@ div.graphContainer.fullscreen {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
-      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId #fullscreenButtonId {
-        background-image: url(../icons/layout_content.png); }
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
       top: 25px;
@@ -2202,8 +2205,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
   cursor: pointer; }
 
 div #dependecy-control {
-  height: calc(100% - 30px);
+  height: calc(100% - 50px);
   overflow: auto; }
+  div #dependecy-control::-webkit-scrollbar {
+    width: 0px; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;
@@ -2502,6 +2507,13 @@ div.content-wrapper div.execution-phase-wrapper {
       flex-basis: 49%; } }
 
 /* Cookbook */
+.cookbook_recipes_editor .clr-select-wrapper,
+.recipeDetail .clr-select-wrapper {
+  display: block; }
+  .cookbook_recipes_editor .clr-select-wrapper select,
+  .recipeDetail .clr-select-wrapper select {
+    display: inherit; }
+
 .taskGeneration .container-fluid {
   padding-left: 0px; }
 
@@ -2527,3 +2539,101 @@ div.content-wrapper div.execution-phase-wrapper {
 .layout-top-nav .main-header > .navbar {
   margin: 0;
   width: 100%; }
+
+/* Clarity */
+.cookbook_recipes_editor .gridStyle,
+.cookbook_recipes_editor .gridStyleTasks,
+.cookbook_recipes_editor .gridStyleGroups,
+.recipeDetail .gridStyle,
+.recipeDetail .gridStyleTasks,
+.recipeDetail .gridStyleGroups {
+  border: none;
+  background: none; }
+  .cookbook_recipes_editor .gridStyle .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleTasks .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleGroups .ngTopPanel,
+  .recipeDetail .gridStyle .ngTopPanel,
+  .recipeDetail .gridStyleTasks .ngTopPanel,
+  .recipeDetail .gridStyleGroups .ngTopPanel {
+    background-color: #d9e4ea; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar {
+      margin-top: 10px;
+      height: 13px !important;
+      background-color: #656565; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText {
+      text-align: center;
+      font-weight: 500;
+      font-size: 11px;
+      color: #3c8dbc; }
+  .cookbook_recipes_editor .gridStyle .ngRow,
+  .cookbook_recipes_editor .gridStyleTasks .ngRow,
+  .cookbook_recipes_editor .gridStyleGroups .ngRow,
+  .recipeDetail .gridStyle .ngRow,
+  .recipeDetail .gridStyleTasks .ngRow,
+  .recipeDetail .gridStyleGroups .ngRow {
+    border: 1px solid #d9e4ea;
+    background: none; }
+    .cookbook_recipes_editor .gridStyle .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow.selected,
+    .recipeDetail .gridStyle .ngRow.selected,
+    .recipeDetail .gridStyleTasks .ngRow.selected,
+    .recipeDetail .gridStyleGroups .ngRow.selected {
+      background-color: #c9dde1; }
+    .cookbook_recipes_editor .gridStyle .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyle .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngRow .ngVerticalBar {
+      width: 0px !important; }
+
+div.clr-select-wrapper {
+  max-height: 1rem;
+  display: inline-block;
+  position: relative;
+  white-space: nowrap; }
+  div.clr-select-wrapper select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: 0 0;
+    height: 1rem;
+    color: #000;
+    display: inline-block;
+    border-bottom: 1px solid #999;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(95%, transparent), color-stop(95%, #0092d1)) no-repeat;
+    background: linear-gradient(to bottom, transparent 95%, #0092d1 95%) no-repeat;
+    background-size: 0 100%;
+    -webkit-transition: background-size .2s ease;
+    transition: background-size .2s ease;
+    position: relative;
+    padding: 0 .916667rem 0 .25rem;
+    cursor: pointer;
+    font-size: .541667rem;
+    z-index: 2;
+    /**/
+    font-size: 13px;
+    padding-left: 0;
+    font-weight: 500;
+    line-height: 18px; }
+    div.clr-select-wrapper select:hover {
+      border-color: rgba(222, 222, 222, 0.5);
+      background: rgba(222, 222, 222, 0.5); }

@@ -127,13 +127,13 @@ div.graphContainer
         height: 22px !important
         background-position: 3px 3px !important
         padding: 0px !important
-        margin-left: 3px !important;
+        margin-left: 3px !important
         &#lassoButtonId
           background-image: url(../icons/shape_handles.png)
         &#selectionAddButtonId
           background-image: url(../icons/tag_blue_add.png)
         &.toolActive
-          background-color: lightgreen;
+          background-color: lightgreen
       #highlightFormId
         &:not(.newHighlightForm)
           display: inline-block !important
@@ -192,7 +192,7 @@ div.graphContainer
           height: 22px
     div.graphPanel
       float: left
-      border: 1px solid #008000
+      border: 1px solid #0077b8
       margin-left: 0px
       margin-top: 0px
       padding: 5px
@@ -200,8 +200,14 @@ div.graphContainer
       position: absolute
       padding-top: 10px
       z-index: 1
+      overflow-y: scroll
+      height: 430px
+      max-height: 430px
+      &::-webkit-scrollbar
+        width: 0px
       &.openPanel
         display: block
+        z-index: 1000
       &:not(.openPanel)
         display: none
       .hasChanges
@@ -312,7 +318,7 @@ div.graphContainer
             text-align: center
             width: 40px
   div#svgContainerId
-    border: 1px solid rgb(0, 128, 0)
+    border: 1px solid #0077b8
     border-width: 1px
     padding: 0px !important
     margin: 0px !important
@@ -348,8 +354,6 @@ div.graphContainer.fullscreen
         opacity: 0.8
       .graphTabButton
         border-top-width: 0px !important
-      #fullscreenButtonId
-        background-image: url(../icons/layout_content.png)
     div.graphPanel
       margin-top: -1px
       top: 25px
