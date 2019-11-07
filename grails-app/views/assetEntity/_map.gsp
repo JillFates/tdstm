@@ -14,7 +14,7 @@
 			</span>
 			<input class="clr-input" type="text" style="border-bottom:1px solid #999" id="searchBoxId" name="Search Box" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
 			<span id="filterClearId" class="ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
-			<span id="filterSubmitButtonId" class="graphButton" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"></span>
+			<span style="font-size:18px; color:#0077b8;" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"><i class="fas fa-binoculars"></i></span>
 		</div>
 		<div id="filterOptionsMenuId" class="hasBorders">
 			<table>
@@ -49,11 +49,13 @@
 				</tr>
 			</table>
 		</div>
-		<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton hasMargin" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
-		<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
-		<div id="lassoButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"></div>
-		<div id="selectionAddButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.SELECTION_ADD_TOOL, $(this))" title="Select multiple nodes in sequence ([ctrl] while selecting, can be combined with the lasso tool)"></div>
-		<button id="refreshButtonId" class="btn btn-outline" style="margin-left:10px;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fa fa-fw fa-warning"></i>Refresh</button>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin:0 10px 0 20px;" onclick="GraphUtil.zoomIn()" title="Zoom in"><i class="fas fa-search-plus"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin-right:10px;" onclick="GraphUtil.zoomOut()" title="Zoom out"><i class="fas fa-search-minus"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin-right:10px;" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"><i class="fas fa-draw-polygon"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fas fa-hand-pointer"></i></span>
+
+
+		<button id="refreshButtonId" class="btn btn-outline" style="margin-left:20px;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fas fa-exclamation-triangle"></i>Refresh</button>
 	</div>
 	<!-- The control panel div containing graph controls and settings -->
 	<div id="controlPanelId" class="graphPanel">
