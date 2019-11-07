@@ -640,16 +640,12 @@ export class TaskListComponent {
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
-				if (taskId && taskId >= 0) {
-					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
-				} else {
-					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
-					for (let id in this.rowsExpandedMap) {
-						if (id && this.rowsExpandedMap.hasOwnProperty(id) && this.rowsExpandedMap[id]) {
-							let rowObject = new DetailExpandEvent(id);
-							rowObject.dataItem = {id: this.grid.gridData.data[+id].id};
-							this.onRowDetailExpandHandler(rowObject);
-						}
+				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				for (let i = 0; i < result.totalCount; i++) {
+					let info = result.rows[i] ? result.rows[i].actionBarInfo : null;
+					if (info) {
+						let actionBarModel = this.taskService.convertToTaskActionInfoModel(info);
+						this.taskActionInfoModels.set(result.rows[i].id.toString(), actionBarModel);
 					}
 				}
 			});
@@ -683,18 +679,13 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			if (!this.taskActionInfoModels.has(taskId) || forceReload) {
-				this.taskService.getTaskActionInfo(parseInt(taskId, 0))
-					.subscribe((result: TaskActionInfoModel) => {
-						const taskActionInfoModel = result;
-						this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-						observer.next(result);
-						observer.complete();
-					});
-			} else {
-				observer.next(this.taskActionInfoModels.get(taskId));
-				observer.complete();
-			}
+			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+				.subscribe((result: TaskActionInfoModel) => {
+					const taskActionInfoModel = result;
+					this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+					observer.next(result);
+					observer.complete();
+				});
 		});
 	}
 }
