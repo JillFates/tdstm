@@ -1278,57 +1278,6 @@ class TaskService implements ServiceMethods {
 		return html
 	}
 
-   /**
-	 * Used to calculate the dial indicator speed that reflects how well the move is going for a given set of datetimes
-	 */
-	def calcStepDialIndicator (planStartTime, planCompTime, actualStartTime, actFinish, int tasksCount, int tasksCompleted) {
-
-		// TODO - calcStepDialIndicator() - need to further refine this method and test
-		return 0
-
-		// timeAsOf = timeAsOf.getTime() / 1000
-		def timeAsOf = TimeUtil.nowGMT().getTime() / 1000  // Remove the millisec
-
-		// def planCompletionTime = (stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
-		planCompTime = (planCompTime.getTime() / 1000) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
-		planStartTime = planStartTime.getTime()  / 1000 + 59
-
-		// log.info "timeAsOf is ${timeAsOf.getClass()}, planCompTime is ${planCompTime.getClass()}, planStartTime is ${planStartTime.getClass()} $planStartTime}"
-
-		def remainingStepTime = timeAsOf > planCompTime ? 0 : planCompTime - timeAsOf
-		//def planTaskPace = stepSnapshot.getPlanTaskPace()
-		def planDuration = planCompTime - planStartTime
-		def planTaskPace = planDuration / (tasksCount == 0 ? 1 : tasksCount)
-
-		def tasksRemaining = tasksCount - tasksCompleted
-
-		def remainingEffort =  tasksRemaining * planTaskPace
-
-		int projectedMinOver
-		if(actualStartTime || tasksCompleted > 0){
-			projectedMinOver  = remainingEffort - remainingStepTime
-		} else {
-			projectedMinOver  =  timeAsOf + planDuration
-		}
-		def adjust
-
-		if (remainingEffort && projectedMinOver > 0) {
-			adjust =  -50 * (1-(remainingStepTime / remainingEffort))
-		} else {
-			adjust =  50 * (1-(remainingEffort / (planCompTime - timeAsOf)))
-		}
-		def result = (50 + adjust).intValue()
-
-		// to show the dial inbetween 0 to 100
-		result = result > 100 ? 100 : result
-		result = result < 0 ? 0 : result
-
-log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTime, planCompTime=$planCompTime, tasksCompleted=$tasksCompleted, remainingStepTime=$remainingStepTime, planDuration=$planDuration, planTaskPace=$planTaskPace, tasksRemaining=$tasksRemaining, " +
-	"remainingEffort=$remainingEffort, projectedMinOver=$projectedMinOver, adjust=$adjust, result=$result"
-
-		return result
-	}
-
 	/**
 	 * Generates a SELECT control for selecting a staff assign to
 	 * @param projectId Id of the project to get staff for
