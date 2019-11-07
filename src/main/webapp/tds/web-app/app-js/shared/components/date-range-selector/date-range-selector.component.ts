@@ -95,7 +95,7 @@ declare var jQuery: any;
                         <button type="button"
                                 class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
                             <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
+                            <span> Cancel</span>
                         </button>
                     </div>
                 </div>
