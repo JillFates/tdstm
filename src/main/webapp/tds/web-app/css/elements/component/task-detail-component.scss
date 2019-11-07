@@ -6,10 +6,15 @@
     right: 20px;
   }
 
+  .full-height {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
   table.task-details {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 2px;
+    border-spacing: 3px;
     padding: 0;
     td {
       display: table-cell;
@@ -19,8 +24,35 @@
       font-weight: inherit;
       font-size: 13px;
       border-radius: .25em;
-      width: 10%;
-      padding: 4px 5px;
+      //width: 10%;
+      padding: 4px 6px;
+    }
+    td.N {
+      width: 15%;
+      //border: 1px solid blue;
+      label {
+        margin-bottom: unset;
+        font-weight: unset;
+      }
+    }
+    td.valueNW {
+      //width: 20%;
+      //border: 1px solid blue;
+    }
+  }
+
+  .dates-info-container {
+    table {
+      width: 100%;
+      tr {
+        width: 100%;
+      }
+      .date-created, .last-updated {
+        width: 50%;
+      }
+      .last-updated {
+        text-align: right;
+      }
     }
   }
 }
