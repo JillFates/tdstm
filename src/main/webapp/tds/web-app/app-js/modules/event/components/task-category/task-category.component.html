@@ -1,54 +1,47 @@
 <div class="container task-category-component" *ngIf="taskCategories.hasInfo">
-    <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;">
-            <div class="col-md-2 category-description">{{categories[rowIndex]}}</div>
-            <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
-                          class="glyphicon glyphicon-chevron-left left-arrow"
-                          title="Previous"
-                          [ngClass]="{'disabled': showFrom === 0}"
-                          (click)="onBack()">
-                    </span>
+    <div class="row">
+        <div class="col-lg-2">
+            <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
+                <div class="category-description category-name{{rowIndex === 0 ? '-first' : ''}}">{{categories[rowIndex]}}</div>
             </div>
-            <div class="col-md-8">
-                <div class="row">
-                    <div *ngFor="let column of getColumns(row);"
-                            class="col-md-{{colSize}} {{column.classes}}" 
-                            [ngClass]="{'heading': rowIndex === RowType.Header}"
-                            [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
-                            <a *ngIf="rowIndex === RowType.Header; else categoryValue"
-                               [routerLink]="['/taskManager', 'list']"
-                               [queryParams]="{category: column.text, justRemaining: 0}">
-                                <span [innerHtml]="column.text"></span>
-                            </a>
-
-                            <ng-template #categoryValue>
-                                <div *ngIf="rowIndex === RowType.Tasks && column.compose; else simpleValue">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                        [queryParams]="{category: column.compose.category, justRemaining: 0}">
-                                        <span [innerHtml]="column.compose.tskComp + ' of ' + column.compose.tskTot "></span>
+        </div>
+        <div class="col-lg-7 category-container" (scroll)="handleScroll($event)" #categoryContainer>
+            <div class="row" *ngFor="let row of taskCategories.tasks; let rowIndex = index;" >
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div *ngFor="let column of row;"
+                                    class="col-md-{{colSize}} category-column {{column.classes}}"
+                                    [ngClass]="{'heading': rowIndex === RowType.Header}"
+                                    [style.background-color]="rowIndex === RowType.Percents && column.compose ? column.compose.color : ''">
+                                    <a *ngIf="rowIndex === RowType.Header; else categoryValue"
+                                       [routerLink]="['/taskManager', 'list']"
+                                       [queryParams]="{category: column.text, justRemaining: 0}">
+                                        <span [innerHtml]="column.text"></span>
                                     </a>
-                                </div>
-                            </ng-template>
 
-                            <ng-template #simpleValue>
-                                <div *ngIf="rowIndex  <= RowType.Tasks; else dateValue">
-                                    <span [innerHtml]="column.text"></span>
-                                </div>
-                           </ng-template>
+                                    <ng-template #categoryValue>
+                                        <div *ngIf="rowIndex === RowType.Tasks && column.compose; else simpleValue">
+                                            <a [routerLink]="['/taskManager', 'list']"
+                                                [queryParams]="{category: column.compose.category, justRemaining: 0}">
+                                                <span [innerHtml]="column.compose.tskComp + ' of ' + column.compose.tskTot "></span>
+                                            </a>
+                                        </div>
+                                    </ng-template>
 
-                            <ng-template #dateValue>
-                                <span>{{column.text | tdsDateTime: userTimeZone: dateTimeFormat}}</span>
-                            </ng-template>
+                                    <ng-template #simpleValue>
+                                        <div *ngIf="rowIndex  <= RowType.Tasks; else dateValue">
+                                            <span [innerHtml]="column.text"></span>
+                                        </div>
+                                   </ng-template>
+
+                                    <ng-template #dateValue>
+                                        <span>{{column.text | tdsDateTime: userTimeZone: dateTimeFormat}}</span>
+                                    </ng-template>
+                            </div>
+                        </div>
                     </div>
-                </div>
             </div>
-            <div class="col-md-1 column-navigation">
-                    <span *ngIf="rowIndex == 0 && taskCategories.columns > elementsToShow"
-                          class="glyphicon glyphicon-chevron-right right-arrow"
-                          title="Next"
-                          [ngClass]="{'disabled': (showFrom + elementsToShow + 1) >  taskCategories.columns}"
-                          (click)="onNext()">
-                    </span>            
-            </div>
+        </div>
+        <div class="col-lg-offset-2"></div>
     </div>
 </div>

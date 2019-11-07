@@ -22,6 +22,7 @@ import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-statu
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {takeWhile} from 'rxjs/operators';
+import {TaskCategoryComponent} from '../task-category/task-category.component';
 
 @Component({
 	selector: 'event-dashboard',
@@ -30,6 +31,7 @@ import {takeWhile} from 'rxjs/operators';
 
 export class EventDashboardComponent implements OnInit {
 	@ViewChild('planVersusStatus') public planVersusStatus: PlanVersusStatusComponent;
+	@ViewChild('taskCategory') public taskCategorySection: TaskCategoryComponent;
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;
@@ -41,6 +43,7 @@ export class EventDashboardComponent implements OnInit {
 	public teamTaskMatrix = [];
 	public taskCategories = null;
 	public hasBundleSteps = false;
+	private taskCategoryScrollPosition = 0;
 	readonly defaultTime = '00:00:00';
 
 	constructor(
@@ -96,7 +99,12 @@ export class EventDashboardComponent implements OnInit {
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
 	*/
-	public onSelectedEvent(id: number, name: string): void {
+	public onSelectedEvent(id: number, name: string, refreshing = false): void {
+		if (!refreshing) {
+			this.taskCategoryScrollPosition = 0;
+		} else {
+			this.taskCategoryScrollPosition = this.taskCategorySection.currentScroll;
+		}
 		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
 
@@ -138,6 +146,9 @@ export class EventDashboardComponent implements OnInit {
 					this.eventPlanStatus.description = this.eventDetails.moveEvent.description;
 					this.eventPlanStatus.dayTime = this.defaultTime;
 				}
+				setTimeout(() => {
+					this.taskCategorySection.setContainerScroll(this.taskCategoryScrollPosition);
+				})
 			});
 	}
 
@@ -225,7 +236,7 @@ export class EventDashboardComponent implements OnInit {
 	 * On countdown timer timeout, call the on selected method to refresh the report
 	*/
 	public onTimeout(): void {
-		this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name);
+		this.onSelectedEvent(this.selectedEvent.id, this.selectedEvent.name, true);
 	}
 
 	public isEventSelected(): boolean {
