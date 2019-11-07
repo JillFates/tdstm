@@ -24,31 +24,19 @@ import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<div class="tds-filter-input">
-			<input type="text"
-				#filterInput
-				[name]="name"
-				[value]="value"
-				[placeholder]="placeholder"
-				input-paste (onPaste)="onPaste($event)"
-				class="form-control">
-			<div class="icon-container">
-				<clr-icon shape="times-circle"
-                          *ngIf="filterInput.value"
-                          (click)="onClearFilter()"
-                          class="clear-filter component-action-clear-filter">
-				</clr-icon>
-			</div>
-			<!--
-			form-control-feedback
-            <span *ngIf="filterInput.value"
-				(click)="onClearFilter()"
-				[title]="'GLOBAL.CLEAR_FILTER' | translate"
-				class="clear-filter fa fa-times form-control-feedback component-action-clear-filter"
-				aria-hidden="true">
-			</span>
-			-->
-		</div>
+		<input clrInput #filterInput
+					 type="text" class="text-filter"
+					 [name]="name"
+					 [value]="value"
+					 [placeholder]="placeholder"
+					 input-paste (onPaste)="onPaste($event)"/>
+				<tds-button *ngIf="filterInput.value"
+										(click)="onClearFilter()"
+										[title]="'Clear Filter'"
+										icon="times-circle"
+										[small]="true"
+										[flat]="true">
+				</tds-button>
 	`
 })
 export class TDSFilterInputComponent implements OnInit, OnDestroy {
