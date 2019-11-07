@@ -43,7 +43,7 @@ export class EventDashboardComponent implements OnInit {
 	public teamTaskMatrix = [];
 	public taskCategories = null;
 	public hasBundleSteps = false;
-	private taskCategoryStartFrom = 0;
+	private taskCategoryScrollPosition = 0;
 	readonly defaultTime = '00:00:00';
 
 	constructor(
@@ -101,9 +101,9 @@ export class EventDashboardComponent implements OnInit {
 	*/
 	public onSelectedEvent(id: number, name: string, refreshing = false): void {
 		if (!refreshing) {
-			this.taskCategoryStartFrom = 0;
+			this.taskCategoryScrollPosition = 0;
 		} else {
-			this.taskCategoryStartFrom = this.taskCategorySection.showFrom;
+			this.taskCategoryScrollPosition = this.taskCategorySection.currentScroll;
 		}
 		this.store.dispatch(new SetEvent({id: id, name: name}));
 		this.getNewsFromEvent(id);
@@ -148,7 +148,7 @@ export class EventDashboardComponent implements OnInit {
 					this.eventPlanStatus.dayTime = this.defaultTime;
 				}
 				setTimeout(() => {
-					this.taskCategorySection.showFrom = this.taskCategoryStartFrom;
+					this.taskCategorySection.setContainerScroll(this.taskCategoryScrollPosition);
 				})
 			});
 	}
