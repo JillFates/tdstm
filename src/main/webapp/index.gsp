@@ -1,24 +1,27 @@
+<%@ page import="com.tdsops.common.grails.ApplicationContextHolder" %>
+<%@ page import="net.transitionmanager.security.SecurityService" %>
 <html>
 <head>
-<title>Welcome to Grails</title>
+<title>TransitionManager</title>
 <meta name="layout" content="main" />
 </head>
-<body><!-- 
-<h1 style="margin-left: 20px;">Welcome to Grails</h1>
-<p style="margin-left: 20px; width: 80%">Congratulations, you have
-successfully started your first Grails application! At the moment this
-is the default page, feel free to modify it to either redirect to a
-controller or display whatever content you may choose. Below is a list
-of controllers that are currently deployed in this application, click on
-each to execute its default action:</p>
-<div class="dialog" style="margin-left: 20px; width: 60%;">
-<ul>
-	<g:each var="c" in="${grailsApplication.controllerClasses}">
-		<li class="controller"><g:link
-			controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
-	</g:each>
-</ul>
-</div> -->
-<% response.sendRedirect("module/auth/login"); %>
+<body>
+<%
+
+	/**
+	 * This logic is responsible for redirecting the user when going to root URL path (/) to their preferred page
+	 * when logged in or to the official login page appropriately
+	 */
+
+	//
+	SecurityService securityService = ApplicationContextHolder.getService('securityService')
+	if (securityService.isLoggedIn()) {
+		// TODO : JPM 10/2019 : Change the redirection here to use the logic that currently is in AuthController.redirectToPrefPage
+		response.sendRedirect('/tdstm/module/user/dashboard')
+	} else {
+		// response.sendRedirect("module/auth/login")
+		response.sendRedirect(securityService.loginUrl())
+	}
+%>
 </body>
 </html>

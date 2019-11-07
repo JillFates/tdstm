@@ -258,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					gt("completionDate", today)
+					ge("completionDate", today)
 				} else {
-					le('completionDate', today)
+					lt('completionDate', today)
 				}
 			}
 
@@ -675,8 +675,6 @@ class ProjectService implements ServiceMethods {
 		// remove Move Bundle
 
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
-		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))".toString(), [project: projectInstance ])
-		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
 		String teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)".toString(), [project: projectInstance ])
@@ -709,15 +707,15 @@ class ProjectService implements ServiceMethods {
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = $projectInstance")
 
-		def recipesQuery = "select r.id from Recipe r where r.project.id = :projectId"
+		String recipesQuery = "select r.id from Recipe r where r.project.id =:projectId"
 		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project.id = $projectInstance.id")
-		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		def recipeVersions = RecipeVersion.executeQuery("from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		if (recipeVersions) {
 			recipeVersions.each {
 				RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom.id = $it.id")
 			}
 		}
-		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
 		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")

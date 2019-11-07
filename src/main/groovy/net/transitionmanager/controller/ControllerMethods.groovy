@@ -68,6 +68,17 @@ trait ControllerMethods {
 	// TODO : JPM 4/2019 : Message should be in i18N messages
 	static final String INVALID_CSRF_TOKEN = 'Unable to perform action due to missing form token. Please retry form entry.'
 
+
+	/**
+	 * Used to redirect the browser to the login form
+	 */
+	void redirectToLoginForm() {
+		String redirectUrl = securityService.loginUrl()
+		// Adding the X-Login-URL header so that we can catch it in Ajax calls
+		response.setHeader('X-Login-URL', redirectUrl)
+		redirect(uri: redirectUrl)
+	}
+
 	/**
 	 * Renders a list of maps to a CSV file.
 	 *
@@ -326,6 +337,14 @@ trait ControllerMethods {
 	// If all else fails the default exception hander will catch the rest
 	def defaultExceptionHandler(Exception e) {
 		handleException(e, 'error', '', true)
+	}
+
+	/**
+	 * Used to determine if the current request is Ajax or not
+	 * @return true if the request is Ajax or otherwise false
+	 */
+	boolean isAjaxRequest() {
+		return WebUtil.isAjax(request)
 	}
 
 	/**

@@ -35,6 +35,7 @@ declare var jQuery: any;
                         class="float-right button-header-grid"
 						[tooltip]="'Add link to Support Asset'"
                         id="add-support"
+						[tabIndex]="449"
                         (click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
                 </tds-button-add>
             </ng-template>
@@ -152,6 +153,7 @@ declare var jQuery: any;
                         class="float-right button-header-grid"
                         [tooltip]="'Add link to Dependent Asset'"
                         id="dependent-support"
+						[tabIndex]="450"
                         (click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
                 </tds-button-add>
             </ng-template>
