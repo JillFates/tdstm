@@ -679,18 +679,13 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			if (!this.taskActionInfoModels.has(taskId) || forceReload) {
-				this.taskService.getTaskActionInfo(parseInt(taskId, 0))
-					.subscribe((result: TaskActionInfoModel) => {
-						const taskActionInfoModel = result;
-						this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-						observer.next(result);
-						observer.complete();
-					});
-			} else {
-				observer.next(this.taskActionInfoModels.get(taskId));
-				observer.complete();
-			}
+			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+				.subscribe((result: TaskActionInfoModel) => {
+					const taskActionInfoModel = result;
+					this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+					observer.next(result);
+					observer.complete();
+				});
 		});
 	}
 }
