@@ -100,9 +100,8 @@
 										<div class="clr-checkbox-wrapper">
 											<input class="clr-checkbox" type="checkbox" id="assignedGroupCB" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()">
 											<label for="assignedGroupCB">Show ONLY Work In Progress</label>
-											<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-												<%-- <span style="font-size:22px; color:black;" title="Refresh Data"><i class="fa fas fa-sync"></i></span> --%>
-												<asset:image src="icons/arrow_refresh.png" title="Refresh Data" />
+											<g:link controller="moveBundle" action="dependencyConsole"  style="display:inline-block; margin-left: 10px;">
+												<span style="font-size:16px; color:#0077b8;" title="Refresh Data"><i class="fas fa-sync"></i></span>
 											</g:link>
 										</div>
 
