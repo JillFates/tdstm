@@ -605,7 +605,7 @@ div.graphContainer {
         user-select: none;
         font-size: 12px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         border-bottom: 0px;
         margin-bottom: 0px;
         padding-left: 8px;
@@ -623,7 +623,7 @@ div.graphContainer {
           z-index: 2; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
           background-color: #dddddd;
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
           border-left-width: 0px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
@@ -631,7 +631,7 @@ div.graphContainer {
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab h4 {
           margin: 0px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.hasBorders {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         display: inline-block; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.spacer {
         background-color: transparent !important; }
@@ -639,9 +639,6 @@ div.graphContainer {
         text-align: center;
         width: auto;
         cursor: pointer; }
-      div.graphContainer div#toolsContainerId div#graphToolbarId > div:not(.spacer).hasBorders {
-        border-left: 1px solid green;
-        border-right: 1px solid green; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphTabButton {
         background-position: 5px 50%;
         background-repeat: no-repeat;
@@ -705,7 +702,6 @@ div.graphContainer {
         z-index: 2;
         display: inline-block;
         position: relative;
-        border: 1px solid green;
         height: 22px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId #highlightFormId.newHighlightForm input#searchBoxId {
           width: 193px;
@@ -759,7 +755,8 @@ div.graphContainer {
       z-index: 1;
       overflow-y: scroll;
       height: 430px;
-      max-height: 430px; }
+      max-height: 430px;
+      top: 50px; }
       div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
         width: 0px; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
@@ -891,23 +888,27 @@ div.graphContainer.fullscreen {
   z-index: 95; }
   div.graphContainer.fullscreen div#toolsContainerId {
     position: fixed;
+    top: 5px;
+    left: 5px;
     z-index: 96; }
     div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId {
       top: 0px;
       left: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > div, div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > span {
         vertical-align: top; }
+      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .btn {
+        margin-top: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab {
         border-top-width: 0px; }
         div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > *:not(.graphPanelTab) {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
-      top: 25px;
+      top: 50px;
       left: 0px; }
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelLabel {
       padding: 0px;
@@ -930,7 +931,7 @@ div.graphContainer.fullscreen {
 #spinnerDivId {
   width: 800px;
   height: 300px;
-  border: 1px solid green;
+  border: 1px solid #0077b8;
   padding: 5px;
   margin: 5px; }
   #spinnerDivId.graph {
@@ -993,17 +994,20 @@ div.graphContainer.fullscreen {
   border-top-color: #3c8dbc; }
 
 /* Cookbook Tabs  to Clarity */
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a,
+.create-recipe-form div.tabbable ul.nav-tabs li a {
   border: 0px;
   background: none;
   color: #444;
   margin-left: 10px;
   margin-right: 10px; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child,
+.create-recipe-form div.tabbable ul.nav-tabs li a:first-child {
   margin-left: 0px; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover,
+.create-recipe-form div.tabbable ul.nav-tabs li a:hover {
   -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
   box-shadow: 0 -3px 0 #0077b8 inset;
   -webkit-transition: -webkit-box-shadow .2s ease-in;
@@ -1011,13 +1015,17 @@ div.graphContainer.fullscreen {
   transition: box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a,
+.create-recipe-form div.tabbable ul.nav-tabs li.active a {
   -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
   box-shadow: 0 -3px 0 #0077b8 inset;
   -webkit-transition: -webkit-box-shadow .2s ease-in;
   transition: -webkit-box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
+.create-recipe-form .tab-content {
+  border: none !important; }
 
 form.left-alignment div.form-group input[type="text"] {
   height: 34px;
@@ -1195,7 +1203,14 @@ tds-ui-dialog .close {
 .tds-modal-content {
   background: #fff; }
   .tds-modal-content .modal-header {
-    padding: 24px; }
+    padding: 24px;
+    color: #000; }
+    .tds-modal-content .modal-header h3 {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 26px;
+      margin-right: 10px; }
     .tds-modal-content .modal-header .modal-title-container {
       display: -webkit-box;
       display: -ms-flexbox;
@@ -1228,6 +1243,8 @@ tds-ui-dialog .close {
       font-weight: 400;
       font-size: 12px;
       color: black; }
+  .tds-modal-content .modal-footer {
+    padding: 20px; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
@@ -2023,7 +2040,7 @@ div.content-wrapper div.container div#DependencyGroupsTableId div#dependencyDivI
 
 div.content-wrapper div.container div#item1.fullscreen div#filterOptionsMenuId.open {
   left: 366px;
-  top: 20px; }
+  top: 50px; }
 
 div.content-wrapper div.container div#item1:not(.fullscreen) div#toolsContainerId {
   z-index: auto; }
@@ -2041,14 +2058,13 @@ div.content-wrapper div.container div#item1 div#graphToolbarId {
 div.content-wrapper div.container div#item1 div#filterOptionsMenuId {
   z-index: 1;
   display: none !important;
-  border-top: 0px;
   margin-top: -1px;
   width: 235px; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId.open {
     display: block !important;
     position: absolute;
-    left: 354px;
-    top: 21px;
+    left: 518px;
+    top: 38px;
     background-color: #ffffff;
     cursor: auto !important; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId table {
@@ -2507,6 +2523,21 @@ div.content-wrapper div.execution-phase-wrapper {
       flex-basis: 49%; } }
 
 /* Cookbook */
+.code-diff-modal .modal-dialog {
+  width: 1060px; }
+
+.modal-dialog-fullscreen .tds-modal-content {
+  height: 100%; }
+  .modal-dialog-fullscreen .tds-modal-content .modal-body {
+    max-height: 100%; }
+    .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror {
+      height: 100% !important; }
+      .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror .CodeMirror-linenumber {
+        margin-top: -4px; }
+
+.code-editor-modal .modal-body {
+  padding: 15px !important; }
+
 .cookbook_recipes_editor .clr-select-wrapper,
 .recipeDetail .clr-select-wrapper {
   display: block; }
@@ -2546,7 +2577,10 @@ div.content-wrapper div.execution-phase-wrapper {
 .cookbook_recipes_editor .gridStyleGroups,
 .recipeDetail .gridStyle,
 .recipeDetail .gridStyleTasks,
-.recipeDetail .gridStyleGroups {
+.recipeDetail .gridStyleGroups,
+.cloneSelectors .gridStyle,
+.cloneSelectors .gridStyleTasks,
+.cloneSelectors .gridStyleGroups {
   border: none;
   background: none; }
   .cookbook_recipes_editor .gridStyle .ngTopPanel,
@@ -2554,14 +2588,20 @@ div.content-wrapper div.execution-phase-wrapper {
   .cookbook_recipes_editor .gridStyleGroups .ngTopPanel,
   .recipeDetail .gridStyle .ngTopPanel,
   .recipeDetail .gridStyleTasks .ngTopPanel,
-  .recipeDetail .gridStyleGroups .ngTopPanel {
+  .recipeDetail .gridStyleGroups .ngTopPanel,
+  .cloneSelectors .gridStyle .ngTopPanel,
+  .cloneSelectors .gridStyleTasks .ngTopPanel,
+  .cloneSelectors .gridStyleGroups .ngTopPanel {
     background-color: #d9e4ea; }
     .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
     .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
     .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
     .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
     .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
-    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar {
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar {
       margin-top: 10px;
       height: 13px !important;
       background-color: #656565; }
@@ -2570,7 +2610,10 @@ div.content-wrapper div.execution-phase-wrapper {
     .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
     .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
     .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
-    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText {
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText {
       text-align: center;
       font-weight: 500;
       font-size: 11px;
@@ -2580,7 +2623,10 @@ div.content-wrapper div.execution-phase-wrapper {
   .cookbook_recipes_editor .gridStyleGroups .ngRow,
   .recipeDetail .gridStyle .ngRow,
   .recipeDetail .gridStyleTasks .ngRow,
-  .recipeDetail .gridStyleGroups .ngRow {
+  .recipeDetail .gridStyleGroups .ngRow,
+  .cloneSelectors .gridStyle .ngRow,
+  .cloneSelectors .gridStyleTasks .ngRow,
+  .cloneSelectors .gridStyleGroups .ngRow {
     border: 1px solid #d9e4ea;
     background: none; }
     .cookbook_recipes_editor .gridStyle .ngRow.selected,
@@ -2588,15 +2634,24 @@ div.content-wrapper div.execution-phase-wrapper {
     .cookbook_recipes_editor .gridStyleGroups .ngRow.selected,
     .recipeDetail .gridStyle .ngRow.selected,
     .recipeDetail .gridStyleTasks .ngRow.selected,
-    .recipeDetail .gridStyleGroups .ngRow.selected {
+    .recipeDetail .gridStyleGroups .ngRow.selected,
+    .cloneSelectors .gridStyle .ngRow.selected,
+    .cloneSelectors .gridStyleTasks .ngRow.selected,
+    .cloneSelectors .gridStyleGroups .ngRow.selected {
       background-color: #c9dde1; }
     .cookbook_recipes_editor .gridStyle .ngRow .ngVerticalBar,
     .cookbook_recipes_editor .gridStyleTasks .ngRow .ngVerticalBar,
     .cookbook_recipes_editor .gridStyleGroups .ngRow .ngVerticalBar,
     .recipeDetail .gridStyle .ngRow .ngVerticalBar,
     .recipeDetail .gridStyleTasks .ngRow .ngVerticalBar,
-    .recipeDetail .gridStyleGroups .ngRow .ngVerticalBar {
+    .recipeDetail .gridStyleGroups .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngRow .ngVerticalBar {
       width: 0px !important; }
+
+.cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderSortColumn {
+  padding-top: 4px; }
 
 div.clr-select-wrapper {
   max-height: 1rem;

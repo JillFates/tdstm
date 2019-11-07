@@ -72,7 +72,7 @@
 
 			<div style="clear: both;"></div>
 
-			<div id = "dependencyBundleDetailsId" >
+			<div id="dependencyBundleDetailsId" >
 				<div style="margin-top: 10px;">
 					<div class="compactClass">
 						<div class="dependency-filters-container">
@@ -80,26 +80,32 @@
 							<div class="message" id="messageId" style="display:none">${flash.message}</div>
 							<div class="row dependencyConsoleForm">
 								<div class="f-grid" id="angular-compiler">
-									<div class="f-column-1">
+									<div class="f-column-1" style="display: flex; max-width:300px; align-items: center;">
 										<label>Dependency Groups</label>
 										<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-											<input type="button"  class="submit pointer" value="Regenerate..." onclick="showDependencyControlDiv()"  />
+											<input type="button" class="btn btn-sm" value="Regenerate" onclick="showDependencyControlDiv()"  />
 										</tds:hasPermission>
 									</div>
 									<div class="f-column-2">
 										<label>Bundle:</label>
-										<g:select id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
+										<div class="clr-select-wrapper">
+											<g:select class="clr-select" style="width:160px; margin-left:10px;" id="planningBundleSelectId" name="bundle" from="${moveBundle}" noSelection="${['':'All Planning']}" optionKey="id" value="${moveBundleId}" onchange="onDependencyFiltersChange()"/>
+										</div>
 									</div>
 									<div class="f-column-3">
 										<label>Tags:</label>
 										<tm-asset-tag-selector ng-init="assetsSelector.tag = ${tagIds}" id="tmHighlightGroupSelector" pre-asset-selector="assetsSelector" pre-selected-operator="'${tagMatch}'" asset-selector="dependencyGroup.assetSelector" on-change="onDependencyFiltersChange()"></tm-asset-tag-selector>
 									</div>
 									<div class="f-column-4">
-										<input type="checkbox" id="assignedGroupCB" class="pointer" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()" />
-										<label for="assignedGroupCB" class="pointer">Show ONLY Work In Progress</label>
-										<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
-											<asset:image src="icons/arrow_refresh.png" title="Refresh Data" />
-										</g:link>
+										<div class="clr-checkbox-wrapper">
+											<input class="clr-checkbox" type="checkbox" id="assignedGroupCB" ${isAssigned == '1' ? 'checked="checked"' : ''} onchange="onDependencyFiltersChange()">
+											<label for="assignedGroupCB">Show ONLY Work In Progress</label>
+											<g:link controller="moveBundle" action="dependencyConsole" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary refresh-icon">
+												<%-- <span style="font-size:22px; color:black;" title="Refresh Data"><i class="fa fas fa-sync"></i></span> --%>
+												<asset:image src="icons/arrow_refresh.png" title="Refresh Data" />
+											</g:link>
+										</div>
+
 									</div>
 								</div>
 							</div>
@@ -218,7 +224,7 @@
 					</div>
 				</div>
 			</div>
-		<div style="float:left;">
+		<div style="float:left; width:100%">
 			<div id="items1" style="display: none"></div>
 			<div id="spinnerDivId" class="containsSpinner" style="display: none"></div>
 			<g:render template="/assetEntity/modelDialog" />

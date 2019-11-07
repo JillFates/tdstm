@@ -43,7 +43,7 @@ div.graphContainer
         user-select: none
         font-size: 12px
       div.graphPanelTab
-        border: 1px solid green
+        border: 1px solid #0077b8
         border-bottom: 0px
         margin-bottom: 0px
         padding-left: 8px
@@ -61,7 +61,7 @@ div.graphContainer
           z-index: 2
         &:not(.activeTab)
           background-color: #dddddd
-          border-bottom: 1px solid green
+          border-bottom: 1px solid #0077b8
         &#legendTabId
         &#dependenciesPanelTabId
           border-left-width: 0px
@@ -71,7 +71,7 @@ div.graphContainer
           margin: 0px
       & > div
         &.hasBorders
-          border: 1px solid green
+          border: 1px solid #0077b8
           display: inline-block
         &.spacer
           background-color: transparent !important
@@ -79,9 +79,6 @@ div.graphContainer
           text-align: center
           width: auto
           cursor: pointer
-        &:not(.spacer).hasBorders
-          border-left: 1px solid green
-          border-right: 1px solid green
       div.graphTabButton
         background-position: 5px 50%
         background-repeat: no-repeat
@@ -146,10 +143,7 @@ div.graphContainer
           z-index: 2
           display: inline-block
           position: relative
-          //margin-bottom: 4px !important
-          border: 1px solid green
           height: 22px
-          //vertical-align: top
           input#searchBoxId
             width: 193px
             height: 20px
@@ -203,6 +197,7 @@ div.graphContainer
       overflow-y: scroll
       height: 430px
       max-height: 430px
+      top: 50px
       &::-webkit-scrollbar
         width: 0px
       &.openPanel
@@ -340,23 +335,27 @@ div.graphContainer.fullscreen
   z-index: 95
   div#toolsContainerId
     position: fixed
+    top: 5px
+    left: 5px
     z-index: 96
     div#graphToolbarId
       top: 0px
       left: 0px
       & > div, & > span
         vertical-align: top
+      .btn
+        margin-top: 0px
       div.graphPanelTab
         border-top-width: 0px
         &:not(.activeTab)
-          border-bottom: 1px solid green
+          border-bottom: 1px solid #0077b8
       & > *:not(.graphPanelTab)
         opacity: 0.8
       .graphTabButton
         border-top-width: 0px !important
     div.graphPanel
       margin-top: -1px
-      top: 25px
+      top: 50px
       left: 0px
     div#controlPanelId
       .controlPanelLabel
@@ -382,7 +381,7 @@ div.graphContainer.fullscreen
 #spinnerDivId
   width: 800px
   height: 300px
-  border: 1px solid green
+  border: 1px solid #0077b8
   padding: 5px
   margin: 5px
   &.graph

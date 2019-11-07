@@ -20,7 +20,7 @@
 		<table id="tagApp" border="0" cellpadding="0" cellspacing="0"
 			style="border-collapse: separate" class="table">
 			<thead>
-				<tr class="header">
+				<tr>
 					<th nowrap="nowrap"><input id="selectId" type="checkbox"   onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 					<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','assetName')">Name</th>
 					<th class="Arrowcursor ${sortBy == 'dbFormat' ? orderBy :''}" onclick="javascript:getListBySort('database','${dependencyBundle}','dbFormat')">DB Format</th>

@@ -20,7 +20,7 @@
 	<div id="item1">
 		<table id="tag" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate" class="table">
 			<thead>
-				<tr class="header">
+				<tr>
 					<th nowrap="nowrap"><input id="selectId" type="checkbox" onclick="selectAll()" title="Select All" />&nbsp;Actions</th>
 					<th class="Arrowcursor ${sortBy == 'assetName' ? orderBy :''}" onclick="javascript:getListBySort('all','${dependencyBundle}','assetName')">Name</th>
 					<th class="Arrowcursor ${sortBy == 'type' ? orderBy :''}" onclick="javascript:getListBySort('all','${dependencyBundle}','type')">Type</th>
@@ -31,7 +31,6 @@
 					<th class="Arrowcursor ${sortBy == 'depToResolve' ? orderBy :''}" onclick="javascript:getListBySort('all','${dependencyBundle}','depToResolve')">TBD</th>
 					<th class="Arrowcursor ${sortBy == 'depToConflict' ? orderBy :''}" onclick="javascript:getListBySort('all','${dependencyBundle}','depToConflict')">Conflict</th>
 				</tr>
-
 			</thead>
 			<tbody class="tbody">
 				<g:each in="${assetList}" var="asset" status="i">

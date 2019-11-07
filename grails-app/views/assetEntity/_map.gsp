@@ -8,12 +8,12 @@
 			<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)">Legend</button>
 		</div>
 		<button id="fullscreenButtonId" class="btn btn-outline" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Full Screen</button>
-		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
+		<div id="highlightFormId" class="noPadding graphTabButton hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
 				<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 			</span>
-			<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
-			<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
+			<input class="clr-input" type="text" style="border-bottom:1px solid #999" id="searchBoxId" name="Search Box" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
+			<span id="filterClearId" class="ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
 			<span id="filterSubmitButtonId" class="graphButton" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"></span>
 		</div>
 		<div id="filterOptionsMenuId" class="hasBorders">
@@ -53,7 +53,7 @@
 		<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
 		<div id="lassoButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"></div>
 		<div id="selectionAddButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.SELECTION_ADD_TOOL, $(this))" title="Select multiple nodes in sequence ([ctrl] while selecting, can be combined with the lasso tool)"></div>
-		<button id="refreshButtonId" class="btn btn-outline" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fa fa-fw fa-warning"></i>Refresh</button>
+		<button id="refreshButtonId" class="btn btn-outline" style="margin-left:10px;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fa fa-fw fa-warning"></i>Refresh</button>
 	</div>
 	<!-- The control panel div containing graph controls and settings -->
 	<div id="controlPanelId" class="graphPanel">
@@ -89,7 +89,7 @@
 						<div class="clr-form-horizontal" style="padding:unset;">
 							<div class="clr-form-control" style="padding:unset; margin:unset; align-items:flex-end;">
 								<label for="maxEdgeCountId" class="clr-control-label" style="width: unset; margin:unset;">Max Dependencies Cut</label>
-								<div class="clr-control-container">
+								<div class="clr-control-container" style="margin-left: 5px;">
 									<div class="clr-select-wrapper">
 										<g:select name="maxEdgeCount" id="maxEdgeCountId" from="${1..20}" value="${graphPrefs.maxEdgeCount ? graphPrefs.maxEdgeCount : defaultPrefs.maxEdgeCount}"></g:select>
 									</div>
@@ -105,7 +105,7 @@
 						<div class="clr-form-horizontal" style="padding:unset;">
 							<div class="clr-form-control" style="padding:unset; margin:unset; align-items:flex-end;">
 								<label for="colorBySelectId" class="clr-control-label" style="width: unset; margin:unset;">Color By</label>
-								<div class="clr-control-container">
+								<div class="clr-control-container" style="margin-left: 5px;">
 									<div class="clr-select-wrapper">
 										<g:select class="clr-select" name="colorBy" id="colorBySelectId" from="${colorByGroupLabels?.values()}" keys="${colorByGroupLabels?.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
 									</div>
@@ -264,12 +264,7 @@
 		}
 		div.dependency_panel_action_buttons {
 			position: absolute;
-			bottom: 0px;
-			/* background: white; */
-			/* height: 33px; */
-		}
-		div.fullscreen div.dependency_panel_action_buttons {
-			bottom: 1px !important;
+			bottom: 5px;
 		}
 		td.groupingControl {
 			background-color: #dddddd;
@@ -277,7 +272,7 @@
 	</style>
 	<div id="dependenciesPanelId" class="graphPanel">
 		<div id="dependecy-control">
-			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i style="color: #0077b8;" class="fa fa-fw fa-caret-down"></i></label>
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i style="color: #0077b8; cursor:pointer;" class="fa fa-fw fa-caret-down"></i></label>
 			<br />
 			<div class="checkboxdiv_control dependency-type-panel open" >
 				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
@@ -301,7 +296,7 @@
 				</table>
 			</div>
 
-			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i style="color: #0077b8;" class="fa fa-fw fa-caret-down"></i></label>
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i style="color: #0077b8; cursor:pointer;" class="fa fa-fw fa-caret-down"></i></label>
 			<div class="checkboxdiv_control dependency-show-panel open">
 				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 					<tr>
@@ -325,7 +320,7 @@
 			</div>
 		</div>
 		<div class="dependency_panel_action_buttons">
-			<input style="margin: unset; width: 250px;" type="button" value="Apply" class="btn btn-outline fullButton" onclick="GraphUtil.applyShowHideDependencies()">
+			<input style="margin: unset; width: 259px;" type="button" value="Apply" class="btn btn-outline fullButton" onclick="GraphUtil.applyShowHideDependencies()">
 		</div>
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
