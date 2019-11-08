@@ -27,6 +27,7 @@ import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/direc
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 import { SortUtils } from '../../../../shared/utils/sort.utils';
+import {StringUtils} from '../../../../shared/utils/string.utils';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
@@ -159,6 +160,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 						// on EDIT mode and empty assetClass
 					} else if (!this.model.assetClass || !this.model.assetClass.id) {
 						this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
+					} else {
+						// for displaying the existing assetClass
+						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
+						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
 					jQuery('[data-toggle="popover"]').popover();
 					this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
