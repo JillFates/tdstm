@@ -1,4 +1,4 @@
-import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import {UIExtraDialog} from '../../services/ui-dialog.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
@@ -28,16 +28,18 @@ declare var jQuery: any;
                                 <div>
                                     <div class="times-container">
                                         <div class="times-section">
+																					<!---->
                                             <kendo-dateinput
-                                                    (valueChange)="onDateChanged('start', $event)"
-                                                    [format]="getDateTimeFormat(model.start)"
+																										(valueChange)="onDateChanged('start', $event)"
+                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
                                                     [(value)]="model.start"></kendo-dateinput>
                                         </div>
                                         <div class="times-section">
+																					<!---->
                                             <kendo-dateinput
+																							(valueChange)="onDateChanged('end', $event)"
 																										[disabled]="model.locked"
-                                                    (valueChange)="onDateChanged('end', $event)"
-                                                    [format]="getDateTimeFormat(model.end)"
+                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
                                                     [(value)]="model.end"></kendo-dateinput>
                                         </div>
                                     </div>
@@ -101,7 +103,8 @@ declare var jQuery: any;
                 </div>
             </div>
         </div>
-	`
+	`,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnInit {
 	dataSignature: string;
