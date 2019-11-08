@@ -119,6 +119,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 	protected userTimeZone: string;
 	protected userDateFormat: string;
+	protected showAssetsFilter = false;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -818,4 +819,35 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	protected isAssetCloneAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetCreate);
 	}
+	/**
+	 * Filter Assets Toggle
+	 */
+	public toggleAssetsFilter(): void {
+		this.showAssetsFilter = !this.showAssetsFilter;
+	}
+
+	/**
+	 * Returns the number of current filters applied.
+	 */
+	public filterCount(): number {
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length
+	}
+
+	/**
+	 * ==============
+	 * GRID TEST STUFF
+	 * ===============
+	 * TODO: delete this stuff below
+	 */
+	public assetsGrid: any = {
+		pageable: {
+			pageSizes: [5, 10, 25, 50, 100],
+			info: true,
+			type: 'input',
+		},
+		filterable: true,
+		sortable: true,
+		resizable: true,
+		columnMenu: true,
+	};
 }

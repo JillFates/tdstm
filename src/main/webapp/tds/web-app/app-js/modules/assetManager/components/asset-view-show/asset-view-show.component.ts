@@ -396,20 +396,47 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * On bulk edit call grid bulk edit action
+	 */
 	onClickBulkButton(): void {
 		this.assetExplorerViewGrid.onClickBulkButton(this.tdsBulkChangeButton);
 	}
 
+	/**
+	 * Handle Bulk edit result.
+	 */
 	onBulkOperationResult(operationResult: BulkActionResult): void {
 		this.assetExplorerViewGrid.onBulkOperationResult(operationResult);
 	}
 
+	/**
+	 * Returns the grid configuration.
+	 */
 	getGridConfig(): any {
 		return this.assetExplorerViewGrid && this.assetExplorerViewGrid.getDynamicConfiguration();
 	}
 
+	/**
+	 * On create asset, call grid create asset action.
+	 * @param assetEntityType
+	 */
 	onCreateAsset(assetEntityType: ASSET_ENTITY_DIALOG_TYPES): void {
 		this.assetExplorerViewGrid.onCreateAsset(assetEntityType);
 		this.assetExplorerViewGrid.setCreatebuttonState(assetEntityType);
+	}
+
+	/**
+	 * Calls to grid clear all filters.
+	 */
+	onClearAllFilters(): void {
+		this.assetExplorerViewGrid.onClearFilters();
+	}
+
+	/**
+	 * Returns the number of current filters applied from grid.
+	 */
+	filterCount(): number {
+		return this.assetExplorerViewGrid ? this.assetExplorerViewGrid.filterCount() : 0;
 	}
 }

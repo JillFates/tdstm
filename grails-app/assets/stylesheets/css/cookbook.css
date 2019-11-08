@@ -218,6 +218,9 @@ form .error-msg{
 	border-radius: 0;
 }
 
+.code-editor-modal {
+	padding: 0px;
+}
 .code-editor-modal .modal-dialog {
   width: 1060px;
 }
@@ -225,10 +228,6 @@ form .error-msg{
 /******/
 
 /* Code Diff Stuff */
-
-.code-diff-modal .modal-dialog {
-  width: 1060px;
-}
 
 .codeDiff {
 	height: 430px;
@@ -291,7 +290,7 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 	display: inline-block;
 }
 
-a:hover{
+.content-wrapper a:hover {
 	text-decoration: none;
 	font-weight: normal;
 	cursor: pointer;

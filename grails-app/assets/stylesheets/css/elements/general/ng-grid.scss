@@ -1,12 +1,13 @@
 .cookbook_recipes_editor,
-.recipeDetail {
+.recipeDetail,
+.cloneSelectors {
   .gridStyle,
   .gridStyleTasks,
   .gridStyleGroups {
     border: none;
     background: none;
     .ngTopPanel {
-      background: none;
+      background-color: #d9e4ea;
       .ngHeaderCell {
         .ngVerticalBar  {
           margin-top: 10px;
@@ -29,6 +30,18 @@
       }
       .ngVerticalBar {
         width: 0px !important;
+      }
+    }
+  }
+}
+
+.cloneSelectors {
+  .gridStyle {
+    .ngTopPanel {
+      .ngHeaderCell {
+        .ngHeaderSortColumn {
+          padding-top: 4px;
+        }
       }
     }
   }
