@@ -18,7 +18,7 @@ import {TranslatePipe} from '../../pipes/translate.pipe';
                         <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
-                        <h4 class="modal-title">Create Person</h4>
+                        <h4 class="modal-title">Person Create</h4>
                     </div>
                     <div class="modal-body">
                         <div class="modal-body-container">

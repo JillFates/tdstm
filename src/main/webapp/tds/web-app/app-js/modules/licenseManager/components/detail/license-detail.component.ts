@@ -59,10 +59,8 @@ export class LicenseDetailComponent implements OnInit {
 		});
 
 		this.licenseManagerService.getLicense(this.licenseModel.id).subscribe((licenseModel: any) => {
-			this.licenseModel = licenseModel;
-			this.savedModel = { ... licenseModel };
-			this.licenseModel.activationDate = DateUtils.toDateUsingFormat(licenseModel.activationDate, DateUtils.SERVER_FORMAT_DATE);
-			this.licenseModel.expirationDate = DateUtils.toDateUsingFormat(licenseModel.expirationDate, DateUtils.SERVER_FORMAT_DATE);
+			this.licenseModel = this.applyLicenseModel(licenseModel);
+			this.savedModel = { ... this.licenseModel };
 			this.dataSignature = JSON.stringify(this.licenseModel);
 			this.prepareControlActionButtons();
 			this.prepareLicenseKey();
@@ -91,6 +89,13 @@ export class LicenseDetailComponent implements OnInit {
 		this.licenseManagerService.getActivityLog(this.licenseModel.id).subscribe((activityLog: any) => {
 			this.activityLog = activityLog.sort((a, b) => SortUtils.compareByProperty(a, b, 'dateCreated'));
 		});
+	}
+
+	private applyLicenseModel(licenseModel: any): any {
+		let licenseCpy = { ... licenseModel };
+		licenseCpy.activationDate = DateUtils.toDateUsingFormat(licenseModel.activationDate, DateUtils.SERVER_FORMAT_DATE);
+		licenseCpy.expirationDate = DateUtils.toDateUsingFormat(licenseModel.expirationDate, DateUtils.SERVER_FORMAT_DATE);
+		return licenseCpy;
 	}
 
 	/**
@@ -196,7 +201,8 @@ export class LicenseDetailComponent implements OnInit {
 	public cancelCloseDialog(): void {
 		if (this.editMode) {
 			this.editMode = false;
-			this.licenseModel = JSON.parse(this.dataSignature);
+			let licenseModel = JSON.parse(this.dataSignature);
+			this.licenseModel = this.applyLicenseModel(licenseModel);
 			this.prepareControlActionButtons();
 		} else if (this.reloadRequired) {
 			this.activeDialog.close();

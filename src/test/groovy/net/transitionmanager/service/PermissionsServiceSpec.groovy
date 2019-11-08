@@ -1,25 +1,24 @@
 package net.transitionmanager.service
 
-
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import net.transitionmanager.security.Permissions
 import net.transitionmanager.security.PermissionsService
-import org.springframework.jdbc.core.JdbcTemplate
+import net.transitionmanager.security.RolePermissions
 import spock.lang.Specification
+import spock.util.mop.ConfineMetaClassChanges
 
 class PermissionsServiceSpec extends Specification implements DataTest, ServiceUnitTest<PermissionsService> {
-	void setupSpec(){
-		mockDomains Permissions
+
+	void setupSpec() {
+		mockDomains Permissions, RolePermissions
 	}
 
-	def setup() {
-		service.jdbcTemplate = Mock(JdbcTemplate)
-	}
-
+	@ConfineMetaClassChanges([RolePermissions])
 	void 'test can findAll permissions saved in database'() {
 
 		given:
+			RolePermissions.metaClass.static.executeUpdate = {String query -> RolePermissions.deleteAll()}
 			new Permissions(permissionItem: 'AssetExplorerView', description: 'AssetExplorerView UNIT TEST').save(flush: true)
 			new Permissions(permissionItem: 'AssetExplorerShow', description: 'AssetExplorerShow UNIT TEST').save(flush: true)
 			new Permissions(permissionItem: 'AssetExplorerUpdate', description: 'AssetExplorerUpdate UNIT TEST').save(flush: true)
@@ -33,9 +32,11 @@ class PermissionsServiceSpec extends Specification implements DataTest, ServiceU
 
 	}
 
+	@ConfineMetaClassChanges([RolePermissions])
 	void 'test can update permissions using a Map'() {
 
 		given: 'a permissions domain instance already saved in database'
+			RolePermissions.metaClass.static.executeUpdate = {String query -> RolePermissions.deleteAll()}
 			Permissions viewPermission = new Permissions(permissionItem: 'AssetExplorerView', description: 'AssetExplorerView UNIT TEST').save(flush: true)
 
 		when: 'service is invoked to update permissions'

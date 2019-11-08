@@ -72,11 +72,14 @@ import net.transitionmanager.tag.TagService
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.Recipe
 import net.transitionmanager.task.RecipeVersion
+import org.apache.commons.lang3.time.DateUtils
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
+import java.text.SimpleDateFormat
 
 class ProjectService implements ServiceMethods {
 
@@ -172,7 +175,11 @@ class ProjectService implements ServiceMethods {
 		Map searchParams=[:], UserLogin userLogin = null) {
 
 		def projectIds = []
-		def timeNow = new Date()
+
+		// Convert the current time to beginning of the day adjusted to GMT so projects from today are considered active
+		SimpleDateFormat sdf = new SimpleDateFormat(TimeUtil.FORMAT_DATE_ISO8601)
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+		Date today = sdf.parse(sdf.format(DateUtils.truncate(TimeUtil.nowGMT(), Calendar.DAY_OF_MONTH)))
 
 		if (!userLogin) {
 			userLogin = securityService.userLogin
@@ -251,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					ge("completionDate", timeNow)
+					gt("completionDate", today)
 				} else {
-					lt('completionDate', timeNow)
+					le('completionDate', today)
 				}
 			}
 
@@ -384,12 +391,12 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers.
+	 * Get all clients, partners, managers(id and name only).
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.executeQuery("""
+		List<PartyRelationship> managers = PartyRelationship.executeQuery("""
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
@@ -397,10 +404,21 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
+		Party partyTo
+		managers = managers.sort { GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)?.lastName }
+		List<Map<String, ?>> managersMap = managers.collect { it ->
+			partyTo = GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)
+
+			[
+				id  : partyTo.id,
+				name: partyTo.toString()
+			]
+		}
+
 		[
 			clients : getAllClients(),
 			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-			managers: managers.sort { GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)?.lastName }
+			managers: managersMap
 		]
 	}
 
@@ -603,14 +621,17 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		def message
-		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
-		Project projectInstance = Project.get(projectId)
+	void deleteProject(Long projectId, includeProject=false) throws UnauthorizedException {
 
-		if (!(projectInstance in projects)) {
+		if(projectId == Project.DEFAULT_PROJECT_ID) {
+			throw new InvalidParamException('The default project cannot be deleted.')
+		}
+
+		if (!securityService.hasAccessToProject(projectId)) {
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
+
+		Project projectInstance = Project.get(projectId)
 
 		// remove preferences
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = :project"
@@ -620,15 +641,15 @@ class ProjectService implements ServiceMethods {
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
 		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
 		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
-		String prefDelSql = '''
+		String prefDelSql = """
 			delete from UserPreference up where
-			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
-			(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or
-			(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or
-			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
-			'''
-		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
-		UserPreference.executeUpdate(prefDelSql, prefDelMap)
+			(up.preferenceCode in(:projectCodesList) and up.value = :projectId) or
+			(up.preferenceCode in (:bundleCodesList) and up.value in ($bundleQuery)) or
+			(up.preferenceCode in (:eventCodesList) and up.value in ($eventQuery)) or
+			(up.preferenceCode = '$roomCode' and up.value in ($roomQuery))
+			"""
+		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes, projectId: projectInstance.id.toString(), project: projectInstance]
+		Integer cant = UserPreference.executeUpdate(prefDelSql, prefDelMap)
 
 		// Setting Configuration settings
 		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
@@ -719,7 +740,6 @@ class ProjectService implements ServiceMethods {
 			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
-		return message
 	}
 
 	/**

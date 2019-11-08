@@ -7,8 +7,6 @@ import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
-import groovy.time.TimeCategory
-
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.imports.TaskBatch
@@ -17,16 +15,16 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.Project
 import org.apache.commons.lang3.StringUtils
 
-import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 import static com.tdsops.tm.enums.domain.AssetCommentCategory.GENERAL
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.TimeScale.M
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_ROLE
 
 class AssetComment {
 
@@ -242,14 +240,14 @@ class AssetComment {
 		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestStart formula: '''
 				if(slack is null, est_start, 
-					if(est_start + slack, date_format(addtime(est_start,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+					if(est_start + slack, DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(est_start)+slack*60),'%Y-%m-%d %H:%i:%s'), null)
 				)
 			'''
 
 		// Used to compute the latest start of a task based on the earliest start + any slack in the plan
 		latestFinish formula: '''
 				if(slack is null, est_finish, 
-					if(est_finish + slack, date_format(addtime(est_finish,concat(slack*100,'.0')),'%Y-%m-%d %H:%i:%s'), null)
+					if(est_finish + slack, DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(est_finish)+slack*60),'%Y-%m-%d %H:%i:%s'), null)
 				)
 			'''
 
@@ -556,37 +554,45 @@ class AssetComment {
 		}
 
 		return [
-			id: id,
-			taskNumber: taskNumber,
-			title: comment,
-			status: status,
-			statusUpdated: statusUpdated,
-			statusUpdatedElapsed: TimeUtil.ago(statusUpdated),
-			lastUpdated: lastUpdated,
-			lastUpdatedElapsed: TimeUtil.ago(lastUpdated),
-			action: actionMap,
-			asset: assetMap,
-			assignedTo: assignedMap,
-			category: category ?: '',
-			dateCreated: dateCreated,
-			hardAssigned: hardAssigned == 1,
-			estDurationMinutes: durationInMinutes(),
-			estStart: estStart,
-			estFinish: estFinish,
-			slack: slack,
-			isCriticalPath: isCriticalPath,
-			actStart: actStart,
-			actFinish: actFinish,
-			team: role ?: '',
-			isPublished: isPublished,
-			percentageComplete: percentageComplete,
-			project: [
-				id: this.project.id,
+			id                       : id,
+			taskNumber               : taskNumber,
+			title                    : comment,
+			status                   : status,
+			statusUpdated            : statusUpdated,
+			statusUpdatedElapsed     : TimeUtil.ago(statusUpdated),
+			lastUpdated              : lastUpdated,
+			lastUpdatedElapsed       : TimeUtil.ago(lastUpdated),
+			action                   : actionMap,
+			asset                    : assetMap,
+			assignedTo               : assignedMap,
+			category                 : category ?: '',
+			dateCreated              : dateCreated,
+			hardAssigned             : hardAssigned == 1,
+			estDurationMinutes       : durationInMinutes(),
+			estStart                 : estStart,
+			estFinish                : estFinish,
+			slack                    : slack,
+			isCriticalPath           : isCriticalPath,
+			actStart                 : actStart,
+			actFinish                : actFinish,
+			team                     : role ?: '',
+			isPublished              : isPublished,
+			percentageComplete       : percentageComplete,
+			project                  : [
+				id  : this.project.id,
 				name: this.project.toString()
 			],
-			isActionInvocableLocally: isActionInvocableLocally(),
+			isActionInvocableLocally : isActionInvocableLocally(),
 			isActionInvocableRemotely: isActionInvocableRemotely(),
-			isAutomatic: isAutomatic(),
+			isAutomatic              : isAutomatic(),
+			duration                 : duration,
+			durationScale            : durationScale.name(),
+			hardAssigned             : hardAssigned,
+			sendNotification         : sendNotification,
+			priority                 : priority,
+			moveEvent                : moveEvent?.id,
+			dueDate                  : dueDate,
+			instructionsLink         : instructionsLink
 		]
 
 	}
@@ -626,18 +632,18 @@ class AssetComment {
 
 	Map toMap() {
 		Map dataMap = [
-				id: id,
-				assetEntityId: assetEntity.id,
-				assetName: assetEntity.assetName,
-				assetType: assetEntity.assetType,
-				createdBy: [id:createdBy.id, name: createdBy.toString()],
-				comment: comment,
-				category: category,
-				lastUpdated: lastUpdated,
-				dateCreated: dateCreated,
-				dateResolved: dateResolved,
-				assignedTo: assignedTo?.toString() ?: '',
-				isResolved: dateResolved ? 'Yes' : 'No'
+			id           : id,
+			assetEntityId: assetEntity.id,
+			assetName    : assetEntity.assetName,
+			assetType    : assetEntity.assetType,
+			createdBy    : [id: createdBy.id, name: createdBy.toString()],
+			comment      : comment,
+			category     : category,
+			lastUpdated  : lastUpdated,
+			dateCreated  : dateCreated,
+			dateResolved : dateResolved,
+			assignedTo   : assignedTo?.toString() ?: '',
+			isResolved   : dateResolved ? 'Yes' : 'No'
 		]
 		return dataMap
 	}
