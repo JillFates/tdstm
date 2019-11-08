@@ -457,10 +457,12 @@ export class TaskService {
 			predecessors: actionBarInfo.predecessorsCount || 0,
 			successors: actionBarInfo.successorsCount || 0,
 			assignedTo: actionBarInfo.assignedTo,
+			assignedToName:  actionBarInfo.assignedToName,
 			apiActionId: actionBarInfo.apiActionId,
 			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
 			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
-			category: actionBarInfo.category
+			category: actionBarInfo.category,
+			status: actionBarInfo.status
 		};
 		if (actionBarInfo.invokeActionDetails) {
 			result.invokeButton = { ...actionBarInfo.invokeActionDetails };
