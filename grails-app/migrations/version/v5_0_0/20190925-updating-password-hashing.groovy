@@ -30,4 +30,13 @@ databaseChangeLog = {
 			}
 		}
 	}
+
+
+	changeSet(author: 'tpelletier', id: '20190920 TM-14929-3') {
+		comment("Drop column salt_prefix")
+		preConditions(onFail: 'MARK_RAN') {
+			columnExists(tableName: 'user_login', columnName: 'salt_prefix')
+		}
+		dropColumn(tableName: 'user_login', columnName: 'salt_prefix')
+	}
 }

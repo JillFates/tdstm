@@ -1,8 +1,9 @@
 package net.transitionmanager.security
 
-import com.tdsops.common.security.SecurityUtil
+
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.imports.DataTransferBatch
 import net.transitionmanager.license.LicenseActivityTrack
 import net.transitionmanager.model.ModelSyncBatch
@@ -11,7 +12,6 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserLoginProjectAccess
 import net.transitionmanager.person.UserPreference
 import net.transitionmanager.project.Project
-import net.transitionmanager.exception.DomainUpdateException
 
 class UserLogin {
 
@@ -35,7 +35,6 @@ class UserLogin {
 	Date passwordExpirationDate
 	Integer failedLoginAttempts = 0
 	Boolean passwordNeverExpires = false
-	String saltPrefix = ''
 
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
@@ -53,7 +52,6 @@ class UserLogin {
 		password password: true
 		passwordChangedDate nullable: true
 		passwordExpirationDate nullable: true
-		saltPrefix nullable: true
 		username blank: false, unique: true, size: 2..50
 	}
 
@@ -68,7 +66,6 @@ class UserLogin {
 		lastModified sqltype: 'DateTime'
 		password sqlType: 'varchar(100)' // size must me more than 20 because it will store as hashed code
 		passwordChangedDate sqltype: 'DateTime'
-		saltPrefix sqltype: 'varchar(32)'
 		username sqlType: 'varchar(50)'
 	}
 
@@ -151,13 +148,6 @@ class UserLogin {
 
 	boolean hasEmail() {
 		person?.email
-	}
-
-	String getSaltPrefix() {
-		if (!saltPrefix && isLocal) {
-			saltPrefix = SecurityUtil.randomString(32)
-		}
-		saltPrefix
 	}
 
 	// Set a cleartext password on the UserLogin that will be hash. Note that the domain will
