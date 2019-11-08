@@ -1657,11 +1657,11 @@ class PersonService implements ServiceMethods {
 				if (!byAdmin) {
 					// Verify that the user entered their old password correctly
 					if (!params.oldPassword) {
-						throw new InvalidParamException('The old password is required')
+						throw new InvalidParamException('The Current password is required')
 					}
 
 					if (!passwordEncoder.matches(params.oldPassword, userLogin.password)) {
-						throw new InvalidParamException('Old password entered does not match the existing password')
+						throw new InvalidParamException('Current password entered does not match the existing password')
 					}
 
 					// Verify that the password isn't being changed too often
