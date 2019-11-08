@@ -15,7 +15,7 @@ import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
 import {
 	DataStateChangeEvent,
-	GridDataResult,
+	GridDataResult, PageChangeEvent,
 	RowClassArgs
 } from '@progress/kendo-angular-grid';
 
@@ -831,6 +831,16 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 */
 	public filterCount(): number {
 		return this.model.columns.filter((c: ViewColumn) => c.filter).length
+	}
+
+	/**
+	 * On Page Change, update grid state & handle pagination on server side.
+	 */
+	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
+		this.gridState.skip = skip;
+		this.gridState.take = take;
+		this.updateGridState(this.gridState);
+		this.modelChange.emit();
 	}
 
 	/**
