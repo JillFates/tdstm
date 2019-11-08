@@ -46,7 +46,7 @@ export class RouterUtils {
 			fullPath.push(path);
 		});
 
-		return {path:fullPath, queryString:queryParams};
+		return {path: fullPath, queryString: queryParams };
 	}
 
 	public static getLegacyRoute(value: string): string {

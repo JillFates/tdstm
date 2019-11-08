@@ -27,6 +27,7 @@ import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/direc
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
 import { SortUtils } from '../../../../shared/utils/sort.utils';
+import {StringUtils} from '../../../../shared/utils/string.utils';
 declare var jQuery: any;
 
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
@@ -159,6 +160,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 						// on EDIT mode and empty assetClass
 					} else if (!this.model.assetClass || !this.model.assetClass.id) {
 						this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
+					} else {
+						// for displaying the existing assetClass
+						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
+						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
 					jQuery('[data-toggle="popover"]').popover();
 					this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
@@ -318,6 +323,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` :  this.dateFormat;
 	}
 
+	getDateFormat(date = null): string {
+		return date ? date : this.dateFormat ;
+	}
+
 	/**
 	 * Open the view to allow select a range of estimated dates
 	 */
@@ -444,10 +453,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {boolean}
 	 */
 	protected hasInvalidFields(): boolean {
-		if (!this.modelHelper.hasDependencyTasksChanges()) {
+		if (this.modelHelper && !this.modelHelper.hasDependencyTasksChanges()) {
 			return false;
 		}
-		return this.modelHelper.hasInvalidTasksDependencies();
+		return this.modelHelper && this.modelHelper.hasInvalidTasksDependencies();
 	}
 
 	/**
@@ -488,7 +497,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * On change selection on asset class reset asset entity value
 	 * @returns {void}
 	 */
-	protected onAssetClassChange(): void {
+	protected onAssetClassChange(event): void {
 		this.model.asset = null;
 	}
 
