@@ -24,7 +24,6 @@ import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.project.Project
-import net.transitionmanager.project.StepSnapshot
 import net.transitionmanager.security.Permission
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
@@ -32,6 +31,11 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class WsDashboardController implements ControllerMethods {
+
+	public static final String CLOCK_MODE_NONE 			= 'none'
+	public static final String CLOCK_MODE_COUNTDOWN 	= 'countdown'
+	public static final String CLOCK_MODE_ELAPSED 		= 'elapsed'
+	public static final String CLOCK_MODE_FINISHED 		= 'finished'
 
 	JdbcTemplate jdbcTemplate
 	TaskService taskService
@@ -92,29 +96,29 @@ class WsDashboardController implements ControllerMethods {
 		def moveEventRevisedSnapshot
 		def revisedComp
 		def dayTime
+		String clockMode = CLOCK_MODE_NONE
 		String eventString = ""
 		if (moveEvent) {
 
-			def resultMap = jdbcTemplate.queryForMap( """
-				SELECT max(mb.completion_time) as compTime,
-				min(mb.start_time) as startTime
-				FROM move_bundle mb WHERE mb.move_event_id = $moveEvent.id
-				""" )
-
-			planSumCompTime = resultMap?.compTime
 			Date eventStartTime = moveEvent.estStartTime
-			if (eventStartTime || resultMap?.startTime) {
-				if(!eventStartTime){
-					eventStartTime = new Date(resultMap?.startTime?.getTime())
-				}
-				if (eventStartTime>sysTime) {
+			Date eventComplTime = moveEvent.estCompletionTime
+
+			if (eventStartTime) {
+				if ( eventStartTime > sysTime ) {
 					dayTime = TimeCategory.minus(eventStartTime, sysTime)
 					eventString = "Countdown Until Event"
-				} else {
+					clockMode = CLOCK_MODE_COUNTDOWN
+				} else if (eventStartTime < sysTime && ( !eventComplTime || eventComplTime > sysTime )) {
 					dayTime = TimeCategory.minus(sysTime, eventStartTime)
 					eventString = "Elapsed Event Time"
+					clockMode = CLOCK_MODE_ELAPSED
+				} else {
+					dayTime = TimeCategory.minus(sysTime, eventComplTime)
+					eventString = "Time since the event finished"
+					clockMode = CLOCK_MODE_FINISHED
 				}
 			}
+
 			/*
 			* select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types.
 			*/
@@ -129,7 +133,7 @@ class WsDashboardController implements ControllerMethods {
 			}
 		}
 
-		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
+		String eventClock = TimeUtil.formatTimeDuration(dayTime)
 
 		renderAsJson(snapshot: [
 			revisedComp: moveEvent?.revisedCompletionTime,
@@ -141,8 +145,8 @@ class WsDashboardController implements ControllerMethods {
 				dialInd: moveEventPlannedSnapshot?.dialIndicator,
 				confText: 'High',
 				confColor: 'green',
-				compTime: planSumCompTime,
-				dayTime: eventClockCountdown,
+				dayTime: eventClock,
+				clockMode: clockMode,
 				eventDescription: moveEvent?.description,
 				eventString: eventString,
 				eventRunbook: moveEvent?.runbookStatus
