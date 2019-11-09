@@ -24,7 +24,7 @@ import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
                                         [tooltip]="'Create a note'"
                                         [id]="'btnAddNote'"
                                         (click)="onCreateNote()">
-                        </tds-button-add>						
+                        </tds-button-add>
 					</div>
                 </ng-template>
                 <!-- Columns -->

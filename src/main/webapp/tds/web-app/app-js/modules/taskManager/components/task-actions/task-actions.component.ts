@@ -45,7 +45,6 @@ export interface TaskActionsOptions {
             <tds-button *ngIf="showNeighborhood()" (click)="onNeighborhood()" [icon]="displayAsButtons ? 'align-left' : ''">
                 Neighborhood
             </tds-button>
-			
             <div *ngIf="showDelayActions && showDelay()"
                  class="task-action-buttons">
                 <span class="delay">Delay for:</span>
@@ -55,7 +54,7 @@ export interface TaskActionsOptions {
                 <tds-button (click)="onDelay(2)">
                     2 days
                 </tds-button>
-                <tds-button (click)="onDelay(3)">
+                <tds-button (click)="onDelay(7)">
                     7 days
                 </tds-button>
             </div>
