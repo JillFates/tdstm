@@ -23,29 +23,31 @@ export interface TaskActionsOptions {
 	selector: 'tds-task-actions',
 	template: `
 		<!-- Main content -->
-		<section class="task-actions-component btn-group btn-sm btn-link">
-            <tds-button *ngIf="showStart()" (click)="onStart()" theme="success">
+		<section class="task-actions-component " [ngClass]="{'btn-link': !displayAsButtons, 'btn-group': !displayAsButtons, 'btn-sm': !displayAsButtons}">
+            <tds-button *ngIf="true || showStart()" (click)="onStart()" theme="success" [icon]="displayAsButtons ? 'play' : ''">
 				Start
 			</tds-button>
-            <tds-button *ngIf="showDone()" (click)="onDone()">
+            <tds-button *ngIf="true || showDone()" (click)="onDone()"  [icon]="displayAsButtons ? 'check' : ''">
 				Done
 			</tds-button>
-            <tds-button *ngIf="showInvoke()" [disabled]="!hasInvokePermission || invokeButton.disabled" (click)="onInvoke()">
-				{{invokeButton.label || 'Invoke'}}
+            <tds-button *ngIf="true || showInvoke()" [disabled]="!hasInvokePermission || invokeButton?.disabled" (click)="onInvoke()"  [icon]="displayAsButtons ? 'cog' : ''">
+				{{invokeButton?.label || 'Invoke'}}
 			</tds-button>
-            <tds-button *ngIf="showReset()" (click)="onReset()">
+            <tds-button *ngIf="true || showReset()" (click)="onReset()"  [icon]="displayAsButtons ? 'power' : ''">
 				Reset Action
             </tds-button>
-            <tds-button *ngIf="showDetails" (click)="onShowDetails()">
+            <tds-button *ngIf="true || showDetails" (click)="onShowDetails()" [icon]="displayAsButtons ? 'zoom-in' : ''">
                 Details
             </tds-button>
-            <tds-button *ngIf="showAssignToMe()" (click)="onAssignToMe()">
+            <tds-button *ngIf="true || showAssignToMe()" (click)="onAssignToMe()" [icon]="displayAsButtons ? 'user' : ''">
                 Assign To Me
             </tds-button>
-            <tds-button *ngIf="showNeighborhood()" (click)="onNeighborhood()">
+            <tds-button *ngIf="true || showNeighborhood()" (click)="onNeighborhood()" [icon]="displayAsButtons ? 'align-left' : ''">
                 Neighborhood
             </tds-button>
-            <div *ngIf="showDelayActions && showDelay()"
+			
+			<!--
+            <div *ngIf="true || showDelayActions && showDelay()"
                  class="task-action-buttons">
                 <span class="delay">Delay for:</span>
                 <tds-button (click)="onDelay(1)">
@@ -58,11 +60,13 @@ export interface TaskActionsOptions {
                     7 days
                 </tds-button>
             </div>
+            -->
 		</section>
 	`,
 })
 export class TaskActionsComponent implements OnInit, OnChanges {
 	@Input() taskStatus: string;
+	@Input() displayAsButtons: boolean;
 	@Input() showDelayActions: boolean;
 	@Input() showDetails: boolean;
 	@Input() buttonClass: string;

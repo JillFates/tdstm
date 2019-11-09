@@ -13,7 +13,7 @@
 				</button>
                 <h4 class="modal-title">{{model.title}}</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="min-height: 80%; border: 1px solid blue;">
                 <div class="full-height">
                     <table style="border: 0;" class="full-height">
                         <tbody class="full-height task-layout">
@@ -318,13 +318,14 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer form-group-center">
-					<div class="pull-left" style="display: flex;">
+            <div class="modal-footer" style="padding-left: 25px; padding-right: 25px; display: block">
+                <!--
+				<div style="display: flex;">
                     <button class="btn btn-primary" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
 						<clr-icon aria-hidden="true" shape="pencil"></clr-icon>
                         <span>Edit</span>
                     </button>
-                    <tds-task-actions
+                        <tds-task-actions
 														*ngIf="model.id && model.status"
 														[taskStatus]="model.status"
 														[taskActionInfoModel]="taskActionInfoModel"
@@ -336,14 +337,42 @@
                             (neighborhood)="onNeighborhood()">
 										</tds-task-actions>
                 </div>
+                -->
+                <div style="display: flex; justify-content: space-between">
+                    <div style="display: flex">
+                        <tds-button-edit (click)="editTaskDetail()" [disabled]="!hasEditTaskPermission"></tds-button-edit>
+                        <tds-task-actions *ngIf="model.id && model.status"
+                                          style="text-align: left"
+                                          [taskStatus]="model.status"
+                                          [displayAsButtons]="true"
+                                          [taskActionInfoModel]="taskActionInfoModel"
+                                          (start)="onStartTask()"
+                                          (done)="onDoneTask()"
+                                          (invoke)="onInvoke()"
+                                          (reset)="onReset()"
+                                          (assignToMe)="onAssignToMe()"
+                                          (neighborhood)="onNeighborhood()">
+                        </tds-task-actions>
+                    </div>
+                    <div style="display: flex">
+                        <tds-button-delete (click)="deleteTask()" [disabled]="!hasDeleteTaskPermission"></tds-button-delete>
+                        <tds-button-close (click)="cancelCloseDialog()"></tds-button-close>
+                    </div>
+                </div>
+
+
+
+                <!--
                 <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
 					<clr-icon aria-hidden="true" shape="trash"></clr-icon>
                     <span>Delete</span>
                 </button>
+
                 <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
 					<clr-icon aria-hidden="true" shape="ban"></clr-icon>
                     <span>Close</span>
                 </button>
+                -->
 
             </div>
         </div>
