@@ -41,6 +41,10 @@
     }
   }
 
+  .k-grid-toolbar {
+    padding-bottom: 0;
+  }
+
   .dates-info-container {
     table {
       width: 100%;
@@ -53,6 +57,13 @@
       .last-updated {
         text-align: right;
       }
+    }
+  }
+
+  tds-button {
+    button {
+      color: unset;
+      border-color: unset;
     }
   }
 }

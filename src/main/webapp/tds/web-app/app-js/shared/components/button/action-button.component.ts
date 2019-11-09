@@ -47,6 +47,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 				[title]="tooltip || button.tooltip || ''"
 				[disabled]="disabled || !hasAllPermissions"
 				[tabindex]="tabindex"
+				class="action-button"
 				[iconClass]="iconClass">
 			{{ displayLabel ? titleButton : '' }}
 		</tds-button>

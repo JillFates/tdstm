@@ -11,7 +11,7 @@ export class ButtonsFactoryService {
 		const translate = this.translateService.transform.bind(this.translateService);
 
 		this.registeredButtons = {
-			['tds-button-add']: {icon: 'plus', title: translate('GLOBAL.ADD'), tooltip: translate('GLOBAL.ADD')},
+			['tds-button-add']: {icon: 'plus-circle', title: translate('GLOBAL.ADD'), tooltip: translate('GLOBAL.ADD')},
 			['tds-button-cancel']: {
 				icon: 'ban',
 				title: translate('GLOBAL.CANCEL'),

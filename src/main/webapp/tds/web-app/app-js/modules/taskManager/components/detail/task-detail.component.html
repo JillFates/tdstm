@@ -219,12 +219,12 @@
                                                     [rowClass]="modelHelper.rowStatusColor">
                                                     <!-- Toolbar Template -->
                                                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                                        <div>
-                                                            <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessors ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
-                                                            <tds-button-add class="float-right"
-                                                                            title="Create"
+                                                        <div class="table-container">
+                                                            <label class="table-title">Predecessors ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
+                                                            <tds-button-add title="Create"
                                                                             [displayLabel]="false"
                                                                             [small]="true"
+                                                                            iconClass="is-solid"
                                                                             [tooltip]="modelHelper.CREATE_PREDECESSOR"
                                                                             [id]="'btnAddPredecessor'"
                                                                             (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
@@ -268,13 +268,17 @@
                                                     [rowClass]="modelHelper.rowStatusColor">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
-                                                    <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
-                                                    <tds-button-add class="button-header-grid float-right"
-                                                                    title="Create"
-                                                                    [tooltip]="modelHelper.CREATE_SUCCESSOR"
-                                                                    [id]="'btnAddSuccessor'"
-                                                                    (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
-                                                    </tds-button-add>
+                                                    <div class="table-container">
+                                                        <label class="table-title">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
+                                                        <tds-button-add title="Create"
+                                                                        [displayLabel]="false"
+                                                                        iconClass="is-solid"
+                                                                        [small]="true"
+                                                                        [tooltip]="modelHelper.CREATE_SUCCESSOR"
+                                                                        [id]="'btnAddSuccessor'"
+                                                                        (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
+                                                        </tds-button-add>
+                                                    </div>
                                                 </ng-template>
                                                 <!-- Columns -->
                                                 <kendo-grid-column *ngFor="let column of taskSuccessorPredecessorColumnsModel.columns"
