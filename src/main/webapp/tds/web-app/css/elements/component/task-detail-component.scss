@@ -1,9 +1,17 @@
 @import "../../base/taskstatus-mixins";
 
 .task-detail-component {
+  .task-detail-container {
+    display: flex;
+    height: 83%;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
   .modal-body {
-    height: 80%;
+    //height: 80%;
+    flex: 1;
+    max-height: unset;
 
     .full-height {
       padding-left: 24px;
@@ -70,12 +78,16 @@
   .modal-footer {
     padding-left: 25px;
     padding-right: 25px;
+    padding-top: 5px;
     display: block;
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
     .options-container {
       display: flex;
       justify-content: space-between;
-      height: 46px;
-      align-items: flex-end;
+      //height: 46px;
+      //align-items: flex-end;
       .options {
         display: flex;
       }

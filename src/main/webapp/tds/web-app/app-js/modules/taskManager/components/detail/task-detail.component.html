@@ -13,7 +13,8 @@
 				</button>
                 <h4 class="modal-title">{{model.title}}</h4>
             </div>
-            <div class="modal-body">
+            <div class="task-detail-container">
+                <div class="modal-body">
                 <div class="full-height">
                     <table class="full-height">
                         <tbody class="full-height task-layout">
@@ -318,7 +319,7 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer">
+                <div class="modal-footer">
                 <div class="options-container">
                     <div class="options">
                         <tds-button-edit (click)="editTaskDetail()" [disabled]="!hasEditTaskPermission"></tds-button-edit>
@@ -340,6 +341,7 @@
                         <tds-button-close (click)="cancelCloseDialog()"></tds-button-close>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
