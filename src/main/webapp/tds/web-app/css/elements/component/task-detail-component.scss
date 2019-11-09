@@ -74,6 +74,8 @@
     .options-container {
       display: flex;
       justify-content: space-between;
+      height: 46px;
+      align-items: flex-end;
       .options {
         display: flex;
       }
