@@ -34,8 +34,8 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-expand
 	`,
 	template: `
+<!--        [ngClass]="hostClasses.length ? hostClasses.value : ''"-->
 		<tds-button
-				[ngClass]="hostClasses.length ? hostClasses.value : ''"
 				[id]="id"
 				[type]="type"
 				[theme]="theme"
