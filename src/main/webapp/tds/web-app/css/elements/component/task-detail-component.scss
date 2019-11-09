@@ -1,61 +1,81 @@
 @import "../../base/taskstatus-mixins";
 
 .task-detail-component {
-  .btn-collapsed-fixed-right {
-    position: absolute;
-    right: 20px;
-  }
 
-  .full-height {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
+  .modal-body {
+    min-height: 80%;
 
-  table.task-details {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 3px;
-    padding: 0;
-    td {
-      display: table-cell;
-      text-align: initial;
-      vertical-align: inherit;
-      color: inherit;
-      font-weight: inherit;
-      font-size: 13px;
-      border-radius: .25em;
-      //width: 10%;
-      padding: 4px 6px;
-    }
-    td.N {
-      width: 15%;
-      //border: 1px solid blue;
-      label {
-        margin-bottom: unset;
-        font-weight: unset;
+    .full-height {
+      padding-left: 24px;
+      padding-right: 24px;
+
+      .dates-info-container {
+        table {
+          width: 100%;
+          tr {
+            width: 100%;
+          }
+          .date-created, .last-updated {
+            width: 50%;
+          }
+          .last-updated {
+            text-align: right;
+          }
+        }
       }
-    }
-    td.valueNW {
-      //width: 20%;
-      //border: 1px solid blue;
-    }
-  }
 
-  .k-grid-toolbar {
-    padding-bottom: 0;
-  }
+      .btn-collapsed-fixed-right {
+        position: absolute;
+        right: 20px;
+      }
 
-  .dates-info-container {
-    table {
-      width: 100%;
-      tr {
+      table.task-details {
         width: 100%;
+        border-collapse: separate;
+        border-spacing: 3px;
+        padding: 0;
+        .task-number {
+          min-width: 104px;
+        }
+        .task-comment {
+          max-width: 400px;
+          font-weight:bold;
+        }
+        td {
+          display: table-cell;
+          text-align: initial;
+          vertical-align: inherit;
+          color: inherit;
+          font-weight: inherit;
+          font-size: 13px;
+          border-radius: .25em;
+          padding: 4px 6px;
+        }
+        td.N {
+          width: 15%;
+          label {
+            margin-bottom: unset;
+            font-weight: unset;
+          }
+        }
       }
-      .date-created, .last-updated {
-        width: 50%;
-      }
-      .last-updated {
-        text-align: right;
+    }
+
+    .k-grid-toolbar {
+      padding-bottom: 0;
+    }
+
+  }
+
+  .modal-footer {
+    padding-left: 25px;
+    padding-right: 25px;
+    display: block;
+    .options-container {
+      display: flex;
+      justify-content: space-between;
+      .options {
+        display: flex;
       }
     }
   }

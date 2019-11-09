@@ -13,9 +13,9 @@
 				</button>
                 <h4 class="modal-title">{{model.title}}</h4>
             </div>
-            <div class="modal-body" style="min-height: 80%; border: 1px solid blue;">
+            <div class="modal-body">
                 <div class="full-height">
-                    <table style="border: 0;" class="full-height">
+                    <table class="full-height">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td colspan="2">
@@ -28,9 +28,9 @@
                                             <tbody>
                                                 <tr class="prop">
                                                     <td class="N" nowrap="nowrap">
-                                                        <label style="min-width: 104px;">Task # {{model.taskNumber}}</label>
+                                                        <label class="task-number">Task # {{model.taskNumber}}</label>
                                                     </td>
-                                                    <td class="valueNW" colspan="5" style="max-width: 400px; font-weight:bold;">
+                                                    <td class="valueNW" class="task-comment" colspan="5">
                                                         <span>{{model.comment}}</span>
                                                     </td>
                                                 </tr>
@@ -318,28 +318,9 @@
                     </table>
                 </div>
             </div>
-            <div class="modal-footer" style="padding-left: 25px; padding-right: 25px; display: block">
-                <!--
-				<div style="display: flex;">
-                    <button class="btn btn-primary" (click)="editTaskDetail()" type="button" [disabled]="!hasEditTaskPermission">
-						<clr-icon aria-hidden="true" shape="pencil"></clr-icon>
-                        <span>Edit</span>
-                    </button>
-                        <tds-task-actions
-														*ngIf="model.id && model.status"
-														[taskStatus]="model.status"
-														[taskActionInfoModel]="taskActionInfoModel"
-                            (start)="onStartTask()"
-                            (done)="onDoneTask()"
-                            (invoke)="onInvoke()"
-														(reset)="onReset()"
-                            (assignToMe)="onAssignToMe()"
-                            (neighborhood)="onNeighborhood()">
-										</tds-task-actions>
-                </div>
-                -->
-                <div style="display: flex; justify-content: space-between">
-                    <div style="display: flex">
+            <div class="modal-footer">
+                <div class="options-container">
+                    <div class="options">
                         <tds-button-edit (click)="editTaskDetail()" [disabled]="!hasEditTaskPermission"></tds-button-edit>
                         <tds-task-actions *ngIf="model.id && model.status"
                                           style="text-align: left"
@@ -354,26 +335,11 @@
                                           (neighborhood)="onNeighborhood()">
                         </tds-task-actions>
                     </div>
-                    <div style="display: flex">
+                    <div class="options">
                         <tds-button-delete (click)="deleteTask()" [disabled]="!hasDeleteTaskPermission"></tds-button-delete>
                         <tds-button-close (click)="cancelCloseDialog()"></tds-button-close>
                     </div>
                 </div>
-
-
-
-                <!--
-                <button (click)="deleteTask()" type="button" class="btn btn-danger component-action-delete" [disabled]="!hasDeleteTaskPermission">
-					<clr-icon aria-hidden="true" shape="trash"></clr-icon>
-                    <span>Delete</span>
-                </button>
-
-                <button (click)="cancelCloseDialog()" type="button" class="btn btn-default component-action-cancel pull-right">
-					<clr-icon aria-hidden="true" shape="ban"></clr-icon>
-                    <span>Close</span>
-                </button>
-                -->
-
             </div>
         </div>
     </div>
