@@ -207,7 +207,7 @@
 					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div *ngIf="isFiltering && column.filterable">
+						<div *ngIf="isFiltering && column.filterable" class="filter-input">
 							<div *ngIf="column.type === 'text'; then stringFilter"></div>
 							<ng-template #stringFilter>
 								<tds-filter-input
