@@ -33,7 +33,7 @@ class InsightService implements ServiceMethods {
 			JOIN a.manufacturer as m
 			WHERE a.project = :project
 			GROUP BY m.name
-			ORDER BY COUNT(*)  desc
+			ORDER BY COUNT(*) desc, m.name  desc
 		''', [
 			project: project
 		], [max: max])
@@ -55,7 +55,7 @@ class InsightService implements ServiceMethods {
 			JOIN a.manufacturer as m
 			WHERE a.project = :project
 			GROUP BY m.name
-			ORDER BY COUNT(*)  desc
+			ORDER BY COUNT(*) desc, m.name  desc
 		''', [
 			project: project
 		], [max: max])

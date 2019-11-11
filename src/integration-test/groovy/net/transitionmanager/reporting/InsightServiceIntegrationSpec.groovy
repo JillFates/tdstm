@@ -18,8 +18,8 @@ import test.helper.AssetEntityTestHelper
 import test.helper.MoveBundleTestHelper
 import test.helper.ProjectTestHelper
 
-@Integration
 @Rollback
+@Integration
 class InsightServiceIntegrationSpec extends Specification {
 	InsightService insightService
 
@@ -264,10 +264,10 @@ class InsightServiceIntegrationSpec extends Specification {
 					name : 'manufacturer4',
 					count: 12
 				], [
-					name : 'manufacturer2',
+					name : 'manufacturer3',
 					count: 8
 				], [
-					name : 'manufacturer3',
+					name : 'manufacturer2',
 					count: 8
 				], [
 					name : 'manufacturer1',
@@ -288,10 +288,10 @@ class InsightServiceIntegrationSpec extends Specification {
 					name : 'manufacturer4',
 					count: 11
 				], [
-					name : 'manufacturer2',
+					name : 'manufacturer3',
 					count: 7
 				], [
-					name : 'manufacturer3',
+					name : 'manufacturer2',
 					count: 7
 				], [
 					name : 'manufacturer1',
@@ -344,14 +344,10 @@ class InsightServiceIntegrationSpec extends Specification {
 
 
 	void cleanup() {
-		AssetEntity.withTransaction {
-
-			Tag.where { project == project }.deleteAll()
-			AssetEntity.where { project == project }.deleteAll()
-			Manufacturer.findByName('manufacturer1').delete(flush: true)
-			Manufacturer.findByName('manufacturer2').delete(flush: true)
-			Manufacturer.findByName('manufacturer3').delete(flush: true)
-			Manufacturer.findByName('manufacturer4').delete(flush: true)
-		}
+		AssetEntity.where { project == project }.deleteAll()
+		Manufacturer.findByName('manufacturer1').delete(flush: true)
+		Manufacturer.findByName('manufacturer2').delete(flush: true)
+		Manufacturer.findByName('manufacturer3').delete(flush: true)
+		Manufacturer.findByName('manufacturer4').delete(flush: true)
 	}
 }
