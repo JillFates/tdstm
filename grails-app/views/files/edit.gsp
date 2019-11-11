@@ -36,109 +36,120 @@
 	<%-- Used to track dependencies added and deleted --%>
 	<g:render template="/assetEntity/dependentHidden" />
 
-	<table style="border: 0;" class="asset-entities-dialog-table-content">
-		<tr>
-			<td colspan="2">
-				<div class="dialog">
-					<table>
-						<tbody>
+	<div class="legacy-modal-dialog">
+		<div class="legacy-modal-content">
+			<%-- Header Content Here --%>
+			<g:render template="/assetEntity/showHeader" model="[assetEntity:fileInstance]"></g:render>
+			<div id="modalBody" class="legacy-modal-body">
+				<div class="legacy-modal-body-content">
+					<table style="border: 0;" class="asset-entities-dialog-table-content">
 						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${fileInstance?.assetName}"/>
-							</td>
-							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${fileInstance?.assetName}"/>
-							</td>
-							<tds:inputLabel field="${standardFieldSpecs.description}" value="${fileInstance?.description}"/>
-							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${fileInstance?.description}" tooltipDataPlacement="bottom"/>
-							</td>
-
-						</tr>
-						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
-							<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
-							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
-							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
-									<g:select class="${standardFieldSpecs.moveBundle.imp?:''}" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-
-						<tr>
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
-								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
-									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
-								</label>
-							</td>
-							<td nowrap="nowrap" class="sizeScale">
-								<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
-								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
-									<g:select class="${standardFieldSpecs.scale.imp?:''}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).scale.inList}" name="scale" id="scale" tabindex="13"
-											  value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
-								</tds:tooltipSpan>
-							</td>
-
-							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
-
-							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}"
-											  value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
-								</tds:tooltipSpan>
-							</td>
-
-							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
-									<g:select class="${standardFieldSpecs.planStatus.imp?:''}" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tr>
-							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.rateOfChange}">
-									<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${fileInstance?.rateOfChange}" tabindex="14"/>
-								</tds:tooltipSpan>
-							</td>
-
 							<td colspan="2">
-							<td colspan="2">
+								<div class="dialog">
+									<table>
+										<tbody>
+										<tr>
+											<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${fileInstance?.assetName}"/>
+											</td>
+											<td colspan="3">
+												<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="10" value="${fileInstance?.assetName}"/>
+											</td>
+											<tds:inputLabel field="${standardFieldSpecs.description}" value="${fileInstance?.description}"/>
+											<td colspan="3">
+												<tds:inputControl field="${standardFieldSpecs.description}" tabindex="11" value="${fileInstance?.description}" tooltipDataPlacement="bottom"/>
+											</td>
 
-							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
-									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
-								</tds:tooltipSpan>
+										</tr>
+										<tr>
+											<tds:inputLabelAndField field="${standardFieldSpecs.fileFormat}" value="${fileInstance.fileFormat}" tabindex="12"/>
+											<tds:inputLabelAndField field="${standardFieldSpecs.LUN}" value="${fileInstance.LUN}" tabindex="22"/>
+											<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${fileInstance?.supportType}" tabindex="32"/>
+											<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${fileInstance?.moveBundle}"/>
+											<td>
+												<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}" tooltipDataPlacement="bottom">
+													<g:select class="${standardFieldSpecs.moveBundle.imp?:''}" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${fileInstance?.moveBundle?.id}" tabindex="42" optionKey="id" optionValue="name" tabindex="34" />
+												</tds:tooltipSpan>
+											</td>
+										</tr>
+
+										<tr>
+											<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
+												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+													${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+												</label>
+											</td>
+											<td nowrap="nowrap" class="sizeScale">
+												<tds:inputControl field="${standardFieldSpecs.size}" tabindex="13" value="${fileInstance?.size}"/>&nbsp;
+												<tds:tooltipSpan field="${standardFieldSpecs.scale}">
+													<g:select class="${standardFieldSpecs.scale.imp?:''}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).scale.inList}" name="scale" id="scale" tabindex="13"
+															value="${fileInstance.scale}" optionValue="value" noSelection="${['':' Please Select']}"/>
+												</tds:tooltipSpan>
+											</td>
+
+											<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${fileInstance.externalRefId}" tabindex="23"/>
+
+											<tds:inputLabel field="${standardFieldSpecs.environment}" value="${fileInstance?.environment}"/>
+											<td>
+												<tds:tooltipSpan field="${standardFieldSpecs.environment}">
+													<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}"
+															value="${fileInstance.environment}" tabindex="33" noSelection="${['':' Please Select']}" />
+												</tds:tooltipSpan>
+											</td>
+
+											<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${fileInstance?.planStatus}"/>
+											<td>
+												<tds:tooltipSpan field="${standardFieldSpecs.planStatus}" tooltipDataPlacement="bottom">
+													<g:select class="${standardFieldSpecs.planStatus.imp?:''}" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${fileInstance.planStatus}"  tabindex="43"/>
+												</tds:tooltipSpan>
+											</td>
+										</tr>
+										<tr>
+											<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${fileInstance?.rateOfChange}"/>
+											<td>
+												<tds:tooltipSpan field="${standardFieldSpecs.rateOfChange}">
+													<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" value="${fileInstance?.rateOfChange}" tabindex="14"/>
+												</tds:tooltipSpan>
+											</td>
+
+											<td colspan="2">
+											<td colspan="2">
+
+											<tds:inputLabel field="${standardFieldSpecs.validation}" value="${fileInstance?.validation}"/>
+											<td>
+												<tds:tooltipSpan field="${standardFieldSpecs.validation}" tooltipDataPlacement="bottom">
+													<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(fileInstance.class).validation.inList}" id="validation" name="validation" tabindex="44" value="${fileInstance.validation}"/>
+												</tds:tooltipSpan>
+											</td>
+										</tr>
+											<tbody class="customTemplate">
+											<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
+											</tbody>
+
+											<g:render template="/comment/assetTagsEdit"></g:render>
+										</tbody>
+									</table>
+								</div>
 							</td>
 						</tr>
-							<tbody class="customTemplate">
-							<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:fileInstance]"></g:render>
-							</tbody>
 
-							<g:render template="/comment/assetTagsEdit"></g:render>
-						</tbody>
+
+
+						<tr id="filesDependentId" class="assetDependent">
+							<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<div class="buttons">
+									<g:render template="/assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
+								</div>
+							</td>
+						</tr>
 					</table>
 				</div>
-			</td>
-		</tr>
-
-
-
-		<tr id="filesDependentId" class="assetDependent">
-			<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<div class="buttons">
-					<g:render template="/assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
-				</div>
-			</td>
-		</tr>
-	</table>
+			</div>
+		</div>
+		<g:render template="/assetEntity/editButtons" model="[assetEntity:fileInstance]"></g:render>
+	</div>
 </g:form>
 <script>
     $(document).ready(function() {
