@@ -8,6 +8,7 @@ import {AlertType} from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
+import {SaveOptions} from '../../../../shared/model/save-options.model';
 
 
 @Component({
@@ -30,15 +31,16 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
                             </label>
                         </div>
                         <div class="form-group" style="padding-left:160px;">
-                            <div *ngIf="hasMaintainAssetList() && !isDefaultProject">
+                            <div *ngIf="hasMaintainAssetList()">
                                 <div class="radio">
                                     <div>
                                         <label>
                                             <input type="radio"
                                                    name="radio-mode"
-                                                   [value]="MODES.SMV"
+                                                   [value]="SAVE_AS_OPTIONS.MY_VIEW.value"
+												   [disabled]="SAVE_AS_OPTIONS.MY_VIEW.disabled"
                                                    (change) = "onChangeMode()"
-                                                   [(ngModel)]="mode"
+                                                   [(ngModel)]="currentSaveOption"
                                                    checked>
                                             <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
                                         </label>
@@ -77,11 +79,14 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="hasMaintainAssetList() && !isDefaultProject">
+                            <div *ngIf="hasMaintainAssetList()">
                                 <div class="radio" style="position:inherit">
                                     <label for="overrideMe">
-                                        <input id="overrideMe" type="radio" name="radio-mode" [value]="MODES.OEVM" (change) = "onChangeMode()"
-                                               [(ngModel)]="mode">
+                                        <input id="overrideMe" type="radio" name="radio-mode"
+											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value"
+											   [disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.disabled"
+											   (change) = "onChangeMode()"
+                                               [(ngModel)]="currentSaveOption">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
                                     </label>
                                 </div>
@@ -89,8 +94,11 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
                             <div *ngIf="hasMaintainSystemList()">
                                 <div class="radio">
                                     <label for="overrideAll">
-                                        <input id="overrideAll" type="radio" name="radio-mode" [value]="MODES.OEVA" (change) = "onChangeMode()"
-                                               [(ngModel)]="mode">
+                                        <input id="overrideAll" type="radio" name="radio-mode"
+											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value"
+											   [disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.disabled"
+											   (change) = "onChangeMode()"
+                                               [(ngModel)]="currentSaveOption">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
                                     </label>
                                 </div>
@@ -115,19 +123,21 @@ import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
 })
 export class AssetViewSaveComponent implements AfterViewInit {
 	public model: ViewModel;
+	public saveOptions: SaveOptions;
 	private preModel: ViewModel;
 	public isUnique = true;
-	private readonly MODES = {
-		SMV: 'SMV',
-		OEVM: 'OEVM',
-		OEVA: 'OEVA'
+	public SAVE_AS_OPTIONS = {
+		MY_VIEW: {value: 'MY_VIEW', disabled: false},
+		OVERRIDE_FOR_ME: {value: 'OVERRIDE_FOR_ME', disabled: false },
+		OVERRIDE_FOR_ALL: {value: 'OVERRIDE_FOR_ALL', disabled: false }
 	};
-	public mode = this.MODES.SMV;
-	private isDefaultProject = false;
+
+	public currentSaveOption: string;
 
 	constructor(
 		model: ViewModel,
 		private favorites: ViewGroupModel,
+		saveOptions: SaveOptions,
 		private assetExpService: AssetExplorerService,
 		public activeDialog: UIActiveDialogService,
 		private permissionService: PermissionService,
@@ -135,18 +145,16 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		private notifier: NotifierService) {
 		this.preModel = model;
 		this.startModel(model);
-		this.userContextService
-			.getUserContext()
-			.subscribe(userContext => {
-				this.isDefaultProject = userContext.project.id === DEFAULT_PROJECT.id;
-				this.mode = this.isDefaultProject ? this.MODES.OEVA :  this.MODES.SMV;
-			})
+		this.saveOptions = saveOptions;
+		this.currentSaveOption = this.saveOptions.saveAsOptions[0] || this.SAVE_AS_OPTIONS.MY_VIEW.value;
+		this.setDisabling();
 	}
 
 	ngAfterViewInit(): void {
 		if (this.model.name) {
 			this.validateUniquenessDataViewByName(this.model.name);
 		}
+		this.setDisabling();
 	}
 
 	public cancelCloseDialog(): void {
@@ -163,15 +171,15 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public isSaveInMyViewMode(): boolean {
-		return this.mode === this.MODES.SMV;
+		return this.currentSaveOption === this.SAVE_AS_OPTIONS.MY_VIEW.value;
 	}
 
 	public isOverrideForMeMode(): boolean {
-		return this.mode === this.MODES.OEVM;
+		return this.currentSaveOption === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value;
 	}
 
 	public isOverrideAllUsersMode(): boolean {
-		return this.mode === this.MODES.OEVM;
+		return this.currentSaveOption === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value;
 	}
 
 	public isValid(): boolean {
@@ -224,8 +232,15 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		}
 	}
 
+	private setDisabling(): void {
+		const options = Object.entries(this.SAVE_AS_OPTIONS);
+		for(const [key, value] of options) {
+			value.disabled = !this.saveOptions.saveAsOptions.includes(key);
+		}
+	}
+
 	public onFavorite() {
-		if(!this.isSaveInMyViewMode()){
+		if(!this.isSaveInMyViewMode()) {
 			return;
 		}
 		if (this.model.isFavorite) {
@@ -250,7 +265,8 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public onChangeMode() {
-		if (this.mode !== this.MODES.SMV) {
+		this.setDisabling();
+		if (this.currentSaveOption !== this.SAVE_AS_OPTIONS.MY_VIEW.value) {
 			this.model.name = this.preModel.name;
 		}
 	}

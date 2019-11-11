@@ -11,6 +11,7 @@
                 </tds-button-save>
 
                 <button type="button" class="btn dropdown-toggle"
+                        *ngIf="config.canSave && config.canSaveAs"
                         [ngClass]="{'btn': true, 'btn-default': !config.isDirty,'btn-success': config.isDirty, 'pull-right': true }"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="caret asset-view-show-caret"></span>

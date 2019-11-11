@@ -25,6 +25,7 @@ import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {SaveOptions} from "../../../../shared/model/save-options.model";
 
 declare var jQuery: any;
 
@@ -38,6 +39,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	public model: ViewModel = new ViewModel();
+	public saveOptions:any;
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
 	private lastSnapshot;
@@ -72,7 +74,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		this.model = this.route.snapshot.data['report'];
+		const {dataView, saveOptions} = this.route.snapshot.data['report'];
+		this.model = dataView;
+		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
 	}
 
@@ -112,7 +116,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 					this.metadata.tagList = this.lastSnapshot.data['tagList'];
 					this.fields = this.lastSnapshot.data['fields'];
 					this.domains = this.lastSnapshot.data['fields'];
-					this.model = this.lastSnapshot.data['report'];
+					const { dataView } = this.lastSnapshot.data['report'];
+					this.model = dataView ;
 					this.dataSignature = this.stringifyCopyOfModel(this.model);
 					this.initialiseComponent();
 				}
@@ -188,7 +193,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: ViewGroupModel, useValue: selectedData }
+			{ provide: ViewGroupModel, useValue: selectedData },
+			{ provide: SaveOptions, useValue: this.saveOptions }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = this.stringifyCopyOfModel(this.model);
@@ -304,17 +310,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	public canSave(): boolean {
 		// If it's all assets view then don't Save is allowed.
-		if (this.assetExplorerService.isAllAssets(this.model)) {
-			return false;
-		}
-		// If it's a system view
-		if (this.model.isSystem) {
-			return this.permissionService.hasPermission(Permission.AssetExplorerEdit) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit);
-		} else {
-			// If it's not a system view.
-			return this.model.isOwner && this.permissionService.hasPermission(Permission.AssetExplorerEdit);
-		}
+		return this.saveOptions.save;
 	}
 
 	/**
@@ -323,14 +319,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	public canSaveAs(): boolean {
 		// If it's a system view
-		if (this.model.isSystem) {
-			return this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
-		} else {
-			// If it's not a system view
-			return this.permissionService.hasPermission(Permission.AssetExplorerCreate) &&
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs);
-		}
+		return this.saveOptions.saveAs;
 	}
 
 	public isEditAvailable(): boolean {

@@ -79,7 +79,8 @@ export class AssetViewConfigComponent implements OnInit {
 		this.allFields = this.route.snapshot.data['fields'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		this.model = {...this.route.snapshot.data['report']};
+		const {dataView} = this.route.snapshot.data['report'];
+		this.model = {...dataView};
 		this.dataSignature = JSON.stringify(this.model);
 		this.draggableColumns = [];
 		if (this.model.id) {
