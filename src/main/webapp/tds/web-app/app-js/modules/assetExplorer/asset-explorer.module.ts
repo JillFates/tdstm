@@ -121,7 +121,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		ModelDeviceShowComponent,
 		AssetCloneComponent,
 		TaskActionSummaryComponent
-	],
+	]
 })
 
 export class AssetExplorerModule {
