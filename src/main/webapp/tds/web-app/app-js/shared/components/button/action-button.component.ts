@@ -34,7 +34,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 	template: `
 		<button *ngIf="button"
 			type="button"
-			[tabindex]="tabindex"
+			[tabindex]="tabIndex"
 			[disabled]="disabled || !hasAllPermissions"
 			[id]="id"
 			[title]="tooltip || button.tooltip || titleButton"
@@ -56,7 +56,7 @@ export class TDSActionButton implements OnInit, OnChanges {
 	@Input() tooltip = '';
 	@Input() icon = '';
 	@Input() id = '';
-	@Input() tabindex = '';
+	@Input() tabIndex = '';
 	@Input() disabled = false;
 	@Input() isIconButton = false;
 	@Input() permissions: string[];

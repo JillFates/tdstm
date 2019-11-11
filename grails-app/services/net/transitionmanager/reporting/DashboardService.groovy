@@ -141,7 +141,6 @@ class DashboardService implements ServiceMethods {
 			projectLogo                   : ProjectLogo.findByProject(project),
 			moveEvent                     : moveEvent,
 			moveEventsList                : moveEventsList,
-			moveBundleSteps               : moveEventService.getMoveBundleSteps(moveBundleList),
 			moveBundleList                : moveBundleList,
 			timeToUpdate                  : userPreferenceService.getPreference(UserPreferenceEnum.DASHBOARD_REFRESH) ?: 'never',
 			EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),

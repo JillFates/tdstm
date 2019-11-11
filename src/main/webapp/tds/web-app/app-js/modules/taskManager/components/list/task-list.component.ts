@@ -643,11 +643,11 @@ export class TaskListComponent {
 		this.taskService.getTaskList(request)
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
-				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 				this.loading = false;
-				// silently load all task action info model, this to improve the performance when opening the task detail row.
 				if (taskId && taskId >= 0) {
 					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
+				} else {
+					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 				}
 			});
 		this.loaderService.stopProgress();

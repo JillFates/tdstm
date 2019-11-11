@@ -1,0 +1,25 @@
+package version.v4_7_2
+/**
+ * @author ecantu
+ * Drop tables move_bundle_step and step_snapshot.
+ * @See TM-16017
+ */
+databaseChangeLog = {
+    changeSet(author: 'ecantu', id: '20191009 TM-16017-1') {
+        comment('Drop table move_bundle_step')
+
+        preConditions(onFail: 'MARK_RAN') {
+            tableExists(tableName: 'move_bundle_step')
+        }
+        sql('DROP TABLE move_bundle_step')
+    }
+
+    changeSet(author: 'ecantu', id: '20191009 TM-16017-2') {
+        comment('Drop table step_snapshot')
+
+        preConditions(onFail: 'MARK_RAN') {
+            tableExists(tableName: 'step_snapshot')
+        }
+        sql('DROP TABLE step_snapshot')
+    }
+}
