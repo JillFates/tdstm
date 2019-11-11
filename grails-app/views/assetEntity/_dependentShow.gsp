@@ -2,7 +2,7 @@
 
 <div id="supports">
 	<h1>Supports:</h1>
-	<table class="tds-table">
+	<table>
 		<thead>
 			<tr>
 				<th>Class</th>
@@ -71,7 +71,7 @@
 
 <div id="depends">
 	<h1>Is dependent on:</h1>
-	<table style="min-width: 400px;" class="planning-application-table table-responsive">
+	<table>
 		<thead>
 			<tr>
 				<th>Class</th>

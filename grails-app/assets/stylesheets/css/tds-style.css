@@ -1151,75 +1151,76 @@ div.dates-info-container {
         width: calc(100% - 250px); }
     .legacy-modal-dialog .legacy-modal-content .legacy-modal-body {
       margin-left: 24px;
-      width: calc(100vw - 212px);
-      padding-right: 40px;
+      width: calc(100vw - 172px);
       overflow-y: scroll;
       overflow-x: hidden; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.has-description {
         max-height: calc(100vh - 300px); }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.no-description {
         max-height: calc(100vh - 255px); }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
-        border: unset;
-        word-break: break-word;
-        border-spacing: unset; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
-        display: block;
-        width: 100%;
-        text-align: right;
-        font-size: 12px;
-        font-weight: 500;
-        color: #3c8dbc;
-        cursor: pointer; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-        justify-content: space-between; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
-          width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
-            width: 100%; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
-          width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
-            width: 49%; }
-            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
-            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
-              width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
-            margin-left: 2%; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content {
+        padding-right: 20px; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
+          border: unset;
+          word-break: break-word;
+          border-spacing: unset; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
+          display: block;
+          width: 100%;
+          text-align: right;
+          font-size: 12px;
+          font-weight: 500;
+          color: #3c8dbc;
+          cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
           display: -webkit-box;
           display: -ms-flexbox;
           display: flex;
-          border: 1px solid #ccc;
-          border-width: 0 0 1px 0; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
-            display: block;
-            font-size: 14px;
-            padding: 4px 8px; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
-            background-color: transparent;
-            color: #18394b;
-            width: 150px;
-            min-width: 150px;
-            text-overflow: ellipsis; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
-            color: #000; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
-        display: none; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex; }
+          -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+          -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+          justify-content: space-between; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
+              width: 100%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
+              width: 49%; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
+                width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
+              margin-left: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            border: 1px solid #ccc;
+            border-width: 0 0 1px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              display: block;
+              font-size: 14px;
+              padding: 4px 8px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
+              background-color: transparent;
+              color: #18394b;
+              width: 150px;
+              min-width: 150px;
+              text-overflow: ellipsis; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              color: #000; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
+          display: none; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex; }
   .legacy-modal-dialog .modal-sidenav {
     position: absolute;
     top: 0;
@@ -1561,7 +1562,7 @@ body > .wrapper {
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;

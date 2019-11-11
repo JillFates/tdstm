@@ -6,13 +6,14 @@
         <button class="btn btn-icon close-button" onclick="closeModal('#showEntityView')">
             <i class="fas fa-times"></i>
         </button>
+        <%-- TODO: Update this to show conditionally. --%>
         <div class="badge modal-badge">A</div>
-        <h4 class="modal-title">${applicationInstance.assetName}</h4>
-        <div class="modal-subtitle">${applicationInstance?.moveBundle}</div>
-        <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${applicationInstance.assetName}"/></div>
+        <h4 class="modal-title">${assetEntity.assetName}</h4>
+        <div class="modal-subtitle">${assetEntity?.moveBundle}</div>
+        <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/></div>
     </div>
 
-    <p id="modalDescription" class="modal-description">${applicationInstance.description}</p>
+    <p id="modalDescription" class="modal-description">${assetEntity.description}</p>
 
     <%-- Clarity Tabs --%>
     <ul class="nav">

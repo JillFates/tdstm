@@ -81,8 +81,7 @@
     // Modal body styling
     .legacy-modal-body {
       margin-left: 24px;
-      width: calc(100vw - 212px);
-      padding-right: 40px;
+      width: calc(100vw - 172px);
       overflow-y: scroll;
       overflow-x: hidden;
 
@@ -95,6 +94,7 @@
       }
 
       .legacy-modal-body-content {
+        padding-right: 20px;
         table {
           border: unset;
           word-break: break-word;
