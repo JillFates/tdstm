@@ -177,7 +177,7 @@ class Person extends Party {
 			SELECT pr.partyIdFrom
 			FROM PartyRelationship pr
 			WHERE pr.partyRelationshipType='PROJ_STAFF'
-			  AND pr.partyIdTo=?
+			  AND pr.partyIdTo=?0
 			  AND pr.roleTypeCodeFrom='$RoleType.CODE_PARTY_PROJECT'
 			  AND pr.roleTypeCodeTo='$RoleType.CODE_PARTY_STAFF'
 		""".toString(), [this])
