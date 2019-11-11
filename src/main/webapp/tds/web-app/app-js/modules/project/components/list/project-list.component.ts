@@ -101,6 +101,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 
 	protected toggleShowActive(): void {
 		this.showActive = !this.showActive;
+		this.projectToOpen = null;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
 		this.updateBreadcrumbAndTitle();
