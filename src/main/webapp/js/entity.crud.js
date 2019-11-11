@@ -1190,6 +1190,7 @@ var EntityCrud = (function ($) {
 		return fetchAssetDependencyEditView(assetA, assetB, type);
 	};
 
+	// NOTE: THIS IS WHERE SHOW MODALS ARE GETTING CREATED
 	// Displays the detail view of the asset from ajax call in model popup
 	var presentAssetShowView = function (html, fieldHelpType) {
 		var showModal = pub.getShowModal();
@@ -1206,7 +1207,7 @@ var EntityCrud = (function ($) {
 				timerBar.Pause();
 			updateAssetTitle(fieldHelpType);
 
-			$('div.ui-dialog.ui-widget').find('button.ui-dialog-titlebar-close').html('<span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span>');
+			$('div.ui-dialog-titlebar').hide();
 			$('[data-toggle="popover"]').popover();
 
 			return true;

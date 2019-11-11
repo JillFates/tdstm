@@ -838,8 +838,8 @@ svg {
 	max-width: 90vw;
 }
 .ui-dialog th {
-	background: #CCCCCC !important;
-	color: #000 !important;
+	background: #CCCCCC;
+	color: #000;
 }
 th.asc{
 	background-image: url(../../../images/images/skin/sorted_asc.gif);
