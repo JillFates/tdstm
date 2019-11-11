@@ -152,21 +152,45 @@ class TagServiceIntegrationSpec extends  Specification{
 		when: 'Calling the list method with no parameters'
 			List results = tagService.list(project)
 		then: 'We get a list of map results'
-			results.size() == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[0].id == tag1.id
-			results[0].color == Color.Green.name()
-			results[0].css == Color.Green.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Green.name()
+			results[4].css == Color.Green.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
 	void "2. Test list with full name"() {
@@ -241,21 +265,45 @@ class TagServiceIntegrationSpec extends  Specification{
 		when: 'Calling the list method with a date created parameter'
 			List results = tagService.list(project, '', '', now)
 		then: 'We get a list of map results'
-			results.size() == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[0].id == tag1.id
-			results[0].color == Color.Green.name()
-			results[0].css == Color.Green.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Green.name()
+			results[4].css == Color.Green.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
 	void "9. Test list with dateCreated tomorrow"() {
@@ -269,21 +317,45 @@ class TagServiceIntegrationSpec extends  Specification{
 		when: 'Calling the list method with a lastUpdated parameter'
 			List results = tagService.list(project, '', '', null, now)
 		then: 'We get a list of map results'
-			results.size() == 2
+			results.size() == 6 // 2 tags (tag1 and tag2) plus the 4 default tags that every project has
+		and: 'the first four are the default tags associated to every new Project'
+			results[0].color == Color.Yellow.name()
+			results[0].css == Color.Yellow.css
+			results[0].name == 'GDPR'
+			results[0].description == 'General Data Protection Regulation Compliance'
+			results[0].assets == 0
 
-			results[0].id == tag1.id
-			results[0].color == Color.Green.name()
-			results[0].css == Color.Green.css
-			results[0].name == 'grouping assets'
-			results[0].description == 'This is a description'
-			results[0].assets == 2
+			results[1].color == Color.Yellow.name()
+			results[1].css == Color.Yellow.css
+			results[1].name == 'HIPPA'
+			results[1].description == 'Health Insurance Portability and Accountability Act Compliance'
+			results[1].assets == 0
 
-			results[1].id == tag2.id
-			results[1].color == Color.Blue.name()
-			results[1].css == Color.Blue.css
-			results[1].name == 'some assets'
-			results[1].description == 'Another description'
-			results[1].assets == 1
+			results[2].color == Color.Yellow.name()
+			results[2].css == Color.Yellow.css
+			results[2].name == 'PCI'
+			results[2].description == 'Payment Card Industry Data Security Standard Compliance'
+			results[2].assets == 0
+
+			results[3].color == Color.Yellow.name()
+			results[3].css == Color.Yellow.css
+			results[3].name == 'SOX'
+			results[3].description == 'Sarbanes–Oxley Act Compliance'
+			results[3].assets == 0
+		and: 'the last two are the tags associated to the Project'
+			results[4].id == tag1.id
+			results[4].color == Color.Green.name()
+			results[4].css == Color.Green.css
+			results[4].name == 'grouping assets'
+			results[4].description == 'This is a description'
+			results[4].assets == 2
+
+			results[5].id == tag2.id
+			results[5].color == Color.Blue.name()
+			results[5].css == Color.Blue.css
+			results[5].name == 'some assets'
+			results[5].description == 'Another description'
+			results[5].assets == 1
 	}
 
 	void "11. Test list with lastUpdated tomorrow"() {
