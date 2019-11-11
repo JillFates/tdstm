@@ -1,15 +1,16 @@
 <%@page import="net.transitionmanager.asset.AssetType; net.transitionmanager.asset.AssetType;"%>
 
+<%-- TODO: Update this so that it will work for show and edit. --%>
+
 <div class="legacy-modal-header">
     <%-- Header --%>
     <div class="modal-title-container">
-        <button class="btn btn-icon close-button" onclick="closeModal('#showEntityView')">
+        <button class="btn btn-icon close-button" onclick="closeModal()">
             <i class="fas fa-times"></i>
         </button>
-        <%-- TODO: Update this to show conditionally. --%>
-        <div class="badge modal-badge">A</div>
+        <div class="badge modal-badge">${assetEntity.assetClass.name().take(1).toUpperCase()}</div>
         <h4 class="modal-title">${assetEntity.assetName}</h4>
-        <div class="modal-subtitle">${assetEntity?.moveBundle}</div>
+        <div class="modal-subtitle">${assetEntity.moveBundle}</div>
         <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/></div>
     </div>
 
@@ -22,26 +23,30 @@
         </li>
         <li class="nav-item">
             <button class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports
-                <span class="badge">
-                    <g:if test="${supportAssets.size() > 99}">
-                        99+
-                    </g:if>
-                    <g:else>
-                        ${supportAssets.size()}
-                    </g:else>
-                </span>
+                <g:if test="${supportAssets?.size()}">
+                    <span class="badge">
+                        <g:if test="${supportAssets?.size() > 99}">
+                            99+
+                        </g:if>
+                        <g:else>
+                            ${supportAssets?.size()}
+                        </g:else>
+                    </span>
+                </g:if>
             </button>
         </li>
         <li class="nav-item">
             <button class="btn btn-link nav-link" id="tab3" onclick="navigate('tab3', 'depends')">Depends On
-                <span class="badge">
-                    <g:if test="${dependentAssets.size() > 99}">
-                        99+
-                    </g:if>
-                    <g:else>
-                        ${dependentAssets.size()}
-                    </g:else>
-                </span>
+                <g:if test="${dependentAssets?.size()}">
+                    <span class="badge">
+                        <g:if test="${dependentAssets?.size() > 99}">
+                            99+
+                        </g:if>
+                        <g:else>
+                            ${dependentAssets?.size()}
+                        </g:else>
+                    </span>
+                </g:if>
             </button>
         </li>
         <li class="nav-item">
@@ -64,7 +69,7 @@
 	$(document).ready(function() { 
         var text = $("#modalDescription").text();
 
-        if  (text.length === 0) {
+        if (text.length === 0) {
             $("#modalBody").addClass("no-description");
         } else {
             $("#modalBody").addClass("has-description");
@@ -72,8 +77,13 @@
         }
     })
     
-    function closeModal(modalId) {
-        $(modalId).dialog('close');
+    function closeModal() {
+        var modalIds = ['#showEntityView', '#editEntityView'];
+        modalIds.forEach(id => {
+            if ($(id).length) {
+                $(id).dialog('close');
+            }
+        });
     }
 
 	function navigate(tabId, id) {

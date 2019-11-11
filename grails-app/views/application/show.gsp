@@ -19,7 +19,7 @@
 											shutdownById: shutdownById, startupBy: startupBy, startupById: startupById,
 											testingBy: testingBy, testingById: testingById]" >
 							</g:render>
-							<%-- TODO: Get tages to render properly... --%>
+							<%-- TODO: Get tags to render properly... --%>
 							<%-- <g:render template="/comment/assetTagsShow" model="[tagAssetList: tagAssetList, tagAssetsFromServer: tagAssetsFromServer]"></g:render> --%>
 						</div>
 						<g:render template="/assetEntity/showHideLink"></g:render>
