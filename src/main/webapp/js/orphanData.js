@@ -267,24 +267,6 @@ function getDeatiledReport( records, table ){
 							"<td>"+getConvertedTimeFormate(record.start_time, userDTFormat, timeZone)+"</td><td>"+getConvertedTimeFormate(record.completion_time, userDTFormat, timeZone)+"</td></tr>"
 				}
 			break;
-			/* for move_bundle_step */
-			case "move_bundle_step" :
-				var thead ="<tr><th>id</th><th>move_bundle_id</th><th>date_created</th><th>last_updated</th><th>plan_start_time</th>"+
-							"<th>plan_completion_time</th><th>actual_start_time</th><th>actual_completion_time</th><th>calc_method</th>"+
-							"<th>label</th><th>show_on_dashboard</th><th>transition_id</th><tr>"	
-				for( i = 0; i < dataLength; i++){
-					var cssClass = 'odd'
-					if(i % 2 == 0){
-						cssClass = 'even'
-					}
-					var record = records[i]
-					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_id+"</td><td nowrap>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.last_updated, userDTFormat, timeZone)+"</td><td nowrap>"+getConvertedTimeFormate(record.plan_start_time, userDTFormat, timeZone)+"</td>"+
-							"<td nowrap>"+getConvertedTimeFormate(record.plan_completion_time, userDTFormat, timeZone)+"</td><td nowrap>"+getConvertedTimeFormate(record.actual_start_time, userDTFormat, timeZone)+"</td>"+
-							"<tdnowrap>"+getConvertedTimeFormate(record.actual_completion_time, userDTFormat, timeZone)+"</td><td>"+record.calc_method+"</td><td>"+record.label+"</td>"+
-							"<td>"+record.show_on_dashboard+"</td><td>"+record.transition_id+"</td></tr>"
-				}
-			break;
 			/* for move_event */
 			case "move_event" :
 				var thead ="<tr><th>move_event_id</th><th>project_id</th><th>name</th><th>description</th><th>actual_start_time</th>"+
@@ -430,22 +412,6 @@ function getDeatiledReport( records, table ){
 					tbody +="<tr class='"+cssClass+"'><td>"+record.project_team_id+"</td><td>"+record.move_bundle_id+"</td>"+
 							"<td>"+record.team_code+"</td><td>"+record.latest_asset_id+"</td><td>"+record.current_location+"</td>"+
 							"<td>"+record.is_disbanded+"</td><td>"+record.is_idle+"</td></tr>"
-				}
-			break;
-			/* for step_snapshot */
-			case "step_snapshot" :
-				var thead ="<tr><th>id</th><th>move_bundle_step_id</th><th>tasks_count</th><th>tasks_completed</th>"+
-							"<th>date_created</th><th>dial_indicator</th><th>duration</th><th>plan_delta</th><tr>"	
-				for( i = 0; i < dataLength; i++){
-					var cssClass = 'odd'
-					if(i % 2 == 0){
-						cssClass = 'even'
-					}
-					var record = records[i]
-					tbody +="<tr class='"+cssClass+"'><td>"+record.id+"</td><td>"+record.move_bundle_step_id+"</td>"+
-							"<td>"+record.tasks_count+"</td><td>"+record.tasks_completed+"</td>"+
-							"<td>"+getConvertedTimeFormate(record.date_created, userDTFormat, timeZone)+"</td>"+
-							"<td>"+record.dial_indicator+"</td><td>"+convertIntoHHMM(record.duration)+"</td><td>"+record.plan_delta+"</td></tr>"
 				}
 			break;
 			/* for user_login */

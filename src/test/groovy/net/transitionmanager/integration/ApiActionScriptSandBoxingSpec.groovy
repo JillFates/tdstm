@@ -1,5 +1,6 @@
 package net.transitionmanager.integration
 
+import com.tdsops.etl.ETLProcessor
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.AssetFacade
 import net.transitionmanager.common.MessageSourceService
@@ -115,38 +116,6 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		and:
 			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
 
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.with {
-				// allow closure creation for the ETL iterate command
-				closuresAllowed = false
-				// disallow method definitions
-				methodDefinitionAllowed = false
-				// Empty withe list means forbid imports
-				importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
-				starImportsWhitelist = []
-				// Language tokens allowed
-				tokensWhitelist = [
-					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
-				].asImmutable()
-				// Types allowed to be used (Including primitive types)
-				constantTypesClassesWhiteList = [
-					Object, Integer, Float, Long, Double, BigDecimal, String,
-					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
-				].asImmutable()
-				// Classes who are allowed to be receivers of method calls
-				receiversClassesWhiteList = [
-					Object, // TODO: This is too much generic class.
-					Integer, Float, Double, Long, BigDecimal, String
-				].asImmutable()
-			}
-
-			ImportCustomizer customizer = new ImportCustomizer()
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
 		when: 'The PRE script is evaluated'
 			evaluator.evaluate("""
 				request.params.format = 'json'
@@ -166,7 +135,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 				// Set the content-type to JSON
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
 			""".stripIndent(),
-				configuration)
+				ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
@@ -272,40 +241,6 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 				.build(ReactionScriptCode.PRE)
 
 		and:
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.with {
-				// allow closure creation for the ETL iterate command
-				closuresAllowed = true
-				// disallow method definitions
-				methodDefinitionAllowed = false
-				// Empty withe list means forbid imports
-				importsWhitelist = ['org.springframework.beans.factory.annotation.Autowired']
-				starImportsWhitelist = []
-				// Language tokens allowed
-				tokensWhitelist = [
-					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
-				].asImmutable()
-				// Types allowed to be used (Including primitive types)
-				constantTypesClassesWhiteList = [
-					Object, Integer, Float, Long, Double, BigDecimal, String,
-					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
-				].asImmutable()
-				// Classes who are allowed to be receivers of method calls
-				receiversClassesWhiteList = [
-					Object, // TODO: This is too much generic class.
-					Integer, Float, Double, Long, BigDecimal, String
-				].asImmutable()
-			}
-
-			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
 			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
 
 		when: 'The PRE script with a closure is evaluated'
@@ -321,8 +256,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', contentType('json'))
-			""".stripIndent(),
-				configuration)
+			""".stripIndent(), ETLProcessor.defaultCompilerConfiguration())
 
 		then: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
@@ -433,8 +367,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', contentType('json'))
-			""".stripIndent(),
-				configuration)
+			""".stripIndent(),configuration)
 
 		then: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
@@ -494,39 +427,6 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 				.build(ReactionScriptCode.PRE)
 
 		and:
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.with {
-				// allow closure creation for the ETL iterate command
-				closuresAllowed = false
-				// disallow method definitions
-				methodDefinitionAllowed = false
-				// Language tokens allowed
-				tokensWhitelist = [
-					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
-				].asImmutable()
-				// Types allowed to be used (Including primitive types)
-				constantTypesClassesWhiteList = [
-					Object, Integer, Float, Long, Double, BigDecimal, String,
-					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
-				].asImmutable()
-				// Classes who are allowed to be receivers of method calls
-				receiversClassesWhiteList = [
-					Math,
-					Object, // TODO: This is too much generic class.
-					Integer, Float, Double, Long, BigDecimal, String
-				].asImmutable()
-			}
-
-			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-
-//			customizer.addStaticStars('java.lang.Math')
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
 			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
 
 		when: 'The PRE script with a closure is evaluated'
@@ -543,8 +443,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 
 				request.config.setProperty('Exchange.CHARSET_NAME', 'ISO-8859-1')
 				request.config.setProperty('Exchange.CONTENT_TYPE', 'application/json')
-			""".stripIndent(),
-				configuration)
+			""".stripIndent(), ETLProcessor.defaultCompilerConfiguration())
 
 		then: 'All the correct variables were bound'
 			scriptBinding.hasVariable('request')
@@ -576,44 +475,12 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 					.build(ReactionScriptCode.PRE)
 
 		and:
-			SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-			secureASTCustomizer.with {
-				// allow closure creation for the ETL iterate command
-				closuresAllowed = false
-				// disallow method definitions
-				methodDefinitionAllowed = false
-				// Language tokens allowed
-				tokensWhitelist = [
-					DIVIDE, PLUS, MINUS, MULTIPLY, MOD, POWER, PLUS_PLUS, MINUS_MINUS, PLUS_EQUAL, LOGICAL_AND,
-					COMPARE_EQUAL, COMPARE_NOT_EQUAL, COMPARE_LESS_THAN, COMPARE_LESS_THAN_EQUAL, LOGICAL_OR, NOT,
-					COMPARE_GREATER_THAN, COMPARE_GREATER_THAN_EQUAL, EQUALS, COMPARE_NOT_EQUAL, COMPARE_EQUAL
-				].asImmutable()
-				// Types allowed to be used (Including primitive types)
-				constantTypesClassesWhiteList = [
-					Object, Integer, Float, Long, Double, BigDecimal, String,
-					Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
-				].asImmutable()
-				// Classes who are allowed to be receivers of method calls
-				receiversClassesWhiteList = [
-					Math,
-					Object, // TODO: This is too much generic class.
-					Integer, Float, Double, Long, BigDecimal, String
-				].asImmutable()
-			}
-
-			ImportCustomizer customizer = new ImportCustomizer()
-
-			secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
-
-			CompilerConfiguration configuration = new CompilerConfiguration()
-			configuration.addCompilationCustomizers customizer, secureASTCustomizer
-
 			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
 
 		when: 'A script with a prohibited string method is called'
 			evaluator.evaluate("""
 				'ls /'.execute().text
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'a MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -621,7 +488,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a prohibited string method is called'
 			evaluator.evaluate("""
 				'www.google.com'.toURI()
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'a MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -629,7 +496,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a prohibited string method is called'
 			evaluator.evaluate("""
 				'ls /'.execute().toURL()
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'a MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -637,7 +504,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a prohibited string method is called'
 			evaluator.evaluate("""
 				'5'.asType(Integer)
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'a MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
@@ -645,7 +512,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a non-prohibited string method is called'
 			evaluator.evaluate("""
 				'test'.toUpperCase()
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'no exception is thrown'
 			noExceptionThrown()
@@ -653,7 +520,7 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a non-prohibited object method is called'
 			evaluator.evaluate("""
 				new Object().asBoolean()
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'no exception is thrown'
 			noExceptionThrown()
@@ -661,11 +528,46 @@ class ApiActionScriptSandBoxingSpec extends Specification implements DataTest {
 		when: 'A script with a non-prohibited string method is called'
 			evaluator.evaluate("""
 				new Object().addShutdownHook({})
-			""".stripIndent(), configuration)
+			""".stripIndent(), ApiActionScriptEvaluator.defaultCompilerConfiguration())
 
 		then: 'a MultipleCompilationErrorsException exception is thrown'
 			thrown MultipleCompilationErrorsException
 
 	}
+
+	void 'test scripts with List and sets'() {
+
+		given:
+			ActionRequest request = new ActionRequest(['format': 'xml'])
+			ApiActionScriptBinding scriptBinding = applicationContext.getBean(ApiActionScriptBindingBuilder)
+			 .with(request)
+			 .with(new ApiActionResponse())
+			 .with(new AssetFacade(null, [:], true))
+			 .with(new TaskFacade(new AssetComment(), new Person()))
+				.with(new ApiActionJob())
+				.build(ReactionScriptCode.PRE)
+
+		and:
+			ApiActionScriptEvaluator evaluator = new ApiActionScriptEvaluator(scriptBinding)
+		when: 'A script with an array list is allowed'
+			evaluator.evaluate("""
+						ArrayList test = [1,2,3,3]
+					""".
+
+				stripIndent(), ETLProcessor.defaultCompilerConfiguration())
+
+		then: 'a  no exception is thrown'
+			noExceptionThrown()
+		when: 'A script with a set is allowed'
+			evaluator.evaluate("""
+					Set test = [1,2,3,3].toSet()
+				""".
+
+				stripIndent(), ETLProcessor.defaultCompilerConfiguration())
+
+		then: 'a no exception is thrown'
+			noExceptionThrown()
+	}
+
 }
 
