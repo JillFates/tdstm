@@ -2806,6 +2806,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderSuccessJson(assetTypes: assetEntityService.assetTypesOf(params.manufacturerId, params.term))
 	}
 
+	@Deprecated
 	@HasPermission(Permission.ArchitectureView)
 	def architectureViewer() {
 		licenseAdminService.checkValidForLicenseOrThrowException()
@@ -2843,6 +2844,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	/**
 	 * Returns the data needed to generate the application architecture graph
 	 */
+	@Deprecated
 	@HasPermission(Permission.ArchitectureView)
 	def applicationArchitectureGraph() {
 		Project project = securityService.userCurrentProject
@@ -2878,12 +2880,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		architectureGraphService.addLinksToNodes(graphLinks, graphNodes)
 
 		render(view: '_applicationArchitectureGraph',
-			   model: architectureGraphService.architectureGraphModel(graphNodes, graphLinks, assetId, levelsUp, levelsDown)
+			   model: architectureGraphService.architectureGraphModelLegacy(graphNodes, graphLinks, assetId, levelsUp, levelsDown)
 		)
 	}
 
-
-
+	@Deprecated
 	@HasPermission(Permission.UserGeneralAccess)
 	def graphLegend() {
 		render(view: '_graphLegend', model: [assetTypes: assetEntityService.ASSET_TYPE_NAME_MAP])

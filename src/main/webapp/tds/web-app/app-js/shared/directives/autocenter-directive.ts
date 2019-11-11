@@ -57,7 +57,7 @@ export class UIAutoCenterDirective implements AfterViewInit, OnInit, OnDestroy {
 			const width = this.modalContent.width() > this.modalDialog.width() ? this.modalContent.width()  : this.modalDialog.width();
 			jQuery(this.modalDialog)
 				.css({
-					'top': '30px',
+					'top': '0',
 					'left': `${left}px`,
 					'width': `${width}px`
 				}).css({

@@ -1569,6 +1569,17 @@ class UrlMappings {
             ]
         }
 
+		"/ws/architectureGraph/" {
+			controller = "wsArchitectureGraph"
+			action = [
+				GET: "architectureGraph"
+			]
+		}
+
+		"/ws/architectureGraph/$action" {
+			controller = "wsArchitectureGraph"
+		}
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )

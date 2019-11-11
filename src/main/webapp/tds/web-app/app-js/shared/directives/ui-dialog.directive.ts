@@ -130,7 +130,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				'display': 'block',
 				'visibility': 'hidden'
 			}).css({
-				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 30) + 'px',
+				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 0) + 'px',
 				'left': (jQuery(window).width() - modalDialog.width()) / 2
 			}).css({
 				'visibility': 'visible'
