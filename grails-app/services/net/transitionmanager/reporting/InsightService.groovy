@@ -1,5 +1,6 @@
 package net.transitionmanager.reporting
 
+import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import net.transitionmanager.asset.AssetDependency
@@ -71,8 +72,9 @@ class InsightService implements ServiceMethods {
 	 */
 	List<Map> topTags(Project project, Integer max) {
 		Tag.executeQuery('''
-			SELECT  new MAP(t.id as id, t.name as name, count(*) as count)
+			SELECT  new MAP(t.id as id, t.name as name, count(ta.id) as count)
 			FROM Tag t
+			JOIN t.tagAssets as ta
 			WHERE t.project = :project
 			GROUP BY t.name
 			ORDER BY count(*) desc
@@ -94,39 +96,39 @@ class InsightService implements ServiceMethods {
 		namedParameterJdbcTemplate.queryForList("""
 				SELECT '>$lowRange' AS level, count(*) AS count
 				FROM (
-					(SELECT ae.asset_entity_id, count(ad.asset_dependency_id) + count(ad2.asset_dependency_id)
+					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
 					LEFT OUTER JOIN asset_dependency ad ON ad.asset_id = ae.asset_entity_id
 					LEFT OUTER JOIN asset_dependency ad2 ON ad2.dependent_id = ae.asset_entity_id
-					WHERE ae.project_id = :projectId
+					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
 					GROUP BY ae.asset_entity_id
-					HAVING count(ad.asset_dependency_id) + count(ad2.asset_dependency_id) <$lowRange)
+					HAVING count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id) <$lowRange
 				) AS count
 
 				UNION
 
 				SELECT '$lowRange>$highRange' AS level, count(*) AS count
 				FROM (
-					SELECT ae.asset_entity_id, count(ad.asset_dependency_id) + count(ad2.asset_dependency_id)
+					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
 					LEFT OUTER JOIN asset_dependency ad ON ad.asset_id = ae.asset_entity_id
 					LEFT OUTER JOIN asset_dependency ad2 ON ad2.dependent_id = ae.asset_entity_id
-					WHERE ae.project_id = :projectId
+					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
 					GROUP BY ae.asset_entity_id
-					HAVING count(ad.asset_dependency_id) + count(ad2.asset_dependency_id) >=$lowRange and count(ad.asset_dependency_id) + count(ad2.asset_dependency_id) <$highRange
+					HAVING (count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)) >=$lowRange AND ( count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)) <$highRange
 				) AS count
 
 				UNION
 
 				SELECT '$highRange+' AS level, count(*) AS count
 				FROM (
-					SELECT  ae.asset_entity_id, count(ad.asset_dependency_id) + count(ad2.asset_dependency_id)
+					SELECT  ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
 					LEFT OUTER JOIN asset_dependency ad ON ad.asset_id = ae.asset_entity_id
 					LEFT OUTER JOIN asset_dependency ad2 ON ad2.dependent_id = ae.asset_entity_id
-					WHERE ae.project_id = :projectId
+					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
 					GROUP BY ae.asset_entity_id
-					HAVING count(ad.asset_dependency_id) + count(ad2.asset_dependency_id) >$highRange
+					HAVING (count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)) >$highRange
 				) AS count;
 		""", [
 			projectId: project.id
