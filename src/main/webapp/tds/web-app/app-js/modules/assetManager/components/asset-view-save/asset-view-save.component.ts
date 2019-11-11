@@ -225,7 +225,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public onFavorite() {
-		if(!this.isSaveInMyViewMode()){
+		if (!this.isSaveInMyViewMode()){
 			return;
 		}
 		if (this.model.isFavorite) {
