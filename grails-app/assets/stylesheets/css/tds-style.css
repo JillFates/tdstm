@@ -1370,6 +1370,62 @@ div.dates-info-container {
   .close .button-label {
     display: none; }
 
+.tds-table .grid-label {
+  font-size: 18px;
+  line-height: 48px; }
+
+.tds-table table {
+  width: 100%;
+  border-collapse: collapse; }
+  .tds-table table thead th {
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 12px;
+    padding: 5px 0 5px 12px;
+    color: #3c8dbc;
+    text-align: left;
+    background: #d9e4ea; }
+  .tds-table table tbody tr {
+    cursor: pointer; }
+    .tds-table table tbody tr td {
+      font-size: 11px;
+      color: #333333;
+      border-style: solid;
+      border-color: #d9e4ea;
+      padding: 5px 0 5px 12px; }
+      .tds-table table tbody tr td:first-child {
+        border-width: 1px 0 1px 1px; }
+      .tds-table table tbody tr td:not(:first-child):not(:last-child) {
+        border-width: 1px 0; }
+      .tds-table table tbody tr td:last-child {
+        border-width: 1px 1px 1px 0; }
+    .tds-table table tbody tr td .status {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      line-height: 13px;
+      border: 1px solid #808080;
+      border-radius: 3px;
+      background: #ccc; }
+      .tds-table table tbody tr td .status i {
+        color: #fff;
+        width: 12px;
+        height: 12px;
+        margin-top: 2px; }
+      .tds-table table tbody tr td .status.status-Ready {
+        background: #01ab08; }
+      .tds-table table tbody tr td .status.status-Started {
+        color: #0092d1; }
+      .tds-table table tbody tr td .status.status-Hold {
+        background: #F27113; }
+      .tds-table table tbody tr td .status.status-Completed {
+        background: #3c8dbc; }
+      .tds-table table tbody tr td .status.status-Pending {
+        color: #808080; }
+      .tds-table table tbody tr td .status.status-Warning {
+        background: #f6c440; }
+
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
   margin: 0 5% 0 0;
