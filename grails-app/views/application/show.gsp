@@ -7,16 +7,11 @@
 <div class="legacy-modal-dialog">
 	<div class="legacy-modal-content">
 		<g:render template="/assetEntity/showHeader" model="[assetEntity:applicationInstance]"></g:render>
-
-		<%-- TODO: Add style properties to modal body class. Calc width and height. Add Padding to modal body. --%>
 		<div id="modalBody" class="legacy-modal-body">
 			<div class="legacy-modal-body-content">
 				<div class="clr-row" style="padding-right:20px;">
 					<div id="details" class="clr-col-6">
-						<div
-						<tds:hasPermission permission="${Permission.AssetEdit}">
-							ondblclick="EntityCrud.showAssetEditView('${assetClass}', ${applicationInstance?.id});"
-						</tds:hasPermission>>
+						<div <tds:hasPermission permission="${Permission.AssetEdit}"> ondblclick="EntityCrud.showAssetEditView('${assetClass}', ${applicationInstance?.id});"</tds:hasPermission>>
 							<g:if test="${errors}">
 								<div id="messageDivId" class="message">${errors}</div>
 							</g:if>

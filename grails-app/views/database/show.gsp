@@ -70,10 +70,10 @@
 						<g:render template="/assetEntity/showHideLink"></g:render>
 					</div>
 				</div>
-			</div>
-			<g:render template="/assetEntity/dependentShow" model="[assetEntity:databaseInstance]"></g:render>
-			<div id="commentListId">
-				<g:render template="/assetEntity/commentList" model="['asset':databaseInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
+				<g:render template="/assetEntity/dependentShow" model="[assetEntity:databaseInstance]"></g:render>
+				<div id="commentListId">
+					<g:render template="/assetEntity/commentList" model="['asset':databaseInstance, 'prefValue': prefValue, 'viewUnpublishedValue': viewUnpublishedValue]" ></g:render>
+				</div>
 			</div>
 		</div>
 	</div>
