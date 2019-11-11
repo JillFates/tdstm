@@ -52,7 +52,9 @@
 				<button tdsScrollerLink>Comments</button>
 			</tds-scroller-item>
 		</tds-tab-scroller>
-		<tds-lib-diagram-layout *ngIf="!!showDetails" class="header-graph"></tds-lib-diagram-layout>
+		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
+		<tds-lib-diagram-layout [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" *ngIf="!!showDetails" class="header-graph"></tds-lib-diagram-layout>
+		</div>
     </div>
     <div class="modal-body" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
@@ -120,7 +122,7 @@
 				</a>
 			</div>
 			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-				<tds-lib-diagram-layout></tds-lib-diagram-layout>
+				<tds-lib-diagram-layout [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true"></tds-lib-diagram-layout>
 			</div>
 		</div>
 
