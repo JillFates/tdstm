@@ -3476,7 +3476,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3517,7 +3517,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 
@@ -3609,7 +3609,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 }
