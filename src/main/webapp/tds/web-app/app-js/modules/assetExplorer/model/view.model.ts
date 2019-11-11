@@ -7,6 +7,7 @@ export class ViewModel {
 	isSystem: boolean;
 	isShared: boolean;
 	isFavorite?: boolean;
+	saveOptionAs?: string;
 	schema?: ViewSpec;
 	constructor() {
 		this.schema = new ViewSpec();

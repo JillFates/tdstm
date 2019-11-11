@@ -37,8 +37,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                                    name="radio-mode"
                                                    [value]="SAVE_AS_OPTIONS.MY_VIEW.value"
                                                    [attr.disabled]="SAVE_AS_OPTIONS.MY_VIEW.disabled || null"
-                                                   (change) = "onChangeMode()"
-                                                   [(ngModel)]="currentSaveOption"
+                                                   [(ngModel)]="model.saveOptionAs"
                                                    checked>
                                             <span>{{ 'ASSET_EXPLORER.SAVE_IN_MY_VIEWS' | translate }}</span>
                                         </label>
@@ -83,8 +82,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                         <input id="overrideMe" type="radio" name="radio-mode"
 											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value"
                                                [attr.disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.disabled || null"
-											   (change) = "onChangeMode()"
-                                               [(ngModel)]="currentSaveOption">
+                                               [(ngModel)]="model.saveOptionAs">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
                                     </label>
                                 </div>
@@ -95,8 +93,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                         <input id="overrideAll" type="radio" name="radio-mode"
 											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value"
                                                [attr.disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.disabled || null"
-											   (change) = "onChangeMode()"
-                                               [(ngModel)]="currentSaveOption">
+                                               [(ngModel)]="model.saveOptionAs">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
                                     </label>
                                 </div>
@@ -130,8 +127,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		OVERRIDE_FOR_ALL: {value: 'OVERRIDE_FOR_ALL', disabled: false }
 	};
 
-	public currentSaveOption: string;
-
 	constructor(
 		model: ViewModel,
 		private favorites: ViewGroupModel,
@@ -144,7 +139,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		this.preModel = model;
 		this.startModel(model);
 		this.saveOptions = saveOptions;
-		this.currentSaveOption = this.saveOptions.saveAsOptions[0] || this.SAVE_AS_OPTIONS.MY_VIEW.value;
+		this.model.saveOptionAs = this.saveOptions.saveAsOptions[0] || this.SAVE_AS_OPTIONS.MY_VIEW.value;
 		this.setDisabling();
 	}
 
@@ -162,21 +157,22 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
 			this.startModel(this.preModel);
 		}
+
 		this.assetExpService.saveReport(this.model)
 			.subscribe(result => result && this.activeDialog.close(result),
 				error => this.activeDialog.dismiss(error));
 	}
 
 	public isSaveInMyViewMode(): boolean {
-		return this.currentSaveOption === this.SAVE_AS_OPTIONS.MY_VIEW.value;
+		return this.model.saveOptionAs === this.SAVE_AS_OPTIONS.MY_VIEW.value;
 	}
 
 	public isOverrideForMeMode(): boolean {
-		return this.currentSaveOption === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value;
+		return this.model.saveOptionAs === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value;
 	}
 
 	public isOverrideAllUsersMode(): boolean {
-		return this.currentSaveOption === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value;
+		return this.model.saveOptionAs === this.SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value;
 	}
 
 	public isValid(): boolean {
@@ -220,7 +216,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public onFavorite() {
-		if(!this.isSaveInMyViewMode()) {
+		if (!this.isSaveInMyViewMode()) {
 			return;
 		}
 		if (this.model.isFavorite) {
