@@ -9,10 +9,6 @@
 													 [tooltip]="'Refresh View'"
 													 (click)="onQuery()">
 				</tds-button-custom>
-<!--				<tds-radial-progress class="inline-progress"-->
-<!--														 style="top: 4px; width: 30px; min-height: unset; min-width: unset; height: unset;"-->
-<!--														 [percent]="50"-->
-<!--														 size="small"></tds-radial-progress>-->
 			</div>
 		</div>
 
@@ -40,12 +36,14 @@
 				</tds-button-custom>
 
 				<!-- Just Planning checkbox -->
-				<input id="justPlanning" type="checkbox" name="justPlanning"
-							 class="component-action-just-planning"
-							 [(ngModel)]="justPlanning">
-				<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
-					Just Planning
-				</label>
+				<clr-checkbox-wrapper class="inline">
+					<input clrCheckbox id="justPlanning" type="checkbox" name="justPlanning"
+								 class="component-action-just-planning"
+								 [(ngModel)]="justPlanning">
+					<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
+						Just Planning
+					</label>
+				</clr-checkbox-wrapper>
 			</div>
 
 			<div class="inline float-right">
@@ -70,6 +68,13 @@
 																(clickBulk)="onClickBulkButton()"
 																(operationResult)="onBulkOperationResult($event)">
 				</tds-bulk-change-button>
+
+				<!-- Clear All Filters button -->
+				<tds-button-custom [disabled]="!filterCount()"
+													 [icon]="'times'"
+													 (click)="onClearAllFilters()"
+													 [tooltip]="'Clear All Filters'">
+				</tds-button-custom>
 
 				<!-- Configure/Edit view button -->
 				<tds-button-custom [icon]="'cog'" (click)="onEdit()"

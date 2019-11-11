@@ -1,143 +1,38 @@
-tds-ui-dialog {
-  #tdsUiDialog {
-    padding: 0 !important;
-    margin: 0;
-    .modal-dialog {
-      background: $color-text-inverse;
-      position: fixed !important;
-      top: 56px !important;
-      left: 35px !important;
-      right: 35px !important;
-      bottom: 48px !important;
-      overflow: hidden !important;
-      width: unset !important;
-      padding-left: 40px !important;
-      .modal-header {
-        .active {
-          box-shadow: 0 -3px 0 #0077b8 inset;
-        }
-      }
-      .modal-body {
-        max-height: calc(100vh - 56px - 48px);
-        height: calc(100vh - 35px - 35px);
-        width: calc(100vw - 40px - 35px - 35px - 22px);
-        padding: 15px 20px 150px 22px;
+.legacy-modal-dialog {
+  padding: 0 !important;
+  margin: 0;
 
-        .grid-form {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          grid-gap: 24px;
-          justify-items: left;
+  .legacy-modal-content {
+    margin-left: 40px;
+    // Modal Header Styling
+    .legacy-modal-header {
+      padding: 24px;
 
-          input {
-            width: 220px;
-          }
-
-          .truck-input-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-
-            input {
-              width: 66px;
-              margin-right: 10px;
-            }
-          }
-        }
-
-        .tdr-detail-list {
-          tbody {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            &.one-column {
-              width: 50%;
-
-              tr {
-                width: 100%;
-              }
-            }
-
-            &.two-column {
-              width: 100%;
-
-              tr {
-                width: 48%;
-              }
-            }
-          }
-
-          tr {
-            display: flex;
-            border: 1px solid $color-border;
-            border-width: 0 0 1px 0;
-            line-height: 16px;
-            th {
-              display: block;
-              text-align: right;
-              background-color: transparent;
-              font-size: 14px;
-              color: $color-active-dark3;
-              // width: 20%;
-              min-width: 150px;
-              width: 150px;
-              max-width: 150px;
-              text-overflow: ellipsis;
-            }
-
-            td {
-              display: block;
-              font-size: 14px;
-              color: $color--black;
-            }
-          }
-          &:not(.all-details) {
-            tr {
-              display: none;
-            }
-            tr:not(.nodata):nth-child(-n + 16) {
-              display: flex;
-            }
-          }
-        }
-      }
-      .modal-footer,
-      .modal-sidenav {
+      .close-button {
+        color: #737373;
+        height: 40px;
+        margin: 0;
         position: absolute;
+        right: 0;
         top: 0;
-        width: 40px;
-        bottom: 0;
-        left: 0;
-        padding-top: 24px;
-        border: solid 1px $color-border;
-        border-width: 0 1px 0 0;
-        .btn {
-          color: $color-icon;
-        }
-        .button-label {
-          display: none;
+        border: unset;
+        &:hover {
+          background: unset;
         }
       }
-    }
-  }
-  .close {
-    opacity: 1;
-    .btn {
-      color: $color-icon;
-    }
-    .button-label {
-      display: none;
-    }
-  }
-}
 
-.tds-modal-content {
-  background: $color-text-inverse;
-  .modal-header {
-    padding: 24px;
-    .modal-title-container {
-      display: flex;
-      align-items: center;
+      .modal-title-container {
+        display: flex;
+        align-items: center;
+
+        a {
+          color: white;
+
+          &:hover {
+            color: #0077b8;
+          }
+        }
+      }
 
       .modal-badge {
         width: 23px;
@@ -166,13 +61,316 @@ tds-ui-dialog {
       .modal-subbadge {
         background-color: #f38b00;
       }
+
+      .modal-description {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        color: black;
+      }
+
+      .modal-description-height {
+        min-height: 48px;
+      }
+
+      .modal-description-sized {
+        width: calc(100% - 250px);
+      }
     }
 
-    .modal-description {
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      color: black;
+    // Modal body styling
+    .legacy-modal-body {
+      margin-left: 24px;
+      width: calc(100vw - 212px);
+      padding-right: 40px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+
+      &.has-description {
+        max-height: calc(100vh - 300px);
+      }
+
+      &.no-description {
+        max-height: calc(100vh - 255px);
+      }
+
+      .legacy-modal-body-content {
+        table {
+          border: unset;
+          word-break: break-word;
+          border-spacing: unset;
+        }
+
+        .show-hide-link {
+          display: block;
+          width: 100%;
+          text-align: right;
+          font-size: 12px;
+          font-weight: 500;
+          color: #3c8dbc;
+          cursor: pointer;
+        }
+
+        .tds-detail-list {
+          tbody {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+
+            &.one-column {
+              width: 100%;
+
+              tr,
+              .source-target-wrapper {
+                width: 100%;
+              }
+            }
+
+            &.two-column {
+              width: 100%;
+
+              tr,
+              .source-target-wrapper {
+                width: 49%;
+
+                tr {
+                  width: 100%;
+                }
+              }
+
+              .source-target-wrapper {
+                + .source-target-wrapper {
+                  margin-left: 2%;
+                }
+              }
+            }
+
+            tr {
+              display: flex;
+              border: 1px solid $color-border;
+              border-width: 0 0 1px 0;
+              th,
+              td {
+                display: block;
+                font-size: 14px;
+                padding: 4px 8px;
+              }
+              th {
+                background-color: transparent;
+                color: $color-active-dark3;
+                width: 150px;
+                min-width: 150px;
+                text-overflow: ellipsis;
+              }
+              td {
+                color: $color--black;
+              }
+            }
+          }
+          &:not(.all-details) {
+            tr {
+              display: none;
+            }
+            tr:not(.nodata):nth-child(-n + 16) {
+              display: flex;
+            }
+          }
+        }
+      }
     }
+  }
+
+  .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px $color-border;
+    border-width: 0 1px 0 0;
+    .btn {
+      color: $color--black;
+      height: 40px;
+      margin: 0;
+    }
+    .button-label {
+      display: none;
+    }
+
+    &.btn-link {
+      .selected-button {
+        .btn {
+          border: unset;
+          color: white;
+          border-radius: unset;
+        }
+      }
+    }
+  }
+}
+
+.modal-dialog {
+  background: $color-text-inverse;
+  position: fixed !important;
+  top: 56px !important;
+  left: 35px !important;
+  right: 35px !important;
+  bottom: 48px !important;
+  overflow: hidden !important;
+  width: unset !important;
+  padding-left: 40px !important;
+
+  .modal-body {
+    width: calc(100vw - 40px - 35px - 35px - 22px);
+    padding: 15px 20px 0 22px;
+
+    &.has-description {
+      max-height: calc(100vh - 300px);
+    }
+
+    &.no-description {
+      max-height: calc(100vh - 255px);
+    }
+
+    .source-target-wrapper {
+      flex-grow: 1;
+      margin: 5px 0;
+
+      .header-label {
+        width: 100%;
+        margin-bottom: 5px;
+        padding: 0 8px;
+        font-size: 14px;
+      }
+    }
+
+    .grid-form {
+      display: grid;
+      grid-template-columns: 49% 49%;
+      column-gap: 2%;
+
+      .k-input {
+        font-size: 14px;
+      }
+
+      .clr-form-control {
+        display: flex;
+        flex-direction: unset;
+        -webkit-box-orient: unset;
+        margin-top: unset;
+        align-items: unset;
+        -webkit-box-align: unset;
+        -webkit-box-direction: unset;
+
+        label {
+          max-width: unset;
+          margin-bottom: unset;
+          min-width: 150px;
+          width: 150px;
+          padding: 0 8px;
+          font-size: 14px;
+        }
+
+        .clr-checkbox-wrapper {
+          .clr-control-label {
+            min-width: unset;
+            width: unset;
+          }
+        }
+
+        .clr-input {
+          font-size: 14px;
+          flex-grow: 1;
+        }
+
+        .clr-input-wrapper {
+          max-height: unset;
+        }
+
+        clr-input-container {
+          &.clr-form-control {
+            display: block;
+            flex-grow: 1;
+            margin-top: unset;
+
+            .clr-control-container {
+              width: 100%;
+
+              .clr-input {
+                width: 100%;
+              }
+            }
+          }
+        }
+
+        .ng-star-inserted,
+        tds-combobox,
+        tds-combobox-group {
+          flex-grow: 1;
+        }
+
+        tds-date-control,
+        tds-number-control {
+          display: block;
+          flex-grow: 1;
+
+          .k-datepicker {
+            width: unset;
+          }
+        }
+
+        .combo-group .k-widget.k-combobox,
+        .k-combobox {
+          width: unset;
+        }
+
+        kendo-dropdownlist.k-dropdown {
+          flex-grow: 1;
+          align-self: flex-end;
+        }
+      }
+
+      .truck-input-container {
+        display: flex;
+        flex-grow: 1;
+        .clr-form-control {
+          + .clr-form-control {
+            margin-left: 10px;
+          }
+        }
+      }
+    }
+
+    // tds-diagram-layout styling in body
+    .modal-body-graph {
+      .diagram-layout-container {
+        width: 100%;
+        padding: unset;
+        padding-top: 100%;
+        position: relative;
+        min-height: unset;
+
+        .overview-container {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          left: 0;
+          width: unset;
+          height: unset;
+        }
+      }
+    }
+  }
+}
+
+.close {
+  opacity: 1;
+  .btn {
+    color: $color-icon;
+  }
+  .button-label {
+    display: none;
   }
 }

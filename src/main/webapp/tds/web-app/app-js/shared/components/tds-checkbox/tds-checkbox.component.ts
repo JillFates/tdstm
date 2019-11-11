@@ -9,7 +9,7 @@ const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 	selector: 'tds-checkbox',
 	template: `
         <div class="tds-checkbox-component">
-            <input class="component-action-change" [disabled]="disabled" type="checkbox" #tdsCheckbox (change)="onChange()" [attr.style]=" disabled ? 'cursor: text' : 'cursor: pointer'" />
+            <input clrCheckbox class="component-action-change" [disabled]="disabled" type="checkbox" #tdsCheckbox (change)="onChange()" [attr.style]=" disabled ? 'cursor: text' : 'cursor: pointer'" />
         </div>
 	`
 })

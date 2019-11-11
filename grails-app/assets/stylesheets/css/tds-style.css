@@ -200,7 +200,6 @@ svg {
 
 div.modal-dialog {
   padding: 0px;
-  margin: unset !important;
   visibility: visible; }
   div.modal-dialog.modal-xlg {
     width: 1065px; }
@@ -606,7 +605,7 @@ div.graphContainer {
         user-select: none;
         font-size: 12px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         border-bottom: 0px;
         margin-bottom: 0px;
         padding-left: 8px;
@@ -624,7 +623,7 @@ div.graphContainer {
           z-index: 2; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
           background-color: #dddddd;
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
           border-left-width: 0px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab#dependenciesPanelTabId {
@@ -632,7 +631,7 @@ div.graphContainer {
         div.graphContainer div#toolsContainerId div#graphToolbarId div.graphPanelTab h4 {
           margin: 0px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.hasBorders {
-        border: 1px solid green;
+        border: 1px solid #0077b8;
         display: inline-block; }
       div.graphContainer div#toolsContainerId div#graphToolbarId > div.spacer {
         background-color: transparent !important; }
@@ -640,9 +639,6 @@ div.graphContainer {
         text-align: center;
         width: auto;
         cursor: pointer; }
-      div.graphContainer div#toolsContainerId div#graphToolbarId > div:not(.spacer).hasBorders {
-        border-left: 1px solid green;
-        border-right: 1px solid green; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.graphTabButton {
         background-position: 5px 50%;
         background-repeat: no-repeat;
@@ -706,7 +702,6 @@ div.graphContainer {
         z-index: 2;
         display: inline-block;
         position: relative;
-        border: 1px solid green;
         height: 22px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId #highlightFormId.newHighlightForm input#searchBoxId {
           width: 193px;
@@ -750,16 +745,23 @@ div.graphContainer {
           height: 22px; }
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
-      border: 1px solid #008000;
+      border: 1px solid #0077b8;
       margin-left: 0px;
       margin-top: 0px;
       padding: 5px;
       background-color: white;
       position: absolute;
       padding-top: 10px;
-      z-index: 1; }
+      z-index: 1;
+      overflow-y: scroll;
+      height: 430px;
+      max-height: 430px;
+      top: 50px; }
+      div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
+        width: 0px; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
-        display: block; }
+        display: block;
+        z-index: 1000; }
       div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
         display: none; }
       div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
@@ -866,14 +868,18 @@ div.graphContainer {
         text-align: center;
         width: 40px; }
   div.graphContainer div#svgContainerId {
-    border: 1px solid green;
+    border: 1px solid #0077b8;
     border-width: 1px;
     padding: 0px !important;
     margin: 0px !important;
     overflow: hidden;
-    font-size: 0; }
+    font-size: 0;
+    position: relative;
+    top: 30px; }
     div.graphContainer div#svgContainerId svg {
       border: none !important; }
+  div.graphContainer button.baseline-btn {
+    margin: 0 10px; }
 
 div.graphContainer.fullscreen {
   background-color: #ffffff;
@@ -882,25 +888,27 @@ div.graphContainer.fullscreen {
   z-index: 95; }
   div.graphContainer.fullscreen div#toolsContainerId {
     position: fixed;
+    top: 5px;
+    left: 5px;
     z-index: 96; }
     div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId {
       top: 0px;
       left: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > div, div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > span {
         vertical-align: top; }
+      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .btn {
+        margin-top: 0px; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab {
         border-top-width: 0px; }
         div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId div.graphPanelTab:not(.activeTab) {
-          border-bottom: 1px solid green; }
+          border-bottom: 1px solid #0077b8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId > *:not(.graphPanelTab) {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
-      div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId #fullscreenButtonId {
-        background-image: url(../icons/layout_content.png); }
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
-      top: 25px;
+      top: 50px;
       left: 0px; }
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelLabel {
       padding: 0px;
@@ -923,7 +931,7 @@ div.graphContainer.fullscreen {
 #spinnerDivId {
   width: 800px;
   height: 300px;
-  border: 1px solid green;
+  border: 1px solid #0077b8;
   padding: 5px;
   margin: 5px; }
   #spinnerDivId.graph {
@@ -986,17 +994,20 @@ div.graphContainer.fullscreen {
   border-top-color: #3c8dbc; }
 
 /* Cookbook Tabs  to Clarity */
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a,
+.create-recipe-form div.tabbable ul.nav-tabs li a {
   border: 0px;
   background: none;
   color: #444;
   margin-left: 10px;
   margin-right: 10px; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:first-child,
+.create-recipe-form div.tabbable ul.nav-tabs li a:first-child {
   margin-left: 0px; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li a:hover,
+.create-recipe-form div.tabbable ul.nav-tabs li a:hover {
   -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
   box-shadow: 0 -3px 0 #0077b8 inset;
   -webkit-transition: -webkit-box-shadow .2s ease-in;
@@ -1004,13 +1015,17 @@ div.graphContainer.fullscreen {
   transition: box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
 
-.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a {
+.cookbook_recipes_editor div.tabbable ul.nav-tabs li.active a,
+.create-recipe-form div.tabbable ul.nav-tabs li.active a {
   -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
   box-shadow: 0 -3px 0 #0077b8 inset;
   -webkit-transition: -webkit-box-shadow .2s ease-in;
   transition: -webkit-box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in;
   transition: box-shadow .2s ease-in, -webkit-box-shadow .2s ease-in; }
+
+.create-recipe-form .tab-content {
+  border: none !important; }
 
 form.left-alignment div.form-group input[type="text"] {
   height: 34px;
@@ -1077,47 +1092,86 @@ form .btn-with-close-icon .fa-close {
 div.dates-info-container {
   padding: 4px 0 !important; }
 
-tds-ui-dialog #tdsUiDialog {
+.legacy-modal-dialog {
   padding: 0 !important;
   margin: 0; }
-  tds-ui-dialog #tdsUiDialog .modal-dialog {
-    background: #fff;
-    position: fixed !important;
-    top: 56px !important;
-    left: 35px !important;
-    right: 35px !important;
-    bottom: 48px !important;
-    overflow: hidden !important;
-    width: unset !important;
-    padding-left: 40px !important; }
-    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-header .active {
-      -webkit-box-shadow: 0 -3px 0 #0077b8 inset;
-      box-shadow: 0 -3px 0 #0077b8 inset; }
-    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body {
-      max-height: calc(100vh - 56px - 48px);
-      height: calc(100vh - 35px - 35px);
-      width: calc(100vw - 40px - 35px - 35px - 22px);
-      padding: 15px 20px 150px 22px; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        grid-gap: 24px;
-        justify-items: left; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form input {
-          width: 220px; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form .truck-input-container {
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-pack: justify;
-          -ms-flex-pack: justify;
-          justify-content: space-between;
-          -ms-flex-wrap: nowrap;
-          flex-wrap: nowrap; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .grid-form .truck-input-container input {
-            width: 66px;
-            margin-right: 10px; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody {
+  .legacy-modal-dialog .legacy-modal-content {
+    margin-left: 40px; }
+    .legacy-modal-dialog .legacy-modal-content .legacy-modal-header {
+      padding: 24px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .close-button {
+        color: #737373;
+        height: 40px;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        border: unset; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .close-button:hover {
+          background: unset; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a {
+          color: white; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a:hover {
+            color: #0077b8; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-badge {
+        width: 23px;
+        height: 23px;
+        border-radius: 100%;
+        font-size: 14px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subtitle {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 16px;
+        color: #808080;
+        margin-right: 10px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subbadge {
+        background-color: #f38b00; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description {
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        color: black; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-height {
+        min-height: 48px; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-sized {
+        width: calc(100% - 250px); }
+    .legacy-modal-dialog .legacy-modal-content .legacy-modal-body {
+      margin-left: 24px;
+      width: calc(100vw - 212px);
+      padding-right: 40px;
+      overflow-y: scroll;
+      overflow-x: hidden; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.has-description {
+        max-height: calc(100vh - 300px); }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.no-description {
+        max-height: calc(100vh - 255px); }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
+        border: unset;
+        word-break: break-word;
+        border-spacing: unset; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
+        display: block;
+        width: 100%;
+        text-align: right;
+        font-size: 12px;
+        font-weight: 500;
+        color: #3c8dbc;
+        cursor: pointer; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
@@ -1126,101 +1180,194 @@ tds-ui-dialog #tdsUiDialog {
         -webkit-box-pack: justify;
         -ms-flex-pack: justify;
         justify-content: space-between; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column {
-          width: 50%; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.one-column tr {
-            width: 100%; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column {
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
           width: 100%; }
-          tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tbody.two-column tr {
-            width: 48%; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        border: 1px solid #ccc;
-        border-width: 0 0 1px 0;
-        line-height: 16px; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr th {
-          display: block;
-          text-align: right;
-          background-color: transparent;
-          font-size: 14px;
-          color: #18394b;
-          min-width: 150px;
-          width: 150px;
-          max-width: 150px;
-          text-overflow: ellipsis; }
-        tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list tr td {
-          display: block;
-          font-size: 14px;
-          color: #000; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr {
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
+            width: 100%; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
+          width: 100%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
+            width: 49%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
+              width: 100%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
+            margin-left: 2%; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          border: 1px solid #ccc;
+          border-width: 0 0 1px 0; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+            display: block;
+            font-size: 14px;
+            padding: 4px 8px; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
+            background-color: transparent;
+            color: #18394b;
+            width: 150px;
+            min-width: 150px;
+            text-overflow: ellipsis; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+            color: #000; }
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
         display: none; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-body .tdr-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex; }
-    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer,
-    tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav {
-      position: absolute;
-      top: 0;
-      width: 40px;
-      bottom: 0;
-      left: 0;
-      padding-top: 24px;
-      border: solid 1px #ccc;
-      border-width: 0 1px 0 0; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer .btn,
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .btn {
-        color: #808080; }
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-footer .button-label,
-      tds-ui-dialog #tdsUiDialog .modal-dialog .modal-sidenav .button-label {
-        display: none; }
+  .legacy-modal-dialog .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px #ccc;
+    border-width: 0 1px 0 0; }
+    .legacy-modal-dialog .modal-sidenav .btn {
+      color: #000;
+      height: 40px;
+      margin: 0; }
+    .legacy-modal-dialog .modal-sidenav .button-label {
+      display: none; }
+    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button .btn {
+      border: unset;
+      color: white;
+      border-radius: unset; }
 
-tds-ui-dialog .close {
-  opacity: 1; }
-  tds-ui-dialog .close .btn {
-    color: #808080; }
-  tds-ui-dialog .close .button-label {
-    display: none; }
-
-.tds-modal-content {
-  background: #fff; }
-  .tds-modal-content .modal-header {
-    padding: 24px; }
-    .tds-modal-content .modal-header .modal-title-container {
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center; }
-      .tds-modal-content .modal-header .modal-title-container .modal-badge {
-        width: 23px;
-        height: 23px;
-        border-radius: 100%;
+.modal-dialog {
+  background: #fff;
+  position: fixed !important;
+  top: 56px !important;
+  left: 35px !important;
+  right: 35px !important;
+  bottom: 48px !important;
+  overflow: hidden !important;
+  width: unset !important;
+  padding-left: 40px !important; }
+  .modal-dialog .modal-body {
+    width: calc(100vw - 40px - 35px - 35px - 22px);
+    padding: 15px 20px 0 22px; }
+    .modal-dialog .modal-body.has-description {
+      max-height: calc(100vh - 300px); }
+    .modal-dialog .modal-body.no-description {
+      max-height: calc(100vh - 255px); }
+    .modal-dialog .modal-body .source-target-wrapper {
+      -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+      flex-grow: 1;
+      margin: 5px 0; }
+      .modal-dialog .modal-body .source-target-wrapper .header-label {
+        width: 100%;
+        margin-bottom: 5px;
+        padding: 0 8px;
         font-size: 14px; }
-      .tds-modal-content .modal-header .modal-title-container .modal-title {
-        font-style: normal;
-        font-weight: 500;
-        font-size: 22px;
-        line-height: 26px;
-        margin-right: 10px; }
-      .tds-modal-content .modal-header .modal-title-container .modal-subtitle {
-        font-style: normal;
-        font-weight: normal;
-        font-size: 14px;
-        line-height: 16px;
-        color: #808080;
-        margin-right: 10px; }
-      .tds-modal-content .modal-header .modal-title-container .modal-subbadge {
-        background-color: #f38b00; }
-    .tds-modal-content .modal-header .modal-description {
-      font-style: normal;
-      font-weight: 400;
-      font-size: 12px;
-      color: black; }
+    .modal-dialog .modal-body .grid-form {
+      display: grid;
+      grid-template-columns: 49% 49%;
+      -webkit-column-gap: 2%;
+      -moz-column-gap: 2%;
+      column-gap: 2%; }
+      .modal-dialog .modal-body .grid-form .k-input {
+        font-size: 14px; }
+      .modal-dialog .modal-body .grid-form .clr-form-control {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: unset;
+        flex-direction: unset;
+        -webkit-box-orient: unset;
+        margin-top: unset;
+        -ms-flex-align: unset;
+        align-items: unset;
+        -webkit-box-align: unset;
+        -webkit-box-direction: unset; }
+        .modal-dialog .modal-body .grid-form .clr-form-control label {
+          max-width: unset;
+          margin-bottom: unset;
+          min-width: 150px;
+          width: 150px;
+          padding: 0 8px;
+          font-size: 14px; }
+        .modal-dialog .modal-body .grid-form .clr-form-control .clr-checkbox-wrapper .clr-control-label {
+          min-width: unset;
+          width: unset; }
+        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input {
+          font-size: 14px;
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+          flex-grow: 1; }
+        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input-wrapper {
+          max-height: unset; }
+        .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control {
+          display: block;
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+          flex-grow: 1;
+          margin-top: unset; }
+          .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container {
+            width: 100%; }
+            .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container .clr-input {
+              width: 100%; }
+        .modal-dialog .modal-body .grid-form .clr-form-control .ng-star-inserted,
+        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox,
+        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox-group {
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+          flex-grow: 1; }
+        .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control,
+        .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control {
+          display: block;
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+          flex-grow: 1; }
+          .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control .k-datepicker,
+          .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control .k-datepicker {
+            width: unset; }
+        .modal-dialog .modal-body .grid-form .clr-form-control .combo-group .k-widget.k-combobox,
+        .modal-dialog .modal-body .grid-form .clr-form-control .k-combobox {
+          width: unset; }
+        .modal-dialog .modal-body .grid-form .clr-form-control kendo-dropdownlist.k-dropdown {
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
+          flex-grow: 1;
+          -ms-flex-item-align: end;
+          align-self: flex-end; }
+      .modal-dialog .modal-body .grid-form .truck-input-container {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1; }
+        .modal-dialog .modal-body .grid-form .truck-input-container .clr-form-control + .clr-form-control {
+          margin-left: 10px; }
+    .modal-dialog .modal-body .modal-body-graph .diagram-layout-container {
+      width: 100%;
+      padding: unset;
+      padding-top: 100%;
+      position: relative;
+      min-height: unset; }
+      .modal-dialog .modal-body .modal-body-graph .diagram-layout-container .overview-container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: unset;
+        height: unset; }
+
+.close {
+  opacity: 1; }
+  .close .btn {
+    color: #808080; }
+  .close .button-label {
+    display: none; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
@@ -1414,7 +1561,7 @@ body > .wrapper {
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
@@ -1824,6 +1971,14 @@ div.ui-dialog {
     padding-right: 18px;
     padding-top: 6px;
     padding-bottom: 1px; }
+    div.ui-dialog div.ui-dialog-content#showEntityView, div.ui-dialog div.ui-dialog-content#cloneEntityView, div.ui-dialog div.ui-dialog-content#editEntityView, div.ui-dialog div.ui-dialog-content#showEntityView, div.ui-dialog div.ui-dialog-content#cablingDialogId {
+      padding: unset;
+      background: #fff;
+      position: fixed !important;
+      top: 56px !important;
+      left: 35px !important;
+      right: 35px !important;
+      bottom: 48px !important; }
   div.ui-dialog div.dialog {
     background-color: #fff;
     border: 0px !important; }
@@ -2016,7 +2171,7 @@ div.content-wrapper div.container div#DependencyGroupsTableId div#dependencyDivI
 
 div.content-wrapper div.container div#item1.fullscreen div#filterOptionsMenuId.open {
   left: 366px;
-  top: 20px; }
+  top: 50px; }
 
 div.content-wrapper div.container div#item1:not(.fullscreen) div#toolsContainerId {
   z-index: auto; }
@@ -2034,14 +2189,13 @@ div.content-wrapper div.container div#item1 div#graphToolbarId {
 div.content-wrapper div.container div#item1 div#filterOptionsMenuId {
   z-index: 1;
   display: none !important;
-  border-top: 0px;
   margin-top: -1px;
   width: 235px; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId.open {
     display: block !important;
     position: absolute;
-    left: 354px;
-    top: 21px;
+    left: 518px;
+    top: 38px;
     background-color: #ffffff;
     cursor: auto !important; }
   div.content-wrapper div.container div#item1 div#filterOptionsMenuId table {
@@ -2198,8 +2352,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
   cursor: pointer; }
 
 div #dependecy-control {
-  height: calc(100% - 30px);
+  height: calc(100% - 50px);
   overflow: auto; }
+  div #dependecy-control::-webkit-scrollbar {
+    width: 0px; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;
@@ -2498,6 +2654,28 @@ div.content-wrapper div.execution-phase-wrapper {
       flex-basis: 49%; } }
 
 /* Cookbook */
+.code-diff-modal .modal-dialog {
+  width: 1060px; }
+
+.modal-dialog-fullscreen .tds-modal-content {
+  height: 100%; }
+  .modal-dialog-fullscreen .tds-modal-content .modal-body {
+    max-height: 100%; }
+    .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror {
+      height: 100% !important; }
+      .modal-dialog-fullscreen .tds-modal-content .modal-body .CodeMirror .CodeMirror-linenumber {
+        margin-top: -4px; }
+
+.code-editor-modal .modal-body {
+  padding: 15px !important; }
+
+.cookbook_recipes_editor .clr-select-wrapper,
+.recipeDetail .clr-select-wrapper {
+  display: block; }
+  .cookbook_recipes_editor .clr-select-wrapper select,
+  .recipeDetail .clr-select-wrapper select {
+    display: inherit; }
+
 .taskGeneration .container-fluid {
   padding-left: 0px; }
 
@@ -2523,3 +2701,125 @@ div.content-wrapper div.execution-phase-wrapper {
 .layout-top-nav .main-header > .navbar {
   margin: 0;
   width: 100%; }
+
+/* Clarity */
+.cookbook_recipes_editor .gridStyle,
+.cookbook_recipes_editor .gridStyleTasks,
+.cookbook_recipes_editor .gridStyleGroups,
+.recipeDetail .gridStyle,
+.recipeDetail .gridStyleTasks,
+.recipeDetail .gridStyleGroups,
+.cloneSelectors .gridStyle,
+.cloneSelectors .gridStyleTasks,
+.cloneSelectors .gridStyleGroups {
+  border: none;
+  background: none; }
+  .cookbook_recipes_editor .gridStyle .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleTasks .ngTopPanel,
+  .cookbook_recipes_editor .gridStyleGroups .ngTopPanel,
+  .recipeDetail .gridStyle .ngTopPanel,
+  .recipeDetail .gridStyleTasks .ngTopPanel,
+  .recipeDetail .gridStyleGroups .ngTopPanel,
+  .cloneSelectors .gridStyle .ngTopPanel,
+  .cloneSelectors .gridStyleTasks .ngTopPanel,
+  .cloneSelectors .gridStyleGroups .ngTopPanel {
+    background-color: #d9e4ea; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngVerticalBar {
+      margin-top: 10px;
+      height: 13px !important;
+      background-color: #656565; }
+    .cookbook_recipes_editor .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cookbook_recipes_editor .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .recipeDetail .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleTasks .ngTopPanel .ngHeaderCell .ngHeaderText,
+    .cloneSelectors .gridStyleGroups .ngTopPanel .ngHeaderCell .ngHeaderText {
+      text-align: center;
+      font-weight: 500;
+      font-size: 11px;
+      color: #3c8dbc; }
+  .cookbook_recipes_editor .gridStyle .ngRow,
+  .cookbook_recipes_editor .gridStyleTasks .ngRow,
+  .cookbook_recipes_editor .gridStyleGroups .ngRow,
+  .recipeDetail .gridStyle .ngRow,
+  .recipeDetail .gridStyleTasks .ngRow,
+  .recipeDetail .gridStyleGroups .ngRow,
+  .cloneSelectors .gridStyle .ngRow,
+  .cloneSelectors .gridStyleTasks .ngRow,
+  .cloneSelectors .gridStyleGroups .ngRow {
+    border: 1px solid #d9e4ea;
+    background: none; }
+    .cookbook_recipes_editor .gridStyle .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow.selected,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow.selected,
+    .recipeDetail .gridStyle .ngRow.selected,
+    .recipeDetail .gridStyleTasks .ngRow.selected,
+    .recipeDetail .gridStyleGroups .ngRow.selected,
+    .cloneSelectors .gridStyle .ngRow.selected,
+    .cloneSelectors .gridStyleTasks .ngRow.selected,
+    .cloneSelectors .gridStyleGroups .ngRow.selected {
+      background-color: #c9dde1; }
+    .cookbook_recipes_editor .gridStyle .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleTasks .ngRow .ngVerticalBar,
+    .cookbook_recipes_editor .gridStyleGroups .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyle .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleTasks .ngRow .ngVerticalBar,
+    .recipeDetail .gridStyleGroups .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyle .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleTasks .ngRow .ngVerticalBar,
+    .cloneSelectors .gridStyleGroups .ngRow .ngVerticalBar {
+      width: 0px !important; }
+
+.cloneSelectors .gridStyle .ngTopPanel .ngHeaderCell .ngHeaderSortColumn {
+  padding-top: 4px; }
+
+div.clr-select-wrapper {
+  max-height: 1rem;
+  display: inline-block;
+  position: relative;
+  white-space: nowrap; }
+  div.clr-select-wrapper select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background: 0 0;
+    height: 1rem;
+    color: #000;
+    display: inline-block;
+    border-bottom: 1px solid #999;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(95%, transparent), color-stop(95%, #0092d1)) no-repeat;
+    background: linear-gradient(to bottom, transparent 95%, #0092d1 95%) no-repeat;
+    background-size: 0 100%;
+    -webkit-transition: background-size .2s ease;
+    transition: background-size .2s ease;
+    position: relative;
+    padding: 0 .916667rem 0 .25rem;
+    cursor: pointer;
+    font-size: .541667rem;
+    z-index: 2;
+    /**/
+    font-size: 13px;
+    padding-left: 0;
+    font-weight: 500;
+    line-height: 18px; }
+    div.clr-select-wrapper select:hover {
+      border-color: rgba(222, 222, 222, 0.5);
+      background: rgba(222, 222, 222, 0.5); }

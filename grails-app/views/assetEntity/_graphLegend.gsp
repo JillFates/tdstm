@@ -5,7 +5,7 @@
 			<td class="noPadding">
 				<span id="twistieSpanId" groupType="ac" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="assetClassesContainerId">
 					Asset Classes
-					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+					<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
 			</td>
 		</tr>
@@ -35,7 +35,7 @@
 			<td class="noPadding">
 				<span id="twistieSpanId" groupType="de" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="dependencyTypeContainerId">
 					Dependencies
-					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+					<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
 			</td>
 		</tr>
@@ -68,8 +68,8 @@
 		<tr id="twistieRowId">
 			<td class="noPadding">
 				<span id="twistieSpanId" groupType="hb" class="open pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="colorGroupingContainerId">
-					<p>Move Bundles</p>
-					<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+					Move Bundles
+					<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 				</span>
 			</td>
 		</tr>

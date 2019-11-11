@@ -838,8 +838,8 @@ svg {
 	max-width: 90vw;
 }
 .ui-dialog th {
-	background: #CCCCCC !important;
-	color: #000 !important;
+	background: #CCCCCC;
+	color: #000;
 }
 th.asc{
 	background-image: url(../../../images/images/skin/sorted_asc.gif);
@@ -932,11 +932,6 @@ br.page-break-after {
 	width: 300px;
 	height: 20px;
 }
-.tabs .tabControls {
-	display: inline;
-	width: 100px;
-	height: 20px;
-}
 
 .disabledButton input{
 	color:gray;
@@ -992,28 +987,6 @@ a#taskLinkId * {
 }
 a#taskLinkAllId * {
 	vertical-align: middle;
-}
-
-
-.btn {
-	display: inline-block;
-	padding: 6px 12px;
-	margin-bottom: 0;
-	font-size: 14px;
-	font-weight: normal;
-	line-height: 1.428571429;
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	cursor: pointer;
-	background-image: none;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
 }
 
 .btn:focus {
@@ -1148,4 +1121,10 @@ span#addAkaId.addAkaDisabled {
 }
 span#addAkaId:not(.addAkaDisabled) {
 	cursor: pointer;
+}
+
+
+/** Clarity **/
+.btn img {
+    margin-top: -3px;
 }

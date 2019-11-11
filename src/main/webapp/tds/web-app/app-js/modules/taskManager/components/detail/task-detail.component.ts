@@ -69,7 +69,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 		private userContextService: UserContextService) {
 
 		super('#task-detail-component');
-		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
+		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.userContextService.getUserContext().subscribe((userContext: UserContextModel) => {
 			this.userContext = userContext;
 		});

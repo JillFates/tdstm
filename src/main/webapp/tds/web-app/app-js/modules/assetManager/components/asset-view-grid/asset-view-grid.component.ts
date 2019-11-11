@@ -15,7 +15,7 @@ import {takeUntil} from 'rxjs/operators';
 import {State} from '@progress/kendo-data-query';
 import {
 	DataStateChangeEvent,
-	GridDataResult,
+	GridDataResult, PageChangeEvent,
 	RowClassArgs
 } from '@progress/kendo-angular-grid';
 
@@ -119,6 +119,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	ASSET_ENTITY_DIALOG_TYPES = ASSET_ENTITY_DIALOG_TYPES;
 	protected userTimeZone: string;
 	protected userDateFormat: string;
+	protected showAssetsFilter = false;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -818,4 +819,45 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	protected isAssetCloneAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetCreate);
 	}
+	/**
+	 * Filter Assets Toggle
+	 */
+	public toggleAssetsFilter(): void {
+		this.showAssetsFilter = !this.showAssetsFilter;
+	}
+
+	/**
+	 * Returns the number of current filters applied.
+	 */
+	public filterCount(): number {
+		return this.model.columns.filter((c: ViewColumn) => c.filter).length
+	}
+
+	/**
+	 * On Page Change, update grid state & handle pagination on server side.
+	 */
+	onPageChangeHandler({ skip, take }: PageChangeEvent): void {
+		this.gridState.skip = skip;
+		this.gridState.take = take;
+		this.updateGridState(this.gridState);
+		this.modelChange.emit();
+	}
+
+	/**
+	 * ==============
+	 * GRID TEST STUFF
+	 * ===============
+	 * TODO: delete this stuff below
+	 */
+	public assetsGrid: any = {
+		pageable: {
+			pageSizes: [5, 10, 25, 50, 100],
+			info: true,
+			type: 'input',
+		},
+		filterable: true,
+		sortable: true,
+		resizable: true,
+		columnMenu: true,
+	};
 }
