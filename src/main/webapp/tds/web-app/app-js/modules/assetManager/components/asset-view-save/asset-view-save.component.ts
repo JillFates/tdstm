@@ -7,9 +7,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {Permission} from '../../../../shared/model/permission.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
-import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
-
 
 @Component({
 	selector: 'asset-explorer-view-save',
@@ -38,7 +36,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                             <input type="radio"
                                                    name="radio-mode"
                                                    [value]="SAVE_AS_OPTIONS.MY_VIEW.value"
-												   [disabled]="SAVE_AS_OPTIONS.MY_VIEW.disabled"
+                                                   [attr.disabled]="SAVE_AS_OPTIONS.MY_VIEW.disabled || null"
                                                    (change) = "onChangeMode()"
                                                    [(ngModel)]="currentSaveOption"
                                                    checked>
@@ -84,7 +82,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     <label for="overrideMe">
                                         <input id="overrideMe" type="radio" name="radio-mode"
 											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.value"
-											   [disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.disabled"
+                                               [attr.disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ME.disabled || null"
 											   (change) = "onChangeMode()"
                                                [(ngModel)]="currentSaveOption">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ME' | translate }}</span>
@@ -96,7 +94,7 @@ import {SaveOptions} from '../../../../shared/model/save-options.model';
                                     <label for="overrideAll">
                                         <input id="overrideAll" type="radio" name="radio-mode"
 											   [value]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.value"
-											   [disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.disabled"
+                                               [attr.disabled]="SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL.disabled || null"
 											   (change) = "onChangeMode()"
                                                [(ngModel)]="currentSaveOption">
                                         <span>{{ 'ASSET_EXPLORER.OVERRIDE_EXISTING_VIEW_ALL_USERS' | translate }}</span>
@@ -154,7 +152,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.model.name) {
 			this.validateUniquenessDataViewByName(this.model.name);
 		}
-		this.setDisabling();
 	}
 
 	public cancelCloseDialog(): void {
@@ -187,16 +184,8 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public startModel(model) {
-		this.model = {...model};
-		if (this.model.id) {
-			const changes = {
-				name: `Copy of ${this.model.name}`
-			};
-			this.model = {...this.model, ...changes};
-		}
-		if (this.model.isSystem) {
-			this.model = {...this.model, isShared: false};
-		}
+		const changes = { name: `Copy of ${model.name}`};
+		this.model = {...this.model, ...changes};
 	}
 
 	/**
@@ -223,18 +212,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		return this.permissionService.hasPermission(Permission.AssetExplorerSystemList);
 	}
 
-	/**
-	 * Should turn isShared to false when isSystem is selected as true.
-	 */
-	private onIsSystemChange(): void {
-		if (this.model.isSystem && this.model.isShared) {
-			this.model.isShared = false;
-		}
-	}
-
 	private setDisabling(): void {
 		const options = Object.entries(this.SAVE_AS_OPTIONS);
-		for(const [key, value] of options) {
+		for (const [key, value] of options) {
 			value.disabled = !this.saveOptions.saveAsOptions.includes(key);
 		}
 	}
@@ -262,13 +242,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 			}
 		}
 
-	}
-
-	public onChangeMode() {
-		this.setDisabling();
-		if (this.currentSaveOption !== this.SAVE_AS_OPTIONS.MY_VIEW.value) {
-			this.model.name = this.preModel.name;
-		}
 	}
 
 	public onNameChanged() {
