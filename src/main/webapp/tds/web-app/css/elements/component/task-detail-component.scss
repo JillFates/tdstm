@@ -1,5 +1,108 @@
 @import "../../base/taskstatus-mixins";
 
+.task-detail-component {
+  .task-detail-container {
+    display: flex;
+    height: 83%;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .modal-body {
+    //height: 80%;
+    flex: 1;
+    max-height: unset;
+
+    .full-height {
+      padding-left: 24px;
+      padding-right: 24px;
+
+      .dates-info-container {
+        table {
+          width: 100%;
+          tr {
+            width: 100%;
+          }
+          .date-created, .last-updated {
+            width: 50%;
+          }
+          .last-updated {
+            text-align: right;
+          }
+        }
+      }
+
+      .btn-collapsed-fixed-right {
+        position: absolute;
+        right: 20px;
+      }
+
+      table.task-details {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 3px;
+        padding: 0;
+        .task-number {
+          min-width: 104px;
+        }
+        .task-comment {
+          max-width: 400px;
+          font-weight:bold;
+        }
+        td {
+          display: table-cell;
+          text-align: initial;
+          vertical-align: inherit;
+          color: inherit;
+          font-weight: inherit;
+          font-size: 13px;
+          border-radius: .25em;
+          padding: 4px 6px;
+        }
+        td.N {
+          width: 15%;
+          label {
+            margin-bottom: unset;
+            font-weight: unset;
+          }
+        }
+      }
+    }
+
+    .k-grid-toolbar {
+      padding-bottom: 0;
+    }
+
+  }
+
+  .modal-footer {
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-top: 5px;
+    display: block;
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+    .options-container {
+      display: flex;
+      justify-content: space-between;
+      //height: 46px;
+      //align-items: flex-end;
+      .options {
+        display: flex;
+      }
+    }
+  }
+
+  tds-button {
+    button {
+      color: unset;
+      border-color: unset;
+    }
+  }
+}
+
+/*
 @mixin combo-status {
   margin: 0;
   padding: 0;
@@ -536,3 +639,4 @@
     }
   }
 }
+ */

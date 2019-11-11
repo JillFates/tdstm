@@ -29,11 +29,13 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-filter,
 		tds-button-save,
 		tds-button-undo,
-		tds-button-script
+		tds-button-script,
+		tds-button-collapse,
+		tds-button-expand
 	`,
 	template: `
+<!--        [ngClass]="hostClasses.length ? hostClasses.value : ''"-->
 		<tds-button
-				[ngClass]="hostClasses.length ? hostClasses.value : ''"
 				[id]="id"
 				[type]="type"
 				[theme]="theme"
@@ -45,6 +47,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 				[title]="tooltip || button.tooltip || ''"
 				[disabled]="disabled || !hasAllPermissions"
 				[tabindex]="tabindex"
+				class="action-button"
 				[iconClass]="iconClass">
 			{{ displayLabel ? titleButton : '' }}
 		</tds-button>
