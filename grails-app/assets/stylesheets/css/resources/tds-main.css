@@ -806,10 +806,11 @@ svg {
 }
 .SuffleImage {
 	height: 16px;
-	margin-left: 60px;
-	margin-top: -10px;
-	position: absolute;
+
+	
 	width: 16px;
+	margin-top: 5px;
+	margin-right: -5px;
 	z-index: 1;
 	cursor:pointer;
 }

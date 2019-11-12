@@ -95,6 +95,7 @@
 
       .legacy-modal-body-content {
         padding-right: 20px;
+
         table {
           border: unset;
           word-break: break-word;
@@ -109,6 +110,126 @@
           font-weight: 500;
           color: #3c8dbc;
           cursor: pointer;
+        }
+
+        .grid-form {
+          display: grid;
+          grid-template-columns: 49% 49%;
+          column-gap: 2%;
+
+          .clr-form-control {
+            flex-direction: row;
+            margin-top: unset;
+
+            .clr-control-container,
+            .clr-input-wrapper {
+              flex-grow: 1;
+
+              // Select Styling
+              .clr-select-wrapper {
+                width: 100%;
+
+                .clr-select {
+                  width: 100%;
+                  padding: unset;
+                  padding-left: 0.25rem;
+                  font-size: 14px;
+                }
+              }
+
+              // Input Styling
+              .clr-input {
+                width: 100%;
+                padding: unset;
+                padding-left: 0.25rem;
+                font-size: 14px;
+              }
+            }
+
+            .clr-control-label {
+              min-width: 150px;
+              max-width: 150px;
+              line-height: unset;
+              padding: 0 8px;
+              font-size: 14px;
+              margin-bottom: unset;
+            }
+
+            &.with-inline-checkbox {
+              padding-left: 12px;
+
+              .clr-control-container {
+                flex: unset;
+
+                .clr-control-label {
+                  padding: 0 0 0 24px;
+                  min-width: unset;
+                }
+              }
+            }
+          }
+
+          .k-datepicker,
+          .k-header,
+          .k-widget {
+            background: unset;
+            border: unset;
+            color: unset;
+            border-radius: unset;
+          }
+
+          .k-picker-wrap.k-state-default {
+            background: unset;
+            border: unset;
+            border-radius: unset;
+          }
+
+          .k-datepicker {
+            flex-grow: 1;
+
+            &:hover {
+              .k-select {
+                border: unset;
+                background-color: unset;
+                background-image: unset;
+                color: #0092d1;
+              }
+            }
+
+            .k-picker-wrap {
+              border: unset;
+              border-bottom: 1px solid #999;
+
+              &:before {
+                height: unset;
+              }
+
+              &.k-state-hover,
+              &.k-state-focused {
+                box-shadow: unset;
+                -webkit-box-shadow: unset;
+                border-bottom: 1px solid #0092d1;
+              }
+
+              .k-input {
+                background: unset;
+                border-radius: unset;
+                height: 1rem;
+                max-height: 1rem;
+                font-size: 14px;
+                padding: 0 0.25rem;
+                text-indent: unset;
+              }
+
+              .k-select {
+                line-height: unset;
+                width: unset;
+                min-height: unset;
+                height: unset;
+                padding-top: 2px;
+              }
+            }
+          }
         }
 
         .tds-detail-list {

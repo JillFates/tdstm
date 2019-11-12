@@ -100,49 +100,24 @@ class ControlTagLib {
 		}
 		StringBuilder sb = new StringBuilder("\n")
 
-		// Build the TD element
-		// <td class="label assetName C" nowrap="nowrap">
-		sb.append('<td class="label ')
-		// TODO : Determine if the fieldName is used in the LABEL class attribute
-		sb.append(fieldSpec.field)
-		if (fieldSpec.imp) {
-			String imp = fieldSpec.imp
-			sb.append(" ${imp}")
-			// Determines if the imp is I)mportant or C)ritical
-			if (imp == "Y" || imp == "G") {
-				// Checks if the value for the input was given
-				if (attrs.containsKey("value")) {
-					// If the value for the input is empty, the label will be red.
-					if (attrs.value == null || StringUtil.isBlank(attrs.value.toString())) {
-						sb.append(EMPTY_IMP_CRIT_FIELD_CSS_CLASS)
-					}
-				}
-			}
-		}
-		sb.append('" nowrap="nowrap">')
-		sb.append("\n")
-
 		// Build the LABEL element
-		// <label for="assetName"><span data-toggle="popover" data-trigger="hover" data-content="Some tip">Name</span></label>
 		sb.append('<label for="')
 		sb.append(fieldSpec.field)
 		sb.append('"')
-		sb.append(' >')
-		sb.append('<span ')
-		sb.append(tooltipAttrib(fieldSpec))
-		sb.append(' >')
+		sb.append(' class="clr-control-label')
+
+		if (fieldSpec.imp) {
+			String imp = fieldSpec.imp
+			sb.append(" ${imp}")
+		}
+
+		sb.append('">')
 		sb.append(HtmlUtil.escape(fieldSpec.label))
-		if (attrs.containsKey("labelSuffix")){
-            sb.append(HtmlUtil.escape(attrs.labelSuffix))
-        }
-		sb.append('</span>')
 		if (fieldSpec.constraints.required) {
 			sb.append('<span style="color: red;">*</span>')
 		}
 		sb.append('</label>')
 
-		// Close out the TD
-		sb.append("\n</td>")
 		out << sb.toString()
 	}
 
@@ -247,10 +222,10 @@ class ControlTagLib {
 	 * Used to render the label and the corresponding input in create/edit views.
 	 */
 	def inputLabelAndField = { Map attrs ->
+		out << '<div class="clr-form-control">'
 		out << inputLabel(attrs)
-		out << '<td>'
 		out << inputControl(attrs)
-		out << '</td>'
+		out << '</div>'
 	}
 
 	/**
@@ -265,8 +240,11 @@ class ControlTagLib {
 	private String renderSelectListInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
 		List options = fieldSpec.constraints?.values ?: []
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<div class="clr-control-container">')
+		sb.append('<div class="clr-select-wrapper">')
+		sb.append('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
+		sb.append(attribute('class', 'clr-select'))
 		sb.append('>')
 
 		// Add a Select... option at top if the field is required
@@ -299,7 +277,8 @@ class ControlTagLib {
 		}
 
 		sb.append('</select>')
-
+		sb.append('</div>')
+		sb.append('</div>')
 		sb.toString()
 	}
 
@@ -313,10 +292,14 @@ class ControlTagLib {
 	 * @return the INPUT Component HTML
 	 */
 	private String renderStringInput(Map fieldSpec, String value, String tabIndex, String tabOffset, Integer size, String tooltipDataPlacement) {
-		'<input' +
+		StringBuilder sb = new StringBuilder('<div class="clr-input-wrapper">')
+		sb.append('<input' +
 		attribute('type', 'text') +
 		commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement) +
-		'/>'
+		attribute('class', 'clr-input') +
+		'/>')
+		sb.append('</div>')
+		sb.toString()
 	}
 
 	/**
@@ -331,9 +314,11 @@ class ControlTagLib {
 		List options = []
 		List valid = ['Yes', 'No']
 
-		StringBuilder sb = new StringBuilder('<select')
+		StringBuilder sb = new StringBuilder('<div class="clr-control-container">')
+		sb.append('<div class="clr-select-wrapper">')
+		sb.append('<select')
 		sb.append(commonAttributes(fieldSpec, value, tabIndex, tabOffset, size, tooltipDataPlacement))
-		sb.append(' style="width: 80px;"')
+		sb.append(attribute('class', 'clr-select'))
 		sb.append('>')
 
 		if (fieldSpec.constraints?.required) {
@@ -366,6 +351,8 @@ class ControlTagLib {
 		}
 
 		sb.append('</select>')
+		sb.append('</div>')
+		sb.append('</div>')
 
 		sb.toString()
 	}
@@ -383,7 +370,7 @@ class ControlTagLib {
 		nameAttrib(fieldSpec) +
 		valueAttrib(fieldSpec, value) +
 		tabIndexAttrib(fieldSpec, tabIndex, tabOffset) +
-		classAttrib(fieldSpec) +
+		// classAttrib(fieldSpec) +
 		sizeAttrib(size) +
 		tooltipAttrib(fieldSpec, tooltipDataPlacement) +
 		constraintsAttrib(fieldSpec) +
