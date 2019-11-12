@@ -57,7 +57,6 @@ function displayWarningOrErrorMsg(isCyclical) {
 function 	buildGraph(response, status) {
 
 	// show the loading spinner
-	$('#spinnerId').css('display', 'block');
 
 	// restore export button
 	$('#exportCriticalPathButton').removeClass('disabledLabel');
@@ -72,12 +71,17 @@ function 	buildGraph(response, status) {
 	var data = $.parseJSON(response.responseText);
 	data = data.data;
 	var ready = false;
-	var items = data.tasks;
+
 	// if the event has no tasks show an error message and exit
-	if (items.length === 0 ) {
+	if (!data || data.tasks.length === 0) {
 		displayWarningOrErrorMsg(false);
 		return;
 	}
+	if (!data.startDate || !data.endDate) {
+        return alert('The event is missing the start and/or end dates. Please update the event dates and then perform a baseline of the plan before continuing.');
+	}
+
+	var items = data.tasks;
 
 	// graph default config
 	var miniRectStroke = 1.0;
@@ -1545,7 +1549,7 @@ function 	buildGraph(response, status) {
 			items[i].siblingGroupParents = [];
 			items[i].childGroups = [];
 		}
-		s
+
 		// if there are undefined start dates and no cycles, alert the user
         if (unknownStarts.size() > 0 || !data.startDate || !data.endDate) {
             alert('Some tasks are missing the estimated start/end dates. As such the graph is inaccurate. Please use the Recalculate/Baseline feature in order to update the Tasks.');

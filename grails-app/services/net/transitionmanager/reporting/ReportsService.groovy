@@ -51,7 +51,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
@@ -78,7 +77,6 @@ class ReportsService implements ServiceMethods {
     JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
-    RunbookService runbookService
     TaskService taskService
     MoveBundleService moveBundleService
     UserPreferenceService userPreferenceService

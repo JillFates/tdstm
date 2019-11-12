@@ -5657,6 +5657,18 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			Map<String, ?> invokeActionDetails = it.getInvokeActionButtonDetails()
+			Map actionBarInfo = [
+				apiActionId: it.apiAction?.id,
+				apiActionInvokedAt: it.apiActionInvokedAt,
+				apiActionCompletedAt: it.apiActionCompletedAt,
+				invokeActionDetails: invokeActionDetails,
+				assignedTo: it.assignedTo?.id,
+				predecessorsCount: it.taskDependencies.size(),
+				successorsCount: TaskDependency.countByPredecessor(it),
+				category: it.category
+			]
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5681,7 +5693,8 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,
-				updatedClass: updatedClass
+				updatedClass: updatedClass,
+				actionBarInfo: actionBarInfo
 			]
 		}
 		return [rows: results, totalCount: totalCount]

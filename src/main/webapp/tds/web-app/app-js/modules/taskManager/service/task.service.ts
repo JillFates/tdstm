@@ -439,25 +439,35 @@ export class TaskService {
 	getTaskActionInfo(taskId: number): Observable<any> {
 		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
 			.pipe(map((response: any) => {
-					let result: TaskActionInfoModel = {
-						predecessors: response.predecessorsCount || 0,
-						successors: response.successorsCount || 0,
-						assignedTo: response.assignedTo,
-						apiActionId: response.apiActionId,
-						apiActionCompletedAt: response.apiActionCompletedAt,
-						apiActionInvokedAt: response.apiActionInvokedAt,
-						category: response.category
-					};
-					if (response.invokeActionDetails) {
-						result.invokeButton = { ...response.invokeActionDetails };
-					}
-					return result;
+				return this.convertToTaskActionInfoModel(response);
 				}),
 				catchError(error => {
 					console.error(error);
 					return error;
 				})
 			);
+	}
+
+	/**
+	 * Converts raw response data from getTaskActionInfo/getTaskList into TaskActionInfoModel object
+	 * @param actionBarInfo - The object that contains all the data for the TaskActionInfoModel
+	 */
+	convertToTaskActionInfoModel(actionBarInfo: any): TaskActionInfoModel {
+		let result: TaskActionInfoModel = {
+			predecessors: actionBarInfo.predecessorsCount || 0,
+			successors: actionBarInfo.successorsCount || 0,
+			assignedTo: actionBarInfo.assignedTo,
+			assignedToName:  actionBarInfo.assignedToName,
+			apiActionId: actionBarInfo.apiActionId,
+			apiActionCompletedAt: actionBarInfo.apiActionCompletedAt,
+			apiActionInvokedAt: actionBarInfo.apiActionInvokedAt,
+			category: actionBarInfo.category,
+			status: actionBarInfo.status
+		};
+		if (actionBarInfo.invokeActionDetails) {
+			result.invokeButton = { ...actionBarInfo.invokeActionDetails };
+		}
+		return result;
 	}
 
 	/**
