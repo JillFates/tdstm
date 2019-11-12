@@ -1,5 +1,5 @@
 databaseChangeLog = {
-	//include file: '20140307-sequence-logic.groovy' // Run on every migration to assure the tdstm_sequencer stored proc exists
+	include file: '20140307-sequence-logic.groovy' // Run on every migration to assure the tdstm_sequencer stored proc exists
 	include file: 'version/v4_7_1/20190930-fix-dataviews.groovy' //TM-15976 added to the beginning to fix the ability to upgrade from 4.5, because of a bug in a previous migration
 	include file: '20180508-add-asset-class-to-transferbatch.groovy'
 	include file: '20180508-migrate-and-remove-eav.groovy'
