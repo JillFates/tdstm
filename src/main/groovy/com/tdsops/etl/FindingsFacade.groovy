@@ -51,6 +51,43 @@ class FindingsFacade {
 	}
 
 	/**
+	 * <pre>
+	 * 	 find Dependency by 'asset' eq assetId and 'type' eq 'Runs On' into 'id'
+	 * 	 FINDINGS each { dependency ->
+	 * 	 	if (['VM','Database'].contains(device.assetType)) {
+	 * 	 		log device.assetName + ' is a VM'
+	 *  	} else {
+	 *      	log device.assetName + ' is a physical server
+	 *      }
+	 *      domain device
+	 *      find Device by 'id' device.id
+	 *      load 'Description' with 'Found by FINDINGS each command'
+	 *	 }
+	 * </pre>
+	 * @param closure the closure applied on each element found
+	 */
+	List<Object> each(Closure closure) {
+		List<Object> objects = queryResults()
+		return objects.each { Object instance ->
+			closure(instance)
+		}
+	}
+
+	/**
+	 * Retrieve a list of domain objects.
+	 *
+	 * @return List of domain objects
+	 */
+	private List<Object> queryResults() {
+		List<Long> ids = findElement.results()
+		List<Object> results = []
+		if (!ids.isEmpty()) {
+			Class domainClass = findElement.currentDomain.clazz
+			results = domainClass.where { id in ids }.list(readonly: true)
+		}
+		return results
+	}
+	/**
 	 * Defines if the FindingsFacade contains a single result
 	 * and that results is an Device asset instance
 	 * <pre>
