@@ -69,6 +69,36 @@ class TaskServiceIntTests extends Specification{
         sessionFactory = grailsApplication.getMainContext().getBean('sessionFactory')
     }
 
+
+    void "test clean task data"() {
+        setup:
+            prepareMoveEventData()
+            Person whom = personTestHelper.createPerson()
+
+        when:
+            List<AssetComment> listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull([max: 10])
+
+        then:
+            for (AssetComment task : listAssetEntityNotNull) {
+                task = taskService.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
+                task.actStart != null
+                task.assignedTo != null
+                AssetCommentStatus.STARTED == task.status
+                task.actFinish == null
+                null == task.dateResolved
+
+                // Test bumping status to COMPLETED after STARTED
+                taskService.setTaskStatus(task, AssetCommentStatus.COMPLETED, whom)
+                !task.actStart
+                !task.actFinish
+                !task.assignedTo
+                !task.resolvedBy
+                AssetCommentStatus.COMPLETED == task.status
+                null != task.dateResolved
+            }
+    }
+
+
     private MoveEvent createMoveEvent(Project project) {
         MoveEvent moveEvent = new MoveEvent(
                 name: "Example 1", project: project,
