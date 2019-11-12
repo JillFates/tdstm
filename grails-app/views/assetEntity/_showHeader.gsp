@@ -64,7 +64,7 @@
         <%-- Clarity Tabs --%>
         <ul class="nav">
             <li class="nav-item">
-                <button class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Summary</button>
+                <button class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Details</button>
             </li>
             <li class="nav-item">
                 <button class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports/Depends</button>

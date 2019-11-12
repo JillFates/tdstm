@@ -1172,6 +1172,97 @@ div.dates-info-container {
           font-weight: 500;
           color: #3c8dbc;
           cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form {
+          display: grid;
+          grid-template-columns: 49% 49%;
+          -webkit-column-gap: 2%;
+          -moz-column-gap: 2%;
+          column-gap: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control {
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            margin-top: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper {
+              -webkit-box-flex: 1;
+              -ms-flex-positive: 1;
+              flex-grow: 1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper {
+                width: 100%; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper .clr-select,
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper .clr-select {
+                  width: 100%;
+                  padding: unset;
+                  padding-left: 0.25rem;
+                  font-size: 14px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-input,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-input {
+                width: 100%;
+                padding: unset;
+                padding-left: 0.25rem;
+                font-size: 14px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-label {
+              min-width: 150px;
+              max-width: 150px;
+              line-height: unset;
+              padding: 0 8px;
+              font-size: 14px;
+              margin-bottom: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox {
+              padding-left: 12px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container {
+                -webkit-box-flex: unset;
+                -ms-flex: unset;
+                flex: unset; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container .clr-control-label {
+                  padding: 0 0 0 24px;
+                  min-width: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-header,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-widget {
+            background: unset;
+            border: unset;
+            color: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-picker-wrap.k-state-default {
+            background: unset;
+            border: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker {
+            -webkit-box-flex: 1;
+            -ms-flex-positive: 1;
+            flex-grow: 1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker:hover .k-select {
+              border: unset;
+              background-color: unset;
+              background-image: unset;
+              color: #0092d1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap {
+              border: unset;
+              border-bottom: 1px solid #999; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap:before {
+                height: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-hover, .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-focused {
+                box-shadow: unset;
+                -webkit-box-shadow: unset;
+                border-bottom: 1px solid #0092d1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-input {
+                background: unset;
+                border-radius: unset;
+                height: 1rem;
+                max-height: 1rem;
+                font-size: 14px;
+                padding: 0 0.25rem;
+                text-indent: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-select {
+                line-height: unset;
+                width: unset;
+                min-height: unset;
+                height: unset;
+                padding-top: 2px; }
         .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
           display: -webkit-box;
           display: -ms-flexbox;
