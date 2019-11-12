@@ -6,7 +6,7 @@
 
 <div class="legacy-modal-dialog">
 	<div class="legacy-modal-content">
-		<g:render template="/assetEntity/showHeader" model="[assetEntity:applicationInstance]"></g:render>
+		<g:render template="/assetEntity/showHeader" model="[assetEntity:applicationInstance, mode: 'show']"></g:render>
 		<div id="modalBody" class="legacy-modal-body">
 			<div class="legacy-modal-body-content">
 				<div class="clr-row" style="padding-right:20px;">
