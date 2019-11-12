@@ -82,9 +82,9 @@ declare var jQuery: any;
 export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() data: any;
 	@Input() model: ViewSpec;
+	@Input() justPlanning: boolean;
 	@Input() gridState: State;
 	@Output() modelChange = new EventEmitter<void>();
-	@Output() justPlanningChange = new EventEmitter<boolean>();
 	@Output() gridStateChange = new EventEmitter<State>();
 	@Output() hiddenFiltersChange = new EventEmitter<boolean>();
 	@Input() edit: boolean;
@@ -93,7 +93,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() hiddenFilters = false;
 
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
-	// @ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	private displayCreateButton: boolean;
 	private showFullTags = false;
 	@Input()
@@ -108,7 +107,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	public currentFields = [];
-	public justPlanning = false;
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
 	public VIEW_COLUMN_MIN_WIDTH_SHRINK = VIEW_COLUMN_MIN_WIDTH_SHRINK;
@@ -176,7 +174,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
 				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
 				this.showFullTags = this.toggleTagsColumn;
-				this.justPlanningChange.emit(this.justPlanning);
 				this.onReload();
 		});
 
@@ -261,8 +258,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	 */
 	public onClearHiddenFilters(): void {
 		this.hiddenFilters = false;
-		this.justPlanning = false;
-		this.justPlanningChange.emit(this.justPlanning);
 		this.hiddenFiltersChange.emit(this.hiddenFilters);
 		this.onClearFilters();
 	}
@@ -674,16 +669,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			return classColumn;
 		}
 		return '';
-	}
-
-	onChangeJustPlanning(isChecked = false): void {
-		this.justPlanningChange.emit(isChecked);
-
-		this.preferenceService.setPreference(PREFERENCE_JUST_PLANNING, isChecked.toString())
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(() => {
-			this.onReload();
-		});
 	}
 
 	/**
