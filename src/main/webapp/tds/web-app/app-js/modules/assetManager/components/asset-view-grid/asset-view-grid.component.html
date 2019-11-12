@@ -138,7 +138,8 @@
 		</ng-template>
 
 		<!-- Default Cell Template -->
-		<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.property !== 'tagAssets' && !fieldPipeMap.pipe[column.domain+'_'+column.property]">
+		<ng-template kendoGridCellTemplate let-dataItem
+								 *ngIf="column.property !== 'tagAssets' && !fieldPipeMap.pipe[column.domain+'_'+column.property]">
                <span [ngClass]="getCellClass(column)">
                    {{fieldPipeMap[column.domain+'_'+column.property]}}
 								 {{dataItem[column.domain+'_'+column.property]}}

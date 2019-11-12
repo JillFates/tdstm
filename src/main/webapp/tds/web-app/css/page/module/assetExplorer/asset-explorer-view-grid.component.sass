@@ -1,5 +1,7 @@
-.asset-explorer-view-grid-component
+asset-explorer-view-grid, .asset-explorer-view-grid-component
   $grid-font-icon-size: 20px
+  .k-grid
+    height: 77vh
   kendo-grid-list
     .k-grid-content
       .k-grid-table
@@ -82,7 +84,6 @@
 
   .k-grid-header .k-header
     top: 3px
-    padding: 0 12px
     .k-link
       margin: unset
       padding: unset
@@ -135,3 +136,15 @@
       .glyphicon.glyphicon-eye-close
         font-size: 13px
         padding-right: 5px
+
+  .clr-checkbox-wrapper
+    input[type=checkbox]+label::after
+      top: 3px
+      left: 3px
+  .assetsSelector
+    .tds-checkbox-component
+      label
+        margin-left: 4px
+  .selectall-checkbox-column
+    label
+      margin-bottom: 0
