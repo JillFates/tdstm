@@ -39,7 +39,7 @@
 				<clr-checkbox-wrapper class="inline">
 					<input clrCheckbox id="justPlanning" type="checkbox" name="justPlanning"
 								 class="component-action-just-planning"
-								 [(ngModel)]="justPlanning">
+								 [(ngModel)]="justPlanning" (change)="onQuery()">
 					<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
 						Just Planning
 					</label>
@@ -90,8 +90,6 @@
 				[hiddenFilters]="hiddenFilters"
 				[data]=data
 				(modelChange)="onQuery()"
-				(justPlanningChange)="onJustPlanningChange($event)"
-				(hiddenFiltersChange)="onHiddenFiltersChange($event)"
 				[gridState]="gridState"
 				(gridStateChange)="onGridStateChange($event)"
 				[fields]="fields"
