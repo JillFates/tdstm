@@ -630,23 +630,4 @@ class WsDashboardController implements ControllerMethods {
 				execution : execution
 		])
 	}
-
-	/**
-	 * Action to return data for the Insight dashboard.
-	 *
-	 * @return returns a JSON map of data containing assetsByVendor, dependenciesByVendor, topTags, and applicationsGroupedByDependencies
-	 */
-	def insightData() {
-		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
-
-		Project project = securityService.userCurrentProject
-
-		render view: "/common/mapAsJson", model: [data: [
-			assetsByVendor                   : insightService.assetsByVendor(project, context.max),
-			dependenciesByVendor             : insightService.dependenciesByVendor(project, context.max),
-			topTags                          : insightService.topTags(project, context.max),
-			applicationsGroupedByDependencies: insightService.applicationsGroupedByDependencies(project, context.lowRange, context.highRange),
-		]]
-	}
 }

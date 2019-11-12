@@ -322,8 +322,12 @@ class UrlMappings {
 		}
 
 		"/ws/dashboard/insight" {
-			controller = "wsDashboard"
+			controller = "WsInsight"
 			action = [GET: "insightData"]
+		}
+
+		"/ws/dashboard/insight/$action" {
+			controller = "WsInsight"
 		}
 
 		"/ws/cookbook/recipe/list" {
