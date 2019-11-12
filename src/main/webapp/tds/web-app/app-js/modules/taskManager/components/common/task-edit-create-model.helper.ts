@@ -181,6 +181,8 @@ export class TaskEditCreateModelHelper {
 			dueDate: assetComment.dueDate ? assetComment.dueDate : '',
 			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
 			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
+			etStart: detail.etStart || '',
+			etFinish: detail.etFinish || '',
 			instructionLink: assetComment.instuctionLink,
 			instructionsLinkLabel: detail.instructionsLinkLabel || '',
 			instructionsLinkURL: detail.instructionsLinkURL || '',
