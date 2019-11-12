@@ -48,7 +48,8 @@
 
 			<div class="inline float-right">
 				<!-- Create button -->
-				<tds-asset-show-create-button [createButtonState]="assetExplorerViewGrid.createButtonState"
+				<tds-asset-show-create-button *ngIf="assetExplorerViewGrid"
+																			[createButtonState]="assetExplorerViewGrid.createButtonState"
 																			(createAsset)="onCreateAsset($event)">
 				</tds-asset-show-create-button>
 
@@ -60,8 +61,8 @@
 
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
-																*ngIf="getGridConfig()"
-																[enabled]="getGridConfig() && getGridConfig().hasSelectedItems"
+																*ngIf="assetExplorerViewGrid"
+																[enabled]="getGridConfig() ? getGridConfig().hasSelectedItems : false"
 																[showDelete]="true"
 																[showEdit]="true"
 																[bulkChangeType]="bulkChangeType"

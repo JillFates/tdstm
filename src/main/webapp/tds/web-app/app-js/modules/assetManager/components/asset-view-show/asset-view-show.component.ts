@@ -414,7 +414,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 * Returns the grid configuration.
 	 */
 	getGridConfig(): any {
-		return this.assetExplorerViewGrid && this.assetExplorerViewGrid.getDynamicConfiguration();
+		return this.assetExplorerViewGrid ?
+			this.assetExplorerViewGrid.getDynamicConfiguration() : null;
 	}
 
 	/**

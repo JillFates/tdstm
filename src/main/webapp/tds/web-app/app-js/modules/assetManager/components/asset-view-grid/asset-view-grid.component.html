@@ -57,12 +57,38 @@
 				<clr-dropdown>
 					<tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
 					<clr-dropdown-menu *clrIfOpen  clrPosition="bottom-left">
-						<a clrDropdownItem (click)="createTask(dataItem, rowIndex)"
-							 *ngIf="!isIssue" [disabled]="!isTaskCreateAvailable()">Create Task</a>
-						<a clrDropdownItem>Edit Asset</a>
-						<a clrDropdownItem>Create Task</a>
-						<a clrDropdownItem>Comment</a>
-						<a clrDropdownItem>Clone</a>
+						<a clrDropdownItem
+							 (click)="showAssetEditView(dataItem, rowIndex)"
+							 [disabled]="!isEditAvailable()">
+							Edit Asset
+						</a>
+						<a clrDropdownItem
+							 (click)="createTask(dataItem, rowIndex)"
+							 *ngIf="!isIssue"
+							 [disabled]="!isTaskCreateAvailable()">
+							Create Task
+						</a>
+						<a clrDropdownItem
+							 (click)="showTask(dataItem, rowIndex)"
+							 *ngIf="isIssue">
+							List Task
+						</a>
+						<a clrDropdownItem
+							 (click)="createComment(dataItem, rowIndex)"
+							 *ngIf="!isComment"
+							 [disabled]="!isCommentCreateAvailable()">
+							Create Comment
+						</a>
+						<a clrDropdownItem
+							 (click)="showComment(dataItem, rowIndex)"
+							 *ngIf="isComment">
+							Show Comments
+						</a>
+						<a clrDropdownItem
+							 (click)="showAssetCloneView(dataItem, rowIndex)"
+							 [disabled]="!isAssetCloneAvailable()">
+							Clone
+						</a>
 					</clr-dropdown-menu>
 				</clr-dropdown>
 			</div>
