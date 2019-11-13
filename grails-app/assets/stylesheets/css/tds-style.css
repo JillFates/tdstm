@@ -1178,6 +1178,15 @@ div.dates-info-container {
           -webkit-column-gap: 2%;
           -moz-column-gap: 2%;
           column-gap: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper {
+            margin: 5px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding-left: 8px;
+              font-size: 14px;
+              color: #454545;
+              font-weight: 600; }
           .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control {
             -webkit-box-orient: horizontal;
             -webkit-box-direction: normal;
@@ -1189,6 +1198,9 @@ div.dates-info-container {
               -webkit-box-flex: 1;
               -ms-flex-positive: 1;
               flex-grow: 1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container + .clr-input-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper + .clr-input-wrapper {
+                margin-left: 20px; }
               .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper,
               .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper {
                 width: 100%; }

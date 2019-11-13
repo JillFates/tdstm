@@ -116,6 +116,19 @@
           display: grid;
           grid-template-columns: 49% 49%;
           column-gap: 2%;
+          
+          .source-target-wrapper {
+            margin: 5px 0;
+      
+            .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding-left: 8px;
+              font-size: 14px;
+              color: #454545;
+              font-weight: 600;
+            }
+          }
 
           .clr-form-control {
             flex-direction: row;
@@ -125,6 +138,9 @@
             .clr-input-wrapper {
               flex-grow: 1;
 
+              + .clr-input-wrapper {
+                margin-left: 20px;
+              }
               // Select Styling
               .clr-select-wrapper {
                 width: 100%;
