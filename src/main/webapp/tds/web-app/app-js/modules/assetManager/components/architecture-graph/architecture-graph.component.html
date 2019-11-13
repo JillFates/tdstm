@@ -1,6 +1,7 @@
 <div class="container architecture-graph-container">
 	<tds-lib-diagram-layout
-		[data]="data"
+		[data]="data$ | async"
+		[layout]="diagramLayout$ | async"
 		[contextMenuOptions]="ctxOpts"
 		[hideExpand]="true"
 	></tds-lib-diagram-layout>

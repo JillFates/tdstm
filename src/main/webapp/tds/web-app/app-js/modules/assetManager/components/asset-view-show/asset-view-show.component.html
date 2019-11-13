@@ -60,7 +60,7 @@
 
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
-																*ngIf="getGridConfig()"
+																*ngIf="!!getGridConfig()"
 																[enabled]="getGridConfig() && getGridConfig().hasSelectedItems"
 																[showDelete]="true"
 																[showEdit]="true"

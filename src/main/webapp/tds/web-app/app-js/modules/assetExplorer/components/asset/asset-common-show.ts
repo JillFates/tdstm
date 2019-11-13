@@ -12,6 +12,11 @@ import {AssetCommonHelper} from './asset-common-helper';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {ArchitectureGraphDiagramHelper} from '../../../assetManager/components/architecture-graph/architecture-graph-diagram-helper';
+import {ReplaySubject} from 'rxjs';
+import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
+import {Layout, Link} from 'gojs';
 
 declare var jQuery: any;
 
@@ -23,6 +28,10 @@ export class AssetCommonShow implements OnInit {
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 	protected showDetails = false;
+	protected currentUser: any;
+	protected data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
+	protected diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
+	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
 
 	constructor(
 		protected activeDialog: UIActiveDialogService,
@@ -32,12 +41,15 @@ export class AssetCommonShow implements OnInit {
 		protected assetExplorerService: AssetExplorerService,
 		protected notifierService: NotifierService,
 		protected userContextService: UserContextService,
-		protected windowService: WindowService) {
+		protected windowService: WindowService,
+		protected architectureGraphService: ArchitectureGraphService
+	) {
 			jQuery('[data-toggle="popover"]').popover();
 			this.userContextService.getUserContext()
 				.subscribe((userContext: UserContextModel) => {
 					this.userDateFormat = userContext.dateFormat;
 					this.userTimeZone = userContext.timezone;
+					this.currentUser = userContext.user;
 				});
 	}
 
@@ -108,5 +120,27 @@ export class AssetCommonShow implements OnInit {
 
 	openGraphUrl() {
 		this.windowService.getWindow().open(this.getGraphUrl(), '_blank');
+	}
+
+	getGoJsGraphUrl(): string {
+		return `/tdstm/module/asset/architecture-graph?assetId=${this.mainAsset}&levelsUp=0&levelsDown=3`;
+	}
+
+	openGoJsGraphUrl() {
+		this.windowService.getWindow().open(this.getGoJsGraphUrl(), '_blank');
+	}
+
+	onExpandActionDispatched(): void {
+		this.openGoJsGraphUrl();
+	}
+
+	/**
+	 * Load asset details for architecture graph thumbnail
+	 */
+	loadThumbnailData(assetId: number | string): void {
+		this.architectureGraphService.getAssetDetails(assetId, 0, 1)
+			.subscribe(res => {
+				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res));
+			})
 	}
 }
