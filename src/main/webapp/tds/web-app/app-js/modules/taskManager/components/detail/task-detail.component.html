@@ -24,7 +24,7 @@
                                         <tds-button-collapse [displayLabel]="false"  *ngIf="!collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-collapse>
                                         <tds-button-expand  [displayLabel]="false" *ngIf="collapsedTaskDetail" (click)="onCollapseTaskDetail()"></tds-button-expand>
                                     </div>
-                                    <div class="dialog">
+                                    <div class="dialog tds-table">
                                         <table class="task-details">
                                             <tbody>
                                                 <tr class="prop">
@@ -155,8 +155,8 @@
                                                      <td class="N" nowrap="nowrap">
 													  <label>Status</label>
 												  </td>
-												  <td class="valueNW task-{{model.status |  lowercase}}">
-													  <span>{{model.status}}</span>
+												  <td class="valueNW">
+                                                      <tds-task-status-indicator [propertyName]="'status'" [value]="model.status"></tds-task-status-indicator>
 												  </td>
 
                                                     <td class="N" nowrap="nowrap">
