@@ -65,6 +65,11 @@
 
     .sortable-column {
       display: inline-block;
+      cursor: pointer;
+      label {
+        cursor: pointer;
+        font-weight: inherit;
+      }
     }
   }
 

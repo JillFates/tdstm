@@ -1151,75 +1151,179 @@ div.dates-info-container {
         width: calc(100% - 250px); }
     .legacy-modal-dialog .legacy-modal-content .legacy-modal-body {
       margin-left: 24px;
-      width: calc(100vw - 212px);
-      padding-right: 40px;
+      width: calc(100vw - 172px);
       overflow-y: scroll;
       overflow-x: hidden; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.has-description {
         max-height: calc(100vh - 300px); }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-body.no-description {
         max-height: calc(100vh - 255px); }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
-        border: unset;
-        word-break: break-word;
-        border-spacing: unset; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
-        display: block;
-        width: 100%;
-        text-align: right;
-        font-size: 12px;
-        font-weight: 500;
-        color: #3c8dbc;
-        cursor: pointer; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-        justify-content: space-between; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
-          width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
-            width: 100%; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
-          width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
-            width: 49%; }
-            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
-            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
-              width: 100%; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
-            margin-left: 2%; }
-        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content {
+        padding-right: 20px; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content table {
+          border: unset;
+          word-break: break-word;
+          border-spacing: unset; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
+          display: block;
+          width: 100%;
+          text-align: right;
+          font-size: 12px;
+          font-weight: 500;
+          color: #3c8dbc;
+          cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form {
+          display: grid;
+          grid-template-columns: 49% 49%;
+          -webkit-column-gap: 2%;
+          -moz-column-gap: 2%;
+          column-gap: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper {
+            margin: 5px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding-left: 8px;
+              font-size: 14px;
+              color: #454545;
+              font-weight: 600; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control {
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            margin-top: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper {
+              -webkit-box-flex: 1;
+              -ms-flex-positive: 1;
+              flex-grow: 1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container + .clr-input-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper + .clr-input-wrapper {
+                margin-left: 20px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper {
+                width: 100%; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper .clr-select,
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper .clr-select {
+                  width: 100%;
+                  padding: unset;
+                  padding-left: 0.25rem;
+                  font-size: 14px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-input,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-input {
+                width: 100%;
+                padding: unset;
+                padding-left: 0.25rem;
+                font-size: 14px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-label {
+              min-width: 150px;
+              max-width: 150px;
+              line-height: unset;
+              padding: 0 8px;
+              font-size: 14px;
+              margin-bottom: unset; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox {
+              padding-left: 12px; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container {
+                -webkit-box-flex: unset;
+                -ms-flex: unset;
+                flex: unset; }
+                .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control.with-inline-checkbox .clr-control-container .clr-control-label {
+                  padding: 0 0 0 24px;
+                  min-width: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-header,
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-widget {
+            background: unset;
+            border: unset;
+            color: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-picker-wrap.k-state-default {
+            background: unset;
+            border: unset;
+            border-radius: unset; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker {
+            -webkit-box-flex: 1;
+            -ms-flex-positive: 1;
+            flex-grow: 1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker:hover .k-select {
+              border: unset;
+              background-color: unset;
+              background-image: unset;
+              color: #0092d1; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap {
+              border: unset;
+              border-bottom: 1px solid #999; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap:before {
+                height: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-hover, .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap.k-state-focused {
+                box-shadow: unset;
+                -webkit-box-shadow: unset;
+                border-bottom: 1px solid #0092d1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-input {
+                background: unset;
+                border-radius: unset;
+                height: 1rem;
+                max-height: 1rem;
+                font-size: 14px;
+                padding: 0 0.25rem;
+                text-indent: unset; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .k-datepicker .k-picker-wrap .k-select {
+                line-height: unset;
+                width: unset;
+                min-height: unset;
+                height: unset;
+                padding-top: 2px; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody {
           display: -webkit-box;
           display: -ms-flexbox;
           display: flex;
-          border: 1px solid #ccc;
-          border-width: 0 0 1px 0; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
-            display: block;
-            font-size: 14px;
-            padding: 4px 8px; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
-            background-color: transparent;
-            color: #18394b;
-            width: 150px;
-            min-width: 150px;
-            text-overflow: ellipsis; }
-          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
-            color: #000; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
-        display: none; }
-      .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex; }
+          -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
+          -webkit-box-pack: justify;
+          -ms-flex-pack: justify;
+          justify-content: space-between; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.one-column .source-target-wrapper {
+              width: 100%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column {
+            width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper {
+              width: 49%; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column tr tr,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper tr {
+                width: 100%; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody.two-column .source-target-wrapper + .source-target-wrapper {
+              margin-left: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            border: 1px solid #ccc;
+            border-width: 0 0 1px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              display: block;
+              font-size: 14px;
+              padding: 4px 8px; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th {
+              background-color: transparent;
+              color: #18394b;
+              width: 150px;
+              min-width: 150px;
+              text-overflow: ellipsis; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
+              color: #000; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
+          display: none; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex; }
   .legacy-modal-dialog .modal-sidenav {
     position: absolute;
     top: 0;
@@ -1240,134 +1344,61 @@ div.dates-info-container {
       color: white;
       border-radius: unset; }
 
-.modal-dialog {
-  background: #fff;
-  position: fixed !important;
-  top: 56px !important;
-  left: 35px !important;
-  right: 35px !important;
-  bottom: 48px !important;
-  overflow: hidden !important;
-  width: unset !important;
-  padding-left: 40px !important; }
-  .modal-dialog .modal-body {
-    width: calc(100vw - 40px - 35px - 35px - 22px);
-    padding: 15px 20px 0 22px; }
-    .modal-dialog .modal-body.has-description {
-      max-height: calc(100vh - 300px); }
-    .modal-dialog .modal-body.no-description {
-      max-height: calc(100vh - 255px); }
-    .modal-dialog .modal-body .source-target-wrapper {
-      -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-      flex-grow: 1;
-      margin: 5px 0; }
-      .modal-dialog .modal-body .source-target-wrapper .header-label {
-        width: 100%;
-        margin-bottom: 5px;
-        padding: 0 8px;
-        font-size: 14px; }
-    .modal-dialog .modal-body .grid-form {
-      display: grid;
-      grid-template-columns: 49% 49%;
-      -webkit-column-gap: 2%;
-      -moz-column-gap: 2%;
-      column-gap: 2%; }
-      .modal-dialog .modal-body .grid-form .k-input {
-        font-size: 14px; }
-      .modal-dialog .modal-body .grid-form .clr-form-control {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-direction: unset;
-        flex-direction: unset;
-        -webkit-box-orient: unset;
-        margin-top: unset;
-        -ms-flex-align: unset;
-        align-items: unset;
-        -webkit-box-align: unset;
-        -webkit-box-direction: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control label {
-          max-width: unset;
-          margin-bottom: unset;
-          min-width: 150px;
-          width: 150px;
-          padding: 0 8px;
-          font-size: 14px; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-checkbox-wrapper .clr-control-label {
-          min-width: unset;
-          width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input {
-          font-size: 14px;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input-wrapper {
-          max-height: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control {
-          display: block;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1;
-          margin-top: unset; }
-          .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container {
-            width: 100%; }
-            .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container .clr-input {
-              width: 100%; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .ng-star-inserted,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox-group {
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control {
-          display: block;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-          .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control .k-datepicker,
-          .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control .k-datepicker {
-            width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .combo-group .k-widget.k-combobox,
-        .modal-dialog .modal-body .grid-form .clr-form-control .k-combobox {
-          width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control kendo-dropdownlist.k-dropdown {
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1;
-          -ms-flex-item-align: end;
-          align-self: flex-end; }
-      .modal-dialog .modal-body .grid-form .truck-input-container {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-        flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .truck-input-container .clr-form-control + .clr-form-control {
-          margin-left: 10px; }
-    .modal-dialog .modal-body .modal-body-graph .diagram-layout-container {
-      width: 100%;
-      padding: unset;
-      padding-top: 100%;
-      position: relative;
-      min-height: unset; }
-      .modal-dialog .modal-body .modal-body-graph .diagram-layout-container .overview-container {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        width: unset;
-        height: unset; }
+.tds-table .grid-label {
+  font-size: 18px;
+  line-height: 48px; }
 
-.close {
-  opacity: 1; }
-  .close .btn {
-    color: #808080; }
-  .close .button-label {
-    display: none; }
+.tds-table table {
+  width: 100%;
+  border-collapse: collapse; }
+  .tds-table table thead th {
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 12px;
+    padding: 5px 0 5px 12px;
+    color: #3c8dbc;
+    text-align: left;
+    background: #d9e4ea; }
+  .tds-table table tbody tr {
+    cursor: pointer; }
+    .tds-table table tbody tr td {
+      font-size: 11px;
+      color: #333333;
+      border-style: solid;
+      border-color: #d9e4ea;
+      padding: 5px 0 5px 12px; }
+      .tds-table table tbody tr td:first-child {
+        border-width: 1px 0 1px 1px; }
+      .tds-table table tbody tr td:not(:first-child):not(:last-child) {
+        border-width: 1px 0; }
+      .tds-table table tbody tr td:last-child {
+        border-width: 1px 1px 1px 0; }
+    .tds-table table tbody tr td .status {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      text-align: center;
+      line-height: 13px;
+      border: 1px solid #808080;
+      border-radius: 3px;
+      background: #ccc; }
+      .tds-table table tbody tr td .status i {
+        color: #fff;
+        width: 12px;
+        height: 12px;
+        margin-top: 2px; }
+      .tds-table table tbody tr td .status.status-Ready {
+        background: #01ab08; }
+      .tds-table table tbody tr td .status.status-Started {
+        color: #0092d1; }
+      .tds-table table tbody tr td .status.status-Hold {
+        background: #F27113; }
+      .tds-table table tbody tr td .status.status-Completed {
+        background: #3c8dbc; }
+      .tds-table table tbody tr td .status.status-Pending {
+        color: #808080; }
+      .tds-table table tbody tr td .status.status-Warning {
+        background: #f6c440; }
 
 /* Exclusive for AngularJS */
 .asset-tag-selector-component {
@@ -1561,7 +1592,7 @@ body > .wrapper {
 .main-header {
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
-  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "Roboto", "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-weight: 500;
   font-size: 14px !important;
   z-index: 80 !important;
@@ -2070,9 +2101,6 @@ div.ui-widget-overlay {
   filter: Alpha(Opacity=50);
   background: rgba(0, 0, 0, 0.3);
   /*z-index: 1050*/ }
-
-div.select2-container span.select2-chosen {
-  font-size: 12px !important; }
 
 .buttons input.clone-asset {
   background: transparent url(../icons/database_copy.png) 5px 50% no-repeat;

@@ -871,7 +871,6 @@ var EntityCrud = (function ($) {
 		$("#assetTypeSelect").select2({
 			placeholder: "Device type filter",
 			minimumInputLength: 0,
-			allowClear: true,
 			width: "100%",
 			allowClear: true,
 			formatAjaxError: tdsCommon.select2AjaxErrorHandler,
@@ -917,7 +916,6 @@ var EntityCrud = (function ($) {
 		$("#modelSelect").select2({
 			placeholder: "Model",
 			minimumInputLength: 0,
-			dropdownAutoWidth: true,
 			width: "100%",
 			allowClear: true,
 			// Specify format function for dropdown item
@@ -978,7 +976,6 @@ var EntityCrud = (function ($) {
 		$("#manufacturerSelect").select2({
 			placeholder: "Manufacturer filter",
 			minimumInputLength: 0,
-			dropdownAutoWidth: true,
 			width: "100%",
 			allowClear: true,
 			formatAjaxError: tdsCommon.select2AjaxErrorHandler,

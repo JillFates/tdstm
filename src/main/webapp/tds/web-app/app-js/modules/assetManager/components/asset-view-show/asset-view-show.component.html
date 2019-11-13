@@ -1,4 +1,4 @@
-<div class="asset-explorer-view-show-component content body">
+<div class="asset-explorer-view-show-component">
 	<section *ngIf="getDynamicConfiguration(); let config"
 					 class="page-asset-explorer-config">
 		<div class="button-bar text-right">
@@ -39,7 +39,7 @@
 				<clr-checkbox-wrapper class="inline">
 					<input clrCheckbox id="justPlanning" type="checkbox" name="justPlanning"
 								 class="component-action-just-planning"
-								 [(ngModel)]="justPlanning">
+								 [(ngModel)]="justPlanning" (change)="onJustPlanningChange($event.currentTarget.checked)">
 					<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
 						Just Planning
 					</label>
@@ -48,7 +48,8 @@
 
 			<div class="inline float-right">
 				<!-- Create button -->
-				<tds-asset-show-create-button [createButtonState]="assetExplorerViewGrid.createButtonState"
+				<tds-asset-show-create-button *ngIf="assetExplorerViewGrid"
+																			[createButtonState]="assetExplorerViewGrid.createButtonState"
 																			(createAsset)="onCreateAsset($event)">
 				</tds-asset-show-create-button>
 
@@ -60,8 +61,8 @@
 
 				<!-- Bulk Change button -->
 				<tds-bulk-change-button #tdsBulkChangeButton
-																*ngIf="!!getGridConfig()"
-																[enabled]="getGridConfig() && getGridConfig().hasSelectedItems"
+																*ngIf="assetExplorerViewGrid"
+																[enabled]="getGridConfig() ? getGridConfig().hasSelectedItems : false"
 																[showDelete]="true"
 																[showEdit]="true"
 																[bulkChangeType]="bulkChangeType"
@@ -90,15 +91,14 @@
 				[hiddenFilters]="hiddenFilters"
 				[data]=data
 				(modelChange)="onQuery()"
-				(justPlanningChange)="onJustPlanningChange($event)"
-				(hiddenFiltersChange)="onHiddenFiltersChange($event)"
 				[gridState]="gridState"
 				(gridStateChange)="onGridStateChange($event)"
 				[fields]="fields"
 				[edit]="false"
 				[model]="model.schema"
 				[viewId]="model.id"
-				[metadata]="metadata">
+				[metadata]="metadata"
+				[justPlanning]="justPlanning">
 			</asset-explorer-view-grid>
 		</div>
 	</section>

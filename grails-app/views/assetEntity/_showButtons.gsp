@@ -37,7 +37,7 @@
     </nav>
 </div>
 
-<%-- TODO: Move these muttons to the task/comment gsp --%>
+<%-- TODO: Move these buttons to the task/comment gsp --%>
 
 <%-- <tds:hasPermission permission="${net.transitionmanager.security.Permission.TaskCreate}">
     <button class="btn btn-default" type="button" onclick="createIssue('${escapedName}','', ${assetEntity.id}, 'update', '${assetEntity.assetType}');">

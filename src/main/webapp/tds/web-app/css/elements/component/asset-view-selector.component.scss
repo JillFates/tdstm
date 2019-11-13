@@ -1,9 +1,10 @@
 kendo-popup {
   .asset-view-selector {
     margin-top: -28px;
+    width: 100%;
+    display: flex;
     > input {
       height: 15px;
-      // width: inherit;
     }
     > i.fa-search {
       line-height: inherit;
@@ -12,6 +13,7 @@ kendo-popup {
   }
 
   .section-container {
+    overflow: auto;
     width: 100%;
     margin-left: -2px;
     padding-left: 2px;
@@ -44,8 +46,16 @@ kendo-popup {
   }
 
   .k-item.k-state-selected {
+    overflow: auto;
     .section-container {
-      background-color: #ededed;
+      background-color: inherit;
+    }
+  }
+
+  kendo-list .k-list-scroller .k-list .k-item {
+    overflow: auto;
+    &:hover, &.k-state-selected, &.k-state-selected:not(:hover) {
+      background: inherit !important;
     }
   }
 }
