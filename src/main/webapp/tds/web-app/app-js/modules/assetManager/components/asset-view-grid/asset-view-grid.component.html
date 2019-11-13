@@ -176,7 +176,11 @@
 	</kendo-grid-column>
 
 	<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
-		<div class="clr-col-4"></div>
+		<div class="clr-col-4 selected-assets-counter">
+			<clr-icon class="icon" shape="check">
+			</clr-icon>
+			<h6 class="inline">{{getSelectedItemsCount()}}</h6>
+		</div>
 		<div class="clr-col-8">
 			<tds-grid-pager [total]="total"
 											[totalPages]="totalPages"
