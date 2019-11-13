@@ -927,7 +927,9 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 		if (passwordHistoryRetentionCount > 0) {
 			// Check to see if the password was used in the past # passwords
-			passwords = PasswordHistory.findAllByUserLogin(userLogin, [max: passwordHistoryRetentionCount, sort: 'createdDate', order: 'desc'])*.password
+			passwords = PasswordHistory.where{
+				userLogin == userLogin
+			}.list([max: passwordHistoryRetentionCount, sort: 'createdDate', order: 'desc'])*.password
 
 			for (String password : passwords) {
 				if (passwordEncoder.matches(newPassword, password)) {
@@ -939,7 +941,8 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		if (passwordHistoryRetentionDays > 0) {
 			// Check to see if the password was used in the past # of days
 			Date dateSince = new Date() - passwordHistoryRetentionDays.intValue()
-			passwords = PasswordHistory.findAllByUserLoginAndCreatedDateGreaterThan(userLogin, dateSince, [max: passwordHistoryRetentionCount])*.password
+			passwords = PasswordHistory.where {userLogin == userLogin && createdDate > dateSince}.list()*.password
+
 			for (String password : passwords) {
 				if (passwordEncoder.matches(newPassword, password)) {
 					return false
@@ -955,28 +958,28 @@ class SecurityService implements ServiceMethods, InitializingBean {
 	 * and meets the password history requirements otherwise it will thrown an exception.
 	 * If the password is set we should set also the expirity date of the password using calculatePasswordExpiration
 	 * @param userLogin - the UserLogin object to set the password on
-	 * @param unhashedPassword - the cleartext password to set
+	 * @param clearTextPassword - the cleartext password to set
 	 * @throws DomainUpdateException
 	 */
 	@Transactional
-	void setUserLoginPassword(UserLogin userLogin, String unhashedPassword, String confirmPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
+	void setUserLoginPassword(UserLogin userLogin, String clearTextPassword, String confirmPassword, Boolean isNewUser=false) throws DomainUpdateException, InvalidParamException {
 		// Check for password confirmation
-		if (!(unhashedPassword == confirmPassword)) {
+		if (!(clearTextPassword == confirmPassword)) {
 			throw new InvalidParamException('The password and the password confirmation do not match')
 		}
 		// Make sure that the password strength is legitimate
-		if (!validPasswordStrength(userLogin.username, unhashedPassword)) {
+		if (!validPasswordStrength(userLogin.username, clearTextPassword)) {
 			throw new InvalidParamException('The new password does not comply with password requirements')
 		}
 
 		String currentPassword = userLogin.password
-		userLogin.applyPassword(unhashedPassword)
+		userLogin.applyPassword(clearTextPassword)
 
-		if (passwordEncoder.matches(unhashedPassword, currentPassword)) {
+		if (passwordEncoder.matches(clearTextPassword, currentPassword)) {
 			throw new InvalidParamException('New password must be different from the existing one')
 		}
 
-		if (!isNewUser && !verifyPasswordHistory(userLogin, unhashedPassword)) {
+		if (!isNewUser && !verifyPasswordHistory(userLogin, clearTextPassword)) {
 			throw new DomainUpdateException('Please provide a new password that was not previously used')
 		}
 
