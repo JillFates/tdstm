@@ -61,6 +61,9 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 
 	openNotifier: any;
 
+	private CANCEL_STR = 'cancel';
+	private CONFIRM_STR = 'confirm';
+
 	constructor(private notifierService: NotifierService) {
 		this.registerListeners();
 	}
@@ -103,7 +106,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	public cancel(): void {
-		this.checkMultipleModals('cancel');
+		this.checkMultipleModals(this.CANCEL_STR);
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
@@ -114,18 +117,18 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	}
 
 	public confirm(): void {
-		this.checkMultipleModals('confirm');
+		this.checkMultipleModals(this.CONFIRM_STR);
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	public checkMultipleModals(scenario) {
 		switch (scenario) {
-			case 'cancel': {
+			case this.CANCEL_STR: {
 				this.addModalClass();
 				break;
 			}
-			case 'confirm': {
+			case this.CONFIRM_STR: {
 				setTimeout(() => {
 					let modals = jQuery('div.modal.fade.in');
 					const body = document.getElementsByTagName('body')[0];
