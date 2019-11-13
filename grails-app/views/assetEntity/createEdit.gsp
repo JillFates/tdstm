@@ -83,7 +83,7 @@
 									${standardFieldSpecs.assetType.label}
 								</span>
 							</label>
-							<div id="modelEditId" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
+							<div id="modelEditId" style="flex:1;" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
 								<div id="assetTypeSelect" tabindex="102">
 								</div>
 							</div>
@@ -100,26 +100,23 @@
 							</div>
 						</div>
 						
-						<%-- The "new location/room/rack" fields are controlled in entity.crud.js. Need to look into this to make sure we can show/hide them properly --%>
 						<%-- SOURCE --%>
 						<div class="source-target-wrapper">
 							<label class="header-label ${standardFieldSpecs.locationSource.imp?:''}">Source</label>
-							<div class="clr-form-control">
+							<div class="clr-form-control useRoomS">
 								<label class="clr-control-label ${standardFieldSpecs.locationSource.imp?:''}" for="locationSourceId">Location/Room</label>
 								<div class="clr-control-container">
 									<div class="clr-select-wrapper">
-										<%-- Should add: class="roomSelectS"??? --%>
 										<g:select class="clr-select" id="roomSelectS" name="roomSourceId"
 												from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
 												optionKey="id" optionValue="${{it.value}}"
 												noSelection="${[0:'Please select...']}"
 												onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"
-												tabindex="300"/>	
+												tabindex="300" />	
 									</div>
 								</div>
 							</div>
 						
-							<%-- TODO: Figure out new room source. These are not showing up when "new room is selected". --%>
 							<%-- Theses fields are used to allow user to create a source room on the fly --%>		
 							<div class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationSource.tip?: standardFieldSpecs.locationSource.label}">
 								<div class="clr-form-control">
@@ -151,15 +148,13 @@
 									
 								<div class="clr-control-container">
   									<div class="clr-select-wrapper">
-										<%-- This is a select field --%>
 										<g:render template="deviceRackSelect" model="[options:sourceRackSelect, rackId:assetEntityInstance?.rackSource?.id,
 											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
 									</div>
 								</div>	
 							</div>
 
-							<%-- TODO: Figure out new rack source, how to show --%>
-							<div style="display:none">
+							<div style="display:none" class="newRackS">
 								<div class="clr-form-control">
 									<label class="clr-control-label ${standardFieldSpecs.rackSource.imp?:''}">Rack Name</label>
 									<div class="clr-control-container">
@@ -174,42 +169,43 @@
 								</div>
 							</div>
 
-							<%-- TODO: Determine how this should be used --%>
-							<%-- <div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.sourceBladePosition.imp?:''}">Chassis Position</label>
-								<div class="clr-control-container">
-									<div class="clr-input-wrapper">
-									<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
-										value="${assetEntityInstance.sourceBladePosition}"
-										placeholder="Chassis Position"
-										class="clr-input useBladeS"
-										tabindex="320"/>
+							<div class="useBladeS" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceChassis.imp?:''}" for="sourceChassisSelectId">Chassis</label>
+									<div class="clr-control-container">
+										<div class="clr-select-wrapper">
+											<g:render template="deviceChassisSelect"
+													model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
+															options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
+															sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"/>
+										</div>
 									</div>
 								</div>
-							</div> --%>
-
-							<%-- TODO: Figure out what this is, when to show --%>
-							<%-- <div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.sourceChassis.imp?:''}" for="sourceChassisSelectId">Chassis</label>
-								<div class="clr-control-container">
-									<div class="clr-select-wrapper">
-										<g:render template="deviceChassisSelect"
-												model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
-														options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
-														sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"/>
-									</div>
-								</div>
-							</div> --%>
-
-							<div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.sourceRackPosition.imp?:''}" for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
-								<div class="clr-control-container">
-									<div class="clr-input-wrapper">
-										<input type="number" id="sourceRackPositionId" name="sourceRackPosition"
-											value="${assetEntityInstance.sourceRackPosition}"
-											placeholder="Position"
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceBladePosition.imp?:''}">Chassis Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+										<input type="number" id="sourceBladePositionId" name="sourceBladePosition"
+											value="${assetEntityInstance.sourceBladePosition}"
+											placeholder="Chassis Position"
 											class="clr-input"
 											tabindex="320"/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="useRackS" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceRackPosition.imp?:''}" for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="sourceRackPositionId" name="sourceRackPosition"
+												value="${assetEntityInstance.sourceRackPosition}"
+												placeholder="Position"
+												class="clr-input"
+												tabindex="320"/>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -219,7 +215,7 @@
 						<div class="source-target-wrapper">
 							<label class="header-label ${standardFieldSpecs.locationTarget.imp?:''}">Target</label>
 							
-							<div class="clr-form-control">
+							<div class="clr-form-control useRoomT">
 								<label class="clr-control-label ${standardFieldSpecs.locationTarget.imp?:''}" for="locationTargetId">Location/Room</label>
 								<div class="clr-control-container">
 									<div class="clr-select-wrapper">
@@ -263,15 +259,13 @@
 								<label class="clr-control-label ${standardFieldSpecs.rackTarget.imp?:''}" for="rackTargetId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cabinet" >Rack/Cabinet</label>
 								<div class="clr-control-container">
   									<div class="clr-select-wrapper">
-										<%-- This is a select field --%>
 										<g:render template="deviceRackSelect"  model="[options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
 											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
 									</div>
 								</div>	
 							</div>
 
-							<%-- TODO: Figure out new rack target, how to show --%>
-							<div style="display:none">
+							<div style="display:none" class="newRackT">
 								<div class="clr-form-control">
 									<label class="clr-control-label ${standardFieldSpecs.rackTarget.imp?:''}">Rack Name</label>
 									<div class="clr-control-container">
@@ -286,42 +280,43 @@
 								</div>
 							</div>
 
-							<%-- TODO: Figure out what this is, when to show --%>
-							<%-- <div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.targetChassis.imp?:''}" for="targetChassisSelectId">Chassis</label>
-								<div class="clr-control-container">
-									<div class="clr-select-wrapper">
-										<g:render template="deviceChassisSelect"
-											model="[ domId:'targetChassisSelectId', domName:'targetChassis',
-													options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
-													sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"/>
+							<div class="useBladeT" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetChassis.imp?:''}" for="targetChassisSelectId">Chassis</label>
+									<div class="clr-control-container">
+										<div class="clr-select-wrapper">
+											<g:render template="deviceChassisSelect"
+												model="[domId:'targetChassisSelectId', domName:'targetChassis',
+														options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
+														sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"/>
+										</div>
 									</div>
 								</div>
-							</div> --%>
-
-							<%-- TODO: Determine how this should be used --%>
-							<%-- <div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.sourceBladePosition.imp?:''}">Chassis Position</label>
-								<div class="clr-control-container">
-									<div class="clr-input-wrapper">
-										<input type="text" id="targetRackPositionId" name="targetBladePosition"
-											value="${assetEntityInstance.targetBladePosition}"
-											placeholder="Chassis Position"
-											class="clr-input useBladeT"
-											tabindex="350"/>
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetBladePosition.imp?:''}">Chassis Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="targetRackPositionId" name="targetBladePosition"
+												value="${assetEntityInstance.targetBladePosition}"
+												placeholder="Chassis Position"
+												class="clr-input"
+												tabindex="350"/>
+										</div>
 									</div>
 								</div>
-							</div> --%>
+							</div>
 
-							<div class="clr-form-control">
-								<label class="clr-control-label ${standardFieldSpecs.targetRackPosition.imp?:''}" for="targetRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
-								<div class="clr-control-container">
-									<div class="clr-input-wrapper">
-										<input type="number" id="targetRackPositionId" name="targetRackPosition"
-											value="${assetEntityInstance.targetRackPosition}"
-											placeholder="Position"
-											class="clr-input"
-											tabindex="355"/>
+							<div class="useRackT" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetRackPosition.imp?:''}" for="targetRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="targetRackPositionId" name="targetRackPosition"
+												value="${assetEntityInstance.targetRackPosition}"
+												placeholder="Position"
+												class="clr-input"
+												tabindex="355"/>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -338,7 +333,7 @@
 									${standardFieldSpecs.manufacturer.label}
 								</label>
 							</g:else>
-							<div id="manufacturerEditId" style="display:inline" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
+							<div id="manufacturerEditId" style="display:inline; flex:1;" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
 								<div id="manufacturerSelect" tabindex="103">
 								</div>
 							</div>
@@ -358,7 +353,7 @@
 
 						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntityInstance.model}"/>
-							<div id="modelSelect" tabindex="104">
+							<div id="modelSelect" style="flex:1;" tabindex="104">
 							</div>
 							<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
 						</div>

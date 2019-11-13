@@ -12,6 +12,6 @@
 	from="${options}" value="${value}" 
 	optionKey="id" optionValue="value"
 	noSelection="${[0:'Please Select...']}" 
-	class="clr-select useChassis${sourceTarget}"  
+	class="clr-select"  
 	onchange="EntityCrud.updateOnChassisSelection(this, '${sourceTarget}', '${forWhom}')"
 />
