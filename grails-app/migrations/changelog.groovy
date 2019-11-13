@@ -75,4 +75,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_1/20190903-drop-workflow-columns.groovy'
 	include file: 'version/v4_7_1/20190905-add-dictionaryMethodName.groovy'
 	include file: 'version/v4_7_1/20191030-remove-plan-methodology-from-application-fieldspecs.groovy'
+	include file: 'version/v4_7_1/20191112-fixing-role-prefix-in-asset-comment.groovy'
 }
