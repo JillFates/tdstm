@@ -5,6 +5,7 @@ import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.timeline.helper.TaskTimeLineGraphTestHelper
 import net.transitionmanager.task.timeline.test.TaskTimeLineDataTest
+import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -1143,5 +1144,238 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
+	/*
+						<<< Event Range (08:00 to 16:00)>>>
+					   ||-----------------------------------||
 
+					   +-----+---+-----+     +-----+---+-----+
+					   |08:00| B |12:00|     |12:00| C |16:00|
+					   +-----+---+-----+ --> +-----+---+-----+
+					   |08:00|240|12:00|     |12:00|240|16:00|
+					   +-----+---+-----+     +-----+---+-----+
+					   +------------------+------------------+
+					 08:00              12:00              16:00
+ 	*/
+	@See('TM-16351')
+	void 'test can calculate critical path for a graph for Plan with no activity'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('08:00')
+			Date windowEndTime = hourInDay('16:00')
+			Date currentTime = hourInDay('08:00')
+
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 240)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 240)
+
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB)
+				.withEdge(edgeAB)
+				.build()
+
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
+
+		then:
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				criticalPath
+				taskNumber == 1
+				taskComment == A
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('08:00')
+				earliestFinishDate == hourInDay('12:00')
+				latestStartDate == hourInDay('08:00')
+				latestFinishDate == hourInDay('12:00')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				criticalPath
+				taskNumber == 2
+				taskComment == B
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('12:00')
+				earliestFinishDate == hourInDay('16:00')
+				latestStartDate == hourInDay('12:00')
+				latestFinishDate == hourInDay('16:00')
+			}
+	}
+
+	/*
+						 <<<       Event Range (04:00 to 16:00)			>>>
+				  ||---------------------------------------------------------- ||
+
+				   +-----+---+-----+     +-----+---+-----+     +-----+---+-----+
+				   |04:00| A |08:00|     |08:00| B |12:00|     |12:00| C |16:00|
+				   +-----+---+-----+ --> +-----+---+-----+ --> +-----+---+-----+
+				   |04:00|240|08:00|     |08:00|240|12:00|     |12:00|240|16:00|
+				   +-----+---+-----+     +-----+---+-----+     +-----+---+-----+
+				   +------------------+---------------------+------------------+
+				 04:00              08:00                 12:00              16:00
+	*/
+	@See('TM-16351')
+	void 'test can calculate critical path for a graph with Plan with activity within the event window'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('04:00')
+			Date windowEndTime = hourInDay('16:00')
+			Date currentTime = hourInDay('08:00')
+
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 240,
+				actStart: hourInDay('04:00'), status: TERMINATED)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 240)
+			Task taskC = new Task(project: project, taskNumber: 3, comment: C, duration: 240)
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+			TaskDependency edgeBC = new TaskDependency(id: 102, predecessor: taskB, assetComment: taskC, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB, taskC)
+				.withEdges(edgeAB, edgeBC)
+				.build()
+
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
+
+		then:
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				criticalPath
+				taskNumber == 1
+				taskComment == A
+				duration == 240
+				remaining == 0
+				elapsed == 240
+				slack == 0
+				earliestStartDate == hourInDay('04:00')
+				earliestFinishDate == hourInDay('08:00')
+				latestStartDate == hourInDay('04:00')
+				latestFinishDate == hourInDay('08:00')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				criticalPath
+				taskNumber == 2
+				taskComment == B
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('08:00')
+				earliestFinishDate == hourInDay('12:00')
+				latestStartDate == hourInDay('08:00')
+				latestFinishDate == hourInDay('12:00')
+			}
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				criticalPath
+				taskNumber == 3
+				taskComment == C
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('12:00')
+				earliestFinishDate == hourInDay('16:00')
+				latestStartDate == hourInDay('12:00')
+				latestFinishDate == hourInDay('16:00')
+			}
+	}
+
+	/*
+							  <<<     Event Range (08:00 to 16:00)     >>>
+							 ||------------------------------------------||
+
+		   +-----+---+-----+     +-----+---+-----+     +-----+---+-----+     +-----+---+-----+
+		   |04:00| A |08:00|     |08:00| B |12:00|     |12:00| C |16:00|     |16:00| D |20:00|
+		   +-----+---+-----+ --> +-----+---+-----+ --> +-----+---+-----+ --> +-----+---+-----+
+		   |04:00|240|08:00|     |08:00|240|12:00|     |12:00|240|16:00|     |16:00|240|20:00|
+		   +-----+---+-----+     +-----+---+-----+     +-----+---+-----+     +-----+---+-----+
+		   +------------------+---------------------+---------------------+------------------+
+		 04:00              08:00                 12:00                 16:00              20:00
+	*/
+	@See('TM-16351')
+	void 'test can calculate critical path for a graph with Plan with activity outside the event window'() {
+
+		given: 'a TaskTimeLineGraph with a list of TaskVertex'
+			Date windowStartTime = hourInDay('08:00')
+			Date windowEndTime = hourInDay('16:00')
+			Date currentTime = hourInDay('08:00')
+
+			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 240,
+				actStart: hourInDay('04:00'), status: TERMINATED)
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 240)
+			Task taskC = new Task(project: project, taskNumber: 3, comment: C, duration: 240)
+			Task taskD = new Task(project: project, taskNumber: 4, comment: D, duration: 240)
+			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
+			TaskDependency edgeBC = new TaskDependency(id: 102, predecessor: taskB, assetComment: taskC, type: 'SS')
+			TaskDependency edgeCD = new TaskDependency(id: 103, predecessor: taskC, assetComment: taskD, type: 'SS')
+
+			TaskTimeLineGraph taskTimeLineGraph = new TaskTimeLineGraph.Builder()
+				.withVertices(taskA, taskB, taskC, taskD)
+				.withEdges(edgeAB, edgeBC, edgeCD)
+				.build()
+
+		when: 'TimeLine calculates its critical path'
+			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+				.calculate(windowStartTime, windowEndTime, currentTime)
+
+		then:
+			with(taskTimeLineGraph.getVertex(1), TaskVertex) {
+				criticalPath
+				taskNumber == 1
+				taskComment == A
+				duration == 240
+				remaining == 0
+				elapsed == 240
+				slack == 0
+				earliestStartDate == hourInDay('04:00')
+				earliestFinishDate == hourInDay('08:00')
+				latestStartDate == hourInDay('04:00')
+				latestFinishDate == hourInDay('08:00')
+			}
+			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
+				criticalPath
+				taskNumber == 2
+				taskComment == B
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('08:00')
+				earliestFinishDate == hourInDay('12:00')
+				latestStartDate == hourInDay('08:00')
+				latestFinishDate == hourInDay('12:00')
+			}
+			with(taskTimeLineGraph.getVertex(3), TaskVertex) {
+				criticalPath
+				taskNumber == 3
+				taskComment == C
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('12:00')
+				earliestFinishDate == hourInDay('16:00')
+				latestStartDate == hourInDay('12:00')
+				latestFinishDate == hourInDay('16:00')
+			}
+			with(taskTimeLineGraph.getVertex(4), TaskVertex) {
+				criticalPath
+				taskNumber == 4
+				taskComment == D
+				duration == 240
+				remaining == 240
+				elapsed == 0
+				slack == 0
+				earliestStartDate == hourInDay('16:00')
+				earliestFinishDate == hourInDay('20:00')
+				latestStartDate == hourInDay('16:00')
+				latestFinishDate == hourInDay('20:00')
+			}
+	}
 }
+

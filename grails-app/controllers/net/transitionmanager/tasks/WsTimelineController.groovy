@@ -50,8 +50,8 @@ class WsTimelineController implements ControllerMethods {
 		} else {
 			List<Task> startTasks = tasks.findAll { it.taskNumber in graph.getStarts()*.taskNumber }
 			List<Task> sinkTasks = tasks.findAll { it.taskNumber in graph.getSinks()*.taskNumber }
-			startDate = findEarliestStartTask(startTasks)?.estStart
-			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
+			startDate = findEarliestTaskStartTime(startTasks)
+			endDate = findLatestTaskFinishTime(sinkTasks)
 		}
 		Integer zeroDurationAdjustment = 60
 
@@ -348,8 +348,10 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskList list of {@code Task}
 	 * @return lowest estStart from a list of {@code Task}
 	 */
-	private Task findEarliestStartTask(List<Task> taskList) {
-		return taskList.min { it.estStart }
+	private Date findEarliestTaskStartTime(List<Task> taskList) {
+		return taskList.collect { Task task ->
+			[task.actStart, task.estStart, task.actFinish].min()
+		}.min()
 	}
 
 	/**
@@ -358,8 +360,9 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskList list of {@code Task}
 	 * @return latest estFinish from a list of {@code Task}
 	 */
-	private Task findLatestFinishTask(List<Task> taskList) {
-		return taskList.min { it.latestFinish }
+	private Date findLatestTaskFinishTime(List<Task> taskList) {
+		return taskList.collect { Task task ->
+			[task.actStart, task.actFinish, task.latestFinish].max()
+		}.max()
 	}
-
 }
