@@ -1,4 +1,13 @@
 .asset-dependency-component {
+	.modal-header {
+		padding: 10px;
+	}
+
+	.modal-body {
+		padding: unset;
+		width: max-content;
+	}
+
 	.error {
 		color: $color-message-error--red;
 	}

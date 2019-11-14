@@ -1344,6 +1344,63 @@ div.dates-info-container {
       color: white;
       border-radius: unset; }
 
+.tds-modal-content {
+  background: #fff; }
+  .tds-modal-content.has-side-nav .modal-header,
+  .tds-modal-content.has-side-nav .modal-body {
+    margin-left: 40px; }
+  .tds-modal-content:focus {
+    outline: unset; }
+  .tds-modal-content .modal-header-height {
+    height: 182px; }
+  .tds-modal-content .modal-header {
+    padding: 24px; }
+    .tds-modal-content .modal-header .close-button {
+      color: #737373;
+      height: 40px;
+      margin: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: unset; }
+      .tds-modal-content .modal-header .close-button:hover {
+        background: unset; }
+    .tds-modal-content .modal-header .modal-title-container {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center; }
+      .tds-modal-content .modal-header .modal-title-container .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+    .tds-modal-content .modal-header .modal-description-height {
+      min-height: 48px; }
+  .tds-modal-content .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px #ccc;
+    border-width: 0 1px 0 0; }
+    .tds-modal-content .modal-sidenav .btn {
+      color: #000;
+      height: 40px !important;
+      margin: 0; }
+    .tds-modal-content .modal-sidenav .button-label {
+      display: none; }
+    .tds-modal-content .modal-sidenav.btn-link .selected-button.btn {
+      border: unset;
+      color: white;
+      border-radius: unset;
+      background: #0077b8; }
+
 .tds-table .grid-label {
   font-size: 18px;
   line-height: 48px; }
@@ -1585,6 +1642,95 @@ div.dates-info-container {
     background: #ccc;
     border: #ccc solid 4px;
     border-radius: 50%; }
+
+.asset-dependency-component .modal-header {
+  border: unset;
+  padding: 10px; }
+
+.asset-dependency-component .modal-body {
+  padding: unset; }
+
+.asset-dependency-component .error {
+  color: red; }
+
+.asset-dependency-component .dependencies {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-top: 10px; }
+  .asset-dependency-component .dependencies:last-child {
+    padding-bottom: 10px; }
+
+.asset-dependency-component .dependency-row {
+  font-weight: normal;
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;
+  -webkit-column-gap: 10px;
+  -moz-column-gap: 10px;
+  column-gap: 10px;
+  border-bottom: 1px solid lightgray; }
+  .asset-dependency-component .dependency-row.dependency-edit {
+    padding: 5px 0; }
+  .asset-dependency-component .dependency-row:last-child {
+    border: unset; }
+  .asset-dependency-component .dependency-row .dependency-row-legend {
+    font-weight: bold;
+    text-transform: capitalize; }
+  .asset-dependency-component .dependency-row .dependency-row-data label {
+    max-width: 200px;
+    overflow: hidden;
+    font-weight: normal; }
+
+.asset-dependency-component .dependency-edit .clr-control-container {
+  width: 100%; }
+  .asset-dependency-component .dependency-edit .clr-control-container .clr-textarea {
+    max-width: unset;
+    width: 100%;
+    resize: none; }
+
+.asset-dependency-component .dependency-edit .clr-input {
+  width: 100%; }
+
+.asset-dependency-component .dependency-edit .clr-select-wrapper {
+  width: 100%; }
+  .asset-dependency-component .dependency-edit .clr-select-wrapper .clr-select {
+    padding-left: 0.25rem !important;
+    width: 100%; }
+
+.asset-dependency-component .dependency-label {
+  overflow: auto;
+  font-weight: normal;
+  margin: unset;
+  display: inline; }
+
+.asset-dependency-component .dependency-comment {
+  max-height: 70px;
+  overflow: auto; }
+
+.asset-dependency-component .has-both-dependencies {
+  padding: 10px;
+  color: green; }
+  .asset-dependency-component .has-both-dependencies .depends-on {
+    color: #d1b9ee; }
+  .asset-dependency-component .has-both-dependencies i {
+    margin-left: -6px; }
+
+.asset-dependency-component .has-dependency-a .dependency-a .dependency-label,
+.asset-dependency-component .has-dependency-b .dependency-b .dependency-label,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a .k-widget,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b .k-widget,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a input,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b input,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a textarea,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b textarea {
+  visibility: visible; }
+
+.asset-dependency-component .delete-button-dependency-show-modal div.tds-action-button-container {
+  margin-left: 30%; }
 
 body > .wrapper {
   padding-top: 45px; }

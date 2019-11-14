@@ -116,10 +116,10 @@
           display: grid;
           grid-template-columns: 49% 49%;
           column-gap: 2%;
-          
+
           .source-target-wrapper {
             margin: 5px 0;
-      
+
             .header-label {
               width: 100%;
               margin-bottom: 5px;
@@ -341,6 +341,89 @@
           border: unset;
           color: white;
           border-radius: unset;
+        }
+      }
+    }
+  }
+}
+
+.tds-modal-content {
+  background: $color-text-inverse;
+
+  &.has-side-nav {
+    .modal-header,
+    .modal-body {
+      margin-left: 40px;
+    }
+  }
+
+  &:focus {
+    outline: unset;
+  }
+
+  .modal-header-height {
+    height: 182px;
+  }
+
+  .modal-header {
+    padding: 24px;
+
+    .close-button {
+      color: #737373;
+      height: 40px;
+      margin: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: unset;
+      &:hover {
+        background: unset;
+      }
+    }
+
+    .modal-title-container {
+      display: flex;
+      align-items: center;
+
+      .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px;
+      }
+    }
+
+    .modal-description-height {
+      min-height: 48px;
+    }
+  }
+
+  .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px $color-border;
+    border-width: 0 1px 0 0;
+    .btn {
+      color: $color--black;
+      height: 40px !important;
+      margin: 0;
+    }
+    .button-label {
+      display: none;
+    }
+
+    &.btn-link {
+      .selected-button {
+        &.btn {
+          border: unset;
+          color: white;
+          border-radius: unset;
+          background: #0077b8;
         }
       }
     }
