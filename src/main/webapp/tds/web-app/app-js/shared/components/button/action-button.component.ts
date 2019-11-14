@@ -21,6 +21,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-cancel,
 		tds-button-clone,
 		tds-button-close,
+		tds-button-confirm,
 		tds-button-create,
 		tds-button-custom,
 		tds-button-delete,

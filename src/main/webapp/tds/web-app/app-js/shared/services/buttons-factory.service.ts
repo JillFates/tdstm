@@ -24,6 +24,11 @@ export class ButtonsFactoryService {
 				title: translate('GLOBAL.CREATE'),
 				tooltip: translate('GLOBAL.CREATE')
 			},
+			['tds-button-confirm']: {
+				icon: 'check',
+				title: translate('GLOBAL.CONFIRM'),
+				tooltip: translate('GLOBAL.CONFIRM')
+			},
 			['tds-button-custom']: {icon: '', title: '', tooltip: ''},
 			['tds-button-delete']: {
 				icon: 'trash',
