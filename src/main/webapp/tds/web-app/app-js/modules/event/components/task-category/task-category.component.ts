@@ -43,7 +43,7 @@ export class TaskCategoryComponent {
 	 * @param scroll - The scroll position to start at.
 	 */
 	public setContainerScroll(scroll: number): void {
-		if(this.categoryContainer) {
+		if (this.categoryContainer) {
 			this.categoryContainer.nativeElement.scrollLeft = scroll;
 		}
 	}
