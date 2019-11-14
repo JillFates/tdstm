@@ -1,6 +1,7 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -34,8 +35,9 @@ class WsTimelineController implements ControllerMethods {
 		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
-		Boolean recalculate = commandObject.isRecalculate()
+		userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEvent.id)
 
+		Boolean recalculate = commandObject.isRecalculate()
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
 
 		TaskTimeLineGraph graph = cpaResults.graph
