@@ -7,7 +7,7 @@
 		<asset:stylesheet href="css/force.css" />
 		<asset:stylesheet href="css/ui.datepicker.css" />
 		<asset:stylesheet href="css/progressbar.css" />
-		<asset:stylesheet href="css/dbootstrap.css" />
+		<asset:stylesheet href="css/tds-bootstrap.css" />
 		<asset:stylesheet href="css/tds-progressbar.css" />
 
 		<g:javascript src="asset.tranman.js" />
