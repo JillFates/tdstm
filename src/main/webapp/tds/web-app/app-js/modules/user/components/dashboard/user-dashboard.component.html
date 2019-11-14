@@ -326,10 +326,6 @@
 							<a *ngIf="column.property == 'related'" (click)="openAssetDialog(dataItem.assetId, dataItem.assetClass)">
 								{{ dataItem[column.property] }}
 							</a>
-
-							<span *ngIf="!['action', 'related', 'status'].includes(column.property)">
-								{{ dataItem[column.property] }}
-							</span>
 							<tds-task-status-indicator [propertyName]="column.property" [value]="dataItem[column.property]"></tds-task-status-indicator>
 						</ng-template>
 
