@@ -41,10 +41,9 @@
       }
 
       .k-i-close:before {
-        font-family: FontAwesome;
+        content: "\D7";
+        font-size: 22px;
         color: black;
-        font-size: 14px;
-        content: "";
       }
 
       span {
@@ -162,7 +161,7 @@
 }
 
 .tag-grey {
-  background-color: #CCCCCC !important;
+  background-color: #cccccc !important;
 }
 
 .tag-red {
@@ -170,31 +169,31 @@
 }
 
 .tag-orange {
-  background-color: #FAD7C3 !important;
+  background-color: #fad7c3 !important;
 }
 
 .tag-yellow {
-  background-color: #FAF0C3 !important;
+  background-color: #faf0c3 !important;
 }
 
 .tag-green {
-  background-color: #DFF0D0 !important;
+  background-color: #dff0d0 !important;
 }
 
 .tag-cyan {
-  background-color: #E1F1F6 !important;
+  background-color: #e1f1f6 !important;
 }
 
 .tag-blue {
-  background-color: #D3D7FA !important;
+  background-color: #d3d7fa !important;
 }
 
 .tag-purple {
-  background-color: #EADEF5 !important;
+  background-color: #eadef5 !important;
 }
 
 .tag-pink {
-  background-color: #F9C7D3 !important;
+  background-color: #f9c7d3 !important;
 }
 
 .tag-white {
@@ -222,5 +221,5 @@
     padding-right: 10px;
     font-size: 11px;
     color: $color-text !important;
-  };
+  }
 }

@@ -1,4 +1,3 @@
-@charset "UTF-8";
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-icons.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/clarity/css/clr-ui.min.css);
 @import url(/tdstm/tds/web-app/assets/modules/roboto-fontface/css/roboto/roboto-fontface.css);
@@ -1486,10 +1485,9 @@ div.dates-info-container {
         background-image: unset;
         padding-top: 10px !important; }
       .asset-tag-selector-component .k-widget li .k-i-close:before {
-        font-family: FontAwesome;
-        color: black;
-        font-size: 14px;
-        content: ""; }
+        content: "\D7";
+        font-size: 22px;
+        color: black; }
       .asset-tag-selector-component .k-widget li span {
         margin-right: unset; }
       .asset-tag-selector-component .k-widget li span:not(.k-select) div {
@@ -1563,31 +1561,31 @@ div.dates-info-container {
   background-color: black !important; }
 
 .tag-grey {
-  background-color: #CCCCCC !important; }
+  background-color: #cccccc !important; }
 
 .tag-red {
   background-color: #f2d9e1 !important; }
 
 .tag-orange {
-  background-color: #FAD7C3 !important; }
+  background-color: #fad7c3 !important; }
 
 .tag-yellow {
-  background-color: #FAF0C3 !important; }
+  background-color: #faf0c3 !important; }
 
 .tag-green {
-  background-color: #DFF0D0 !important; }
+  background-color: #dff0d0 !important; }
 
 .tag-cyan {
-  background-color: #E1F1F6 !important; }
+  background-color: #e1f1f6 !important; }
 
 .tag-blue {
-  background-color: #D3D7FA !important; }
+  background-color: #d3d7fa !important; }
 
 .tag-purple {
-  background-color: #EADEF5 !important; }
+  background-color: #eadef5 !important; }
 
 .tag-pink {
-  background-color: #F9C7D3 !important; }
+  background-color: #f9c7d3 !important; }
 
 .tag-white {
   background-color: white !important; }
