@@ -166,7 +166,7 @@ export class ProjectCreateComponent implements OnInit {
 	}
 
 	public saveForm(): void {
-		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel)) {
+		if (DateUtils.validateDateRange(this.projectModel.startDate, this.projectModel.completionDate) && this.validateRequiredFields(this.projectModel) && this.validatePartners(this.projectModel.partners)) {
 			if (this.projectModel.startDate) {
 				this.projectModel.startDate.setHours(0, 0, 0, 0);
 				this.projectModel.startDate.setMinutes(this.projectModel.startDate.getMinutes() - this.projectModel.startDate.getTimezoneOffset());
@@ -181,6 +181,27 @@ export class ProjectCreateComponent implements OnInit {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Validates that there are no duplicate partners and no blank partners in the partner list
+	 * @param partnerList - The list of partners from the project model
+	 */
+	public validatePartners(partnerList: any[]): boolean {
+		let partners = [...partnerList];
+		partners.sort((a, b) => (a.id > b.id) ? 1 : -1);
+		let i = 1;
+		for (i = 0; i < partners.length; i++) {
+			if (!partners[i].id) {
+				alert('Partner cannot be blank.');
+				return false;
+			}
+			if (i !== partners.length - 1 && partners[i].id === partners[i + 1].id) {
+				alert('Duplicate partners are not allowed.');
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**

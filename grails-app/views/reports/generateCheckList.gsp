@@ -88,14 +88,6 @@
 			</tr>
 			<tr>
 				<td></td>
-
-				<td><g:if
-						test="${dashBoardOk[0]?.contains('No steps created')}">
-						<span style="color: red;"><b>Dashboard </b><br></br></span>
-					</g:if> <g:else>
-						<span style="color: green;"><b>Dashboard OK</b><br></br></span>
-					</g:else>
-
 			</tr>
 			<tr>
 				<td><g:if test="${allErrors.contains('Assets')}">

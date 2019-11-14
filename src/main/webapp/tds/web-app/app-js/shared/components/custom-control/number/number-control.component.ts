@@ -61,7 +61,7 @@ export class TDSNumberControlComponent extends TDSCustomControl implements OnCha
 
 	ngOnChanges(inputs: SimpleChanges) {
 		const numberConstraints = {
-			allowNegative: this.allowNegative,
+			allowNegative: this.min < 0 || this.allowNegative,
 			max: this.max,
 			min: this.min,
 			required: this.required

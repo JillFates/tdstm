@@ -311,14 +311,23 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/bundleData/$id?" {
+		"/ws/dashboard/eventData/$id" {
 			controller = "wsDashboard"
-			action = [GET:"bundleData"]
+			action = [GET:"eventData"]
 		}
 
 		"/ws/dashboard/getPlanningStats" {
 			controller = "wsDashboard"
 			action = [GET:"getDataForPlanningDashboard"]
+		}
+
+		"/ws/dashboard/insight" {
+			controller = "WsInsight"
+			action = [GET: "insightData"]
+		}
+
+		"/ws/dashboard/insight/$action" {
+			controller = "WsInsight"
 		}
 
 		"/ws/cookbook/recipe/list" {
@@ -732,6 +741,11 @@ class UrlMappings {
 		"/ws/user/updateAccountAdmin" {
 			controller = "wsUser"
 			action = [POST:"updateAccountAdmin"]
+		}
+
+		"/ws/user/updateLastPage" {
+			controller = "wsUser"
+			action = [GET:"updateLastPage"]
 		}
 
 		"/ws/progress" {

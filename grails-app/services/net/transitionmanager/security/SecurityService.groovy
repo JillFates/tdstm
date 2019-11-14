@@ -16,10 +16,12 @@ import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.GormUtil
+import com.tdssrc.grails.HtmlUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
+import grails.core.GrailsApplication
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
@@ -75,6 +77,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 
 	AuditService             auditService
 	EmailDispatchService     emailDispatchService
+	GrailsApplication grailsApplication
 	PartyRelationshipService partyRelationshipService
 	PersonService            personService
 	SpringSecurityService    springSecurityService
@@ -332,6 +335,15 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		return projectIds
 	}
 
+	/**
+	 * Used to retrieve the URL to the login form
+	 * @param absolute - if true the URL will be the fully qualified path otherwise just the relative path (default)
+	 * @return the URL to access the login form
+	 */
+	String loginUrl(boolean absolute=false) {
+		String url = HtmlUtil.createLink([absolute:absolute, uri:grailsApplication.config.getProperty('grails.plugin.springsecurity.auth.loginFormUrl', String)])
+		return url
+	}
 
 	/**
 	 * Get the UserLogin object of the currently logged in user or null if user is not logged in
