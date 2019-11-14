@@ -31,7 +31,7 @@ import {TaskCategoryComponent} from '../task-category/task-category.component';
 
 export class EventDashboardComponent implements OnInit {
 	@ViewChild('planVersusStatus', {static: false}) public planVersusStatus: PlanVersusStatusComponent;
-	@ViewChild('taskCategory') public taskCategorySection: TaskCategoryComponent;
+	@ViewChild('taskCategory', {static: false}) public taskCategorySection: TaskCategoryComponent;
 	public eventList: Array<EventModel> = [];
 	public newsList: Array<NewsModel> = [];
 	public selectedEvent = null;

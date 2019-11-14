@@ -11,7 +11,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 export class TaskCategoryComponent {
 	@Input() taskCategories: any;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
-	@ViewChild('categoryContainer') categoryContainer: ElementRef;
+	@ViewChild('categoryContainer', {static: false}) categoryContainer: ElementRef;
 
 	public userTimeZone = '';
 	public dateFormat = '';
@@ -43,7 +43,7 @@ export class TaskCategoryComponent {
 	 * @param scroll - The scroll position to start at.
 	 */
 	public setContainerScroll(scroll: number): void {
-		if(this.categoryContainer) {
+		if (this.categoryContainer) {
 			this.categoryContainer.nativeElement.scrollLeft = scroll;
 		}
 	}

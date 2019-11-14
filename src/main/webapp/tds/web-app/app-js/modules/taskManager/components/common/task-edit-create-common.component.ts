@@ -33,7 +33,7 @@ declare var jQuery: any;
 export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
-	@ViewChild('dueDate') dueDate;
+	@ViewChild('dueDate', {static: false}) dueDate;
 
 	protected modalType = ModalType;
 	protected dateFormat: string;
