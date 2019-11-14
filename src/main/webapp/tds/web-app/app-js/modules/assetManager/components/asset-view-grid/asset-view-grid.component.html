@@ -117,7 +117,7 @@
 		</ng-template>
 
 		<!-- Filter Template -->
-		<ng-template kendoGridFilterCellTemplate let-filter>
+		<ng-template kendoGridFilterCellTemplate *ngIf="column.property !== 'tagAssets'">
 			<div class="filter-input">
 				<tds-filter-input
 					name="{{column.domain}}.{{column.property}}"
@@ -130,6 +130,7 @@
 		<!-- Asset Tags Filter Template -->
 		<ng-template kendoGridFilterCellTemplate *ngIf="column.property === 'tagAssets'">
 			<tds-asset-tag-selector #tagSelector
+															[popupClass]="'assets-view-grid'"
 															[tagList]="metadata.tagList"
 															placeholder="{{'GLOBAL.FILTER' | translate}}"
 															[viewFilterModel]="column.filter"
