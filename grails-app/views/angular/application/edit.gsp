@@ -26,14 +26,14 @@
 		</tds-tab-scroller>
 	</div>
 	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
-		<form 
-			name="form" 
+		<form
+			name="form"
 			(ngSubmit)="form.form.valid && onUpdate()"
 			class="asset-entry-form"
 			[ngClass]="{'form-submitted': form && form.submitted}"
-			role="form" 
-			#form="ngForm" 
-			novalidate>	
+			role="form"
+			#form="ngForm"
+			novalidate>
 			<div tdsScrollSection class="grid-form">
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.assetName}" value="${asset.assetName}" ngmodel="model.asset.assetName" tabindex="1"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.description}" value="${asset.description}" ngmodel="model.asset.description" tabindex="2"/>
@@ -60,7 +60,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.environment}" value="${asset.environment}" tabindex="9" blankOptionListText="Please Select..." ngmodel="model.asset.environment" />
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.userLocations}" value="${asset.userLocations}" ngmodel="model.asset.userLocations" tabindex="10" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.appTech}" value="${asset.appTech}" ngmodel="model.asset.appTech" tabindex="11"/>
-						
+
 				<div class="clr-form-control">
 					<div style="display: flex">
 						<tdsAngular:inputLabel field="${standardFieldSpecs.sme2}" value="${asset.sme2}"/>
@@ -110,7 +110,7 @@
 						[valueField]="'id'">
 					</kendo-dropdownlist>
 				</div>
-						
+
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.drRpoDesc}" value="${asset.drRpoDesc}"  ngmodel="model.asset.drRpoDesc" tabindex="18" tooltipDataPlacement="bottom"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.license}" value="${asset.license}" ngmodel="model.asset.license" tabindex="19"/>
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.businessUnit}" value="${asset.businessUnit}" ngmodel="model.asset.businessUnit" tabindex="20"/>
@@ -148,7 +148,7 @@
 				</div>
 
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.testProc}" value="${asset.testProc}" tabindex="25"  ngmodel="model.asset.testProc" blankOptionListText="?" />
-				
+
 				<div class="clr-form-control">
 					<tdsAngular:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 					<tds-date-control
@@ -200,7 +200,7 @@
 				<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="34"/>
 
 				<div class="clr-form-control">
-					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>			
+					<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 					<tds-combobox-group
 							[model]="model.asset.testingBy"
 							(modelChange)="model.asset.testingBy.id = $event"
@@ -222,24 +222,24 @@
 			</div>
 			<g:render template="/angular/common/assetTagsEdit"></g:render>
 
-			<tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>	
+			<tds-supports-depends tdsScrollSection (initDone)="onInitDependenciesDone($event)"  [(model)]="model" (isValidForm)="onDependenciesValidationChange($event)"></tds-supports-depends>
 		</form>
 	</div>
 	<div class="modal-sidenav form-group-center">
 		<nav class="modal-sidenav btn-link">
 			<tds-button-edit
-				theme="primary" 
+				theme="primary"
 				icon="pencil"
 				class="selected-button">
 			</tds-button-edit>
-			<tds-button-save 
-				(click)="submitForm($event)" 
+			<tds-button-save
+				(click)="submitForm($event)"
 				[disabled]="!(this.isDirty() && this.form.valid)"
-				[permissions]="['${Permission.AssetEdit}']" 
-				tooltip="Save" 
+				[permissions]="['${Permission.AssetEdit}']"
+				tooltip="Save"
 				icon="floppy"
 				tabindex="501">
-			</tds-button-save> 
+			</tds-button-save>
 			<tds:hasPermission permission="${Permission.AssetDelete}">
 				<tds-button-delete
 					tooltip="Delete Asset"

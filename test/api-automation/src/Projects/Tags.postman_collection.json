@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c79505b0-ebb7-4291-887d-3497467e8fc1",
+		"_postman_id": "65566c59-b4a9-4ac3-8bcd-4558886ff380",
 		"name": "Tags",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -71,85 +71,67 @@
 			"response": []
 		},
 		{
-			"name": "set current project",
+			"name": "Set current project",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "61811bcc-2082-41cd-842f-dde12dba00ee",
-						"type": "text/javascript",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"",
-							"pm.test(\"Project Details is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Details\");",
-							"});",
-							"",
-							"pm.test(\"Proj Name is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Name\");",
-							"});",
-							"",
-							"pm.test(\"Proj Description is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Description\");",
-							"});",
-							"pm.test(\"Proj Client is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Client\");",
-							"});",
-							"",
-							"pm.test(\"Proj Code is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Code:\");",
-							"});",
-							"",
-							"",
-							"pm.test(\"Proj Type is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Project Type:\");",
-							"});",
-							"",
-							"",
-							"pm.test(\"Comment is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Comment:\");",
-							"});",
-							"pm.test(\"Start Date is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Start Date:\");",
-							"});",
-							"",
-							"pm.test(\"Completion Date is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Completion Date:\");",
-							"});",
-							"",
-							"pm.test(\"Associated partner is present\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Associated Partner(s):\");",
-							"});",
-							""
-						]
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{projectId}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
@@ -162,7 +144,6 @@
 					"listen": "test",
 					"script": {
 						"id": "f8f383fe-6062-4b1e-8792-b808b9474fe8",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -181,7 +162,8 @@
 							"    postman.setGlobalVariable(\"tag_id\", data.id);",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -222,7 +204,6 @@
 					"listen": "test",
 					"script": {
 						"id": "8fed5574-acc9-4676-b9b3-2fa79166d923",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -243,7 +224,8 @@
 							"    pm.expect(jsonData.data[lastIndex].css).to.eql('tag-white');",
 							"});",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -280,7 +262,6 @@
 					"listen": "test",
 					"script": {
 						"id": "1bedc79c-8a2f-4929-a9e8-2ef97543e692",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -291,7 +272,8 @@
 							"});",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -328,7 +310,6 @@
 					"listen": "test",
 					"script": {
 						"id": "59748a73-8e1e-4776-964f-2d5e62f53df1",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200 with error\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -337,7 +318,8 @@
 							"    ",
 							"    pm.expect(jsonData.errors).to.eql(['Requested information was not found']);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -379,7 +361,6 @@
 					"listen": "test",
 					"script": {
 						"id": "61d1fd86-b1a6-490b-9557-f920d8faad91",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -400,7 +381,8 @@
 							"",
 							"",
 							""
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -442,7 +424,6 @@
 					"listen": "test",
 					"script": {
 						"id": "f59c1c68-da14-4637-8b15-4af4348a7d97",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -458,7 +439,8 @@
 							"",
 							"//cleanup code",
 							"pm.globals.unset(\"tag_id\");"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -542,5 +524,6 @@
 			"value": "newTestTag",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

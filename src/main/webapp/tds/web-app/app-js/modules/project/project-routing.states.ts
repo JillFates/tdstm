@@ -29,6 +29,7 @@ export const ProjectRoute: Routes = [
 				title: 'Projects',
 				instruction: '',
 				menu: ['GLOBAL.PROJECT.PROJECTS', 'GLOBAL.LIST'],
+				onSameUrlNavigation: 'reload'
 			},
 			requiresAuth: true
 		},

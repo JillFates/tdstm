@@ -118,12 +118,12 @@
                                                     <td class="N" nowrap="nowrap">
                                                         <label>Estimated Start</label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedStart || ''}}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedStart || '' | tdsDateTime: userTimeZone}}</span></td>
 
                                                     <td class="N" nowrap="nowrap">
                                                         <label>Estimated Finish</label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedFinish || ''}}</span></td>
+                                                    <td class="valueNW"><span>{{model.estimatedFinish || '' | tdsDateTime: userTimeZone}}</span></td>
 
                                                 </tr>
 

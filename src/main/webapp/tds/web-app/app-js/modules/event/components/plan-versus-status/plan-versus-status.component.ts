@@ -51,7 +51,7 @@ export class PlanVersusStatusComponent implements OnChanges {
 	}
 
 	/**
-	 * Reset the statue of the control
+	 * Reset the status of the control
 	*/
 	public reset() {
 		if (this.form && this.form.controls) {
