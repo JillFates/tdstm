@@ -1,13 +1,10 @@
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
-import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FindCondition
-import com.tdsops.etl.RowResult
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetDependencyStatus
 import grails.gorm.transactions.Rollback
@@ -20,7 +17,6 @@ import net.transitionmanager.asset.Room
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.util.mop.ConfineMetaClassChanges
 import test.helper.AssetEntityTestHelper
@@ -402,7 +398,6 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 			}
 	}
 
-	@IgnoreRest
 	void 'test can iterate FINDINGS results'() {
 
 		given:
