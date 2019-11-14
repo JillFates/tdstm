@@ -20,10 +20,10 @@
     <g:if test="${mode == 'show'}">
         <ul class="nav">
             <li class="nav-item">
-                <button class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Summary</button>
+                <button type="button" class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Summary</button>
             </li>
             <li class="nav-item">
-                <button class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports
+                <button type="button" class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports
                     <span class="badge">
                         <g:if test="${supportAssets?.size() > 99}">
                             99+
@@ -35,7 +35,7 @@
                 </button>
             </li>
             <li class="nav-item">
-                <button class="btn btn-link nav-link" id="tab3" onclick="navigate('tab3', 'depends')">Depends On
+                <button type="button" class="btn btn-link nav-link" id="tab3" onclick="navigate('tab3', 'depends')">Depends On
                     <span class="badge">
                         <g:if test="${dependentAssets?.size() > 99}">
                             99+
@@ -47,13 +47,13 @@
                 </button>
             </li>
             <li class="nav-item">
-                <button class="btn btn-link nav-link" id="tab4" onclick="navigate('tab4', 'commentListId')">Tasks
+                <button type="button" class="btn btn-link nav-link" id="tab4" onclick="navigate('tab4', 'commentListId')">Tasks
                     <%-- TODO: UPDATE PLACEHOLDER / Add badge w/ number if possible --%>
                     <%-- <span class="badge">9</span> --%>
                 </button>
             </li>
             <li class="nav-item">
-                <button class="btn btn-link nav-link" id="tab5" onclick="navigate('tab5', 'commentListId')">Comments
+                <button type="button" class="btn btn-link nav-link" id="tab5" onclick="navigate('tab5', 'commentListId')">Comments
                     <%-- TODO: UPDATE PLACEHOLDER / Add badge w/ number if possible --%>
                     <%-- <span class="badge">9</span> --%>
                 </button>
@@ -64,10 +64,10 @@
         <%-- Clarity Tabs --%>
         <ul class="nav">
             <li class="nav-item">
-                <button class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Details</button>
+                <button type="button" class="btn btn-link nav-link active" id="tab1" onclick="navigate('tab1', 'details')">Details</button>
             </li>
             <li class="nav-item">
-                <button class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports/Depends</button>
+                <button type="button" class="btn btn-link nav-link" id="tab2" onclick="navigate('tab2', 'supports')">Supports/Depends</button>
             </li>
         </ul>
     </g:else>

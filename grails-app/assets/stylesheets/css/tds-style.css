@@ -1121,7 +1121,6 @@ div.dates-info-container {
           .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a:hover {
             color: #0077b8; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-badge {
-        width: 23px;
         height: 23px;
         border-radius: 100%;
         font-size: 14px; }
@@ -1139,6 +1138,8 @@ div.dates-info-container {
         color: #808080;
         margin-right: 10px; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subbadge {
+        min-width: unset;
+        width: 8px;
         background-color: #f38b00; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description {
         font-style: normal;
@@ -1178,6 +1179,15 @@ div.dates-info-container {
           -webkit-column-gap: 2%;
           -moz-column-gap: 2%;
           column-gap: 2%; }
+          .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper {
+            margin: 5px 0; }
+            .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .source-target-wrapper .header-label {
+              width: 100%;
+              margin-bottom: 5px;
+              padding-left: 8px;
+              font-size: 14px;
+              color: #454545;
+              font-weight: 600; }
           .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control {
             -webkit-box-orient: horizontal;
             -webkit-box-direction: normal;
@@ -1189,6 +1199,9 @@ div.dates-info-container {
               -webkit-box-flex: 1;
               -ms-flex-positive: 1;
               flex-grow: 1; }
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container + .clr-input-wrapper,
+              .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper + .clr-input-wrapper {
+                margin-left: 20px; }
               .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-control-container .clr-select-wrapper,
               .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .grid-form .clr-form-control .clr-input-wrapper .clr-select-wrapper {
                 width: 100%; }
@@ -1332,134 +1345,62 @@ div.dates-info-container {
       color: white;
       border-radius: unset; }
 
-.modal-dialog {
-  background: #fff;
-  position: fixed !important;
-  top: 56px !important;
-  left: 35px !important;
-  right: 35px !important;
-  bottom: 48px !important;
-  overflow: hidden !important;
-  width: unset !important;
-  padding-left: 40px !important; }
-  .modal-dialog .modal-body {
-    width: calc(100vw - 40px - 35px - 35px - 22px);
-    padding: 15px 20px 0 22px; }
-    .modal-dialog .modal-body.has-description {
-      max-height: calc(100vh - 300px); }
-    .modal-dialog .modal-body.no-description {
-      max-height: calc(100vh - 255px); }
-    .modal-dialog .modal-body .source-target-wrapper {
-      -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-      flex-grow: 1;
-      margin: 5px 0; }
-      .modal-dialog .modal-body .source-target-wrapper .header-label {
-        width: 100%;
-        margin-bottom: 5px;
-        padding: 0 8px;
-        font-size: 14px; }
-    .modal-dialog .modal-body .grid-form {
-      display: grid;
-      grid-template-columns: 49% 49%;
-      -webkit-column-gap: 2%;
-      -moz-column-gap: 2%;
-      column-gap: 2%; }
-      .modal-dialog .modal-body .grid-form .k-input {
-        font-size: 14px; }
-      .modal-dialog .modal-body .grid-form .clr-form-control {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-direction: unset;
-        flex-direction: unset;
-        -webkit-box-orient: unset;
-        margin-top: unset;
-        -ms-flex-align: unset;
-        align-items: unset;
-        -webkit-box-align: unset;
-        -webkit-box-direction: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control label {
-          max-width: unset;
-          margin-bottom: unset;
-          min-width: 150px;
-          width: 150px;
-          padding: 0 8px;
-          font-size: 14px; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-checkbox-wrapper .clr-control-label {
-          min-width: unset;
-          width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input {
-          font-size: 14px;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .clr-input-wrapper {
-          max-height: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control {
-          display: block;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1;
-          margin-top: unset; }
-          .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container {
-            width: 100%; }
-            .modal-dialog .modal-body .grid-form .clr-form-control clr-input-container.clr-form-control .clr-control-container .clr-input {
-              width: 100%; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .ng-star-inserted,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-combobox-group {
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control,
-        .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control {
-          display: block;
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1; }
-          .modal-dialog .modal-body .grid-form .clr-form-control tds-date-control .k-datepicker,
-          .modal-dialog .modal-body .grid-form .clr-form-control tds-number-control .k-datepicker {
-            width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control .combo-group .k-widget.k-combobox,
-        .modal-dialog .modal-body .grid-form .clr-form-control .k-combobox {
-          width: unset; }
-        .modal-dialog .modal-body .grid-form .clr-form-control kendo-dropdownlist.k-dropdown {
-          -webkit-box-flex: 1;
-          -ms-flex-positive: 1;
-          flex-grow: 1;
-          -ms-flex-item-align: end;
-          align-self: flex-end; }
-      .modal-dialog .modal-body .grid-form .truck-input-container {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-        flex-grow: 1; }
-        .modal-dialog .modal-body .grid-form .truck-input-container .clr-form-control + .clr-form-control {
-          margin-left: 10px; }
-    .modal-dialog .modal-body .modal-body-graph .diagram-layout-container {
-      width: 100%;
-      padding: unset;
-      padding-top: 100%;
-      position: relative;
-      min-height: unset; }
-      .modal-dialog .modal-body .modal-body-graph .diagram-layout-container .overview-container {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        width: unset;
-        height: unset; }
-
-.close {
-  opacity: 1; }
-  .close .btn {
-    color: #808080; }
-  .close .button-label {
-    display: none; }
+.tds-modal-content {
+  background: #fff; }
+  .tds-modal-content.has-side-nav .modal-header,
+  .tds-modal-content.has-side-nav .modal-body {
+    margin-left: 40px; }
+  .tds-modal-content:focus {
+    outline: unset; }
+  .tds-modal-content .modal-header-height {
+    height: 182px; }
+  .tds-modal-content .modal-header {
+    padding: 24px; }
+    .tds-modal-content .modal-header .close-button {
+      color: #737373;
+      height: 40px;
+      margin: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      border: unset; }
+      .tds-modal-content .modal-header .close-button:hover {
+        background: unset; }
+    .tds-modal-content .modal-header .modal-title-container {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-align: center;
+      -ms-flex-align: center;
+      align-items: center; }
+      .tds-modal-content .modal-header .modal-title-container .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 22px;
+        line-height: 26px;
+        margin-right: 10px; }
+    .tds-modal-content .modal-header .modal-description-height {
+      min-height: 48px; }
+  .tds-modal-content .modal-sidenav {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    bottom: 0;
+    left: 0;
+    padding-top: 24px;
+    border: solid 1px #ccc;
+    border-width: 0 1px 0 0; }
+    .tds-modal-content .modal-sidenav .btn {
+      color: #000;
+      height: 40px !important;
+      margin: 0; }
+    .tds-modal-content .modal-sidenav .button-label {
+      display: none; }
+    .tds-modal-content .modal-sidenav.btn-link .selected-button.btn {
+      border: unset;
+      color: white;
+      border-radius: unset;
+      background: #0077b8; }
 
 .tds-table .grid-label {
   font-size: 18px;
@@ -1702,6 +1643,95 @@ div.dates-info-container {
     background: #ccc;
     border: #ccc solid 4px;
     border-radius: 50%; }
+
+.asset-dependency-component .modal-header {
+  border: unset;
+  padding: 10px; }
+
+.asset-dependency-component .modal-body {
+  padding: unset; }
+
+.asset-dependency-component .error {
+  color: red; }
+
+.asset-dependency-component .dependencies {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  padding-top: 10px; }
+  .asset-dependency-component .dependencies:last-child {
+    padding-bottom: 10px; }
+
+.asset-dependency-component .dependency-row {
+  font-weight: normal;
+  display: grid;
+  grid-template-columns: 1fr 2fr 2fr;
+  -webkit-column-gap: 10px;
+  -moz-column-gap: 10px;
+  column-gap: 10px;
+  border-bottom: 1px solid lightgray; }
+  .asset-dependency-component .dependency-row.dependency-edit {
+    padding: 5px 0; }
+  .asset-dependency-component .dependency-row:last-child {
+    border: unset; }
+  .asset-dependency-component .dependency-row .dependency-row-legend {
+    font-weight: bold;
+    text-transform: capitalize; }
+  .asset-dependency-component .dependency-row .dependency-row-data label {
+    max-width: 200px;
+    overflow: hidden;
+    font-weight: normal; }
+
+.asset-dependency-component .dependency-edit .clr-control-container {
+  width: 100%; }
+  .asset-dependency-component .dependency-edit .clr-control-container .clr-textarea {
+    max-width: unset;
+    width: 100%;
+    resize: none; }
+
+.asset-dependency-component .dependency-edit .clr-input {
+  width: 100%; }
+
+.asset-dependency-component .dependency-edit .clr-select-wrapper {
+  width: 100%; }
+  .asset-dependency-component .dependency-edit .clr-select-wrapper .clr-select {
+    padding-left: 0.25rem !important;
+    width: 100%; }
+
+.asset-dependency-component .dependency-label {
+  overflow: auto;
+  font-weight: normal;
+  margin: unset;
+  display: inline; }
+
+.asset-dependency-component .dependency-comment {
+  max-height: 70px;
+  overflow: auto; }
+
+.asset-dependency-component .has-both-dependencies {
+  padding: 10px;
+  color: green; }
+  .asset-dependency-component .has-both-dependencies .depends-on {
+    color: #d1b9ee; }
+  .asset-dependency-component .has-both-dependencies i {
+    margin-left: -6px; }
+
+.asset-dependency-component .has-dependency-a .dependency-a .dependency-label,
+.asset-dependency-component .has-dependency-b .dependency-b .dependency-label,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a .k-widget,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b .k-widget,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a input,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b input,
+.asset-dependency-component .has-dependency-a .dependency-edit .dependency-a textarea,
+.asset-dependency-component .has-dependency-b .dependency-edit .dependency-b textarea {
+  visibility: visible; }
+
+.asset-dependency-component .delete-button-dependency-show-modal div.tds-action-button-container {
+  margin-left: 30%; }
 
 body > .wrapper {
   padding-top: 45px; }
@@ -2218,9 +2248,6 @@ div.ui-widget-overlay {
   filter: Alpha(Opacity=50);
   background: rgba(0, 0, 0, 0.3);
   /*z-index: 1050*/ }
-
-div.select2-container span.select2-chosen {
-  font-size: 12px !important; }
 
 .buttons input.clone-asset {
   background: transparent url(../icons/database_copy.png) 5px 50% no-repeat;

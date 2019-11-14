@@ -39,7 +39,7 @@
 				<clr-checkbox-wrapper class="inline">
 					<input clrCheckbox id="justPlanning" type="checkbox" name="justPlanning"
 								 class="component-action-just-planning"
-								 [(ngModel)]="justPlanning" (change)="onQuery()">
+								 [(ngModel)]="justPlanning" (change)="onJustPlanningChange($event.currentTarget.checked)">
 					<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
 						Just Planning
 					</label>

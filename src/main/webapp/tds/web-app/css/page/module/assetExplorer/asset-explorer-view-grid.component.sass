@@ -27,7 +27,53 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
             padding: 0
             top: 0
             .k-multiselect-wrap
-              min-height: unset
+              border: 1px solid #ccc
+              border-radius: 3px
+              font-size: 13px
+              min-height: 26px
+              font-weight: 500
+              kendo-searchbar
+                width: 100%
+                input
+                  height: 100%
+                  width: 100%
+              div[class^="tag"]
+                border-radius: .5rem
+                border: 1px solid #737373
+                font-size: 11px
+                text-align: center
+                margin-bottom: 0
+                font-weight: 500
+                color: black
+                padding-top: 4px
+                padding-bottom: 4px
+                max-width: 143px
+          kendo-switch
+            float: right
+            z-index: 2
+            width: 55px
+            top: 4px
+            height: 24px
+            position: relative
+            .k-switch-container
+              border-width: .1em
+              border-color: rgba(0, 0, 0, 0.17)
+              color: inherit !important
+              margin-right: 4px
+              background-color: transparent !important
+            .k-switch-handle
+              width: 2.3em
+              height: 2.2em
+              background-color: #5f9fcf !important
+            .k-switch-label-on, .k-switch-label-off
+              right: 6px
+              font-size: 10px
+              width: 100%
+              font-weight: 600
+            &.k-switch-on
+              .k-switch-handle
+                left: calc(100% - 2.3em)
+
         .has-feedback
           input.form-control
             padding: 2px 27px 2px 12px
@@ -148,3 +194,32 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
   .selectall-checkbox-column
     label
       margin-bottom: 0
+  .selected-assets-counter
+    .icon
+      position: relative
+      bottom: 2px
+    h6
+      margin-top: 0
+      margin-left: 5px
+
+kendo-popup.assets-view-grid
+  kendo-list
+    .k-list-scroller .k-list
+      overflow: auto
+      .k-item
+        padding: 0px 4px
+        &:last-child
+          margin-bottom: 10px
+    .asset-tag-selector-single-container
+      margin-left: 0
+      margin-top: 0
+    .asset-tag-selector-single-item
+      border-radius: .5rem
+      border: 1px solid #737373
+      height: 15px
+      font-size: 11px
+      text-align: center
+      margin-bottom: 0
+      font-weight: 500
+      color: black
+      padding: 4px

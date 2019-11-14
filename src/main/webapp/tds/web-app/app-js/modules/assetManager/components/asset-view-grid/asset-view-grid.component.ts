@@ -171,7 +171,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe((preferences: any) => {
 				this.updateGridState({take: parseInt(preferences[PREFERENCE_LIST_SIZE], 10) || 25});
 				this.bulkCheckboxService.setPageSize(this.gridState.take);
-				this.justPlanning = (preferences[PREFERENCE_JUST_PLANNING]) ? preferences[PREFERENCE_JUST_PLANNING].toString() === 'true' : false;
 				this.toggleTagsColumn = (preferences[PREFERENCE_WRAP_TAGS_COLUMN]) ? preferences[PREFERENCE_WRAP_TAGS_COLUMN].toString() === 'true' : false;
 				this.showFullTags = this.toggleTagsColumn;
 				this.onReload();
@@ -210,7 +209,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private getPreferences(): Observable<any> {
-		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_JUST_PLANNING, PREFERENCE_WRAP_TAGS_COLUMN);
+		return this.preferenceService.getPreferences(PREFERENCE_LIST_SIZE, PREFERENCE_WRAP_TAGS_COLUMN);
 	}
 
 	/**
