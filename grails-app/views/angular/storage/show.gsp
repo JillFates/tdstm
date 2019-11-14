@@ -49,7 +49,9 @@
 				<button tdsScrollerLink>Comments</button>
 			</tds-scroller-item>
 		</tds-tab-scroller>
-		<tds-diagram-layout *ngIf="showDetails" class="header-graph"></tds-diagram-layout>
+		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
+			<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideOverview]="true" [hideControlButton]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+		</div>
 	</div>
 	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
@@ -91,7 +93,7 @@
 				</a>
 			</div>
 			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-				<tds-diagram-layout></tds-diagram-layout>
+				<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
 			</div>
 		</div>
 		<div tdsScrollSection class="clr-row">

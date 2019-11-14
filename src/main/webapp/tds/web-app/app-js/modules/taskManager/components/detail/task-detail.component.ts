@@ -162,7 +162,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	deleteTask(): void {
 		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM')	,
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))

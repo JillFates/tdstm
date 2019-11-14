@@ -246,6 +246,8 @@ tds-ui-dialog {
 
 				// tds-diagram-layout styling in body
 				.modal-body-graph {
+					min-height: 300px;
+					border: 1px solid #ddd;
 					.diagram-layout-container {
 						width: 100%;
 						padding: unset;
@@ -282,6 +284,25 @@ tds-ui-dialog {
 
 .tds-modal-content {
 	background: $color-text-inverse;
+	min-width: 340px;
+	box-shadow: 0 5px 15px $color--darkgray;
+
+	.modal-body {
+		form {
+			padding: 0 10px;
+			.box-body {
+				padding-top: 0;
+				p {
+                  margin-top: 0;
+				}
+			}
+		}
+	}
+  	.modal-footer {
+		padding: 24px;
+		display: flex;
+		justify-content: space-between;
+	}
 
 	&.has-side-nav {
 		.modal-header,
