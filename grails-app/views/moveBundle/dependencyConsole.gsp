@@ -81,7 +81,7 @@
 									<div class="clr-control-container ">
 										<div class="clr-checkbox-wrapper">
 											<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
-											<label class="clr-control-label" for="saveDefault">Save as defaults</label>
+											<label class="clr-control-label" for="saveDefault" style="font-weight:600;">Save As Defaults</label>
 										</div>
 									</div>
 								</div>
