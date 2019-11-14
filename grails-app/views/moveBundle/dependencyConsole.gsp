@@ -7,7 +7,7 @@
 		<asset:stylesheet href="css/force.css" />
 		<asset:stylesheet href="css/ui.datepicker.css" />
 		<asset:stylesheet href="css/progressbar.css" />
-		<asset:stylesheet href="css/tds-bootstrap.css" />
+		<asset:stylesheet href="css/dbootstrap.css" />
 		<asset:stylesheet href="css/tds-progressbar.css" />
 
 		<g:javascript src="asset.tranman.js" />
@@ -32,41 +32,76 @@
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId">
-			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
-				<div id="checkBoxDivId">
+			<div id="checkBoxDiv" title="Dependency Grouping Control" style="display: none; overflow-x: hidden; padding:unset;" class="tds-modal-content has-side-nav">
+				<div class="modal-header modal-header-small">
+					<button class="btn btn-icon close-button" onclick="hideDependencyControlDiv()">
+						<i class="fas fa-times"></i>
+					</button>
+
+					<div class="modal-title-container">
+						<div class="modal-title">Dependency Grouping Control</div>
+					</div>
+				</div>
+
+				<div id="checkBoxDivId" class="modal-body-tight">
 					<g:form name="checkBoxForm">
-						<div class="row">
-							<div class="col-sm-6">
+						<div class="modal-grid-2">
+							<div>
 								<h3>Connection Type</h3>
 								<div class="checkboxdiv_control">
 									<g:each in="${dependencyType}" var="dependency">
-										<input type="checkbox" id="${dependency}"
-												 name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependency}"> ${dependency}</span>
-										<br />
+									 	 <div class="clr-control-container"  style="display:block;">
+											<div class="clr-checkbox-wrapper">
+												<input type="checkbox" id="${dependency}"
+													name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>
+												<label class="clr-control-label" id="dependecy_${dependency}" for="${dependency}">${dependency}</label>
+											</div>
+										</div>
 									</g:each>
 								</div>
 							</div>
-							<div class="col-sm-6">
+							<div>
 								<h3>Connection Status</h3>
 								<div class="checkboxdiv_control">
 									<g:each in="${dependencyStatus}" var="dependencyStatusInst">
-										<input type="checkbox" id="${dependencyStatusInst}"
-												 name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
-										<br />
+										<div class="clr-control-container"  style="display:block;">
+											<div class="clr-checkbox-wrapper">
+												<input type="checkbox" id="${dependencyStatusInst}"
+												 name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>
+												<label class="clr-control-label" id="dependecy_${dependencyStatusInst}" for="${dependencyStatusInst}">${dependencyStatusInst}</label>
+											</div>
+										</div>
 									</g:each>
 								</div>
 							</div>
 						</div>
-						<div class="row checkboxdiv_default">
-							<div class="col-sm-12"><input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>&nbsp;&nbsp; <span>Save as defaults</span></div>
-						</div>
-						<div class="buttonR">
-							<button type="button" class="btn btn-default submit" value="Generate" id="generateId" onclick="submitCheckBox()"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Generate</button>
+						<div class="checkboxdiv_default">
+							<div class="checkboxdiv_control">
+								<div class="clr-control-container ">
+									<div class="clr-checkbox-wrapper">
+										<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+										<label class="clr-control-label" for="saveDefault">Save as defaults</label>
+									</div>
+								</div>
+							</div>
 						</div>
 					</g:form>
 				</div>
+
+				<div class="modal-sidenav">
+					<nav class="modal-sidenav btn-link">
+						<button
+							type="button"
+							id="generateId"
+							class="btn btn-icon"
+							value="Generate"
+							onclick="submitCheckBox()"
+							title="Regenerate"
+							>
+							<i class="fas fa-chart-bar"></i>
+						</button>
+					</nav>
+				</div>	
 			</div>
 
 

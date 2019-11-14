@@ -2310,7 +2310,8 @@ function showDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('option', 'modal', 'true');
 	$("#checkBoxDiv").dialog('option', 'position', ['center', 'top']);
 	$("#checkBoxDiv").dialog('open')
-	$("#checkBoxDivId").show();
+	$('div.ui-dialog-titlebar').hide();
+	$("#checkBoxDiv").show();
 }
 
 function hideDependencyControlDiv() {

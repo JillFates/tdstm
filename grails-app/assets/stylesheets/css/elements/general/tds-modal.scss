@@ -353,7 +353,8 @@
 
   &.has-side-nav {
     .modal-header,
-    .modal-body {
+    .modal-body,
+    .modal-body-tight {
       margin-left: 40px;
     }
   }
@@ -362,12 +363,28 @@
     outline: unset;
   }
 
+  .modal-body-tight {
+    padding: 10px;
+    padding-top: 0;
+
+    .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 10px;
+    }
+  }
+
   .modal-header-height {
     height: 182px;
   }
 
   .modal-header {
     padding: 24px;
+    border: unset;
+
+    &.modal-header-small {
+      padding: 10px;
+    }
 
     .close-button {
       color: #737373;

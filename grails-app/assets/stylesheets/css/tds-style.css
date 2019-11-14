@@ -1347,14 +1347,27 @@ div.dates-info-container {
 .tds-modal-content {
   background: #fff; }
   .tds-modal-content.has-side-nav .modal-header,
-  .tds-modal-content.has-side-nav .modal-body {
+  .tds-modal-content.has-side-nav .modal-body,
+  .tds-modal-content.has-side-nav .modal-body-tight {
     margin-left: 40px; }
   .tds-modal-content:focus {
     outline: unset; }
+  .tds-modal-content .modal-body-tight {
+    padding: 10px;
+    padding-top: 0; }
+    .tds-modal-content .modal-body-tight .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      -webkit-column-gap: 10px;
+      -moz-column-gap: 10px;
+      column-gap: 10px; }
   .tds-modal-content .modal-header-height {
     height: 182px; }
   .tds-modal-content .modal-header {
-    padding: 24px; }
+    padding: 24px;
+    border: unset; }
+    .tds-modal-content .modal-header.modal-header-small {
+      padding: 10px; }
     .tds-modal-content .modal-header .close-button {
       color: #737373;
       height: 40px;
@@ -2222,9 +2235,6 @@ div.ui-dialog {
       background-color: #f3f4f6 !important; }
   div.ui-dialog div#createEntityView, div.ui-dialog div#checkBoxDiv, div.ui-dialog div#createStaffDialog, div.ui-dialog div#personGeneralViewId, div.ui-dialog div#personDialog {
     background-color: #fff; }
-  div.ui-dialog div#checkBoxDiv div.checkboxdiv_control {
-    margin-left: 12px;
-    margin-top: 5px; }
   div.ui-dialog div#checkBoxDiv div.checkboxdiv_default {
     margin-top: 25px;
     font-weight: 600; }
