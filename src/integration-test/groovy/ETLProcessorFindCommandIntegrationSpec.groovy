@@ -451,22 +451,16 @@ class ETLProcessorFindCommandIntegrationSpec extends ETLBaseIntegrationSpec {
 				}
 			""".stripIndent())
 
-		then: 'Results should contain Application domain results associated'
-			with(etlProcessor.finalResult(), ETLProcessorResult) {
-				domains.size() == 2
-				with(domains[0], DomainResult) {
-					with(data[0], RowResult) {
-						fields.size() == 2
-					}
-					domain == ETLDomain.Dependency.name()
-				}
+		def results = etlProcessor.finalResult()
 
-				with(domains[1], DomainResult) {
-					data.each { row ->
-						row.id == application.id
-					}
-					domain == ETLDomain.Application.name()
-				}
+		then: 'Results should contain Application domain results associated'
+			results.domains.size() == 2
+			results.domains[0].domain == ETLDomain.Dependency.name()
+			results.domains[0].data[0].fields.size() == 2
+
+			results.domains[1].domain == ETLDomain.Device.name()
+			results.domains[1].data.each { row ->
+				row.fields.id == application.id
 			}
 
 		cleanup:
