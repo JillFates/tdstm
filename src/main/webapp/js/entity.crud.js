@@ -2306,7 +2306,6 @@ function onDependencyFiltersChange() {
 };
 
 function showDependencyControlDiv() {
-	console.log("showDependencyControlDiv");
 	$("#checkBoxDiv").dialog('option', 'width', '480px')
 	$("#checkBoxDiv").dialog('option', 'modal', 'true');
 	$("#checkBoxDiv").dialog('option', 'position', ['center', 'top']);
