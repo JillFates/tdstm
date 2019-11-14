@@ -1121,7 +1121,6 @@ div.dates-info-container {
           .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-title-container a:hover {
             color: #0077b8; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-badge {
-        width: 23px;
         height: 23px;
         border-radius: 100%;
         font-size: 14px; }
@@ -1139,6 +1138,8 @@ div.dates-info-container {
         color: #808080;
         margin-right: 10px; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-subbadge {
+        min-width: unset;
+        width: 8px;
         background-color: #f38b00; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description {
         font-style: normal;
