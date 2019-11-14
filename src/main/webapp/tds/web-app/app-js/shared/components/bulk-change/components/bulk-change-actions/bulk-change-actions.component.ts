@@ -92,7 +92,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog {
 		const message = this.translatePipe.transform(translationKey,
 			[this.affected, singleOrPluralName, singleOrPluralName]);
 		return new Promise((resolve, reject) =>  {
-			this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+			this.promptService.open(this.translatePipe.transform(
+				'GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
 				message,
 				this.translatePipe.transform('GLOBAL.CONFIRM'),
 				this.translatePipe.transform('GLOBAL.CANCEL'))
