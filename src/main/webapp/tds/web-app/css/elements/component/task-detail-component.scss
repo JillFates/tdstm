@@ -39,6 +39,13 @@
         border-collapse: separate;
         border-spacing: 3px;
         padding: 0;
+        .progress.completion {
+          max-height: unset;
+          display: flex;
+          .progress-bar {
+            line-height: unset;
+          }
+        }
         .task-number {
           min-width: 104px;
         }
@@ -82,8 +89,9 @@
     padding-top: 5px;
     display: block;
     position: absolute;
-    bottom: 30px;
+    bottom: 45px;
     width: 100%;
+    background-color: #fff;
     .options-container {
       display: flex;
       justify-content: space-between;
