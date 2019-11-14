@@ -16,7 +16,7 @@ import {ArchitectureGraphService} from '../../../assetManager/service/architectu
 import {ArchitectureGraphDiagramHelper} from '../../../assetManager/components/architecture-graph/architecture-graph-diagram-helper';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
-import {Layout, Link} from 'gojs';
+import {Diagram, Layout, Link} from 'gojs';
 
 declare var jQuery: any;
 
@@ -140,7 +140,7 @@ export class AssetCommonShow implements OnInit {
 	loadThumbnailData(assetId: number | string): void {
 		this.architectureGraphService.getAssetDetails(assetId, 0, 1)
 			.subscribe(res => {
-				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res));
+				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res, Diagram.Uniform));
 			})
 	}
 }
