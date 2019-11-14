@@ -63,7 +63,7 @@ class WsDashboardController implements ControllerMethods {
 	 * @return JSON map
 	 */
 	@HasPermission(Permission.DashboardMenuView)
-	def eventData(Long id) {
+	def eventData() {
 		MoveEvent moveEvent = fetchDomain(MoveEvent, params)
 		renderAsJson(moveEventService.eventData(moveEvent))
 	}

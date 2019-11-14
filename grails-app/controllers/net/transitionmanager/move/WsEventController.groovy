@@ -201,8 +201,17 @@ class WsEventController implements ControllerMethods {
 	/**
 	 * Find and return various task-related stats per category for the given event.
 	 */
-	def taskCategoriesStats(Long moveEventId) {
+	def taskCategoriesStats() {
+		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('eventId', UserPreferenceEnum.MOVE_EVENT))
+		if (!moveEventId) {
+			throw new InvalidParamException('A valid Move Event ID is needed.')
+		}
+		// handle the view unpublished tasks checkbox
+		if (params.containsKey('viewUnpublished')) {
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
+		}
+		boolean viewUnpublished = securityService.viewUnpublished()
 		Project project = getProjectForWs()
-		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId))
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId, viewUnpublished))
 	}
 }

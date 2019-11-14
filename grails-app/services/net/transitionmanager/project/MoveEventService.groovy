@@ -527,9 +527,10 @@ class MoveEventService implements ServiceMethods {
 	 * Find different stats for the given event, grouped by category.
 	 * @param project
 	 * @param moveEventId
+	 * @param viewUnpublished - whether or not unpublished tasks should be included in the model.
 	 * @return a list with the task category stats
 	 */
-	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
+	List<Map> getTaskCategoriesStats(Project project, Long moveEventId, boolean viewUnpublished) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
 		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
 		// Query the database for the min/max dates for tasks in the event grouped by category.

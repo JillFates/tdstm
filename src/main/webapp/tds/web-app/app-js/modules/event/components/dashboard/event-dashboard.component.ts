@@ -98,6 +98,7 @@ export class EventDashboardComponent implements OnInit {
 	/**
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
+	 * @param {string} name  Event name
 	*/
 	public onSelectedEvent(id: number, name: string, refreshing = false): void {
 		if (!refreshing) {
@@ -109,7 +110,7 @@ export class EventDashboardComponent implements OnInit {
 		this.getNewsFromEvent(id);
 
 		this.eventDetails = null;
-		this.eventsService.getEventDetails(id, true)
+		this.eventsService.getEventDetails(id, this.includeUnpublished)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
 
@@ -117,7 +118,8 @@ export class EventDashboardComponent implements OnInit {
 					id,
 					this.userTimeZone,
 					this.eventDetails.moveEvent.estStartTime,
-					this.eventDetails.moveEvent.estCompletionTime)
+					this.eventDetails.moveEvent.estCompletionTime,
+					this.includeUnpublished)
 				.subscribe((data: any[]) => {
 					this.taskCategories = data;
 				});
@@ -150,6 +152,14 @@ export class EventDashboardComponent implements OnInit {
 					this.taskCategorySection.setContainerScroll(this.taskCategoryScrollPosition);
 				})
 			});
+	}
+
+		/**
+	 * On Any other change.
+	 * @param selection: Array<any>
+	 */
+	onFiltersChange($event ?: any): void {
+		this.onSelectedEvent($event.selectedEvent.id, $event.selectedEvent.name);
 	}
 
 	/**
