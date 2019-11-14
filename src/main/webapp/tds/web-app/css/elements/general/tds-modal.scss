@@ -1,3 +1,34 @@
+@mixin modalSideNav {
+	.modal-sidenav {
+		position: absolute;
+		top: 0;
+		width: 40px;
+		bottom: 0;
+		left: 0;
+		padding-top: 24px;
+		border: solid 1px $color-border;
+		border-width: 0 1px 0 0;
+		.btn {
+			color: $color--black;
+			height: 40px !important;
+			margin: 0;
+		}
+		.button-label {
+			display: none;
+		}
+
+		&.btn-link {
+			.selected-button {
+				.btn {
+					border: unset;
+					color: white;
+					border-radius: unset;
+				}
+			}
+		}
+	}
+}
+
 tds-ui-dialog {
 	#tdsUiDialog {
 		padding: 0 !important;
@@ -234,35 +265,8 @@ tds-ui-dialog {
 					}
 				}
 			}
-			.modal-footer,
-			.modal-sidenav {
-				position: absolute;
-				top: 0;
-				width: 40px;
-				bottom: 0;
-				left: 0;
-				padding-top: 24px;
-				border: solid 1px $color-border;
-				border-width: 0 1px 0 0;
-				.btn {
-					color: $color--black;
-					height: 40px;
-					margin: 0;
-				}
-				.button-label {
-					display: none;
-				}
 
-				&.btn-link {
-					.selected-button {
-						.btn {
-							border: unset;
-							color: white;
-							border-radius: unset;
-						}
-					}
-				}
-			}
+			@include modalSideNav();
 		}
 	}
 	.close {
@@ -278,6 +282,13 @@ tds-ui-dialog {
 
 .tds-modal-content {
 	background: $color-text-inverse;
+
+	&.has-side-nav {
+		.modal-header,
+		.modal-body {
+			margin-left: 40px;
+		}
+	}
 
 	&:focus {
 		outline: unset;
@@ -364,4 +375,6 @@ tds-ui-dialog {
 			}
 		}
 	}
+
+	@include modalSideNav();
 }

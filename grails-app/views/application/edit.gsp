@@ -210,9 +210,9 @@
 							<script type="text/javascript" charset="utf-8">
 								jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
 							</script>
-								<input type="text" class="dateRange"
-									name="maintExpDate" id="maintExpDate" tabindex="28"
-									value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
+							<input type="text" class="dateRange"
+								name="maintExpDate" id="maintExpDate" tabindex="28"
+								value="<tds:convertDate date="${applicationInstance?.maintExpDate}" />">
 						</div>
 
 						<div class="clr-form-control">
