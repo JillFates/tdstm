@@ -60,8 +60,8 @@ function 	buildGraph(response, status) {
 	$('#exportCriticalPathButton').removeClass('disabledLabel');
 
 	// check for errors in the ajax call
-	if (status == 'error') {
-		displayWarningOrErrorMsg(response.responseText == 'cyclical')
+	if (status === 'error') {
+		displayWarningOrErrorMsg(response.responseText === 'cyclical')
 		return;
 	}
 
@@ -2482,6 +2482,9 @@ function baseLine(){
  */
 function generateGraph() {
 	var id = $('#moveEventId').val();
+	if(!+id){
+		return;
+	}
 	var mode = $("input[name=mode]:checked").val();
 	var viewUnpublished = $('#viewUnpublishedId').is(':checked');
 
