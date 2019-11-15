@@ -14,12 +14,6 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 	selector: 'asset-dependency',
 	templateUrl: 'asset-dependency.component.html',
 	styles: [`
-		.modal-body,
-		.modal-header {
-            padding-left: 10px;
-            padding-right: 10px;
-		}
-
         td.lbl-asset-dependency-direction,
         form.dependency-edit-fields td.legend-fields {
 			padding: 2px 0;
@@ -56,11 +50,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
             text-decoration: line-through;
         }
 
-        .half-size {
-            width: 60%;
-        }
-
-        .separator-table {
+		.separator-table {
             border-top: 2px solid #f4f4f4 !important;
             margin-top: 10px !important;
         }
