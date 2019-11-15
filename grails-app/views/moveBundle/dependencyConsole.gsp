@@ -62,7 +62,7 @@
 									</div>
 								</div>
 								<div>
-									
+									<div class="modal-section-header">Connection Status</div>
 									<div class="checkboxdiv_control">
 										<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 											<div class="clr-control-container"  style="display:block;">
