@@ -797,7 +797,12 @@ div.graphContainer {
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:active {
           -webkit-filter: saturate(10);
           filter: saturate(10); }
+        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.plus {
+          color: green; }
+        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.minus {
+          color: red; }
         div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.disabled {
+          color: grey;
           -webkit-filter: saturate(0);
           filter: saturate(0);
           opacity: 0.5;
