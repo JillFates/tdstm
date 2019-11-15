@@ -1935,7 +1935,11 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 			recompileDOM('tmAssignmentTagSelector');
 		});
 
+		$('#moveBundleSelectId').dialog('option', 'width', 'auto');
+		$('#moveBundleSelectId').dialog('option', 'modal', 'true');
+
 		$('#moveBundleSelectId').dialog('open')
+		$('div.ui-dialog-titlebar').hide();
 	}
 }
 function submitMoveForm() {

@@ -156,44 +156,65 @@
 
 			<div style="clear: both;"></div>
 
-			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
-				<g:form name="changeBundle" action="assetsAssignment" >
-					<input type="hidden" name="assetType" id="assetsTypeId"  />
-					<input type="hidden" name="bundleSession" id="bundleSession" />
-					<table style="border: 0px;">
-						<tr>
-							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
-						</tr>
-                        <tr>
-                            <td>
-                                <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
-                                <tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
-                            </td>
-                        </tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
-								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}" style="max-width: 144px;"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Plan Status</b></span> &nbsp;&nbsp;<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div>
-									<label for="planningBundle" ><input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>Planning Bundles</b></span></label>
-									<label for="allBundles" ><input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>All Bundles</b></span></label><br />
+			<div id="moveBundleSelectId" title="Assignment" style="display: none;" class="static-dialog tds-modal-content with-box-shadow">
+				<div class="modal-header" style="padding-left: unset;">
+					<button class="btn btn-icon close-button" onclick="$('#moveBundleSelectId').dialog('close')">
+						<i class="fas fa-times"></i>
+					</button>
+
+					<div class="modal-title-container">
+						<div class="modal-title" style="padding: unset;">Asset Assignment</div>
+					</div>
+				</div>
+				
+				<div class="modal-body-tight" style="padding: unset;">
+					<g:form name="changeBundle" action="assetsAssignment" >
+						<input type="hidden" name="assetType" id="assetsTypeId"  />
+						<input type="hidden" name="bundleSession" id="bundleSession" />
+						<div>Assign selected assets to:</div>
+						
+						<div class="clr-form-control">
+							<label for="tmAssignmentTagSelector" class="clr-control-label">Tags</label>
+							<div class="clr-control-container">
+								<tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="plannedMoveBundleList" class="clr-control-label">Plan Status</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="moveBundle" id="plannedMoveBundleList" class="clr-select" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select>
 								</div>
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: left"><input type="button" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()"> </td>
-						</tr>
-					</table>
-				</g:form>
+							</div>
+						</div>
+						
+						<div class="clr-form-control">
+							<label for="plannedStatus" class="clr-control-label">Bundle</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value" class="clr-select"></g:select>
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<div class="clr-control-container">
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="planningBundle" class="clr-control-label">Planning Bundles</label>
+								</div>
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="allBundles" class="clr-control-label">All Bundles</label>
+								</div>
+							</div>
+						</div>
+						
+						<input type="button" class="btn btn-outiline" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()">
+
+					</g:form>
+				</div>
 			</div>
 		</div>
 			<div id="statusColors"  title="Dependency Group Status" style="display: none" class="static-dialog">
