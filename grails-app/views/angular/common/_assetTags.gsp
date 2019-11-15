@@ -1,15 +1,15 @@
 <!-- Asset Tags -->
 <tr>
-    <th>
+    <th style="padding: 10px 10px 0 0;">
         <label>
             Tags
         </label>
     </th>
-    <td>
-        <span *ngFor="let tag of assetTags" class="badge label tag"
+    <td style="display: flex;">
+        <div *ngFor="let tag of assetTags" class="badge label tag"
               [ngClass]="tag.css"
-              style="">
+              style="width: unset;">
             {{tag.name}}
-        </span>
+        </div>
     </td>
 </tr>

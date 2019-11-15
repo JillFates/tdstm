@@ -1,5 +1,11 @@
 <div
 	class="modal fade in asset-dependency-component"
+	[ngClass]="{
+		'dependency-show': !isEditing,
+		'dependency-edit': isEditing,
+		'uni-directional': !(dependencyA?.id && dependencyB?.id),
+		'bi-directional': dependencyA?.id && dependencyB?.id
+	}"
 	id="assetDependency"
 	data-backdrop="static"
 	tabindex="-1"
@@ -16,16 +22,14 @@
 					(click)="cancelCloseDialog()"
 				></tds-button-close>
 				<div class="modal-title-container">
-					<h4
-						class="modal-title"
-						style="padding:unset; margin:unset;"
-					>
+					<div class="modal-title">
 						{{
 							(!isEditing
 								? 'ASSET_EXPLORER.DEPENDENCY_DETAIL'
-								: 'ASSET_EXPLORER.DEPENDENCY_EDIT') | translate
+								: 'ASSET_EXPLORER.DEPENDENCY_EDIT'
+							) | translate
 						}}
-					</h4>
+					</div>
 				</div>
 			</div>
 			<div class="modal-body comment-dialog-content">
@@ -107,27 +111,22 @@
 						</tbody>
 					</table>
 				</div>
+
 				<div
 					class="dependencies"
-					[ngClass]="{
-						'has-dependency-a': dependencyA,
-						'has-dependency-b': dependencyB
-					}"
 					*ngIf="dependencyA?.id || dependencyB?.id"
 				>
 					<div
 						class="dependency-row has-both-dependencies"
 						*ngIf="dependencyA?.id && dependencyB?.id"
 					>
-						<div class="dependency-row-legend"></div>
-
-						<div>
+						<div class="dependency-a" style="grid-column-start: 2;">
 							{{ assetDependency.assetA.name }} <br />
 							<i class="fa fa-fw fa-long-arrow-down"></i>
 							<span class="depends-on">Depends On</span><br />
 							{{ assetDependency.assetB.name }}
 						</div>
-						<div>
+						<div class="dependency-b" style="grid-column-start: 3;">
 							{{ assetDependency.assetB.name }} <br />
 							<i class="fa fa-fw fa-long-arrow-down"></i>
 							<span class="depends-on">Depends On</span><br />
@@ -158,10 +157,7 @@
 
 				<div
 					class="dependencies"
-					[ngClass]="{
-						'has-dependency-a': dependencyA,
-						'has-dependency-b': dependencyB
-					}"
+					*ngIf="dependencyA?.id || dependencyB?.id"
 				>
 					<div class="dependency-row">
 						<div class="dependency-row-legend">Created by</div>
@@ -214,7 +210,7 @@
 					<nav class="modal-sidenav btn-link">
 						<tds-button-edit
 							[disabled]="!isEditAvailable()"
-							tooltip="Edit dependencies"
+							tooltip="Edit Dependencies"
 							(click)="setEditMode(true)"
 							icon="pencil"
 						>
@@ -227,7 +223,7 @@
 								onDeleteDependency(DependencyType.dependencyA)
 							"
 							class="btn-danger"
-							tooltip="Delete dependency"
+							tooltip="Delete Dependency"
 						>
 						</tds-button-delete>
 
