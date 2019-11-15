@@ -164,9 +164,16 @@ class WsTimelineController implements ControllerMethods {
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
 		try {
+
+			Closure buildList = { List<TaskVertex> vertices ->
+				return vertices.collect { TaskVertex v ->
+					"${v.taskNumber}:${v.taskComment}"
+				}
+			}
+
 			results << "Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>"
-			results << "Start Vertices: " << (graph.starts.size() > 0 ? graph.starts : 'none') << '<br/>'
-			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? graph.sinks : 'none') << '<br/>'
+			results << "Start Vertices: " << (graph.starts.size() > 0 ? buildList(graph.starts) : 'none') << '<br/>'
+			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? buildList(graph.sinks)  : 'none') << '<br/>'
 
 			if (!summary.cycles.isEmpty()) {
 				results << "Cyclical Maps: "
@@ -262,12 +269,12 @@ class WsTimelineController implements ControllerMethods {
 					<td>${task.comment.encodeAsHTML()}</td>
 					<td align="right">${task.durationInMinutes()}</td>
 					$durationExtra
-					<td>${task.estStart}</td>
-					<td>${task.estFinish}</td>
-					<td align="right">${task.slack}</td>
+					<td>${task.estStart?: ''}</td>
+					<td>${task.estFinish?: ''}</td>
+					<td align="right">${task.slack?: ''}</td>
 					<td>$constraintTime</td>
 					$timesExtra
-					<td>$actFinish</td>
+					<td>${actFinish?: ''}</td>
 					<td>$task.priority</td>
 					<td>$criticalPath</td>
 					<td>$team</td>
