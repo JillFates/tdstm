@@ -307,6 +307,7 @@ tds-ui-dialog {
 			}
 		}
 	}
+
 	.modal-footer {
 		padding: 24px;
 		display: flex;
@@ -315,8 +316,13 @@ tds-ui-dialog {
 
 	&.has-side-nav {
 		.modal-header,
-		.modal-body {
+		.modal-body,
+		.modal-footer {
 			margin-left: 40px;
+		}
+
+		.modal-footer {
+			width: calc(100% - 40px);
 		}
 	}
 
