@@ -40,7 +40,7 @@
 						</button>
 
 						<div class="modal-title-container">
-							<div class="modal-title">Dependency Grouping Control</div>
+							<div class="modal-title" style="padding: unset;">Dependency Grouping Control</div>
 						</div>
 					</div>
 
@@ -48,7 +48,7 @@
 						<g:form name="checkBoxForm">
 							<div class="modal-grid-2">
 								<div>
-									<h3>Connection Type</h3>
+									<div class="modal-section-header">Connection Type</div>
 									<div class="checkboxdiv_control">
 										<g:each in="${dependencyType}" var="dependency">
 											<div class="clr-control-container"  style="display:block;">
@@ -62,7 +62,7 @@
 									</div>
 								</div>
 								<div>
-									<h3>Connection Status</h3>
+									
 									<div class="checkboxdiv_control">
 										<g:each in="${dependencyStatus}" var="dependencyStatusInst">
 											<div class="clr-control-container"  style="display:block;">
@@ -99,7 +99,7 @@
 								onclick="submitCheckBox()"
 								title="Regenerate"
 								>
-								<i class="fas fa-chart-bar"></i>
+								<i class="far fa-save"></i>
 							</button>
 						</nav>
 					</div>	

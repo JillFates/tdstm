@@ -1363,6 +1363,11 @@ div.dates-info-container {
       -webkit-column-gap: 10px;
       -moz-column-gap: 10px;
       column-gap: 10px; }
+  .tds-modal-content .modal-section-header {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px; }
   .tds-modal-content .modal-header-height {
     height: 182px; }
   .tds-modal-content .modal-header {
