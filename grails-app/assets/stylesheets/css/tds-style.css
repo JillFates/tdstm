@@ -1302,9 +1302,7 @@ div.dates-info-container {
           .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr {
             display: -webkit-box;
             display: -ms-flexbox;
-            display: flex;
-            border: 1px solid #ccc;
-            border-width: 0 0 1px 0; }
+            display: flex; }
             .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr th,
             .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
               display: block;
@@ -1317,7 +1315,11 @@ div.dates-info-container {
               min-width: 150px;
               text-overflow: ellipsis; }
             .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list tbody tr td {
-              color: #000; }
+              color: #000;
+              border-bottom: 1px solid #ccc;
+              -webkit-box-flex: 1;
+              -ms-flex: 1;
+              flex: 1; }
         .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr {
           display: none; }
         .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .tds-detail-list:not(.all-details) tr:not(.nodata):nth-child(-n + 16) {
