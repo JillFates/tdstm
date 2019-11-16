@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 @Component({
 	selector: 'tds-task-status-indicator',
 	template: `
-		<div [ngSwitch]="propertyName">
+		<span [ngSwitch]="propertyName">
 			<span *ngSwitchCase="'status'">
 				<span [ngClass]="'status status-' + value" [ngSwitch]="value">
 					<clr-icon *ngSwitchCase="'Ready'" shape="thumbs-up" class="is-solid"></clr-icon>
@@ -15,7 +15,7 @@ import { Component, Input } from '@angular/core';
 				{{ value }}
 			</span>
 			<span *ngSwitchDefault>{{ value }}</span>
-		</div>
+		</span>
 	`,
 })
 export class TaskStatusIndicatorComponent {
