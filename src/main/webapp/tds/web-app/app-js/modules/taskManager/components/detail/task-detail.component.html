@@ -711,6 +711,17 @@
 															>
 														</ng-template>
 
+														<ng-template kendoGridCellTemplate
+																	 let-dataItem
+																	 let-rowIndex="rowIndex"
+																	 *ngIf="column.property === 'status'">
+															<tds-task-status-indicator
+																	class="pad-left-7"
+																	[propertyName]="column.property"
+																	[value]="dataItem[column.property]">
+															</tds-task-status-indicator>
+														</ng-template>
+
 														<ng-template
 															kendoGridCellTemplate
 															let-dataItem
@@ -867,6 +878,17 @@
 																	dataItem.desc
 																}}</label
 															>
+														</ng-template>
+
+														<ng-template kendoGridCellTemplate
+																	 let-dataItem
+																	 let-rowIndex="rowIndex"
+																	 *ngIf="column.property === 'status'">
+															<tds-task-status-indicator
+																	class="pad-left-7"
+																	[propertyName]="column.property"
+																	[value]="dataItem[column.property]">
+															</tds-task-status-indicator>
 														</ng-template>
 
 														<ng-template
