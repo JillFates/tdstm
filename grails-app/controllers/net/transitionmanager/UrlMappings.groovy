@@ -311,9 +311,9 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/bundleData/$id?" {
+		"/ws/dashboard/eventData/$id" {
 			controller = "wsDashboard"
-			action = [GET:"bundleData"]
+			action = [GET:"eventData"]
 		}
 
 		"/ws/dashboard/getPlanningStats" {
@@ -732,6 +732,11 @@ class UrlMappings {
 		"/ws/user/updateAccountAdmin" {
 			controller = "wsUser"
 			action = [POST:"updateAccountAdmin"]
+		}
+
+		"/ws/user/updateLastPage" {
+			controller = "wsUser"
+			action = [GET:"updateLastPage"]
 		}
 
 		"/ws/progress" {

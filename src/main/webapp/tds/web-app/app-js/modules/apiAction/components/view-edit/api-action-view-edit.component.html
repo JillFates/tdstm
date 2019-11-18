@@ -3,7 +3,7 @@
 		<button (click)="cancelCloseDialog()" type="button"  class="close" aria-label="Close">
 			<clr-icon aria-hidden="true" shape="close"></clr-icon>
 		</button>
-		<h4 class="modal-title">{{modalTitle}}</h4>
+		<h4 class="modal-title">{{modalTitle}}<span *ngIf="apiActionModel.name"> - </span>{{apiActionModel.name}}</h4>
 	</div>
 	<div class="modal-body"
 	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
@@ -100,19 +100,20 @@
 											<label for="apiActionProvider" class="col-sm-3 control-label required-field">Provider:
 											</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<kendo-dropdownlist #apiActionProvider
-                                  tabindex="2"
-																	id="apiActionProvider"
-																	name="apiActionProvider"
-                                  (valueChange)="onProviderValueChange($event, false)"
-																	[data]="providerList"
-																	[textField]="'name'"
-																	[valueField]="'id'"
-																	requiredComplexValue
-																	propertyName="id"
-																	[(ngModel)]="apiActionModel.provider"
-																	required
-																	class="form-control">
+												<kendo-dropdownlist
+														#apiActionProvider
+														tabindex="2"
+														id="apiActionProvider"
+														name="apiActionProvider"
+														(valueChange)="onProviderValueChange($event, false)"
+														[data]="providerList"
+														[textField]="'name'"
+														[valueField]="'id'"
+														requiredComplexValue
+														propertyName="id"
+														[(ngModel)]="apiActionModel.provider"
+														required
+														class="form-control">
 												</kendo-dropdownlist>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">

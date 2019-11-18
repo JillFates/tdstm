@@ -1935,7 +1935,11 @@ function changeMoveBundle(assetType, totalAsset, assignBundle, tagIds) {
 			recompileDOM('tmAssignmentTagSelector');
 		});
 
+		$('#moveBundleSelectId').dialog('option', 'width', 'auto');
+		$('#moveBundleSelectId').dialog('option', 'modal', 'true');
+
 		$('#moveBundleSelectId').dialog('open')
+		$('div.ui-dialog-titlebar').hide();
 	}
 }
 function submitMoveForm() {
@@ -2310,6 +2314,7 @@ function showDependencyControlDiv() {
 	$("#checkBoxDiv").dialog('option', 'modal', 'true');
 	$("#checkBoxDiv").dialog('option', 'position', ['center', 'top']);
 	$("#checkBoxDiv").dialog('open')
+	$('div.ui-dialog-titlebar').hide();
 	$("#checkBoxDivId").show();
 }
 

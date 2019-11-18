@@ -66,7 +66,7 @@ class ApiActionScriptEvaluator {
 	 * @see ImportCustomizer
 	 * @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -85,13 +85,13 @@ class ApiActionScriptEvaluator {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Set, HashSet, List,  ArrayList,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String
+				Integer, Float, Double, Long, BigDecimal, String, Set, HashSet, List, ArrayList,
 			].asImmutable()
 		}
 

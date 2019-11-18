@@ -1,5 +1,5 @@
 // Angular
-import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter, HostListener, ViewChild, ElementRef} from '@angular/core';
 import {EventRowType} from './../../model/event.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
@@ -11,21 +11,21 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 export class TaskCategoryComponent {
 	@Input() taskCategories: any;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
+	@ViewChild('categoryContainer', {static: false}) categoryContainer: ElementRef;
 
 	public userTimeZone = '';
 	public dateFormat = '';
 	public dateTimeFormat = '';
 	public colSize: number;
-	public showFrom: number;
-	public elementsToShow: number;
+	public currentScroll: number;
 	public RowType = EventRowType;
 	public DateUtils = DateUtils;
 	public categories = [
 		'Category',
 		'Percent completed',
 		'Task completed',
-		'Estimated Start',
-		'Estimated Completion',
+		'Earliest Estimated Start',
+		'Latest Estimated Completion',
 		'Actual Start',
 		'Actual Completion',
 	];
@@ -34,12 +34,17 @@ export class TaskCategoryComponent {
 		this.setInitialConfiguration();
 	}
 
+	public handleScroll(e): void {
+		this.currentScroll = e.srcElement.scrollLeft;
+	}
+
 	/**
-	 * If showFrom start indicator is valid decrease its value
-	*/
-	public onBack(): void {
-		if (this.showFrom > 0) {
-			this.showFrom -= 1;
+	 * Sets the current position of the scrollbar for the category list
+	 * @param scroll - The scroll position to start at.
+	 */
+	public setContainerScroll(scroll: number): void {
+		if (this.categoryContainer) {
+			this.categoryContainer.nativeElement.scrollLeft = scroll;
 		}
 	}
 
@@ -48,8 +53,6 @@ export class TaskCategoryComponent {
 	*/
 	private setInitialConfiguration(): void {
 		this.colSize = 2;
-		this.showFrom = 0;
-		this.elementsToShow = 6;
 
 		this.preferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
 		.subscribe((preferences) => {
@@ -57,35 +60,5 @@ export class TaskCategoryComponent {
 			this.dateFormat = preferences.CURR_DT_FORMAT || this.preferenceService.getUserDateFormat();
 			this.dateTimeFormat = `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}`;
 		});
-	}
-
-	/**
-	 * Increase the showFrom indicator one value just if doing this doesn't cause an index overflow
-	*/
-	public onNext(): void {
-		if (this.hasTasks &&  (this.showFrom + this.elementsToShow + 1) <= this.taskCategories.columns)  {
-			this.showFrom += 1;
-		}
-	}
-
-	/**
-	 * Based on showFrom index indicator and elements to show
-	 * extract from the array the items to be displayed
- 	 * @param {any} row  Row containing all the available columns
-	 * @returns {Array<any>} Array containing the columns covered by the interval defined
-	*/
-	public getColumns(row: any): any {
-		if (!this.hasTasks) {
-			return [];
-		}
-
-		return row.slice(this.showFrom, this.showFrom + this.elementsToShow);
-	}
-
-	/**
-	 * Return a boolean indicating if there are task present
-	*/
-	private hasTasks(): boolean {
-		return this.taskCategories && this.taskCategories.tasks;
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "babd9b39-7b56-49bd-a654-f557ad9db8b0",
+		"_postman_id": "904af9c7-493b-4695-9c59-0c18f48d0fd5",
 		"name": "ListEvents",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -76,8 +76,8 @@
 							"var jsonObject = JSON.parse(responseBody);",
 							"var project01ID ; ",
 							"var jsonData = pm.response.json();",
-							"project01ID = jsonObject.data.projects[0].id;",
-							"project01Name = jsonObject.data.projects[0].name;",
+							"project01ID = jsonObject.data.activeProjects[0].id;",
+							"project01Name = jsonObject.data.activeProjects[0].name;",
 							"pm.environment.set(\"firstProjID\", project01ID);",
 							"pm.environment.set(\"firstProjName\", project01Name);",
 							"",
@@ -86,12 +86,7 @@
 							"pm.test(\"Project accessible to the user are listed\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"TM-Demo\");",
 							"    pm.expect(pm.response.text()).to.include(\"TM DEFAULT PROJECT\");",
-							"});",
-							"",
-							"",
-							"",
-							"",
-							""
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -115,7 +110,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "{{host}}/tdstm/ws/project/userProjects",
+					"raw": "{{host}}/tdstm/ws/project/lists",
 					"host": [
 						"{{host}}"
 					],
@@ -123,7 +118,7 @@
 						"tdstm",
 						"ws",
 						"project",
-						"userProjects"
+						"lists"
 					]
 				},
 				"description": "This EP lists the projects available to a user"
@@ -186,36 +181,67 @@
 			"response": []
 		},
 		{
-			"name": "change project to first listed",
+			"name": "Change project to first listed",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
-							"pm.test(\"Changed to first list project\", function () {",
-							"let pName = pm.variables.get(\"firstProjName\")",
-							"pm.expect(pm.response.text()).to.include(pName);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
-							""
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"{{firstProjID}}\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{firstProjID}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{firstProjID}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
@@ -371,35 +397,67 @@
 			"response": []
 		},
 		{
-			"name": "change back to default project",
+			"name": "Change project to the Default one (TM-DEMO)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "825d5842-999f-43dc-a477-da6c4afc5e29",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
-							"pm.test(\"Changed to TM Demo\", function () {",
-							"pm.expect(pm.response.text()).to.include(\"TM-Demo project\");",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
-							""
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{tmDemoID}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{tmDemoID}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
@@ -541,5 +599,6 @@
 			"value": "2445",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

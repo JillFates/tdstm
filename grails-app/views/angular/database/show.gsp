@@ -17,7 +17,20 @@
 					<div class="modal-subtitle">${asset?.moveBundle}</div>
 					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 				</div>
-				<p class="modal-description">${asset.description}</p>
+                <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
+                    <div *ngIf="readMore">
+                        <p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+                    </div>
+                    <div *ngIf="!readMore" class="readMore">
+                        <g:if test="${asset.description?.length() > 80}">
+                            <div class="truncated-description">${asset.description.substring(0,80)}...</div>
+                            <a (click)="readMore = !readMore">Read More</a>
+                        </g:if>
+                        <g:else>
+                            <div class="truncated-description">${asset.description}</div>
+                        </g:else>
+                    </div>
+                </div>
 			</div>
 
 			<div  class="clr-col-6">
@@ -57,10 +70,28 @@
 						</button>
 					</tds-scroller-item>
 					<tds-scroller-item>
-						<button tdsScrollerLink>Tasks</button>
+						<button tdsScrollerLink>Tasks
+                            <span class="badge">
+                                <g:if test="${taskCount > 99}">
+                                    99+
+                                </g:if>
+                                <g:else>
+                                    ${taskCount}
+                                </g:else>
+                            </span>
+                        </button>
 					</tds-scroller-item>
 					<tds-scroller-item>
-						<button tdsScrollerLink>Comments</button>
+						<button tdsScrollerLink>Comments
+                            <span class="badge">
+                                <g:if test="${commentCount > 99}">
+                                    99+
+                                </g:if>
+                                <g:else>
+                                    ${commentCount}
+                                </g:else>
+                            </span>
+                        </button>
 					</tds-scroller-item>
 				</tds-tab-scroller>
 			</div>

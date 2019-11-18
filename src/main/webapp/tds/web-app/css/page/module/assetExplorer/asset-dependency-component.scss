@@ -1,4 +1,32 @@
 .asset-dependency-component {
+	.modal-body {
+		padding: 0 24px 24px 24px;
+	}
+
+	&.dependency-show {
+		.dependency-row {
+			border-bottom: 1px solid lightgray;
+		}
+	}
+
+	&.uni-directional {
+		.dependency-row {
+			grid-template-columns: 1fr 4fr;
+			.dependency-b {
+				display: none;
+			}
+		}
+	}
+
+	&.bi-directional {
+		.dependency-row {
+			grid-template-columns: 1fr 2fr 2fr;
+			.dependency-b {
+				display: block;
+			}
+		}
+	}
+
 	.error {
 		color: $color-message-error--red;
 	}
@@ -7,22 +35,12 @@
 		display: flex;
 		flex-direction: column;
 		padding-top: 10px;
-
-		&:last-child {
-			padding-bottom: 10px;
-		}
 	}
 
 	.dependency-row {
 		font-weight: normal;
 		display: grid;
-		grid-template-columns: 1fr 2fr 2fr;
 		column-gap: 10px;
-		border-bottom: 1px solid lightgray;
-
-		&.dependency-edit {
-			padding: 5px 0;
-		}
 
 		&:last-child {
 			border: unset;
@@ -41,36 +59,34 @@
 			}
 		}
 	}
-	.dependency-edit {
-		.clr-form-control {
-			margin: unset;
 
-			.clr-control-container {
+	.clr-form-control {
+		margin: unset;
+
+		.clr-control-container {
+			width: 100%;
+
+			input {
 				width: 100%;
-
-				input {
-					width: 100%;
-				}
-
-				.clr-textarea {
-					max-width: unset;
-					padding: unset;
-				}
-
-				textarea {
-					width: 100%;
-					resize: none;
-				}
 			}
-		}
 
-		.k-dropdown {
-			width: unset;
+			.clr-textarea {
+				max-width: unset;
+				padding: unset;
+			}
+
+			textarea {
+				width: 100%;
+				resize: none;
+			}
 		}
 	}
 
+	.k-dropdown {
+		width: unset;
+	}
+
 	.dependency-label {
-		visibility: hidden;
 		overflow: auto;
 		font-weight: normal;
 		margin: unset;
@@ -92,17 +108,6 @@
 		i {
 			margin-left: -6px;
 		}
-	}
-
-	.has-dependency-a .dependency-a .dependency-label,
-	.has-dependency-b .dependency-b .dependency-label,
-	.has-dependency-a .dependency-edit .dependency-a .k-widget,
-	.has-dependency-b .dependency-edit .dependency-b .k-widget,
-	.has-dependency-a .dependency-edit .dependency-a input,
-	.has-dependency-b .dependency-edit .dependency-b input,
-	.has-dependency-a .dependency-edit .dependency-a textarea,
-	.has-dependency-b .dependency-edit .dependency-b textarea {
-		visibility: visible;
 	}
 
 	.delete-button-dependency-show-modal {

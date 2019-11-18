@@ -28,6 +28,7 @@ export class AssetCommonShow implements OnInit {
 	protected assetTags: Array<TagModel>;
 	protected isHighField = AssetCommonHelper.isHighField;
 	protected showDetails = false;
+	protected readMore = false;
 	protected currentUser: any;
 	protected data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	protected diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
