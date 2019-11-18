@@ -381,19 +381,19 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public isSaveButtonDisabled(): boolean {
-	    if (!this.model.id) {
-	        return !(
-                (
-                    this.isDefaultProject() &&
-                    this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate)
-                ) || (
-                    !this.isDefaultProject() &&
-                    this.permissionService.hasPermission(Permission.AssetExplorerCreate)
-                )
-            );
-        }
-	    return false;
-    }
+		if (!this.model.id) {
+			return !(
+				(
+					this.isDefaultProject() &&
+					this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate)
+				) || (
+					!this.isDefaultProject() &&
+					this.permissionService.hasPermission(Permission.AssetExplorerCreate)
+				)
+			);
+		}
+		return false;
+	}
 
 	/**
 	 * Group all the dynamic information required by the view in just one function
@@ -407,7 +407,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			canSaveAs: this.canSaveAs(),
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
-            disableSaveButton: this.isSaveButtonDisabled()
+			disableSaveButton: this.isSaveButtonDisabled()
 		}
 	}
 }
