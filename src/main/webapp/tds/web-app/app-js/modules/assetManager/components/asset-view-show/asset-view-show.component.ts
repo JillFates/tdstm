@@ -25,7 +25,9 @@ import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
-import {SaveOptions} from "../../../../shared/model/save-options.model";
+import {SaveOptions} from '../../../../shared/model/save-options.model';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
 
 declare var jQuery: any;
 
@@ -39,11 +41,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
 	public model: ViewModel = new ViewModel();
-	public saveOptions:any;
+	public saveOptions: any;
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
 	private lastSnapshot;
 	protected navigationSubscription;
+	private currentProject: any;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
@@ -69,6 +72,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
+		private userContextService: UserContextService,
 		private assetTagUIWrapperService: AssetTagUIWrapperService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
@@ -78,6 +82,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
+        this.userContextService.getUserContext().subscribe((userContext) => {
+            this.currentProject = userContext.project;
+        });
 	}
 
 	ngOnInit(): void {
@@ -368,6 +375,26 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public getSaveButtonId(): string {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
+
+	public isDefaultProject(): boolean {
+        return this.currentProject.id === DEFAULT_PROJECT.id;
+	}
+
+	public isSaveButtonDisabled(): boolean {
+	    if (!this.model.id) {
+	        return !(
+                (
+                    this.isDefaultProject() &&
+                    this.permissionService.hasPermission(Permission.AssetExplorerSystemCreate)
+                ) || (
+                    !this.isDefaultProject() &&
+                    this.permissionService.hasPermission(Permission.AssetExplorerCreate)
+                )
+            );
+        }
+	    return false;
+    }
+
 	/**
 	 * Group all the dynamic information required by the view in just one function
 	 * @return {any} Object with the values required dynamically by the view
@@ -380,6 +407,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			canSaveAs: this.canSaveAs(),
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
+            disableSaveButton: this.isSaveButtonDisabled()
 		}
 	}
 }

@@ -1,5 +1,5 @@
 export class SaveOptions {
-    saveAs: boolean;
-    save: boolean;
-    saveAsOptions: Array<string>;
+    saveAs?: boolean;
+    save?: boolean;
+    saveAsOptions?: Array<string> ;
 }

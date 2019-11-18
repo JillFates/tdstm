@@ -1,6 +1,6 @@
 const DEFAULT_PROJECT = {
     id: 2,
-    name: 'M DEFAULT PROJECT'
+    name: 'TM DEFAULT PROJECT'
 };
 
 export default DEFAULT_PROJECT;
