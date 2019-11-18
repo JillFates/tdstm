@@ -5,52 +5,62 @@
 <div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()"><span aria-hidden="true">×</span></button>
-		<div class="modal-title-container">
-			<div class="badge modal-badge" style="">S</div>
-			<h4 class="modal-title">${asset.assetName}</h4>
-			<div class="modal-subtitle">${asset?.moveBundle}</div>
-			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-		</div>
-		<p class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">${asset.description}</p>		
-		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">		
-			<tds-scroller-item>
-				<button tdsScrollerLink>
-					{{ showDetails ? "Details" : "Summary"}}
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Supports 					
-					<span class="badge">
-						<g:if test="${supportAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${supportAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Depends On 					
-					<span class="badge">
-						<g:if test="${dependentAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${dependentAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Tasks</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Comments</button>
-			</tds-scroller-item>
-		</tds-tab-scroller>
-		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-			<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideOverview]="true" [hideControlButton]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+
+		<div class="clr-row">
+			<div class="clr-col-6">
+				<div class="modal-title-container">
+					<div class="badge modal-badge" style="">S</div>
+					<h4 class="modal-title">${asset.assetName}</h4>
+					<div class="modal-subtitle">${asset?.moveBundle}</div>
+					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
+				</div>
+				<p class="modal-description">${asset.description}</p>
+			</div>
+
+			<div  class="clr-col-6">
+				<div class="minimized-arch-thumbnail" *ngIf="!!showDetails">
+					<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+				</div>
+			</div>
+			<div class="clr-col-12">
+				<tds-tab-scroller>
+					<tds-scroller-item>
+						<button tdsScrollerLink>
+							{{ showDetails ? "Details" : "Summary"}}
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Supports
+							<span class="badge">
+								<g:if test="${supportAssets.size() > 99}">
+									99+
+								</g:if>
+								<g:else>
+									${supportAssets.size()}
+								</g:else>
+							</span>
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Depends On
+							<span class="badge">
+								<g:if test="${dependentAssets.size() > 99}">
+									99+
+								</g:if>
+								<g:else>
+									${dependentAssets.size()}
+								</g:else>
+							</span>
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Tasks</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Comments</button>
+					</tds-scroller-item>
+				</tds-tab-scroller>
+			</div>
 		</div>
 	</div>
 	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
