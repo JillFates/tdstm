@@ -5,10 +5,10 @@
 <%-- <g:set var="assetClass" value="${(new Files()).assetClass}" /> --%>
 <g:set var="assetClass" value="Files"/>
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
      class="tds-modal-content tds-angular-component-content">
     <div class="modal-header">
-        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span
+        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span
                 aria-hidden="true">×</span></button>
         <div class="modal-title-container">
 			<div class="badge modal-badge" style="">S</div>

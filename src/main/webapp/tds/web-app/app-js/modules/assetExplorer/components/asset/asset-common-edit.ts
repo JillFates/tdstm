@@ -152,7 +152,10 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			tagsToAdd = this.newAssetTagsSelection;
 		}
 		this.tagService
-			.createAssetTags(assetId, tagsToAdd.tags.map(item => item.id))
+			.createAssetTags(
+				assetId,
+				tagsToAdd.tags.map(item => item.id)
+			)
 			.subscribe(
 				result => {
 					this.showAssetDetailView(
@@ -237,8 +240,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 
 	/**
 	 * Notify user there are changes
+	 * @param {boolean} closeModal - specify as true if the modal should be closed (as opposed to reopening the asset summary modal)
 	 */
-	protected promptSaveChanges(): void {
+	protected promptSaveChanges(closeModal: boolean): void {
 		this.promptService
 			.open(
 				this.translatePipe.transform(
@@ -252,7 +256,14 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			)
 			.then(result => {
 				if (result) {
-					this.cancelCloseDialog();
+					if (closeModal) {
+						this.cancelCloseDialog();
+					} else {
+						this.showAssetDetailView(
+							this.model.asset.assetClass.name,
+							this.model.assetId
+						);
+					}
 				} else {
 					this.focusAssetModal();
 				}
@@ -267,7 +278,24 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 			this.assetTagsDirty ||
 			!ramdaEquals(this.initialModel, this.model)
 		) {
-			this.promptSaveChanges();
+			this.promptSaveChanges(false);
+		} else {
+			this.showAssetDetailView(
+				this.model.asset.assetClass.name,
+				this.model.assetId
+			);
+		}
+	}
+
+	/**
+	 * On Close if there is changes notify user, then close the modal if prompt return is true
+	 */
+	protected onCloseEdit(): void {
+		if (
+			this.assetTagsDirty ||
+			!ramdaEquals(this.initialModel, this.model)
+		) {
+			this.promptSaveChanges(true);
 		} else {
 			this.cancelCloseDialog();
 		}

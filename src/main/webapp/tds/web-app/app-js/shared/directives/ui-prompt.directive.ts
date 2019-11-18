@@ -38,9 +38,6 @@ declare var jQuery: any;
             </div>
         </div>
 	`,
-	styles: [`
-		.modal { background:none;}
-	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	title: string;

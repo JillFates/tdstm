@@ -5,10 +5,10 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
 	 class="tds-modal-content tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
+		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span  aria-hidden="true">×</span></button>
 		<div class="modal-title-container">
 			<div class="badge modal-badge" style="">D</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
