@@ -4,7 +4,7 @@ import {UIDialogService, UIExtraDialog} from '../../../../shared/services/ui-dia
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskService} from '../../service/task.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {DataGridOperationsHelper} from '../../../../shared/utils/data-grid-operations.helper';
 import {TaskSuccessorPredecessorColumnsModel} from '../../model/task-successor-predecessor-columns.model';
@@ -76,17 +76,19 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.hasChanges = false;
-		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-		if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
-			this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
-		} else {
-			this.currentUserId = this.userContext.user.id;
-		}
-		this.loadTaskDetail();
-		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
-		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
-		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
+			this.hasChanges = false;
+			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
+			} else {
+				this.currentUserId = this.userContext.user.id;
+			}
+			this.loadTaskDetail();
+			this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+		});
 	}
 
 	/**
@@ -160,7 +162,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	deleteTask(): void {
 		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM')	,
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))

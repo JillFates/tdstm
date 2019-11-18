@@ -16,7 +16,7 @@ import {TaskNotesColumnsModel} from './model/task-notes-columns.model';
                 <!-- Toolbar Template -->
                 <ng-template kendoGridToolbarTemplate [position]="'top'">
 					<div class="table-container">
-                        <label class="table-title">Task Notess ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
+                        <label class="table-title">Task Notes ({{dataGridTaskNotesHelper.gridData.data.length}})</label>
                         <tds-button-add [title]="'Create'"
 										[displayLabel]="false"
 										[small]="true"

@@ -43,6 +43,7 @@ declare var jQuery: any;
 		            (valueChange)="onTagValueChange($event)"
 					placeholder="{{placeholder}}"
 					[filterable]="true"
+					[tabindex]="440"
 		            (open)="onOpen()">
 		        <ng-template kendoMultiSelectTagTemplate let-dataItem>
 		            <div class="{{dataItem.css}}" [title]="dataItem.name">{{ dataItem.name }}</div>

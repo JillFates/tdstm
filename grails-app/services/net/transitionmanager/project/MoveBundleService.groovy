@@ -438,19 +438,6 @@ class MoveBundleService implements ServiceMethods {
 	}
 
 	/**
-	 * Create Manual MoveEventSnapshot, when project is task driven. So dashboard dial default to manual 50
-	 * @param moveEvent
-	 * @param dialIndicator
-	 * @return
-	 */
-	def createManualMoveEventSnapshot(MoveEvent moveEvent, int dialIndicator = 50){
-		if(moveEvent.project.runbookOn ==1){
-			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent , dialIndicator: dialIndicator)
-			!moveEventSnapshot.save()
-		}
-	}
-
-	/**
 	 * Method help to write data in excel sheet's appropriate column and remove redundant code.
 	 * @param exportList : list of data which is being export
 	 * @param columnList : list of column of sheet

@@ -31,16 +31,13 @@ declare var jQuery: any;
                         </form>
                     </div>
                     <div class="modal-footer form-group-center">
-						<tds-button theme="primary" (click)="confirm()" [icon]="!hideIconButtons && 'check'">{{confirmLabel}}</tds-button>
-						<tds-button (click)="cancel()" [icon]="!hideIconButtons && 'ban'" data-dismiss="modal">{{cancelLabel}}</tds-button>
+                        <tds-button-confirm theme="primary" (click)="confirm()">{{ confirmLabel}}</tds-button-confirm>
+						<tds-button-cancel (click)="cancel()"  data-dismiss="modal"></tds-button-cancel>
                     </div>
                 </div>
             </div>
         </div>
 	`,
-	styles: [`
-		.modal { background:none;}
-	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	title: string;

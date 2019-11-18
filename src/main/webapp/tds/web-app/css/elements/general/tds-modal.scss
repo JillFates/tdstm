@@ -215,8 +215,6 @@ tds-ui-dialog {
 
 					tr {
 						display: flex;
-						border: 1px solid $color-border;
-						border-width: 0 0 1px 0;
 						th,
 						td {
 							display: block;
@@ -232,6 +230,9 @@ tds-ui-dialog {
 						}
 						td {
 							color: $color--black;
+							border-bottom: 1px solid $color-border;
+							flex: 1;
+							word-break: break-all;
 						}
 					}
 					&:not(.all-details) {
@@ -246,6 +247,9 @@ tds-ui-dialog {
 
 				// tds-diagram-layout styling in body
 				.modal-body-graph {
+					min-height: 300px;
+					border: 1px solid #ddd;
+
 					.diagram-layout-container {
 						width: 100%;
 						padding: unset;
@@ -263,6 +267,10 @@ tds-ui-dialog {
 							height: unset;
 						}
 					}
+				}
+
+				.tag + .tag {
+					margin-left: 5px;
 				}
 			}
 
@@ -282,11 +290,39 @@ tds-ui-dialog {
 
 .tds-modal-content {
 	background: $color-text-inverse;
+	min-width: 340px;
+
+	&.with-box-shadow {
+		box-shadow: 0 5px 15px $color--darkgray;
+	}
+
+	.modal-body {
+		form {
+			padding: 0 10px;
+			.box-body {
+				padding-top: 0;
+				p {
+					margin-top: 0;
+				}
+			}
+		}
+	}
+
+	.modal-footer {
+		padding: 24px;
+		display: flex;
+		justify-content: space-between;
+	}
 
 	&.has-side-nav {
 		.modal-header,
-		.modal-body {
+		.modal-body,
+		.modal-footer {
 			margin-left: 40px;
+		}
+
+		.modal-footer {
+			width: calc(100% - 40px);
 		}
 	}
 
@@ -349,6 +385,18 @@ tds-ui-dialog {
 			font-weight: 400;
 			font-size: 12px;
 			color: black;
+			word-break: break-all;
+
+			.readMore {
+				display: flex;
+				margin-top: 1rem;
+				line-height: 1rem;
+				font-size: 0.583333rem;
+			}
+
+			.truncated-description {
+				color: #575757;
+			}
 		}
 
 		.modal-description-height {

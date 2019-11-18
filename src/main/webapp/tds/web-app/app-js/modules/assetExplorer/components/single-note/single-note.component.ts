@@ -10,7 +10,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 	template: `
         <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="single-note-component modal fade in" id="single-note-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="tds-modal-content resizable" [style.width.px]="500">
+                <div class="tds-modal-content with-box-shadow resizable" [style.width.px]="500">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                             <clr-icon aria-hidden="true" shape="close"></clr-icon>
@@ -19,7 +19,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
                     </div>
                     <div class="modal-body">
                         <div class="modal-body-container">
-                            <form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm' class="form-horizontal left-alignment">
+                            <form name="dependentForm" role="form" data-toggle="validator" #dependentForm='ngForm'>
                                 <div class="box-body">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -35,15 +35,17 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
                             </form>
                         </div>
                     </div>
-                    <div class="modal-footer form-group-center">
-                        <tds-button-save class="btn-primary pull-left"
-                                         (click)="onSave()"
-                                         *ngIf="singleNoteModel.modal.type !== modalType.VIEW"
-                                         [disabled]="note.trim() === ''" >
-                        </tds-button-save>
-                        <tds-button-cancel class="pull-right"
-                                           (click)="cancelCloseDialog()">
-                        </tds-button-cancel>
+                    <div class="modal-footer">
+						<div>
+                            <tds-button-save theme="primary"
+                                             (click)="onSave()"
+                                             *ngIf="singleNoteModel.modal.type !== modalType.VIEW"
+                                             [disabled]="note.trim() === ''" >
+                            </tds-button-save>
+						</div>
+						<div>
+                            <tds-button-cancel (click)="cancelCloseDialog()"></tds-button-cancel>
+						</div>
                     </div>
                 </div>
             </div>

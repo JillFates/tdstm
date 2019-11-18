@@ -14,7 +14,20 @@
 			<div class="modal-subtitle">${asset?.moveBundle}</div>
 			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
-		<p class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">${asset.description}</p>
+		<div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
+			<div *ngIf="readMore">
+				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+			</div>
+			<div *ngIf="!readMore" class="readMore">
+				<g:if test="${asset.description?.length() > 80}">
+					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
+					<a (click)="readMore = !readMore">Read More</a>
+				</g:if>
+				<g:else>
+					<div class="truncated-description">${asset.description}</div>
+				</g:else>
+			</div>
+		</div>
 		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">
 			<tds-scroller-item>
 				<button tdsScrollerLink>
@@ -52,7 +65,9 @@
 				<button tdsScrollerLink>Comments</button>
 			</tds-scroller-item>
 		</tds-tab-scroller>
-		<tds-diagram-layout *ngIf="showDetails" class="header-graph"></tds-diagram-layout>
+		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
+		<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+		</div>
     </div>
     <div class="modal-body" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
@@ -120,7 +135,7 @@
 				</a>
 			</div>
 			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-				<tds-diagram-layout></tds-diagram-layout>
+				<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
 			</div>
 		</div>
 

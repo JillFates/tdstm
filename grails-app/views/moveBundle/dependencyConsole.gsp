@@ -32,40 +32,74 @@
 		<input type="hidden" id="redirectTo" name="redirectTo" value="dependencyConsole" />
 		<div class="body fluid" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 		<div id="DependencyGroupsTableId">
-			<div id="checkBoxDiv"  title="Dependency Grouping Control" style="display: none" class="static-dialog">
-				<div id="checkBoxDivId">
-					<g:form name="checkBoxForm">
-						<div class="row">
-							<div class="col-sm-6">
-								<h3>Connection Type</h3>
-								<div class="checkboxdiv_control">
-									<g:each in="${dependencyType}" var="dependency">
-										<input type="checkbox" id="${dependency}"
-												 name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependency}"> ${dependency}</span>
-										<br />
-									</g:each>
+			<div id="checkBoxDiv" title="Dependency Grouping Control" style="display: none;" class="static-dialog">
+				<div id="checkBoxDivId" class="tds-modal-content" style="overflow-x: hidden; padding:unset;">
+					<div class="modal-header">
+						<button class="btn btn-icon close-button" onclick="hideDependencyControlDiv()">
+							<i class="fas fa-times"></i>
+						</button>
+
+						<div class="modal-title-container">
+							<div class="modal-title" style="padding: unset;">Dependency Grouping Control</div>
+						</div>
+					</div>
+
+					<div class="modal-body">
+						<g:form name="checkBoxForm">
+							<div class="modal-grid-2">
+								<div>
+									<div class="modal-section-header">Connection Type</div>
+									<div class="checkboxdiv_control">
+										<g:each in="${dependencyType}" var="dependency">
+											<div class="clr-control-container"  style="display:block;">
+												<div class="clr-checkbox-wrapper">
+													<input type="checkbox" id="${dependency}"
+														name="connection" value="${dependency}" ${depGrpCrt.connectionTypes ? (depGrpCrt.connectionTypes.contains(dependency) ? 'checked' : '') : ([ 'Batch' ].contains(dependency) ? "" : "checked")}/>
+													<label class="clr-control-label" id="dependecy_${dependency}" for="${dependency}">${dependency}</label>
+												</div>
+											</div>
+										</g:each>
+									</div>
+								</div>
+								<div>
+									<div class="modal-section-header">Connection Status</div>
+									<div class="checkboxdiv_control">
+										<g:each in="${dependencyStatus}" var="dependencyStatusInst">
+											<div class="clr-control-container"  style="display:block;">
+												<div class="clr-checkbox-wrapper">
+													<input type="checkbox" id="${dependencyStatusInst}"
+													name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>
+													<label class="clr-control-label" id="dependecy_${dependencyStatusInst}" for="${dependencyStatusInst}">${dependencyStatusInst}</label>
+												</div>
+											</div>
+										</g:each>
+									</div>
 								</div>
 							</div>
-							<div class="col-sm-6">
-								<h3>Connection Status</h3>
+							<div class="checkboxdiv_default">
 								<div class="checkboxdiv_control">
-									<g:each in="${dependencyStatus}" var="dependencyStatusInst">
-										<input type="checkbox" id="${dependencyStatusInst}"
-												 name="status" value="${dependencyStatusInst}" ${depGrpCrt.statusTypes ? (depGrpCrt.statusTypes.contains(dependencyStatusInst) ? 'checked' : '') : (['Archived','Not Applicable'].contains(dependencyStatusInst) ? '' : 'checked')}/>&nbsp;&nbsp;
-										<span id="dependecy_${dependencyStatusInst}"> ${dependencyStatusInst} </span>
-										<br />
-									</g:each>
+									<div class="clr-control-container ">
+										<div class="clr-checkbox-wrapper">
+											<input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>
+											<label class="clr-control-label" for="saveDefault" style="font-weight:600;">Save As Defaults</label>
+										</div>
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="row checkboxdiv_default">
-							<div class="col-sm-12"><input type="checkbox" id="saveDefault" name="saveDefault" value="0" onclick="if(this.checked){this.value = 1} else {this.value = 0 }"/>&nbsp;&nbsp; <span>Save as defaults</span></div>
-						</div>
-						<div class="buttonR">
-							<button type="button" class="btn btn-default submit" value="Generate" id="generateId" onclick="submitCheckBox()"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Generate</button>
-						</div>
-					</g:form>
+						</g:form>
+					</div>
+
+					<div class="modal-footer">
+						<button
+							type="button"
+							id="generateId"
+							class="btn btn-icon btn-outline"
+							value="Generate"
+							onclick="submitCheckBox()"
+							>
+							<i class="fas fa-chart-bar"></i> Regenerate
+						</button>
+					</div>	
 				</div>
 			</div>
 
@@ -83,7 +117,7 @@
 									<div class="f-column-1" style="display: flex; max-width:300px; align-items: center;">
 										<label>Dependency Groups</label>
 										<tds:hasPermission permission="${Permission.DepAnalyzerGenerate}">
-											<input type="button" class="btn btn-sm" value="Regenerate" onclick="showDependencyControlDiv()"  />
+											<input type="button" class="btn btn-sm" value="Regenerate" onclick="showDependencyControlDiv()"/>
 										</tds:hasPermission>
 									</div>
 									<div class="f-column-2">
@@ -119,43 +153,65 @@
 
 			<div style="clear: both;"></div>
 
-			<div id="moveBundleSelectId" title="Assignment" style="background-color: #808080; display: none; float: right" class="static-dialog">
-				<g:form name="changeBundle" action="assetsAssignment" >
-					<input type="hidden" name="assetType" id="assetsTypeId"  />
-					<input type="hidden" name="bundleSession" id="bundleSession" />
-					<table style="border: 0px;">
-						<tr>
-							<td style="color:#EFEFEF ; width: 260px"> <b> Assign selected assets to :</b></td>
-						</tr>
-                        <tr>
-                            <td>
-                                <span style="color:#EFEFEF; top: 9px; position: relative; "><b>Tags</b></span> &nbsp;&nbsp;
-                                <tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
-                            </td>
-                        </tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Bundle</b></span> &nbsp;&nbsp;
-								<g:select name="moveBundle" id="plannedMoveBundleList" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}" style="max-width: 144px;"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<span style="color:#EFEFEF "><b>Plan Status</b></span> &nbsp;&nbsp;<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value"></g:select><br></br>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<div>
-									<label for="planningBundle" ><input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>Planning Bundles</b></span></label>
-									<label for="allBundles" ><input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" />&nbsp;<span style="color:#EFEFEF "><b>All Bundles</b></span></label><br />
+			<div id="moveBundleSelectId" title="Assignment" style="display: none;" class="static-dialog tds-modal-content">
+				<div class="modal-header">
+					<button class="btn btn-icon close-button" onclick="$('#moveBundleSelectId').dialog('close')">
+						<i class="fas fa-times"></i>
+					</button>
+
+					<div class="modal-title-container">
+						<div class="modal-title" style="padding: unset;">Asset Assignment</div>
+					</div>
+				</div>
+				
+				<g:form name="changeBundle" action="assetsAssignment" class="clr-form clr-form-horizontal clr-form-compact" >
+					<div class="modal-body">
+						<input type="hidden" name="assetType" id="assetsTypeId"  />
+						<input type="hidden" name="bundleSession" id="bundleSession" />
+						<div>Assign selected assets to:</div>
+						
+						<div class="clr-form-control">
+							<label for="tmAssignmentTagSelector" class="clr-control-label" style="width: 4rem; min-width: unset;">Tags</label>
+							<div class="clr-control-container">
+								<tm-asset-tag-selector hide-operator="true" form-data='true' id="tmAssignmentTagSelector" pre-asset-selector="assignments.preAssetSelector" asset-selector="assignments.assetSelector"></tm-asset-tag-selector>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="plannedMoveBundleList" class="clr-control-label" style="width: 4rem; min-width: unset;">Plan Status</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="moveBundle" id="plannedMoveBundleList" class="clr-select" from="${moveBundle}" optionKey="id" onchange="changeBundleSelect()" noSelection="${['':'Please Select']}"></g:select>
 								</div>
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: left"><input type="button" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()"> </td>
-						</tr>
-					</table>
+							</div>
+						</div>
+							
+						<div class="clr-form-control">
+							<label for="plannedStatus" class="clr-control-label" style="width: 4rem; min-width: unset;">Bundle</label>
+							<div class="clr-control-container">
+								<div class="clr-select-wrapper">
+									<g:select name="planStatus" id="plannedStatus" from="${planStatusOptions}" optionKey="value" optionValue="value" class="clr-select"></g:select>
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<div class="clr-control-container">
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="planningBundle" value="planningBundle" checked="checked" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="planningBundle" class="clr-control-label">Planning Bundles</label>
+								</div>
+								<div class="clr-radio-wrapper">
+									<input type="radio" name="bundles" id="allBundles" value="allBundles" onChange="changeBundles(this.id)" class="clr-radio"/>
+									<label for="allBundles" class="clr-control-label">All Bundles</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<input type="button" class="btn btn-outiline" id ="saveBundleId" name="saveBundle"  value= "Assign" onclick="submitMoveForm()">
+					</div>
 				</g:form>
 			</div>
 		</div>

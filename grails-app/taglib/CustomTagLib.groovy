@@ -566,7 +566,7 @@ class CustomTagLib implements InitializingBean {
 	 */
 	def showDependencyGroup = { attrs ->
 		if (!attrs.groupId) {
-			out << " "
+			out << ""
 		} else {
 			def value = dependencyGroupValueWithTooltip(attrs.groupId)
 			def tabName = attrs.tab ?: 'map'

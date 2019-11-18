@@ -12,6 +12,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 
 export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -27,10 +28,23 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
 			userContextService: UserContextService,
-			windowService: WindowService) {
-			super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
+			windowService: WindowService,
+			architectureGraphService: ArchitectureGraphService
+		) {
+			super(
+				activeDialog,
+				dialogService,
+				assetService,
+				prompt,
+				assetExplorerService,
+				notifierService,
+				userContextService,
+				windowService,
+				architectureGraphService
+			);
 			this.mainAsset = modelId;
 			this.assetTags = metadata.assetTags;
+			this.loadThumbnailData(this.mainAsset);
 		}
 
 		showAssetEditView(): Promise<any> {

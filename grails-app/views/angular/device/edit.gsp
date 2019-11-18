@@ -7,17 +7,30 @@
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
      class="tds-modal-content tds-angular-component-content">
     <div class="modal-header">
-        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
+        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span  aria-hidden="true">×</span></button>
         <div class="modal-title-container">
             <div class="badge modal-badge" style="">D</div>
 			<h4 class="modal-title">${asset.assetName}</h4>
             <div class="modal-subtitle">${asset?.moveBundle}</div>
 			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
-        <p class="modal-description">${asset.description}</p>
+        <div class="modal-description">
+			<div *ngIf="readMore">
+				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+			</div>
+			<div *ngIf="!readMore" class="readMore">
+				<g:if test="${asset.description?.length() > 80}">
+					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
+					<a (click)="readMore = !readMore">Read More</a>
+				</g:if>
+				<g:else>
+					<div class="truncated-description">${asset.description}</div>
+				</g:else>
+			</div>
+		</div>
         <tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>

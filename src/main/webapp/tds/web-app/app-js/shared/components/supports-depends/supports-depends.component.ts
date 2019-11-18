@@ -39,7 +39,7 @@ declare var jQuery: any;
 							<tds-button-add
 								[tooltip]="'Add link to Support Asset'"
 								id="add-support"
-								(click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
+								[tabIndex]="449"(click)="onAdd(dependencyType.SUPPORT, dataGridSupportsOnHelper)">
 							</tds-button-add>
 						</div>
 					</div>
@@ -157,7 +157,7 @@ declare var jQuery: any;
 							<tds-button-add
 								[tooltip]="'Add link to Dependent Asset'"
 								id="dependent-support"
-								(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
+								[tabIndex]="450"(click)="onAdd(dependencyType.DEPENDENT, dataGridDependsOnHelper)">
 							</tds-button-add>
 						</div>
 					</div>
