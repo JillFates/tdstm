@@ -59,10 +59,28 @@
 				</button>
 			</tds-scroller-item>
 			<tds-scroller-item>
-				<button tdsScrollerLink>Tasks</button>
+				<button tdsScrollerLink>Tasks 					
+					<span class="badge">
+						<g:if test="${taskCount > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${taskCount}
+						</g:else>
+					</span>
+				</button>
 			</tds-scroller-item>
 			<tds-scroller-item>
-				<button tdsScrollerLink>Comments</button>
+				<button tdsScrollerLink>Comments 					
+					<span class="badge">
+						<g:if test="${commentCount > 99}">
+							99+
+						</g:if>
+						<g:else>
+							${commentCount}
+						</g:else>
+					</span>
+				</button>
 			</tds-scroller-item>
 		</tds-tab-scroller>
 		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
