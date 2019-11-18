@@ -140,7 +140,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		private notifier: NotifierService) {
 		this.preModel = model;
 		this.saveOptions = saveOptions;
-		this.startModel(model);
+		this.startModel();
 		this.setDisabling();
 	}
 
@@ -160,7 +160,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	public confirmCloseDialog() {
 		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
-			this.startModel(this.preModel);
+			this.startModel();
 		}
 
 		this.assetExpService.saveReport(this.model)
@@ -184,9 +184,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		return this.model.name && this.model.name.trim() !== '' && this.isUnique;
 	}
 
-	public startModel(model) {
-		const changes = { name: `Copy of ${model.name}`};
-		this.model = {...this.model, ...changes};
+	public startModel() {
+		const changes = { name: `Copy of ${this.preModel.name}`};
+		this.model = {...this.preModel, ...changes};
 		if (this.saveOptions) {
 			this.model.saveOptionAs = this.saveOptions.saveAsOptions[0];
 		} else {
