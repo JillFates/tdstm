@@ -17,7 +17,20 @@
             <div class="modal-subtitle">${asset?.moveBundle}</div>
 			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
 		</div>
-        <p class="modal-description">${asset.description}</p>
+        <div class="modal-description">
+			<div *ngIf="readMore">
+				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+			</div>
+			<div *ngIf="!readMore" class="readMore">
+				<g:if test="${asset.description?.length() > 80}">
+					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
+					<a (click)="readMore = !readMore">Read More</a>
+				</g:if>
+				<g:else>
+					<div class="truncated-description">${asset.description}</div>
+				</g:else>
+			</div>
+		</div>
         <tds-tab-scroller>
 			<tds-scroller-item>
 				<button tdsScrollerLink>Details</button>

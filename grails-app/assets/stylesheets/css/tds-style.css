@@ -1149,7 +1149,20 @@ div.dates-info-container {
         font-style: normal;
         font-weight: 400;
         font-size: 12px;
-        color: black; }
+        color: black;
+        word-break: break-all; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description a {
+          color: #3c8dbc;
+          cursor: pointer; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description .readMore {
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          margin-top: 1rem;
+          line-height: 1rem;
+          font-size: 0.583333rem; }
+        .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description .truncated-description {
+          color: #575757; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-height {
         min-height: 48px; }
       .legacy-modal-dialog .legacy-modal-content .legacy-modal-header .modal-description-sized {

@@ -68,6 +68,23 @@
         font-weight: 400;
         font-size: 12px;
         color: black;
+        word-break: break-all;
+
+        a {
+          color: #3c8dbc;
+          cursor: pointer;
+        }
+
+        .readMore {
+          display: flex;
+          margin-top: 1rem;
+          line-height: 1rem;
+          font-size: 0.583333rem;
+        }
+
+        .truncated-description {
+          color: #575757;
+        }
       }
 
       .modal-description-height {
@@ -353,9 +370,9 @@
   background: $color-text-inverse;
 
   &.with-box-shadow {
-		box-shadow: 0 5px 15px $color--darkgray;
+    box-shadow: 0 5px 15px $color--darkgray;
   }
-  
+
   &.has-side-nav {
     .modal-header,
     .modal-body {

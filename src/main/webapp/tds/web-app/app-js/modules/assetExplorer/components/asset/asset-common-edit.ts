@@ -43,6 +43,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	protected newAssetTagsSelection: any = { tags: [] };
 	protected tagList: Array<TagModel> = [];
 	protected dateFormat: string;
+	protected readMore = false;
 	protected isDependenciesValidForm = true;
 	protected defaultSelectOption = 'Please Select';
 	protected defaultPlanStatus = 'Unassigned';
