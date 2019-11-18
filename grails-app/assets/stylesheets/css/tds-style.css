@@ -487,8 +487,6 @@ div.progress-bar-container {
       font-size: 12px; }
   div.progress-bar-container div.select-timer {
     width: 69px; }
-    div.progress-bar-container div.select-timer select {
-      border: none; }
   div.progress-bar-container div.progress-bar-wrapper {
     margin-left: 10px;
     width: 26px;
@@ -673,11 +671,9 @@ div.graphContainer {
         width: 22px !important;
         height: 22px !important;
         background-position: 2px 2px !important;
-        padding: 0px !important; }
-        div.graphContainer div#toolsContainerId div#graphToolbarId div.zoomButton#zoomOutButtonId {
-          background-image: url(../icons/magifier_zoom_out.png); }
-        div.graphContainer div#toolsContainerId div#graphToolbarId div.zoomButton#zoomInButtonId {
-          background-image: url(../icons/magnifier_zoom_in.png); }
+        padding: 0px !important;
+        color: black;
+        font-size: 16px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId div.toolButton {
         width: 22px !important;
         height: 22px !important;
@@ -706,7 +702,6 @@ div.graphContainer {
           width: 193px;
           height: 20px;
           margin: 0px !important;
-          border: 0px;
           vertical-align: top; }
           div.graphContainer div#toolsContainerId div#graphToolbarId #highlightFormId.newHighlightForm input#searchBoxId::-ms-clear {
             display: none; }
@@ -726,9 +721,8 @@ div.graphContainer {
           display: inline-block;
           height: 20px;
           width: 20px;
-          background-image: url(../icons/find.png);
-          background-position: 2px 2px !important;
-          background-repeat: no-repeat; }
+          color: black;
+          font-size: 16px; }
       div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan {
         margin-left: 10px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan input, div.graphContainer div#toolsContainerId div#graphToolbarId span.controlSpan select {
@@ -2784,7 +2778,7 @@ div.content-wrapper div.container div.task-timeline-container svg#timelineSVGId 
 
 div.content-wrapper div.container div.body {
   position: static; }
-  div.content-wrapper div.container div.body div#taskGraphId div.progress-bar-container div.refresh-button {
+  div.content-wrapper div.container div.body div#taskGraphId div.progress-bar-container {
     margin-top: 5px; }
   div.content-wrapper div.container div.body div#taskGraphId div#graphToolbarId {
     font-size: 0px; }
