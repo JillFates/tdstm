@@ -44,7 +44,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public collapsedTaskDetail = false;
 	protected hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
-	public model: any = {};
+	public model: any = null;
 	protected getAssetList: Function;
 	protected yesNoList =  [...YesNoList];
 	protected predecessorSuccessorColumns: any[];
@@ -165,8 +165,6 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
 						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
-					jQuery('[data-toggle="popover"]').popover();
-					this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
 				});
 
 			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
@@ -182,6 +180,13 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	// set the handlers on open / on close to set the flags that indicate the state of the
 	// dropdown list items (opened/closed)
 	ngAfterViewInit() {
+		jQuery('[data-toggle="popover"]').popover();
+		const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
+
+		if (percentageComplete) {
+			percentageComplete.markAsPristine();
+		}
+
 		this.dropdowns.toArray()
 			.forEach((dropdown) => {
 				dropdown.open
@@ -464,9 +469,9 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {boolean}
 	 */
 	public isFormInvalid(): boolean {
-		return this.taskEditCreateForm.form && !this.taskEditCreateForm.form.valid ||
-			this.hasInvalidFields() ||
-			!(this.taskEditCreateForm.form.dirty || this.hasModelChanges)
+		const { form = null } = this.taskEditCreateForm || {};
+
+		return form && ((!form.valid || this.hasInvalidFields()) || !(form.dirty || this.hasModelChanges));
 	}
 
 	/**
