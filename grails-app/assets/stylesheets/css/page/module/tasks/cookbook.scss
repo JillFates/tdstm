@@ -36,6 +36,18 @@
     }
   }
 }
+
+.cookbook_recipes_editor {
+  .recipe-add {
+    width: 40px;
+    button {
+      max-height: 30px;
+      line-height: 30px;
+      min-width: 44px;
+    }
+  }
+}
+
 .taskGeneration {
   .container-fluid {
     padding-left: 0px;
