@@ -68,6 +68,23 @@
         font-weight: 400;
         font-size: 12px;
         color: black;
+        word-break: break-all;
+
+        a {
+          color: #3c8dbc;
+          cursor: pointer;
+        }
+
+        .readMore {
+          display: flex;
+          margin-top: 1rem;
+          line-height: 1rem;
+          font-size: 0.583333rem;
+        }
+
+        .truncated-description {
+          color: #575757;
+        }
       }
 
       .modal-description-height {
@@ -285,8 +302,7 @@
 
             tr {
               display: flex;
-              border: 1px solid $color-border;
-              border-width: 0 0 1px 0;
+
               th,
               td {
                 display: block;
@@ -302,6 +318,8 @@
               }
               td {
                 color: $color--black;
+                border-bottom: 1px solid $color-border;
+                flex: 1;
               }
             }
           }
@@ -351,10 +369,13 @@
 .tds-modal-content {
   background: $color-text-inverse;
 
+  &.with-box-shadow {
+    box-shadow: 0 5px 15px $color--darkgray;
+  }
+
   &.has-side-nav {
     .modal-header,
-    .modal-body,
-    .modal-body-tight {
+    .modal-body {
       margin-left: 40px;
     }
   }
@@ -363,15 +384,11 @@
     outline: unset;
   }
 
-  .modal-body-tight {
-    padding: 10px;
-    padding-top: 0;
-
-    .modal-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 10px;
-    }
+  .modal-section-header {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
   }
 
   .modal-header-height {
@@ -381,10 +398,6 @@
   .modal-header {
     padding: 24px;
     border: unset;
-
-    &.modal-header-small {
-      padding: 10px;
-    }
 
     .close-button {
       color: #737373;
@@ -417,6 +430,16 @@
     }
   }
 
+  .modal-body {
+    padding: 0 24px 24px 24px;
+
+    .modal-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 10px;
+    }
+  }
+
   .modal-sidenav {
     position: absolute;
     top: 0;
@@ -445,5 +468,9 @@
         }
       }
     }
+  }
+
+  .modal-footer {
+    // .btn
   }
 }

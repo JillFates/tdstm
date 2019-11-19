@@ -14,7 +14,20 @@
         <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${assetEntity.assetName}"/></div>
     </div>
 
-    <p id="modalDescription" class="modal-description">${assetEntity.description}</p>
+    <div class="modal-description">
+        <div id="readMore">
+            <p>${assetEntity.description} <a onclick="toggleReadMore()">Read Less</a></p>
+        </div>
+        <div id="readLess" class="readMore">
+            <g:if test="${assetEntity.description?.length() > 80}">
+                <div class="truncated-description">${assetEntity.description.substring(0,80)}...</div>
+                <a onclick="toggleReadMore()"> Read More</a>
+            </g:if>
+            <g:else>
+                <div class="truncated-description">${assetEntity.description}</div>
+            </g:else>
+        </div>
+    </div>
 
     <%-- Navigation - Page scrolling --%>
     <g:if test="${mode == 'show'}">
@@ -75,15 +88,19 @@
 
 <script>
 	$(document).ready(function() { 
-        var text = $("#modalDescription").text();
-
-        if (text.length === 0) {
-            $("#modalBody").addClass("no-description");
-        } else {
+        <g:if test="${assetEntity.description?.length() > 0}">
             $("#modalBody").addClass("has-description");
             $("#modalDescription").addClass("modal-description-height");
-        }
+        </g:if>
+        <g:else>
+            $("#modalBody").addClass("no-description");
+        </g:else>
+
+        $("#readMore").hide();
+        $("#readLess").show();
     })
+
+    var readMore = false;
     
     function closeModal() {
         var modalIds = ['#showEntityView', '#editEntityView'];
@@ -92,6 +109,18 @@
                 $(id).dialog('close');
             }
         });
+    }
+
+    function toggleReadMore() {
+        readMore = !readMore;
+
+        if (!readMore) {
+            $("#readMore").hide();
+            $("#readLess").show();
+        } else {
+            $("#readLess").hide();
+            $("#readMore").show();
+        }
     }
 
     function navigate(tabId, id) {

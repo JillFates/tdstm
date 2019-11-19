@@ -3,6 +3,10 @@
   tabindex="-1"
   data-keyboard="false"
   class="asset-dependency-component"
+  ng-class="{'dependency-show': !actionTypeEdit, 
+            'dependency-edit': actionTypeEdit, 
+            'uni-directional': !(assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id),
+            'bi-directional': assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id}"
 >
   <div class="tds-modal-content has-side-nav">
     <div class="modal-header">
@@ -22,7 +26,7 @@
     <div class="modal-body">
       <div id="editCommentDialog">
         <loading-indicator></loading-indicator>
-        <div class="dialog">
+        <div>
           <div class="tds-table">
             <table style="border:unset;">
               <thead>
@@ -79,16 +83,34 @@
             class="form-horizontal dependency-edit-fields"
             ng-if="assetDependency.assetA.dependency.id || assetDependency.assetB.dependency.id"
           >
-            <div class="dependencies">
+            <div
+              class="dependencies"
+              ng-if="assetDependency.assetA.dependency.id || assetDependency.assetB.dependency.id"
+            >
               <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
+                class="dependency-row has-both-dependencies"
+                ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id"
               >
+                <div class="dependency-a" style="grid-column-start: 2;">
+                  {{ assetDependency.assetA.name }} <br />
+                  <i style="margin-left: -6px;" class="fas fa-arrow-down"></i>
+                  <span style="color: #D1B9EE;">Depends On</span><br />
+                  {{ assetDependency.assetB.name }}
+                </div>
+                <div class="dependency-b" style="grid-column-start: 3;">
+                  {{ assetDependency.assetB.name }} <br />
+                  <i style="margin-left: -6px;" class="fas fa-arrow-down"></i>
+                  <span style="color: #D1B9EE;">Depends On</span><br />
+                  {{ assetDependency.assetA.name }}
+                </div>
+              </div>
+
+              <div class="dependency-row">
                 <div class="dependency-row-legend">Frequency</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.dataFlowFreq
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.dataFlowFreq }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -100,9 +122,9 @@
                   </div>
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.dataFlowFreq
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.dataFlowFreq }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -115,15 +137,12 @@
                   </div>
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">Type</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.type
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.type }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -136,9 +155,9 @@
                   </div>
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.type
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.type }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -151,15 +170,12 @@
                   </div>
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">Status</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.status
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.status }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -172,9 +188,9 @@
                   </div>
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.status
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.status }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -187,15 +203,13 @@
                   </div>
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">Direction</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.dataFlowDirection
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.dataFlowDirection
+                    }}</label
+                  >
 
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
@@ -209,9 +223,10 @@
                   </div>
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.dataFlowDirection
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.dataFlowDirection
+                    }}</label
+                  >
                   <div ng-if="actionTypeEdit" class="clr-select-wrapper">
                     <select
                       class="clr-select"
@@ -224,15 +239,12 @@
                   </div>
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">C1</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.c1
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.c1 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -243,9 +255,9 @@
                   />
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.c1
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.c1 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -256,15 +268,12 @@
                   />
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">C2</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.c2
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.c2 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -275,9 +284,9 @@
                   />
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.c2
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.c2 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -288,15 +297,12 @@
                   />
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">C3</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.c3
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.c3 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -307,9 +313,9 @@
                   />
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.c3
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.c3 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -320,15 +326,12 @@
                   />
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">C4</div>
                 <div class="dependency-a">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetA.dependency.c4
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetA.dependency.c4 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -339,9 +342,9 @@
                   />
                 </div>
                 <div class="dependency-b">
-                  <label ng-if="!actionTypeEdit" class="dependency-label">{{
-                    assetDependency.assetB.dependency.c4
-                  }}</label>
+                  <label ng-if="!actionTypeEdit" class="dependency-label"
+                    >{{ assetDependency.assetB.dependency.c4 }}</label
+                  >
                   <input
                     ng-if="actionTypeEdit"
                     ng-change="changeData()"
@@ -352,10 +355,7 @@
                   />
                 </div>
               </div>
-              <div
-                class="dependency-row"
-                ng-class="{'dependency-edit': actionTypeEdit}"
-              >
+              <div class="dependency-row">
                 <div class="dependency-row-legend">Comment</div>
                 <div class="dependency-a">
                   <label
@@ -363,6 +363,19 @@
                     class="dependency-label-comment"
                     >{{ assetDependency.assetA.dependency.comment }}</label
                   >
+                  <div
+                    ng-if="!actionTypeEdit && (assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id) && assetDependency.editPermission"
+                  >
+                    <button
+                      type="button"
+                      ng-click="toDeleteDependency('assetA', false)"
+                      class="btn btn-icon btn-danger"
+                    >
+                      <i class="far fa-trash-alt"></i>
+                      Delete
+                    </button>
+                  </div>
+
                   <div ng-if="actionTypeEdit" class="clr-control-container">
                     <textarea
                       maxlength="65535"
@@ -380,6 +393,19 @@
                     class="dependency-label-comment"
                     >{{ assetDependency.assetB.dependency.comment }}</label
                   >
+
+                  <div
+                    ng-if="!actionTypeEdit && assetDependency.editPermission"
+                  >
+                    <button
+                      type="button"
+                      ng-click="toDeleteDependency('assetB', false)"
+                      class="btn btn-icon btn-danger"
+                    >
+                      <i class="far fa-trash-alt"></i>
+                      Delete
+                    </button>
+                  </div>
                   <div ng-if="actionTypeEdit" class="clr-control-container">
                     <textarea
                       maxlength="65535"
@@ -398,94 +424,30 @@
               <div class="dependency-row">
                 <div class="dependency-row-legend">Date Created</div>
                 <div class="dependency-a">
-                  <label class="dependency-label">{{
-                    assetDependency.assetA.dateCreated
-                  }}</label>
+                  <label class="dependency-label"
+                    >{{ assetDependency.assetA.dateCreated }}</label
+                  >
                 </div>
                 <div class="dependency-b">
-                  <label class="dependency-label">{{
-                    assetDependency.assetB.dateCreated
-                  }}</label>
+                  <label class="dependency-label"
+                    >{{ assetDependency.assetB.dateCreated }}</label
+                  >
                 </div>
               </div>
               <div class="dependency-row">
                 <div class="dependency-row-legend">Date Updated</div>
                 <div class="dependency-a">
-                  <label class="dependency-label">{{
-                    assetDependency.assetA.lastUpdated
-                  }}</label>
+                  <label class="dependency-label"
+                    >{{ assetDependency.assetA.lastUpdated }}</label
+                  >
                 </div>
                 <div class="dependency-b">
-                  <label class="dependency-label">{{
-                    assetDependency.assetB.lastUpdated
-                  }}</label>
+                  <label class="dependency-label"
+                    >{{ assetDependency.assetB.lastUpdated }}</label
+                  >
                 </div>
               </div>
             </div>
-            <table
-              ng-class="{ 'half-size': !assetDependency.assetB.dependency}"
-            >
-              <tr
-                ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id"
-              >
-                <td></td>
-                <td class="legend-fields">
-                  {{ assetDependency.assetA.name }} <br />
-                  <i
-                    style="margin-left: -6px;"
-                    class="fa fa-fw fa-long-arrow-down"
-                  ></i>
-                  <span style="color: #D1B9EE;">Depends On</span><br />
-                  {{ assetDependency.assetB.name }}
-                </td>
-                <td class="legend-fields">
-                  {{ assetDependency.assetB.name }} <br />
-                  <i
-                    style="margin-left: -6px;"
-                    class="fa fa-fw fa-long-arrow-down"
-                  ></i>
-                  <span style="color: #D1B9EE;">Depends On</span><br />
-                  {{ assetDependency.assetA.name }}
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <div
-                    class="form-group"
-                    ng-if="!actionTypeEdit && (assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id) && assetDependency.editPermission"
-                  >
-                    <button
-                      type="button"
-                      style="margin-top: 25px;"
-                      ng-click="toDeleteDependency('assetA', false)"
-                      class="btn btn-default"
-                    >
-                      <img src="../icons/database_delete.png" border="0px" />
-                      Delete
-                    </button>
-                  </div>
-                </td>
-                <td
-                  ng-if="assetDependency.assetA.dependency.id && assetDependency.assetB.dependency.id"
-                  style="max-width: 200px; vertical-align: baseline;"
-                >
-                  <div
-                    class="form-group"
-                    ng-if="!actionTypeEdit && assetDependency.editPermission"
-                  >
-                    <button
-                      type="button"
-                      style="margin-top: 25px;"
-                      ng-click="toDeleteDependency('assetB', false)"
-                      class="btn btn-default"
-                    >
-                      <img src="../icons/database_delete.png" border="0px" />
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </table>
           </form>
         </div>
       </div>
@@ -557,11 +519,6 @@
   </div>
 
   <style>
-    .dialog {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-
     .tds-table .lbl-asset-dependency-direction,
     form.dependency-edit-fields td.legend-fields {
       font-weight: bold;
@@ -608,18 +565,9 @@
       width: 200px;
     }
 
-    .half-size {
-      width: 60%;
-    }
-
     .separator-table {
       border-top: 2px solid #f4f4f4 !important;
       margin-top: 10px !important;
-    }
-
-    .dialog select,
-    .dialog input.form-control {
-      width: 150px;
     }
   </style>
 </div>

@@ -9,11 +9,11 @@
 	<table>
 		<thead>
 			<tr>
-				<th>Class</th>
-				<th>Name</th>
-				<th>Bundle</th>
-				<th>Type</th>
-				<th>Status</th>
+				<th style="width: 20%;">Class</th>
+				<th style="width: 20%;">Name</th>
+				<th style="width: 20%;">Bundle</th>
+				<th style="width: 20%;">Type</th>
+				<th style="width: 20%;">Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -25,7 +25,7 @@
 						onclick="EntityCrud.showAssetDetailView('${supportAsset.assetClass}', ${supportAsset.id})">
 						${supportAsset.assetType}
 					</td>
-					<td style="min-width:80px"
+					<td
 						data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}"
 						onclick="EntityCrud.showAssetDetailView('${supportAsset.assetClass}', ${supportAsset.id})">
 						${supportAsset.assetName}
@@ -34,8 +34,7 @@
 						<td style="position:relative;"
 							data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}"
 							onclick="EntityCrud.showAssetDetailView('${supportAsset.assetClass}', ${supportAsset.id})">
-							<div data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}"
-									style="padding: 5px 25px 5px 0px;">${supportAsset.moveBundle}</div>
+							<div data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}">${supportAsset.moveBundle}</div>
 							<div class="text-center" style="position:absolute;right:5px;top:2px" title="The linked assets have conflicting bundles.">
 								<span class="status status-Warning">
 									<i class="fas fa-exclamation-triangle"></i>							
@@ -47,7 +46,7 @@
 						<td style="position:relative;"
 							data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}"
 							onclick="EntityCrud.showAssetDetailView('${supportAsset.assetClass}', ${supportAsset.id})">
-							<div data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}" style="padding: 5px 25px 5px 0px;">${supportAsset.moveBundle}</div>
+							<div data-asset-class="${supportAsset.assetClass}" data-asset-id="${supportAsset.id}">${supportAsset.moveBundle}</div>
 							<div class="text-center" style="position:absolute;right:5px;top:2px" title="The linked assets have conflicting bundles.">
 								<span class="status status-Warning">
 									<i class="fas fa-exclamation-triangle"></i>							
@@ -118,23 +117,23 @@
 	<table>
 		<thead>
 			<tr>
-				<th>Class</th>
-				<th>Name</th>
-				<th>Bundle</th>
-				<th>Type</th>
-				<th>Status</th>
+				<th style="width: 20%;">Class</th>
+				<th style="width: 20%;">Name</th>
+				<th style="width: 20%;">Bundle</th>
+				<th style="width: 20%;">Type</th>
+				<th style="width: 20%;">Status</th>
 			</tr>
 		</thead>
 		<tbody>
 			<g:each in="${dependentAssets}" var="dependent" status="i">
-				<% depedentAsset = org.grails.orm.hibernate.cfg.GrailsHibernateUtil.unwrapIfProxy(depedentAsset) %>
+				<% depedentAsset = org.grails.orm.hibernate.cfg.GrailsHibernateUtil.unwrapIfProxy(dependent?.asset) %>
 				<tr>
 					<td 
 						data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}"
 						onclick="EntityCrud.showAssetDetailView('${depedentAsset?.assetClass}', ${depedentAsset?.id})">
 						${depedentAsset?.assetType}
 					</td>
-					<td style="min-width:80px"
+					<td
 						data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}"
 						onclick="EntityCrud.showAssetDetailView('${depedentAsset?.assetClass}', ${depedentAsset?.id})">
 						${depedentAsset?.assetName}
@@ -143,7 +142,7 @@
 						<td style="position:relative;"
 							data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}"
 							onclick="EntityCrud.showAssetDetailView('${depedentAsset?.assetClass}', ${depedentAsset?.id})">
-							<div data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}" style="padding: 5px 25px 5px 0px;">${depedentAsset?.moveBundle}</div>
+							<div data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}">${depedentAsset?.moveBundle}</div>
 							<div class="text-center" style="position:absolute;right:5px;top:2px;" title="The linked assets have conflicting bundles.">
 								<span class="status status-Warning">
 									<i class="fas fa-exclamation-triangle"></i>							
@@ -156,7 +155,7 @@
 							data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}"
 							onclick="EntityCrud.showAssetDetailView('${depedentAsset?.assetClass}', ${depedentAsset?.id})">
 							<b>
-								<div data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}" style="padding: 5px 25px 5px 0px;">${depedentAsset?.moveBundle}</div>
+								<div data-asset-class="${depedentAsset?.assetClass}" data-asset-id="${depedentAsset?.id}">${depedentAsset?.moveBundle}</div>
 								<div class="text-center" style="position:absolute;right:5px;top:2px;" title="The linked assets have conflicting bundles.">
 									<span class="status status-Warning">
 										<i class="fas fa-exclamation-triangle"></i>							

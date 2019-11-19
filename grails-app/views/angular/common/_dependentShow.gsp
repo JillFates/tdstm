@@ -8,11 +8,11 @@
 	<table>
 		<thead>
 			<tr>
-				<th>Class</th>
-				<th>Name</th>
-				<th>Bundle</th>
-				<th>Type</th>
-				<th>Status</th>
+				<th style="width: 20%;">Class</th>
+				<th style="width: 20%;">Name</th>
+				<th style="width: 20%;">Bundle</th>
+				<th style="width: 20%;">Type</th>
+				<th style="width: 20%;">Status</th>
 			</tr>
 		</thead>
 		<tbody>
