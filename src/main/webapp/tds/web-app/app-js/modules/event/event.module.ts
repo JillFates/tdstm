@@ -17,6 +17,7 @@ import {PopupModule} from '@progress/kendo-angular-popup';
 import {InputsModule} from '@progress/kendo-angular-inputs'
 import {ContextMenuModule} from '@progress/kendo-angular-menu';
 import {LayoutModule} from '@progress/kendo-angular-layout';
+import { ChartsModule } from '@progress/kendo-angular-charts';
 // Components
 import {EventDashboardComponent} from './components/dashboard/event-dashboard.component';
 import {NewsComponent} from './components/news/news.component';
@@ -54,6 +55,7 @@ import {EventsResolveService} from './resolve/events-resolve.service';
 		DateInputsModule,
 		ContextMenuModule,
 		LayoutModule,
+		ChartsModule,
 		// Route
 		EventRouteModule
 	],
