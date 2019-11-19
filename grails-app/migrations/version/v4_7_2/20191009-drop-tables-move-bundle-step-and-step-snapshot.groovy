@@ -14,6 +14,7 @@ databaseChangeLog = {
         sql('DROP TABLE move_bundle_step')
     }
 
+	/*
     changeSet(author: 'ecantu', id: '20191009 TM-16017-2') {
         comment('Drop table step_snapshot')
 
@@ -22,4 +23,17 @@ databaseChangeLog = {
         }
         sql('DROP TABLE step_snapshot')
     }
+	*/
+
+	changeSet(author: 'oluna', id: '20191119 TM-16431') {
+		comment('Drop table step_snapshot')
+
+		preConditions(onFail: 'MARK_RAN') {
+			not {
+				tableExists(tableName: 'step_snapshot')
+			}
+		}
+		sql('CREATE TABLE step_snapshot ( id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY)')
+	}
+
 }
