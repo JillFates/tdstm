@@ -73,25 +73,26 @@
 											</div>
 										</td>
 
-										<td class="text-center tds-action-button-set">
+										<td class="text-center tds-action-button-set asset-explorer-td-favorite">
 											<tds-button-custom
-											            [icon]="report.isFavorite ? 'star' : 'star-o' "
-											            [title]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
-											            class="text-yellow"
-											            isIconButton="true"
-											            (click)="toggleFavorite(report)">
+												[flat]="true"
+												[icon]="'star'"
+												[iconClass]="report.isFavorite ? 'is-solid' : ''"
+												[tooltip]="report.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+												class="favorite-button text-yellow"
+												(click)="toggleFavorite(report)">
 											</tds-button-custom>
 										</td>
-										<td>
+											<td class="asset-explorer-td-name">
 											<a [routerLink]="['/asset','views',report.id,'show']">{{report.name}}</a>
 										</td>
-										<td>
+										<td class="asset-explorer-td-created-by">
 											{{report.createdBy}}
 										</td>
-										<td>
+										<td class="asset-explorer-td-created-on">
 											{{report.createdOn}}
 										</td>
-										<td>
+										<td class="asset-explorer-td-updated-on">
 											{{report.updatedOn}}
 										</td>
 										<td class="text-center">
