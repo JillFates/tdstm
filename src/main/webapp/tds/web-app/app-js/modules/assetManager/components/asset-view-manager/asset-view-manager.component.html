@@ -12,7 +12,7 @@
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
 								<a (click)="selectFolder(folder)" href="javascript:void(0)">
 									<i class="fa" [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
-									<span class="label label-primary pull-right">{{folder.items.length}}</span>
+									<span class="label label-primary pull-right">{{folder.views.length}}</span>
 								</a>
 							</li>
 						</ul>
@@ -58,7 +58,7 @@
 									</tr>
 								</thead>
 								<tbody *ngIf="selectedFolder">
-									<tr *ngFor="let report of selectedFolder.items | filter:{ name: searchText}">
+									<tr *ngFor="let report of selectedFolder.views | filter:{ name: searchText}">
 										<td class="asset-explorer-td-actions k-custom-command-column">
 											<div class="tds-action-button-set">
 												<tds-button-edit [style.visibility]="isEditAvailable(report) ? 'visible' : 'hidden'"
