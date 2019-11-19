@@ -36,18 +36,13 @@
                                                 <td class="N edge-cell" nowrap="nowrap">
                                                     <label class="required-field">Task # {{model.taskNumber}}</label>
                                                 </td>
-                                                <td class="valueNW description-container">
+                                                <td class="valueNW description-container" colspan="4">
                                                     <div class="validated-field">
                                                         <input type="text" name="comment" [(ngModel)]="model.comment" required>
-                                                        <!--
-                                                        <button class="btn btn-default" (click)="onCollapseTaskDetail()" type="button">
-                                                            <i class="fa" [ngClass]="{'fa-angle-double-down': !collapsedTaskDetail, 'fa-angle-double-right': collapsedTaskDetail}"></i>
-                                                        </button>
-                                                        -->
                                                         <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                     </div>
                                                 </td>
-                                                <td colspan="4" class="btn-collapsed-fixed-right">
+                                                <td colspan="1" class="btn-collapsed-fixed-right">
                                                     <tds-button-collapse
                                                             [displayLabel]="false"
                                                             *ngIf="!collapsedTaskDetail"
@@ -253,6 +248,7 @@
                                                         </div>
                                                         <label data-toggle="popover"
                                                                data-trigger="hover"
+                                                               class="lock"
                                                                data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
                                                             <i class="fa fa-fw  lock-state"
                                                                [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
