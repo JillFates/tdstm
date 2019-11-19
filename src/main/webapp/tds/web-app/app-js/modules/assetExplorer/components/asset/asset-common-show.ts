@@ -132,7 +132,7 @@ export class AssetCommonShow implements OnInit {
 	}
 
 	onExpandActionDispatched(): void {
-		this.openGoJsGraphUrl();
+		this.openGraphUrl();
 	}
 
 	/**

@@ -37,7 +37,8 @@
 				</div>
 
 				<button id="fullscreenButtonId" class="btn btn-outline"  onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Fullscreen</div>
-
+		</div>
+		<div id="legacy-arch-graph-container">
 			<div id="controlPanelId" class="graphPanel openPanel">
 				<table class="labelTree" cellpadding="0" cellspacing="0" style="border: 0;" >
 					<tr title="Sets the asset to use as the root node">
@@ -104,7 +105,7 @@
 							<td colspan="3" class="noPadding">
 								<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="labelControlContainerId">
 									Show Labels:&nbsp;<!--
-									--><svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+									--><svg style="width: 12px;height: 12px;border-width: 0;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable" /></g></g></svg>
 								</span>
 							</td>
 						</tr>
@@ -186,10 +187,9 @@
 					</tr>
 				</table>
 			</div>
-
 			<g:include controller="assetEntity" action="graphLegend" params="${[displayMoveEvents:false, displayFuture:true, displayCycles:true, displayBundleConflicts:false, arrowheadOffset:true]}" />
+			<div id="svgContainerId"></div>
 		</div>
-		<div id="svgContainerId"></div>
 		<div id="spinnerDivId" style="display: none"></div>
 	</div>
 

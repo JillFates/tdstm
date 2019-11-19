@@ -33,6 +33,16 @@ tds-ui-dialog {
 	#tdsUiDialog {
 		padding: 0 !important;
 		margin: 0;
+		.modal-header {
+
+			.minimized-arch-thumbnail {
+				border: 1px solid #ddd;
+				float: right;
+				width: 100%;
+				max-width: 350px;
+				height: 125px;
+			}
+		}
 		.modal-dialog {
 			background: $color-text-inverse;
 			position: fixed !important;
@@ -249,24 +259,6 @@ tds-ui-dialog {
 				.modal-body-graph {
 					min-height: 300px;
 					border: 1px solid #ddd;
-
-					.diagram-layout-container {
-						width: 100%;
-						padding: unset;
-						padding-top: 100%;
-						position: relative;
-						min-height: unset;
-
-						.overview-container {
-							position: absolute;
-							top: 0;
-							bottom: 0;
-							right: 0;
-							left: 0;
-							width: unset;
-							height: unset;
-						}
-					}
 				}
 
 				.tag + .tag {
@@ -381,6 +373,7 @@ tds-ui-dialog {
 		}
 
 		.modal-description {
+			width: 100%;
 			font-style: normal;
 			font-weight: 400;
 			font-size: 12px;
@@ -410,17 +403,6 @@ tds-ui-dialog {
 		.modal-nav-margin-top {
 			display: block;
 			margin-top: 70px;
-		}
-
-		.header-graph {
-			position: absolute;
-			right: 210px;
-			top: 40px;
-
-			.diagram-layout-container {
-				min-height: unset;
-				height: 100px;
-			}
 		}
 	}
 
