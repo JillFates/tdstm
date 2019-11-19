@@ -10,10 +10,10 @@
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="cancelCloseDialog()"></tds-button-close>
 
         <div class="clr-row">
-            <div class="clr-col-6">
+            <div class="clr-col-9">
                 <%-- TODO: Implement badge with correct color and rounded corners. --%>
                 <div class="modal-title-container">
-                    <div class="badge modal-badge" style="">D</div>
+                    <div class="badge modal-badge" style="">A</div>
                     <h4 class="modal-title">${asset.assetName}</h4>
                     <%-- TODO: Update Subtitle content with field --%>
                     <div class="modal-subtitle">${asset?.moveBundle}</div>
@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <div  class="clr-col-6">
+            <div  class="clr-col-3">
                 <div class="minimized-arch-thumbnail" *ngIf="!!showDetails">
                     <tds-lib-diagram-layout
                             [data]="data$ | async"

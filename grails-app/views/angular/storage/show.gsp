@@ -9,7 +9,7 @@
         <div class="clr-row">
             <div class="clr-col-6">
                 <div class="modal-title-container">
-                    <div class="badge modal-badge" style="">D</div>
+                    <div class="badge modal-badge" style="">S</div>
                     <h4 class="modal-title">${asset.assetName}</h4>
                     <div class="modal-subtitle">${asset?.moveBundle}</div>
                     <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
