@@ -53,6 +53,16 @@
         }
       }
 
+      table.has-double-assignment {
+        .dependency-error-section .has-double-assignment {
+          display: block;
+        }
+      }
+
+      .dependency-error-section .has-double-assignment {
+        display: none;
+      }
+
       .ng-invalid {
         border: 1px solid $color-message-error--red;
       }
@@ -129,6 +139,7 @@
         border-collapse: separate;
         border-spacing: 3px;
         padding: 0;
+
         .estimated-date-container {
           display: flex;
           align-items: center;
