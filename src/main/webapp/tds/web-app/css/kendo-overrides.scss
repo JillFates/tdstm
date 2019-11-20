@@ -108,6 +108,7 @@ kendo-grid.k-grid {
 						background: #ffffff !important;
 						border: 1px solid #ccc;
 						border-radius: 3px;
+						overflow: hidden;
 
 						&.k-state-focused {
 							border-color: $color-active;
