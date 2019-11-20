@@ -274,7 +274,7 @@
                                                     <label>Estimated Finish</label>
                                                 </td>
 
-                                                <td class="valueNW estimated-finish">
+                                                <td class="valueNW">
                                                     <div class="estimated-date-container">
                                                         <kendo-dateinput
                                                                 name="estimatedFinish"
@@ -283,12 +283,12 @@
                                                                 (click)="openRangeDatesSelector()"
                                                                 [(ngModel)]="model.estimatedFinish">
                                                         </kendo-dateinput>
+                                                        <span (click)="cleanEstimatedDates()"
+                                                              [ngClass]="{'disabled-delete-estimated': !model.estimatedFinish && !model.estimatedStart}"
+                                                              class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates">
+                                                        </span>
                                                     </div>
-                                                    <span (click)="cleanEstimatedDates()"
-                                                          [ngClass]="{'disabled-delete-estimated': !model.estimatedFinish && !model.estimatedStart}"
-                                                          class="glyphicon glyphicon-remove delete-command" title="Delete estimation dates"></span>
                                                 </td>
-
                                             </tr>
 
                                             <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop">
@@ -321,9 +321,9 @@
                                                     <label>Status</label>
                                                 </td>
                                                 <td class="valueNW task-status vertical-note-status">
+<!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
                                                     <kendo-dropdownlist
                                                             name="statusList"
-                                                            [class]="'form-control status task-' + model.status.toLowerCase()"
                                                             [data]="model.statusList"
                                                             [(ngModel)]="model.status">
                                                     </kendo-dropdownlist>
@@ -398,6 +398,8 @@
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Predecessor ({{dataGridTaskPredecessorsHelper.gridData.data.length}})</label>
                                                     <tds-button-add class="button-header-grid float-right"
                                                                     [tooltip]="modelHelper.CREATE_PREDECESSOR"
+                                                                    [displayLabel]="false"
+                                                                    [iconClass]="'is-solid'"
                                                                     [id]="'btnAddPredecessor'"
                                                                     (click)="onAddTaskDependency(model.predecessorList, dataGridTaskPredecessorsHelper)">
                                                     </tds-button-add>
@@ -417,7 +419,6 @@
 
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                         <tds-combobox
-                                                                class="status"
                                                                 [(model)]="dataItem.model"
                                                                 [placeholder]="'Please Select'"
                                                                 [innerTemplateFormat]="innerTemplateTaskItem"
@@ -446,6 +447,8 @@
                                                     <label class="pad-top-2 pad-left-10 mar-bottom-0">Successors ({{dataGridTaskSuccessorsHelper.gridData.data.length}})</label>
                                                     <tds-button-add class="button-header-grid float-right"
                                                                     [tooltip]="modelHelper.CREATE_SUCCESSOR"
+                                                                    [iconClass]="'is-solid'"
+                                                                    [displayLabel]="false"
                                                                     [id]="'btnAddSuccessor'"
                                                                     (click)="onAddTaskDependency(model.successorList, dataGridTaskSuccessorsHelper)">
                                                     </tds-button-add>
@@ -461,7 +464,6 @@
 
                                                     <ng-template kendoGridCellTemplate *ngIf="column.property === 'desc'" let-dataItem let-rowIndex="rowIndex">
                                                         <tds-combobox
-                                                                class="status"
                                                                 [(model)]="dataItem.model"
                                                                 [updateOnChanges]="true"
                                                                 [placeholder]="'Please Select'"
@@ -513,17 +515,17 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <tds-button theme="primary" (click)="onSave()" icon="floppy" title="Save" [disabled]="isFormInvalid() || !hasEditTaskPermission">Save</tds-button>
-                    <tds-button theme="danger" (click)="deleteTask()" icon="trash" title="Delete" [disabled]="!hasDeleteTaskPermission">Delete</tds-button>
-                    <tds-button (click)="cancelCloseDialog($event)" icon="ban" title="Cancel">Cancel</tds-button>
+<!--                    <tds-button theme="primary" (click)="onSave()" icon="floppy" title="Save" [disabled]="isFormInvalid() || !hasEditTaskPermission">Save</tds-button>-->
+<!--                    <tds-button theme="danger" (click)="deleteTask()" icon="trash" title="Delete" [disabled]="!hasDeleteTaskPermission">Delete</tds-button>-->
+<!--                    <tds-button (click)="cancelCloseDialog($event)" icon="ban" title="Cancel">Cancel</tds-button>-->
                 </div>
             </div>
 
             <div class="modal-sidenav form-group-center">
                 <nav class="modal-sidenav btn-link">
                     <tds-button-edit></tds-button-edit>
-                    <tds-button-delete></tds-button-delete>
-                    <tds-button-close></tds-button-close>
+                    <tds-button-delete (click)="deleteTask()" ></tds-button-delete>
+                    <tds-button-close (click)="cancelCloseDialog($event)"></tds-button-close>
                 </nav>
             </div>
 
