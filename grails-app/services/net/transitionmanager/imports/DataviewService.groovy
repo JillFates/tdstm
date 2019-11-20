@@ -41,6 +41,8 @@ import net.transitionmanager.task.AssetComment
 import org.apache.poi.ss.usermodel.DataValidation
 import org.grails.web.json.JSONObject
 
+import javax.xml.crypto.Data
+import java.security.InvalidParameterException
 import java.sql.Timestamp
 
 /**
@@ -196,7 +198,7 @@ class DataviewService implements ServiceMethods {
 	 */
 	@Transactional
 	Dataview create(Person currentPerson, Project currentProject, JSONObject dataviewJson) {
-		validateDataviewCreateAccessOrException(dataviewJson)
+		validateDataviewCreateAccessOrException(dataviewJson, currentProject)
 
 		Dataview dataview = new Dataview()
 		dataview.with {
@@ -206,6 +208,7 @@ class DataviewService implements ServiceMethods {
 			isSystem = dataviewJson.isSystem
 			isShared = dataviewJson.isShared
 			reportSchema = dataviewJson.schema
+            overridesView = dataviewJson.overridesView ? fetch(dataviewJson.overridesView) : null
 		}
 
 		if (!dataview.save(failOnError: false)) {
@@ -292,7 +295,7 @@ class DataviewService implements ServiceMethods {
 	 * @param dataviewJSON - the JSON object containing information about the Dataview to create
 	 * @throws UnauthorizedException
 	 */
-	void validateDataviewCreateAccessOrException(JSONObject dataviewJson) {
+	void validateDataviewCreateAccessOrException(JSONObject dataviewJson, Project project) {
 		validateDataviewJson(dataviewJson, CREATE_PROPERTIES)
 
 		// Check if user has necessary permission(s)
@@ -300,6 +303,63 @@ class DataviewService implements ServiceMethods {
 		if (! securityService.hasPermission(requiredPerm)) {
 			securityService.reportViolation("attempted to create a Dataview without required permission $requiredPerm")
 			throw new UnauthorizedException(requiredPerm)
+		}
+
+		if (dataviewJson.isSystem) {
+			switch (dataviewJson.saveAsOption) {
+				case ViewSaveAsOptionEnum.MY_VIEW.ordinal():
+					throwException(InvalidParameterException, 'dataview.validate.saveMyViewInDefaultProject', 'My Views are not allowed to be saved into the Default project.')
+					break
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.ordinal():
+					throwException(InvalidParameterException, 'dataview.validate.overrideForSelfInDefaultProject', 'Overriding system views for self is not allowed in the Default project.')
+					break
+                case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal():
+                    if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)) {
+                        throwException(UnauthorizedException, 'dataview.validate.overrideGlobalPermission', 'You do not have the necessary permission to save override views for the Default project.')
+                    }
+                    break
+            }
+		} else {
+            switch (dataviewJson.saveAsOption) {
+                case ViewSaveAsOptionEnum.MY_VIEW.ordinal():
+                    if (!securityService.hasPermission(Permission.AssetExplorerCreate)) {
+                        throwException(UnauthorizedException, 'dataview.validate.createPermission', 'You do not have the necessary permission to create views.')
+                    }
+                    break
+                case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.ordinal():
+                    if (!securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
+                        throwException(UnauthorizedException, 'dataview.validate.createOveridePermission', 'You do not have the necessary permission to save override views.')
+                    }
+                    break
+                case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal():
+                    if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)) {
+                        throwException(UnauthorizedException, 'dataview.validate.overrideAllUsers', 'You do not have the necessary permission to save override views for all users.')
+                    }
+                    break
+            }
+		}
+
+		Dataview viewToOverride = dataviewJson.overridesView ? fetch(dataviewJson.overridesView) : null
+
+		def results = Dataview.findWhere([
+					project: project,
+					overridesView: viewToOverride,
+					isShared: false,
+					person: securityService.loadCurrentPerson()
+		])
+
+		if (results && dataviewJson.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ME) {
+			throwException(UnauthorizedException, 'dataview.validation.overrideDupForMe','You already have a saved override for this system view.')
+		}
+
+		results = Dataview.findWhere([
+				project: project,
+				overridesView: viewToOverride,
+				isShared: true
+		])
+
+		if (results && dataviewJson.saveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL) {
+			throwException(UnauthorizedException, 'dataview.validation.overrideDupForAll')
 		}
 	}
 
