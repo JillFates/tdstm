@@ -38,8 +38,6 @@ section.page-asset-explorer-index
     div.box
       margin-bottom: 0
       .box-body
-        overflow: auto
-        height: 75vh
       h3.box-title-grid-list
         padding-top: 4px
         font-size: 21px
@@ -58,32 +56,19 @@ section.page-asset-explorer-index
           input.txt-search
             width: 500px
 
-      table
-        th
-          vertical-align: middle
-          line-height: 10px
-          font-size: 14px
-          padding: 5px
-          font-family: inherit
-          cursor: pointer
-          span
-            color: $color-material--blue1
-          .k-icon
-            width: 0
-        th.no-action
-          cursor: default
-        td.asset-explorer-td-actions
-          width: 200px
-          max-width: 200px
-        td.asset-explorer-td-favorite
-          width: 90px
-          max-width: 90px
-        td.asset-explorer-td-created-on,
-        td.asset-explorer-td-created-by,
-        td.asset-explorer-td-updated-on
-          width: 120px
-          min-width: 120px
-      .table
-        border: 0
-        button.tds-button
-          font-size: 10px
+      .clarity-table-grid
+        tbody
+          height: 70vh
+        // column widths
+        .asset-explorer-td-actions,
+        .asset-explorer-td-favorite,
+        .asset-explorer-td-is-shared,
+        .asset-explorer-td-is-system
+          width: 60px
+        .asset-explorer-column-name
+          width: 600px
+          max-width: 600px
+        .asset-explorer-td-created-on,
+        .asset-explorer-td-created-by,
+        .asset-explorer-td-updated-on
+          width: 100px
