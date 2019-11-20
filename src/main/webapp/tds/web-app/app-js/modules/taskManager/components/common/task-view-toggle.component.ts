@@ -94,16 +94,18 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the task manager view on a new tab
 	 **/
 	taskManagerView(): void {
-		if (this.disableTaskManager) { return; }
-		this.router.navigate([TaskManagerRoutingStates.TASK_MANAGER_LIST.url]);
+		const url = 'taskManager/list';
+		window.open(url, '_blank');
+
 	}
 
 	/**
 	 * open the neighborhood view on a new tab
 	 **/
 	neighborhoodView(): void {
-		if (this.disableNeighborhood) { return; }
-		this.router.navigate([TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url]);
+		const url = 'neighborhood';
+		window.open(url, '_blank');
+
 	}
 
 	/**
@@ -115,6 +117,6 @@ export class TaskViewToggleComponent implements OnInit {
 		let currentUrl = window.location.href;
 		currentUrl = currentUrl.substr(0, currentUrl.indexOf('module'));
 		let url = `${currentUrl}task/taskTimeline`;
-		window.open(url);
+		window.open(url, '_blank');
 	}
 }
