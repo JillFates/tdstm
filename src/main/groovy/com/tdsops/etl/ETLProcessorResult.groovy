@@ -258,6 +258,21 @@ class ETLProcessorResult {
 			throw ETLProcessorException.domainOnlyAllowOnNewRows()
 		}
 	}
+	/**
+	 * Returns true if {@code ETLProcessorResult}, in the current {@code RowResult}
+	 * contains a column with columnName parameter
+	 *
+	 * @param columnName
+	 * @return
+	 */
+	Boolean hasColumn(String columnName){
+		if (resultIndex >= 0) {
+			RowResult row = currentRow()
+			return row.hasField(columnName)
+		} else {
+			throw ETLProcessorException.domainOnlyAllowOnNewRows()
+		}
+	}
 
 	/**
 	 * Used to render the ETLProcessorResult instance as a Map object that will contain the following:
@@ -634,6 +649,18 @@ class RowResult {
 		}
 
 		return fields[fieldName]
+	}
+	/**
+	 * Returns <tt>true</tt> if {@code RowResult#fields} map contains a mapping for the specified
+	 * field name.  More formally, returns <tt>true</tt> if and only if
+	 * this map contains a mapping for a key
+	 *
+	 * @param fieldName a field name
+	 * @return true or false if {@code RowResult}
+	 * 			contains a field name or not.
+	 */
+	Boolean hasField(String fieldName){
+		return fields.containsKey(fieldName)
 	}
 
 	/**

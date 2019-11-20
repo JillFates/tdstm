@@ -22,7 +22,15 @@ class DataSetRowFacade {
 		}
 		return new SourceField(row[name.toLowerCase()])
 	}
-
+	/**
+	 * Checks if Dataset contains a particular column name.
+	 * @param name a column name
+	 * @return true if {@code DataSetRowFacade#row} contains a key with name parameter
+	 * 			otherwise it returns false
+	 */
+	boolean containsKey(String name){
+		return row.containsKey(name.toLowerCase())
+	}
 
 	@Override
 	String toString() {
