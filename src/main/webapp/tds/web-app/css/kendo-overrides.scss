@@ -89,6 +89,54 @@ kendo-grid.k-grid {
 	.k-grid-table tr td:nth-child(-n + 2) {
 		overflow: visible;
 	}
+
+	// NOTE: This should probably be moved to the components library
+	.k-filter-row {
+		.filter-input {
+			position: relative;
+			kendo-numerictextbox,
+			kendo-datepicker,
+			kendo-dropdownlist {
+				&.k-numerictextbox,
+				&.k-datepicker,
+				&.k-dropdown {
+					width: calc(100% - 2em);
+
+					.k-numeric-wrap,
+					.k-dateinput-wrap,
+					.k-dropdown-wrap {
+						background: #ffffff !important;
+						border: 1px solid #ccc;
+						border-radius: 3px;
+
+						&.k-state-focused {
+							border-color: $color-active;
+						}
+					}
+
+					.k-numeric-wrap {
+						height: 1rem;
+						max-height: 1rem;
+
+						.k-input {
+							height: unset;
+						}
+					}
+
+					&.k-datepicker {
+						.k-picker-wrap {
+							border-bottom: unset;
+							border-radius: 3px;
+						}
+
+						.k-select {
+							bottom: 4px;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 kendo-list {
