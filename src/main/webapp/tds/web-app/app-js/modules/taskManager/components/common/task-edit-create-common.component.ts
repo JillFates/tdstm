@@ -45,6 +45,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	protected hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
 	public model: any = {};
+	public modelInitialized = false;
 	protected getAssetList: Function;
 	protected yesNoList =  [...YesNoList];
 	protected predecessorSuccessorColumns: any[];
@@ -176,6 +177,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 
 			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
+			this.modelInitialized = true;
 		});
 	}
 
