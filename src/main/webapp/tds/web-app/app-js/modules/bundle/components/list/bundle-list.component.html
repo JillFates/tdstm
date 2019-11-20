@@ -126,95 +126,95 @@
 								"
 								style="margin-bottom:0px;"
 							>
-								<div *ngIf="column.type === 'date'">
-									<div class="filter-input">
-										<kendo-datepicker
-											[format]="dateFormat"
-											[(ngModel)]="column.filter"
-											(valueChange)="onFilter(column)"
-										></kendo-datepicker>
-										<tds-button
-											*ngIf="column.filter"
-											(click)="clearValue(column)"
-											[title]="'Clear Filter'"
-											icon="times-circle"
-											[small]="true"
-											[flat]="true"
-										>
-										</tds-button>
-									</div>
+								<div
+									*ngIf="column.type === 'date'"
+									class="filter-input"
+								>
+									<kendo-datepicker
+										[format]="dateFormat"
+										[(ngModel)]="column.filter"
+										(valueChange)="onFilter(column)"
+									></kendo-datepicker>
+									<tds-button
+										*ngIf="column.filter"
+										(click)="clearValue(column)"
+										[title]="'Clear Filter'"
+										icon="times-circle"
+										[small]="true"
+										[flat]="true"
+									>
+									</tds-button>
 								</div>
-								<div *ngIf="column.type === 'text'">
-									<div class="filter-input">
-										<input
-											clrInput
-											type="text"
-											(keyup)="onFilter(column)"
-											class="text-filter"
-											name="{{ column.property }}"
-											[(ngModel)]="column.filter"
-											placeholder="Filter {{
-												column.label
-											}}"
-											value=""
-										/>
-										<tds-button
-											*ngIf="column.filter"
-											(click)="clearValue(column)"
-											[title]="'Clear Filter'"
-											icon="times-circle"
-											[small]="true"
-											[flat]="true"
-										>
-										</tds-button>
-									</div>
+								<div
+									*ngIf="column.type === 'text'"
+									class="filter-input"
+								>
+									<input
+										clrInput
+										type="text"
+										(keyup)="onFilter(column)"
+										class="text-filter"
+										name="{{ column.property }}"
+										[(ngModel)]="column.filter"
+										placeholder="Filter {{ column.label }}"
+										value=""
+									/>
+									<tds-button
+										*ngIf="column.filter"
+										(click)="clearValue(column)"
+										[title]="'Clear Filter'"
+										icon="times-circle"
+										[small]="true"
+										[flat]="true"
+									>
+									</tds-button>
 								</div>
-								<div *ngIf="column.type === 'number'">
-									<div class="filter-input">
-										<kendo-numerictextbox
-											(valueChange)="onFilter(column)"
-											[decimals]="0"
-											[min]="0"
-											[autoCorrect]="true"
-											format="\#"
-											placeholder="Filter {{
-												column.label
-											}}"
-											name="{{ column.property }}"
-											[(ngModel)]="column.filter"
-										>
-										</kendo-numerictextbox>
-										<tds-button
-											*ngIf="
-												column.filter !== undefined &&
-												column.filter !== ''
-											"
-											(click)="clearValue(column)"
-											[title]="'Clear Filter'"
-											icon="times-circle"
-											[small]="true"
-											[flat]="true"
-										>
-										</tds-button>
-									</div>
+								<div
+									*ngIf="column.type === 'number'"
+									class="filter-input"
+								>
+									<kendo-numerictextbox
+										(valueChange)="onFilter(column)"
+										[decimals]="0"
+										[min]="0"
+										[autoCorrect]="true"
+										format="\#"
+										placeholder="Filter {{ column.label }}"
+										name="{{ column.property }}"
+										[(ngModel)]="column.filter"
+									>
+									</kendo-numerictextbox>
+									<tds-button
+										*ngIf="
+											column.filter !== undefined &&
+											column.filter !== ''
+										"
+										(click)="clearValue(column)"
+										[title]="'Clear Filter'"
+										icon="times-circle"
+										[small]="true"
+										[flat]="true"
+									>
+									</tds-button>
 								</div>
-								<div *ngIf="column.type === 'boolean'">
-									<div class="filter-input">
-										<kendo-dropdownlist
-											[data]="booleanFilterData"
-											[(ngModel)]="column.filter"
-											(valueChange)="onFilter(column)"
-										></kendo-dropdownlist>
-										<tds-button
-											*ngIf="column.filter"
-											(click)="clearValue(column)"
-											[title]="'Clear Filter'"
-											icon="times-circle"
-											[small]="true"
-											[flat]="true"
-										>
-										</tds-button>
-									</div>
+								<div
+									*ngIf="column.type === 'boolean'"
+									class="filter-input"
+								>
+									<kendo-dropdownlist
+										[data]="booleanFilterData"
+										[(ngModel)]="column.filter"
+										(valueChange)="onFilter(column)"
+									></kendo-dropdownlist>
+									<tds-button
+										*ngIf="column.filter"
+										(click)="clearValue(column)"
+										[title]="'Clear Filter'"
+										icon="times-circle"
+										[small]="true"
+										[flat]="true"
+									>
+									</tds-button>
 								</div>
 							</div>
 						</ng-template>
