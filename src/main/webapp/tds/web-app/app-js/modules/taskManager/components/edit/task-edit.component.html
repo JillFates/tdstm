@@ -523,8 +523,9 @@
 
             <div class="modal-sidenav form-group-center">
                 <nav class="modal-sidenav btn-link">
-                    <tds-button-edit></tds-button-edit>
-                    <tds-button-delete (click)="deleteTask()" ></tds-button-delete>
+                    <tds-button-edit theme="primary"></tds-button-edit>
+                    <tds-button-save (click)="onSave()" [disabled]="isFormInvalid() || !hasEditTaskPermission"></tds-button-save>
+                    <tds-button-delete (click)="deleteTask()" [disabled]="!hasDeleteTaskPermission"></tds-button-delete>
                     <tds-button-close (click)="cancelCloseDialog($event)"></tds-button-close>
                 </nav>
             </div>
