@@ -24,14 +24,14 @@ export class NoticeColumnModel {
 				property: 'activationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 140
+				width: 170
 			},
 			{
 				label: 'Expiration Date',
 				property: 'expirationDate',
 				format: dateFormat,
 				type: 'date',
-				width: 140
+				width: 170
 			},
 			{
 				label: 'Sequence',
