@@ -586,7 +586,7 @@ div.graphContainer {
       border-width: 0px;
       margin-bottom: -1px;
       padding: 0px;
-      height: 32px;
+      height: auto !important;
       font-size: 0; }
       div.graphContainer div#toolsContainerId div#graphToolbarId:before {
         content: "";
@@ -736,119 +736,119 @@ div.graphContainer {
           font-size: 12px; }
         div.graphContainer div#toolsContainerId div#graphToolbarId span.controlWrapper input, div.graphContainer div#toolsContainerId div#graphToolbarId span.controlWrapper select {
           height: 22px; }
-    div.graphContainer div#toolsContainerId div.graphPanel {
-      float: left;
+    div.graphContainer div#toolsContainerId div#dependenciesPanelId {
+      min-width: 271px; }
+  div.graphContainer div#legacy-arch-graph-container {
+    position: relative;
+    border: 1px solid #0077b8; }
+    div.graphContainer div#legacy-arch-graph-container div.graphPanel {
       border: 1px solid #0077b8;
-      margin-left: 0px;
-      margin-top: 0px;
+      margin-left: 0;
+      margin-top: 0;
       padding: 5px;
       background-color: white;
       position: absolute;
-      padding-top: 10px;
-      z-index: 1;
       overflow-y: scroll;
-      height: 430px;
-      max-height: 430px;
-      top: 50px; }
-      div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
-        width: 0px; }
-      div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
+      height: auto;
+      max-height: 70vh;
+      top: 20px;
+      left: 15px;
+      min-width: 150px; }
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel::-webkit-scrollbar {
+        width: 0; }
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel.openPanel {
         display: block;
-        z-index: 1000; }
-      div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
+        z-index: 75; }
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel:not(.openPanel) {
         display: none; }
-      div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .hasChanges {
         background-color: green;
         color: white; }
-    div.graphContainer div#toolsContainerId div#controlPanelId {
-      min-width: 150px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId * {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel * {
         vertical-align: middle; }
-      div.graphContainer div#toolsContainerId div#controlPanelId table.labelTree {
-        border-width: 0px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId .halfButton {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel table.labelTree {
+        border-width: 0; }
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .halfButton {
         width: 95px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId .fullButton {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .fullButton {
         width: 193px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId .controlPanelLabel {
-        padding: 0px;
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .controlPanelLabel {
+        padding: 0;
         text-align: right;
         white-space: nowrap; }
-      div.graphContainer div#toolsContainerId div#controlPanelId .controlPanelControl {
-        padding-left: 0px;
-        padding-right: 0px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId #colorByFormId {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .controlPanelControl {
+        padding-left: 0;
+        padding-right: 0; }
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel #colorByFormId {
         padding-left: 2px;
-        padding-bottom: 0px;
+        padding-bottom: 0;
         padding-top: 2px; }
-        div.graphContainer div#toolsContainerId div#controlPanelId #colorByFormId span {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel #colorByFormId span {
           margin-right: 5px; }
-      div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon {
         opacity: 0.9999; }
-        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:hover {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon:hover {
           -webkit-filter: saturate(1.5);
           filter: saturate(1.5); }
-        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon:active {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon:active {
           -webkit-filter: saturate(10);
           filter: saturate(10); }
-        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.plus {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon.plus {
           color: green; }
-        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.minus {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon.minus {
           color: red; }
-        div.graphContainer div#toolsContainerId div#controlPanelId .plusMinusIcon.disabled {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel .plusMinusIcon.disabled {
           color: grey;
           -webkit-filter: saturate(0);
           filter: saturate(0);
           opacity: 0.5;
           cursor: default; }
-      div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td:not(.labelToggleCol) {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td:not(.labelToggleCol) {
         padding-left: 4px; }
-        div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td:not(.labelToggleCol) * {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td:not(.labelToggleCol) * {
           float: right; }
-      div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td.labelToggleCol {
+      div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td.labelToggleCol {
         vertical-align: middle;
         padding-top: 0px;
         padding-bottom: 0px;
         padding-right: 0px;
         padding-left: 5px; }
-        div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td.labelToggleCol * {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td.labelToggleCol * {
           vertical-align: middle; }
-        div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td.labelToggleCol svg {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td.labelToggleCol svg {
           padding-left: 10px;
           width: 40px;
           height: 30px;
           border-width: 0px; }
-        div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td.labelToggleCol div.checkboxContainer input {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td.labelToggleCol div.checkboxContainer input {
           margin-top: 0px; }
-        div.graphContainer div#toolsContainerId div#controlPanelId div#labelControlContainerId tr.labelToggleRow td.labelToggleCol div.checkboxContainer svg {
+        div.graphContainer div#legacy-arch-graph-container div.graphPanel div#labelControlContainerId tr.labelToggleRow td.labelToggleCol div.checkboxContainer svg {
           padding-left: 6px !important;
           padding-right: 5px !important; }
-    div.graphContainer div#toolsContainerId div#dependenciesPanelId {
-      min-width: 271px; }
-    div.graphContainer div#toolsContainerId div#legendDivId {
+    div.graphContainer div#legacy-arch-graph-container div#legendDivId {
       min-width: 245px; }
-      div.graphContainer div#toolsContainerId div#legendDivId table {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId table {
         margin-left: 5px;
         border: 0px; }
-      div.graphContainer div#toolsContainerId div#legendDivId p {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId p {
         display: inline; }
-      div.graphContainer div#toolsContainerId div#legendDivId svg {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId svg {
         border-width: 0px; }
-      div.graphContainer div#toolsContainerId div#legendDivId div#assetClassesContainerId svg {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId div#assetClassesContainerId svg {
         width: 35px;
         height: 35px; }
-      div.graphContainer div#toolsContainerId div#legendDivId div#dependencyTypeContainerId svg {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyTypeContainerId svg {
         width: 34px;
         height: 16px; }
-      div.graphContainer div#toolsContainerId div#legendDivId div#dependencyGroupContainerId td {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyGroupContainerId td {
         padding-top: 0px;
         padding-bottom: 0px; }
-        div.graphContainer div#toolsContainerId div#legendDivId div#dependencyGroupContainerId td span {
+        div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyGroupContainerId td span {
           display: inline-block;
           padding: 4px; }
-          div.graphContainer div#toolsContainerId div#legendDivId div#dependencyGroupContainerId td span.depLabel {
+          div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyGroupContainerId td span.depLabel {
             width: 100px; }
-          div.graphContainer div#toolsContainerId div#legendDivId div#dependencyGroupContainerId td span.toolTipButton {
+          div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyGroupContainerId td span.toolTipButton {
             background-image: url("../icons/help.png");
             background-repeat: no-repeat;
             background-position: 0px 1px;
@@ -856,26 +856,22 @@ div.graphContainer {
             height: 20px;
             padding: 0px;
             cursor: pointer; }
-        div.graphContainer div#toolsContainerId div#legendDivId div#dependencyGroupContainerId td div.popover {
+        div.graphContainer div#legacy-arch-graph-container div#legendDivId div#dependencyGroupContainerId td div.popover {
           width: 300px; }
-      div.graphContainer div#toolsContainerId div#legendDivId div#colorGroupingContainerId svg {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId div#colorGroupingContainerId svg {
         width: 35px;
         height: 35px; }
-      div.graphContainer div#toolsContainerId div#legendDivId div#colorGroupingContainerId table#colorGroupingTableId td.bundleColorExample {
+      div.graphContainer div#legacy-arch-graph-container div#legendDivId div#colorGroupingContainerId table#colorGroupingTableId td.bundleColorExample {
         padding: 0px;
         text-align: center;
         width: 40px; }
-  div.graphContainer div#svgContainerId {
-    border: 1px solid #0077b8;
-    border-width: 1px;
-    padding: 0px !important;
-    margin: 0px !important;
-    overflow: hidden;
-    font-size: 0;
-    position: relative;
-    top: 30px; }
-    div.graphContainer div#svgContainerId svg {
-      border: none !important; }
+    div.graphContainer div#legacy-arch-graph-container div#svgContainerId {
+      padding: 0 !important;
+      margin: 0 !important;
+      font-size: 0;
+      position: relative; }
+      div.graphContainer div#legacy-arch-graph-container div#svgContainerId svg {
+        border: none !important; }
   div.graphContainer button.baseline-btn {
     margin: 0 10px; }
 
@@ -904,10 +900,6 @@ div.graphContainer.fullscreen {
         opacity: 0.8; }
       div.graphContainer.fullscreen div#toolsContainerId div#graphToolbarId .graphTabButton {
         border-top-width: 0px !important; }
-    div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
-      margin-top: -1px;
-      top: 50px;
-      left: 0px; }
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelLabel {
       padding: 0px;
       text-align: right;
@@ -915,13 +907,18 @@ div.graphContainer.fullscreen {
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelControl {
       padding-left: 0px;
       padding-right: 0px; }
-  div.graphContainer.fullscreen div#svgContainerId {
-    border: none !important;
-    position: fixed;
-    left: 0px;
-    top: 0px; }
-    div.graphContainer.fullscreen div#svgContainerId svg {
-      border-width: 0px; }
+  div.graphContainer.fullscreen div#legacy-arch-graph-container {
+    position: relative; }
+    div.graphContainer.fullscreen div#legacy-arch-graph-container div.graphPanel {
+      top: 20px;
+      left: 15px; }
+    div.graphContainer.fullscreen div#legacy-arch-graph-container div#svgContainerId {
+      border: none !important;
+      position: fixed;
+      left: 0px;
+      top: 0px; }
+      div.graphContainer.fullscreen div#legacy-arch-graph-container div#svgContainerId svg {
+        border-width: 0px; }
 
 #scriptDivId {
   padding: 0px; }
@@ -2883,6 +2880,13 @@ div.content-wrapper div.execution-phase-wrapper {
   .cookbook_recipes_editor .clr-select-wrapper select,
   .recipeDetail .clr-select-wrapper select {
     display: inherit; }
+
+.cookbook_recipes_editor .recipe-add {
+  width: 40px; }
+  .cookbook_recipes_editor .recipe-add button {
+    max-height: 30px;
+    line-height: 30px;
+    min-width: 44px; }
 
 .taskGeneration .container-fluid {
   padding-left: 0px; }
