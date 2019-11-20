@@ -18,7 +18,7 @@ export class TaskSuccessorPredecessorColumnsModel {
 				label: 'Task #',
 				property: 'taskNumber',
 				type: 'text',
-				width: 40
+				width: 50
 			},
 			{
 				label: 'Task',
@@ -30,7 +30,7 @@ export class TaskSuccessorPredecessorColumnsModel {
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 80
+				width: 75
 			}
 		];
 	}

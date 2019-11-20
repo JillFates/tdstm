@@ -430,6 +430,17 @@
                                                         </tds-combobox>
                                                     </ng-template>
 
+                                                    <ng-template kendoGridCellTemplate
+                                                                 let-dataItem
+                                                                 let-rowIndex="rowIndex"
+                                                                 *ngIf="column.property === 'status'">
+                                                        <tds-task-status-indicator
+                                                                class="pad-left-7"
+                                                                [propertyName]="column.property"
+                                                                [value]="dataItem[column.property]">
+                                                        </tds-task-status-indicator>
+                                                    </ng-template>
+
                                                 </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>
@@ -474,6 +485,18 @@
                                                                 (selectionChange)="onDependencyTaskChange($event, 'successor', dataGridTaskSuccessorsHelper,  rowIndex)">
                                                         </tds-combobox>
                                                     </ng-template>
+
+                                                    <ng-template kendoGridCellTemplate
+                                                                 let-dataItem
+                                                                 let-rowIndex="rowIndex"
+                                                                 *ngIf="column.property === 'status'">
+                                                        <tds-task-status-indicator
+                                                                class="pad-left-7"
+                                                                [propertyName]="column.property"
+                                                                [value]="dataItem[column.property]">
+                                                        </tds-task-status-indicator>
+                                                    </ng-template>
+
                                                 </kendo-grid-column>
                                                 <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
                                             </kendo-grid>
