@@ -26,7 +26,7 @@ databaseChangeLog = {
 	*/
 
 	changeSet(author: 'oluna', id: '20191119 TM-16431') {
-		comment('Drop table step_snapshot')
+		comment("Recreate table step_snapshot in case that it doesn't exist")
 
 		preConditions(onFail: 'MARK_RAN') {
 			not {
