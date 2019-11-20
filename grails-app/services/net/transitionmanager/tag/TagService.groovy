@@ -230,6 +230,29 @@ class TagService implements ServiceMethods {
 	}
 
 	/**
+	 *  Lists tags by project using projections.
+	 *  <pre>
+	 *  getTagIdAndName(currentProject) == [
+	 * 			[5, 'GDPR'],
+	 * 			[6, 'HIPPA'],
+	 * 			[7, 'PCI'],
+	 * 			[8, 'SOX']
+	 * 		]
+	 *  </pre>
+	 * @param currentProject
+	 * @return
+	 */
+	List<Object> getTagIdAndName(Project currentProject) {
+		return Tag.createCriteria().list {
+			eq('project', currentProject)
+			projections {
+				groupProperty('id')
+				groupProperty('name')
+			}
+		}
+	}
+
+	/**
 	 * Clone any existing tags associated to sourceProject (if any),
 	 * then associate those newly created tags to targetProject.
 	 *

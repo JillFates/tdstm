@@ -7,6 +7,7 @@ import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
+import groovy.transform.CompileStatic
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
@@ -46,7 +47,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
 
-/**
+/*
  * Class that receives all the ETL initial commands.
  * <pre>
  * 	extract 'dataSetFieldName' load 'assetFieldName'
@@ -424,10 +425,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Aborts processing of the current row for the domain in the context
 	 * <pre>
-	 *  if (SOURCE.Env == 'Development) {
-	 *  	ignore record
-	 *	}
-	 * </pre>
+	 *  if (SOURCE.Env == 'Development) {*  	ignore record
+	 *}* </pre>
 	 * @param label just a label to detect if the command was used with 'row' label
 	 * @return current instance of ETLProcessor
 	 */
@@ -763,7 +762,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return new CommentElement(this, this.selectedDomain.domain)
 	}
 
-	/**
+	/*
 	 * Create a local variable using variableName parameter.
 	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
@@ -784,7 +783,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		doSet(localVariable.name)
 	}
 
-	/**
+	/*
 	 * Create a local variable using variableName parameter.
 	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
@@ -794,7 +793,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	    def varName = 'myVarName'
 	 * 		set varName with 'Production'
 	 * 		.....
-	 *	}
+	 *  }
 	 * </pre>
 	 * @param field
 	 * @return
@@ -832,7 +831,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		]
 	}
 
-	/**
+	/*
 	 * Lookup ETL command implementation:
 	 * <pre>
 	 *  iterate {
@@ -843,7 +842,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *      def clusterName = CE
 	 *
 	 *      lookup 'assetName' with 'clusterName'
-	 *}* 	</pre>
+	 * }
+	 * </pre>
 	 * @param fieldNames
 	 */
 
@@ -852,7 +852,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return new LookupElement(this, [fieldName])
 	}
 
-	/**
+	/*
 	 * Lookup ETL command for multiple parameters implementation:
 	 * <pre>
 	 *  set lookupNameVar = 'assetName'
@@ -878,8 +878,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
-	 * 	iterate {
-	 * 		domain Application
+	 * 	iterate {* 		domain Application
 	 * 		initialize 'environment' with 'Production'
 	 * 	    initialize 'environment' with Production
 	 * 	    initialize 'environment' with SOURCE.'application id'
@@ -887,8 +886,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *
 	 * 	    extract 'application id'
 	 * 	    initialize 'environment' with CE
-	 *	}
-	 * </pre>
+	 *}* </pre>
 	 * @param field
 	 * @return
 	 */
@@ -918,13 +916,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
-	/**
+	/*
 	 * Initialize a fieldName using a default value
 	 * <pre>
 	 * 	iterate {
 	 * 		domain Application
 	 * 		init 'environment' with 'Production'
-	 *	}
+	 * }
 	 * </pre>
 	 * @param field
 	 * @return
@@ -1124,10 +1122,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tagName a String with a tag name content to be added
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagAdd(Object tagName) {
-		String value = ETLValueHelper.valueOf(tagName)
-		tagValidator.validate(value)
-		result.addTag(value)
+		result.addTag(validateTagValue(tagName))
 		return this
 	}
 
@@ -1139,6 +1136,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tags a List of String with a tag names
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagAdd(List<Object> tags) {
 		for (Object tag : tags) {
 			tagAdd(tag)
@@ -1154,6 +1152,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tags a List of String with a tag names
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagAdd(Object... tags) {
 		for (Object tag : tags) {
 			tagAdd(tag)
@@ -1169,10 +1168,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tagName a String with a tag name content to be removed
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagRemove(Object tagName) {
-		String value = ETLValueHelper.valueOf(tagName)
-		tagValidator.validate(value)
-		result.removeTag(value)
+		result.removeTag(validateTagValue(tagName))
 		return this
 	}
 
@@ -1185,6 +1183,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tags a List of String with a tag names
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagRemove(Object... tags) {
 		for (Object tag : tags) {
 			tagRemove(tag)
@@ -1201,6 +1200,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param tags a List of String with a tag names
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagRemove(List tags) {
 		for (Object tag : tags) {
 			tagRemove(tag)
@@ -1216,16 +1216,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param newTag a new Tag for replacing
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagReplace(Object currentTag, Object newTag) {
-		String currentValue = ETLValueHelper.valueOf(currentTag)
-		tagValidator.validate(currentValue)
-
-		String newValue = ETLValueHelper.valueOf(newTag)
-		tagValidator.validate(newValue)
-
-		result.replaceTag(currentValue, newValue)
+		result.replaceTag(validateTagValue(currentTag), validateTagValue(newTag))
 		return this
 	}
+
 	/**
 	 * Replaces a list of tag defined by the map key with map value on an asset if associated
 	 * <pre>
@@ -1235,8 +1231,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param newTag a new Tag for replacing
 	 * @return an instance of {@code ETLProcessor}
 	 */
-	ETLProcessor tagReplace(Map... tags) {
-		tags.each { tagReplace(it) }
+	@CompileStatic
+	ETLProcessor tagReplace(Map<String, ?>... tags) {
+		tags.each { Map<String, ?> tag -> tagReplace(tag) }
 		return this
 	}
 	/**
@@ -1248,6 +1245,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param newTag a new Tag for replacing
 	 * @return an instance of {@code ETLProcessor}
 	 */
+	@CompileStatic
 	ETLProcessor tagReplace(Map map) {
 		map.each { Object key, Object value ->
 			tagReplace(key, value)
@@ -1352,6 +1350,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	// ------------------------------------
 	// Support methods
 	// ------------------------------------
+
+	/**
+	 * Takes tag name from tag parameter using {@code ETLValueHelper#valueOf}
+	 * and after that it validate tag name using {@code ETLTagValidator#validate}
+	 * @param tag an Object param used in ETL command
+	 * @return String tag name after transforming and validating tag parameter
+	 */
+	private String validateTagValue(Object tag) {
+		String tagValue = ETLValueHelper.valueOf(tag)
+		tagValidator.validate(tagValue)
+		return tagValue
+	}
 
 	/**
 	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded

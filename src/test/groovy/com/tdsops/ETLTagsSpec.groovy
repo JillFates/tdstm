@@ -369,6 +369,36 @@ class ETLTagsSpec extends ETLBaseSpec {
 				}
 			}
 
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Application
+					extract 'application id' load 'Id'
+					extract 'current tag' set currentTag
+					extract 'new tag' set newTag
+					tagReplace "\${currentTag}":newTag
+				}
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['id'], '12345678', '12345678')
+						assertWith(tags, TagResults) {
+							add == [] as Set
+							remove == [] as Set
+							replace == [(currentTag): newTag]
+						}
+					}
+				}
+			}
+
 		cleanup:
 			if (fileName) {
 				fileSystemService.deleteTemporaryFile(fileName)
@@ -577,20 +607,68 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 	}
 
+	@See('TM-11583')
+	void 'test can not create tags results in ETLProcessorResult if any command of tags was used in an ETL script'() {
+
+		given:
+			String tagName = 'Code Blue'
+
+		and:
+			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+				application id,tag
+				12345678,$tagName
+			""".stripIndent())
+
+			tagValidator.addTag(100l, tagName)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				console on
+				read labels
+				iterate {
+					domain Application
+					extract 'application id' load 'Id'
+				}
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Application.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['id'], '12345678', '12345678')
+						tags == null
+					}
+				}
+			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
 
 	/**
 	 * Creates a {@code ETLTagValidator} instance used in test cases.
+	 *
 	 * @return an instance of {@code ETLTagValidator}
 	 */
 	protected ETLTagValidator createTagValidator() {
-		ETLTagValidator tagValidator = new ETLTagValidator(5l, 'GDPR', 'General Data Protection Regulation Compliance')
-
-		tagValidator.addTag(6l, 'HIPPA', 'Health Insurance Portability and Accountability Act Compliance')
-		tagValidator.addTag(7l, 'PCI', 'Payment Card Industry Data Security Standard Compliance')
-		tagValidator.addTag(8l, 'SOX', 'Sarbanes–Oxley Act Compliance')
-		tagValidator.addTag(9l, 'Pablo2019Tag1', '')
-
-
+		ETLTagValidator tagValidator = new ETLTagValidator(5l, 'GDPR')
+		tagValidator.addTag(6l, 'HIPPA')
+		tagValidator.addTag(7l, 'PCI')
+		tagValidator.addTag(8l, 'SOX')
 		return tagValidator
 	}
 }

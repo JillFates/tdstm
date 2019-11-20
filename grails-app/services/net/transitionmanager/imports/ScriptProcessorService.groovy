@@ -117,8 +117,8 @@ class ScriptProcessorService {
 	 */
 	private ETLTagValidator createTagValidator(Project project) {
 		ETLTagValidator tagValidator = new ETLTagValidator()
-		tagService.list(project)?.each { Map tag ->
-			tagValidator.addTag(tag.id, tag.name, tag.description)
+		tagService.getTagIdAndName(project).each {Object tagInfo ->
+			tagValidator.addTag(tagInfo[0], tagInfo[1])
 		}
 		return tagValidator
 	}
