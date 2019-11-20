@@ -63,7 +63,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '1. test create dataview without project throws exception'() {
 		setup:
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true }, isLoggedIn: {return true}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
 			dataviewJson.saveAsOption = 0
@@ -157,8 +157,6 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '7. test create dataview to throw saveMyViewInDefaultProject exception'() {
 		setup:
-			Person person = personHelper.createPerson()
-			Project project = projectTestHelper.createProject(null)
 			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
@@ -172,8 +170,6 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '8. test create dataview to throw overrideForSelfInDefaultProject exception'() {
 		setup:
-			Person person = personHelper.createPerson()
-			Project project = projectTestHelper.createProject(null)
 			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
@@ -187,9 +183,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '9. test create dataview to throw overrideGlobalPermission exception'() {
 		setup:
-			Person person = personHelper.createPerson()
-			Project project = projectTestHelper.createProject(null)
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
 			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
@@ -198,5 +192,44 @@ class DataviewServiceIntegrationSpec extends Specification{
 		then:
 			UnauthorizedException e = thrown()
 			e.message ==~ /.*You do not have the necessary permission to save override views for the Default project.*/
+	}
+
+	void '10. test create dataview to throw createPermission exception'() {
+		setup:
+		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+		JSONObject dataviewJson = createDataview(null)
+		dataviewJson.isSystem = false
+		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+		when: 'creating a dataview for non-system view as my view'
+		dataviewService.create(person, project , dataviewJson)
+		then:
+		UnauthorizedException e = thrown()
+		e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+	}
+
+	void '11. test create dataview to throw createOverridePermission exception'() {
+		setup:
+		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+		JSONObject dataviewJson = createDataview(null)
+		dataviewJson.isSystem = false
+		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+		when: 'creating a dataview for non-system view as override for me'
+		dataviewService.create(person, project , dataviewJson)
+		then:
+		UnauthorizedException e = thrown()
+		e.message ==~ /.*You do not have the necessary permission to save override views.*/
+	}
+
+	void '12. test create dataview to throw overrideAllUsers exception'() {
+		setup:
+		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+		JSONObject dataviewJson = createDataview(null)
+		dataviewJson.isSystem = false
+		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+		when: 'creating a dataview for non-system view as override for all'
+		dataviewService.create(person, project , dataviewJson)
+		then:
+		UnauthorizedException e = thrown()
+		e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
 	}
 }
