@@ -1357,9 +1357,6 @@ div.dates-info-container {
 
 .tds-modal-content {
   background: #fff; }
-  .tds-modal-content.with-box-shadow {
-    -webkit-box-shadow: 0 5px 15px darkgray;
-    box-shadow: 0 5px 15px darkgray; }
   .tds-modal-content.has-side-nav .modal-header,
   .tds-modal-content.has-side-nav .modal-body {
     margin-left: 40px; }

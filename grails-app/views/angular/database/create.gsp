@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()" class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()" class="tds-modal-content has-side-nav tds-angular-component-content">
 	<div class="modal-header">
 		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Create</h4>
@@ -18,7 +18,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
 	</div>
-	<div class="modal-body no-description" tdsScrollContainer style="position: relative">
+	<div class="modal-body asset-crud no-description" tdsScrollContainer style="position: relative">
 		<form 
 			name="form" 
 			(ngSubmit)="form.form.valid && onCreate()"

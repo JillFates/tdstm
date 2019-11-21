@@ -5,7 +5,7 @@
 
 <g:set var="assetClass" value="${(new Application()).assetClass}" />
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content has-side-nav tds-angular-component-content">
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="cancelCloseDialog()"></tds-button-close>
 
@@ -108,7 +108,7 @@
         </div>
 	</div>
 
-	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+	<div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">
