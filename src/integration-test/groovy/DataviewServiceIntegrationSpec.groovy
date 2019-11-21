@@ -63,7 +63,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '1. test create dataview without project throws exception'() {
 		setup:
-			dataviewService.securityService = [hasPermission: { return true }, isLoggedIn: {return true}] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
 			dataviewJson.saveAsOption = 0
@@ -76,7 +77,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '2. test create dataview with duplicate name within same project throws exception'() {
 		setup:
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewService.create(person, project, dataviewJson)
 		when: 'creating a second dataview with same name and project'
@@ -88,7 +90,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '4. Test that unique name validation with duplicate name within same project returns false'() {
 		setup:
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview('my dataview name')
 			dataviewService.create(person, project, dataviewJson)
 		when: 'a dataview with same name and project is tested'
@@ -100,7 +103,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 	void '5. test unique name validation with duplicate name for a different project returns true'() {
 		setup:
 			Project anotherProject = projectTestHelper.createProject()
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview('my dataview name')
 			dataviewService.create(person, project, dataviewJson)
 		when: 'validate if a dataview with same name for a different project can be created'
@@ -196,40 +200,54 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '10. test create dataview to throw createPermission exception'() {
 		setup:
-		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
-		JSONObject dataviewJson = createDataview(null)
-		dataviewJson.isSystem = false
-		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
 		when: 'creating a dataview for non-system view as my view'
-		dataviewService.create(person, project , dataviewJson)
+			dataviewService.create(person, project , dataviewJson)
 		then:
-		UnauthorizedException e = thrown()
-		e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+			UnauthorizedException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
 	}
 
 	void '11. test create dataview to throw createOverridePermission exception'() {
 		setup:
-		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
-		JSONObject dataviewJson = createDataview(null)
-		dataviewJson.isSystem = false
-		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
 		when: 'creating a dataview for non-system view as override for me'
-		dataviewService.create(person, project , dataviewJson)
+			dataviewService.create(person, project , dataviewJson)
 		then:
-		UnauthorizedException e = thrown()
-		e.message ==~ /.*You do not have the necessary permission to save override views.*/
+			UnauthorizedException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views.*/
 	}
 
 	void '12. test create dataview to throw overrideAllUsers exception'() {
 		setup:
-		dataviewService.securityService = [hasPermission: { return false }] as SecurityService
-		JSONObject dataviewJson = createDataview(null)
-		dataviewJson.isSystem = false
-		dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
 		when: 'creating a dataview for non-system view as override for all'
-		dataviewService.create(person, project , dataviewJson)
+			dataviewService.create(person, project , dataviewJson)
 		then:
-		UnauthorizedException e = thrown()
-		e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+			UnauthorizedException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+	}
+
+	void '13. test creating override dataview'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = 1
+			dataviewJson.overridesView = 1
+		when: 'creating a valid override dataview'
+			dataviewService.create(person, project, dataviewJson)
+		then:
+			Dataview.findAll()
 	}
 }
