@@ -129,7 +129,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Traps EQL expression with undefined variable therefore throws an exception
 	 * <pre>
-	 * 	extract 1 load aBogusVariableNameVar
+	 * 	extract 1 load aNotPreviouslyDefinedVariable
 	 * </pre>
 	 * @param localVariableDefinition
 	 * @throws {@code ETLProcessorException}

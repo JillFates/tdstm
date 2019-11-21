@@ -200,6 +200,8 @@ export class TaskListComponent {
 					});
 				} else if (result.shouldOpenTask) {
 					this.onOpenTaskDetailHandler(result.commentInstance);
+				} else if (result.shouldEdit) {
+					this.onOpenTaskEditHandler(result.id);
 				} else {
 					this.search(parseInt(taskRow.id, 0));
 				}
@@ -642,13 +644,10 @@ export class TaskListComponent {
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
-				// silently load all task action info model, this to improve the performance when opening the task detail row.
 				if (taskId && taskId >= 0) {
 					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
 				} else {
-					result.rows.forEach(taskRow => {
-						this.loadTaskInfoModel(taskRow.id, true).subscribe(() => {/* loaded */});
-					});
+					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 				}
 			});
 		this.loaderService.stopProgress();

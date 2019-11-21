@@ -30,7 +30,7 @@ class ETLScriptsCleanUpSpec extends GebReportingSpec{
         to LoginPage
         login()
         at MenuPage
-        projectsModule.goToETLScripts()
+        waitFor{projectsModule.goToETLScripts()}
         at ETLScriptsPage
     }
 

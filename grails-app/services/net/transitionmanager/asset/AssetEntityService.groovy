@@ -1209,7 +1209,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	List<Map> getMoveBundles(Project project) {
 		List<String> properties = [
-			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'completionTime',
 			'operationalOrder', 'operationalOrder', 'useForPlanning', 'project'
 		]
 		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])

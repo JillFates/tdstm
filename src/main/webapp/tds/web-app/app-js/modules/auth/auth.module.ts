@@ -16,12 +16,14 @@ import {UserService} from './service/user.service';
 import {AuthGuardService} from './service/auth.guard.service';
 import {LoginService} from './service/login.service';
 import {PermissionService} from '../../shared/services/permission.service';
+import {PageService} from './service/page.service';
 // Components
 import {LoginComponent} from './components/login/login.component';
 import {ForgotPasswordComponent} from './components/forgot-password/forgot-password.component';
 import {ChangePasswordComponent} from './components/change-password/change-password.component';
 import {StandardNoticesComponent} from '../noticeManager/components/standard-notices/standard-notices.component';
 import {MandatoryNoticesComponent} from '../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import {SelectProjectModalComponent} from '../project/components/select-project-modal/select-project-modal.component';
 
 @NgModule({
 	imports: [
@@ -41,18 +43,21 @@ import {MandatoryNoticesComponent} from '../noticeManager/components/mandatory-n
 		PermissionService,
 		UserContextService,
 		AuthGuardService,
-		LoginService
+		LoginService,
+		PageService
 	],
 	declarations: [
 		LoginComponent,
 		ForgotPasswordComponent,
 		ChangePasswordComponent,
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		SelectProjectModalComponent
 	],
 	entryComponents: [
 		StandardNoticesComponent,
-		MandatoryNoticesComponent
+		MandatoryNoticesComponent,
+		SelectProjectModalComponent
 	]
 })
 export class AuthModule {

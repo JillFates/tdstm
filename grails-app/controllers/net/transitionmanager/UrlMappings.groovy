@@ -311,9 +311,9 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/bundleData/$id?" {
+		"/ws/dashboard/eventData/$id" {
 			controller = "wsDashboard"
-			action = [GET:"bundleData"]
+			action = [GET:"eventData"]
 		}
 
 		"/ws/dashboard/getPlanningStats" {
@@ -494,13 +494,13 @@ class UrlMappings {
 			action = [GET: "getInfoForActionBar"]
 		}
 
-        "/ws/task/customColumns" {
-            controller = "wsTask"
-            action = [
-                    GET:"listCustomColumns",
-                    POST: "setCustomColumns"
-            ]
-        }
+		"/ws/task/customColumns" {
+			controller = "wsTask"
+			action = [
+				GET:"listCustomColumns",
+				POST: "setCustomColumns"
+			]
+		}
 
 		"/ws/task/generateTasks" {
 			controller = "wsTask"
@@ -574,15 +574,25 @@ class UrlMappings {
 			]
 		}
 
-        "/ws/task/$id/changeTime" {
-            controller = "wsTask"
-            action = [POST:"changeEstTime"]
-        }
-
-        "/ws/task/$id/updateStatus" {
-            controller = "wsTask"
-            action = [POST:"updateStatus"]
-        }
+		"/ws/task/$id/changeTime" {
+			controller = "wsTask"
+			action = [POST:"changeEstTime"]
+		}
+		
+		"/ws/task/$id/updateStatus" {
+			controller = "wsTask"
+			action = [POST:"updateStatus"]
+		}
+		
+		"/ws/timeline/$id/timeline" {
+			controller = "wsTimeLine"
+			action = [GET:"timeline"]
+		}
+		
+		/*"/ws/timeline/$id/updateStatus" {
+			controller = "wsTask"
+			action = [POST:"updateStatus"]
+		}*/
 
 		"/ws/progress/$id" {
 			controller = "wsProgress"
@@ -671,10 +681,10 @@ class UrlMappings {
 			action = [ GET: "getAssignedPeople" ]
 		}
 
-        "/ws/user/mapAreas" {
-            controller = "wsUser"
-            action = [GET: "getMapAreas"]
-        }
+		"/ws/user/mapAreas" {
+			controller = "wsUser"
+			action = [GET: "getMapAreas"]
+		}
 
 		"/ws/user/timezones" {
 			controller = "wsUser"
@@ -722,6 +732,11 @@ class UrlMappings {
 		"/ws/user/updateAccountAdmin" {
 			controller = "wsUser"
 			action = [POST:"updateAccountAdmin"]
+		}
+
+		"/ws/user/updateLastPage" {
+			controller = "wsUser"
+			action = [GET:"updateLastPage"]
 		}
 
 		"/ws/progress" {
@@ -1488,12 +1503,12 @@ class UrlMappings {
 			]
 		}
 
-        "/ws/reports/moveBundles" {
-            controller = "wsReports"
-            action = [
-                    GET: "moveBundles"
-            ]
-        }
+		"/ws/reports/moveBundles" {
+			controller = "wsReports"
+			action = [
+				GET: "moveBundles"
+			]
+		}
 
 		"/ws/reports/moveBundlesForSelection" {
 			controller = "wsReports"

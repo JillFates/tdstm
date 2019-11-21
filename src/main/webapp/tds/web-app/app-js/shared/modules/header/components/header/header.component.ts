@@ -17,6 +17,7 @@ import {PasswordChangeModel} from '../../model/password-change.model';
 import {PageMetadataModel} from '../../model/page-metadata.model';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
+import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 
 declare var jQuery: any;
 
@@ -97,6 +98,7 @@ export class HeaderComponent {
 	 */
 	public logOut(): void {
 		localStorage.removeItem(APP_STATE_KEY);
+		localStorage.removeItem(LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY);
 		this.store.dispatch(new Logout());
 	}
 }

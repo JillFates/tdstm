@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "bd9e9a76-4531-4263-8c48-9c997ed91ad6",
+		"_postman_id": "d2b33a44-6ea0-498c-8d27-2c00f779f686",
 		"name": "Tag Event CRUD",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -61,53 +61,74 @@
 			"response": []
 		},
 		{
-			"name": "set current project",
+			"name": "Set current project",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"    ",
 							"});",
 							"",
-							""
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
+							"});"
 						],
 						"type": "text/javascript"
 					}
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{projectId}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "create tag",
+			"name": "Create Tag",
 			"event": [
 				{
 					"listen": "test",
@@ -168,7 +189,7 @@
 			"response": []
 		},
 		{
-			"name": "create another tag",
+			"name": "Create another tag",
 			"event": [
 				{
 					"listen": "test",
@@ -240,12 +261,10 @@
 							"",
 							"pm.test(\"Events have been listed.\", function () {",
 							"    var jsonData = pm.response.json();",
-							"    ",
-							"    var data = jsonData.rows",
-							"    pm.globals.set(\"event1\", data[0].id);",
-							"    pm.globals.set(\"event2\", data[1].id);",
-							"    pm.globals.set(\"event3\", data[2].id);",
-							"    pm.globals.set(\"event4\", data[3].id);",
+							"    pm.globals.set(\"event1\", jsonData.data[0].id);",
+							"    pm.globals.set(\"event2\", jsonData.data[1].id);",
+							"    pm.globals.set(\"event3\", jsonData.data[2].id);",
+							"    pm.globals.set(\"event4\", jsonData.data[3].id);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -265,28 +284,15 @@
 					}
 				],
 				"url": {
-					"raw": "{{host}}/tdstm/moveEvent/listJson?_search=false&nd=15453170873241&sidx=name",
+					"raw": "{{host}}/tdstm/ws/moveEvent/list",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
+						"ws",
 						"moveEvent",
-						"listJson"
-					],
-					"query": [
-						{
-							"key": "_search",
-							"value": "false"
-						},
-						{
-							"key": "nd",
-							"value": "15453170873241"
-						},
-						{
-							"key": "sidx",
-							"value": "name"
-						}
+						"list"
 					]
 				},
 				"description": "This EP will bring a list of events. Some event ids will be saved in order to add the created tags to them."
@@ -294,7 +300,7 @@
 			"response": []
 		},
 		{
-			"name": "create tagEvent",
+			"name": "Create TagEvent",
 			"event": [
 				{
 					"listen": "test",
@@ -362,7 +368,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvent after creating",
+			"name": "List tagEvent after creating",
 			"event": [
 				{
 					"listen": "test",
@@ -424,13 +430,12 @@
 			"response": []
 		},
 		{
-			"name": "create tagEvent 2",
+			"name": "Create tagEvent 2",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "efdab324-f67f-429c-ad74-44f1b410f25d",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -449,7 +454,8 @@
 							"    ",
 							"    postman.setGlobalVariable(\"tag_event_id3\", data1.id);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -485,7 +491,7 @@
 			"response": []
 		},
 		{
-			"name": "create tagEvent 3",
+			"name": "Create tagEvent 3",
 			"event": [
 				{
 					"listen": "test",
@@ -547,7 +553,7 @@
 			"response": []
 		},
 		{
-			"name": "create tagEvent 4",
+			"name": "Create tagEvent 4",
 			"event": [
 				{
 					"listen": "test",
@@ -609,7 +615,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvents before merge",
+			"name": "List tagEvents before merge",
 			"event": [
 				{
 					"listen": "test",
@@ -670,7 +676,6 @@
 					"listen": "test",
 					"script": {
 						"id": "032ac9a8-aa95-4151-8f48-b2d99daa7ba3",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -680,7 +685,8 @@
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.status).to.eql('success');",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -718,7 +724,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvents after merge",
+			"name": "List tagEvents after merge",
 			"event": [
 				{
 					"listen": "test",
@@ -775,7 +781,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvents after merge 2",
+			"name": "List tagEvents after merge 2",
 			"event": [
 				{
 					"listen": "test",
@@ -827,7 +833,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvents after merge 3",
+			"name": "List tagEvents after merge 3",
 			"event": [
 				{
 					"listen": "test",
@@ -879,7 +885,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvents after merge 4",
+			"name": "List tagEvents after merge 4",
 			"event": [
 				{
 					"listen": "test",
@@ -936,7 +942,6 @@
 					"listen": "test",
 					"script": {
 						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -949,7 +954,8 @@
 							"    var data = jsonData.data",
 							"    pm.expect(data).to.eql({});",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -987,13 +993,12 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvent after delete",
+			"name": "List tagEvent after delete",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"id": "33c3d2b2-c554-4ce6-9dee-07ba44973824",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1003,7 +1008,8 @@
 							"    var response = pm.response.json();",
 							"    pm.expect(response.data).to.eql([]);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1036,7 +1042,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvent after delete 2",
+			"name": "List tagEvent after delete 2",
 			"event": [
 				{
 					"listen": "test",
@@ -1087,7 +1093,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvent after delete 3",
+			"name": "List tagEvent after delete 3",
 			"event": [
 				{
 					"listen": "test",
@@ -1137,7 +1143,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagEvent after delete 4",
+			"name": "List tagEvent after delete 4",
 			"event": [
 				{
 					"listen": "test",
@@ -1193,7 +1199,6 @@
 					"listen": "test",
 					"script": {
 						"id": "eabc81f5-b819-4290-b497-24862b2010c2",
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
@@ -1206,7 +1211,8 @@
 							"    var data = jsonData.data",
 							"    pm.expect(data).to.eql({});",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -1243,7 +1249,7 @@
 			"response": []
 		},
 		{
-			"name": "list tags after delete",
+			"name": "List tags after delete",
 			"event": [
 				{
 					"listen": "test",
@@ -1330,5 +1336,6 @@
 			"value": "2445",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }
