@@ -57,7 +57,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 		}
 
 		launchManageStaff(id): void {
@@ -95,7 +95,7 @@ export function ApplicationShowComponent(template, modelId: number, metadata: an
 					];
 
 					this.dialogService
-						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.APPLICATION, result.assetId);
 				}
