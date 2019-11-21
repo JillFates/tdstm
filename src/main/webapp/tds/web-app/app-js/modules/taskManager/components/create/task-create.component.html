@@ -14,7 +14,7 @@
             </div>
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height create-form">
-                    <table *ngIf="modelInitialized" style="border: 0;" class="full-height"
+                    <table style="border: 0;" class="full-height"
                            [ngClass]="{'has-duplicated-predecessors': modelHelper?.hasDuplicatedPredecessors(),
                                        'has-duplicated-successors': modelHelper?.hasDuplicatedSuccessors(),
                                        'has-double-assignment': modelHelper?.hasDoubleAssignment()}">
@@ -349,7 +349,7 @@
                             </td>
                         </tr>
                         <tr class="deps grow-container">
-                            <table *ngIf="modelInitialized" class="create-task">
+                            <table class="create-task">
                                 <tr>
                                     <td valign="top">
                                         <kendo-grid
