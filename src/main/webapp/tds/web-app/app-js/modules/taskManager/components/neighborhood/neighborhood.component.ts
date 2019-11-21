@@ -236,7 +236,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
 			&& this.diagramLayoutService.isCacheFromMoveEvent()) {
 			this.generateModelFromCache();
-		} else {
+		} else if (this.selectedEvent && this.selectedEvent.id) {
 			const filters = {
 				myTasks: this.myTasks ? '1' : '0',
 				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
