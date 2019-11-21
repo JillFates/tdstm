@@ -69,7 +69,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
-		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
+		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 
@@ -413,7 +413,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 */
 	public deleteTask(): void {
 		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))
