@@ -77,6 +77,7 @@ class DataScriptService implements ServiceMethods{
             name = dataScriptJson.name
             description = dataScriptJson.description
 			isAutoProcess = dataScriptJson.isAutoProcess?:false
+			useWithAssetActions = dataScriptJson.useWithAssetActions?:false
             target = dataScriptJson.target
             etlSourceCode = dataScriptJson.etlSourceCode?:dataScript.etlSourceCode
             provider = providerInstance
