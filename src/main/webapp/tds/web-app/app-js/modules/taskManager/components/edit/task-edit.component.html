@@ -31,26 +31,29 @@
                                 <td class="" colspan="2">
                                     <div class="dialog tds-table">
                                         <table class="task-details">
-                                            <tbody>
+                                            <tbody [ngClass]="{'collapsed-table': collapsedTaskDetail}">
                                             <tr class="prop">
                                                 <td class="N edge-cell" nowrap="nowrap">
                                                     <label class="required-field">Task # {{model.taskNumber}}</label>
                                                 </td>
                                                 <td class="valueNW description-container" colspan="4">
                                                     <div class="validated-field">
-                                                        <input type="text" name="comment" [(ngModel)]="model.comment" required>
+                                                        <input type="text" name="comment" class="comment" [(ngModel)]="model.comment" required>
                                                         <div class="error-message">{{'TASK_MANAGER.EDIT.REQUIRED_FIELD' | translate}}</div>
                                                     </div>
                                                 </td>
                                                 <td colspan="1" class="btn-collapsed-fixed-right">
+<!--                                                    *ngIf="!collapsedTaskDetail"-->
                                                     <tds-button-collapse
                                                             [displayLabel]="false"
-                                                            *ngIf="!collapsedTaskDetail"
+                                                            class="collapsed-button"
                                                             (click)="onCollapseTaskDetail()">
                                                     </tds-button-collapse>
+
+<!--                                                    *ngIf="collapsedTaskDetail"-->
                                                     <tds-button-expand
                                                             [displayLabel]="false"
-                                                            *ngIf="collapsedTaskDetail"
+                                                            class="expanded-button"
                                                             (click)="onCollapseTaskDetail()">
                                                     </tds-button-expand>
                                                 </td>

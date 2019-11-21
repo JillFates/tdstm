@@ -144,6 +144,24 @@
         border-spacing: 3px;
         padding: 0;
 
+        .expanded-button {
+          display: none;
+        }
+
+        .collapsed-table {
+          .comment {
+            width: 75%;
+          }
+
+          .expanded-button {
+            display: block;
+          }
+
+          .collapsed-button {
+            display: none;
+          }
+        }
+
         .task-status {
           display: flex;
           .k-widget {
@@ -156,6 +174,10 @@
           align-items: center;
           span {
             margin-left: 5px;
+            cursor: pointer;
+          }
+          span.disabled-delete-estimated {
+            color: transparent;
           }
         }
         .progress.completion {
