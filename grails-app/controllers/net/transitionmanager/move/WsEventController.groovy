@@ -170,9 +170,8 @@ class WsEventController implements ControllerMethods {
 		renderSuccessJson([model: dashboardService.getEventDashboardModel(project, moveEvent, viewUnpublished)])
 	}
 
-
 	/*
-	 * will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
+	 * Will update the moveEvent calcMethod = M and create a MoveEventSnapshot for summary dialIndicatorValue
 	 * @param  : moveEventId and moveEvent dialIndicatorValue
 	 */
 	@HasPermission(Permission.EventEdit)
@@ -186,7 +185,7 @@ class WsEventController implements ControllerMethods {
 		}
 		if (dialIndicator  || dialIndicator == 0) {
 			MoveEventSnapshot moveEventSnapshot = new MoveEventSnapshot(moveEvent: moveEvent, planDelta: 0,
-				dialIndicator: dialIndicator, type: 'P')
+				dialIndicator: dialIndicator, type: MoveEventSnapshot.TYPE_PLANNED)
 			saveWithWarnings moveEventSnapshot
 			if (moveEventSnapshot.hasErrors()) {
 				moveEvent.calcMethod = MoveEvent.METHOD_MANUAL
@@ -194,12 +193,10 @@ class WsEventController implements ControllerMethods {
 			else {
 				moveEvent.calcMethod = MoveEvent.METHOD_LINEAR
 			}
-
 			saveWithWarnings moveEvent
 		}
 		renderSuccessJson("success")
 	}
-
 
 	/**
 	 * Used to retrieve the list of categories and various metrics for each for a given event. This is used by the

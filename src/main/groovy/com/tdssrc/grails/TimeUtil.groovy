@@ -661,6 +661,16 @@ class TimeUtil {
 	}
 
 	/**
+	 *  This method determines the amount of minutes elapsed between two dates
+	 *
+	 * @param start an instance of {@code Date}
+	 * @param end another instance of {@code Date}
+	 * @return elapsed minutes between start and end parameters
+	 */
+	static int minutesElapsed(Date start, Date end) {
+		return elapsed (start, end, GRANULARITY_MINUTES)
+	}
+	/**
 	 * This method determines the elapsed time between two dates and
 	 * returns the value using the given granularity (D|H|M|S).
 	 */

@@ -2,6 +2,7 @@ package net.transitionmanager.reporting
 
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.dashboard.PlanningDashboardData
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
@@ -141,7 +142,6 @@ class DashboardService implements ServiceMethods {
 			projectLogo                   : ProjectLogo.findByProject(project),
 			moveEvent                     : moveEvent,
 			moveEventsList                : moveEventsList,
-			moveBundleSteps               : moveEventService.getMoveBundleSteps(moveBundleList),
 			moveBundleList                : moveBundleList,
 			timeToUpdate                  : userPreferenceService.getPreference(UserPreferenceEnum.DASHBOARD_REFRESH) ?: 'never',
 			EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),
@@ -154,5 +154,14 @@ class DashboardService implements ServiceMethods {
 			model.putAll(taskSummaryMap)
 		}
 		return model
+	}
+
+	/**
+	 * Retrieve all the different metrics for populating the Planning Dashboard.
+	 * @param project
+	 * @return
+	 */
+	Map getDataForPlanningDashboard(Project project) {
+		return new PlanningDashboardData(project).getDataForDashboard()
 	}
 }

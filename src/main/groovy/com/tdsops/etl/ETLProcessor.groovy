@@ -260,6 +260,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	// ------------------------------------
 	// ETL DSL methods
 	// ------------------------------------
+
+	/**
+	 * Traps ETL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	domain aBogusVariableName
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException
+	 * @See ETLProcessorException.missingPropertyException
+	 */
+	Element domain(LocalVariableDefinition localVariableDefinition){
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
@@ -763,10 +776,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return
 	 */
 	Map<String, ?> set(final Object variableName) {
-		if (!(variableName instanceof String) ||
-			hasVariable(variableName) ||
-			!binding.isValidETLVariableName(variableName)
-		) {
+		if (!(variableName instanceof String) || hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 		doSet((String) variableName)
@@ -1149,6 +1159,34 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	ETLProcessor log(Object message, DebugConsole.LevelMessage level = DebugConsole.LevelMessage.DEBUG) {
 		debugConsole.append(level, String.valueOf(message))
 		return this
+	}
+
+	/**
+	 * Returns a field specs definition for a given {@code ETLDomain}
+	 * <pre>
+	 *	iterate {
+	 *		fieldSpec Application each {
+	 *			if (SOURCE.contains(it.label)) {
+	 *				extract it.label load it.fieldName
+	 *			}
+	 *		....
+	 *     }
+	 * }
+	 * </pre>
+	 */
+	List<Map<String, ?>> fieldSpec(ETLDomain domain) {
+
+		if (!domain.isAsset()) {
+			throw ETLProcessorException.domainWithoutFieldSpec(domain)
+		}
+
+		return this.fieldsValidator.lookupFieldSpec(domain).collect {
+			[
+				'name' : it.field,
+				'label': it.label,
+				'type' : it.control
+			]
+		}
 	}
 
 	// ------------------------------------
@@ -1649,7 +1687,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * and an instance of SecureASTCustomizer.
 	 * @see CompilerConfiguration* @see SecureASTCustomizer* @see ImportCustomizer* @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -1677,13 +1715,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,  List, ArrayList, Set, HashSet,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
 				Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
 			].asImmutable()
 		}
@@ -1697,6 +1735,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
+		configuration.scriptBaseClass = ETProcessorBaseScript.class.name
 		return configuration
 	}
 

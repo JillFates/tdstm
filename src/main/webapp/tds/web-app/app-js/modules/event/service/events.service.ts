@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {pathOr} from 'ramda'
@@ -13,7 +13,7 @@ import {DateUtils} from '../../../shared/utils/date.utils';
 import move from 'ramda/es/move';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
-import {PreferenceService} from '../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
 
 /**
  * @name EventsService
@@ -30,7 +30,7 @@ export class EventsService {
 	private readonly APP_EVENT_DELETE_NEWS = `${this.baseURL}/newsEditor/deleteNews`;
 	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/newsEditor/retrieveCommetOrNewsData`;
 	private readonly APP_EVENT_LIST_BUNDLES = `${this.baseURL}/ws/event/listBundles`;
-	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/bundleData`;
+	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/eventData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
 	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/event/taskCategoriesStats`;
@@ -46,6 +46,7 @@ export class EventsService {
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient, private preferenceService: PreferenceService) {
+		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
 	}
 
 	/**
@@ -118,7 +119,6 @@ export class EventsService {
 						percDurationStarted: model.percDurationStarted || '',
 						teamTaskMatrix: model.teamTaskMatrix || [],
 						moveEvent: model.moveEvent,
-						moveBundleSteps: model.moveBundleSteps || [],
 						moveBundleList: model.moveBundleList || []
 					}
 				}
@@ -187,8 +187,8 @@ export class EventsService {
  	 * @param {number} bundleId Bundle id
 	 * @returns {Observable<any>} Event status details
 	*/
-	getEventStatusDetails(userTimeZone: string, bundleId: number, eventId: number): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${bundleId}?moveEventId=${eventId}`)
+	getEventStatusDetails(userTimeZone: string, eventId: number): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${eventId}`)
 			.map((response: any) => {
 				const result = pathOr(null, ['snapshot'], response);
 				if (result) {
@@ -196,10 +196,6 @@ export class EventsService {
 
 					if (result.planSum) {
 						result.planSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.planSum.compTime);
-					}
-
-					if (result.revSum) {
-						result.revSum.compTime = DateUtils.formatUserDateTime(userTimeZone, result.revSum.compTime);
 					}
 				}
 
@@ -232,9 +228,9 @@ export class EventsService {
 				let userTimeZone = this.preferenceService.getUserTimeZone();
 				eventModels.forEach((r) => {
 					r.estStartTime =  r.estStartTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estStartTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estStartTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 					r.estCompletionTime =  r.estCompletionTime ?
-						DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(r.estCompletionTime), DateUtils.SERVER_FORMAT_DATE) : '';
+						DateUtils.toDateUsingFormat(DateUtils.convertFromGMT(r.estCompletionTime, userTimeZone), DateUtils.SERVER_FORMAT_DATE) : '';
 				});
 				return eventModels;
 			})

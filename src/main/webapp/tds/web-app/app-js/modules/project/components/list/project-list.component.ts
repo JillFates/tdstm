@@ -101,6 +101,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 
 	protected toggleShowActive(): void {
 		this.showActive = !this.showActive;
+		this.projectToOpen = null;
 		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
 		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
 		this.updateBreadcrumbAndTitle();
@@ -178,7 +179,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
 		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
-		this.renderer.setStyle(target, 'height', '36px');
+		this.renderer.setStyle(target, 'height', '23px');
 	}
 
 	/**

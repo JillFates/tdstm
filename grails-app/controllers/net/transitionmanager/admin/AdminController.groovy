@@ -56,7 +56,7 @@ class AdminController implements ControllerMethods {
 
 	static final String APP_RESTART_CMD_PROPERTY = 'admin.serviceRestartCommand'
 
-	private static final int thirtyDaysInMS = 60 * 24 * 30 * 1000
+	private static final Long thirtyDaysInMS = 60 * 60 * 24 * 30 * 1000l
 
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def index() {}
@@ -253,13 +253,6 @@ class AdminController implements ControllerMethods {
 			WHERE m.totalCount > 0
 
 			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_BUNDLE_STEP-------------------------------------------*/
-			SELECT * FROM  ( SELECT 'move_bundle_step' as mainTable,'move_bundle_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )
-				UNION
-				SELECT 'move_bundle_step' as mainTable,'move_bundle_id' as refId,'Null' as type,count(*) as totalCount FROM move_bundle_step mbs where mbs.move_bundle_id is null ) mbs
-			WHERE mbs.totalCount > 0
-
-			UNION
 			/*-----------------------------------ORPHAN RESULTS QUERY FOR MOVE_EVENT-------------------------------------------*/
 			SELECT * FROM  ( SELECT 'move_event' as mainTable,'project_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_event me where me.project_id not in (select p.project_id from project p )
 				UNION
@@ -284,14 +277,7 @@ class AdminController implements ControllerMethods {
 			SELECT * FROM  ( SELECT 'move_event_snapshot' as mainTable,'move_event_id' as refId,'Orphan' as type,count(*) as totalCount FROM move_event_snapshot mes where mes.move_event_id not in (select me.move_event_id from move_event me )
 				UNION
 				SELECT 'move_event_snapshot' as mainTable,'move_event_id' as refId,'Null' as type,count(*) as totalCount FROM move_event_snapshot mes where mes.move_event_id is null) mes
-			WHERE mes.totalCount > 0
-
-			UNION
-			/*-----------------------------------ORPHAN RESULTS QUERY FOR STEP_SNAPSHOT-----------------------------------------*/
-			SELECT * FROM  ( SELECT 'step_snapshot' as mainTable,'move_bundle_step_id' as refId,'Orphan' as type,count(*) as totalCount FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)
-				UNION
-				SELECT 'step_snapshot' as mainTable,'move_bundle_step_id' as refId,'Null' as type,count(*) as totalCount FROM step_snapshot ss where ss.move_bundle_step_id is null ) ss
-			WHERE ss.totalCount > 0	"""
+			WHERE mes.totalCount > 0"""
 
 		summaryRecords << jdbcTemplate.queryForList(moveSummaryQuery)
 
@@ -644,15 +630,6 @@ class AdminController implements ControllerMethods {
 				}
 			break
 
-			case 'move_bundle_step':
-				if (type != 'Null') {
-					query = 'SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id not in (select m.move_bundle_id from move_bundle m )'
-				} else {
-					query = 'SELECT * FROM move_bundle_step mbs where mbs.move_bundle_id is null'
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
 			case 'move_event':
 				if (type != 'Null') {
 					query = 'SELECT * FROM move_event me where me.project_id not in (select p.project_id from project p )'
@@ -695,16 +672,6 @@ class AdminController implements ControllerMethods {
 				}
 				else {
 					query = "SELECT * FROM move_event_snapshot mes where mes.move_event_id is null"
-				}
-				orphanDeatils = jdbcTemplate.queryForList(query)
-			break
-
-			case "step_snapshot":
-				if (type != "Null") {
-					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id not in (select m.id from move_bundle_step m)"
-				}
-				else {
-					query = "SELECT * FROM step_snapshot ss where ss.move_bundle_step_id is null"
 				}
 				orphanDeatils = jdbcTemplate.queryForList(query)
 			break

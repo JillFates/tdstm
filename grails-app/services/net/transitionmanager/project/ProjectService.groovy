@@ -72,10 +72,14 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
 import net.transitionmanager.search.FieldSearchData
 import net.transitionmanager.security.Permission
+import org.apache.commons.lang3.time.DateUtils
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.web.util.WebUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 class ProjectService implements ServiceMethods {
 
@@ -171,7 +175,11 @@ class ProjectService implements ServiceMethods {
 		Map searchParams=[:], UserLogin userLogin = null) {
 
 		def projectIds = []
-		def timeNow = new Date()
+
+		// Convert the current time to beginning of the day adjusted to GMT so projects from today are considered active
+		SimpleDateFormat sdf = new SimpleDateFormat(TimeUtil.FORMAT_DATE_ISO8601)
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"))
+		Date today = sdf.parse(sdf.format(DateUtils.truncate(TimeUtil.nowGMT(), Calendar.DAY_OF_MONTH)))
 
 		if (!userLogin) {
 			userLogin = securityService.userLogin
@@ -250,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					ge("completionDate", timeNow)
+					ge("completionDate", today)
 				} else {
-					lt('completionDate', timeNow)
+					lt('completionDate', today)
 				}
 			}
 
@@ -667,8 +675,6 @@ class ProjectService implements ServiceMethods {
 		// remove Move Bundle
 
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
-		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))".toString(), [project: projectInstance ])
-		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
 		String teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)".toString(), [project: projectInstance ])
@@ -701,15 +707,15 @@ class ProjectService implements ServiceMethods {
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = $projectInstance")
 
-		def recipesQuery = "select r.id from Recipe r where r.project.id = :projectId"
+		String recipesQuery = "select r.id from Recipe r where r.project.id =:projectId"
 		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project.id = $projectInstance.id")
-		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		def recipeVersions = RecipeVersion.executeQuery("from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		if (recipeVersions) {
 			recipeVersions.each {
 				RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom.id = $it.id")
 			}
 		}
-		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
 		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")
