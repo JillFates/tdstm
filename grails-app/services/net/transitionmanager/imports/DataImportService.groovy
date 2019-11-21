@@ -340,6 +340,10 @@ class DataImportService implements ServiceMethods {
 			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
+		if (rowData.tags){
+			batchRecord.saveTagsAsMap(rowData.tags)
+		}
+
 		if (! batchRecord.save(failOnError:false)) {
 			// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
 			String gmsg = GormUtil.allErrorsString(batchRecord)
