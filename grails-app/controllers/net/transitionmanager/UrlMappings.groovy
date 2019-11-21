@@ -321,11 +321,6 @@ class UrlMappings {
 			action = [GET:"getDataForPlanningDashboard"]
 		}
 
-		"/ws/dashboard/insight" {
-			controller = "WsInsight"
-			action = [GET: "insightData"]
-		}
-
 		"/ws/dashboard/insight/$action" {
 			controller = "WsInsight"
 		}

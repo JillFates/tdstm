@@ -253,52 +253,7 @@ class InsightServiceIntegrationSpec extends Specification {
 		//}
 	}
 
-	void 'Test assetsByVendor'() {
-		when: 'Calling assetsByVendor'
-
-			List<Map> assetsByVendor = insightService.assetsByVendor(project, 5)
-
-		then: 'The counts for the number of assets by vendor are returned in descending order'
-			assetsByVendor == [
-				[
-					name : 'manufacturer4',
-					count: 12
-				], [
-					name : 'manufacturer3',
-					count: 8
-				], [
-					name : 'manufacturer2',
-					count: 8
-				], [
-					name : 'manufacturer1',
-					count: 4
-				]
-			]
-	}
-
-
-	void 'Test dependenciesByVendor'() {
-		when: 'calling dependenciesByVendor'
-
-			List<Map> dependenciesByVendor = insightService.dependenciesByVendor(project, 5)
-
-		then: 'The counts for the number of dependencies by vendor are returned in descending order'
-			dependenciesByVendor == [
-				[
-					name : 'manufacturer4',
-					count: 11
-				], [
-					name : 'manufacturer3',
-					count: 7
-				], [
-					name : 'manufacturer2',
-					count: 7
-				], [
-					name : 'manufacturer1',
-					count: 3
-				]
-			]
-	}
+//TODO add better integration tests when I have time
 
 	void 'Test topTags'() {
 		when: 'calling toTags'
@@ -322,25 +277,25 @@ class InsightServiceIntegrationSpec extends Specification {
 			topTags[4].count == 1
 	}
 
-	void 'Test applicationsGroupedByDependencies'() {
-		when: 'calling applicationsGroupedByDependencies'
-			List<Map> applicationsGroupedByDependencies = insightService.applicationsGroupedByDependencies(project, 5, 10)
-
-
-		then: 'the differenct levels of  the counts of dependencies(parent+dependant) are returned'
-			applicationsGroupedByDependencies == [
-				[
-					level: '>5',
-					count: 32
-				], [
-					level: '5>10',
-					count: 2
-				], [
-					level: '10+',
-					count: 1
-				]
-			]
-	}
+//	void 'Test applicationsGroupedByDependencies'() {
+//		when: 'calling applicationsGroupedByDependencies'
+//			List<Map> applicationsGroupedByDependencies = insightService.applicationsGroupedByDependencies(project, 5, 10)
+//
+//
+//		then: 'the differenct levels of  the counts of dependencies(parent+dependant) are returned'
+//			applicationsGroupedByDependencies == [
+//				[
+//					level: '>5',
+//					count: 32
+//				], [
+//					level: '5>10',
+//					count: 2
+//				], [
+//					level: '10+',
+//					count: 1
+//				]
+//			]
+//	}
 
 
 	void cleanup() {
