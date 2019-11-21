@@ -61,7 +61,7 @@ class BulkAssetETLService implements ServiceMethods {
 				currentProject,
 				bulkETL.dataScriptId,
 				tempFileObject[0],
-				true
+				bulkETL.sendEmail
 			)
 
 			return result

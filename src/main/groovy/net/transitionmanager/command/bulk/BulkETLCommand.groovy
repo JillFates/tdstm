@@ -12,6 +12,7 @@ import net.transitionmanager.command.dataview.DataviewUserParamsCommand
  * @param dataScriptId The ETL datascript to run on the assets.
  * @param ids Optional asset Ids to to run the bulk changes on. If not set the allAssets flag, userParams, and dataviewId must be set
  * @param allAssets A flag to determine if the bulk change should be run against all assets filtered by the userParams.
+ * @param sendEmail A flag to determine if the builk ETL should send an email notification.
  */
 class BulkETLCommand implements CommandObject {
 
@@ -19,7 +20,8 @@ class BulkETLCommand implements CommandObject {
 	Long                      dataViewId
 	Long                      dataScriptId
 	List<Long>                ids
-	Boolean                   allIds = false
+	Boolean                   allIds    = false
+	Boolean                   sendEmail = false
 
 	static constraints = {
 		userParams cascade: true, nullable: true
