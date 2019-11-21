@@ -129,12 +129,11 @@ export class EventDashboardComponent implements OnInit {
 					this.selectedEventBundle = bundles[0];
 					this.eventPlanStatus = new EventPlanStatus();
 
-					this.eventsService.getEventStatusDetails(this.userTimeZone, this.selectedEventBundle.id, this.selectedEvent.id)
+					this.eventsService.getEventStatusDetails(this.userTimeZone, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
 						this.hasBundleSteps = true;
 						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
 						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
-						this.eventPlanStatus.cssClass = pathOr('', ['planSum', 'confColor'], statusDetails);
 						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
 						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
 						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);

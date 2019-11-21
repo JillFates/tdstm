@@ -18,7 +18,7 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 	selector: 'tds-task-category',
 	templateUrl: 'task-category.component.html'
 })
-export class TaskCategoryComponent implements OnInit, AfterViewInit{
+export class TaskCategoryComponent implements OnInit, AfterViewInit {
 	@Input() taskCategories: any;
 	@Input() scrollPosition: number;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
