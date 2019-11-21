@@ -30,6 +30,10 @@
         display: none;
       }
 
+      .status.status-undefined {
+        display: none;
+      }
+
       table.has-duplicated-predecessors {
         .dependency-error-section.has-duplicated {
           .has-duplicated-predecessors {
@@ -139,6 +143,10 @@
         border-collapse: separate;
         border-spacing: 3px;
         padding: 0;
+
+        .task-status {
+          display: flex;
+        }
 
         .estimated-date-container {
           display: flex;

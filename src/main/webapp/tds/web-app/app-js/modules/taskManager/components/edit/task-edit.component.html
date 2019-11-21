@@ -29,7 +29,7 @@
                             <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td class="" colspan="2">
-                                    <div class="dialog">
+                                    <div class="dialog tds-table">
                                         <table class="task-details">
                                             <tbody>
                                             <tr class="prop">
@@ -322,11 +322,17 @@
                                                 </td>
                                                 <td class="valueNW task-status vertical-note-status">
 <!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
+                                                    <tds-task-status-indicator
+                                                            [propertyName]="'status'"
+                                                            [displayLabel]="false"
+                                                            [value]="model.status">
+                                                    </tds-task-status-indicator>
                                                     <kendo-dropdownlist
                                                             name="statusList"
                                                             [data]="model.statusList"
                                                             [(ngModel)]="model.status">
                                                     </kendo-dropdownlist>
+
                                                 </td>
 
                                                 <td class="N edge-cell" nowrap="nowrap">
