@@ -597,46 +597,24 @@
 													"
 												>
 													<!-- Toolbar Template -->
-													<ng-template
-														kendoGridToolbarTemplate
-														[position]="'top'"
-													>
-														<div
-															class="table-container"
-														>
-															<label
-																class="table-title"
-																>Predecessors
-																({{
-																	dataGridTaskPredecessorsHelper
+													<ng-template kendoGridToolbarTemplate [position]="'top'">
+														<div class="table-container">
+															<label class="table-title">Predecessors
+																({{ dataGridTaskPredecessorsHelper
 																		.gridData
 																		.data
 																		.length
-																}})</label
-															>
-															<tds-button-add
-																title="Create"
-																[displayLabel]="
-																	false
-																"
+																}})</label >
+															<tds-button-add title="Create" [displayLabel]="false"
 																[small]="true"
 																iconClass="is-solid"
-																[tooltip]="
-																	modelHelper.CREATE_PREDECESSOR
-																"
-																[id]="
-																	'btnAddPredecessor'
-																"
-																(click)="
-																	onAddTaskDependency(
-																		model.predecessorList,
-																		dataGridTaskPredecessorsHelper
-																	)
-																"
-															>
+																[tooltip]="modelHelper.CREATE_PREDECESSOR"
+																[id]="'btnAddPredecessor'"
+																(click)="onAddTaskDependency(model.predecessorList,dataGridTaskPredecessorsHelper)">
 															</tds-button-add>
 														</div>
 													</ng-template>
+
 													<!-- Columns -->
 													<kendo-grid-column
 														*ngFor="
