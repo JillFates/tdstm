@@ -67,6 +67,9 @@ class DataScript {
 	// Flag to indicate that the ETL Script when used will automatically Import and Post the transformation results
 	Boolean isAutoProcess = false
 
+	// Flag to indicate that the ETL Script is for running on bulk change of assets.
+	Boolean useWithAssetActions = false
+
     static belongsTo = [project: Project, provider: Provider ]
 
     static constraints = {

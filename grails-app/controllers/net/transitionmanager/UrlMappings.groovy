@@ -219,6 +219,13 @@ class UrlMappings {
 				GET: 'actions'
 			]
 		}
+
+		'/ws/bulkChange/etl' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				PUT: 'runETL'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveBundle/list" {
