@@ -33,7 +33,7 @@ enum DataScriptMode {
 
 class DataScript {
 	 static enum PROPS {
-		 id, name, description, target, mode, isAutoProcess, etlSourceCode, provider, dateCreated,
+		 id, name, description, target, mode, isAutoProcess, useWithAssetActions, etlSourceCode, provider, dateCreated,
 		 lastUpdated, sampleFilename, originalSampleFilename
 	 }
 	 static Set<PROPS> MINIMAL_INFO = [ PROPS.id, PROPS.name ]
