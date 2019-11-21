@@ -11,45 +11,24 @@ import net.transitionmanager.project.Project
 @Secured('isAuthenticated()')
 class WsInsightController implements ControllerMethods {
 
-	InsightService      insightService
-
+	InsightService insightService
 
 	/**
-	 * Action to return data for the Insight dashboard.
-	 *
-	 * @return returns a JSON map of data containing assetsByVendor, dependenciesByVendor, topTags, and applicationsGroupedByDependencies
+	 * Action to return Provider data for insight dashboard of assets and dependencies.
 	 */
-	def insightData() {
+	def provider() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
 		validateCommandObject(context)
 
 		Project project = securityService.userCurrentProject
 
 		render view: "/common/mapAsJson", model: [data: [
-			assetsByVendor                   : insightService.assetsByVendor(project, context.max),
-			dependenciesByVendor             : insightService.dependenciesByVendor(project, context.max),
-			topTags                          : insightService.topTags(project, context.max),
-			applicationsGroupedByDependencies: insightService.applicationsGroupedByDependencies(project, context.lowRange, context.highRange),
+			assetsAndDependenciesByProvider: insightService.assetsAndDependenciesByProvider(project, context.max),
 		]]
 	}
 
 	/**
-	 * Action to return Vendor data for  insight dashboard of assets and dependencies
-	 */
-	def vendor() {
-		InsightDataCommand context = populateCommandObject(InsightDataCommand)
-		validateCommandObject(context)
-
-		Project project = securityService.userCurrentProject
-
-		render view: "/common/mapAsJson", model: [data: [
-			assetsByVendor      : insightService.assetsByVendor(project, context.max),
-			dependenciesByVendor: insightService.dependenciesByVendor(project, context.max),
-		]]
-	}
-
-	/**
-	 * Action tor return
+	 * Action for returning top tags data by assets.
 	 */
 	def topTags() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
@@ -63,9 +42,45 @@ class WsInsightController implements ControllerMethods {
 	}
 
 	/**
-	 *
+	 * Action for returning assets broken down by OS and environment.
 	 */
-	def applicationsGroupedByDependencies() {
+	def assetsByOsAndEnvironment() {
+		Project project = securityService.userCurrentProject
+
+		render view: "/common/mapAsJson", model: [data: [
+			assetsByOsAndEnvironment: insightService.assetsByOsAndEnvironment(project),
+		]]
+	}
+
+	/**
+	 * Action for returning devices by events.
+	 */
+	def devicesByEvent() {
+		InsightDataCommand context = populateCommandObject(InsightDataCommand)
+		validateCommandObject(context)
+
+		Project project = securityService.userCurrentProject
+
+		render view: "/common/mapAsJson", model: [data: [
+			devicesByEvent: insightService.devicesByEvent(project, context.max),
+		]]
+	}
+
+	/**
+	 * Action for returning assets broken down by provider and asset type.
+	 */
+	def AssetsByProviderAndAssetType() {
+		Project project = securityService.userCurrentProject
+
+		render view: "/common/mapAsJson", model: [data: [
+			AssetsByProviderAndAssetType: insightService.AssetsByProviderAndAssetType(project),
+		]]
+	}
+
+	/**
+	 * This returns the applications "blast radius" which is applications Grouped by the number of dependencies they have.
+	 */
+	def applicationsBlastRadius() {
 		InsightDataCommand context = populateCommandObject(InsightDataCommand)
 		validateCommandObject(context)
 
