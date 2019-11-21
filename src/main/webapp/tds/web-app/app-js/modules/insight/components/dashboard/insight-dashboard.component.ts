@@ -26,10 +26,10 @@ export class InsightDashboardComponent implements OnInit {
 
 	public insightData: any;
 
-	private showAssetsByVendorTable = true;
-	private showTopTags = true;
-	private showDependenciesByVendor = true;
-	private showApplicationGroupedByDependencies = true;
+	private showAssetsByVendorTable = false;
+	private showTopTags = false;
+	private showDependenciesByVendor = false;
+	private showApplicationGroupedByDependencies = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -68,6 +68,11 @@ export class InsightDashboardComponent implements OnInit {
 		// 	});
 
 		this.insightService.getInsightData().subscribe( (insightData: any) => {
+			// For demo purposes:
+			// insightData.assetsByVendor[0].count = 74;
+			// insightData.dependenciesByVendor[0].count = 20;
+			// insightData.topTags[0].count = 40;
+			// insightData.applicationsGroupedByDependencies[0].count = 44;
 			this.insightData = insightData;
 			console.log(insightData);
 		} );
