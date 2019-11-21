@@ -300,12 +300,25 @@ tds-ui-dialog {
 		}
 	}
 
+	.modal-body {
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+	}
+
+	&.has-footer {
+		.modal-body {
+			max-height: calc(100vh - 274px);
+		}
+	}
+
 	&:focus {
 		outline: unset;
 	}
 
 	.modal-body {
-		padding: 0 24px 24px 24px;
+		padding: 0 0 24px 24px;
+		// use margin-right instead of padding so that scrollbar will be positioned correctly.
+		margin-right: 24px;
 
 		.clr-form {
 			padding: unset;
