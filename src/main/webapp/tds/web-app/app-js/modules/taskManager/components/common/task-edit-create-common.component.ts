@@ -74,7 +74,13 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
+		console.log('----on init----');
+	}
+
+	// set the handlers on open / on close to set the flags that indicate the state of the
+	// dropdown list items (opened/closed)
+	ngAfterViewInit() {
+		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT).subscribe(() => {
 			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 			this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
@@ -165,6 +171,12 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
 						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
+					jQuery('[data-toggle="popover"]').popover();
+					const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
+
+					if (percentageComplete) {
+						percentageComplete.markAsPristine();
+					}
 				});
 
 			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
@@ -175,17 +187,6 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		});
-	}
-
-	// set the handlers on open / on close to set the flags that indicate the state of the
-	// dropdown list items (opened/closed)
-	ngAfterViewInit() {
-		jQuery('[data-toggle="popover"]').popover();
-		const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
-
-		if (percentageComplete) {
-			percentageComplete.markAsPristine();
-		}
 
 		this.dropdowns.toArray()
 			.forEach((dropdown) => {
