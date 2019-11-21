@@ -44,7 +44,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public collapsedTaskDetail = false;
 	protected hasCookbookPermission = false;
 	public modalOptions: DecoratorOptions;
-	public model: any = {};
+	public model: any = null;
 	protected getAssetList: Function;
 	protected yesNoList =  [...YesNoList];
 	protected predecessorSuccessorColumns: any[];
@@ -69,12 +69,18 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
-		this.modalOptions = { isResizable: true, isCentered: true, isDraggable: false };
+		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
+		console.log('----on init----');
+	}
+
+	// set the handlers on open / on close to set the flags that indicate the state of the
+	// dropdown list items (opened/closed)
+	ngAfterViewInit() {
+		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT).subscribe(() => {
 			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 			this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
 			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
@@ -166,7 +172,11 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
 					}
 					jQuery('[data-toggle="popover"]').popover();
-					this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
+					const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
+
+					if (percentageComplete) {
+						percentageComplete.markAsPristine();
+					}
 				});
 
 			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
@@ -177,11 +187,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
 			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 		});
-	}
 
-	// set the handlers on open / on close to set the flags that indicate the state of the
-	// dropdown list items (opened/closed)
-	ngAfterViewInit() {
 		this.dropdowns.toArray()
 			.forEach((dropdown) => {
 				dropdown.open
@@ -407,7 +413,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 */
 	public deleteTask(): void {
 		this.promptService.open(
-			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
+			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))
@@ -464,9 +470,9 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {boolean}
 	 */
 	public isFormInvalid(): boolean {
-		return this.taskEditCreateForm.form && !this.taskEditCreateForm.form.valid ||
-			this.hasInvalidFields() ||
-			!(this.taskEditCreateForm.form.dirty || this.hasModelChanges)
+		const { form = null } = this.taskEditCreateForm || {};
+
+		return form && ((!form.valid || this.hasInvalidFields()) || !(form.dirty || this.hasModelChanges));
 	}
 
 	/**

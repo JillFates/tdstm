@@ -76,7 +76,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
+		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT).subscribe(() => {
 			this.hasChanges = false;
 			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
 			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {

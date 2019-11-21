@@ -7,8 +7,6 @@
   $secondary-fore-color: #18394B
   .btn-link
     .contextual-menu
-      clr-icon
-        color: #000
   .refresh-container
     display: flex
   .page-header
@@ -23,49 +21,22 @@
       line-height: 24px
       color: #18394B
       margin-top: 5px
-  //.box-body.tds-kendo-grid.is-filtering
-  //  .k-grid
-  //    .k-grid-header
-  //      height: unset
   .badge
     padding: 0
   .task-action-buttons
     display: inline
   .grid-container
     height: 100%
+    .k-grid-header
+      .k-header
+        top: 3px
+        overflow: unset
     .box-with-empty-header
       height: 90%
     .task-grid
       height: 100%
       max-height: 100%
       display: -webkit-box
-  //.box-body.tds-kendo-grid
-  //  height: 100%
-  //  max-height: 100%
-  //  kendo-grid
-  //    .k-grid-toolbar
-  //      padding-top: 0
-  //    .k-grid-header
-  //      .k-header
-  //        vertical-align: middle
-  //        padding: 0 12px
-  //      .k-header.action-column
-  //        .k-link
-  //          text-overflow: unset
-  //  .sortable-column
-  //    label
-  //      font-style: normal
-  //      font-weight: 500
-  //      font-size: 12px
-  //      line-height: 16px
-  //      color: $secondary-fore-color
-  //      padding-right: unset
-  //      margin-bottom: 1px
-  //      margin-top: 1px
-  tds-button
-    button
-      color: unset
-      border-color: unset
   .label-event-list
     font-style: normal
     font-weight: 500
@@ -85,6 +56,10 @@
     display: flex
     justify-content: space-between
     align-items: flex-end
+    tds-button
+      button
+        color: unset
+        border-color: unset
     .left-container
       display: flex
       clr-select-container
