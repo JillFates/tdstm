@@ -5,9 +5,9 @@
 
 <g:set var="assetClass" value="Database" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()" class="tds-modal-content has-side-nav tds-angular-component-content">
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()" class="tds-modal-content has-side-nav tds-angular-component-content">
 	<div class="modal-header">
-		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
+		<button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span  aria-hidden="true">×</span></button>
 		<h4 class="modal-title">Database Create</h4>
 		<tds-tab-scroller>
 			<tds-scroller-item>

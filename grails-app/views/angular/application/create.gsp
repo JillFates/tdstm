@@ -5,10 +5,10 @@
 <g:set var="assetClass" value="Application" />
 <%@page import="grails.converters.JSON"%>
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
 	 class="tds-modal-content has-side-nav tds-angular-component-content">
 	<div class="modal-header">
-		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCancelEdit()"></tds-button-close>
+		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCloseEdit()"></tds-button-close>
 		<h4 class="modal-title">Application Create</h4>
 		<tds-tab-scroller>
 			<tds-scroller-item>
