@@ -1,6 +1,6 @@
 import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BehaviorSubject, Observable, ReplaySubject} from 'rxjs';
-import {distinctUntilChanged, map, skip, takeUntil} from 'rxjs/operators';
+import {distinctUntilChanged, map, skip, takeUntil, timeout} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 import {clone} from 'ramda';
@@ -85,6 +85,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	isFullView: boolean;
 	isMoveEventReq: boolean;
 	requestId: number;
+	refreshTriggered: boolean;
 
 	constructor(
 			private taskService: TaskService,
@@ -162,14 +163,20 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				this.minimizeAutoTasks = (minimizeAutoTasks && (minimizeAutoTasks === 'true' || minimizeAutoTasks === '1'));
 				this.viewUnpublished = (VIEW_UNPUBLISHED && (VIEW_UNPUBLISHED === 'true' || VIEW_UNPUBLISHED === '1'));
 
-				// If this a neighborhood view from the task manager, then load tasks from task service, otherwise load tasks
-				// from selected event
-				if (this.urlParams && this.urlParams.taskId) {
-					this.loadTasks(this.urlParams.taskId);
-				} else {
-					this.loadFromSelectedEvent();
-				}
+				this.loadData();
 			});
+	}
+
+	/**
+	 * If this a neighborhood view from the task manager, then load tasks from task service, otherwise load tasks
+	 from selected event
+	 */
+	loadData(): void {
+		if (this.urlParams && this.urlParams.taskId) {
+			this.loadTasks(this.urlParams.taskId);
+		} else {
+			this.loadFromSelectedEvent();
+		}
 	}
 
 	/**
@@ -192,7 +199,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 
 		if (this.isFullView
 			&& this.diagramLayoutService.getRequestId() === taskId
-			&& !this.diagramLayoutService.isCacheFromMoveEvent()) {
+			&& !this.diagramLayoutService.isCacheFromMoveEvent()
+			&& !this.refreshTriggered) {
 			this.generateModelFromCache();
 		} else {
 			const filters = {
@@ -201,7 +209,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				viewUnpublished: this.viewUnpublished ? '1' : '0'
 			};
 			this.taskService.findTask(taskId, filters)
-				.pipe(takeUntil(this.unsubscribe$))
+				.pipe(
+					takeUntil(this.unsubscribe$),
+					timeout(15000)
+				)
 				.subscribe((res: IGraphNode[]) => {
 					if (res && res.length > 0) {
 						this.tasks = res && res.map(r => r.task);
@@ -215,6 +226,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
+		this.refreshTriggered = false;
 	}
 
 	/**
@@ -232,18 +244,24 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Load tasks from a moveEvent Id
 	 **/
 	loadFromSelectedEvent(): void {
+		if (this.urlParams) { this.urlParams = null; }
+
 		if (this.isFullView
 			&& this.diagramLayoutService.getRequestId() === this.selectedEvent.id
-			&& this.diagramLayoutService.isCacheFromMoveEvent()) {
+			&& this.diagramLayoutService.isCacheFromMoveEvent()
+			&& !this.refreshTriggered) {
 			this.generateModelFromCache();
-		} else {
+		} else if (this.selectedEvent && this.selectedEvent.id) {
 			const filters = {
 				myTasks: this.myTasks ? '1' : '0',
 				minimizeAutoTasks: this.minimizeAutoTasks ? '1' : '0',
 				viewUnpublished: this.viewUnpublished ? '1' : '0'
 			};
 			this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
-				.pipe(takeUntil(this.unsubscribe$))
+				.pipe(
+					takeUntil(this.unsubscribe$),
+					timeout(15000)
+				)
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
 					if (this.tasks) {
@@ -255,6 +273,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				},
 					error => console.error(`Could not load tasks ${error}`));
 		}
+		this.refreshTriggered = false;
 	}
 
 	/**
@@ -289,14 +308,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	checkboxFilterChange(): void {
-		// If actual task used by diagram comes from task manager neighborhood button, then reload
-		// from tasks endpoint, else load tasks from the actual selected event
-		if (this.urlParams && this.urlParams.taskId
-			&& !!this.tasks.find(t => t.id === Number(this.urlParams.taskId))) {
-			this.loadTasks(this.urlParams.taskId);
-		} else {
-			this.loadFromSelectedEvent()
-		}
+		this.refreshTriggered = true;
+		this.loadData();
 	}
 
 	/**
@@ -575,7 +588,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * Reload Diagram data and re-render
 	 */
 	refreshDiagram(): void {
-		this.loadAll();
+		this.refreshTriggered = true;
+		this.subscribeToHighlightFilter();
+		this.loadData();
+		this.subscribeToEvents();
 	}
 
 	/**
