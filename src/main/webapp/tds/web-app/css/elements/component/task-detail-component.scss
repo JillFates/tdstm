@@ -146,6 +146,9 @@
 
         .task-status {
           display: flex;
+          .k-widget {
+            margin-left: 5px;
+          }
         }
 
         .estimated-date-container {
