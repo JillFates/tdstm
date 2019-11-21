@@ -18,7 +18,6 @@ import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.imports.DataScript
-import net.transitionmanager.imports.DataScriptMode
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
@@ -202,17 +201,27 @@ class DataScriptService implements ServiceMethods{
         return isUnique
     }
 
-    /**
-     * Return a list of DataScripts for the current project and provider (optional).
-     * @param providerId
-     * @return
-     */
-    List<DataScript> getDataScripts(Long providerId = null) {
+	/**
+	 * Returns a list of DataScripts for the current project and provider (optional).
+	 *
+	 * @param currentProject The current project passed in from the controller
+	 * @param providerId Optional provider id to filter on.
+	 * @param assetActions If the list is to be filtered to just actions for bulk asset ETL( useWithAssetActions and isAutoProcess are both true).
+	 *
+	 * @return A list of DataScripts.
+	 */
+    List<DataScript> getDataScripts(Project currentProject, Long providerId = null, boolean assetActions) {
         return DataScript.where {
-            project == securityService.userCurrentProject
+            project == currentProject
+
             if (providerId) {
                 provider.id == providerId
             }
+
+			if(assetActions){
+				useWithAssetActions == true
+				isAutoProcess == true
+			}
         }.list()
     }
 
