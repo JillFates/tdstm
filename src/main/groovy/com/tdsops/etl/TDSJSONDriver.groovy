@@ -56,7 +56,7 @@ class TDSJSONDriver extends JSONDriver {
 				case null:
 					throw new ExceptionGETL("Unable to parse attribute names due to empty results at rootNode '${dataset.rootNode}'")
 				default:
-					log.warn "fields() encountered unexpected type ${json.getClass().getName()}, rootNode=${dataset.rootNode}"
+					println "fields() encountered unexpected type ${json.getClass().getName()}, rootNode=${dataset.rootNode}"
 					throw new ExceptionGETL("Unable to parse attribute names due to JSON structure at rootNode '${dataset.rootNode}")
 			}
 

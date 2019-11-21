@@ -45,7 +45,7 @@
 							<select name="teamSelect" id="teamSelectId" style="width:120px;"></select>
 						</span>
 						<span class="controlSpan">
-							<form onsubmit="return performSearch()" id="highlightFormId">
+							<form onsubmit="performSearch()" id="highlightFormId" >
 								<input type="text" name="Search Box" id="searchBoxId" value="" placeholder="Enter highlighting filter" size="24" />
 								<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="clearFilter()" title="Clear the current filter"></span>
 								<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer graphButton" value="Highlight" />
@@ -57,9 +57,14 @@
 							<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
 							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
 						</span>
-						<div style="float: right;" class="task-timeline-progress-wrapper">
-							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
-						</div>
+						<span class="controlSpan radioboxContainer">
+							<input type="radio" name="mode" value="C" checked id="modecId"> <label for="modecId" class="pointer">&nbsp;Current Plan</label>
+							<input type="radio"  name="mode" value="R" id="modeRId"> <label for="modeRId" class="pointer">&nbsp;Recalculate</label>
+						</span>
+						<span id="baselinePlanButton">
+							<button onclick="baseLine()" title="Baseline" class="baseline-btn"><label>Baseline Plan</label></button>
+						</span>
+
 					</div>
 					<!-- control panel -->
 					<div id="controlPanelId" class="graphPanel">
@@ -103,17 +108,7 @@
 										</span>
 									</td>
 								</tr>
-								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
-									<tr title="Execute critical path analysis">
-										<td colspan="3" style="padding-left :0px">
-											<span>
-												<label id="baselinePlanButton" class="pointer" onclick="baselinePlan()">
-													&nbsp;Baseline Plan
-												</label>
-											</span>
-										</td>
-									</tr>
-								</tds:hasPermission>
+
 								<tds:hasPermission permission="${Permission.TaskViewCriticalPath}">
 								<tr title="Export Critical Path Data of an event">
 									<td colspan="3" style="padding-left :0px">

@@ -2,8 +2,21 @@ package net.transitionmanager.task.timeline.test
 
 import net.transitionmanager.task.timeline.TaskVertex
 import net.transitionmanager.task.timeline.TimelineTable
+import spock.lang.Shared
+
+import java.text.SimpleDateFormat
 
 trait TaskTimeLineDataTest {
+
+	@Shared
+	String aDay = '06/22/2018'
+
+	@Shared
+	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
+
+	Date hourInDay(String dateTime) {
+		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
+	}
 
 	/*
 		TaskVertex Structure definition

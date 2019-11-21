@@ -47,6 +47,7 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
@@ -55,6 +56,7 @@ export const en_DICTIONARY: Object = {
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'CONTINUE_WITH_CHANGES': 'Continue with Changes?',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
@@ -269,7 +271,12 @@ export const en_DICTIONARY: Object = {
 			'LIST': 'Bundle List',
 		}
 	},
-	'PROJECTS': 'Projects',
+	'PROJECT': {
+		'PROJECTS': 'Projects',
+		'SELECT_PROJECT': 'Select a Project',
+		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
+		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
+	},
 	'FIELD_SETTINGS': {
 		'ON_SHARED': 'This will overwrite field {param1} in all asset classes and delete all existing data in this field. Do you want to continue?',
 		'WARNING_VALIDATION_CHANGE': `Changing the validation range will have adverse effects if existing data falls outside the new range. Press confirm to proceed and change the validation range`,

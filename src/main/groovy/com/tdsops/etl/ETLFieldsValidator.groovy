@@ -143,5 +143,15 @@ class ETLFieldsValidator {
 	Map<String, String> fieldLabelMapForDomain(String domain){
 		return fieldLabelMap[domain]
 	}
+	/**
+	 * Returns a List of field specs for a given {@code ETLDomain}
+	 * taken from {@code ETLFieldsValidator#assetClassFieldsSpecMap}
+	 *
+	 * @param domain an enumeration value from {@code ETLDomain}
+	 * @return a list of field specs using a List of properties in Map format.
+	 */
+	List<Map<String, ?>> lookupFieldSpec(ETLDomain domain){
+		return assetClassFieldsSpecMap[domain]
+	}
 
 }
