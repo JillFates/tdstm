@@ -12,7 +12,7 @@ export class TaskSuccessorPredecessorColumnsModel {
 				label: 'Category',
 				property: 'category',
 				type: 'text',
-				width: 70
+				width: 60
 			},
 			{
 				label: 'Task #',
@@ -24,13 +24,13 @@ export class TaskSuccessorPredecessorColumnsModel {
 				label: 'Task',
 				property: 'desc',
 				type: 'text',
-				width: 130
+				width: 150
 			},
 			{
 				label: 'Status',
 				property: 'status',
 				type: 'text',
-				width: 80
+				width: 75
 			}
 		];
 	}
