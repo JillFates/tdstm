@@ -111,16 +111,13 @@ class ScriptProcessorService {
 
 	/**
 	 * Base on a project it creates an instance tha implements ETLTagValidator.
+	 *
 	 * @param project a defined Project instance to be used listing tags
 	 * @see ETLTagValidator
 	 * @return an instance of ETLTagValidator.
 	 */
 	private ETLTagValidator createTagValidator(Project project) {
-		ETLTagValidator tagValidator = new ETLTagValidator()
-		tagService.getTagIdAndName(project).each {Object tagInfo ->
-			tagValidator.addTag(tagInfo[0], tagInfo[1])
-		}
-		return tagValidator
+		return new ETLTagValidator(tagService.tagMapByName(project))
 	}
 
     /**
@@ -254,7 +251,7 @@ class ScriptProcessorService {
 			new DataSetFacade(dataset),
 			console,
 			new ETLFieldsValidator(),
-			new ETLTagValidator()
+			new ETLTagValidator([:])
 		)
 
         List<Map<String, ?>> errors = []

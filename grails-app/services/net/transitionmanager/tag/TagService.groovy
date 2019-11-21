@@ -232,24 +232,29 @@ class TagService implements ServiceMethods {
 	/**
 	 *  Lists tags by project using projections.
 	 *  <pre>
-	 *  getTagIdAndName(currentProject) == [
-	 * 			[5, 'GDPR'],
-	 * 			[6, 'HIPPA'],
-	 * 			[7, 'PCI'],
-	 * 			[8, 'SOX']
+	 *  tagMapByName(currentProject) == [
+	 * 			['GDPR': 5],
+	 * 			['HIPPA': 6],
+	 * 			['PCI': 7],
+	 * 			['SOX': 8]
 	 * 		]
 	 *  </pre>
 	 * @param currentProject
 	 * @return
 	 */
-	List<Object> getTagIdAndName(Project currentProject) {
-		return Tag.createCriteria().list {
-			eq('project', currentProject)
-			projections {
-				groupProperty('id')
-				groupProperty('name')
-			}
+	Map<String, Long> tagMapByName(Project currentProject) {
+		List tagList = Tag.where {
+			project == currentProject
+		}.projections {
+			property('name')
+			property('id')
+		}.list()
+
+		Map<String, Long> tagMap = [:]
+		tagList.each { row ->
+			tagMap.put(row[0], row[1])
 		}
+		return tagMap
 	}
 
 	/**

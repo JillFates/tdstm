@@ -63,7 +63,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,$tagName
 			""".stripIndent())
 
-			tagValidator.addTag(100l, tagName)
+			tagValidator.addTag(tagName, 100l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -120,10 +120,8 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,${tagNames[0]},${tagNames[1]}
 			""".stripIndent())
 
-			tagValidator.addTags([
-				[id: 101l, name: tagNames[0]],
-				[id: 102l, name: tagNames[1]]
-			])
+			tagValidator.addTag(tagNames[0], 100l)
+			tagValidator.addTag(tagNames[1], 101l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -181,7 +179,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,$tagName
 			""".stripIndent())
 
-			tagValidator.addTag(100l, tagName)
+			tagValidator.addTag(tagName, 100l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -238,10 +236,8 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,${tagNames[0]},${tagNames[1]}
 			""".stripIndent())
 
-			tagValidator.addTags([
-				[id: 101l, name: tagNames[0]],
-				[id: 102l, name: tagNames[1]]
-			])
+			tagValidator.addTag(tagNames[0], 100l)
+			tagValidator.addTag(tagNames[1], 101l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -300,8 +296,8 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,$currentTag,$newTag
 			""".stripIndent())
 
-			tagValidator.addTag(105l, currentTag)
-			tagValidator.addTag(106l, newTag)
+			tagValidator.addTag(currentTag, 105l)
+			tagValidator.addTag(newTag, 106l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -416,12 +412,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,${tagNames[0]},${tagNames[1]},${tagNames[2]},${tagNames[3]}
 			""".stripIndent())
 
-			tagValidator.addTags([
-				[id: 101l, name: tagNames[0]],
-				[id: 102l, name: tagNames[1]],
-				[id: 103l, name: tagNames[2]],
-				[id: 104l, name: tagNames[3]]
-			])
+			tagValidator.addTag(tagNames[0], 100l)
+			tagValidator.addTag(tagNames[1], 101l)
+			tagValidator.addTag(tagNames[2], 102l)
+			tagValidator.addTag(tagNames[3], 103l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -483,12 +477,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,${tagA},${tagB},${tagC},${tagD}
 			""".stripIndent())
 
-			tagValidator.addTags([
-				[id: 101l, name: tagA],
-				[id: 102l, name: tagB],
-				[id: 103l, name: tagC],
-				[id: 104l, name: tagD]
-			])
+			tagValidator.addTag(tagA, 100l)
+			tagValidator.addTag(tagB, 101l)
+			tagValidator.addTag(tagC, 102l)
+			tagValidator.addTag(tagD, 103l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -619,7 +611,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 				12345678,$tagName
 			""".stripIndent())
 
-			tagValidator.addTag(100l, tagName)
+			tagValidator.addTag(tagName, 100l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -665,10 +657,10 @@ class ETLTagsSpec extends ETLBaseSpec {
 	 * @return an instance of {@code ETLTagValidator}
 	 */
 	protected ETLTagValidator createTagValidator() {
-		ETLTagValidator tagValidator = new ETLTagValidator(5l, 'GDPR')
-		tagValidator.addTag(6l, 'HIPPA')
-		tagValidator.addTag(7l, 'PCI')
-		tagValidator.addTag(8l, 'SOX')
+		ETLTagValidator tagValidator = new ETLTagValidator('GDPR', 5l)
+		tagValidator.addTag('HIPPA', 6l)
+		tagValidator.addTag('PCI', 7l)
+		tagValidator.addTag('SOX', 8l)
 		return tagValidator
 	}
 }

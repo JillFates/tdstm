@@ -7,9 +7,9 @@ import groovy.transform.CompileStatic
  * Validates Tags and works with as an internal cache for an instance of {@code ETLProcessor}
  * <pre>
  * 	ETLTagValidator tagValidator = new ETLTagValidator(5l, 'GDPR')
- * 	tagValidator.addTag(6l, 'HIPPA')
- * 	tagValidator.addTag(7l, 'PCI')
- * 	tagValidator.addTag(8l, 'SOX')
+ * 	tagValidator.addTag('HIPPA', 6l)
+ * 	tagValidator.addTag('PCI', 7l)
+ * 	tagValidator.addTag('SOX', 8l)
  *
  * 	...
  * 	tagValidator.validate('HIPPA')
@@ -21,24 +21,24 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class ETLTagValidator {
 
-	private Map<String, Map<String, ?>> tags
+	private Map<String, Long> tags
 
-	ETLTagValidator() {
-		tags = [:]
+	ETLTagValidator(Map<String, Long> tags) {
+		this.tags = tags
 	}
 
-	ETLTagValidator(Long id, String name) {
+	ETLTagValidator(String name, Long id) {
 		tags = [:]
-		addTag(id, name)
+		addTag(name, id)
 	}
 	/**
 	 * Add a list of Tags  {@code ETLTagValidator#tags} Map
 	 * @param tags List of Map with Tag name and id
 	 * @return Current instance of {@code ETLTagValidator}
-	 * @see ETLTagValidator#addTag(java.lang.Long, java.lang.String)
+	 * @see ETLTagValidator#addTag(java.lang.String, java.lang.Long)
 	 */
 	ETLTagValidator addTags(List<Map<String, ?>> tags) {
-		tags.each { addTag(it.id as Long, it.name as String) }
+		tags.each { addTag(it.name as String, it.id as Long) }
 		return this
 	}
 	/**
@@ -47,11 +47,8 @@ class ETLTagValidator {
 	 * @param name a Tag name
 	 * @return Current instance of {@code ETLTagValidator}
 	 */
-	ETLTagValidator addTag(Long id, String name) {
-		tags[name] = [
-			id  : id,
-			name: name
-		]
+	ETLTagValidator addTag(String name, Long id) {
+		tags[name] = id
 		return this
 	}
 
