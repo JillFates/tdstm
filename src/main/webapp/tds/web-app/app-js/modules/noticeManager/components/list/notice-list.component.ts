@@ -10,7 +10,6 @@ import { NoticeService } from '../../service/notice.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
-
 import { PreferenceService } from '../../../../shared/services/preference.service';
 // Model
 import { Permission } from '../../../../shared/model/permission.model';
