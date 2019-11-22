@@ -17,7 +17,7 @@
 				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
-                <h4 class="modal-title">Task Edit</h4>
+                <h4 class="modal-title">{{taskDetailModel && taskDetailModel.modal.title}}</h4>
             </div>
             <div class="task-detail-container">
                 <div class="modal-body">
@@ -326,6 +326,7 @@
                                                 <td class="valueNW task-status vertical-note-status">
 <!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
                                                     <tds-task-status-indicator
+                                                            *ngIf="model.status"
                                                             [propertyName]="'status'"
                                                             [displayLabel]="false"
                                                             [value]="model.status">

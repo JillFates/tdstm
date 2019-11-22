@@ -35,6 +35,7 @@ import {ModelDeviceShowComponent} from './components/device/model-device/compone
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
+import {TaskEditCreateComponent} from '../taskManager/components/edit-create/task-edit-create.component';
 import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
 import {AssetCreateComponent} from './components/asset/asset-create.component';
@@ -74,6 +75,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		TaskCommentDialogComponent,
 		TaskCreateComponent,
 		TaskEditComponent,
+		TaskEditCreateComponent,
 		TaskDetailComponent,
 		TaskActionsComponent,
 		TaskNotesComponent,
@@ -113,6 +115,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		TaskDetailComponent,
 		TaskEditComponent,
 		TaskCreateComponent,
+		TaskEditCreateComponent,
 		SingleCommentComponent,
 		SingleNoteComponent,
 		ManufacturerShowComponent,

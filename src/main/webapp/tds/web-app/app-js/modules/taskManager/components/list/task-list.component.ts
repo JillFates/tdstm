@@ -32,7 +32,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
-import { TaskCreateComponent } from '../create/task-create.component';
+import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -170,7 +170,7 @@ export class TaskListComponent {
 				currentUserId: this.userContext.user.id
 			}
 		};
-		this.dialogService.extra(TaskCreateComponent, [
+		this.dialogService.extra(TaskEditCreateComponent, [
 			{ provide: TaskDetailModel, useValue: taskCreateModel }
 		]).then((result) => {
 			if (result) {

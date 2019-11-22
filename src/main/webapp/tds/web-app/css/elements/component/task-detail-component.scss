@@ -67,11 +67,13 @@
         display: none;
       }
 
-      .ng-invalid {
+      .ng-touched.ng-invalid,
+      .ng-dirty.ng-invalid {
         border: 1px solid $color-message-error--red;
       }
 
-      .ng-invalid + .error-message {
+      .ng-touched.ng-invalid + .error-message {
+      .ng-dirty.ng-invalid + .error-message {
         color: $color-message-error--red;
         display: block;
       }

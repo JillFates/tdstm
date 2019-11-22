@@ -21,7 +21,7 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskCreateComponent} from '../create/task-create.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
@@ -287,7 +287,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
 		let taskCreateModel: TaskDetailModel = {
-			id: this.model.asset.id, // dataItem.common_id,
+			id: this.model.id,
 			modal: {
 				title: 'Create Task',
 				type: ModalType.CREATE
@@ -300,7 +300,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			}
 		};
 
-		this.dialogService.extra(TaskCreateComponent, [
+		this.dialogService.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {
