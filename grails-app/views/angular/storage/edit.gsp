@@ -6,7 +6,7 @@
 <g:set var="assetClass" value="Files"/>
 
 <div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
-     class="tds-modal-content tds-angular-component-content">
+     class="tds-modal-content has-side-nav tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span
                 aria-hidden="true">×</span></button>
@@ -49,7 +49,7 @@
             </div>
         </div>
     </div>
-    <div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+    <div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <form 
             name="form" 
             (ngSubmit)="form.form.valid && onUpdate()"

@@ -140,6 +140,31 @@
 						{{dataItem.parsedInstructions[0]}}
 					</button>
 				</div>
+
+				<kendo-grid-column [width]="60"
+								   [class]="{'k-custom-command-column': true}"
+								   [sortable]="false"
+								   [columnMenu]="false"
+								   [minResizableWidth]="60">
+					<ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
+						<tds-button [flat]="true" (click)="toggleFiltering()">
+							<clr-icon shape="filter" class="grid-filter-button is-solid">
+								<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
+							</clr-icon>
+						</tds-button>
+					</ng-template>
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<div class="action-button btn-group btn-link">
+							<clr-dropdown>
+								<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
+								<clr-dropdown-menu *clrIfOpen>
+									<a clrDropdownItem (click)="onOpenTaskEditHandler(dataItem)">Edit Task</a>
+								</clr-dropdown-menu>
+							</clr-dropdown>
+						</div>
+					</ng-template>
+				</kendo-grid-column>
+
 				<kendo-grid-column *ngFor="let column of columnsModel"
 													 [resizable]="column.resizable"
 													 field="{{column.property}}"
@@ -156,13 +181,19 @@
 						<div *ngIf="column.type !== 'action'" [ngClass]="{'sortable-column' : (column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
-						<span *ngIf="column.type === 'action'">
-							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
-							<span *ngIf="filterCounter(); let counter" class="badge badge-orange">{{counter}}</span>
-						</span>
+<!--						<span *ngIf="column.type === 'action'">-->
+						<!--
+							<tds-button [flat]="true" (click)="toggleFiltering()" *ngIf="column.type === 'action'">
+								<clr-icon shape="filter" class="grid-filter-button is-solid">
+								<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
+								</clr-icon>
+							</tds-button>
+						-->
+<!--						</span>-->
 					</ng-template>
 
 					<!-- edit action column -->
+					<!--
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 						<div class="btn-link">
 							<clr-dropdown>
@@ -173,6 +204,7 @@
 							</clr-dropdown>
 						</div>
 					</ng-template>
+					-->
 
 					<!-- task Number -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>

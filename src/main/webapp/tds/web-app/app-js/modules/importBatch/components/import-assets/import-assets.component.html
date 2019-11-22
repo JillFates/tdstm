@@ -15,7 +15,8 @@
                                         (ngModelChange)="onActionScriptChange($event)"
                                         name="fetch"
                                         id="fetch"
-                                        class="form-control">
+                                        class="form-control"
+                                        [disabled]="!!actionOptions">
                                     <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>

@@ -29,6 +29,7 @@ import { Router } from '@angular/router';
 												[valueField]="'name'"
 												(click)="onToggle()"
 												[textField]="'name'"
+												[popupSettings]="{popupClass: 'tds-asset-view-popup'}"
 												class="asset-explorer-view-selector-component">
 			<ng-template kendoDropDownListValueTemplate let-dataItem>
 				<span class="asset-explorer-view-selector-views">
@@ -41,7 +42,7 @@ import { Router } from '@angular/router';
 				</span>
 			</ng-template>
 			<ng-template kendoDropDownListHeaderTemplate>
-				<div class="asset-view-selector has-feedback">
+				<div class="asset-view-selector has-feedback" style="padding:unset;">
 					<input #viewSelectorFilter
 								 (focusout)="onFocusOut($event)"
 								 type="text"
@@ -50,7 +51,8 @@ import { Router } from '@angular/router';
 								 name="searchFilterSelector"
 								 [(ngModel)]='searchFilterSelector'
 								 placeholder="Search"
-								 aria-describedby="search">
+								 aria-describedby="search"
+								 style="padding: unset;">
 					<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
 				</div>
 			</ng-template>

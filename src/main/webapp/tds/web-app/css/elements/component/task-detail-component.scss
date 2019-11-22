@@ -10,9 +10,120 @@
     flex: 1;
     max-height: unset;
 
+    form {
+      input {
+        width: 100%;
+        padding-left: 5px;
+      }
+
+      .dependency-error-section {
+        table {
+          width: 100%;
+          td {
+            text-align: center;
+            color: $color-message-error--red;
+          }
+        }
+      }
+
+      .error-message {
+        display: none;
+      }
+
+      .status.status-undefined {
+        display: none;
+      }
+
+      table.has-duplicated-predecessors {
+        .dependency-error-section.has-duplicated {
+          .has-duplicated-predecessors {
+            visibility: visible;
+          }
+        }
+      }
+
+      table.has-duplicated-successors {
+        .dependency-error-section.has-duplicated {
+          .has-duplicated-successors {
+            visibility: visible;
+          }
+        }
+      }
+
+      .dependency-error-section.has-duplicated {
+        .has-duplicated-predecessors,
+        .has-duplicated-successors {
+          visibility: hidden;
+        }
+      }
+
+      table.has-double-assignment {
+        .dependency-error-section .has-double-assignment {
+          display: block;
+        }
+      }
+
+      .dependency-error-section .has-double-assignment {
+        display: none;
+      }
+
+      .ng-invalid {
+        border: 1px solid $color-message-error--red;
+      }
+
+      .ng-invalid + .error-message {
+        color: $color-message-error--red;
+        display: block;
+      }
+
+    }
+
+
+
     .full-height {
       padding-left: 24px;
       padding-right: 24px;
+
+      .successor-predecessor-table {
+        input {
+          padding-right: 10px;
+          padding-left: 2px;
+        }
+      }
+
+
+      .description-container {
+        input {
+          //width: 100%;
+        }
+      }
+
+      .duration-container {
+        vertical-align: top;
+        width: 160px;
+        max-width: 160px;
+        .duration-controls {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          label.lock {
+            margin-bottom: 15px;
+          }
+          .duration-value {
+            flex: 32%;
+            display: flex;
+            flex-direction: column;
+            label {
+              font-weight: unset;
+              margin: unset;
+            }
+            input {
+              width: 95%;
+              text-align: center;
+            }
+          }
+        }
+      }
 
       .dates-info-container {
         table {
@@ -39,6 +150,43 @@
         border-collapse: separate;
         border-spacing: 3px;
         padding: 0;
+
+        .expanded-button {
+          display: none;
+        }
+
+        .collapsed-table {
+          .comment {
+            width: 75%;
+          }
+
+          .expanded-button {
+            display: block;
+          }
+
+          .collapsed-button {
+            display: none;
+          }
+        }
+
+        .task-status {
+          display: flex;
+          .k-widget {
+            margin-left: 5px;
+          }
+        }
+
+        .estimated-date-container {
+          display: flex;
+          align-items: center;
+          span {
+            margin-left: 5px;
+            cursor: pointer;
+          }
+          span.disabled-delete-estimated {
+            color: transparent;
+          }
+        }
         .progress.completion {
           max-height: unset;
           display: flex;
@@ -66,6 +214,9 @@
           border-style: unset;
           border-color: unset;
           cursor: default;
+        }
+        td.valueNW {
+          max-width: 180px;
         }
         td.N {
           width: 15%;
@@ -101,11 +252,13 @@
     }
   }
 
+
   tds-button {
     button {
       color: unset;
       border-color: unset;
     }
   }
+
 }
 

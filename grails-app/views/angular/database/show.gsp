@@ -3,7 +3,7 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content has-side-nav tds-angular-component-content">
     <div class="modal-header" [ngClass]="{'modal-header-height':showDetails}">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <clr-icon aria-hidden="true" shape="close"></clr-icon>
@@ -104,7 +104,7 @@
 			</div>
 		</div>
     </div>
-    <div class="modal-body" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
+    <div class="modal-body asset-crud" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">

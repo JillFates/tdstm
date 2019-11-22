@@ -23,12 +23,13 @@ import {AssetViewManagerColumnsHelper} from './asset-view-manager-columns.helper
 })
 export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	public reportGroupModels = Array<ViewGroupModel>();
-	public searchText: String;
+	public searchText: string;
 	private viewType = ViewType;
 	public selectedFolder: ViewGroupModel;
 	public gridColumns: GridColumnModel[];
 	private report;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	showAssetsFilter: boolean;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -193,4 +194,10 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.complete();
 	}
 
+	/**
+	 * Toggle filter show/hide flag.
+	 */
+	public toggleFilter(): void {
+		this.showAssetsFilter = !this.showAssetsFilter;
+	}
 }

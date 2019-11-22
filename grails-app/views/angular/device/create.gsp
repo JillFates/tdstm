@@ -7,10 +7,10 @@
 <g:set var="actionLabel" value="${action == 'save' ? 'Save' : 'Update'}" />
 <g:set var="jsAction" value="${action=='save' ? 'saveToShow' : 'performAssetUpdate'}" />
 
-<div tds-autocenter tds-handle-escape (escPressed)="onCancelEdit()"
-     class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
+     class="tds-modal-content has-side-nav tds-angular-component-content">
     <div class="modal-header">
-        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCancelEdit()"><span  aria-hidden="true">×</span></button>
+        <button aria-label="Close" class="close component-action-close" type="button" (click)="onCloseEdit()"><span  aria-hidden="true">×</span></button>
         <h4 class="modal-title">Device Create</h4>
         <tds-tab-scroller>
 			<tds-scroller-item>
@@ -21,7 +21,7 @@
 			</tds-scroller-item>
 		</tds-tab-scroller>
     </div>
-    <div class="modal-body no-description" tdsScrollContainer style="position: relative">
+    <div class="modal-body asset-crud no-description" tdsScrollContainer style="position: relative">
         <form 
             name="form"
             (ngSubmit)="form.form.valid && onCreate()"

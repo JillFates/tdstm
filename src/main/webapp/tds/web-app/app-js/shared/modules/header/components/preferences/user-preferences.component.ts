@@ -1,10 +1,10 @@
-import {Component, OnInit, HostListener} from '@angular/core';
-import {HeaderService} from '../../services/header.service';
-import {UIActiveDialogService} from '../../../../services/ui-dialog.service';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { HeaderService } from '../../services/header.service';
+import { UIActiveDialogService } from '../../../../services/ui-dialog.service';
 
 @Component({
 	selector: 'user-preferences',
-	templateUrl: 'user-preferences.component.html'
+	templateUrl: 'user-preferences.component.html',
 })
 export class UserPreferencesComponent implements OnInit {
 	public preferenceList;
@@ -13,13 +13,16 @@ export class UserPreferencesComponent implements OnInit {
 
 	constructor(
 		private headerService: HeaderService,
-		public activeDialog: UIActiveDialogService) {
+		public activeDialog: UIActiveDialogService
+	) {
 		this.loadComponentModel();
 	}
 
 	ngOnInit(): void {
 		// Resize modal window to fit content
-		let modal = document.getElementsByClassName('modal-dialog') as HTMLCollectionOf<HTMLElement>;
+		let modal = document.getElementsByClassName(
+			'modal-dialog'
+		) as HTMLCollectionOf<HTMLElement>;
 
 		if (modal.length !== 0) {
 			// TODO: Refactor the Dialog so it is no longer a Table
@@ -40,7 +43,6 @@ export class UserPreferencesComponent implements OnInit {
 	 */
 	public cancelCloseDialog(): void {
 		this.activeDialog.dismiss();
-
 	}
 
 	/**
@@ -53,7 +55,8 @@ export class UserPreferencesComponent implements OnInit {
 				this.fixedPreferenceCodes = result.fixedPreferenceCodes;
 				this.personName = result.person.firstName;
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -64,12 +67,15 @@ export class UserPreferencesComponent implements OnInit {
 		this.headerService.removePreference(preferenceCode).subscribe(
 			(result: any) => {
 				// Remove the delete preference from the list
-				let idx = this.preferenceList.findIndex(x => x.code === preferenceCode);
+				let idx = this.preferenceList.findIndex(
+					x => x.code === preferenceCode
+				);
 				if (idx > -1) {
 					this.preferenceList.splice(idx, 1);
 				}
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -81,6 +87,7 @@ export class UserPreferencesComponent implements OnInit {
 				this.cancelCloseDialog();
 				location.reload();
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 }

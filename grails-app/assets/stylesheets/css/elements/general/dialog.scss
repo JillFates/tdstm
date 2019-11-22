@@ -107,3 +107,17 @@ div.modal.no-background {
 div.modal.dialog-draggable-no-background {
 	background: transparent !important;
 }
+
+.legacy-modal-header-s,
+.legacy-modal-body-s {
+	margin-left: 36px;
+}
+
+.modal-sidenav {
+	button {
+		i.fas,
+		i.far {
+			font-size: 15.4px;
+		}
+	}
+}
