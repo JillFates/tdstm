@@ -152,8 +152,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					if (events) {
 						this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
 					}
-					if (taskDefaults && taskDefaults.preferences) {
-						this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT'] || '', text: ''};
+					if (taskDefaults && taskDefaults.preferences && this.taskDetailModel.modal.type === ModalType.CREATE) {
 						this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 						this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 						this.metaParam = this.getMetaParam();

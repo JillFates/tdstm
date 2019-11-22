@@ -128,12 +128,15 @@ export class TaskEditCreateModelHelper {
 			asset: {id: detailModel.detail.assetEntity, text: detailModel.detail.assetName},
 			assignedTo: {id : parseInt(detailModel.detail.currentUserId, 10), text: ''},
 			assignedTeam: {id: '', text: ''},
-			event: {id: '', text: ''},
+			event: detailModel.detail.event ||  {id: '', text: ''},
 			category: 'general',
 			apiAction: {id: '', text: ''},
 			deletedPredecessorList: [],
 			deletedSuccessorList: []
 		};
+
+		// should be an string
+		this.model.event.id = this.model.event.id.toString();
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 

@@ -296,7 +296,8 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				assetClass: this.model.assetClass,
 				assetEntity: this.model.asset.id,
 				assetName:  this.model.assetName,
-				currentUserId: this.model.assignedTo.id
+				currentUserId: this.model.assignedTo.id,
+				event: this.model.event
 			}
 		};
 
