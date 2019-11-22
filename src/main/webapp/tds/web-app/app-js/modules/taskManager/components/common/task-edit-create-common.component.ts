@@ -59,6 +59,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 	private destroySubject: Subject<any> = new Subject<any>();
+	public taskViewType: string;
 	constructor(
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
@@ -69,6 +70,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
+		this.taskViewType = this.taskDetailModel.modal.type === ModalType.CREATE ? 'task-create-view' : 'task-edit-view';
 		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}

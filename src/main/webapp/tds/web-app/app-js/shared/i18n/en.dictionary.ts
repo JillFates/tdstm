@@ -449,6 +449,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',
+		'EDIT_TASK': 'Edit Task',
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager',
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
