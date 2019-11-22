@@ -220,7 +220,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass },
 			],
-			DIALOG_SIZE.LG
+			DIALOG_SIZE.XXL
 		);
 	}
 

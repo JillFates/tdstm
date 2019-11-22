@@ -57,7 +57,7 @@ class WsArchitectureGraphController implements ControllerMethods, PaginationMeth
 
 		// Check if the parameters are null
 		if ((context.assetId == null || context.assetId == -1) || (context.levelsUp == null || context.levelsDown == null)) {
-			render view: '/common/mapAsJson', model: [data: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown)]
+			render view: '/common/mapAsJson', model: [data: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode)]
 			return
 		}
 

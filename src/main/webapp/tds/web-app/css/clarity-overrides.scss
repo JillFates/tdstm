@@ -111,7 +111,7 @@ kendo-popup {
   border-bottom: 1px solid $color-border;
 }
 
-.clarity-table-grid {
+table.clarity-table-grid {
   color: #656565;
   border: 0;
   thead {
@@ -171,8 +171,10 @@ kendo-popup {
       padding: 4px 8px !important;
       line-height: 20px !important;
       vertical-align: middle !important;
+      border: 1px solid #d9e4ea;
+      border-width: 0 0 1px 0;
 
-      .link-text {
+    .link-text {
         font-weight: bold;
         cursor: pointer;
         color: inherit;
@@ -182,7 +184,7 @@ kendo-popup {
 
   &.fixed-header {
     table-layout: fixed;
-    width: 100%;
+    width: unset;
     thead {
       tr {
         display: block;

@@ -269,9 +269,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 
 		const returnValue =
 			noticeType === this.MANDATORY
-				? isValid &&
-				  this.model.acknowledgeLabel &&
-				  this.model.acknowledgeLabel.trim() !== ''
+				? isValid && this.model.acknowledgeLabel && this.model.acknowledgeLabel.trim() !== ''
 				: isValid;
 
 		return returnValue;
@@ -355,7 +353,7 @@ export class NoticeViewEditComponent implements OnInit, AfterViewInit {
 					touched: field.touched,
 					dirty: field.dirty,
 					errors: field.errors || {},
-			  };
+			};
 	}
 	/**
 	 * Based on modalType action returns the corresponding title
