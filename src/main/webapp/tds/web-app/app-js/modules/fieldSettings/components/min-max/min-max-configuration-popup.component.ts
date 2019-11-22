@@ -1,19 +1,24 @@
-import {Component, Input, ViewChild, OnInit, Inject} from '@angular/core';
-import { FieldSettingsModel, ConstraintModel } from '../../model/field-settings.model';
-import {UIActiveDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ConfigurationCommonComponent} from '../configuration-common/configuration-common.component';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
-import {NgForm} from '@angular/forms';
+import { Component, Input, ViewChild, OnInit, Inject } from '@angular/core';
+import {
+	FieldSettingsModel,
+	ConstraintModel,
+} from '../../model/field-settings.model';
+import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
+import { ConfigurationCommonComponent } from '../configuration-common/configuration-common.component';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { NgForm } from '@angular/forms';
 
 @Component({
 	selector: 'min-max-configuration-popup',
 	templateUrl: 'min-max-configuration-popup.component.html',
-	exportAs: 'minmaxConfig'
+	exportAs: 'minmaxConfig',
 })
-
-export class MinMaxConfigurationPopupComponent extends ConfigurationCommonComponent implements OnInit {
-	@ViewChild('templateForm', {static: false}) protected templateForm: NgForm;
+export class MinMaxConfigurationPopupComponent
+	extends ConfigurationCommonComponent
+	implements OnInit {
+	@ViewChild('templateForm', { static: false })
+	protected templateForm: NgForm;
 	public show = false; // first time should open automatically.
 	public model: ConstraintModel;
 	public minIsValid = true;
@@ -23,7 +28,8 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 		@Inject('domain') public domain: string,
 		public prompt: UIPromptService,
 		public translate: TranslatePipe,
-		public activeDialog: UIActiveDialogService) {
+		public activeDialog: UIActiveDialogService
+	) {
 		super(field, activeDialog, prompt, translate);
 	}
 
@@ -49,13 +55,12 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 	 * On button save click
 	 */
 	public onSave(): void {
-		this.displayWarningMessage()
-			.then((confirm: boolean) => {
-				if (confirm) {
-					this.field.constraints = { ...this.model };
-					this.activeDialog.close(this.isDirty());
-				}
-			});
+		this.displayWarningMessage().then((confirm: boolean) => {
+			if (confirm) {
+				this.field.constraints = { ...this.model };
+				this.activeDialog.close(this.isDirty());
+			}
+		});
 	}
 
 	/**
@@ -63,5 +68,12 @@ export class MinMaxConfigurationPopupComponent extends ConfigurationCommonCompon
 	 */
 	isDirty(): boolean {
 		return this.templateForm.dirty;
+	}
+
+	/**
+	 * Close the Dialog
+	 */
+	public cancelCloseDialog(): void {
+		this.activeDialog.dismiss();
 	}
 }
