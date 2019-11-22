@@ -76,7 +76,7 @@ export class AssetCommonShow implements OnInit {
 		this.dialogService.replace(AssetShowComponent, [
 				{provide: 'ID', useValue: id},
 				{provide: 'ASSET', useValue: assetClass}],
-			DIALOG_SIZE.LG);
+			DIALOG_SIZE.XXL);
 		jQuery('body').addClass('modal-open');
 	}
 

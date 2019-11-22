@@ -15,7 +15,7 @@ declare var jQuery: any;
 	template: `
         <div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
-                <div class="tds-modal-content with-box-shadow">
+                <div class="tds-modal-content">
 					<div class="modal-header">
 						<button aria-label="Close" class="close" type="button" (click)="cancel()">
 							<clr-icon aria-hidden="true" shape="close"></clr-icon>

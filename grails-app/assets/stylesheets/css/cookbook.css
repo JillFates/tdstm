@@ -155,6 +155,10 @@ form.groups{
 	overflow-y: auto;
 }
 
+.gridStyleGroups .ngCellText  span {
+	cursor: pointer !important;
+}
+
 .gridIcon{
 	display: table;
 	height: 100%;
@@ -230,7 +234,7 @@ form .error-msg{
 /* Code Diff Stuff */
 
 .codeDiff {
-	height: 430px;
+	height: 480px;
 }
 
 .codeDiffHeaderLeft {
@@ -292,6 +296,5 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 
 .content-wrapper a:hover {
 	text-decoration: none;
-	font-weight: normal;
 	cursor: pointer;
 }

@@ -9,6 +9,12 @@ import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {UserListComponent} from './components/list/user-list.component';
 import {UserDashboardComponent} from './components/dashboard/user-dashboard.component';
 
+/**
+ * Top menu parent section class.
+ * @type {string}
+ */
+const TOP_MENU_PARENT_SECTION = 'menu-parent-dashboard';
+
 export class UserStates {
 	public static readonly USER_LIST = {
 		url: 'list'
@@ -38,7 +44,8 @@ export const UserRoute: Routes = [
 			page: {
 				title: 'User Dashboard',
 				instruction: '',
-				menu: ['Dashboard', 'User']
+				menu: ['Dashboard', 'User'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-dashboard-user-dashboard', subMenu: true}
 			},
 			requiresAuth: true,
 		},

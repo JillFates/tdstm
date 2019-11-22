@@ -1,6 +1,7 @@
 import { GridColumnModel } from '../../../shared/model/data-list-grid.model';
 
 export const taskListColumnsModel: Array<GridColumnModel> = [
+	/*
 	{
 		label: '',
 		property: 'actionColumn',
@@ -11,6 +12,7 @@ export const taskListColumnsModel: Array<GridColumnModel> = [
 		sortable: false,
 		headerClass: ['no-sort-header', 'action-column']
 	},
+	 */
 	{
 		label: 'Task',
 		property: 'taskNumber',
