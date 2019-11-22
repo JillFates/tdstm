@@ -533,7 +533,6 @@ class MoveEventService implements ServiceMethods {
 	List<Map> getTaskCategoriesStats(Project project, Long moveEventId, boolean viewUnpublished) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
 		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
-		List<Boolean> publishedValues = viewUnpublished ? [true, false] : [true]
 
 		// Query the database for the min/max dates for tasks in the event grouped by category.
 		String hql = """
@@ -550,11 +549,13 @@ class MoveEventService implements ServiceMethods {
 					case when (count(*) > 0) then (sum(case when ac.status = 'Completed' then 1 else 0 end)/count(*)*100) else 100 end
 				from AssetComment ac
 					where moveEvent =:moveEvent
-					and isPublished IN (:publishedValues)
-				group by ac.category
-			"""
+				"""
+		if (!viewUnpublished) {
+			hql += " and isPublished = true "
+		}
+		hql += " group by ac.category "
 
-		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent, publishedValues: publishedValues])
+		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
 		List<Map> stats = []
 		taskCategoriesStatsList.each { categoryStats ->

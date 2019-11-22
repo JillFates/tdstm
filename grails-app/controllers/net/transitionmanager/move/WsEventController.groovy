@@ -147,6 +147,12 @@ class WsEventController implements ControllerMethods {
 		renderSuccessJson("Move Event ${moveEvent.name} deleted.")
 	}
 
+	/**
+	 * Find and return various task-related stats per category for the given event.
+	 * @param moveEvent - The event id.
+	 * @param viewUnpublished - Whether or not unpublished tasks should be included in the model.
+	 * @return  A model with Event Dashboard info
+	 */
 	@HasPermission(Permission.DashboardMenuView)
 	def getEventDashboardModel() {
 		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('moveEvent', UserPreferenceEnum.MOVE_EVENT))
@@ -157,12 +163,12 @@ class WsEventController implements ControllerMethods {
 		Project project = getProjectForWs()
 		MoveEvent moveEvent = GormUtil.findInProject(project, MoveEvent, moveEventId, true)
 
+		boolean viewUnpublished = false
 		// handle the view unpublished tasks checkbox
-		if (params.containsKey('viewUnpublished')) {
-			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
+		if (params.containsKey('viewUnpublished') && securityService.hasPermission(Permission.TaskViewUnpublished)) {
+			viewUnpublished = params.viewUnpublished == '1'
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
 		}
-
-		boolean viewUnpublished = securityService.viewUnpublished()
 
 		// Save the user's preference for the current move event
 		userPreferenceService.setMoveEventId(moveEvent.id)
@@ -200,18 +206,21 @@ class WsEventController implements ControllerMethods {
 
 	/**
 	 * Find and return various task-related stats per category for the given event.
+	 * @param eventId - The event id.
+	 * @param viewUnpublished - Whether or not unpublished tasks should be included in the model.
+	 * @return a list with the task category stats
 	 */
-	def taskCategoriesStats() {
-		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('eventId', UserPreferenceEnum.MOVE_EVENT))
-		if (!moveEventId) {
+	def taskCategoriesStats(Long eventId) {
+		if (!eventId) {
 			throw new InvalidParamException('A valid Move Event ID is needed.')
 		}
+		boolean viewUnpublished = false
 		// handle the view unpublished tasks checkbox
-		if (params.containsKey('viewUnpublished')) {
-			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
+		if (params.containsKey('viewUnpublished') && securityService.hasPermission(Permission.TaskViewUnpublished)) {
+			viewUnpublished = params.viewUnpublished == '1'
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
 		}
-		boolean viewUnpublished = securityService.viewUnpublished()
 		Project project = getProjectForWs()
-		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId, viewUnpublished))
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, eventId, viewUnpublished))
 	}
 }

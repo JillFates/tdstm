@@ -188,7 +188,7 @@ export class EventsService {
 	 * @returns {Observable<any>} Event status details
 	*/
 	getEventStatusDetails(userTimeZone: string, eventId: number): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/?id=${eventId}`)
+		return this.http.get(`${this.APP_EVENT_STATUS_DETAILS}/${eventId}`)
 			.map((response: any) => {
 				const result = pathOr(null, ['snapshot'], response);
 				if (result) {
@@ -385,7 +385,7 @@ export class EventsService {
 	 * @returns {Observable<any>} Category status details
 	*/
 	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any, viewUnpublished: boolean): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/?eventId=${eventId}&viewUnpublished=${viewUnpublished ? 1 : 0}`)
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}/?viewUnpublished=${viewUnpublished ? 1 : 0}`)
 			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}

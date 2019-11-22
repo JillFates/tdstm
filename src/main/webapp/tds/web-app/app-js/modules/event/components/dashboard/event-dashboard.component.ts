@@ -23,6 +23,8 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {takeWhile} from 'rxjs/operators';
 import {TaskCategoryComponent} from '../task-category/task-category.component';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'event-dashboard',
@@ -45,6 +47,7 @@ export class EventDashboardComponent implements OnInit {
 	public hasBundleSteps = false;
 	private taskCategoryScrollPosition = 0;
 	readonly defaultTime = '00:00:00';
+	public hasViewUnpublishedPermission = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -52,10 +55,12 @@ export class EventDashboardComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
+		private permissionService: PermissionService,
 		private store: Store) {}
 
 	ngOnInit() {
 		this.populateData();
+		this.hasViewUnpublishedPermission = this.permissionService.hasPermission(Permission.TaskViewUnpublished);
 	}
 
 	/**
