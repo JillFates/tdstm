@@ -403,12 +403,12 @@ tds.cookbook.controller.RecipesController = function(scope, rootScope, timeout, 
 			var selectedId = row.entity.recipeId;
 			cookbookService.unarchive({moreDetails:selectedId}, function(){
 				log.info('Success on unarchiving Recipe');
-				alerts.addAlert({type: 'success', msg: 'Recipe UnArchived', closeIn: 1500});
+				alerts.addAlert({type: 'success', msg: 'Recipe Unarchived', closeIn: 1500});
 				listRecipes();
 				scope.preventSelection = false;
 			}, function(){
 				log.warn('Error on unarchiving Recipe');
-				alerts.addAlert({type: 'danger', msg: 'Unable to UnArchive Recipe'});
+				alerts.addAlert({type: 'danger', msg: 'Unable to Unarchived Recipe'});
 				scope.preventSelection = false;
 			});
 		},
@@ -1631,7 +1631,7 @@ tds.cookbook.controller.TaskBatchHistoryTasksController = function(scope, state,
 		enableCellEditOnFocus: false,
 		enableHighlighting: true,
 		afterSelectionChange: function(rowItem) {
-			if(rowItem.selected){
+			if(rowItem.selected && rowItem.entity && rowItem.entity.commentId){
 				log.info(rowItem.commentId);
 				//$rootScope.$broadcast("viewComment", commentUtils.commentTO(rowItem.entity.commentId, 'issue'), 'show');
 				showAssetComment(rowItem.entity.commentId, 'show');
