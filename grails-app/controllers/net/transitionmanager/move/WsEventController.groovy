@@ -205,11 +205,11 @@ class WsEventController implements ControllerMethods {
 	}
 
 	/**
-	 * Find and return various task-related stats per category for the given event.
-	 * @param eventId - The event id.
-	 * @param viewUnpublished - Whether or not unpublished tasks should be included in the model.
-	 * @return a list with the task category stats
-	 */
+     * Used to retrieve the list of categories and various metrics for each for a given event. This is used by the
+     * Event Dashboard for the lower category data elements.
+     * @param eventId - (Long) the id of the event to retrieve metrics
+     * @param viewUnpublished - a Boolean flag if true will include unpublished tasks in the results
+     */
 	def taskCategoriesStats(Long eventId) {
 		if (!eventId) {
 			throw new InvalidParamException('A valid Move Event ID is needed.')

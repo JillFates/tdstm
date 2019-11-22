@@ -33,7 +33,7 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/eventData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
-	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/moveEvent/taskCategoriesStats`;
+	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/event/taskCategoriesStats`;
 	private readonly categories = [
 		'Step',
 		'',
@@ -418,25 +418,25 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
 
-			item.estStart = item.estStart ? item.estStart : plannedStart;
-			item.estFinish = item.estFinish ? item.estFinish : plannedCompletion;
+			item.minEstStart = item.minEstStart ? item.minEstStart : plannedStart;
+			item.maxEstFinish = item.maxEstFinish ? item.maxEstFinish : plannedCompletion;
 
-			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minEstStart);
 
-			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxEstFinish);
 
-			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minActStart);
 
-			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
+			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxActFinish);
 
-			if (item.estFinish && (DateUtils.stringDateToDate(item.actFinish) > DateUtils.stringDateToDate(item.estFinish))) {
+			if (item.maxEstFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxEstFinish))) {
 				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
 				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
 			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
-			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
+			return Boolean(item.minEstStart || item.maxEstFinish || item.minActStart || item.maxActFinish);
 		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};

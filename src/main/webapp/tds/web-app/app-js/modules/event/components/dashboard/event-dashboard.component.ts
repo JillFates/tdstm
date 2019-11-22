@@ -134,17 +134,19 @@ export class EventDashboardComponent implements OnInit {
 				this.hasBundleSteps = false;
 				if (bundles.length) {
 					this.selectedEventBundle = bundles[0];
-					this.eventPlanStatus = new EventPlanStatus();
 
 					this.eventsService.getEventStatusDetails(this.userTimeZone, this.selectedEvent.id)
 					.subscribe((statusDetails: any) => {
+						let eventPlanStatus = new EventPlanStatus();
 						this.hasBundleSteps = true;
-						this.eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
-						this.eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
-						this.eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
-						this.eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
-						this.eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
-						this.eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
+						eventPlanStatus.dayTime = pathOr('', ['planSum', 'dayTime'], statusDetails);
+						eventPlanStatus.clockMode = pathOr('', ['planSum', 'clockMode'], statusDetails);
+						eventPlanStatus.dialIndicator = pathOr(0, ['planSum', 'dialInd'], statusDetails);
+						eventPlanStatus.description = pathOr('', ['planSum', 'eventDescription'], statusDetails);
+						eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
+						eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
+						eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
+						this.eventPlanStatus = eventPlanStatus;
 					});
 				} else {
 					this.eventPlanStatus = new EventPlanStatus();

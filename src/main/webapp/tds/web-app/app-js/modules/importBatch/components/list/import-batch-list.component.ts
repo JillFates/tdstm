@@ -283,7 +283,7 @@ export class ImportBatchListComponent implements OnDestroy {
 	private confirmDelete(): void {
 		const ids = this.dataGridOperationsHelper.getCheckboxSelectedItems().map( item => parseInt(item, 10));
 		this.promptService.open(
-			this.translatePipe.transform(PROMPT_DEFAULT_TITLE_KEY),
+			this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
 			this.translatePipe.transform(ids.length === 1 ? PROMPT_DELETE_ITEM_CONFIRMATION : PROMPT_DELETE_ITEMS_CONFIRMATION),
 			'Confirm', 'Cancel').then(result => {
 			if (result) {

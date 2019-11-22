@@ -43,16 +43,16 @@
 				</div>
 				<div class="col-sm-5 text-right">
 					<tds-button-custom class="btn-primary"
-														 (click)="onViewTaskGraphHandler()"
-														 title="View Task Graph"
-														 tooltip="View Task Graph"
-														 icon="sitemap">
+							 (click)="onViewTaskGraphHandler()"
+							 title="View Task Graph"
+							 tooltip="View Task Graph"
+							 icon="sitemap">
 					</tds-button-custom>
 					<tds-button-custom class="btn-primary"
-														 (click)="onViewTimelineHandler()"
-														 title="View Timeline"
-														 tooltip="View Timeline"
-														 icon="table">
+							 (click)="onViewTimelineHandler()"
+							 title="View Timeline"
+							 tooltip="View Timeline"
+							 icon="table">
 					</tds-button-custom>
 					<div class="refresh-control">
 						<tds-pie-countdown
@@ -60,11 +60,11 @@
 							(timeout)="search()"
 							[hideRefresh]="true"
 							[customOptions]="[{seconds: 0, description: 'Manual'},
-																		{seconds: 60, description: '1 Min'},
-																		{seconds: 120, description: '2 Min'},
-																		{seconds: 180, description: '3 Min'},
-																		{seconds: 240, description: '4 Min'},
-																		{seconds: 300, description: '5 Min'}]">
+									{seconds: 60, description: '1 Min'},
+									{seconds: 120, description: '2 Min'},
+									{seconds: 180, description: '3 Min'},
+									{seconds: 240, description: '4 Min'},
+									{seconds: 300, description: '5 Min'}]">
 						</tds-pie-countdown>
 					</div>
 				</div>
