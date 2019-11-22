@@ -135,7 +135,9 @@ export class BreadcrumbNavigationComponent {
 						[]
 					)
 				);
-				this.selectTopMenuSections();
+				setTimeout(() => {
+					this.selectTopMenuSections();
+				});
 			}
 		});
 		this.notifierService.on('notificationHeaderTitleChange', event => {
