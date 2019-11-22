@@ -49,29 +49,7 @@
 								<label class="control-label label-detail">{{dataScriptModel.name}}</label>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Mode:</label>
-							<div class="col-sm-9">
-								<div class="row" style="margin-top: 6px;" *ngIf="modalType !== actionTypes.VIEW">
-									<div class="col-sm-3">
-										<label class="label-detail">
-											<input type="radio" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.IMPORT" [(ngModel)]="dataScriptModel.mode" checked> Import
-										</label>
-									</div>
-									<div class="col-sm-3">
-										<label class="label-detail">
-											<input type="radio" class="radio-aligned" name="dataScriptModeType" [value]="dataScriptMode.EXPORT" [(ngModel)]="dataScriptModel.mode"> Export
-										</label>
-									</div>
-								</div>
-								<div class="row" style="margin-top: 6px;" *ngIf="modalType === actionTypes.VIEW">
-									<div class="col-sm-3">
-										<label class="label-detail" *ngIf="dataScriptModel.mode === dataScriptMode.IMPORT">Import</label>
-										<label class="label-detail" *ngIf="dataScriptModel.mode === dataScriptMode.EXPORT">Export</label>
-									</div>
-								</div>
-							</div>
-						</div>
+
 					</div>
 				</div>
 				<div>
@@ -82,6 +60,27 @@
 						</div>
 						<div class="col-sm-9" *ngIf="modalType !== actionTypes.VIEW">
 							<textarea id="dataScriptDescription" name="dataScriptDescription" class="form-control" [(ngModel)]="dataScriptModel.description"></textarea>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="form-group">
+						<div class="col-sm-2">
+							<div></div>
+						</div>
+						<div class="col-sm-9" >
+							<div>
+								<input
+										id="isAutoProcess"
+										name="isAutoProcess"
+										type="checkbox"
+										[disabled]="modalType === actionTypes.VIEW"
+										[(ngModel)]="dataScriptModel.isAutoProcess" />
+
+								<label for="isAutoProcess">
+									Automatically processs Import and Posting ETL results
+								</label>
+							</div>
 						</div>
 					</div>
 				</div>

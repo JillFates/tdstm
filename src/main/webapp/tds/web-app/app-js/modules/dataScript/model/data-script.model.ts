@@ -61,6 +61,7 @@ export class DataScriptModel {
 	lastUpdated?: Date;
 	sampleFilename?: string;
 	originalSampleFilename?: string;
+	isAutoProcess?: boolean;
 }
 
 export const Flatten = filter => {
