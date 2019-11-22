@@ -345,6 +345,8 @@
     padding-top: 24px;
     border: solid 1px $color-border;
     border-width: 0 1px 0 0;
+    overflow: hidden;
+
     .btn {
       color: $color--black;
       height: 40px;
@@ -356,10 +358,12 @@
 
     &.btn-link {
       .selected-button {
-        .btn {
+        &.btn {
           border: unset;
           color: white;
           border-radius: unset;
+          background: #0077b8;
+          cursor: default;
         }
       }
     }
@@ -461,6 +465,7 @@
           color: white;
           border-radius: unset;
           background: #0077b8;
+          cursor: default;
         }
       }
     }

@@ -1352,17 +1352,20 @@ div.dates-info-container {
     left: 0;
     padding-top: 24px;
     border: solid 1px #ccc;
-    border-width: 0 1px 0 0; }
+    border-width: 0 1px 0 0;
+    overflow: hidden; }
     .legacy-modal-dialog .modal-sidenav .btn {
       color: #000;
       height: 40px;
       margin: 0; }
     .legacy-modal-dialog .modal-sidenav .button-label {
       display: none; }
-    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button .btn {
+    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button.btn {
       border: unset;
       color: white;
-      border-radius: unset; }
+      border-radius: unset;
+      background: #0077b8;
+      cursor: default; }
 
 .tds-modal-content {
   background: #fff; }
@@ -1433,7 +1436,8 @@ div.dates-info-container {
       border: unset;
       color: white;
       border-radius: unset;
-      background: #0077b8; }
+      background: #0077b8;
+      cursor: default; }
 
 .tds-table .grid-label {
   font-size: 18px;
