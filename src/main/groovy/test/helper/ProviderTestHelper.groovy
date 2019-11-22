@@ -17,9 +17,9 @@ class ProviderTestHelper {
      * @param project
      * @return
      */
-    Provider createProvider(Project project) {
+    Provider createProvider(Project project, String name = null) {
         Provider provider = new Provider(
-                name: RSU.randomAlphabetic(10),
+                name: name ?: RSU.randomAlphabetic(10),
                 comment: 'Test comment',
                 description: 'Test description',
                 project: project
