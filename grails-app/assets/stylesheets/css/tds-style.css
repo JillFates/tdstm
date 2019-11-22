@@ -276,6 +276,14 @@ div.modal.no-background {
 div.modal.dialog-draggable-no-background {
   background: transparent !important; }
 
+.legacy-modal-header-s,
+.legacy-modal-body-s {
+  margin-left: 36px; }
+
+.modal-sidenav button i.fas,
+.modal-sidenav button i.far {
+  font-size: 15.4px; }
+
 /* This will be only used to override buttons elements in certain dialogs */
 div.ui-dialog-content div.buttons .btn.btn-default {
   margin-left: 10px;
@@ -991,6 +999,7 @@ div.graphContainer.fullscreen {
 /* Cookbook Tabs  to Clarity */
 .cookbook_recipes_editor div.tabbable ul.nav-tabs li a,
 .create-recipe-form div.tabbable ul.nav-tabs li a {
+  cursor: pointer;
   border: 0px;
   background: none;
   color: #444;
