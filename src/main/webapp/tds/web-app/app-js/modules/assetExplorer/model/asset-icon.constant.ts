@@ -12,7 +12,7 @@ export const ASSET_ICONS: IconModel = {
 	database: {
 		iconAlt: '\uf04c',
 		// tslint:disable-next-line:max-line-length
-		icon: '/./../../../../icons/svg/database.svg',
+		icon: '../assets/icons/svg/database.svg',
 		color: '#fff',
 		background: '#fff200'
 	},
@@ -20,7 +20,7 @@ export const ASSET_ICONS: IconModel = {
 	server: {
 		iconAlt: '\uf017',
 		// tslint:disable-next-line:max-line-length
-		icon: '/./../../../../icons/svg/serverPhysical.svg',
+		icon: '../assets/icons/svg/serverPhysical.svg',
 		color: '#fff',
 		background: '#fff200'
 	},
@@ -28,21 +28,21 @@ export const ASSET_ICONS: IconModel = {
 	virtualServer: {
 		iconAlt: '\uf068',
 		// tslint:disable-next-line:max-line-length
-		icon: '/./../../../../icons/svg/serverVirtual.svg',
+		icon: '../assets/icons/svg/serverVirtual.svg',
 		color: '#fff',
 		background: '#9e9e9e'
 	},
 	logicalStorage: {
 		iconAlt: '\uf00c',
 		// tslint:disable-next-line:max-line-length
-		icon: '/./../../../../icons/svg/storageLogical.svg',
+		icon: '../assets/icons/svg/storageLogical.svg',
 		color: '#fff',
 		background: '#0b63a8'
 	},
 	device: {
 		iconAlt: '\uf04e',
 		// tslint:disable-next-line:max-line-length
-		icon: '/./../../../../icons/svg/device_menu.svg',
+		icon: '../assets/icons/svg/device_menu.svg',
 		color: '#fff',
 		background: '#99d9ea'
 	}

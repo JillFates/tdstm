@@ -1,12 +1,12 @@
 import {
 	Binding,
-	Diagram,
+	Diagram, GraphObject,
 	Layout,
 	Link,
 	Margin,
 	Node,
 	Panel,
-	Picture,
+	Picture, Point, RowColumnDefinition,
 	Shape,
 	Size,
 	Spot,
@@ -20,6 +20,7 @@ import {IconModel, IDiagramData} from 'tds-component-library/lib/diagram-layout/
 import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborhood.component';
 import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
+import {icon} from '@fortawesome/fontawesome-svg-core';
 
 export class ArchitectureGraphDiagramHelper {
 
@@ -127,16 +128,14 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	static iconOnlyNodeTemplate(): Node {
-		const node = new Node(Panel.Viewbox);
-		node.margin = new Margin(1, 1, 1, 1);
-		node.desiredSize = new Size(72, 62);
+		const node = new Node(Panel.Position);
 
 		// Picture Icon
 		const iconPicture = new Picture();
-		iconPicture.desiredSize = new Size(70, 60);
+		iconPicture.desiredSize = new Size(80, 70);
 		iconPicture.bind(new Binding('source', 'assetClass',
 			(val: string) => this.getIconPath(val)));
-		iconPicture.imageStretch = Diagram.UniformToFill;
+		iconPicture.position = new Point(50, 30);
 
 		node.add(iconPicture);
 		node.click = (i, o) => console.log('click');
