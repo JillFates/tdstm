@@ -739,8 +739,8 @@ div.graphContainer {
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
       border: 1px solid #0077b8;
-      margin-left: 0px;
-      margin-top: 0px;
+      margin-left: 15px;
+      margin-top: 15px;
       padding: 5px;
       background-color: white;
       position: absolute;

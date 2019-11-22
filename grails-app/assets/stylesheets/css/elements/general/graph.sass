@@ -30,7 +30,7 @@ div.graphContainer
       border-width: 0px
       margin-bottom: -1px
       padding: 0px
-      height: auto !important
+      height: 32px
       font-size: 0
       &:before
         content: ""
@@ -118,9 +118,9 @@ div.graphContainer
         color: black
         font-size: 16px
         &#zoomOutButtonId
-          // background-image: url(../icons/magifier_zoom_out.png)
+        // background-image: url(../icons/magifier_zoom_out.png)
         &#zoomInButtonId
-          // background-image: url(../icons/magnifier_zoom_in.png)
+      // background-image: url(../icons/magnifier_zoom_in.png)
       div.toolButton
         width: 22px !important
         height: 22px !important
@@ -184,53 +184,51 @@ div.graphContainer
           font-size: 12px
         input, select
           height: 22px
-    div#dependenciesPanelId
-      min-width: 271px
-  div#legacy-arch-graph-container
-    position: relative
-    border: 1px solid #0077b8
     div.graphPanel
+      float: left
       border: 1px solid #0077b8
-      margin-left: 0
-      margin-top: 0
+      margin-left: 15px
+      margin-top: 15px
       padding: 5px
       background-color: white
       position: absolute
+      padding-top: 10px
+      z-index: 1
       overflow-y: scroll
-      height: auto
-      max-height: 70vh
-      top: 20px
-      left: 15px
+      height: 430px
+      max-height: 430px
+      top: 50px
       &::-webkit-scrollbar
-        width: 0
+        width: 0px
       &.openPanel
         display: block
-        z-index: 75
+        z-index: 1000
       &:not(.openPanel)
         display: none
       .hasChanges
         background-color: green
         color: white
+    div#controlPanelId
       min-width: 150px
       *
         vertical-align: middle
       table.labelTree
-        border-width: 0
+        border-width: 0px
       .halfButton
         width: 95px
       .fullButton
         width: 193px
       .controlPanelLabel
-        padding: 0
+        padding: 0px
         text-align: right
         white-space: nowrap
       .controlPanelControl
-        padding-left: 0
-        padding-right: 0
+        padding-left: 0px
+        padding-right: 0px
 
       #colorByFormId
         padding-left: 2px
-        padding-bottom: 0
+        padding-bottom: 0px
         padding-top: 2px
         span
           margin-right: 5px
@@ -274,6 +272,8 @@ div.graphContainer
               svg
                 padding-left: 6px !important
                 padding-right: 5px !important
+    div#dependenciesPanelId
+      min-width: 271px
     div#legendDivId
       min-width: 245px
       table
@@ -317,13 +317,17 @@ div.graphContainer
             padding: 0px
             text-align: center
             width: 40px
-    div#svgContainerId
-      padding: 0 !important
-      margin: 0 !important
-      font-size: 0
-      position: relative
-      svg
-        border: none !important
+  div#svgContainerId
+    border: 1px solid #0077b8
+    border-width: 1px
+    padding: 0px !important
+    margin: 0px !important
+    overflow: hidden
+    font-size: 0
+    position: relative
+    top: 30px
+    svg
+      border: none !important
 
   button.baseline-btn
     margin: 0 10px
@@ -354,6 +358,10 @@ div.graphContainer.fullscreen
         opacity: 0.8
       .graphTabButton
         border-top-width: 0px !important
+    div.graphPanel
+      margin-top: -1px
+      top: 50px
+      left: 0px
     div#controlPanelId
       .controlPanelLabel
         padding: 0px
@@ -362,19 +370,14 @@ div.graphContainer.fullscreen
       .controlPanelControl
         padding-left: 0px
         padding-right: 0px
-  div#legacy-arch-graph-container
-    position: relative
-    div.graphPanel
-      top: 20px
-      left: 15px
     div#legendDivId
-    div#svgContainerId
-      border: none !important
-      position: fixed
-      left: 0px
-      top: 0px
-      svg
-        border-width: 0px
+  div#svgContainerId
+    border: none !important
+    position: fixed
+    left: 0px
+    top: 0px
+    svg
+      border-width: 0px
 
 #scriptDivId
   padding: 0px
