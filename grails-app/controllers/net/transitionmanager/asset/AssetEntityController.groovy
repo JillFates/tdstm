@@ -2862,7 +2862,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		// Check if the parameters are null
 		if ((context.assetId == null || context.assetId == -1) || (context.levelsUp == null || context.levelsDown == null)) {
-			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(context.assetId, context.levelsUp, context.levelsDown, context.mode))
+			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode))
 			return
 		}
 
