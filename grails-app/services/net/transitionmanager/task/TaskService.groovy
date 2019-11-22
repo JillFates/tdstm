@@ -5606,6 +5606,18 @@ class TaskService implements ServiceMethods {
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			Map<String, ?> invokeActionDetails = it.getInvokeActionButtonDetails()
+			Map actionBarInfo = [
+				apiActionId: it.apiAction?.id,
+				apiActionInvokedAt: it.apiActionInvokedAt,
+				apiActionCompletedAt: it.apiActionCompletedAt,
+				invokeActionDetails: invokeActionDetails,
+				assignedTo: it.assignedTo?.id,
+				predecessorsCount: it.taskDependencies.size(),
+				successorsCount: TaskDependency.countByPredecessor(it),
+				category: it.category
+			]
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5630,7 +5642,8 @@ class TaskService implements ServiceMethods {
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,
-				updatedClass: updatedClass
+				updatedClass: updatedClass,
+				actionBarInfo: actionBarInfo
 			]
 		}
 		return [rows: results, totalCount: totalCount]
