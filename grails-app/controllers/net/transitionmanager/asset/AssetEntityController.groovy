@@ -2863,7 +2863,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 
 		// Check if the parameters are null
 		if ((assetId == null || assetId == -1) || (levelsUp == null || levelsDown == null)) {
-			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(assetId, levelsUp, levelsDown))
+			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModelLegacy(assetId, levelsUp, levelsDown))
 			return
 		}
 
