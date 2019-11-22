@@ -489,7 +489,7 @@
           id="deleteDependency"
           class="btn btn-icon"
           ng-click="toDeleteDependency('assetA', true)"
-          ng-if="!actionTypeEdit && (assetDependency.assetA.dependency.id && !assetDependency.assetB.dependency.id) && assetDependency.editPermission"
+          ng-if="(assetDependency.assetA.dependency.id && !assetDependency.assetB.dependency.id) && assetDependency.editPermission"
         >
           <i class="far fa-trash-alt"></i>
         </button>
