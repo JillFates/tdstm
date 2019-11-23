@@ -292,8 +292,7 @@
 														</td>
 														<td class="valueNW">
 															<span>{{
-																model.dueDate ||
-																	''
+																model.dueDate || '' | tdsDate : dateFormat
 															}}</span>
 														</td>
 													</tr>
@@ -329,12 +328,7 @@
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{
-																model.estimatedStart ||
-																	''
-																	| tdsDateTime
-																		: userTimeZone
-															}}</span>
+															<span>{{ model.estimatedStart || '' | date : dateFormatTime }}</span>
 														</td>
 
 														<td
@@ -347,12 +341,7 @@
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{
-																model.estimatedFinish ||
-																	''
-																	| tdsDateTime
-																		: userTimeZone
-															}}</span>
+															<span>{{ model.estimatedFinish || '' | date : dateFormatTime }}</span>
 														</td>
 													</tr>
 

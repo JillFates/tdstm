@@ -76,10 +76,16 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT).subscribe(() => {
+		// DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone())
+		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.subscribe((preferences: any[]) => {
 			this.hasChanges = false;
-			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+
+			this.dateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+			this.userTimeZone = preferences[PREFERENCES_LIST.CURR_TZ] || DateUtils.TIMEZONE_GMT;
+
+
+				if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
 				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
 			} else {
 				this.currentUserId = this.userContext.user.id;
@@ -101,7 +107,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					this.dismiss();
 					return;
 				}
-				this.dateFormat = this.userPreferenceService.getUserDateFormat();
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 

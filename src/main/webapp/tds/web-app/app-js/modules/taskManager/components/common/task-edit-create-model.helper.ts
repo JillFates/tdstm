@@ -184,7 +184,7 @@ export class TaskEditCreateModelHelper {
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			dueDate: assetComment.dueDate ? assetComment.dueDate : '',
+			dueDate: DateUtils.utcStringToLocalDate(assetComment.dueDate),
 			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
 			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
 			instructionLink: assetComment.instuctionLink,
