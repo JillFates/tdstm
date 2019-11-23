@@ -12,7 +12,6 @@ import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/mo
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -84,8 +83,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 			this.dateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
 			this.userTimeZone = preferences[PREFERENCES_LIST.CURR_TZ] || DateUtils.TIMEZONE_GMT;
 
-
-				if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
+			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
 				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
 			} else {
 				this.currentUserId = this.userContext.user.id;

@@ -55,7 +55,7 @@ import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-
 import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
-import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {UserService} from '../../../auth/service/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
@@ -457,7 +457,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(TaskCreateComponent, [
+		this.dialog.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {

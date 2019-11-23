@@ -39,7 +39,6 @@ import { Store } from '@ngxs/store';
 import { SetEvent } from '../../../event/action/event.actions';
 import { TaskStatus } from '../../model/task-edit-create.model';
 import { FilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
-import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
@@ -236,7 +235,7 @@ export class TaskListComponent {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
+				this.dialogService.extra(TaskEditCreateComponent, [
 					{ provide: TaskDetailModel, useValue: clone(model) }
 				], false, false)
 					.then(result => {
