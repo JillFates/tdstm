@@ -296,7 +296,7 @@
                                                 </td>
                                             </tr>
 
-                                            <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop">
+                                            <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop just-task-edit-view">
                                                 <td class="N edge-cell" nowrap="nowrap">
                                                     <label>Actual Start</label>
                                                 </td>
@@ -321,6 +321,7 @@
                                                     <span class="read-only-dates">{{model.taskSpec}}</span>
                                                 </td>
                                             </tr>
+
                                             <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                 <td class="N status-cell" nowrap="nowrap">
                                                     <label>Status</label>
@@ -340,22 +341,7 @@
                                                     </kendo-dropdownlist>
 
                                                 </td>
-
-                                                <td class="N edge-cell" nowrap="nowrap">
-                                                    <label>Actual Start/Finish</label>
-                                                </td>
-
-                                                <td class="valueNW">
-                                                    <span class="read-only-dates">{{model.actualStart}}-{{model.actualFinish}}</span>
-                                                </td>
-
-                                                <td class="N edge-cell" nowrap="nowrap">
-                                                    <label>TaskSpec ID</label>
-                                                </td>
-
-                                                <td class="valueNW">
-                                                    <span class="read-only-dates">{{model.taskSpec}}</span>
-                                                </td>
+                                                <td colspan="4"></td>
                                             </tr>
                                             <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                 <td class="N edge-cell" nowrap="nowrap">

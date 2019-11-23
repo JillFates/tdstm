@@ -15,6 +15,9 @@
     .just-task-edit-view {
       display: initial;
     }
+    tr.just-task-edit-view {
+      display: table-row;
+    }
   }
 
   .task-detail-container {
@@ -293,7 +296,7 @@
       .options-container {
         display: flex;
         justify-content: space-between;
-
+        margin-top: 5px;
         .options {
           display: flex;
         }
