@@ -468,8 +468,9 @@
 																<div
 																	class="progress-bar"
 																	role="progressbar"
+																	*ngIf="model.percentageComplete"
 																	[style.width.%]="
-																		model.percentageComplete
+																		model.percentageComplete <= 24 ? 24 : model.percentageComplete
 																	"
 																	[attr.aria-valuenow]="
 																		model.percentageComplete
