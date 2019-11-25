@@ -175,7 +175,7 @@ export class UIExtraDialog implements OnDestroy {
 	 */
 	private processMultipleDialogBackgrounds(closingDialog?: boolean): void {
 		let divs = jQuery('tds-ui-dialog div.modal.fade.in');
-		let index = 1;
+		let index = divs.length;  // get the reference to the latest modal
 		for (let div of divs) {
 			if (!closingDialog) {
 				this.currentActiveModalDivIndex = index;
