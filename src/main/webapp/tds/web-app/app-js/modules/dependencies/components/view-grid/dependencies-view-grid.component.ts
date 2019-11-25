@@ -454,4 +454,16 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	protected isBulkSelectAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetDependenciesBulkSelect);
 	}
+
+	/**
+	 * reloads data when the user clicks on refresh
+	 */
+	protected reloadData(): void {
+		this.setupGridColumns();
+		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(this.actionableAssets);
+		this.state = this.getInitialComponentState();
+		this.setupBulkCheckboxService();
+		this.setupComponentStateObservable();
+		this.setupTagsFilterStateObservable();
+	}
 }

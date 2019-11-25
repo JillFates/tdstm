@@ -76,4 +76,6 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20190930-update-dataviews.groovy'
 	include file: 'version/v4_7_2/20191009-drop-tables-move-bundle-step-and-step-snapshot.groovy'
 	include file: 'version/v5_0_0/20190920-add_fk_to_party_relationship.groovy'
+	include file: 'version/v5_0_0/20191112-add_fk_to_asset_comment_asset.groovy'
+	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'
 }
