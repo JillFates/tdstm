@@ -147,7 +147,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 *
 	 * @return A map representing the architecture graph to be rendered in the view.
 	 */
-	Map architectureGraphModelLegacy(List<Map> graphNodes = [], List<Map> graphLinks = [], Integer assetId, Integer levelsUp, Integer levelsDown) {
+	Map architectureGraphModelLegacy(List<Map> graphNodes = [], List<Map> graphLinks = [], Long assetId, Integer levelsUp, Integer levelsDown) {
 		// maps asset type names to simpler versions
 		Map assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
 
