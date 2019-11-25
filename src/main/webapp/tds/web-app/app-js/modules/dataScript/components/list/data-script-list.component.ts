@@ -153,7 +153,9 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	protected filterCount(): number {
 		let filterCount = 0;
 		this.state.filter.filters.forEach((filter: FilterDescriptor) => {
-			if (filter.value !== '') filterCount++;
+			if (filter.value !== '') {
+				filterCount++;
+			}
 		});
 		return filterCount;
 	}

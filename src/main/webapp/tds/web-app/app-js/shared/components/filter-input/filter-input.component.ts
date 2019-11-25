@@ -71,7 +71,9 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 				this.keyPressedListener.bind(this)
 			);
 		});
-		if (this.value === undefined) this.value = '';
+		if (this.value === undefined) {
+			this.value = '';
+		}
 	}
 
 	/**
