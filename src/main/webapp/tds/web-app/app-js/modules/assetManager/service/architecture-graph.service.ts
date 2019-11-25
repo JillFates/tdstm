@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
-import {IArchitectureGraphAsset, IAssetType} from '../model/architecture-graph-asset.model';
-import {ArchitectreGraphAssetPreference} from '../model/architectre-graph-asset-preference.model';
+import {IArchitectureGraphAsset, IAssetType} from '../../assetExplorer/model/architecture-graph-asset.model';
+import {ArchitectreGraphAssetPreference} from '../../assetExplorer/model/architectre-graph-asset-preference.model';
 
 @Injectable({
 	providedIn: 'root'
