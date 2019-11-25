@@ -373,7 +373,10 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		let all = document.getElementsByClassName(
 			'modal-content tds-angular-component-content'
 		)[0];
-		if (all === undefined) return;
+		// TODO: verify this code, this should be: if (all) do the rest below s
+		if (!all) {
+			return;
+		}
 		let focusable = all.querySelectorAll(
 			'input, select, textarea, [tabindex]:not([tabindex="-1"])'
 		);
