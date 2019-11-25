@@ -1,4 +1,4 @@
-<tr>
+<tr style="order: 2000">
     <th class="label N" nowrap="nowrap">
         <label>
             Tags

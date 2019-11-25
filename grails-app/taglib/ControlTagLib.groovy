@@ -26,13 +26,24 @@ class ControlTagLib {
 		if (!fieldSpec) {
 			throw new InvalidParamException('<tds:clrRowDetail> tag requires field=fieldSpec Map')
 		}
+
 		StringBuilder tr = new StringBuilder("\n")
 		tr.append('<tr')
 		if(fieldValue == '') {
 			tr.append(' class="nodata"')
 		}
-		tr.append('>')
+		
 		out << tr.toString()
+	
+		// This is necessary so that we can specify the order of the fields.
+		def style = attrs.style ?: ""
+		if (style == '') {
+			out << ' style="order: 1000;"'
+		} else {
+			out << attribute("style", style);
+		}
+
+		out << " >\n"
 		clrInputLabel.call(attrs)
 		StringBuilder row = new StringBuilder("\n")
 		row.append('<td>')

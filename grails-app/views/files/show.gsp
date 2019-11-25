@@ -15,10 +15,10 @@
 							</g:if>
 							<table id="detailsTable" class="tds-detail-list">
 								<tbody id="detailsBody" class="one-column">
-									<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${filesInstance.LUN}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
-									<tr>
+									<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.fileFormat}" value="${filesInstance.fileFormat}"/>
+									<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.LUN}" value="${filesInstance.LUN}"/>
+									<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.supportType}" value="${filesInstance.supportType}"/>
+									<tr style="order: 30">
 										<th class="${standardFieldSpecs.size.imp?:''}">
 												${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 										</th>
@@ -29,11 +29,11 @@
 										</td>
 									</tr>
 
-									<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${filesInstance.rateOfChange}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
+									<tds:clrRowDetail style="order: 35" field="${standardFieldSpecs.externalRefId}" value="${filesInstance.externalRefId}"/>
+									<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.environment}" value="${filesInstance.environment}"/>
+									<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.planStatus}" value="${filesInstance.planStatus}" tooltipDataPlacement="bottom"/>
+									<tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.rateOfChange}" value="${filesInstance.rateOfChange}"/>
+									<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.validation}" value="${filesInstance.validation}" tooltipDataPlacement="bottom"/>
 									
 									<g:render template="/assetEntity/customShow" model="[assetEntity:filesInstance]"></g:render>
 									<g:render template="/comment/assetTagsShow"></g:render>

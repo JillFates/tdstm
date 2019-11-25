@@ -16,11 +16,11 @@
 								</g:if>
 								<table id="detailsTable" class="tds-detail-list">
 									<tbody id="detailsBody" class="one-column">
-										<tds:clrRowDetail field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}"/>	
-										<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${assetEntity.environment}"/>
+										<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}"/>	
+										<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.environment}" value="${assetEntity.environment}"/>
 										
 										<%-- TODO: Fix this. Divs not showing in markup, but inner content is. --%>
-										<div class="source-target-wrapper">
+										<div style="order: 25" class="source-target-wrapper">
 											<tr>
 												<th class="${standardFieldSpecs.locationSource.imp?:''} header-label">Source</th>
 											</tr>
@@ -85,7 +85,7 @@
 											</tr>
 										</div>
 
-										<div class="source-target-wrapper">
+										<div style="order: 30" class="source-target-wrapper">
 											<tr>
 												<th class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
 											</tr>
@@ -149,7 +149,7 @@
 											</tr>
 										</div>
 
-										<tr>
+										<tr style="order: 35">
 											<tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${assetEntity.manufacturer}"/>
 											<td class="valueNW ${standardFieldSpecs.manufacturer.imp?:''}">
 												<tds:tooltipSpan field="${standardFieldSpecs.manufacturer}">
@@ -158,9 +158,9 @@
 											</td>
 										</tr>
 											
-										<tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
+										<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.priority}" value="${assetEntity.priority}"/>
 
-										<tr>
+										<tr style="order: 45">
 											<tds:clrInputLabel field="${standardFieldSpecs.model}" value="${assetEntity.model}"/>
 											<td>
 												<tds:tooltipSpan field="${standardFieldSpecs.model}">
@@ -170,14 +170,14 @@
 											</td>
 										</tr>
 											
-										<tds:clrRowDetail field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.os}" value="${assetEntity.os}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}"/>
+										<tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.ipAddress}" value="${assetEntity.ipAddress}"/>
+										<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.shortName}" value="${assetEntity.shortName}"/>
+										<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.os}" value="${assetEntity.os}"/>
+										<tds:clrRowDetail style="order: 65" field="${standardFieldSpecs.serialNumber}" value="${assetEntity.serialNumber}"/>
+										<tds:clrRowDetail style="order: 70" field="${standardFieldSpecs.supportType}" value="${assetEntity.supportType}"/>
+										<tds:clrRowDetail style="order: 80" field="${standardFieldSpecs.assetTag}" value="${assetEntity.assetTag}"/>
 
-										<tr>
+										<tr style="order: 85">
 											<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}"/>
 											<td>
 												<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
@@ -186,7 +186,7 @@
 											</td>
 										</tr>
 
-										<tr>
+										<tr style="order: 75">
 											<td class="${standardFieldSpecs.size.imp?:''}">
 												<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?: standardFieldSpecs.size.label}">
 													Size/Scale
@@ -199,9 +199,9 @@
 											</td>
 										</tr>
 
-										<tds:clrRowDetail field="${standardFieldSpecs.railType}" value="${assetEntity.railType}"/>
+										<tds:clrRowDetail style="order: 95" field="${standardFieldSpecs.railType}" value="${assetEntity.railType}"/>
 										
-										<tr>
+										<tr style="order: 100">
 											<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}"/>
 											<td>
 												<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
@@ -210,12 +210,12 @@
 											</td>
 										</tr>
 
-										<tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}"/>
-										<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}"/>
+										<tds:clrRowDetail style="order: 90" field="${standardFieldSpecs.planStatus}" value="${assetEntity.planStatus}"/>
+										<tds:clrRowDetail style="order: 110" field="${standardFieldSpecs.rateOfChange}" value="${assetEntity.rateOfChange}"/>
+										<tds:clrRowDetail style="order: 115" field="${standardFieldSpecs.externalRefId}" value="${assetEntity.externalRefId}"/>
 
 										<g:if test="! assetEntity.isVM()">
-											<tr>
+											<tr style="order: 120">
 												<th class="${standardFieldSpecs.truck.imp?:''}">
 													<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">
 														Truck/Cart/Shelf
@@ -229,7 +229,7 @@
 											</tr>
 										</g:if>
 
-										<tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${assetEntity.validation}"/>
+										<tds:clrRowDetail style="order: 105" field="${standardFieldSpecs.validation}" value="${assetEntity.validation}"/>
 
 										<g:render template="customShow"></g:render>
 										<g:render template="/comment/assetTagsShow"></g:render>

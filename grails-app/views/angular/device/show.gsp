@@ -111,10 +111,10 @@
                 </g:if>
                 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
                     <tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
-                        <tds:clrRowDetail field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+                        <tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
+                        <tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
-                        <tr>
+                        <tr style="order: 35">
                             <tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
                             <td>
                                 <a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
@@ -124,9 +124,9 @@
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${asset.priority}" />
+                        <tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.priority}" value="${asset.priority}" />
 
-                        <div class="source-target-wrapper">
+                        <div  style="order: 25" class="source-target-wrapper">
                             <tr>
                                 <th class="${standardFieldSpecs.locationSource.imp?:''} header-label">Source</th>
                             </tr>
@@ -156,11 +156,18 @@
                                     <td>${assetEntity.sourceRackPosition}</td>
                                 </tr>
                             </g:if>
+
+                            <g:if test="${assetEntity.assetType in ['Blade']}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Source Blade Chassis</th>
+                                    <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
+                                </tr>
+                            </g:if>
                         </div>
 
-                        <div class="source-target-wrapper">
+                        <div style="order: 30" class="source-target-wrapper">
                             <tr>
-                                <th colspan="2" class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
+                                <th class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
                             </tr>
                             <tr>
                                 <th class="${standardFieldSpecs.locationTarget.imp?:''}">Target Location</th>
@@ -187,9 +194,16 @@
                                     <td>${assetEntity.targetRackPosition}</td>
                                 </tr>
                             </g:if>
+
+                            <g:if test="${assetEntity.assetType in ['Blade']}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Target Blade Chassis</th>
+                                    <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${targetChassis}</td>
+                                </tr>
+                            </g:if>
                         </div>
 
-                        <tr>
+                        <tr style="order: 45">
                             <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
                             <td>
                                 <a *ngIf="isModelLinkAvailable()"
@@ -198,37 +212,21 @@
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.shortName}" value="${asset.shortName}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.os}" value="${asset.os}" />
+                        <tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" />
+                        <tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.shortName}" value="${asset.shortName}" />
+                        <tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.os}" value="${asset.os}" />
+                        <tds:clrRowDetail style="order: 65" field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" />
+                        <tds:clrRowDetail style="order: 70" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+                        <tds:clrRowDetail style="order: 85" field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" />
 
-
-                        <g:if test="${assetEntity.assetType in ['Blade']}">
-                            <tr>
-                                <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Source Blade Chassis</th>
-                                <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
-                            </tr>
-                        </g:if>
-
-                        <g:if test="${assetEntity.assetType in ['Blade']}">
-                            <tr>
-                                <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Target Blade Chassis</th>
-                                <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${targetChassis}</td>
-                            </tr>
-                        </g:if>
-
-                        <tds:clrRowDetail field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" />
-
-                        <tr>
+                        <tr style="order: 90">
                             <tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}" />
                             <td>
                                 {{ '${assetEntity?.retireDate}' | tdsDate: userDateFormat }}
                             </td>
                         </tr>
 
-                        <tr>
+                        <tr style="order: 75">
                             <th class="${standardFieldSpecs.moveBundle.imp?:''}">
                                 ${standardFieldSpecs.moveBundle.label} : Dep. Group
                             </th>
@@ -240,32 +238,32 @@
                             </td>
                         </tr>
 
-                        <tr>
+                        <tr style="order: 80">
                             <th class="${standardFieldSpecs.size.imp?:''}">Size/Scale</th>
                             <td>${assetEntity.size} ${assetEntity.scale?.value()}</td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.railType}" value="${asset.railType}" />
+                        <tds:clrRowDetail style="order: 100" field="${standardFieldSpecs.railType}" value="${asset.railType}" />
 
-                        <tr>
+                        <tr style="order: 105">
                             <tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}" />
                             <td>
                                 {{ '${assetEntity?.maintExpDate}' | tdsDate: userDateFormat }}
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+                        <tds:clrRowDetail style="order: 95" field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+                        <tds:clrRowDetail style="order: 115" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+                        <tds:clrRowDetail style="order: 120" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 
                         <g:if test="! assetEntity.isVM()">
-                            <tr>
+                            <tr style="order: 125">
                                 <th class="${standardFieldSpecs.truck.imp?:''}">Truck/Cart/Shelf</th>
                                 <td>${assetEntity.truck ?: ' '} / ${assetEntity.cart ?: ' '} / ${assetEntity.shelf ?: ' '}</td>
                             </tr>
                         </g:if>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
+                        <tds:clrRowDetail style="order: 110" field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
                         <g:render template="/angular/common/customShow"></g:render>       
                     </tbody>
