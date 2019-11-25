@@ -48,7 +48,7 @@ class BulkAssetETLService implements ServiceMethods {
 		}
 
 		try {
-			List<Map> assets = getAssets(ids, queryFilter)
+			List<Map> assets = getAssets(ids, queryFilter, currentProject)
 			List<Map> assetsUsingLabels = replaceLabels(assets, fieldMapping)
 			List<Object> tempFileObject = fileSystemService.createTemporaryFile('','json')
 
@@ -80,31 +80,28 @@ class BulkAssetETLService implements ServiceMethods {
 	 *
 	 * @param ids The asset Ids to look up other wise use the queryFilter.
 	 * @param queryFilter The query filter to use if ther are no assetIds.
+	 * @param currentProject, the project to get assets for.
 	 *
 	 * @return A list Of assets to use in the builk ETL.
 	 */
-	List<AssetEntity> getAssets(List<Long> ids, Map queryFilter) {
+	List<AssetEntity> getAssets(List<Long> ids, Map queryFilter, Project currentProject) {
 		String queryForAssetIds
 		Map params = [:]
 
-		//Map assetQueryParams = [:]
 
 		if (ids && !queryFilter) {
 			queryForAssetIds = ':assetIds'
 			params.assetIds = ids
-			//assetQueryParams['assetIds'] = ids
 		} else {
 			queryForAssetIds = queryFilter.query
 			params << queryFilter.params
-			//assetQueryParams = queryFilter.params
 		}
+		params.project = currentProject
 
 		String query = """
 			FROM AssetEntity a
-			WHERE a.id in ($queryForAssetIds)
+			WHERE a.id in ($queryForAssetIds) AND project = :project
 		"""
-		//TODO should we do this?
-		//assetEntityService.bulkBumpAssetLastUpdated(securityService.userCurrentProject, queryForAssetIds, assetQueryParams)
 
 		return AssetEntity.executeQuery(query, params)
 	}
