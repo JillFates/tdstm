@@ -185,7 +185,9 @@
             border-spacing: 3px;
             padding: 0;
 
-            .k-widget.k-dropdown {
+            .k-widget.k-dropdown,
+            .k-widget.k-dateinput,
+            .k-widget.k-datepicker {
               width: 100%;
             }
 
