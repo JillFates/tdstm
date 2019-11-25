@@ -69,6 +69,7 @@ class TaskServiceIntTests extends Specification{
         sessionFactory = grailsApplication.getMainContext().getBean('sessionFactory')
     }
 
+
     void "test clean task data"() {
         setup:
             prepareMoveEventData()
@@ -78,7 +79,7 @@ class TaskServiceIntTests extends Specification{
             List<AssetComment> listAssetEntityNotNull = AssetComment.findAllByAssetEntityIsNotNull([max: 10])
 
         then:
-            for(AssetComment task :listAssetEntityNotNull) {
+            for (AssetComment task : listAssetEntityNotNull) {
                 task = taskService.setTaskStatus(task, AssetCommentStatus.STARTED, whom)
                 task.actStart != null
                 task.assignedTo != null
@@ -96,6 +97,7 @@ class TaskServiceIntTests extends Specification{
                 null != task.dateResolved
             }
     }
+
 
     private MoveEvent createMoveEvent(Project project) {
         MoveEvent moveEvent = new MoveEvent(
