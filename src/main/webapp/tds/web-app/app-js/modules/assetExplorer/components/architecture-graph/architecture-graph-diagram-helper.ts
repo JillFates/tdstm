@@ -27,20 +27,20 @@ export class ArchitectureGraphDiagramHelper {
 	/**
 	 * Diagram data object
 	 */
-	static diagramData(rootAsset: number | string, currentUserId?: any, data?: any, scaleMode?: any, iconOnly?: boolean): IDiagramData {
+	static diagramData(rootAsset: number | string, currentUserId?: any, data?: any, iconsOnly?: boolean, extras?: any): IDiagramData {
 		const d = this.data(data);
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
 			currentUserId: currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
-			nodeTemplate: iconOnly ? this.iconOnlyNodeTemplate() : this.nodeTemplate(),
+			nodeTemplate: iconsOnly ? this.iconOnlyNodeTemplate() : this.nodeTemplate(),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
-			autoScaleMode: !!scaleMode && scaleMode || null,
-			rootAsset: rootAsset
+			rootAsset: rootAsset,
+			extras: extras && extras
 		};
 	}
 
@@ -128,16 +128,21 @@ export class ArchitectureGraphDiagramHelper {
 	}
 
 	static iconOnlyNodeTemplate(): Node {
-		const node = new Node(Panel.Position);
+		const node = new Node(Panel.Viewbox);
+		node.position = new Point(0, 0);
+		node.maxSize = new Size(35, 60);
 
+		const panel = new Panel(Panel.Auto);
+		const panelBody = new Panel(Panel.Vertical);
 		// Picture Icon
 		const iconPicture = new Picture();
-		iconPicture.desiredSize = new Size(80, 70);
+		// iconPicture.desiredSize = new Size(80, 80);
 		iconPicture.bind(new Binding('source', 'assetClass',
 			(val: string) => this.getIconPath(val)));
-		iconPicture.position = new Point(50, 30);
 
-		node.add(iconPicture);
+		panelBody.add(iconPicture);
+		panel.add(panelBody);
+		node.add(panel);
 		node.click = (i, o) => console.log('click');
 
 		return node;
