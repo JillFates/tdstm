@@ -149,9 +149,6 @@ export class EventDashboardComponent implements OnInit {
 					this.eventPlanStatus.description = this.eventDetails.moveEvent.description;
 					this.eventPlanStatus.dayTime = this.defaultTime;
 				}
-				setTimeout(() => {
-					this.taskCategorySection.setContainerScroll(this.taskCategoryScrollPosition);
-				})
 			});
 	}
 
