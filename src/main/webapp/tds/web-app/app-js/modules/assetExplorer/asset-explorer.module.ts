@@ -40,6 +40,8 @@ import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
 import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
+import {AssetExplorerrRouteModule} from './asset-explorer.route';
+import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 
 @NgModule({
 	imports: [
@@ -52,7 +54,9 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		GridModule,
 		SortableModule,
 		IntlModule,
-		DateInputsModule
+		DateInputsModule,
+		// Route
+		AssetExplorerrRouteModule
 	],
 	declarations: [
 		AssetShowComponent,
@@ -75,7 +79,8 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		TaskDetailComponent,
 		TaskActionsComponent,
 		TaskNotesComponent,
-		TaskActionSummaryComponent
+		TaskActionSummaryComponent,
+		ArchitectureGraphComponent
 	],
 	providers: [
 		// Services

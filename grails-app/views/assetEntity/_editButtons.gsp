@@ -4,28 +4,36 @@
 <div class="modal-sidenav form-group-center">
 	<nav class="modal-sidenav btn-link">
 		<g:if test="${redirectTo!='dependencyConsole'}">
-			<button class="btn btn-icon" type="button" id="assetUpdateButton" value="Update">
+			<button type="button" class="btn btn-icon selected-button">
 				<i class="fas fa-edit"></i>
+			</button>
+			
+			<button type="button" class="btn btn-icon" type="button" id="assetUpdateButton" value="Update">
+				<i class="far fa-save"></i>
 			</button>
 
 			<tds:hasPermission permission="${Permission.AssetDelete}">
-				<button class="btn btn-icon" type="submit" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');" value="Delete">
+				<button type="button" class="btn btn-icon" type="submit" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');" value="Delete">
 					<i class="far fa-trash-alt"></i>
 				</button>
 			</tds:hasPermission>
 			
-			<button class="btn btn-icon" type="button" value="Cancel" onclick="$('#editEntityView').dialog('close');">
+			<button type="button" class="btn btn-icon" type="button" value="Cancel" onclick="$('#editEntityView').dialog('close');">
 				<i class="fas fa-ban"></i>
 			</button>
 		</g:if>
 		<g:else>
-			<button class="btn btn-icon" type="button" id="assetUpdateButton" value="Update">
+			<button type="button" class="btn btn-icon selected-button">
 				<i class="fas fa-edit"></i>
 			</button>
-			<button class="btn btn-icon" type="button" id="deleteId" onclick="deleteAsset('${assetEntity.id}','${assetEntity.assetClass}')" value="Delete">
+
+			<button type="button" class="btn btn-icon" type="button" id="assetUpdateButton" value="Update">
+				<i class="far fa-save"></i>
+			</button>
+			<button type="button" class="btn btn-icon" type="button" id="deleteId" onclick="deleteAsset('${assetEntity.id}','${assetEntity.assetClass}')" value="Delete">
 				<i class="far fa-trash-alt"></i>
 			</button>
-			<button class="btn btn-icon" type="button" value="Cancel" onclick="$('#editEntityView').dialog('close');">
+			<button type="button" class="btn btn-icon" type="button" value="Cancel" onclick="$('#editEntityView').dialog('close');">
 				<i class="fas fa-ban"></i>
 			</button>
 		</g:else>

@@ -51,7 +51,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DATABASE }],
-				DIALOG_SIZE.LG);
+				DIALOG_SIZE.XXL);
 		}
 
 		/**
@@ -74,7 +74,7 @@ export function DatabaseShowComponent(template, modelId: number, metadata: any) 
 					];
 
 					this.dialogService
-						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.DATABASE, result.assetId);
 				}

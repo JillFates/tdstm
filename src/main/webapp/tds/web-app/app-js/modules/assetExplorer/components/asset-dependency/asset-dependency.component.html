@@ -252,6 +252,17 @@
 						>
 						</tds-button-save>
 
+						<tds-button-delete
+							*ngIf="dependencyA && !dependencyB"
+							[disabled]="!isDeleteAvailable()"
+							(click)="
+								onDeleteDependency(DependencyType.dependencyA)
+							"
+							class="btn-danger"
+							tooltip="Delete Dependency"
+						>
+						</tds-button-delete>
+
 						<tds-button-cancel
 							tooltip="Cancel editing"
 							(click)="cancelEdit(false)"

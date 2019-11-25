@@ -1,10 +1,14 @@
-<div class="modal-header">
+<div class="modal-header legacy-modal-header-s">
     <label class="codeDiffHeaderLeft">{{leftLabel}}</label>
     <label class="codeDiffHeaderRight">{{rightLabel}}</label>
 </div>
-<div class="modal-body codeDiff">
+<div class="modal-body codeDiff legacy-modal-body-s">
     <div id="compareViewport"></div>
 </div>
-<div class="modal-footer">
-    <button class="btn btn-warning" ng-click="close()">Close</button>
+<div class="modal-sidenav form-group-center">
+    <nav class="modal-sidenav btn-link">
+        <button type="button" class="btn btn-icon" name="close-button" value="Close" ng-click="close()">
+            <i class="fas fa-ban"></i>
+        </button>
+    </nav>
 </div>

@@ -17,7 +17,7 @@ import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetType
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-
+import net.transitionmanager.command.dashboard.InsightDataCommand
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveBundle
@@ -33,10 +33,11 @@ import org.springframework.jdbc.core.JdbcTemplate
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class WsDashboardController implements ControllerMethods {
 
-	JdbcTemplate jdbcTemplate
-	TaskService taskService
-	MoveEventService moveEventService
+	JdbcTemplate        jdbcTemplate
+	TaskService         taskService
+	MoveEventService    moveEventService
 	CustomDomainService customDomainService
+	InsightService      insightService
 
 	/**
 	 * Returns data used to render the Event Dashboard
