@@ -185,6 +185,10 @@
             border-spacing: 3px;
             padding: 0;
 
+            .k-widget.k-dropdown {
+              width: 100%;
+            }
+
             .expanded-button {
               display: none;
             }
