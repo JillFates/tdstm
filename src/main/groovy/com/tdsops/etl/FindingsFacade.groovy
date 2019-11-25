@@ -1,4 +1,7 @@
 package com.tdsops.etl
+
+import net.transitionmanager.asset.AssetEntity
+
 /**
  * Find Element Facade used in ETL script for FINDINGS bound variable.
  * It could be used for defining the latest results
@@ -83,7 +86,10 @@ class FindingsFacade {
 		List<Object> results = []
 		if (!ids.isEmpty()) {
 			Class domainClass = findElement.currentDomain.clazz
-			results = domainClass.where { id in ids }.list(readonly: true)
+			results = domainClass.createCriteria().list {
+				'in' ('id', ids)
+				readOnly(true)
+			}
 		}
 		return results
 	}
