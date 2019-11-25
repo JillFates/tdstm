@@ -141,7 +141,10 @@ export class AssetCommonShow implements OnInit {
 	loadThumbnailData(assetId: number | string): void {
 		this.architectureGraphService.getAssetDetails(assetId, 0, 1)
 			.subscribe(res => {
-				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res, Diagram.Uniform, true));
+				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res, true, {
+					autoScale: Diagram.Uniform,
+					allowZoom: false
+				}));
 			})
 	}
 }
