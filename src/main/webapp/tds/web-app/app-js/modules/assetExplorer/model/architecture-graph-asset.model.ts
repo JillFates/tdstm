@@ -53,4 +53,5 @@ export interface IAssetNode {
 	title?: string;
 	type?: string;
 	tooltipData?: any;
+	iconPath?: any
 }
