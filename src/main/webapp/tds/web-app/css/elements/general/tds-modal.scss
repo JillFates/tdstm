@@ -1,3 +1,5 @@
+$side-nav-icon-size: 18px;
+
 tds-ui-dialog {
 	#tdsUiDialog {
 		padding: 0 !important;
@@ -387,7 +389,10 @@ tds-ui-dialog {
 		.btn {
 			color: $color--black;
 			height: 40px !important;
+			width: 40px;
 			margin: 0;
+			border: unset;
+			padding: unset;
 		}
 
 		.button-label {
@@ -395,6 +400,19 @@ tds-ui-dialog {
 		}
 
 		&.btn-link {
+			.tds-generic-button {
+				tds-button.action-button {
+					button.tds-button {
+						span {
+							clr-icon {
+								height: $side-nav-icon-size;
+								width: $side-nav-icon-size;
+							}
+						}
+					}
+				}
+			}
+
 			.selected-button {
 				.btn {
 					border: unset;
