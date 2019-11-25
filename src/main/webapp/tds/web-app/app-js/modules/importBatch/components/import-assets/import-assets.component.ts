@@ -27,7 +27,14 @@ declare var jQuery: any;
 export class ImportAssetsComponent implements OnInit {
 
 	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
-	public dataScriptOptions = [];
+
+	private dataScriptOptionsInitial = {
+		id: -1,
+		name: 'GLOBAL.PLEASE_SELECT',
+		isAutoProcess: false
+	};
+	public dataScriptOptions = [this.dataScriptOptionsInitial];
+	public selectedScriptOption = this.dataScriptOptions[0];
 	public selectedActionOption = -1;
 	private transformInterval: any;
 	public importResult: any;
@@ -46,14 +53,21 @@ export class ImportAssetsComponent implements OnInit {
 	public fetchResult: any;
 	public fetchInProcess = false;
 	public fetchInputUsed: 'action' | 'file' = 'action';
-	public selectedScriptOption = -1;
 	public file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
-	public uiConfig: any = {
+	readonly UI_CONFIG = {
 		labelColSize: 3,
 		inputColSize: 3,
 		buttonColSize: 1,
-		urlColSize: 2
+		urlColSize: 2,
+		showTransformButton: false,
+		showAutoProcessElements: false,
+		showManualElements: false,
+		hasFinishedManualImport: false,
+		transformBtnLabel: '',
+		sendNotification: false
 	};
+
+	public uiConfig: any = {...this.UI_CONFIG};
 
 	constructor(
 		private importAssetsService: ImportAssetsService,
@@ -65,8 +79,19 @@ export class ImportAssetsComponent implements OnInit {
 	ngOnInit(): void {
 		this.importAssetsService.getManualOptions().subscribe( (result) => {
 			this.actionOptions = result.actions;
-			this.dataScriptOptions = result.dataScripts;
+			this.dataScriptOptions = [...this.dataScriptOptions, ...result.dataScripts];
 		});
+	}
+
+	onChangeSelectedScript(etlScript) {
+		this.selectedScriptOption = etlScript;
+		if (etlScript === this.dataScriptOptionsInitial) {
+			this.uiConfig = {...this.UI_CONFIG};
+		} else if(etlScript.isAutoProcess) {
+			this.setAutoProcessScript();
+		} else {
+			this.setManualProcessScript();
+		}
 	}
 
 	/**
@@ -118,7 +143,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.transformResult = null;
 		this.transformFileContent = null;
 		this.importResult = null;
-		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename).subscribe( (result: ApiResponseModel) => {
+		this.importAssetsService.postTransform(this.selectedScriptOption, this.fetchResult.filename, this.uiConfig.sendNotification).subscribe( (result: ApiResponseModel) => {
 			if (result.status === ApiResponseModel.API_SUCCESS && result.data.progressKey) {
 				this.transformProgress.progressKey = result.data.progressKey;
 				this.setTransformProgressInterval();
@@ -279,12 +304,20 @@ export class ImportAssetsComponent implements OnInit {
 	 * Clears out most of results peformed on the page.
 	 */
 	public onClear(): void {
+		this.uiConfig = {...this.UI_CONFIG};
+		this.selectedActionOption = this.selectedScriptOption[0];
+		this.selectedActionOption = -1;
 		this.removeFileByUID();
 	}
 
 	public disableTransformButton() {
-		return !this.selectedScriptOption || this.selectedScriptOption === -1
-			|| !this.fetchResult || !this.fetchResult.filename || this.fetchResult.status === ApiResponseModel.API_ERROR;
+		return (
+			!this.selectedScriptOption ||
+			this.selectedScriptOption.id === -1 ||
+			!this.fetchResult
+			|| !this.fetchResult.filename ||
+			this.fetchResult.status === ApiResponseModel.API_ERROR
+		);
 	}
 
 	private clearFilename(e?: any) {
@@ -345,5 +378,26 @@ export class ImportAssetsComponent implements OnInit {
 			this.clearFilename();
 			this.fetchResult = { status: 'error' };
 		}
+	}
+
+	private setAutoProcessScript() {
+		this.uiConfig = {
+			...this.uiConfig,
+			showAutoProcessElements: true,
+			showManualElements: false,
+			showTransformButton: true,
+			transformBtnLabel: 'IMPORT_ASSETS.AUTO_IMPORT.INITIATE_IMPORT'
+		}
+	}
+
+	private setManualProcessScript() {
+		this.uiConfig = {
+			...this.uiConfig,
+			showAutoProcessElements: false,
+			showManualElements: true,
+			showTransformButton: true,
+			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM',
+			sendNotification: false
+		};
 	}
 }
