@@ -12,7 +12,6 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 		<div *ngIf="shouldDisplayDropdownButton(); else saveButton"
 				 class="btn-group">
 			<tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
-									class="btn-sm"
 									[id]="'btnSave'"
 									[icon]="'floppy'"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
@@ -21,7 +20,6 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
 			</tds-button>
 			<tds-button *ngIf="!model.isOwner && !model.isSystem"
-									class="btn-sm"
 									[id]="'btnSaveAs'"
 									[icon]="'floppy'"
 									[disabled]="!isSaveAsAvailable() || !isValid"
@@ -49,7 +47,6 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
 									[icon]="'floppy'"
 									(click)="onSave()">
-				{{ 'GLOBAL.SAVE' | translate }}
 			</tds-button>
 			<tds-button [id]="'btnSaveAs'"
 									*ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
@@ -57,7 +54,6 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
 									[icon]="'floppy'"
 									(click)="onSaveAs()">
-				{{ 'GLOBAL.SAVE_AS' | translate }}
 			</tds-button>
 		</ng-template>
 	`,

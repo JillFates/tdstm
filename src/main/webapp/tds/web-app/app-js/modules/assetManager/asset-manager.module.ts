@@ -40,7 +40,6 @@ import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/a
 import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
 import { AssetViewConfigSaveButtonComponent } from './components/asset-view-config/asset-view-config-save-button.component';
 import { TabStripModule } from '@progress/kendo-angular-layout';
-import { ArchitectureGraphComponent } from '../assetExplorer/components/architecture-graph/architecture-graph.component';
 
 @NgModule({
 	imports: [
@@ -70,8 +69,7 @@ import { ArchitectureGraphComponent } from '../assetExplorer/components/architec
 		AssetViewGridComponent,
 		AssetViewShowComponent,
 		AssetViewShowSaveButtonComponent,
-		AssetViewShowCreateButtonComponent,
-		ArchitectureGraphComponent
+		AssetViewShowCreateButtonComponent
 		// ExportComponent
 	],
 	providers: [

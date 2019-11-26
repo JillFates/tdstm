@@ -51,6 +51,7 @@
 			</div>
 		</div>
 
+		<!-- Tabs action buttons -->
 		<div class="tabs-button-bar text-right" *ngIf="!collapsed">
 			<tds-button [title]="'Preview'"
 									class="preview"
@@ -66,6 +67,7 @@
 												 [tooltip]="'Hide Configuration'">
 			</tds-button-custom>
 		</div>
+
 		<!-- Tabs configuration -->
 		<div class="clr-margin-top-lg tabs-section" *ngIf="!collapsed">
 			<kendo-tabstrip [keepTabContent]="true">
@@ -78,7 +80,6 @@
 							<div class="checkbox" *ngFor="let asset of assetClasses">
 								<clr-checkbox-wrapper class="inline">
 									<input clrCheckbox type="checkbox"
-												 class="component-action-just-planning"
 												 [name]="asset"
 												 (change)="updateModelbyFilter()"
 												 [(ngModel)]="filterModel.assets[asset]">
@@ -199,150 +200,7 @@
 			</kendo-tabstrip>
 		</div>
 
-		<!--<div class="nav-tabs-custom" *ngIf="!collapsed">
-			&lt;!&ndash; Tabs within a box &ndash;&gt;
-			<ul class="nav nav-tabs">
-				<li role="presentation" [ngClass]="{'active':isCurrentTab(0)}">
-					<a href="#tab_1" (click)="setCurrentTab(0)" data-toggle="tab">Asset Classes</a>
-				</li>
-				<li role="presentation" [ngClass]="{'disabled':!isAssetSelected(),'active':isCurrentTab(1)}">
-					<a *ngIf="!isAssetSelected();else fieldsTabLink">Fields</a>
-					<ng-template #fieldsTabLink>
-						<a href="#tab_2" data-toggle="tab" (click)="setCurrentTab(1)" #link>Fields</a>
-					</ng-template>
-				</li>
-				<li role="presentation"
-						[ngClass]="{'disabled':!isAssetSelected() || !isColumnSelected(),'active':isCurrentTab(2)}">
-					<a *ngIf="!isAssetSelected() || !isColumnSelected();else columnsTabLink">Columns</a>
-					<ng-template #columnsTabLink>
-						<a href="#tab_3" (click)="setCurrentTab(2)" data-toggle="tab" #link>Columns</a>
-					</ng-template>
-				</li>
-				<li class="pull-right" role="presentation">
-					<button class="btn btn-default" (click)="onToggleConfig()">
-						<i class="fa fa-angle-double-down" style="padding-right:0px;" aria-hidden="true"></i>
-					</button>
-				</li>
-				<li class="pull-right" role="presentation">
-					<button class="btn" [disabled]="!isValid()" [ngClass]="{'btn-default':!isValid(),'btn-success':isValid()}"
-									name="btnPreview"
-									(click)="previewButtonClicked = true;onPreview()">Preview
-					</button>
-				</li>
-				&lt;!&ndash; <li class="pull-right" role="presentation">
-					<button [disabled]="!isSaveAvailable() || !isValid()" class="btn" [ngClass]="{'btn-default':!isDirty() || !isSaveAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"><i class="fa fa-fw fa-floppy-o" style="padding-right:0px;" aria-hidden="true"></i>Save Preferences</button>
-				</li> &ndash;&gt;
-			</ul>
-			<div class="tab-content" [hidden]="collapsed">
-				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(0)" [ngClass]="{'active':isCurrentTab(0)}"
-						 id="tab_1">
-					<label for="" style="font-size:14px;">Please select at least one asset class to continue</label>
-					<br>
-					<div class="checkbox" *ngFor="let asset of assetClasses">
-						<label>
-							<input type="checkbox" name="{{asset}}" (change)="updateModelbyFilter()"
-										 [(ngModel)]="filterModel.assets[asset]">
-							<tds-ui-svg-icon [name]="getAssetIcon(asset)" [height]="'16'" [width]="'16'"></tds-ui-svg-icon>
-							{{ 'ASSETS.' + asset | translate }}
-						</label>
-					</div>
-					<button class="btn" [disabled]="!isAssetSelected()" (click)="setCurrentTab(1)"
-									onclick="$('a[href=#tab_2]').trigger('click')"
-									[ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}">
-						<i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next
-					</button>
-				</div>
-				<div class="tab-pane" id="tab_2" *ngIf="isCurrentTab(1)" [ngClass]="{'active':isCurrentTab(1)}">
-					<div class="row">
-						<div class="col-md-4 col-sm-12">
-							<div class="col-sm-9">
-								<div class="form-group has-feedback" style="margin-bottom:0px;">
-									<input type="text" class="form-control" name="search" placeholder="Filter on field name"
-												 [(ngModel)]="filterModel.search"
-												 (keyup.enter)="applyFilters()">
-									<span style="cursor:pointer;color:#656565;pointer-events:all" (click)="onClearTextFilter()"
-												class="fa fa-times form-control-feedback"
-												aria-hidden="true"></span>
-								</div>
-							</div>
-							<div class="col-sm-3">
-								<button type="button" class="btn btn-default" id="btnFilter" (click)="applyFilters()">
-									<i class="fa fa-fw fa-filter"></i> {{'GLOBAL.FILTER' | translate}}</button>
-							</div>
-						</div>
-						<div class="col-md-8 col-sm-12">
-							<div class="col-md-3 col-sm-6">
-								<div class="form-group">
-									<select name="selected" (change)="applyFilters()" id="selected" class="form-control pd-top-5"
-													[(ngModel)]="filterModel.selected">
-										<option value="all">All Fields</option>
-										<option value="true">Selected</option>
-										<option value="false">Unselected</option>
-									</select>
-								</div>
-							</div>
-							<div class="col-md-3 col-sm-6">
-								<div class="form-group">
-									<select name="show" (change)="applyFilters()" id="show" class="form-control pd-top-5"
-													[(ngModel)]="filterModel.asset">
-										<option value="all">All Classes</option>
-										<option *ngFor="let asset of selectedAssetClasses()"
-														value="{{asset}}"> {{ 'ASSETS.' + asset | translate }} Fields
-										</option>
-									</select>
-								</div>
-							</div>
-						</div>
-					</div>
-					<label for="" style="font-size:14px;padding-left: 15px;padding-bottom: 10px;">Select one or more columns to
-						display</label>
-					<div class="row" style="overflow:auto;margin:0 5px;">
-						<div style="position:relative;float:left;height:375px;">
-							<div [ngStyle]="position[fieldIndex]" class="checkbox"
-									 *ngFor="let field of fields;let fieldIndex = index">
-								<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label"
-											 *ngIf="field.isTitle;else defaultField">{{ 'ASSETS.' + field.domain | uppercase | translate}}
-									Fields</label>
-								<ng-template #defaultField>
-									<label style="width:100%;padding-left:25px;" class="{{field.imp}} text-delimited"
-												 title="{{field.label}}">
-										<input type="checkbox" (change)="onFieldSelection(field)" name="{{field.field+'_'+fieldIndex}}"
-													 [(ngModel)]="field.selected"> {{ field.label }}</label>
-								</ng-template>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(2)" [ngClass]="{'active':isCurrentTab(2)}"
-						 id="tab_3">
-					<div class="row">
-						<div class="col-md-12">
-							<div class="form-group">
-								<label for="" style="margin-bottom:15px;font-size:14px;">Drag and drop to change the column
-									order</label>
-								<kendo-sortable [kendoSortableBinding]="draggableColumns" [navigatable]="true" [animation]="false"
-																class="row" style="margin-right:0px;" itemClass="item" (dragEnd)="onDragEnd()">
-									<ng-template let-item="item" let-index="index">
-										<div class="row" style="height: 35px;">
-											<div class="drag-label" style="height: 35px;">
-												<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
-												{{item.label}}
-												<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column"
-													 [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}"
-													 (click)="freezeColumn(item)"></i>
-											</div>
-										</div>
-									</ng-template>
-								</kendo-sortable>
-								<label class="invalid-columns-selection" *ngIf="!hasAtLeastOneNonLockedColumnOrEmpty()">Must have at
-									least one not locked column</label>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>-->
-
+		<!-- Preview Grid -->
 		<div class="grid-section">
 			<asset-explorer-view-grid [data]="data"
 																(modelChange)="onPreview()"
