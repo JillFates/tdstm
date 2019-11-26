@@ -83,7 +83,7 @@
 				[resizable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
-				[sortable]="{mode:'single'}"
+				[sortable]="{mode:'single', allowUnsort: false}"
 				(sortChange)="onSortChangeHandler($event)"
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
