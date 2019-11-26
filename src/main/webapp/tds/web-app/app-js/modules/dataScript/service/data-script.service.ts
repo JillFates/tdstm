@@ -302,14 +302,13 @@ export class DataScriptService {
 					let dataItem = (response && response.status === 'success' && response.data);
 					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
 					return dataItem;
-				})
-				.catch((error: any) => error);
+				}, (error: any) => error);
+
 		} else {
 			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data;
-				})
-				.catch((error: any) => error);
+				}, (error: any) => error);
 		}
 	}
 
