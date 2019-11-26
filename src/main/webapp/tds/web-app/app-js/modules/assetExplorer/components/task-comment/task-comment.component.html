@@ -1,27 +1,39 @@
 <div class="task-comment-component dialog-container">
-    <div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
-        <kendo-grid
-                *ngIf="dataGridTaskHelper"
-                class="tds-table"
-                [data]="dataGridTaskHelper.gridData"
-                [sort]="dataGridTaskHelper.state.sort"
-                [sortable]="{mode:'single'}"
-                [resizable]="true"
-                (sortChange)="dataGridTaskHelper.sortChange($event)">
-
-            <!-- Toolbar Template -->
-            <ng-template kendoGridToolbarTemplate [position]="'top'">
+	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
+		<kendo-grid
+			*ngIf="dataGridTaskHelper"
+			class="tds-table"
+			[data]="dataGridTaskHelper.gridData"
+			[sort]="dataGridTaskHelper.state.sort"
+			[sortable]="{ mode: 'single' }"
+			[resizable]="true"
+			(sortChange)="dataGridTaskHelper.sortChange($event)"
+		>
+			<!-- Toolbar Template -->
+			<ng-template kendoGridToolbarTemplate [position]="'top'">
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
 						<strong>Tasks</strong>
 					</div>
 					<div class="grid-actions clr-col-8">
 						<clr-checkbox-wrapper>
-							<input clrCheckbox name="showAllTasks" type="checkbox" [(ngModel)]="showAllTasks"  (change)="reloadTasksGrid()">
+							<input
+								clrCheckbox
+								name="showAllTasks"
+								type="checkbox"
+								[(ngModel)]="showAllTasks"
+								(change)="reloadTasksGrid()"
+							/>
 							<label>View All Tasks</label>
 						</clr-checkbox-wrapper>
 						<clr-checkbox-wrapper>
-							<input clrCheckbox name="viewUnpublished" type="checkbox" [(ngModel)]="viewUnpublished" (change)="onViewUnpublishedChange()">
+							<input
+								clrCheckbox
+								name="viewUnpublished"
+								type="checkbox"
+								[(ngModel)]="viewUnpublished"
+								(change)="onViewUnpublishedChange()"
+							/>
 							<label>View Unpublished Tasks</label>
 						</clr-checkbox-wrapper>
 						<div class="btn-sm">
@@ -34,66 +46,109 @@
 						</div>
 					</div>
 				</div>
-            </ng-template>
+			</ng-template>
 
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of taskColumnModel.columns"
-                               field="{{column.property}}"
-                               [headerClass]="column.headerClass ? column.headerClass : ''"
-                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                               [class]="column.cellClass ? column.cellClass : ''"
-                               [style]="column.cellStyle ? column.cellStyle : ''"
-                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+			<!-- Columns -->
+			<kendo-grid-column
+				*ngFor="let column of taskColumnModel.columns"
+				field="{{ column.property }}"
+				[headerClass]="column.headerClass ? column.headerClass : ''"
+				[headerStyle]="column.headerStyle ? column.headerStyle : ''"
+				[class]="column.cellClass ? column.cellClass : ''"
+				[style]="column.cellStyle ? column.cellStyle : ''"
+				[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
+				[sortable]="column.type !== 'action'"
+			>
+				<!-- Header Template -->
+				<ng-template kendoGridHeaderTemplate>
+					{{ column.label }}
+				</ng-template>
 
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    {{column.label}}
-                </ng-template>
-
-                <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+				<!-- Action -->
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.type === 'action'"
+					let-dataItem
+				>
 					<div class="action-button btn-group btn-link">
 						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" title="Actions" clrDropdownTrigger></tds-button>
+							<tds-button
+								icon="ellipsis-vertical"
+								title="Actions"
+								clrDropdownTrigger
+							></tds-button>
 							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="openTaskEdit(dataItem)" [disabled]="!isTaskEditAvailable()">Edit Task</a>
-								<a clrDropdownItem (click)="onDelete(dataItem)" [disabled]="!isTaskDeleteAvailable()">Delete Task</a>
+								<a
+									clrDropdownItem
+									(click)="openTaskEdit(dataItem)"
+									[disabled]="!isTaskEditAvailable()"
+									>Edit Task</a
+								>
+								<a
+									clrDropdownItem
+									(click)="onDelete(dataItem)"
+									[disabled]="!isTaskDeleteAvailable()"
+									>Delete Task</a
+								>
 							</clr-dropdown-menu>
 						</clr-dropdown>
 					</div>
-                </ng-template>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.taskNumber'" let-dataItem let-rowIndex="rowIndex">
-                    <a (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.taskNumber}}</a>
-                </ng-template>
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.property === 'commentInstance.taskNumber'"
+					let-dataItem
+					let-rowIndex="rowIndex"
+				>
+					<a (click)="openTaskComment(dataItem, modalType.VIEW)">{{
+						dataItem.commentInstance.taskNumber
+					}}</a>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-                    <a (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</a>
-                </ng-template>
-
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
-        </kendo-grid>
-    </div>
-    <div *ngIf="(!showTask && !showComment) || showComment" class="comment-content">
-        <kendo-grid
-                *ngIf="dataGridCommentHelper"
-                class="tds-table"
-                [data]="dataGridCommentHelper.gridData"
-                [sort]="dataGridCommentHelper.state.sort"
-                [sortable]="{mode:'single'}"
-                [resizable]="true"
-                (sortChange)="dataGridCommentHelper.sortChange($event)">
-
-            <!-- Toolbar Template -->
-            <ng-template kendoGridToolbarTemplate [position]="'top'">
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.property === 'commentInstance.comment'"
+					let-dataItem
+					let-rowIndex="rowIndex"
+				>
+					<a (click)="openTaskComment(dataItem, modalType.VIEW)">{{
+						dataItem.commentInstance.comment
+					}}</a>
+				</ng-template>
+			</kendo-grid-column>
+			<kendo-grid-messages noRecords="There are no records to display.">
+			</kendo-grid-messages>
+		</kendo-grid>
+	</div>
+	<div
+		*ngIf="(!showTask && !showComment) || showComment"
+		class="comment-content"
+	>
+		<kendo-grid
+			*ngIf="dataGridCommentHelper"
+			class="tds-table"
+			[data]="dataGridCommentHelper.gridData"
+			[sort]="dataGridCommentHelper.state.sort"
+			[sortable]="{ mode: 'single' }"
+			[resizable]="true"
+			(sortChange)="dataGridCommentHelper.sortChange($event)"
+		>
+			<!-- Toolbar Template -->
+			<ng-template kendoGridToolbarTemplate [position]="'top'">
 				<div class="clr-row">
 					<div class="grid-label clr-col-4">
 						<strong>Comments</strong>
 					</div>
 					<div class="grid-actions clr-col-8">
 						<clr-checkbox-wrapper>
-							<input clrCheckbox name="showAllComments" type="checkbox" [(ngModel)]="showAllComments"  (change)="reloadCommentsGrid()">
+							<input
+								clrCheckbox
+								name="showAllComments"
+								type="checkbox"
+								[(ngModel)]="showAllComments"
+								(change)="reloadCommentsGrid()"
+							/>
 							<label>View All Comments</label>
 						</clr-checkbox-wrapper>
 						<div class="btn-sm">
@@ -106,45 +161,84 @@
 						</div>
 					</div>
 				</div>
-            </ng-template>
+			</ng-template>
 
-            <!-- Columns -->
-            <kendo-grid-column *ngFor="let column of commentColumnModel.columns"
-                               field="{{column.property}}"
-                               [headerClass]="column.headerClass ? column.headerClass : ''"
-                               [headerStyle]="column.headerStyle ? column.headerStyle : ''"
-                               [class]="column.cellClass ? column.cellClass : ''"
-                               [style]="column.cellStyle ? column.cellStyle : ''"
-                               [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
+			<!-- Columns -->
+			<kendo-grid-column
+				*ngFor="let column of commentColumnModel.columns"
+				field="{{ column.property }}"
+				[headerClass]="column.headerClass ? column.headerClass : ''"
+				[headerStyle]="column.headerStyle ? column.headerStyle : ''"
+				[class]="column.cellClass ? column.cellClass : ''"
+				[style]="column.cellStyle ? column.cellStyle : ''"
+				[width]="!column.width ? COLUMN_MIN_WIDTH : column.width"
+				[sortable]="column.type !== 'action'"
+			>
+				<!-- Header Template -->
+				<ng-template kendoGridHeaderTemplate>
+					{{ column.label }}
+				</ng-template>
 
-                <!-- Header Template -->
-                <ng-template kendoGridHeaderTemplate>
-                    {{column.label}}
-                </ng-template>
-
-                <!-- Action -->
-                <ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
+				<!-- Action -->
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.type === 'action'"
+					let-dataItem
+				>
 					<div class="action-button btn-group btn-link">
 						<clr-dropdown>
-							<tds-button icon="ellipsis-vertical" title="Actions" clrDropdownTrigger></tds-button>
+							<tds-button
+								icon="ellipsis-vertical"
+								title="Actions"
+								clrDropdownTrigger
+							></tds-button>
 							<clr-dropdown-menu *clrIfOpen>
-								<a clrDropdownItem (click)="openTaskComment(dataItem, modalType.EDIT)" [disabled]="!isCommentEditAvailable()">Edit Comment</a>
-								<a clrDropdownItem (click)="onDelete(dataItem)" [disabled]="!isCommentDeleteAvailable()">Delete Comment</a>
+								<a
+									clrDropdownItem
+									(click)="
+										openTaskComment(
+											dataItem,
+											modalType.EDIT
+										)
+									"
+									[disabled]="!isCommentEditAvailable()"
+									>Edit Comment</a
+								>
+								<a
+									clrDropdownItem
+									(click)="onDelete(dataItem)"
+									[disabled]="!isCommentDeleteAvailable()"
+									>Delete Comment</a
+								>
 							</clr-dropdown-menu>
 						</clr-dropdown>
-                    </div>
-                </ng-template>
+					</div>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.comment'" let-dataItem let-rowIndex="rowIndex">
-                    <a (click)="openTaskComment(dataItem, modalType.VIEW)">{{dataItem.commentInstance.comment}}</a>
-                </ng-template>
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.property === 'commentInstance.comment'"
+					let-dataItem
+					let-rowIndex="rowIndex"
+				>
+					<a (click)="openTaskComment(dataItem, modalType.VIEW)">{{
+						dataItem.commentInstance.comment
+					}}</a>
+				</ng-template>
 
-                <ng-template kendoGridCellTemplate *ngIf="column.property === 'commentInstance.status'" let-dataItem let-rowIndex="rowIndex">
-                    <div class="text-capitalize">{{dataItem.commentInstance.status}}</div>
-                </ng-template>
-
-            </kendo-grid-column>
-            <kendo-grid-messages noRecords="There are no records to display."> </kendo-grid-messages>
-        </kendo-grid>
-    </div>
+				<ng-template
+					kendoGridCellTemplate
+					*ngIf="column.property === 'commentInstance.status'"
+					let-dataItem
+					let-rowIndex="rowIndex"
+				>
+					<div class="text-capitalize">
+						{{ dataItem.commentInstance.status }}
+					</div>
+				</ng-template>
+			</kendo-grid-column>
+			<kendo-grid-messages noRecords="There are no records to display.">
+			</kendo-grid-messages>
+		</kendo-grid>
+	</div>
 </div>
