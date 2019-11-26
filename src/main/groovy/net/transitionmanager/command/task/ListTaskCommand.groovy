@@ -1,10 +1,10 @@
 package net.transitionmanager.command.task
 
-import com.tdssrc.grails.StringUtil
 import net.transitionmanager.command.CommandObject
 
 class ListTaskCommand implements CommandObject {
 
+	String filter
 	Integer rows            = 25
 	Integer page            = 0
 	Integer justRemaining   = 1
@@ -50,6 +50,7 @@ class ListTaskCommand implements CommandObject {
 	String taskSpec
 
 	static constraints = {
+		filter nullable: true
 		justMyTasks range: 0..1, nullable: true
 		justRemaining range: 0..1, nullable: true
 		viewUnpublished range: 0..1, nullable: true
