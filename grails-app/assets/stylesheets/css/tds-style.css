@@ -1800,7 +1800,7 @@ div.dates-info-container {
   margin-left: 30%; }
 
 .dep-list {
-  max-height: calc(100vh - 415px);
+  max-height: calc(100vh - 460px);
   overflow-y: auto; }
   .dep-list thead,
   .dep-list th {
