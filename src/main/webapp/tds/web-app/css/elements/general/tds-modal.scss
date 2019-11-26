@@ -45,9 +45,7 @@ tds-ui-dialog {
 					}
 
 					.show-hide-link {
-						display: block;
-						width: 100%;
-						text-align: right;
+						float: right;
 						font-size: 12px;
 						font-weight: 500;
 					}
@@ -268,7 +266,7 @@ tds-ui-dialog {
 	min-width: 340px;
 
 	&.with-box-shadow {
-		box-shadow:  0 5px 15px $color-border;
+		box-shadow: 0 5px 15px $color-border;
 	}
 
 	&.has-side-nav {

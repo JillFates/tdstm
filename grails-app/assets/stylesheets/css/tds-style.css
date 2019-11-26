@@ -1186,9 +1186,7 @@ div.dates-info-container {
           word-break: break-word;
           border-spacing: unset; }
         .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
-          display: block;
-          width: 100%;
-          text-align: right;
+          float: right;
           font-size: 12px;
           font-weight: 500;
           color: #3c8dbc;
