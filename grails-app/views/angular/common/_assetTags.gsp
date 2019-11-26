@@ -6,9 +6,8 @@
         </label>
     </th>
     <td style="display: flex;">
-        <div *ngFor="let tag of assetTags" class="badge label tag"
-              [ngClass]="tag.css"
-              style="width: unset;">
+        <div *ngFor="let tag of assetTags" class="label tag"
+              [ngClass]="tag.css">
             {{tag.name}}
         </div>
     </td>

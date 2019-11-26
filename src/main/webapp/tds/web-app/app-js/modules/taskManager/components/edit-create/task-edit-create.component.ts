@@ -12,11 +12,11 @@ import {TaskService} from '../../service/task.service';
 declare var jQuery: any;
 
 @Component({
-	selector: `tds-task-edit`,
-	templateUrl: 'task-edit.component.html',
+	selector: `tds-task-edit-create`,
+	templateUrl: 'task-edit-create.component.html',
 	styles: []
 })
-export class TaskEditComponent extends TaskEditCreateCommonComponent  implements OnInit {
+export class TaskEditCreateComponent extends TaskEditCreateCommonComponent  implements OnInit {
 	constructor(
 		taskDetailModel: TaskDetailModel,
 		taskManagerService: TaskService,

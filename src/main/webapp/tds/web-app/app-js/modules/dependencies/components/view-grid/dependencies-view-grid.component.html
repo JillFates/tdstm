@@ -27,7 +27,9 @@
 					<span class="badge badge-light">{{counter.count}}</span><label>{{counter.entityName}} selected</label>
 				</div>
 			</div>
-			<div class="col-sm-6 filters-section"></div>
+			<div class="col-sm-6 filters-section">
+				<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+			</div>
 		</ng-template>
 
 		<!-- Select All column -->

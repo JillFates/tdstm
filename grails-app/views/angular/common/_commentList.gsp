@@ -9,6 +9,9 @@
 			[asset-name]="'${(raw(asset.assetName).replace("'","\\'")).replace("\"","\"")}'"
 			[asset-class]="'${asset.assetClass}'"
 			[user-id]="'${currentUserId}'"
-			[asset-type]="'${asset.assetType}'">
+			[asset-type]="'${asset.assetType}'"
+			<g:if test="${showTask}">(taskCount)=updateTaskCount($event)</g:if>
+			<g:if test="${showComment}">(commentCount)=updateCommentCount($event)</g:if>
+			>
 	</task-comment>
 </td>

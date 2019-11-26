@@ -75,24 +75,14 @@
                     <tds-scroller-item>
                         <button tdsScrollerLink>Tasks
                             <span class="badge">
-                                <g:if test="${taskCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${taskCount}
-                                </g:else>
+                                {{ taskCount > 99 ? '99+' : taskCount }}
                             </span>
                         </button>
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Comments
                             <span class="badge">
-                                <g:if test="${commentCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${commentCount}
-                                </g:else>
+                                {{ commentCount > 99 ? '99+' : commentCount }}
                             </span>
                         </button>
                     </tds-scroller-item>
@@ -108,11 +98,11 @@
 				</g:if>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
-						<tds:clrRowDetail field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
+						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
+						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
 						
-						<tr>
+						<tr style="order: 30">
 							<th class="${standardFieldSpecs.moveBundle.imp?:''}">									
 								${standardFieldSpecs.moveBundle.label} : Dep. Group
 							</th>
@@ -123,12 +113,12 @@
 							</td>
 						</tr>
 						
-						<tds:clrRowDetail field="${standardFieldSpecs.size}" value="${asset.size}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
+						<tds:clrRowDetail style="order: 35" field="${standardFieldSpecs.size}" value="${asset.size}" />
+						<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+						<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+						<tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+						<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+						<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
 						<g:render template="/angular/common/customShow" model="[assetEntity:filesInstance]"></g:render>
 					</tbody>

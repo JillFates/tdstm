@@ -1,30 +1,46 @@
-import {Binding, Layout, Link, Margin, Node, Panel, Shape, Size, TextBlock, TreeLayout} from 'gojs';
+import {
+	Binding,
+	Diagram, GraphObject,
+	Layout,
+	Link,
+	Margin,
+	Node,
+	Panel,
+	Picture, Point, RowColumnDefinition,
+	Shape,
+	Size,
+	Spot,
+	TextBlock,
+	TreeLayout
+} from 'gojs';
 import {
 	ITdsContextMenuOption
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {IconModel, IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborhood.component';
 import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
+import {ASSET_ICONS} from '../../model/asset-icon.constant';
+import {icon} from '@fortawesome/fontawesome-svg-core';
 
 export class ArchitectureGraphDiagramHelper {
 
 	/**
 	 * Diagram data object
 	 */
-	static diagramData(rootAsset: number | string, currentUserId?: any, data?: any, scaleMode?: any): IDiagramData {
+	static diagramData(rootAsset: number | string, currentUserId?: any, data?: any, iconsOnly?: boolean, extras?: any): IDiagramData {
 		const d = this.data(data);
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
 			currentUserId: currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
-			nodeTemplate: this.nodeTemplate(),
+			nodeTemplate: iconsOnly ? this.iconOnlyNodeTemplate() : this.nodeTemplate(),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
-			autoScaleMode: !!scaleMode && scaleMode || null,
-			rootAsset: rootAsset
+			rootAsset: rootAsset,
+			extras: extras && extras
 		};
 	}
 
@@ -39,6 +55,7 @@ export class ArchitectureGraphDiagramHelper {
 
 		dataCopy.nodes.map((t: IAssetNode) => {
 			t.key = t.id;
+			t.iconPath = t.assetClass && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
 			nodeDataArr.push(t);
 		});
 		dataCopy.links
@@ -82,12 +99,23 @@ export class ArchitectureGraphDiagramHelper {
 		nodeShape.stroke = '#3c8dbc';
 		nodeShape.fill = '#3c8dbc';
 
-		const panelBody = new Panel(Panel.Horizontal);
+		const panelBody = new Panel(Panel.Vertical);
 		panel.padding = new Margin(0, 0, 0, 0);
 		panel.margin = new Margin(0, 0, 0, 0);
+
+		// Picture Icon
+		const iconPicture = new Picture();
+		iconPicture.desiredSize = new Size(50, 50);
+		iconPicture.bind(new Binding('source', 'assetClass',
+			(val: string) => this.getIconPath(val)));
+		iconPicture.imageAlignment = Spot.Center;
+
+		// TextBlock
 		const textBlock = new TextBlock();
 		textBlock.stroke = '#fff';
 		textBlock.bind(new Binding('text', 'name'));
+
+		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
 		panel.add(nodeShape);
@@ -97,6 +125,32 @@ export class ArchitectureGraphDiagramHelper {
 		node.click = (i, o) => console.log('click');
 
 		return node;
+	}
+
+	static iconOnlyNodeTemplate(): Node {
+		const node = new Node(Panel.Viewbox);
+		node.position = new Point(0, 0);
+		node.maxSize = new Size(35, 60);
+
+		const panel = new Panel(Panel.Auto);
+		const panelBody = new Panel(Panel.Vertical);
+		// Picture Icon
+		const iconPicture = new Picture();
+		// iconPicture.desiredSize = new Size(80, 80);
+		iconPicture.bind(new Binding('source', 'assetClass',
+			(val: string) => this.getIconPath(val)));
+
+		panelBody.add(iconPicture);
+		panel.add(panelBody);
+		node.add(panel);
+		node.click = (i, o) => console.log('click');
+
+		return node;
+	}
+
+	private static getIconPath(name: string): string {
+		const icon = ASSET_ICONS[name && name.toLowerCase()];
+		return !!icon ? icon.icon : ASSET_ICONS.application.icon;
 	}
 
 	static linkTemplate(): Link {

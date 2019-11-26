@@ -79,24 +79,14 @@
 					<tds-scroller-item>
 						<button tdsScrollerLink>Tasks
                             <span class="badge">
-                                <g:if test="${taskCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${taskCount}
-                                </g:else>
+								{{ taskCount > 99 ? '99+' : taskCount }}
                             </span>
                         </button>
 					</tds-scroller-item>
 					<tds-scroller-item>
 						<button tdsScrollerLink>Comments
                             <span class="badge">
-                                <g:if test="${commentCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${commentCount}
-                                </g:else>
+                                {{ commentCount > 99 ? '99+' : commentCount }}
                             </span>
                         </button>
 					</tds-scroller-item>
@@ -112,23 +102,23 @@
 				</g:if>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
-						<tds:clrRowDetail field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
+						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
-						<tr>
+						<tr style="order: 30">
 							<th class="${standardFieldSpecs.size.imp?:''}">
 								${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 							</th>
 							<td>${asset?.size}&nbsp;${asset.scale?.value()}</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 35">
 							<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 							<td>{{ '${asset?.retireDate}' | tdsDate: userDateFormat }}</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 40">
 							<th class="${standardFieldSpecs.moveBundle.imp?:''}">
 								${standardFieldSpecs.moveBundle.label} : Dep. Group
 							</th>
@@ -139,23 +129,23 @@
 							</td>
 						</tr>
 						
-						<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+						<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
 
-						<tr>
+						<tr style="order: 50">
 							<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 							<td>
 								{{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
 							</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 55">
 							<tds:clrInputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 							<td>${asset.planStatus}</td>
 						</tr>
 
-						<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+						<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 
-						<tr>
+						<tr style="order: 65">
 							<tds:clrInputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 							<td>${asset.validation}</td>
 						</tr>

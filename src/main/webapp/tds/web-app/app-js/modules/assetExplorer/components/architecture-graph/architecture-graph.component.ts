@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
-import {ArchitectureGraphService} from '../../service/architecture-graph.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
