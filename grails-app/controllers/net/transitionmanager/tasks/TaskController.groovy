@@ -456,16 +456,17 @@ class TaskController implements ControllerMethods {
 
 			def dotText = new StringBuilder()
 
-			dotText << """#
-# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
-# Exported on $now
-# This is  .DOT file format of the project tasks
-#
-digraph runbook {
-	graph [rankdir=LR, margin=0.001]
-	node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
-
-"""
+			dotText << """
+				#
+				# TDS Runbook for Project $project, Task ${rootTask.toString().replaceAll(/[\n\r]/,'')}
+				# Exported on $now
+				# This is  .DOT file format of the project tasks
+				#
+				digraph runbook {
+					graph [rankdir=LR, margin=0.001]
+					node [ fontsize=10, fontname="Helvetica", shape="rect" style="$styleDef" ]
+				
+			""".stripIndent()
 
 			def style = ''
 			def fontcolor = ''
@@ -565,18 +566,6 @@ digraph runbook {
 			dotText << "}\n"
 
 			try {
-//				def uri = reportsService.generateDotGraph("neighborhood-$taskId", dotText.toString())
-//
-//				// convert the URI to a web safe format
-//				uri = uri.replaceAll("\\u005C", "/") // replace all backslashes with forwardslashes
-//				def svgFile = new File(grailsApplication.config.graph.targetDir + uri.split('/')[uri.split('/').size()-1])
-//
-//				def svgText = svgFile.text
-//				def data = [svgText:svgText, roles:roles, tasks:taskList]
-//				render data as JSON
-//
-//				return false
-
 				String svgText = graphvizService.generateSVGFromDOT("neighborhood-${taskId}", dotText.toString())
 				def data = [svgText:svgText, roles:roles, tasks:taskList, automatedTasks: automatedTasks]
 				render(text: data as JSON, contentType: 'application/json', encoding:"UTF-8")
@@ -599,6 +588,124 @@ digraph runbook {
 			render errorMessage
 		}
 
+	}
+
+	/**
+	 * Generates JSON object of the tasks in the neighborhood around a given task
+	 * @param taskId
+	 */
+	@HasPermission(Permission.TaskGraphView)
+	def neighborhood() {
+
+		def taskId = params.id
+		if (! taskId || ! taskId.isNumber()) {
+			renderErrorJson("An invalid task id was supplied. Please contact support if this problem persists.")
+			return
+		}
+
+		Project project = securityService.userCurrentProject
+		if (! project) {
+			renderErrorJson('You must first select a project before view graphs')
+			return
+		}
+
+		def rootTask = AssetComment.read(taskId)
+		if (!rootTask || rootTask.project.id != project.id) {
+			if (rootTask) {
+				log.warn "SECURITY : User $securityService.currentUsername attempted to access graph for task ($taskId) not associated to current project ($project)"
+			}
+			renderErrorJson("Unable to find the specified task")
+			return
+		}
+
+		boolean viewUnpublished = params.viewUnpublished && params.viewUnpublished == "1"
+
+		userPreferenceService.setPreference(
+				  PREF.VIEW_UNPUBLISHED,
+				  securityService.hasPermission(Permission.TaskPublish) && viewUnpublished
+		)
+
+		// check if the specified task is unpubublished and the user shouldn't see it
+		if (!viewUnpublished && !rootTask.isPublished) {
+			renderErrorJson("Unable to find the specified task")
+			return
+		}
+
+		def depList = taskService.getNeighborhood(taskId, 2, 5, viewUnpublished)
+		if (depList.size() == 0) {
+			renderErrorJson("The task has no interdependencies with other tasks so a map wasn't generated.")
+			return
+		}
+
+		def styleDef = "rounded, filled"
+		Map<String, Map> nodesMap = [:]
+		def tasks = []
+
+		// helper closure that creates the definition of a node
+		def outputTaskNode = { task, rootId ->
+
+			def style
+			def fontcolor
+			def fontsize
+			def color
+
+			if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
+				tasks << task.id
+
+				def label = "${task.taskNumber}:${task.comment}"
+				def tooltip = new String(label)
+				label = (label.size() < 31) ? label : label[0..30]
+				label = StringUtil.sanitizeDotString(label)
+				tooltip = StringUtil.sanitizeDotString(tooltip)
+
+				def colorKey = taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
+				def fillcolor = taskStatusColorMap[colorKey][1]
+
+				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
+				if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
+					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
+					color = taskStatusColorMap['AUTO_TASK'][1]
+					fontsize = '8'
+				} else {
+					fontcolor = taskStatusColorMap[colorKey][0]
+					color = 'black'	// edge color
+					fontsize = '10'
+				}
+
+				// Make the center root task stand out
+				if (task.id.toString() == rootId) {
+					style = "dashed, bold, filled"
+				} else {
+					style = styleDef
+				}
+
+				nodesMap[task.taskNumber] = [
+					label     : label,
+					style     : style,
+					id        : task.id,
+					taskNumber: task.taskNumber,
+					color     : color,
+					fillcolor : fillcolor,
+					fontcolor : fontcolor,
+					fontsize  : fontsize,
+					tooltip   : tooltip,
+					category  : task.category,
+					status    : task.status,
+					successors: []
+				]
+			}
+		}
+
+		// Iterate over the task dependency list outputting the two nodes in the relationship. If it is an outer node
+		depList.each { d ->
+			outputTaskNode(d.successor, taskId)
+			outputTaskNode(d.predecessor, taskId)
+
+			nodesMap[d.predecessor.taskNumber].successors << d.assetComment.taskNumber
+		}
+
+		List<Map> nodes = nodesMap.collect { key, value -> value }
+		renderSuccessJson(nodes)
 	}
 
 	/**

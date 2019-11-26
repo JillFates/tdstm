@@ -1,10 +1,10 @@
 package com.tdsops.etl
 
+import grails.testing.gorm.DomainUnitTest
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
-import grails.testing.gorm.DomainUnitTest
-import groovy.json.internal.LazyMap
 import net.transitionmanager.project.Project
+import org.apache.groovy.json.internal.LazyMap
 import spock.lang.See
 import spock.lang.Shared
 import spock.lang.Specification

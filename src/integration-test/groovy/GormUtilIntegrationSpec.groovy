@@ -574,11 +574,11 @@ class GormUtilIntegrationSpec extends Specification {
             ! tvc.validate() & tvc.hasErrors()
 		and: 'the error message should be about the age being out of range, defaulting to US'
 			GormUtil.validateErrorsI18n(tvc).contains(
-				'Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'
+				'Property age with value [120] does not fall within the valid range from [1] to [110]'
 			)
 		and: 'the error should also translate to Spanish'
 			GormUtil.validateErrorsI18n(tvc, new Locale('es')).contains(
-				'Property age of class TestValidatableCommand with value [120] does not fall within the valid range from [1] to [110]'
+				'Property age with value [120] does not fall within the valid range from [1] to [110]'
 			)
 			// TODO : JM 2/2018 : TM-9197 : Fix to support proper localization
 			// ['La propiedad age de la clase TestValidatableCommand con valor [120] no entra en el rango válido de [1] a [110]'] ==

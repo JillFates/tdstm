@@ -385,12 +385,12 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def remove() {
 		AssetEntity assetEntity = AssetEntity.get(params.id)
 		if (assetEntity) {
-			ProjectAssetMap.executeUpdate('delete ProjectAssetMap where asset=?', [assetEntity])
-			ProjectTeam.executeUpdate('update ProjectTeam set latestAsset=null where latestAsset=?', [assetEntity])
+			ProjectAssetMap.executeUpdate('delete ProjectAssetMap where asset=?0', [assetEntity])
+			ProjectTeam.executeUpdate('update ProjectTeam set latestAsset=null where latestAsset=?0', [assetEntity])
 			AssetEntity.executeUpdate('''
 				update AssetEntity
 				set moveBundle=null, project=null
-				where id=?''', assetEntity.id)
+				where id=?0''', assetEntity.id)
 			flash.message = "AssetEntity $assetEntity.assetName Removed from Project"
 		}
 		else {
@@ -873,7 +873,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.ManufacturerView)
 	def retrieveManufacturersList() {
 		def assetType = params.assetType
-		def manufacturers = Model.executeQuery("From Model where assetType = ? group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
+		def manufacturers = Model.executeQuery("From Model where assetType = ?0 group by manufacturer order by manufacturer.name",[assetType])?.manufacturer
 		def prefVal =  userPreferenceService.getPreference(PREF.LAST_MANUFACTURER)
 		def selectedManu = prefVal ? Manufacturer.findByName(prefVal)?.id : null
 		render(view: 'manufacturerView', model: [manufacturers: manufacturers, selectedManu: selectedManu, forWhom: params.forWhom])
