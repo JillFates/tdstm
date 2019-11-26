@@ -82,24 +82,14 @@
                     <tds-scroller-item>
                         <button tdsScrollerLink>Tasks
                             <span class="badge">
-                                <g:if test="${taskCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${taskCount}
-                                </g:else>
+                                {{ taskCount > 99 ? '99+' : taskCount }}
                             </span>
                         </button>
                     </tds-scroller-item>
                     <tds-scroller-item>
                         <button tdsScrollerLink>Comments
                             <span class="badge">
-                                <g:if test="${commentCount > 99}">
-                                    99+
-                                </g:if>
-                                <g:else>
-                                    ${commentCount}
-                                </g:else>
+                                {{ commentCount > 99 ? '99+' : commentCount }}
                             </span>
                         </button>
                     </tds-scroller-item>
