@@ -1,5 +1,7 @@
 <div class="content body">
 	<section class="page-asset-explorer-config field-setting-component">
+
+		<!-- Top buttons -->
 		<div class="button-bar">
 			<div class="inline">
 
@@ -41,7 +43,160 @@
 													 (click)="onExport()"
 													 [tooltip]="'Export View'">
 				</tds-button-custom>
+				<tds-button-custom *ngIf="collapsed"
+													 [icon]="'cog'"
+													 (click)="onToggleConfig()"
+													 [tooltip]="'Open Configuration'">
+				</tds-button-custom>
 			</div>
+		</div>
+
+		<div class="tabs-button-bar text-right" *ngIf="!collapsed">
+			<tds-button [title]="'Preview'"
+									class="preview"
+									[disabled]="!isValid()"
+									[ngClass]="{'btn-secondary':!isValid(),'btn-success':isValid()}"
+									(click)="previewButtonClicked = true; onPreview()">
+				Preview
+			</tds-button>
+			<tds-button-custom [icon]="'angle down'"
+												 class="toggle"
+												 [flat]="true"
+												 (click)="onToggleConfig()"
+												 [tooltip]="'Hide Configuration'">
+			</tds-button-custom>
+		</div>
+		<!-- Tabs configuration -->
+		<div class="clr-margin-top-lg tabs-section" *ngIf="!collapsed">
+			<kendo-tabstrip [keepTabContent]="true">
+
+				<!-- Tab 1 -->
+				<kendo-tabstrip-tab [title]="'Asset Classes'" [selected]="isCurrentTab(0)">
+					<ng-template kendoTabContent>
+						<div class="asset-domain-section">
+							<label class="title">Please select at least one asset class to continue</label>
+							<div class="checkbox" *ngFor="let asset of assetClasses">
+								<clr-checkbox-wrapper class="inline">
+									<input clrCheckbox type="checkbox"
+												 class="component-action-just-planning"
+												 [name]="asset"
+												 (change)="updateModelbyFilter()"
+												 [(ngModel)]="filterModel.assets[asset]">
+									<label class="clr-control-label inline">
+										<tds-ui-svg-icon [name]="getAssetIcon(asset)"
+																		 [height]="'16'"
+																		 [width]="'16'">
+										</tds-ui-svg-icon>
+										{{ 'ASSETS.' + asset | translate }}
+									</label>
+								</clr-checkbox-wrapper>
+							</div>
+							<button class="btn"	[disabled]="!isAssetSelected()" (click)="setCurrentTab(1)"
+											[ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}">
+								<i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next
+							</button>
+						</div>
+					</ng-template>
+				</kendo-tabstrip-tab>
+
+				<!-- Tab 2 -->
+				<kendo-tabstrip-tab [title]="'Fields'"
+														[disabled]="!isAssetSelected()"
+														[selected]="isCurrentTab(1)">
+					<ng-template kendoTabContent>
+						<div class="fields-section">
+							<div class="filters-bar">
+								<tds-filter-input
+									[value]="filterModel.search || ''"
+									(filter)="filterModel.search = $event; applyFilters()"
+									placeholder="Filter on field name">
+								</tds-filter-input>
+<!--								<tds-button [icon]="'filter'"-->
+<!--														[iconClass]="'is-solid'"-->
+<!--														class="btn-sm"-->
+<!--														[title]="'Apply Filter'"-->
+<!--														(click)="applyFilters()">-->
+<!--								</tds-button>-->
+								<clr-select-container class="inline">
+									<select clrSelect
+													name="selected"
+													(change)="applyFilters()"
+													[(ngModel)]="filterModel.selected">
+										<option value="all">All Fields</option>
+										<option value="true">Selected</option>
+										<option value="false">Unselected</option>
+									</select>
+								</clr-select-container>
+								<clr-select-container class="inline">
+									<select clrSelect
+													name="show"
+													(change)="applyFilters()"
+													[(ngModel)]="filterModel.asset">
+										<option value="all">All Classes</option>
+										<option *ngFor="let asset of selectedAssetClasses()"
+														value="{{asset}}"> {{ 'ASSETS.' + asset | translate }} Fields
+										</option>
+									</select>
+								</clr-select-container>
+							</div>
+							<label class="title" >Select one or more columns to display</label>
+							<div class="fields-checkboxes">
+								<div [ngStyle]="position[fieldIndex]" class="checkbox"
+										 *ngFor="let field of fields;let fieldIndex = index">
+									<label style="text-decoration:underline;margin-left:-10px;font-weight:bold;" class="control-label"
+												 *ngIf="field.isTitle; else defaultField">{{ 'ASSETS.' + field.domain | uppercase | translate}}
+										Fields</label>
+									<ng-template #defaultField>
+										<clr-checkbox-wrapper class="field-checkbox inline">
+											<input clrCheckbox type="checkbox"
+														 [name]="field.field+'_'+fieldIndex"
+														 (change)="onFieldSelection(field)"
+														 class="component-action-just-planning"
+														 [(ngModel)]="field.selected">
+											<label style="width:100%;padding-left:25px;"
+														 [ngClass]="field.imp + ' text-delimited'"
+														 [title]="field.label">
+												{{ field.label }}
+											</label>
+										</clr-checkbox-wrapper>
+									</ng-template>
+								</div>
+							</div>
+						</div>
+					</ng-template>
+				</kendo-tabstrip-tab>
+
+				<!-- Tab 3 -->
+				<kendo-tabstrip-tab [title]="'Columns'"
+														[disabled]="!isAssetSelected() || !isColumnSelected()"
+														[selected]="isCurrentTab(2)" >
+					<ng-template kendoTabContent>
+						<div class="columns-section">
+							<label class="title">Drag and drop to change the column order</label>
+							<kendo-sortable [kendoSortableBinding]="draggableColumns"
+															[navigatable]="true"
+															[animation]="false"
+															(dragEnd)="onDragEnd()"
+															itemClass="item">
+								<ng-template let-item="item" let-index="index">
+									<div class="row" style="height: 35px;">
+										<div class="drag-label" style="height: 35px;">
+											<i class="fa fa-bars drag-icon" aria-hidden="true"></i>
+											{{item.label}}
+											<i class="fa fa-thumb-tack pull-right" title="Freeze column / Unfreeze column"
+												 [ngClass]="{'freeze-column': item.locked, 'not-freeze-column': !item.locked}"
+												 (click)="freezeColumn(item)"></i>
+										</div>
+									</div>
+								</ng-template>
+							</kendo-sortable>
+							<label class="invalid-columns-selection" *ngIf="!hasAtLeastOneNonLockedColumnOrEmpty()">Must have at
+								least one not locked column</label>
+						</div>
+					</ng-template>
+				</kendo-tabstrip-tab>
+
+			</kendo-tabstrip>
 		</div>
 
 		<!--<div class="nav-tabs-custom" *ngIf="!collapsed">
@@ -157,7 +312,6 @@
 							</div>
 						</div>
 					</div>
-
 				</div>
 				<div class="tab-pane" style="padding-left:15px" *ngIf="isCurrentTab(2)" [ngClass]="{'active':isCurrentTab(2)}"
 						 id="tab_3">
@@ -189,17 +343,19 @@
 			</div>
 		</div>-->
 
-		<!--<asset-explorer-view-grid [data]="data"
-															(modelChange)="onPreview()"
-															(justPlanningChange)="onJustPlanningChange($event)"
-															[gridState]="gridState"
-															(gridStateChange)="onGridStateChange($event)"
-															[fields]="allFields"
-															[edit]="true"
-															[model]="model.schema"
-															[viewId]="model.id"
-															[metadata]="metadata">
-		</asset-explorer-view-grid>-->
+		<div class="grid-section">
+			<asset-explorer-view-grid [data]="data"
+																(modelChange)="onPreview()"
+																(justPlanningChange)="onJustPlanningChange($event)"
+																[gridState]="gridState"
+																(gridStateChange)="onGridStateChange($event)"
+																[fields]="allFields"
+																[edit]="true"
+																[model]="model.schema"
+																[viewId]="model.id"
+																[metadata]="metadata">
+			</asset-explorer-view-grid>
+		</div>
 
 	</section>
 </div>

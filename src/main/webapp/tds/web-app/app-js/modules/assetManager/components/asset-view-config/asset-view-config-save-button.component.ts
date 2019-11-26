@@ -12,6 +12,7 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 		<div *ngIf="shouldDisplayDropdownButton(); else saveButton"
 				 class="btn-group">
 			<tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+									class="btn-sm"
 									[id]="'btnSave'"
 									[icon]="'floppy'"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
@@ -20,6 +21,7 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
 			</tds-button>
 			<tds-button *ngIf="!model.isOwner && !model.isSystem"
+									class="btn-sm"
 									[id]="'btnSaveAs'"
 									[icon]="'floppy'"
 									[disabled]="!isSaveAsAvailable() || !isValid"
@@ -41,21 +43,22 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 			</clr-dropdown>
 		</div>
 		<ng-template #saveButton>
-			<button type="button" id="btnSave" *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
-							[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
-							class="btn"
-							[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
-							(click)="onSave()">
-				<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE' | translate }}
-			</button>
-			<button type="button" id="btnSaveAs"
-							*ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
-							[disabled]="!isSaveAsAvailable() || !isValid"
-							class="btn"
-							[ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
-							(click)="onSaveAs()">
-				<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
-			</button>
+			<tds-button [id]="'btnSave'"
+									*ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
+									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
+									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
+									[icon]="'floppy'"
+									(click)="onSave()">
+				{{ 'GLOBAL.SAVE' | translate }}
+			</tds-button>
+			<tds-button [id]="'btnSaveAs'"
+									*ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
+									[disabled]="!isSaveAsAvailable() || !isValid"
+									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
+									[icon]="'floppy'"
+									(click)="onSaveAs()">
+				{{ 'GLOBAL.SAVE_AS' | translate }}
+			</tds-button>
 		</ng-template>
 	`,
 })

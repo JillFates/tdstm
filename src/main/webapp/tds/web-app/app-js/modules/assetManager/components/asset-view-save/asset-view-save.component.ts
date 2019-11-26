@@ -9,7 +9,7 @@ import {Permission} from '../../../../shared/model/permission.model';
 @Component({
 	selector: 'asset-explorer-view-save',
 	template: `
-        <div class="tds-modal-content asset-explorer-view-save-component">
+        <div class="tds-modal-content asset-explorer-view-save-component has-side-nav">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                     <clr-icon aria-hidden="true" shape="close"></clr-icon>
