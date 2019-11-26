@@ -87,6 +87,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
+		if (!commentId) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateAssignedToSelect?format=json&forView=&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -111,6 +115,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getStatusList(commentId: any): Observable<any> {
+		if (!commentId) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;

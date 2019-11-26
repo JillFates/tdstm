@@ -11,8 +11,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TaskService} from '../../../taskManager/service/task.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {TaskDetailComponent} from '../../../taskManager/components/detail/task-detail.component';
-import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
-import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
@@ -218,7 +217,7 @@ export class TaskCommentComponent implements OnInit {
 			}
 		};
 
-		this.dialogService.extra(TaskCreateComponent, [
+		this.dialogService.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {
@@ -294,7 +293,7 @@ export class TaskCommentComponent implements OnInit {
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
 
-				this.dialogService.extra(TaskEditComponent, [
+				this.dialogService.extra(TaskEditCreateComponent, [
 					{provide: TaskDetailModel, useValue: clone(model)}
 				], false, false)
 					.then(result => {

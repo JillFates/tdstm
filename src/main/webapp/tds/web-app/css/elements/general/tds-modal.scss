@@ -260,6 +260,10 @@ tds-ui-dialog {
 	background: $color-text-inverse;
 	min-width: 340px;
 
+	&.with-box-shadow {
+		box-shadow:  0 5px 15px $color-border;
+	}
+
 	&.has-side-nav {
 		.modal-header,
 		.modal-body,

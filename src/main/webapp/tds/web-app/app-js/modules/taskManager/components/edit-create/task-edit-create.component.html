@@ -8,16 +8,18 @@
      tabindex="-1"
      role="dialog">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="tds-modal-content resizable tds-angular-component-content has-side-nav"
+        <div class="tds-modal-content with-box-shadow resizable tds-angular-component-content has-side-nav"
              tds-ui-modal-decorator=""
+             [ngClass]="taskViewType"
              [options]="modalOptions"
              [style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
              [style.height.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_WIDTH">
-            <div class="modal-header">
+            <div class="modal-header hola">
 				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
-                <h4 class="modal-title">Task Edit</h4>
+                <h4 class="modal-title just-task-create-view">{{'TASK_MANAGER.CREATE_TASK' | translate}}</h4>
+                <h4 class="modal-title just-task-edit-view">{{'TASK_MANAGER.EDIT_TASK' | translate}}</h4>
             </div>
             <div class="task-detail-container">
                 <div class="modal-body">
@@ -294,7 +296,7 @@
                                                 </td>
                                             </tr>
 
-                                            <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop">
+                                            <tr *ngIf="!collapsedTaskDetail && !model.apiActionInvokedAt" class="prop just-task-edit-view">
                                                 <td class="N edge-cell" nowrap="nowrap">
                                                     <label>Actual Start</label>
                                                 </td>
@@ -319,6 +321,7 @@
                                                     <span class="read-only-dates">{{model.taskSpec}}</span>
                                                 </td>
                                             </tr>
+
                                             <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                 <td class="N status-cell" nowrap="nowrap">
                                                     <label>Status</label>
@@ -326,6 +329,7 @@
                                                 <td class="valueNW task-status vertical-note-status">
 <!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
                                                     <tds-task-status-indicator
+                                                            *ngIf="model.status"
                                                             [propertyName]="'status'"
                                                             [displayLabel]="false"
                                                             [value]="model.status">
@@ -337,22 +341,7 @@
                                                     </kendo-dropdownlist>
 
                                                 </td>
-
-                                                <td class="N edge-cell" nowrap="nowrap">
-                                                    <label>Actual Start/Finish</label>
-                                                </td>
-
-                                                <td class="valueNW">
-                                                    <span class="read-only-dates">{{model.actualStart}}-{{model.actualFinish}}</span>
-                                                </td>
-
-                                                <td class="N edge-cell" nowrap="nowrap">
-                                                    <label>TaskSpec ID</label>
-                                                </td>
-
-                                                <td class="valueNW">
-                                                    <span class="read-only-dates">{{model.taskSpec}}</span>
-                                                </td>
+                                                <td colspan="4"></td>
                                             </tr>
                                             <tr *ngIf="!collapsedTaskDetail" class="prop">
                                                 <td class="N edge-cell" nowrap="nowrap">
@@ -541,7 +530,7 @@
                                     </tr>
                                 </table>
                             </tr>
-                            <tr class="deps grow-container">
+                            <tr class="deps grow-container just-task-edit-view">
                                 <td colspan="5">
                                     <tds-task-notes [dataGridTaskNotesHelper]="dataGridTaskNotesHelper"
                                                     (create)="createNote()"></tds-task-notes>
@@ -551,13 +540,15 @@
                         </table>
                     </form>
                 </div>
+                <div class="modal-footer">
+                </div>
             </div>
 
             <div class="modal-sidenav form-group-center">
                 <nav class="modal-sidenav btn-link">
                     <tds-button-edit theme="primary"></tds-button-edit>
                     <tds-button-save (click)="onSave()" [disabled]="isFormInvalid() || !hasEditTaskPermission"></tds-button-save>
-                    <tds-button-delete (click)="deleteTask()" [disabled]="!hasDeleteTaskPermission"></tds-button-delete>
+                    <tds-button-delete class="just-task-edit-view" (click)="deleteTask()" [disabled]="!hasDeleteTaskPermission"></tds-button-delete>
                     <tds-button-close (click)="cancelCloseDialog($event)"></tds-button-close>
                 </nav>
             </div>

@@ -59,6 +59,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 	private destroySubject: Subject<any> = new Subject<any>();
+	public taskViewType: string;
 	constructor(
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
@@ -69,6 +70,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
+		this.taskViewType = this.taskDetailModel.modal.type === ModalType.CREATE ? 'task-create-view' : 'task-edit-view';
 		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
@@ -111,19 +113,22 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			];
 
 			if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+				let assetId = this.model.asset && this.model.asset.id || null;
 				commonCalls.push(this.taskManagerService.getAssetClasses());
 				commonCalls.push(this.taskManagerService.getAssetCommentCategories());
 				commonCalls.push(this.taskManagerService.getEvents());
 				commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
-				commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
+				commonCalls.push(this.taskManagerService.getClassForAsset(assetId));
 			}
 
 			this.metaParam = this.getMetaParam();
 			Observable.forkJoin(commonCalls)
 				.subscribe((results: any[]) => {
-					const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+					const [status, persons, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+					let personList = persons || [] ;
 
 					this.model.statusList = status;
+					personList = personList || [];
 					// Add Unassigned and Auto options to staff list
 					personList.push({id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic'});
 					this.model.personList = personList
@@ -149,8 +154,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					if (events) {
 						this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
 					}
-					if (taskDefaults && taskDefaults.preferences) {
-						this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT'] || '', text: ''};
+					if (taskDefaults && taskDefaults.preferences && this.taskDetailModel.modal.type === ModalType.CREATE) {
 						this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 						this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 						this.metaParam = this.getMetaParam();
@@ -173,6 +177,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					}
 					jQuery('[data-toggle="popover"]').popover();
 					const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
+					const comment = this.taskEditCreateForm.form.controls['comment'];
 
 					if (percentageComplete) {
 						percentageComplete.markAsPristine();
@@ -365,19 +370,18 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	/**
-	 * Save the changes on the task
+	 * Save the changes on the task or create it
 	 */
 	public onSave(): void {
-		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
-			.subscribe((result) => this.close(result));
-	}
+		let observable = null;
 
-	/**
-	 * Create the task
-	*/
-	public onCreate(): void {
-		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
-			.subscribe((result) => this.close(result));
+		if (this.taskDetailModel.modal.type === ModalType.EDIT) {
+			observable = this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
+		} else {
+			observable = this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
+		}
+
+		observable.subscribe((result) => this.close(result));
 	}
 
 	/**
