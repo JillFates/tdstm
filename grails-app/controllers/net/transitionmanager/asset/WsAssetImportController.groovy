@@ -212,7 +212,11 @@ class WsAssetImportController implements ControllerMethods {
 		List<Map> dataScripts = []
 		where = DataScript.where { project == project }.readOnly(true)
 		where.list().each() {
-			dataScripts << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
+			dataScripts << [
+					id:it.id,
+					name: "${it.provider.name} - ${it.name}",
+					isAutoProcess: it.isAutoProcess
+			]
 		}
 		dataScripts = dataScripts.sort { it.name }
 		results.dataScripts = dataScripts
