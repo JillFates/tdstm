@@ -61,7 +61,7 @@ export class ImportAssetsComponent implements OnInit {
 		urlColSize: 2,
 		showTransformButton: false,
 		showAutoProcessElements: false,
-		showManualElements: false,
+		showManuaProcesslElements: false,
 		hasFinishedManualImport: false,
 		transformBtnLabel: '',
 		sendNotification: false
@@ -87,7 +87,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.selectedScriptOption = etlScript;
 		if (etlScript === this.dataScriptOptionsInitial) {
 			this.uiConfig = {...this.UI_CONFIG};
-		} else if(etlScript.isAutoProcess) {
+		} else if (etlScript.isAutoProcess) {
 			this.setAutoProcessScript();
 		} else {
 			this.setManualProcessScript();
@@ -229,6 +229,13 @@ export class ImportAssetsComponent implements OnInit {
 			this.importResult = result;
 			this.postImportResult();
 			this.importInProcess = false;
+			if (this.uiConfig.showAutoProcessElements){
+				this.onClear();
+				this.notifier.broadcast({
+					name: AlertType.SUCCESS,
+					message: 'The ETL import process was succesfully initiated'
+				});
+			}
 		});
 	}
 
@@ -305,9 +312,13 @@ export class ImportAssetsComponent implements OnInit {
 	 */
 	public onClear(): void {
 		this.uiConfig = {...this.UI_CONFIG};
-		this.selectedActionOption = this.selectedScriptOption[0];
+		this.selectedScriptOption = this.dataScriptOptionsInitial;
 		this.selectedActionOption = -1;
 		this.removeFileByUID();
+		this.importResult = null;
+		this.importInProcess = false;
+		this.transformInProcess = false;
+		this.importResult = null;
 	}
 
 	public disableTransformButton() {
@@ -384,7 +395,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: true,
-			showManualElements: false,
+			showManuaProcesslElements: true,
 			showTransformButton: true,
 			transformBtnLabel: 'IMPORT_ASSETS.AUTO_IMPORT.INITIATE_IMPORT'
 		}
@@ -394,7 +405,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: false,
-			showManualElements: true,
+			showManuaProcesslElements: true,
 			showTransformButton: true,
 			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM',
 			sendNotification: false

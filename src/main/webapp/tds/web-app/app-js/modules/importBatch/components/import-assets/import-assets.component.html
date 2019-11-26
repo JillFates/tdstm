@@ -123,7 +123,7 @@
                         </div>
 
                         <!-- Progress bar-->
-                        <div class="form-group row progressBar-row">
+                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManuaProcesslElements">
                             <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
                                         col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
                                 <div *ngIf="transformInProcess" class="progress">
