@@ -48,6 +48,12 @@ export class TaskEditCreateModelHelper {
 		this.model.estimatedFinish = this.model.estimatedFinish ?
 			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedFinish), userTimeZone).slice(0, -6)) : null;
 		this.model.dueDate = this.model.dueDate ? new Date(this.model.dueDate) : null;
+
+		// validate null access
+		if (this.model.event && this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
+
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -134,6 +140,11 @@ export class TaskEditCreateModelHelper {
 			deletedPredecessorList: [],
 			deletedSuccessorList: []
 		};
+
+		// validate null access
+		if (this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
 
 		// should be an string
 		this.model.event.id = this.model.event.id.toString();
