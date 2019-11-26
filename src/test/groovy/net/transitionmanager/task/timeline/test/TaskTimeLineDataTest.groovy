@@ -12,7 +12,7 @@ trait TaskTimeLineDataTest {
 	String aDay = '06/22/2018'
 
 	@Shared
-	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy hh:mm')
+	SimpleDateFormat formatter = new SimpleDateFormat('MM/dd/yyyy HH:mm')
 
 	Date hourInDay(String dateTime) {
 		return dateTime ? formatter.parse(aDay + ' ' + dateTime) : null
