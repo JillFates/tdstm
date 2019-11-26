@@ -287,7 +287,7 @@ export class UserDashboardComponent implements OnInit {
 		this.dialogService.open(AssetShowComponent, [
 			{provide: 'ID', useValue: id},
 			{provide: 'ASSET', useValue: assetClass}
-		], DIALOG_SIZE.LG);
+		], DIALOG_SIZE.XXL);
 	}
 
 	public handlePersonClicked(event): void {

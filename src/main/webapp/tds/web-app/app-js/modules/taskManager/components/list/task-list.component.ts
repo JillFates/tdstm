@@ -307,7 +307,7 @@ export class TaskListComponent {
 				{ provide: 'ID', useValue: taskRow.assetEntityId },
 				{ provide: 'ASSET', useValue: taskRow.assetEntityAssetClass },
 				{ provide: 'AssetExplorerModule', useValue: AssetExplorerModule }
-			], DIALOG_SIZE.LG).then(result => {
+			], DIALOG_SIZE.XXL).then(result => {
 				// nothing
 		}).catch(result => {
 			console.error('rejected: ' + result);
