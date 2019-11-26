@@ -237,6 +237,13 @@ tds-ui-dialog {
 					.tag + .tag {
 						margin-left: 5px;
 					}
+
+					.label.tag {
+						border-radius: 0;
+						border: 0;
+						width: unset;
+						font-weight: 500;
+					}
 				}
 			}
 

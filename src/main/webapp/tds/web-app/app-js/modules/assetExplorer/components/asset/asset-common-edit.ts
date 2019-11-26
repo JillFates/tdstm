@@ -138,7 +138,7 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 	 */
 
 	protected isDirty(): boolean {
-		return !ramdaEquals(this.initialModel, this.model);
+		return !ramdaEquals(this.initialModel, this.model) || this.assetTagsDirty;
 	}
 	/**
 	 * Used on Create Asset view.
@@ -373,7 +373,9 @@ export class AssetCommonEdit implements OnInit, AfterViewInit, OnDestroy {
 		let all = document.getElementsByClassName(
 			'modal-content tds-angular-component-content'
 		)[0];
-		if (all === undefined) { return; }
+		if (all === undefined) {
+			return;
+		}
 		let focusable = all.querySelectorAll(
 			'input, select, textarea, [tabindex]:not([tabindex="-1"])'
 		);
