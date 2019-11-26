@@ -305,6 +305,13 @@ class ImportBatchRecord {
 	}
 	/**
 	 * Retrieves {@code ImportBatchRecord#tags} in a Map format.
+	 * <pre>
+	 * 	{
+	 * 		"add": ["Code Blue", "FUBAR", "SNAFU"],
+	 *  	"remove": ["Blah", "xyzzy"],
+	 *  	"replace": {"a":"b", "e":"f", "c":"d", "g":"h"}
+	 *  }
+	 * </pre>
 	 * @return a Map with tags content
 	 */
 	Map tagsAsMap() {
@@ -353,5 +360,13 @@ class ImportBatchRecord {
 	 */
 	boolean hasComments() {
 		return comments != defaultCommentFieldValue
+	}
+
+	/**
+	 * Checks if {@code ImportBatchRecord#tags} field is different than null
+	 * @return true if tags contains any value or false if tags is null
+	 */
+	boolean hasTags() {
+		return tags != null
 	}
 }

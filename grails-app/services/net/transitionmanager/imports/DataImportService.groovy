@@ -1,18 +1,5 @@
 package net.transitionmanager.imports
 
-import net.transitionmanager.asset.AssetService
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.common.ProgressService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
@@ -30,17 +17,29 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.imports.ImportBatch
-import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.i18n.Message
-import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagAssetService
+import net.transitionmanager.tag.TagService
+import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -72,6 +71,8 @@ class DataImportService implements ServiceMethods {
 	ProjectService           projectService
 	AssetService             assetService
 	CustomDomainService      customDomainService
+	TagService 				 tagService
+	TagAssetService			 tagAssetService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -576,7 +577,10 @@ class DataImportService implements ServiceMethods {
 			staffList: getStaffReferencesForProject(project),
 
 			// Prepares field Specs cache from database
-			fieldSpecProject: customDomainService.createFieldSpecProject(project)
+			fieldSpecProject: customDomainService.createFieldSpecProject(project),
+
+			// Tags Map used to validate tags in an ImportBatchRecord creation
+			projectTags: tagService.tagMapByName(project)
 		]
 	}
 
@@ -807,11 +811,15 @@ class DataImportService implements ServiceMethods {
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		Object entity
 		Map fieldsInfo
+		Map tagsInfo
 
 		try {
 			fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
+
+			tagsInfo = record.tagsAsMap()
+			validateTagReferences(record, tagsInfo, context.projectTags)
 
 			entity = findOrCreateEntity(fieldsInfo, context)
 
@@ -841,7 +849,10 @@ class DataImportService implements ServiceMethods {
 					// Determine the correct Operation that was performed and if the record should be saved
 					Boolean shouldBeSaved = true
 					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
-					if ( record.operation == ImportOperationEnum.UPDATE && ! GormUtil.hasUnsavedChanges(entity) && !record.hasComments()) {
+					if (record.operation == ImportOperationEnum.UPDATE
+						&& !GormUtil.hasUnsavedChanges(entity)
+						&& !record.hasComments()
+						&& !record.hasTags()) {
 						record.operation = ImportOperationEnum.UNCHANGED
 						shouldBeSaved = false
 					}
@@ -852,7 +863,7 @@ class DataImportService implements ServiceMethods {
 
 							if (record.hasComments()) {
 								List<String> comments = record.commentsAsList()
-								log.info "processEntityRecord() record ${record.id} contains comments ${}"
+								log.info "processEntityRecord() record ${record.id} contains comments ${comments}"
 								saveCommentsForEntity(comments, entity, context)
 								entity.lastUpdated = new Date()
 							}
@@ -865,6 +876,11 @@ class DataImportService implements ServiceMethods {
 							// if entity is Person then associate it to company and project
 							if (isNewEntity && Person.isAssignableFrom(entity.class)) {
 								associatePersonToCompanyAndProject(context.project, entity)
+							}
+
+							if (tagsInfo) {
+								log.info "processEntityRecord() record ${record.id} contains tags ${tagsInfo}"
+								saveTagsForEntity(record, entity, tagsInfo, context)
 							}
 
 						} else {
@@ -911,6 +927,38 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
+	 * Saves, deletes or replaces tags associated with entity parameter.
+	 * It uses {@code context#projectTags} for validations.
+	 * It also manages {@code ImportBatchRecord#status} and
+	 * {@code ImportBatchRecord#operation} logic.
+	 * @param record an instance of {@code ImportBatchRecord} used in the import process.
+	 * @param entity an instance of a TDS domain classes, populated and ready to be used in tag association.
+	 * @param tagsInfo a Map with tags as results of an ETL script executed.
+	 * @param context a Map with context variables. It is used for validation purposes and project with tags association.
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	void saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> tagsInfo, Map<String, ?> context) {
+
+		List<String> errors = bindTagInfoValuesToEntity(entity, tagsInfo, context)
+
+		if (errors.isEmpty()) {
+			entity.lastUpdated = new Date()
+			if (record.operation == ImportOperationEnum.UNCHANGED) {
+				record.operation = ImportOperationEnum.UPDATE
+			}
+
+		} else {
+			errors.each { record.addError(it) }
+			// The entity change should be discarded
+			//The record should remain in the Pending status
+			record.operation = ImportOperationEnum.TBD
+			record.status = ImportBatchStatusEnum.PENDING
+			entity.discard()
+			entity = null
+		}
+	}
+
+	/**
 	 * Saves {@code AssetComment} List for domain classes. It creates instances using {@code AssetCommentType.COMMENT} type
 	 * @param comments a {@code List} of {@code String} values.
 	 * @param entity an instance of a domain to be used to link new instances of {@code AssetComment}.
@@ -928,7 +976,49 @@ class DataImportService implements ServiceMethods {
 			).save()
 		}
 	}
-  
+
+	@Transactional(noRollbackFor=[Throwable])
+	List<String> bindTagInfoValuesToEntity(Object entity, Map tagsInfo, Map context) {
+
+		List<String> errors = []
+		List<TagAsset> entityTags = tagAssetService.list(context.project, entity.id)
+		Map<String, TagAsset> tagAssetMap = entityTags.collectEntries { TagAsset tagAsset ->
+			[(tagAsset.tag.name): tagAsset]
+		}
+
+		for (tagName in tagsInfo.remove) {
+			TagAsset tagAsset = tagAssetMap[tagName]
+			if (tagAsset) {
+				tagAssetService.removeTags(context.project, [tagAsset.id])
+			} else {
+				errors.add("Unable to Remove tag '${tagName}' on asset")
+			}
+		}
+
+		for (tagName in tagsInfo.add) {
+			Long tagId = context.projectTags[tagName]
+			if (!tagAssetMap[tagName]) {
+				tagAssetService.applyTags(context.project, [tagId], entity.id)
+			} else {
+				errors.add("Unable to Add tag '${tagName}' on asset")
+			}
+		}
+
+		for (tagEntry in tagsInfo.replace) {
+			TagAsset tagAsset = tagAssetMap[tagEntry.key]
+			Long tagId = context.projectTags[tagEntry.value]
+
+			if (tagAsset && !tagAssetMap[tagEntry.value]) {
+				tagAssetService.removeTags(context.project, [tagAsset.id])
+				tagAssetService.applyTags(context.project, [tagId], entity.id)
+			} else {
+				errors.add("Unable to Replace tag '${tagEntry.key}' with '${tagEntry.value}' on asset")
+			}
+		}
+
+		return errors
+	}
+
 	/**
 	 * This method should be used after any SearchQueryHelper.findEntityByMetaData calls to record errors
 	 * into the field or import batch record errors appropriately.
@@ -1406,6 +1496,8 @@ class DataImportService implements ServiceMethods {
 	 * It also removes previousValue key from fieldsInfo when it exist so previous value data shown is more accurate.
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
+	 * @param tagsInfo - the Map of the record.tags to be cleared
+	 *
 	 */
 	@Transactional(noRollbackFor=[Throwable])
 	private void resetRecordAndFieldsInfoErrors(ImportBatchRecord record, Map fieldsInfo) {
@@ -1416,6 +1508,52 @@ class DataImportService implements ServiceMethods {
 			if (field.value.containsKey(PREVIOUS_VALUE_PROPERTY)) {
 				field.value.remove(PREVIOUS_VALUE_PROPERTY)
 			}
+		}
+	}
+
+	/**
+	 * Used to clear out the errors recorded at the tag level .
+	 * It also removes invalid tags from tagsInfo when it does not exist in Project tags.
+	 *
+	 * @param record - the import batch record to clear
+	 * @param tagsInfo - the Map of the record.tags to be cleared
+	 * @param projectTags - the Map of the project tags used for validation.
+	 *
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	private void validateTagReferences(ImportBatchRecord record, Map tagsInfo, Map projectTags) {
+		Set tagsNotFound = [] as Set
+		Set tagsToProcessed = [] as Set
+
+		for (tag in tagsInfo.add){
+			if(!projectTags.containsKey(tag)){
+				tagsNotFound.add(tag)
+				tagsInfo.remove(tag)
+			}
+		}
+
+		for (tag in tagsInfo.remove){
+			if(!projectTags.containsKey(tag)){
+				tagsNotFound.add(tag)
+				tagsInfo.remove(tag)
+			}
+		}
+
+		for (tag in tagsInfo.replace){
+
+			if(!projectTags.containsKey(tag.key)){
+				tagsNotFound.add(tag.key)
+				tagsInfo.remove(tag)
+			}
+
+			if(!projectTags.containsKey(tag.value)){
+				tagsNotFound.add(tag.value)
+				tagsInfo.remove(tag.key)
+			}
+		}
+
+		if (!tagsNotFound.isEmpty()){
+			record.addError("The follow tag(s) were not found: ${tagsNotFound.join(', ')}")
 		}
 	}
 
