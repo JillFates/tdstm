@@ -1316,11 +1316,13 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			throw new DomainUpdateException('Unable to update user security roles')
 		}
 
-		//
-		// Set the default project preference for the user
-		//
-		if (!userPreferenceService.setPreference(userLogin, PREF.CURR_PROJ, (String) params.projectId)) {
-			throw new DomainUpdateException('Unable to save selected project')
+		if (params.projectId) {
+			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
+		}
+
+		// Try to save the user changes
+		if (!userLogin.save(flush: true, failOnError: false)) {
+			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
 		}
 
 		if (isNewUser) {
@@ -1333,13 +1335,11 @@ class SecurityService implements ServiceMethods, InitializingBean {
 			auditService.saveUserAudit(UserAuditBuilder.newUserLogin(userLogin.username))
 		}
 
-		if (params.projectId) {
-			personService.addToProject(byWhom, (String) params.projectId, person.id.toString())
-		}
-
-		// Try to save the user changes
-		if (!userLogin.save(flush: true, failOnError: false)) {
-			throw new DomainUpdateException("Unable to update User : " + GormUtil.allErrorsString(userLogin))
+		//
+		// Set the default project preference for the user
+		//
+		if (!userPreferenceService.setPreference(userLogin, PREF.CURR_PROJ, (String) params.projectId)) {
+			throw new DomainUpdateException('Unable to save selected project')
 		}
 
 		return userLogin
