@@ -196,6 +196,10 @@
 						(click)="onDeleteAsset()">
 				</tds-button-delete>
 			</tds:hasPermission>
+			<tds-button-close
+                tooltip="Close"
+                (click)="cancelCloseDialog()">
+			</tds-button-close>
 		</nav>
 	</div>
 </div>
