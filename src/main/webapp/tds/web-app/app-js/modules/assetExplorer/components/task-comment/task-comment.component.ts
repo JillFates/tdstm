@@ -35,9 +35,9 @@ import { Permission } from '../../../../shared/model/permission.model';
 })
 export class TaskCommentComponent implements OnInit {
 	@Input('asset-id') id: number;
-	@Input('has-publish-permission') hasPublishPermission? = false;
-	@Input('can-edit-comments') canEdit? = false;
-	@Input('can-edit-tasks') canEditTasks? = false;
+	@Input('has-publish-permission') hasPublishPermission ? = false;
+	@Input('can-edit-comments') canEdit ? = false;
+	@Input('can-edit-tasks') canEditTasks ? = false;
 	@Input('asset-name') assetName: string;
 	@Input('asset-type') assetType: string;
 	@Input('show-task') showTask: boolean;
@@ -446,10 +446,10 @@ export class TaskCommentComponent implements OnInit {
 			.subscribe((preferences: any) => {
 				this.viewUnpublished = preferences[
 					PREFERENCES_LIST.VIEW_UNPUBLISHED
-				]
+					]
 					? preferences[
-							PREFERENCES_LIST.VIEW_UNPUBLISHED
-					  ].toString() === 'true'
+					PREFERENCES_LIST.VIEW_UNPUBLISHED
+					].toString() === 'true'
 					: false;
 			});
 	}
