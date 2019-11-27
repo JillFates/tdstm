@@ -5,6 +5,9 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 
 import {DateUtils} from '../utils/date.utils';
+import {Store} from '@ngxs/store';
+import {UserContextModel} from '../../modules/auth/model/user-context.model';
+import {UserContextState} from '../../modules/auth/state/user-context.state';
 
 // add constants as needed
 export const PREFERENCES_LIST = {
@@ -50,9 +53,8 @@ export class PreferenceService {
 	 * if not it will got it from the endpoint and persist the value for next request
 	 */
 	private preferencesList = new BehaviorSubject([]);
-	private currentPreferences = this.preferencesList.asObservable();
 
-	constructor(private http: HttpClient) {
+	constructor(private http: HttpClient, private store: Store) {
 	}
 
 	// query a set of user preferences passed as arg variables
@@ -97,9 +99,9 @@ export class PreferenceService {
 	 * Used to retrieve the format to use for Date properties based on user's preference (e.g. MM/dd/YYYY)
 	 */
 	getUserDateFormat(): string {
-		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		if (currentUserDateFormat) {
-			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
+		const dateFormat  = this.store.selectSnapshot(UserContextState.getDateFormat);
+		if (dateFormat) {
+			return dateFormat;
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
@@ -123,9 +125,9 @@ export class PreferenceService {
 	 * based on user's preference in TM instead of the TimeZone of their computer.
 	 */
 	getUserTimeZone(): string {
-		const currentUserTimeZone = this.preferences[PREFERENCES_LIST.CURR_TZ];
-		if (currentUserTimeZone) {
-			return currentUserTimeZone;
+		const timeZone  = this.store.selectSnapshot(UserContextState.getTimezone);
+		if (timeZone) {
+			return timeZone;
 		}
 		return DateUtils.TIMEZONE_GMT;
 	}

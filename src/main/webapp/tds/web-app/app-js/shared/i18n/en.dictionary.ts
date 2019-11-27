@@ -57,6 +57,7 @@ export const en_DICTIONARY: Object = {
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'CONTINUE_WITH_CHANGES': 'Continue with Changes?',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',

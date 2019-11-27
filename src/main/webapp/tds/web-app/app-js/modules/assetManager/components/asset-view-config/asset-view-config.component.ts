@@ -250,33 +250,6 @@ export class AssetViewConfigComponent implements OnInit {
 		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
-	protected isDirty(): boolean {
-		let result = this.dataSignature !== JSON.stringify(this.model);
-		// TODO: hasPendingChanges
-		// if (this.state && this.state.$current && this.state.$current.data) {
-		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		// }
-		return result;
-	}
-
-	public isSaveAvailable(): boolean {
-		return this.assetExplorerService.isSaveAvailable(this.model);
-	}
-
-	protected isSaveAsAvailable(): boolean {
-		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
-			this.isSaveAvailable();
-	}
-
-	public isSystemSaveAvailable(edit): boolean {
-		return edit ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
-	}
-
 	protected isCurrentTab(num: number): boolean {
 		return this.currentTab === num;
 	}
@@ -299,13 +272,6 @@ export class AssetViewConfigComponent implements OnInit {
 	}
 
 	/** Dialog and view Actions methods */
-
-	protected onSaveAs(): void {
-		if (this.isSaveAsAvailable()) {
-			this.openSaveDialog();
-		}
-	}
-
 	public onCancel() {
 		if (this.model && this.model.id) {
 			this.router.navigate(['asset', 'views', this.model.id, 'show']);
@@ -314,17 +280,19 @@ export class AssetViewConfigComponent implements OnInit {
 		}
 	}
 
+	protected onSaveAs(): void {
+		this.openSaveDialog();
+	}
+
 	protected onSave() {
-		if (this.isSaveAvailable()) {
-			if (this.model.id) {
-				this.assetExplorerService.saveReport(this.model)
-					.subscribe(result => {
-						this.dataSignature = JSON.stringify(this.model);
-						this.select.loadData();
-					});
-			} else {
-				this.openSaveDialog();
-			}
+		if (this.model.id) {
+			this.assetExplorerService.saveReport(this.model)
+				.subscribe(result => {
+					this.dataSignature = JSON.stringify(this.model);
+					this.select.loadData();
+				});
+		} else {
+			this.openSaveDialog();
 		}
 	}
 

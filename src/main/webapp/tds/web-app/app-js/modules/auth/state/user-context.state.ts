@@ -25,6 +25,16 @@ import {of} from 'rxjs';
 export class UserContextState {
 
 	@Selector()
+	static getTimezone(state: UserContextModel) {
+		return state.timezone;
+	}
+
+	@Selector()
+	static getDateFormat(state: UserContextModel) {
+		return state.dateFormat;
+	}
+
+	@Selector()
 	static getUserContext(state: UserContextModel) {
 		return state;
 	}

@@ -137,6 +137,7 @@ var preferenceName = '${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.
 var isIE = GraphUtil.isIE()
 
 var selectedNodes = []
+var selectedSecondaryNodes = []
 var defaultColor = '#0000ff'
 var selectedParentColor = '#00ff00'
 var selectedChildColor = '#00cc99'
@@ -532,11 +533,10 @@ function createBehaviorHandler () {
 				var selectionList = [d]
 				var mode = GraphUtil.SELECT_MODES.REPLACE
 				// check if one of the multiselect tools are being used
-				if (event.ctrlKey || GraphUtil.toolStates.selectionAdd) 
+				if (event.ctrlKey || GraphUtil.toolStates.selectionAdd) {
 					mode = GraphUtil.SELECT_MODES.TOGGLE
-				// else user is normal clicking on a node so select the adjacent nodes
-				else
-					selectionList = _.union(selectionList, getAdjacentNodes(d))
+				}
+
 				modifyNodeSelection(selectionList, mode)
 			}
 			d3.event.sourceEvent.preventDefault()
@@ -715,6 +715,14 @@ function updateElementPositions (callback) {
 
 // Handles the modification of node selection based on a given list of nodes (the "delta") and a selection mode (from GraphUtil enum)
 function modifyNodeSelection (delta, mode, skipRender) {
+	// deselect old secondary nodes
+	selectedSecondaryNodes.forEach(function (node, i) {
+		if (node.selected == GraphUtil.SELECTION_STATES.SELECTED_SECONDARY) {
+			node.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED;
+		}
+	});
+	selectedSecondaryNodes = [];
+
 	// keep track of which nodes will be added to or removed from the selection in this function call
 	var toSelect = []
 	var toDeselect = []
@@ -729,21 +737,21 @@ function modifyNodeSelection (delta, mode, skipRender) {
 			linksToCheck = _.union(linksToCheck, GraphUtil.getAdjacentLinks(node))
 		})
 		linksToCheck.each(function (link) {
-			if (link.source.selected == GraphUtil.SELECTION_STATES.NOT_SELECTED && link.target.selected == GraphUtil.SELECTION_STATES.NOT_SELECTED)
+			if (link.source.selected != GraphUtil.SELECTION_STATES.SELECTED_PRIMARY && link.target.selected != GraphUtil.SELECTION_STATES.SELECTED_PRIMARY)
 				link.selected = GraphUtil.SELECTION_STATES.NOT_SELECTED
 		})
-		
+
 	// if we are in replace mode, change the selection to the current set of nodes
 	} else if (mode == GraphUtil.SELECT_MODES.REPLACE) {
 		toSelect = _.difference(delta, selectedNodes)
 		toDeselect = _.difference(selectedNodes, delta)
-		if (delta.size() == 1 || (delta.length == _.intersection(delta, selectedNodes).length)) {
+		if ((delta.size() == 1) && (delta.length == _.intersection(delta, selectedNodes).length)) {
 			toSelect = []
 			toDeselect = delta
 		}
 		modifyNodeSelection(toDeselect, GraphUtil.SELECT_MODES.SUB, true)
 		modifyNodeSelection(toSelect, GraphUtil.SELECT_MODES.ADD, true)
-		
+
 	// same as normal replace mode, but don't toggle single nodes
 	} else if (mode == GraphUtil.SELECT_MODES.REPLACE_NO_TOGGLE) {
 		toSelect = _.difference(delta, selectedNodes)
@@ -782,6 +790,18 @@ function modifyNodeSelection (delta, mode, skipRender) {
 	
 	// if it wasn't specified that the render should be skipped, update the styles and reoreder the DOM
 	if (!skipRender) {
+
+		// handle setting the adjacent node to be highlighted as secondary selection nodes
+		selectedNodes.forEach(function (node, i) {
+			let adjacentNodes = getAdjacentNodes(node);
+			adjacentNodes.forEach(function (node, i) {
+				if (node.selected == GraphUtil.SELECTION_STATES.NOT_SELECTED) {
+					node.selected = GraphUtil.SELECTION_STATES.SELECTED_SECONDARY;
+					selectedSecondaryNodes.push(node);
+				}
+			});
+		});
+
 		// if the selection was changed, update the elements
 		if (toSelect.size() > 0 || toDeselect.size() > 0) {
 			GraphUtil.updateAllClasses()
@@ -789,6 +809,7 @@ function modifyNodeSelection (delta, mode, skipRender) {
 			GraphUtil.reorderDOM()
 		}
 	}
+
 }
 
 // Used to rebuild the layout using the new parameters
