@@ -391,11 +391,13 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
                 apiActionId: task.apiAction?.id,
                 apiActionInvokedAt: task.apiActionInvokedAt,
                 apiActionCompletedAt: task.apiActionCompletedAt,
+				assignedTo: task.assignedTo?.id,
+				assignedToName: task.assignedTo?.toString() ?: '',
+				category: task.category,
                 invokeActionDetails: invokeActionDetails,
-                assignedTo: task.assignedTo?.id,
                 predecessorsCount: task.taskDependencies.size(),
-                successorsCount: TaskDependency.countByPredecessor(task),
-                category: task.category
+				status: task.status,
+                successorsCount: TaskDependency.countByPredecessor(task)
         )
     }
 

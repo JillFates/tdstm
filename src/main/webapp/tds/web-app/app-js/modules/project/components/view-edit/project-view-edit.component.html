@@ -174,7 +174,7 @@
                     <tr class="prop">
                         <td valign="top" class="name"><b>Client:&nbsp;<span style="color: red">*</span></b></td>
                         <td valign="top" class="value">
-                            <kendo-dropdownlist [(ngModel)]="projectModel.clientId" [data]="clients" [valueField]="'clientId'" [textField]="'clientName'" [valuePrimitive]="true" id="client" name="client"></kendo-dropdownlist>
+                            {{client?.name}}
                         </td>
                     </tr>
 

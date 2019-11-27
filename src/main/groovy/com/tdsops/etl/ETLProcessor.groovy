@@ -1161,6 +1161,34 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this
 	}
 
+	/**
+	 * Returns a field specs definition for a given {@code ETLDomain}
+	 * <pre>
+	 *	iterate {
+	 *		fieldSpec Application each {
+	 *			if (SOURCE.contains(it.label)) {
+	 *				extract it.label load it.fieldName
+	 *			}
+	 *		....
+	 *     }
+	 * }
+	 * </pre>
+	 */
+	List<Map<String, ?>> fieldSpec(ETLDomain domain) {
+
+		if (!domain.isAsset()) {
+			throw ETLProcessorException.domainWithoutFieldSpec(domain)
+		}
+
+		return this.fieldsValidator.lookupFieldSpec(domain).collect {
+			[
+				'name' : it.field,
+				'label': it.label,
+				'type' : it.control
+			]
+		}
+	}
+
 	// ------------------------------------
 	// Support methods
 	// ------------------------------------
@@ -1659,7 +1687,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * and an instance of SecureASTCustomizer.
 	 * @see CompilerConfiguration* @see SecureASTCustomizer* @see ImportCustomizer* @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -1687,13 +1715,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,  List, ArrayList, Set, HashSet,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
 				Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
 			].asImmutable()
 		}

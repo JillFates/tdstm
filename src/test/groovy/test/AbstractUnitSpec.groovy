@@ -110,7 +110,7 @@ abstract class AbstractUnitSpec extends Specification implements DataTest{
 		List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority('USER'))
 		// Setup a user with a set of Permissions
 		TdsUserDetails principal = new TdsUserDetails(USERNAME, 'password', true, true, true, true,
-			authorities, userLogin.id, userLogin.personId, 'salt', ROLE_USER_PERMISSIONS)
+			authorities, userLogin.id, userLogin.personId, ROLE_USER_PERMISSIONS)
 		SecurityContextHolder.context.authentication = new TestingAuthenticationToken(principal, null, authorities)
 
 		return userLogin

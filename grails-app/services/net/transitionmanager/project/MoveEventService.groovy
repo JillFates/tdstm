@@ -9,6 +9,8 @@ import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
@@ -27,11 +29,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagEvent
 import net.transitionmanager.tag.TagEventService
 import net.transitionmanager.task.AssetComment
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.FillPatternType
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.*
 import org.springframework.jdbc.core.JdbcTemplate
 
 @Slf4j
@@ -75,6 +73,19 @@ class MoveEventService implements ServiceMethods {
 														'taskDependencies', 'duration', 'estStart', 'estFinish',
 														'actStart', 'actFinish']
 
+	// Positions in query results for the getTaskCategoriesStats method
+	private static final Integer MAX_ACTUAL_FINISH = 3
+	private static final Integer MAX_PLANNED_FINISH = 4
+	private static final Integer MAX_EST_FINISH = 5
+	private static final Integer REMAINING_TASKS = 6
+	private static final Integer COMPLETED_TASKS = 7
+	private static final Integer TOTAL_TASKS = 8
+
+    public static final String CLOCK_MODE_NONE 			= 'none'
+    public static final String CLOCK_MODE_COUNTDOWN 	= 'countdown'
+    public static final String CLOCK_MODE_ELAPSED 		= 'elapsed'
+    public static final String CLOCK_MODE_FINISHED 		= 'finished'
+
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
 	TagEventService       tagEventService
@@ -87,7 +98,6 @@ class MoveEventService implements ServiceMethods {
 		save me, true
 		me
 	}
-
 
 	/**
 	 * Create or update a MoveEvent based on the given CommandObject.
@@ -117,7 +127,7 @@ class MoveEventService implements ServiceMethods {
 		List<Long> tagEventIdsToAdd = eventCommand.tagIds
 		// If the event had already some tags, filter those out so we don't add them twice.
 		if (existingTagEvents) {
-			tagEventIdsToAdd = eventCommand.tagIds.collect { Long tagId -> !existingTagEvents.contains(tagId)}
+			tagEventIdsToAdd = eventCommand.tagIds.findAll { Long tagId -> !existingTagEvents.contains(tagId)}
 		}
 		if (tagEventIdsToAdd) {
 			tagEventService.applyTags(project, tagEventIdsToAdd, moveEvent)
@@ -519,128 +529,148 @@ class MoveEventService implements ServiceMethods {
 
 	}
 
-	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
-		List<MoveBundleStep> moveBundleSteps = []
-
-		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
-
-			if (step) {
-				moveBundleSteps.addAll(step)
-			}
-		}
-
-		return moveBundleSteps
-	}
-
-
 	/**
-	 * Find different stats for the given event, grouped by category.
-	 * @param project
-	 * @param moveEventId
+	 * Find the stats for all the tasks by category for the event
+	 * @param project  The {@code Project} to which the event belongs to.
+	 * @param eventId  The id of the event
+	 * @param viewUnpublished - flag to indicate if unpublished tasks should be included in the results when true
 	 * @return a list with the task category stats
 	 */
-	List<Map> getTaskCategoriesStats(Project project, Long moveEventId) {
+	List<Map> getTaskCategoriesStats(Project project, Long eventId, Boolean viewUnpublished) {
 		// Fetch the corresponding MoveEvent and throw an exception if not found.
-		MoveEvent moveEvent = get(MoveEvent, moveEventId, project, true)
-		// Query the database for the min/max dates for tasks in the event grouped by category.
+		MoveEvent moveEvent = get(MoveEvent, eventId, project, true)
+		// Query the database for the min/max values and counts for the tasks in the event, grouped by category.
 		String hql = """
 				select 
-					ac.category,
-					min(ac.actStart),
-					max(ac.dateResolved),
-					min(ac.estStart),
-					max(ac.estFinish),
-					max(ac.duration),
-					ac.durationScale,
-					count(*),
-					sum(case when ac.status = 'Completed' then 1 else 0 end),
-					case when (count(*) > 0) then (sum(case when ac.status = 'Completed' then 1 else 0 end)/count(*)*100) else 100 end
-				from AssetComment ac
-					where moveEvent =:moveEvent
-				group by ac.category
+					t.category as category,
+					min(case when t.actStart is null then t.dateResolved else t.actStart end) as minActualStart,
+					min(t.estStart) as minEstStart,
+					max(t.dateResolved) as maxActualFinish,
+					max(t.latestFinish) as maxPlannedFinish,
+					max( case when t.dateResolved is null 
+						then 
+							case when t.actStart is null 
+							then 
+								case when t.latestStart >= NOW() then 
+									FROM_UNIXTIME( UNIX_TIMESTAMP(t.latestStart) + COALESCE(t.duration,0)*60 )
+								else
+									FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) + COALESCE(t.duration,0)*60 )
+								end
+							else
+								FROM_UNIXTIME( UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(t.actStart) + COALESCE(t.duration,0)*60 ) 
+							end
+						else
+						  null
+						end
+					) as maxEstFinish,
+					sum( case when t.dateResolved is null then 1 else 0 end ) as remainingTasks,
+					sum( case when t.dateResolved is null then 0 else 1 end ) as completedTasks,
+					count(*) as totalTasks
+				from Task t
+				where t.moveEvent =:moveEvent 
+					and t.category is not null
+					${ (! viewUnpublished ? 'and t.isPublished = true' : '') }
+				group by t.category
+				order by minEstStart, category
 			"""
 
 		List taskCategoriesStatsList = AssetComment.executeQuery(hql, ["moveEvent": moveEvent])
 
 		List<Map> stats = []
-		taskCategoriesStatsList.each { categoryStats ->
-			// Only add to the results if there are any tasks for the category
-			if (categoryStats[7] ) {
-				stats << [
-					"category": 	categoryStats[0],
-					"actStart": 	categoryStats[1],
-					"actFinish": 	categoryStats[2],
-					"estStart": 	categoryStats[3],
-					"estFinish": 	categoryStats[4],
-					"maxRemaining":	categoryStats[5],
-					"maxRScale":	categoryStats[6],
-					"tskTot": 		categoryStats[7],
-					"tskComp": 		categoryStats[8],
-					"percComp": 	categoryStats[9],
-					"color":		calculateColumnColor(categoryStats, moveEvent)
-				]
-			}
-			// Sort by the category "natural" sort order
-			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
-		}
+		Date now = new Date()
 
+		taskCategoriesStatsList.each { categoryStats ->
+			stats << [
+				"category": 			categoryStats[0],
+				"minActStart": 			categoryStats[1],
+				"minEstStart": 			categoryStats[2],
+				"maxActFinish": 		categoryStats[MAX_ACTUAL_FINISH],
+				"maxPlannedFinish": 	categoryStats[MAX_PLANNED_FINISH],
+				"maxEstFinish": 		categoryStats[MAX_EST_FINISH],
+				"remainingTasks":		categoryStats[REMAINING_TASKS],
+				"completedTasks": 		categoryStats[COMPLETED_TASKS],
+				"totalTasks": 			categoryStats[TOTAL_TASKS],
+				"percComp": 			Math.round(categoryStats[COMPLETED_TASKS] / categoryStats[TOTAL_TASKS] * 100),
+				"color":				calculateColumnColor(categoryStats, now)
+			]
+		}
 		return stats
 	}
 
 	/**
-	 * Returns the color that the column should have for the given category in the Event Dashboard.
-	 * @See TM-15896
-	 * @param categoryStats  The category properties
-	 * @param moveEvent  The event to which the category properties belong
-	 * @return  The calculated color for the category column.
+	 * Returns data used to render the Event Dashboard
+	 * @param moveEvent  The MoveEvent
+	 * @return JSON map
 	 */
-	private String calculateColumnColor(categoryStats, MoveEvent moveEvent) {
+	Map eventData(MoveEvent moveEvent) {
+		Date sysTime = TimeUtil.nowGMT()
+		MoveEventSnapshot moveEventPlannedSnapshot
+		TimeDuration dayTime
+		String eventString = ""
+        Date eventStartTime = moveEvent.estStartTime
+        Date eventComplTime = moveEvent.estCompletionTime
+        String clockMode = CLOCK_MODE_NONE
 
-		Date actualStart = categoryStats[1]
-		Date actualFinish = categoryStats[2]
+        if (eventStartTime) {
+            if ( eventStartTime > sysTime ) {
+                dayTime = TimeCategory.minus(eventStartTime, sysTime)
+                eventString = "Countdown Until Event"
+                clockMode = CLOCK_MODE_COUNTDOWN
+            } else if (eventStartTime < sysTime && ( !eventComplTime || eventComplTime > sysTime )) {
+                dayTime = TimeCategory.minus(sysTime, eventStartTime)
+                eventString = "Elapsed Event Time"
+                clockMode = CLOCK_MODE_ELAPSED
+            } else {
+                dayTime = TimeCategory.minus(sysTime, eventComplTime)
+                eventString = "Time since the event finished"
+                clockMode = CLOCK_MODE_FINISHED
+            }
+        }
+        // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
 
-		// If tasks estimated start or completion are blank, use the Event estimated start and completion
-		Date estimatedStart = categoryStats[3] ?: moveEvent.estStartTime
-		Date estimatedFinish = categoryStats[4] ?: moveEvent.estCompletionTime
+        String eventClock = TimeUtil.formatTimeDuration(dayTime)
 
-		Date now = new Date()
-
-		Long totalTasks = categoryStats[7]
-		Long completedTasks = categoryStats[8]
-		Long percentCompleted = categoryStats[9]
-
-		long longestRemainingInMillis = getLongestRemainingInMillis(categoryStats[5], categoryStats[6])
-
-		// default is green
-		String color = "green"
-		if (completedTasks == totalTasks && actualFinish < estimatedFinish) {
-			color = "#24488a" // completed-blue
-		} else {
-			if (estimatedFinish < now && percentCompleted < 100) {
-				color = "red" // past completed time and tasks remain
-			} else {
-				if (longestRemainingInMillis && estimatedFinish < new Date(now.getTime() + longestRemainingInMillis)) {
-					color = "#FFCC66" // yellow, unlikely to finish in estimate window because the longest task remaining would complete too late
-				}
-			}
-		}
-		return color
+		return [snapshot: [
+				revisedComp: moveEvent?.revisedCompletionTime,
+				calcMethod: moveEvent?.calcMethod,
+				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
+				eventStartDate: moveEvent.estStartTime,
+				planSum: [
+						dialInd: moveEventPlannedSnapshot?.dialIndicator,
+						compTime: moveEvent.estCompletionTime,
+						dayTime: eventClock,
+                        clockMode: clockMode,
+						eventDescription: moveEvent?.description,
+						eventString: eventString,
+						eventRunbook: moveEvent?.runbookStatus
+				]
+		]]
 	}
 
 	/**
-	 * Calculates the longest remaining time for a task in milliseconds, or returns 0 if parameters are empty or null.
-	 * @param maxRemaining
-	 * @param maxRScale
-	 * @return  The max remaining time in milliseconds, or zero if anything is empty or null.
+	 * Returns the color that the column should have for the given category in the Event Dashboard.
+	 * @See TM-15896/ TM-16319
+	 * @param categoryStats - The properties for the category
+	 * @return - The calculated color for the category column.
 	 */
-	private long getLongestRemainingInMillis(maxRemaining, TimeScale maxRScale) {
+	private String calculateColumnColor(Object[] categoryStats, Date now) {
+		Long remainingTasks = categoryStats[REMAINING_TASKS]
+		Date maxPlannedFinish = categoryStats[MAX_PLANNED_FINISH]
+		Date maxActualFinish = categoryStats[MAX_ACTUAL_FINISH]
+		Date maxEstFinish = categoryStats[MAX_EST_FINISH]
 
-		if (!maxRemaining || !maxRScale) {
-			return 0
+		String color = ""
+		if (remainingTasks == 0 && maxActualFinish <= maxPlannedFinish) {
+			color = '#24488A'
+		} else if (remainingTasks > 0 && maxEstFinish <= maxPlannedFinish) {
+			color = "green"
+		} else if ( (remainingTasks == 0 && maxActualFinish > maxPlannedFinish) || ( remainingTasks > 0 && maxPlannedFinish < now ) ) {
+			color = "red"
 		} else {
-			return maxRScale.toMinutes(maxRemaining) * 60000
+			color = "yellow"
 		}
+		return color
 	}
-
 }
