@@ -348,7 +348,6 @@ List staticSecurityRules = [
 	[pattern: '/ws/**', access: 'isAuthenticated()'],
 	[pattern: '/', access: 'permitAll'],
 	[pattern: '/index', access: 'permitAll'],
-	[pattern: '/index.gsp', access: 'permitAll'],
 	[pattern: '/assets/**', access: 'permitAll'],        // Don't believe it is used
 	[pattern: '/auth/**', access: 'permitAll'],        // Authentication Controller
 	[pattern: '/**/js/**', access: 'permitAll'],        // Javascript
