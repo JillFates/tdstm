@@ -111,6 +111,15 @@ kendo-popup {
   border-bottom: 1px solid $color-border;
 }
 
+.clr-checkbox-wrapper {
+  .clr-control-label {
+    &.disabled-input {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+  }
+}
+
 table.clarity-table-grid {
   color: #656565;
   border: 0;
