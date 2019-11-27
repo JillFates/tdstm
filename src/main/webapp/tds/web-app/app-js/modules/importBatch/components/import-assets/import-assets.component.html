@@ -29,15 +29,15 @@
                                                'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
                                 <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
                             </tds-button>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
-                                <a href="javascript:void(0);"
-                                   (click)="onViewData('FETCH')" >
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                                </a>
-                            </span>
+<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
+<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+<!--                                <br>-->
+<!--                                <a href="javascript:void(0);"-->
+<!--                                   (click)="onViewData('FETCH')" >-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                                </a>-->
+<!--                            </span>-->
 
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
@@ -65,15 +65,15 @@
                                     <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
                                 </kendo-upload><!---->
                             </div>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
-                                <a href="javascript:void(0);"
-                                   (click)="onViewData('FETCH')">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                                </a>
-                            </span>
+<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"-->
+<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+<!--                                <br>-->
+<!--                                <a href="javascript:void(0);"-->
+<!--                                   (click)="onViewData('FETCH')">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                                </a>-->
+<!--                            </span>-->
 
                         </div>
 
@@ -137,7 +137,6 @@
                                     <kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
                                 </kendo-grid>
                             </div>
-                            {{fetchResult}}
                            <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
                                    class="col-sm-{{uiConfig.buttonColSize}}">
