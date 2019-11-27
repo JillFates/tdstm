@@ -2,7 +2,10 @@
   font-family: Roboto
   padding-top: 10px
   height: 90vh
+  min-height: 620px;
+  min-width: 830px;
   form
+    height: 12%
     padding-top: 0
   $secondary-fore-color: #18394B
   .btn-link
@@ -26,13 +29,13 @@
   .task-action-buttons
     display: inline
   .grid-container
-    height: 100%
+    height: 88%
     .k-grid-header
       .k-header
         top: 3px
         overflow: unset
     .box-with-empty-header
-      height: 90%
+      height: 100%
     .task-grid
       height: 100%
       max-height: 100%
@@ -42,8 +45,11 @@
     font-weight: 500
     font-size: 14px
     line-height: 24px
+    margin: unset
   .select-event-list
-    width: 176px
+    //width: 176px
+    width: 150px
+    max-width: 150px
     font-style: normal
     font-weight: 500
     font-size: 13px
@@ -56,19 +62,20 @@
     display: flex
     justify-content: space-between
     align-items: flex-end
+    clr-select-container
+      margin-top: unset
     tds-button
       button
         color: unset
         border-color: unset
-    .left-container
+    //.left-container
+    //  display: flex
+    //  clr-select-container
+    //    margin-top: 10px
+    .check-container
       display: flex
-      clr-select-container
-        margin-top: 10px
-      .check-container
-        display: flex
-        align-items: flex-end
-        clr-checkbox-wrapper
-          margin-right: 15px
+      clr-checkbox-wrapper
+        margin-right: 15px
   .actions-secondary-page-container
     display: flex
     justify-content: flex-end
