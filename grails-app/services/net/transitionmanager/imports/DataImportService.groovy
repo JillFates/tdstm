@@ -811,15 +811,11 @@ class DataImportService implements ServiceMethods {
 	void processEntityRecord(ImportBatch batch, ImportBatchRecord record, Map context, Long recordCount) {
 		Object entity
 		Map fieldsInfo
-		Map tagsInfo
 
 		try {
 			fieldsInfo = record.fieldsInfoAsMap()
 
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
-
-			tagsInfo = record.tagsAsMap()
-			validateTagReferences(record, tagsInfo, context.projectTags)
 
 			entity = findOrCreateEntity(fieldsInfo, context)
 
@@ -878,9 +874,9 @@ class DataImportService implements ServiceMethods {
 								associatePersonToCompanyAndProject(context.project, entity)
 							}
 
-							if (tagsInfo) {
-								log.info "processEntityRecord() record ${record.id} contains tags ${tagsInfo}"
-								saveTagsForEntity(record, entity, tagsInfo, context)
+							if (record.hasTags()) {
+								log.info "processEntityRecord() record ${record.id} contains tags ${record.tags}"
+								saveTagsForEntity(record, entity, context)
 							}
 
 						} else {
@@ -937,25 +933,37 @@ class DataImportService implements ServiceMethods {
 	 * @param context a Map with context variables. It is used for validation purposes and project with tags association.
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	void saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> tagsInfo, Map<String, ?> context) {
+	void saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> context) {
 
-		List<String> errors = bindTagInfoValuesToEntity(entity, tagsInfo, context)
+		Map<String, ?> tagsInfo = record.tagsAsMap()
+		String error = validateTagReferences(tagsInfo, context.projectTags)
 
-		if (errors.isEmpty()) {
-			entity.lastUpdated = new Date()
-			if (record.operation == ImportOperationEnum.UNCHANGED) {
-				record.operation = ImportOperationEnum.UPDATE
-			}
-
-		} else {
-			errors.each { record.addError(it) }
-			// The entity change should be discarded
-			//The record should remain in the Pending status
-			record.operation = ImportOperationEnum.TBD
+		if (error){
+			/* This scenarios occurs when ETL script uses a project tag
+			 * but at the import process time that tag was deleted. */
+			record.addError(error)
 			record.status = ImportBatchStatusEnum.PENDING
 			entity.discard()
 			entity = null
+			return
 		}
+
+		List<String> errors = bindTagInfoValuesToEntity(entity, tagsInfo, context)
+		if (!errors.isEmpty()) {
+			/* This scenarios occurs when ETL script uses a project tag
+			 * and binding it to an Asset, that Asset does not have that assigment anymore. */
+			errors.each { record.addError(it) }
+			// The entity change should be discarded
+			//The record should remain in the Pending status
+			record.status = ImportBatchStatusEnum.PENDING
+			entity.discard()
+			entity = null
+			return
+		}
+
+		/* When there was not error in tags and Asset tags,
+		then entity.lastUpdate must be updated manually  */
+		entity.lastUpdated = new Date()
 	}
 
 	/**
@@ -1512,48 +1520,28 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * Used to clear out the errors recorded at the tag level .
-	 * It also removes invalid tags from tagsInfo when it does not exist in Project tags.
+	 * Used to validate tags defined in {@code ImportBatchRecord#tags}.
+	 * <pre>
 	 *
-	 * @param record - the import batch record to clear
+	 * </pre>
 	 * @param tagsInfo - the Map of the record.tags to be cleared
 	 * @param projectTags - the Map of the project tags used for validation.
 	 *
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	private void validateTagReferences(ImportBatchRecord record, Map tagsInfo, Map projectTags) {
-		Set tagsNotFound = [] as Set
-		Set tagsToProcessed = [] as Set
+	private String validateTagReferences(Map tagsInfo, Map projectTags) {
 
-		for (tag in tagsInfo.add){
-			if(!projectTags.containsKey(tag)){
-				tagsNotFound.add(tag)
-				tagsInfo.remove(tag)
-			}
-		}
+		Set tagsNames = [] as Set
+		tagsNames.addAll(tagsInfo.add)
+		tagsNames.addAll(tagsInfo.remove)
+		tagsNames.addAll(tagsInfo.replace.keySet())
+		tagsNames.addAll(tagsInfo.replace.values())
 
-		for (tag in tagsInfo.remove){
-			if(!projectTags.containsKey(tag)){
-				tagsNotFound.add(tag)
-				tagsInfo.remove(tag)
-			}
-		}
-
-		for (tag in tagsInfo.replace){
-
-			if(!projectTags.containsKey(tag.key)){
-				tagsNotFound.add(tag.key)
-				tagsInfo.remove(tag)
-			}
-
-			if(!projectTags.containsKey(tag.value)){
-				tagsNotFound.add(tag.value)
-				tagsInfo.remove(tag.key)
-			}
-		}
-
+		List tagsNotFound = tagsNames.collect { !projectTags.containsKey(it) }
 		if (!tagsNotFound.isEmpty()){
-			record.addError("The follow tag(s) were not found: ${tagsNotFound.join(', ')}")
+			return "The follow tag(s) were not found: ${tagsNotFound.join(', ')} in current project"
+		} else {
+			return null
 		}
 	}
 
