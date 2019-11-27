@@ -72,12 +72,18 @@ export class TaskViewToggleComponent implements OnInit {
 			if (d.find(p => p.path === TaskManagerRoutingStates.TASK_MANAGER_LIST.url)) {
 				this.makeActive(this.taskManager);
 				this.disableTaskManager = true;
+				this.disableNeighborhood = false;
+				this.disableTaskTimeline = false;
 			} else if (d.find(p => p.path === TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url)) {
 				this.makeActive(this.neighborhood);
 				this.disableNeighborhood = true;
+				this.disableTaskManager = false;
+				this.disableTaskTimeline = false;
 			} else if (d.find(p => p.path === routeNames.TASK_TIMELINE)) {
 				this.makeActive(this.taskTimeline);
 				this.disableTaskTimeline = true;
+				this.disableTaskManager = false;
+				this.disableNeighborhood = false;
 			}
 		});
 	}
@@ -94,6 +100,7 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the task manager view on a new tab
 	 **/
 	taskManagerView(): void {
+		if (this.disableTaskManager) { return; }
 		const url = 'taskManager/list';
 		window.open(url, '_blank');
 
@@ -103,7 +110,8 @@ export class TaskViewToggleComponent implements OnInit {
 	 * open the neighborhood view on a new tab
 	 **/
 	neighborhoodView(): void {
-		const url = 'neighborhood';
+		if (this.disableNeighborhood) { return; }
+		const url = 'taskManager/task-graph';
 		window.open(url, '_blank');
 
 	}

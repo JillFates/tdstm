@@ -357,7 +357,6 @@ export class TaskListComponent {
 			// loaded.
 		});	}
 
-
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
@@ -683,10 +682,10 @@ export class TaskListComponent {
 	/**
 	 * Used to colapse all of the rows that were expanded and reset the state used by the action bar
 	 */
-	private colapseAllExandedRows():void {
+	private colapseAllExandedRows(): void {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
-			let rowNum = parseInt(rowIndex);
+			let rowNum = parseInt(rowIndex, 10);
 			expandedEvent.index = rowNum;
 			this.onRowDetailCollapseHandler(expandedEvent);
 			this.gridComponent.collapseRow(rowNum);
@@ -732,7 +731,7 @@ export class TaskListComponent {
 
 					// Update the grid row with new information from the endpoint (status, assignTo, etc)
 					for (let i = 0; i < this.grid.gridData.data.length; i++) {
-						if (this.grid.gridData.data[i].id == taskId ) {
+						if (this.grid.gridData.data[i].id === taskId ) {
 							this.grid.gridData.data[i].status = taskActionInfoModel.status;
 							this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
 							this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
@@ -752,7 +751,7 @@ export class TaskListComponent {
 	 * @param personName
 	 * @param row
 	 */
-	private populateAssignedToName(personName: string, row: any) : void {
+	private populateAssignedToName(personName: string, row: any): void {
 		if (personName) {
 			for (let columnName in this.currentCustomColumns) {
 				if (this.currentCustomColumns[columnName] === 'assignedTo') {
