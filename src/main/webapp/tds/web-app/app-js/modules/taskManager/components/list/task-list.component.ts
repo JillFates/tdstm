@@ -684,7 +684,7 @@ export class TaskListComponent {
 	 */
 	private colapseAllExandedRows(): void {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-		for (let rowIndex in this.rowsExpandedMap) {
+		for (let rowIndex of this.rowsExpandedMap) {
 			let rowNum = parseInt(rowIndex, 10);
 			expandedEvent.index = rowNum;
 			this.onRowDetailCollapseHandler(expandedEvent);
