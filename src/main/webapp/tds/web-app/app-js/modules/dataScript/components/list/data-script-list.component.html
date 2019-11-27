@@ -97,14 +97,21 @@
 									>
 										<a
 											clrDropdownItem
-											*ngIf="!isUpdateAvailable()"
-											(click)="onEditDataScript(dataItem)"
+											*ngIf="isUpdateAvailable()"
+											(click)="onViewDataScript(dataItem)"
 										>
-											Edit Name
+											View
 										</a>
 										<a
 											clrDropdownItem
-											*ngIf="!isUpdateAvailable()"
+											*ngIf="isUpdateAvailable()"
+											(click)="onEditDataScript(dataItem)"
+										>
+											Edit
+										</a>
+										<a
+											clrDropdownItem
+											*ngIf="isUpdateAvailable()"
 											(click)="
 												openDataScriptEtlBuilder(
 													dataItem

@@ -198,6 +198,10 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		this.openDataScriptDialogViewEdit(dataItem, ActionType.EDIT);
 	}
 
+	protected onViewDataScript(dataItem: any): void {
+		this.openDataScriptDialogViewEdit(dataItem, ActionType.VIEW);
+	}
+
 	/**
 	 * Delete the selected DataScript
 	 * @param dataItem

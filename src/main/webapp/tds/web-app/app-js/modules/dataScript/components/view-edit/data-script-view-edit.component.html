@@ -243,7 +243,8 @@
 			[disabled]="
 				!dataScriptForm.form.valid ||
 				!isUnique ||
-				(dataScriptModel.provider && !dataScriptModel.provider.id)
+				(dataScriptModel.provider && !dataScriptModel.provider.id) ||
+				!isDirty()
 			"
 			[tooltip]="'Save'"
 		>
