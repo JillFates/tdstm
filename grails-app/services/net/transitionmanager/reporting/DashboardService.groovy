@@ -2,6 +2,7 @@ package net.transitionmanager.reporting
 
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.dashboard.PlanningDashboardData
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
@@ -153,5 +154,14 @@ class DashboardService implements ServiceMethods {
 			model.putAll(taskSummaryMap)
 		}
 		return model
+	}
+
+	/**
+	 * Retrieve all the different metrics for populating the Planning Dashboard.
+	 * @param project
+	 * @return
+	 */
+	Map getDataForPlanningDashboard(Project project) {
+		return new PlanningDashboardData(project).getDataForDashboard()
 	}
 }

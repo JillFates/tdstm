@@ -47,6 +47,7 @@ export class TaskEditCreateModelHelper {
 			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedStart), userTimeZone).slice(0, -6)) : null; // Slice removes the offset from the date string to ensure correct timezone
 		this.model.estimatedFinish = this.model.estimatedFinish ?
 			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedFinish), userTimeZone).slice(0, -6)) : null;
+		this.model.dueDate = this.model.dueDate ? new Date(this.model.dueDate) : null;
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -183,6 +184,8 @@ export class TaskEditCreateModelHelper {
 			dueDate: assetComment.dueDate ? assetComment.dueDate : '',
 			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
 			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
+			etStart: detail.etStart || '',
+			etFinish: detail.etFinish || '',
 			instructionLink: assetComment.instuctionLink,
 			instructionsLinkLabel: detail.instructionsLinkLabel || '',
 			instructionsLinkURL: detail.instructionsLinkURL || '',

@@ -199,10 +199,14 @@ class WsEventController implements ControllerMethods {
 	}
 
 	/**
-	 * Find and return various task-related stats per category for the given event.
+	 * Used to retrieve the list of categories and various metrics for each for a given event. This is used by the
+	 * Event Dashboard for the lower category data elements.
+	 * @param id - (Long) the id of the event to retrieve metrics
+	 * @param includeUnpublished - a Boolean flag if true will include unpublished tasks in the results
 	 */
-	def taskCategoriesStats(Long moveEventId) {
+	def taskCategoriesStats(Long id) {
 		Project project = getProjectForWs()
-		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId))
+		Boolean includeUnpublished = params.getBoolean('viewUnpublished')
+		renderSuccessJson( moveEventService.getTaskCategoriesStats(project, id, includeUnpublished) )
 	}
 }

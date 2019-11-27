@@ -102,9 +102,6 @@ class SettingService implements ServiceMethods {
             try {
                 Map<String, ?> settingMap = JsonUtil.convertJsonToMap(setting.json)
                 settingMap.put(VERSION_KEY, setting.version)
-                if (setting.key == AssetClass.APPLICATION.name()) {
-                    settingMap.put(PLAN_METHODOLOGY_KEY, setting.project.planMethodology)
-                }
                 fixEmptyConstraints(settingMap)
                 return settingMap
             } catch (Exception e) {
