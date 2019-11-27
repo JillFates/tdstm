@@ -289,6 +289,12 @@ tds-ui-dialog {
 		.clr-form {
 			padding: unset;
 		}
+
+		code-mirror {
+			textarea {
+				width: 100%;
+			}
+		}
 	}
 
 	.modal-footer {
@@ -349,6 +355,11 @@ tds-ui-dialog {
 			.modal-subbadge {
 				background-color: #f38b00;
 			}
+		}
+
+		.header-actions {
+			display: flex;
+			justify-content: flex-end;
 		}
 
 		.modal-description {
