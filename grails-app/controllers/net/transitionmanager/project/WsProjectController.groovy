@@ -18,9 +18,7 @@ import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.PersonService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.Permission
-import org.apache.tomcat.util.descriptor.web.ContextService
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
-
 /**
  * Handles WS calls of the ProjectsService
  */
@@ -149,13 +147,6 @@ class WsProjectController implements ControllerMethods {
 			log.warn "Project ${project.id} has plan methodlogy define as ${project.planMethodology} but the field is not in field settings"
 		}
 
-		List<Map> possibleManagers = projectDetails.managers.collect { it ->
-			Party party = GrailsHibernateUtil.unwrapIfProxy(it.partyIdTo)
-			[
-				name: party.toString(),
-				id: party.id
-			]
-		}
 		List<Map> planMethodologies = projectService.getPlanMethodologiesValues(project)
 		List<String> projectTypes = com.tdssrc.grails.GormUtil.getConstrainedProperties(Project).projectType.inList
 		List availableBundles = moveBundleService.lookupList(project)
