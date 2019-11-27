@@ -63,7 +63,7 @@ import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-bu
 export class DataScriptListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 
-	private state: State = {
+	protected state: State = {
 		sort: [
 			{
 				dir: 'asc',

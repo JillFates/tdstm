@@ -2,7 +2,7 @@
 	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
-			class="tds-table"
+			class="tds-table row-actions-2-children"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
