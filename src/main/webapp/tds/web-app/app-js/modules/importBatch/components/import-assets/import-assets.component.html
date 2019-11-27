@@ -16,7 +16,7 @@
                                         name="fetch"
                                         id="fetch"
                                         class="form-control"
-                                        [disabled]="!!actionOptions">
+                                        [disabled]="actionOptions.length == 0">
                                     <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>
@@ -137,6 +137,7 @@
                                     <kendo-grid-column title="Records" field="rowsCreated"></kendo-grid-column>
                                 </kendo-grid>
                             </div>
+                            {{fetchResult}}
                            <tds-button [disabled]="!fetchResult || fetchResult?.status === 'error' || !transformResult || transformResult?.status === 'error'"
                                    (click)="onImport()"
                                    class="col-sm-{{uiConfig.buttonColSize}}">

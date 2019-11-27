@@ -342,6 +342,13 @@ class ETLFindElement implements ETLStackableCommand {
 	Object firstResult() {
 		return results.objects[0]
 	}
+	/**
+	 * Returns a List of IDs collected from find/elseFind command
+	 * @return a List of id.
+	 */
+	List<Long> results(){
+		return (List<Long>)results.objects
+	}
 
 	/**
 	 * Validates calls within the DSL script that can not be managed

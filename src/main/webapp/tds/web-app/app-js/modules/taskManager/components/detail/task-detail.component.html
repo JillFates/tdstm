@@ -323,12 +323,11 @@
 															nowrap="nowrap"
 														>
 															<label
-																>Estimated
-																Start</label
+																>Earliest Start</label
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{ model.estimatedStart || '' | date : dateFormatTime }}</span>
+															<span>{{ model.etStart || '' | date : dateFormatTime }}</span>
 														</td>
 
 														<td
@@ -336,12 +335,11 @@
 															nowrap="nowrap"
 														>
 															<label
-																>Estimated
-																Finish</label
+																>Earliest Finish</label
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{ model.estimatedFinish || '' | date : dateFormatTime }}</span>
+															<span>{{ model.etFinish || '' | date : dateFormatTime }}</span>
 														</td>
 													</tr>
 
