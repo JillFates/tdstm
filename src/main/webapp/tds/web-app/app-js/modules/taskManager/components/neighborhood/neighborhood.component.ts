@@ -213,9 +213,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					takeUntil(this.unsubscribe$),
 					timeout(15000)
 				)
-				.subscribe((res: IGraphNode[]) => {
-					if (res && res.length > 0) {
-						this.tasks = res && res.map(r => r.task);
+				.subscribe(res => {
+					const data = res.body;
+					if (data && data.length > 0) {
+						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
 							this.diagramLayoutService.clearFullGraphCache();
 							this.requestId = taskId;
@@ -794,13 +795,18 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	onNeighborhood(data?: IGraphTask): void {
 		this.graph.cleanUpDiagram();
 		this.isFullView = false;
-		const currentUrl = this.location.path().includes(this.urlParams.taskId) ?
-			this.location.path().replace(this.urlParams.taskId, `${data.id}`)
-			: this.location.path().concat('?', 'taskId', '=', `${data.id}`);
-		this.location.go(currentUrl);
-		this.urlParams.taskId = data.id;
+		this.graph.showFullGraphBtn = true;
+		// const taskIdParam = this.urlParams && this.urlParams.taskId;
+		// const currentUrl = this.location.path().includes(taskIdParam) ?
+		// 	this.location.path().replace(taskIdParam, `${data.id}`)
+		// 	: this.location.path().concat('?', 'taskId', '=', `${data.id}`);
+		// this.location.go(currentUrl);
+		// this.urlParams = {
+		// 	taskId: data.id
+		// };
 		this.loadTasks(Number(data.id));
-		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED, () => this.graph.setNeighborAdornment(data));
+		this.notifierService.on(DiagramEventAction.ANIMATION_FINISHED,
+			() => !this.isFullView ? this.graph.setNeighborAdornment(data) : null);
 	}
 
 	/**
@@ -861,6 +867,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 */
 	viewFullGraphFromCache(): void {
 		this.isFullView = true;
+		this.graph.showFullGraphBtn = false;
 		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
 	}
 

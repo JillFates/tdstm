@@ -34,6 +34,7 @@ import {TaskTeam} from '../../../modules/taskManager/components/common/constants
 import {DiagramEvent, DiagramEventAction} from './model/diagram-event.constant';
 import {DiagramLayoutService} from '../../services/diagram-layout.service';
 import {ILinkPath} from './model/diagram-layout.model';
+import {GOJS_LICENSE_KEY} from './gojs-license';
 
 const enum NodeTemplateEnum {
 	HIGH_SCALE,
@@ -138,6 +139,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		private notifierService: NotifierService,
 		private renderer: Renderer2
 		) {
+		Diagram.licenseKey = GOJS_LICENSE_KEY;
 		this.onResize();
 	}
 
@@ -280,7 +282,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				if (this.neighborMove) {
 					this.neighborMove = false;
 					this.notifierService.broadcast({name: DiagramEventAction.ANIMATION_FINISHED});
-					this.showFullGraphBtn = true;
 				}
 
 				if (this.largeArrayRemaining) {
@@ -288,7 +289,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 					this.handleLargeDataArray();
 					setTimeout(() => {
 						this.diagram.animationManager.isEnabled = true;
-						this.showFullGraphBtn = false;
 					}, 1000);
 				}
 
@@ -765,18 +765,28 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			if (!match || match.length < 1) { return d.clearSelection(); }
 			let highlightCollection: any;
 
-			if (match && team) {
+			if (match.length > 0 && team.length > 0) {
 				if (team === TaskTeam.ALL_TEAMS) {
 					highlightCollection = d.nodes
-						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
+						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
+							|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
+						);
 				} else if (team === TaskTeam.NO_TEAM_ASSIGNMENT) {
 					highlightCollection = d.nodes
-						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase())
+						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
+								|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
 							&& !f.data.team);
 				} else {
 					highlightCollection = d.nodes
-						.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase())
-							&& (f.data.team && f.data.team.includes(team)));
+						.filter(f => {
+							console.log(!!f.data.name.toLowerCase().includes(match.toLowerCase()),
+								f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()),
+								f.data.team && !!f.data.team.includes(team), f.data.team && f.data.team.includes(team)
+								);
+							return (!!f.data.name.toLowerCase().includes(match.toLowerCase())
+								|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
+							&& f.data.team && !!f.data.team.includes(team)
+						});
 				}
 			} else {
 				highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));

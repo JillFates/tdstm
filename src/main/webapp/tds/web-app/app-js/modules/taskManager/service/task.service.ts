@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams, HttpResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SingleCommentModel } from '../../assetExplorer/components/single-comment/model/single-comment.model';
 import 'rxjs/add/operator/map';
@@ -539,11 +539,10 @@ export class TaskService {
 	 * @param taskId: number | string
 	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphNode[]> {
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<HttpResponse<IGraphNode[]>> {
 		const params = this.createHttpFilterParams(filters);
-		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
-			{ params, observe: 'response' })
-			.map(res => res.body.data);
+		return this.http.get<IGraphNode[]>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
+			{ params, observe: 'response' });
 	}
 
 	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IMoveEventTask> {
