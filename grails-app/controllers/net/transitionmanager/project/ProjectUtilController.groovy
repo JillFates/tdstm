@@ -44,22 +44,6 @@ class ProjectUtilController implements ControllerMethods {
 	}
 
 	/*
-	 *  Copy MoveBundleSteps from template project bundle.
-	 */
-	private void copyMoveBundleStep(MoveBundle moveBundle, MoveBundle oldBundle, int timeDelta) {
-		MoveBundleStep.findAllByMoveBundle(oldBundle).each { step ->
-			def moveBundleStep = new MoveBundleStep(
-					moveBundle: moveBundle,
-					label: step.label,
-					planStartTime: new Date(step.planStartTime?.time + timeDelta),
-					planCompletionTime: new Date(step.planCompletionTime?.time + timeDelta),
-					calcMethod: step.calcMethod)
-
-			moveBundleStep.save()
-		}
-	}
-
-	/*
 	 * copy news from temp project to demo project.
 	 */
 	def copyMoveEventNews(def moveEvent, def oldEvent){

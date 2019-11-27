@@ -7,6 +7,7 @@ import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired, Post
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
 import {SetProject} from '../../project/actions/project.actions';
+import {SetPageChange} from '../action/page.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
@@ -22,6 +23,16 @@ import {of} from 'rxjs';
 	defaults: {}
 })
 export class UserContextState {
+
+	@Selector()
+	static getTimezone(state: UserContextModel) {
+		return state.timezone;
+	}
+
+	@Selector()
+	static getDateFormat(state: UserContextModel) {
+		return state.dateFormat;
+	}
 
 	@Selector()
 	static getUserContext(state: UserContextModel) {
@@ -154,4 +165,19 @@ export class UserContextState {
 		);
 	}
 
+	/**
+	 * Set the new Latest Page to the context
+	 * @param ctx
+	 * @param payload
+	 */
+	@Action(SetPageChange)
+	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
+		const state = ctx.getState();
+		let notices = state.notices;
+		notices.redirectUrl = payload.path;
+		ctx.setState({
+			...state,
+			notices: notices
+		});
+	}
 }

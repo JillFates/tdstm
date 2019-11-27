@@ -39,7 +39,7 @@ import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.AppMoveEvent
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveBundleService
-import net.transitionmanager.project.MoveBundleStep
+
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
@@ -51,7 +51,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
@@ -78,7 +77,6 @@ class ReportsService implements ServiceMethods {
     JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
-    RunbookService runbookService
     TaskService taskService
     MoveBundleService moveBundleService
     UserPreferenceService userPreferenceService
@@ -100,9 +98,6 @@ class ReportsService implements ServiceMethods {
 
         def eventsProjectInfo = getEventsProjectInfo(moveEvent, project, projectId, moveBundles, eventErrorList)
 
-        //---------------------------------------for Event and Bundles ---------------------------------------//
-
-        def eventBundleInfo = getEventsBundelsInfo(moveBundles, moveEvent, eventErrorList)
 
         //---------------------------------------for Assets and Bundles --------------------------------------//
 
@@ -148,7 +143,6 @@ class ReportsService implements ServiceMethods {
             clientAccess           : eventsProjectInfo.clientAccess,
             projectStaffList       : eventsProjectInfo.projectStaffList,
             list                   : eventsProjectInfo.list,
-            steps                  : eventBundleInfo.steps,
             moveBundleSize         : moveBundles.size(),
             moveBundles            : moveBundles,
             summaryOk              : assetsInfo.summaryOk,
@@ -179,7 +173,6 @@ class ReportsService implements ServiceMethods {
             specialInstruction     : assetsInfo.specialInstruction,
             importantInstruction   : assetsInfo.importantInstruction,
             eventErrorString       : eventErrorString,
-            dashBoardOk            : eventBundleInfo.dashBoardOk,
             allErrors              : allErrors,
             nullAssetTag           : assetsInfo.nullAssetTag,
             blankAssetTag          : assetsInfo.blankAssetTag,
@@ -571,34 +564,6 @@ class ReportsService implements ServiceMethods {
             blankAssetTag          : blankAssetTag,
             nonAssetIssue          : nonAssetIssue,
             dependenciesNotValid   : dependenciesNotValid
-        ]
-    }
-
-    def getEventsBundelsInfo(moveBundles, MoveEvent moveEvent, eventErrorList) {
-        def steps = [:]
-
-        List<String> dashBoardOk = []
-        moveBundles.each { moveBundle ->
-            List<String> labels = []
-            def moveBundleStep = MoveBundleStep.findAllByMoveBundle(moveBundle, [sort: 'moveBundle'])
-            if (!moveBundleStep) {
-                steps[moveBundle.name] = "No steps created"
-                eventErrorList << 'EventsBundle'
-                dashBoardOk << 'No steps created'
-            } else {
-                moveBundleStep.each { step ->
-                    labels << step.label + '(' + (step.planDuration / 60) + 'm)'
-                    steps[HtmlUtil.escape(moveBundle.name)] = labels.toString().replace('[[', '').replace('], [', ' , ').replace(']]', '')
-                }
-
-                dashBoardOk << greenSpan('Dashboard OK:')
-            }
-        }
-
-        [
-            steps         : steps,
-            eventErrorList: eventErrorList,
-            dashBoardOk   : dashBoardOk
         ]
     }
 

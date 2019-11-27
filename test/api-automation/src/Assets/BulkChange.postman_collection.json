@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "12ee0f9f-efac-4032-8f7e-0e43334de115",
+		"_postman_id": "ee86a133-6f6d-4290-ad29-64f12e5cae1a",
 		"name": "Bulk Change All",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -61,15 +61,19 @@
 			"response": []
 		},
 		{
-			"name": "set current project",
+			"name": "Set Current Project",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "51b5875f-dd83-4223-8edf-6538dabcd9da",
+						"id": "9b8fd089-a47a-4da8-a2d3-adda615f2be4",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Success\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"success\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -77,34 +81,54 @@
 				}
 			],
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json, text/plain, */*"
+					},
+					{
+						"key": "Referer",
+						"value": "{{host}}/tdstm/module/auth/login"
+					},
+					{
+						"key": "Origin",
+						"value": "{{host}}"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"
+					},
+					{
+						"key": "Sec-Fetch-Mode",
+						"value": "cors"
+					},
 					{
 						"key": "Content-Type",
 						"value": "application/json"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"code\":\"CURR_PROJ\",\"value\":\"2445\"}"
+				},
 				"url": {
-					"raw": "{{host}}/tdstm/project/addUserPreference/{{projectId}}",
+					"raw": "{{host}}/tdstm/ws/user/preference",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"tdstm",
-						"project",
-						"addUserPreference",
-						"{{projectId}}"
+						"ws",
+						"user",
+						"preference"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "create tag",
+			"name": "Create tag",
 			"event": [
 				{
 					"listen": "test",
@@ -163,7 +187,7 @@
 			"response": []
 		},
 		{
-			"name": "create another tag",
+			"name": "Create another tag",
 			"event": [
 				{
 					"listen": "test",
@@ -559,7 +583,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagAssetss after bulk add",
+			"name": "List tagAssetss after bulk add",
 			"event": [
 				{
 					"listen": "test",
@@ -622,7 +646,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagAssetss after bulk add 2",
+			"name": "List tagAssetss after bulk add 2",
 			"event": [
 				{
 					"listen": "test",
@@ -736,7 +760,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagAssetss after bulk remove",
+			"name": "List tagAssetss after bulk remove",
 			"event": [
 				{
 					"listen": "test",
@@ -791,7 +815,7 @@
 			"response": []
 		},
 		{
-			"name": "tag not removed from asset2",
+			"name": "Tag not removed from asset2",
 			"event": [
 				{
 					"listen": "test",
@@ -905,7 +929,7 @@
 			"response": []
 		},
 		{
-			"name": "validate bulk clear asset1",
+			"name": "Validate bulk clear asset1",
 			"event": [
 				{
 					"listen": "test",
@@ -956,7 +980,7 @@
 			"response": []
 		},
 		{
-			"name": "validate bulk clear asset2",
+			"name": "Validate bulk clear asset2",
 			"event": [
 				{
 					"listen": "test",
@@ -1057,7 +1081,7 @@
 			"response": []
 		},
 		{
-			"name": "list tagAssetss after bulk replace",
+			"name": "List tagAssetss after bulk replace",
 			"event": [
 				{
 					"listen": "test",
@@ -1439,7 +1463,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 validation",
+			"name": "Get Asset 1 validation",
 			"event": [
 				{
 					"listen": "test",
@@ -1491,7 +1515,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 validation",
+			"name": "Get Asset 2 validation",
 			"event": [
 				{
 					"listen": "test",
@@ -1749,7 +1773,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 validation reset",
+			"name": "Get Asset 1 validation reset",
 			"event": [
 				{
 					"listen": "test",
@@ -1803,7 +1827,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 validation reset",
+			"name": "Get Asset 2 validation reset",
 			"event": [
 				{
 					"listen": "test",
@@ -2065,7 +2089,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace size",
+			"name": "Get Asset 1 replace size",
 			"event": [
 				{
 					"listen": "test",
@@ -2119,7 +2143,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace size",
+			"name": "Get Asset 2 replace size",
 			"event": [
 				{
 					"listen": "test",
@@ -2223,7 +2247,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace size 5",
+			"name": "Get Asset 1 replace size 5",
 			"event": [
 				{
 					"listen": "test",
@@ -2276,7 +2300,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace size 5",
+			"name": "Get Asset 2 replace size 5",
 			"event": [
 				{
 					"listen": "test",
@@ -2379,7 +2403,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace size reset/clear",
+			"name": "Get Asset 1 replace size reset/clear",
 			"event": [
 				{
 					"listen": "test",
@@ -2432,7 +2456,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace size reset/clear",
+			"name": "Get Asset 2 replace size reset/clear",
 			"event": [
 				{
 					"listen": "test",
@@ -2535,7 +2559,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace maintExpDate",
+			"name": "Get Asset 1 replace maintExpDate",
 			"event": [
 				{
 					"listen": "test",
@@ -2588,7 +2612,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace maintExpDate",
+			"name": "Get Asset 2 replace maintExpDate",
 			"event": [
 				{
 					"listen": "test",
@@ -2691,7 +2715,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace maintExpDate reset/clear",
+			"name": "Get Asset 1 replace maintExpDate reset/clear",
 			"event": [
 				{
 					"listen": "test",
@@ -2744,7 +2768,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace maintExpDate reset/clear",
+			"name": "Get Asset 2 replace maintExpDate reset/clear",
 			"event": [
 				{
 					"listen": "test",
@@ -2847,7 +2871,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace supportType",
+			"name": "Get Asset 1 replace supportType",
 			"event": [
 				{
 					"listen": "test",
@@ -2900,7 +2924,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace supportType",
+			"name": "Get Asset 2 replace supportType",
 			"event": [
 				{
 					"listen": "test",
@@ -3003,7 +3027,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 clear/reset supportType",
+			"name": "Get Asset 1 clear/reset supportType",
 			"event": [
 				{
 					"listen": "test",
@@ -3056,7 +3080,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 clear/reset supportType",
+			"name": "Get Asset 2 clear/reset supportType",
 			"event": [
 				{
 					"listen": "test",
@@ -3159,7 +3183,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace custom1",
+			"name": "Get Asset 1 replace custom1",
 			"event": [
 				{
 					"listen": "test",
@@ -3212,7 +3236,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace custom1",
+			"name": "Get Asset 2 replace custom1",
 			"event": [
 				{
 					"listen": "test",
@@ -3316,7 +3340,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 clear/reset custom1",
+			"name": "Get Asset 1 clear/reset custom1",
 			"event": [
 				{
 					"listen": "test",
@@ -3368,7 +3392,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 clear/reset custom",
+			"name": "Get Asset 2 clear/reset custom",
 			"event": [
 				{
 					"listen": "test",
@@ -3471,7 +3495,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace custom2",
+			"name": "Get Asset 1 replace custom2",
 			"event": [
 				{
 					"listen": "test",
@@ -3523,7 +3547,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace custom2",
+			"name": "Get Asset 2 replace custom2",
 			"event": [
 				{
 					"listen": "test",
@@ -3626,7 +3650,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 clear/reset custom2",
+			"name": "Get Asset 1 clear/reset custom2",
 			"event": [
 				{
 					"listen": "test",
@@ -3679,7 +3703,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 clear/reset custom2",
+			"name": "Get Asset 2 clear/reset custom2",
 			"event": [
 				{
 					"listen": "test",
@@ -3782,7 +3806,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 replace custom3",
+			"name": "Get Asset 1 replace custom3",
 			"event": [
 				{
 					"listen": "test",
@@ -3834,7 +3858,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 replace custom3",
+			"name": "Get Asset 2 replace custom3",
 			"event": [
 				{
 					"listen": "test",
@@ -3937,7 +3961,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 1 clear/reset custom3",
+			"name": "Get Asset 1 clear/reset custom3",
 			"event": [
 				{
 					"listen": "test",
@@ -3989,7 +4013,7 @@
 			"response": []
 		},
 		{
-			"name": "get Asset 2 clear/reset custom3",
+			"name": "Get Asset 2 clear/reset custom3",
 			"event": [
 				{
 					"listen": "test",
@@ -4132,5 +4156,6 @@
 			"value": "113848",
 			"type": "string"
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

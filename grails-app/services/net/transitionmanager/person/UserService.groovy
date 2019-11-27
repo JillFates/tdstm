@@ -69,7 +69,7 @@ class UserService implements ServiceMethods {
 		//    3. The Person.firstName+lastName match the person's AD givenname + sn properties
 
 		def persons
-		def project
+		Project project
 
 		String mn = 'findOrProvisionUser:'
 		String em
@@ -105,12 +105,8 @@ class UserService implements ServiceMethods {
 		}
 
 		project = Project.get(defaultProject)
-		if (!project) {
-			log.error "$mn Unable to find configured default project for id $defaultProject"
-			throw new ConfigurationException("Unable to find the default project for $company")
-		}
 
-		if (! projectService.companyIsAssociated(project, company) ) {
+		if (project && !projectService.companyIsAssociated(project, company) ) {
 			em = "The configured default project is not associated with the company in security settings"
 			log.error "$mn $me : project=${project.id}, company=${company.id}"
 			throw new ConfigurationException(em)
@@ -159,7 +155,7 @@ class UserService implements ServiceMethods {
 				throw new RuntimeException('Unable to associate new person to company')
 			}
 			// Create Staff relationship with the default Project
-			if (!partyRelationshipService.addProjectStaff(project, person)) {
+			if (project && !partyRelationshipService.addProjectStaff(project, person)) {
 				throw new RuntimeException('Unable to associate new person to project')
 			}
 		} else {
@@ -288,7 +284,7 @@ class UserService implements ServiceMethods {
 		// Now setup their preferences if there is no or that they are a new user
 		//
 		def pref = createUser ? null : userPreferenceService.getCurrentProjectId(userLogin)
-		if (createUser || !pref) {
+		if (project && (createUser || !pref)) {
 			// Set their default project preference
 			userPreferenceService.setCurrentProjectId(userLogin, project.id)
 			log.debug "$mn set default project preference to $project"
