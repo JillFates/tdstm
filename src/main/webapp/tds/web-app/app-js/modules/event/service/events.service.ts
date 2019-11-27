@@ -386,7 +386,7 @@ export class EventsService {
 	 * @returns {Observable<any>} Category status details
 	*/
 	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any, viewUnpublished: boolean): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}/?viewUnpublished=${viewUnpublished ? 1 : 0}`)
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}?viewUnpublished=${viewUnpublished ? 1 : 0}`)
 			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}

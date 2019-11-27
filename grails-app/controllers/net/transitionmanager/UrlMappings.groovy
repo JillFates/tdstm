@@ -271,7 +271,7 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
-		"/ws/event/taskCategoriesStats/$eventId" {
+		"/ws/event/taskCategoriesStats/$id?" {
 			controller = 'wsEvent'
 			action = [GET: 'taskCategoriesStats']
 		}

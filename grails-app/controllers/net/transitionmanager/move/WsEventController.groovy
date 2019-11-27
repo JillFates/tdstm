@@ -207,20 +207,18 @@ class WsEventController implements ControllerMethods {
 	/**
      * Used to retrieve the list of categories and various metrics for each for a given event. This is used by the
      * Event Dashboard for the lower category data elements.
-     * @param eventId - (Long) the id of the event to retrieve metrics
+     * @param id - (Long) the id of the event to retrieve metrics from
      * @param viewUnpublished - a Boolean flag if true will include unpublished tasks in the results
      */
-	def taskCategoriesStats(Long eventId) {
-		if (!eventId) {
-			throw new InvalidParamException('A valid Move Event ID is needed.')
-		}
+	def taskCategoriesStats(Long id) {
+		Project project = getProjectForWs()
+		MoveEvent moveEvent = fetchDomain(MoveEvent, [id: id], project)
 		boolean viewUnpublished = false
 		// handle the view unpublished tasks checkbox
 		if (params.containsKey('viewUnpublished') && securityService.hasPermission(Permission.TaskViewUnpublished)) {
 			viewUnpublished = params.viewUnpublished == '1'
 			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
 		}
-		Project project = getProjectForWs()
-		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, eventId, viewUnpublished))
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEvent, viewUnpublished))
 	}
 }
