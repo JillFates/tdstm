@@ -126,7 +126,7 @@ export function DeviceShowComponent(template, modelId: number, metadata: any) {
 			this.dialogService.replace(AssetEditComponent, [
 					{ provide: 'ID', useValue: this.mainAsset },
 					{ provide: 'ASSET', useValue: DOMAIN.DEVICE }],
-				DIALOG_SIZE.LG);
+				DIALOG_SIZE.XXL);
 		}
 
 		protected isManufacturerLinkAvailable(): boolean {

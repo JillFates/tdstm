@@ -99,7 +99,7 @@ export class DateUtils {
 	 * @param {sourceTime} The original source in a GMT based timezone
 	 * @returns {string} The formatted day without hh:mm:ss
 	 */
-	public static getDateFromGMT(sourceTime: Date): string {
+	public static getDateFromGMT(sourceTime: Date | String): string {
 		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
 		return sourceZonedTime.format('YYYY-MM-DD');
 	}
@@ -394,5 +394,13 @@ export class DateUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Convert a utc date string to a local date
+	 * @returns Date
+	 */
+	public static utcStringToLocalDate(utcString: string): Date | String {
+		return utcString ? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(utcString), DateUtils.SERVER_FORMAT_DATE) : '';
 	}
 }

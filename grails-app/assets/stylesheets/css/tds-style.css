@@ -12,6 +12,37 @@
   line-height: 35px;
   color: #333; }
 
+.alert.alert-info,
+.alert.alert-danger,
+.alert.alert-warning,
+.alert.alert-success {
+  padding: 0;
+  margin: 6px 0 0 0;
+  line-height: 18px;
+  font-size: 13px;
+  color: #333 !important; }
+  .alert.alert-info p,
+  .alert.alert-danger p,
+  .alert.alert-warning p,
+  .alert.alert-success p {
+    line-height: 18px;
+    font-size: 13px;
+    margin: 0;
+    padding: 0;
+    color: #333 !important; }
+
+.alert.alert-info {
+  background-color: #e1f1f6 !important; }
+
+.alert.alert-danger {
+  background-color: #f5dbd9 !important; }
+
+.alert.alert-warning {
+  background-color: #feecb5 !important; }
+
+.alert.alert-success {
+  background-color: #dff0d0 !important; }
+
 .modal {
   display: none; }
 
@@ -275,6 +306,14 @@ div.modal.no-background {
 
 div.modal.dialog-draggable-no-background {
   background: transparent !important; }
+
+.legacy-modal-header-s,
+.legacy-modal-body-s {
+  margin-left: 36px; }
+
+.modal-sidenav button i.fas,
+.modal-sidenav button i.far {
+  font-size: 15.4px; }
 
 /* This will be only used to override buttons elements in certain dialogs */
 div.ui-dialog-content div.buttons .btn.btn-default {
@@ -739,8 +778,8 @@ div.graphContainer {
     div.graphContainer div#toolsContainerId div.graphPanel {
       float: left;
       border: 1px solid #0077b8;
-      margin-left: 0px;
-      margin-top: 0px;
+      margin-left: 15px;
+      margin-top: 15px;
       padding: 5px;
       background-color: white;
       position: absolute;
@@ -754,7 +793,7 @@ div.graphContainer {
         width: 0px; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
         display: block;
-        z-index: 1000; }
+        z-index: 75; }
       div.graphContainer div#toolsContainerId div.graphPanel:not(.openPanel) {
         display: none; }
       div.graphContainer div#toolsContainerId div.graphPanel .hasChanges {
@@ -947,7 +986,7 @@ div.graphContainer.fullscreen {
 
 .customMenu {
   display: none;
-  z-index: 1000;
+  z-index: 75;
   position: fixed;
   overflow: hidden;
   border: 1px solid #CCC;
@@ -994,6 +1033,7 @@ div.graphContainer.fullscreen {
 /* Cookbook Tabs  to Clarity */
 .cookbook_recipes_editor div.tabbable ul.nav-tabs li a,
 .create-recipe-form div.tabbable ul.nav-tabs li a {
+  cursor: pointer;
   border: 0px;
   background: none;
   color: #444;
@@ -1177,9 +1217,7 @@ div.dates-info-container {
           word-break: break-word;
           border-spacing: unset; }
         .legacy-modal-dialog .legacy-modal-content .legacy-modal-body .legacy-modal-body-content .show-hide-link {
-          display: block;
-          width: 100%;
-          text-align: right;
+          float: right;
           font-size: 12px;
           font-weight: 500;
           color: #3c8dbc;
@@ -1346,23 +1384,23 @@ div.dates-info-container {
     left: 0;
     padding-top: 24px;
     border: solid 1px #ccc;
-    border-width: 0 1px 0 0; }
+    border-width: 0 1px 0 0;
+    overflow: hidden; }
     .legacy-modal-dialog .modal-sidenav .btn {
       color: #000;
       height: 40px;
       margin: 0; }
     .legacy-modal-dialog .modal-sidenav .button-label {
       display: none; }
-    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button .btn {
+    .legacy-modal-dialog .modal-sidenav.btn-link .selected-button.btn {
       border: unset;
       color: white;
-      border-radius: unset; }
+      border-radius: unset;
+      background: #0077b8;
+      cursor: default; }
 
 .tds-modal-content {
   background: #fff; }
-  .tds-modal-content.with-box-shadow {
-    -webkit-box-shadow: 0 5px 15px darkgray;
-    box-shadow: 0 5px 15px darkgray; }
   .tds-modal-content.has-side-nav .modal-header,
   .tds-modal-content.has-side-nav .modal-body {
     margin-left: 40px; }
@@ -1430,7 +1468,8 @@ div.dates-info-container {
       border: unset;
       color: white;
       border-radius: unset;
-      background: #0077b8; }
+      background: #0077b8;
+      cursor: default; }
 
 .tds-table .grid-label {
   font-size: 18px;
@@ -1761,7 +1800,7 @@ div.dates-info-container {
   margin-left: 30%; }
 
 .dep-list {
-  max-height: calc(100vh - 415px);
+  max-height: calc(100vh - 460px);
   overflow-y: auto; }
   .dep-list thead,
   .dep-list th {
@@ -2883,6 +2922,13 @@ div.content-wrapper div.execution-phase-wrapper {
   .cookbook_recipes_editor .clr-select-wrapper select,
   .recipeDetail .clr-select-wrapper select {
     display: inherit; }
+
+.cookbook_recipes_editor .recipe-add {
+  width: 40px; }
+  .cookbook_recipes_editor .recipe-add button {
+    max-height: 30px;
+    line-height: 30px;
+    min-width: 44px; }
 
 .taskGeneration .container-fluid {
   padding-left: 0px; }

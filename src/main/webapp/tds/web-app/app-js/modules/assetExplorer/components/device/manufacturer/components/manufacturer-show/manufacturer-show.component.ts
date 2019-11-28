@@ -16,7 +16,7 @@ import { Permission } from '../../../../../../../shared/model/permission.model';
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
                             <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
-                        <h4 class="modal-title">Manufacturer Show</h4>
+                        <h4 class="modal-title">Manufacturer Detail</h4>
                     </div>
                     <div class="modal-body">
                         <div class="modal-body-container">

@@ -118,9 +118,9 @@ div.graphContainer
         color: black
         font-size: 16px
         &#zoomOutButtonId
-          // background-image: url(../icons/magifier_zoom_out.png)
+        // background-image: url(../icons/magifier_zoom_out.png)
         &#zoomInButtonId
-          // background-image: url(../icons/magnifier_zoom_in.png)
+      // background-image: url(../icons/magnifier_zoom_in.png)
       div.toolButton
         width: 22px !important
         height: 22px !important
@@ -187,8 +187,8 @@ div.graphContainer
     div.graphPanel
       float: left
       border: 1px solid #0077b8
-      margin-left: 0px
-      margin-top: 0px
+      margin-left: 15px
+      margin-top: 15px
       padding: 5px
       background-color: white
       position: absolute
@@ -202,7 +202,7 @@ div.graphContainer
         width: 0px
       &.openPanel
         display: block
-        z-index: 1000
+        z-index: 75
       &:not(.openPanel)
         display: none
       .hasChanges
@@ -405,7 +405,7 @@ div.graphContainer.fullscreen
 // custom right click context menu for graphs
 .customMenu
   display: none
-  z-index: 1000
+  z-index: 75
   position: fixed
   overflow: hidden
   border: 1px solid #CCC

@@ -109,7 +109,7 @@ class ArchitectureGraphService implements ServiceMethods {
 		Set assetsList = [] as Set
 		Set dependencyList = [] as Set
 
-		if (mode == "assetId") {
+		if (rootAsset && mode == "assetId") {
 			buildArchitectureGraph([rootAsset.id], levelsDown + 1, assetsList, dependencyList)
 			buildArchitectureGraph([rootAsset.id], levelsUp, assetsList, dependencyList, false)
 		}
@@ -147,7 +147,7 @@ class ArchitectureGraphService implements ServiceMethods {
 	 *
 	 * @return A map representing the architecture graph to be rendered in the view.
 	 */
-	Map architectureGraphModelLegacy(List<Map> graphNodes = [], List<Map> graphLinks = [], Integer assetId, Integer levelsUp, Integer levelsDown) {
+	Map architectureGraphModelLegacy(List<Map> graphNodes = [], List<Map> graphLinks = [], Long assetId, Integer levelsUp, Integer levelsDown) {
 		// maps asset type names to simpler versions
 		Map assetTypes = AssetEntityService.ASSET_TYPE_NAME_MAP
 
@@ -237,9 +237,11 @@ class ArchitectureGraphService implements ServiceMethods {
 		return AssetDependency.createCriteria().list {
 			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 
-			and {
-				'in'('asset.id', assetList*.id)
-				'in'('dependent.id', assetList*.id)
+			if (assetList) {
+				and {
+					'in'('asset.id', assetList*.id)
+					'in'('dependent.id', assetList*.id)
+				}
 			}
 
 			projections {
@@ -294,7 +296,7 @@ class ArchitectureGraphService implements ServiceMethods {
 				shape     : shape,
 				size      : size,
 				title     : StringEscapeUtils.escapeHtml(StringEscapeUtils.escapeJava(assetName)),
-				color     : asset.id == rootAsset.id ? 'red' : 'grey',
+				color     : asset.id == rootAsset?.id ? 'red' : 'grey',
 				parents   : [],
 				children  : [],
 				checked   : false,

@@ -1,37 +1,57 @@
-import {Binding, Layout, Link, Margin, Node, Panel, Shape, Size, TextBlock, TreeLayout} from 'gojs';
+import {
+	Binding, GraphObject,
+	Layout,
+	Link,
+	Margin,
+	Node,
+	Panel,
+	Picture, Point,
+	Shape,
+	Size,
+	Spot,
+	TextBlock,
+	TreeLayout
+} from 'gojs';
 import {
 	ITdsContextMenuOption
 } from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
 import {IconModel, IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborhood.component';
 import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
+import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
 export class ArchitectureGraphDiagramHelper {
+
+	constructor() {
+		// Architecture Graph Diagram Helper Constructor
+	}
 
 	/**
 	 * Diagram data object
 	 */
-	static diagramData(rootAsset: number | string, currentUserId?: any, data?: any, scaleMode?: any): IDiagramData {
-		const d = this.data(data);
+	diagramData(params?: any): IDiagramData {
+		const d = this.data(params.data);
 		return {
 			nodeDataArray: d.nodeDataArray,
 			linkDataArray: d.linkDataArray,
-			currentUserId: currentUserId,
+			currentUserId: params.currentUserId,
 			ctxMenuOptions: this.contextMenuOptions(),
-			nodeTemplate: this.nodeTemplate(),
+			nodeTemplate: params.iconsOnly ?
+				this.iconOnlyNodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable })
+				: this.nodeTemplate({ isExpandable: params.extras.isExpandable && params.extras.isExpandable }),
 			linkTemplate: this.linkTemplate(),
 			lowScaleTemplate: this.lowScaleNodeTemplate(),
 			mediumScaleTemplate: this.mediumScaleNodeTemplate(),
 			layout: this.layout(),
-			autoScaleMode: !!scaleMode && scaleMode || null,
-			rootAsset: rootAsset
+			rootAsset: params.rootAsset,
+			extras: params.extras && params.extras
 		};
 	}
 
 	/**
 	 * generate model to be used by diagram with task specific data
 	 **/
-	static data(data?: any): any {
+	data(data?: any): any {
 		const nodeDataArr = [];
 		const linksPath = [];
 
@@ -39,6 +59,7 @@ export class ArchitectureGraphDiagramHelper {
 
 		dataCopy.nodes.map((t: IAssetNode) => {
 			t.key = t.id;
+			t.iconPath = t.assetClass && ASSET_ICONS[t.assetClass.toLowerCase()].icon;
 			nodeDataArr.push(t);
 		});
 		dataCopy.links
@@ -53,7 +74,7 @@ export class ArchitectureGraphDiagramHelper {
 	/**
 	 * Load events to fill events dropdown
 	 **/
-	static getLinksPath(link: any): ILinkPath {
+	getLinksPath(link: any): ILinkPath {
 		const t = Object.assign({}, link);
 		if (t) {
 			return {
@@ -64,11 +85,11 @@ export class ArchitectureGraphDiagramHelper {
 		return null;
 	}
 
-	static currentUser(): Node {
+	currentUser(): Node {
 		return null;
 	}
 
-	static nodeTemplate(): Node {
+	nodeTemplate(opts?: any): Node {
 		const node = new Node(Panel.Horizontal);
 		node.margin = new Margin(1, 1, 1, 1);
 
@@ -82,35 +103,84 @@ export class ArchitectureGraphDiagramHelper {
 		nodeShape.stroke = '#3c8dbc';
 		nodeShape.fill = '#3c8dbc';
 
-		const panelBody = new Panel(Panel.Horizontal);
+		const panelBody = new Panel(Panel.Vertical);
 		panel.padding = new Margin(0, 0, 0, 0);
 		panel.margin = new Margin(0, 0, 0, 0);
+
+		// Picture Icon
+		const iconPicture = new Picture();
+		iconPicture.desiredSize = new Size(50, 50);
+		iconPicture.bind(new Binding('source', 'assetClass',
+			(val: string) => this.getIconPath(val)));
+		iconPicture.imageAlignment = Spot.Center;
+
+		// TextBlock
 		const textBlock = new TextBlock();
 		textBlock.stroke = '#fff';
 		textBlock.bind(new Binding('text', 'name'));
+
+		panelBody.add(iconPicture);
 		panelBody.add(textBlock);
 
 		panel.add(nodeShape);
 		panel.add(panelBody);
 
 		node.add(panel);
+
+		if (opts.isExpandable) {
+			node.isTreeExpanded = false;
+			const expandButton = GraphObject.make('TreeExpanderButton');
+			node.add(expandButton);
+		}
 		node.click = (i, o) => console.log('click');
 
 		return node;
 	}
 
-	static linkTemplate(): Link {
+	iconOnlyNodeTemplate(opts?: any): Node {
+		const node = new Node(Panel.Viewbox);
+		node.position = new Point(0, 0);
+		node.maxSize = new Size(35, 60);
+
+		const panel = new Panel(Panel.Auto);
+		const panelBody = new Panel(Panel.Vertical);
+		// Picture Icon
+		const iconPicture = new Picture();
+		// iconPicture.desiredSize = new Size(80, 80);
+		iconPicture.bind(new Binding('source', 'assetClass',
+			(val: string) => this.getIconPath(val)));
+
+		panelBody.add(iconPicture);
+		panel.add(panelBody);
+		node.add(panel);
+
+		if (opts.isExpandable) {
+			node.isTreeExpanded = false;
+			const expandButton = GraphObject.make('TreeExpanderButton');
+			node.add(expandButton);
+		}
+		node.click = (i, o) => console.log('click');
+
+		return node;
+	}
+
+	private getIconPath(name: string): string {
+		const icon = ASSET_ICONS[name && name.toLowerCase()];
+		return !!icon ? icon.icon : ASSET_ICONS.application.icon;
+	}
+
+	linkTemplate(): Link {
 		const linkTemplate = new Link();
 		linkTemplate.routing = Link.AvoidsNodes;
 		linkTemplate.corner = 5;
 
 		const linkShape = new Shape();
-		linkShape.strokeWidth = 5;
+		linkShape.strokeWidth = 2;
 		linkShape.stroke = '#ddd';
 		const arrowHead = new Shape();
 		arrowHead.toArrow = 'Standard';
-		arrowHead.stroke = '#3c8dbc';
-		arrowHead.fill = '#3c8dbc';
+		arrowHead.stroke = '#c3c3c3';
+		arrowHead.fill = '#c3c3c3';
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);
@@ -118,14 +188,14 @@ export class ArchitectureGraphDiagramHelper {
 		return linkTemplate;
 	}
 
-	static layout(): Layout {
+	layout(): Layout {
 		const treeLayout = new TreeLayout();
 		treeLayout.angle = 90;
 		treeLayout.layerSpacing = 35;
 		return treeLayout;
 	}
 
-	static lowScaleNodeTemplate(): Node {
+	lowScaleNodeTemplate(): Node {
 		const node = new Node(Panel.Horizontal);
 
 		const  shape = new Shape();
@@ -141,7 +211,7 @@ export class ArchitectureGraphDiagramHelper {
 		return node;
 	}
 
-	static mediumScaleNodeTemplate(): Node {
+	mediumScaleNodeTemplate(): Node {
 
 		const node = new Node(Panel.Horizontal);
 
@@ -151,24 +221,23 @@ export class ArchitectureGraphDiagramHelper {
 		return node;
 	}
 
-	static contextMenuOptions(): ITdsContextMenuOption {
+	contextMenuOptions(): ITdsContextMenuOption {
 		return null;
 	}
 
-	static icons(): IconModel {
+	icons(): IconModel {
 		return null;
 	}
 
-	static ctxMenuActionDispatched(action: string): void {
+	ctxMenuActionDispatched(action: string): void {
 		// TODO
 	}
 
-	static nodeClicked(): void {
+	nodeClicked(): void {
 		// TODO
 	}
 
-	static animationFinished(): void {
+	animationFinished(): void {
 		// TODO
 	}
-
 }

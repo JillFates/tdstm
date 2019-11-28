@@ -6,39 +6,49 @@
 <%@page import="grails.converters.JSON"%>
 
 <div tds-autocenter tds-handle-escape (escPressed)="onCloseEdit()"
-	 class="tds-modal-content tds-angular-component-content">
+	 class="tds-modal-content has-side-nav tds-angular-component-content">
 	<div class="modal-header">
 		<tds-button-close aria-label="Close" class="close" icon="close" [flat]="true" (click)="onCloseEdit()"></tds-button-close>
-		<div class="modal-title-container">
-			<div class="badge modal-badge">A</div>
-			<h4 class="modal-title">${asset.assetName}</h4>
-			<div class="modal-subtitle">${asset?.moveBundle}</div>
-			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-		</div>
-		<div class="modal-description">
-			<div *ngIf="readMore">
-				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+
+		<div class="clr-row">
+			<div class="clr-col-12">
+				<%-- TODO: Implement badge with correct color and rounded corners. --%>
+				<div class="modal-title-container">
+					<div class="badge modal-badge" style="">A</div>
+					<h4 class="modal-title">${asset.assetName}</h4>
+					<%-- TODO: Update Subtitle content with field --%>
+					<div class="modal-subtitle">${asset?.moveBundle}</div>
+					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
+				</div>
+
+				<div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
+					<div *ngIf="readMore">
+						<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+					</div>
+					<div *ngIf="!readMore" class="readMore">
+						<g:if test="${asset.description?.length() > 80}">
+							<div class="truncated-description">${asset.description.substring(0,80)}...</div>
+							<a (click)="readMore = !readMore">Read More</a>
+						</g:if>
+						<g:else>
+							<div class="truncated-description">${asset.description}</div>
+						</g:else>
+					</div>
+				</div>
 			</div>
-			<div *ngIf="!readMore" class="readMore">
-				<g:if test="${asset.description?.length() > 80}">
-					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
-					<a (click)="readMore = !readMore">Read More</a>
-				</g:if>
-				<g:else>
-					<div class="truncated-description">${asset.description}</div>
-				</g:else>
+			<div class="clr-col-12">
+				<tds-tab-scroller>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Details</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Supports/Depends</button>
+					</tds-scroller-item>
+				</tds-tab-scroller>
 			</div>
 		</div>
-		<tds-tab-scroller>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Details</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Supports/Depends</button>
-			</tds-scroller-item>
-		</tds-tab-scroller>
 	</div>
-	<div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+	<div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
 		<form
 			name="form"
 			(ngSubmit)="form.form.valid && onUpdate()"

@@ -219,7 +219,7 @@
         <div class="pull-right hidden-xs">
             <span>${buildInfo}</span>
         </div>
-        <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} .</strong> All rights reserved.
+        <strong><a href="http://www.transitionaldata.com/service/transitionmanager" target="_blank">&nbsp;TransitionManager&trade;</a> 2010-${Calendar.getInstance().get(Calendar.YEAR)} . </strong> </strong><i><strong> Patent Pending</strong></i> All rights reserved.
         <!-- /.container -->
     </footer>
 </div>

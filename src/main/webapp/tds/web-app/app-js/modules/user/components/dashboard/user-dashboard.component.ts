@@ -28,7 +28,7 @@ import { Store } from '@ngxs/store';
 import {SetProject} from '../../../project/actions/project.actions';
 import {TaskEditCreateModelHelper} from '../../../taskManager/components/common/task-edit-create-model.helper';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {TaskEditComponent} from '../../../taskManager/components/edit/task-edit.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {clone} from 'ramda';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 
@@ -200,7 +200,7 @@ export class UserDashboardComponent implements OnInit {
 				model.instructionLink = modelHelper.getInstructionsLink(taskDetailModel.detail);
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
-				this.dialogService.extra(TaskEditComponent, [
+				this.dialogService.extra(TaskEditCreateComponent, [
 					{ provide: TaskDetailModel, useValue: clone(model) }
 				], false, false)
 					.then(result => {
@@ -287,7 +287,7 @@ export class UserDashboardComponent implements OnInit {
 		this.dialogService.open(AssetShowComponent, [
 			{provide: 'ID', useValue: id},
 			{provide: 'ASSET', useValue: assetClass}
-		], DIALOG_SIZE.LG);
+		], DIALOG_SIZE.XXL);
 	}
 
 	public handlePersonClicked(event): void {

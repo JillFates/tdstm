@@ -3,91 +3,97 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content has-side-nav tds-angular-component-content">
     <div class="modal-header">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
-        <div class="modal-title-container">
-            <div class="badge modal-badge" style="">D</div>
-			<h4 class="modal-title">${asset.assetName}</h4>
-			<div class="modal-subtitle">${asset?.moveBundle}</div>
-			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-		</div>
-        <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
-			<div *ngIf="readMore">
-				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
-			</div>
-			<div *ngIf="!readMore" class="readMore">
-				<g:if test="${asset.description?.length() > 80}">
-					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
-					<a (click)="readMore = !readMore">Read More</a>
-				</g:if>
-				<g:else>
-					<div class="truncated-description">${asset.description}</div>
-				</g:else>
-			</div>
-		</div>
-		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">        
-			<tds-scroller-item>
-				<button tdsScrollerLink>
-					{{ showDetails ? "Details" : "Summary"}}
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Supports 					
-					<span class="badge">
-						<g:if test="${supportAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${supportAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Depends On 					
-					<span class="badge">
-						<g:if test="${dependentAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${dependentAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-            <tds-scroller-item>
-				<button tdsScrollerLink>Tasks 					
-					<span class="badge">
-						<g:if test="${taskCount > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${taskCount}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Comments 					
-					<span class="badge">
-						<g:if test="${commentCount > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${commentCount}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-		</tds-tab-scroller>
-        <div  class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-            <tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" (expandActionDispatched)="onExpandActionDispatched()" [linkTemplate]="linkTemplate$ | async" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+
+        <div class="clr-row">
+            <div class="clr-col-6">
+                <div class="modal-title-container">
+                    <div class="badge modal-badge" style="">D</div>
+                    <h4 class="modal-title">${asset.assetName}</h4>
+                    <div class="modal-subtitle">${asset?.moveBundle}</div>
+                    <div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
+                </div>
+                <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
+                    <div *ngIf="readMore">
+                        <p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+                    </div>
+                    <div *ngIf="!readMore" class="readMore">
+                        <g:if test="${asset.description?.length() > 80}">
+                            <div class="truncated-description">${asset.description.substring(0,80)}...</div>
+                            <a (click)="readMore = !readMore">Read More</a>
+                        </g:if>
+                        <g:else>
+                            <div class="truncated-description">${asset.description}</div>
+                        </g:else>
+                    </div>
+                </div>
+            </div>
+            <div  class="clr-col-6">
+                <div class="minimized-arch-thumbnail" *ngIf="!!showDetails">
+                    <tds-lib-diagram-layout
+                            [data]="data$ | async"
+                            [layout]="diagramLayout$ | async"
+                            [linkTemplate]="linkTemplate$ | async"
+                            (expandActionDispatched)="onExpandActionDispatched()"
+                            [hideExpand]="false"
+                            [hideOverview]="true"
+                            [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
+                </div>
+            </div>
+            <div class="clr-col-12">
+                <tds-tab-scroller>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>
+                            {{ showDetails ? "Details" : "Summary"}}
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Supports
+                            <span class="badge">
+                                <g:if test="${supportAssets.size() > 99}">
+                                    99+
+                                </g:if>
+                                <g:else>
+                                    ${supportAssets.size()}
+                                </g:else>
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Depends On
+                            <span class="badge">
+                                <g:if test="${dependentAssets.size() > 99}">
+                                    99+
+                                </g:if>
+                                <g:else>
+                                    ${dependentAssets.size()}
+                                </g:else>
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Tasks
+                            <span class="badge">
+                                {{ taskCount > 99 ? '99+' : taskCount }}
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                    <tds-scroller-item>
+                        <button tdsScrollerLink>Comments
+                            <span class="badge">
+                                {{ commentCount > 99 ? '99+' : commentCount }}
+                            </span>
+                        </button>
+                    </tds-scroller-item>
+                </tds-tab-scroller>
+            </div>
         </div>
     </div>
-    <div class="modal-body" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
+    <div class="modal-body asset-crud" [ngClass]="{'has-description': ${!!asset.description?.trim()}, 'no-description': ${!asset.description?.trim()}}" tdsScrollContainer style="position: relative">
         <div tdsScrollSection class="clr-row">
             <div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
                 <g:if test="${errors}">
@@ -95,10 +101,10 @@
                 </g:if>
                 <table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
                     <tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
-                        <tds:clrRowDetail field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+                        <tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.assetType}" value="${assetEntity.assetType}" />
+                        <tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
-                        <tr>
+                        <tr style="order: 35">
                             <tds:clrInputLabel field="${standardFieldSpecs.manufacturer}" value="${asset.manufacturer}"/>
                             <td>
                                 <a *ngIf="isManufacturerLinkAvailable()" (click)="showManufacturer('${assetEntity.manufacturer?.id}')">
@@ -108,9 +114,9 @@
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.priority}" value="${asset.priority}" />
+                        <tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.priority}" value="${asset.priority}" />
 
-                        <div class="source-target-wrapper">
+                        <div  style="order: 25" class="source-target-wrapper">
                             <tr>
                                 <th class="${standardFieldSpecs.locationSource.imp?:''} header-label">Source</th>
                             </tr>
@@ -140,11 +146,18 @@
                                     <td>${assetEntity.sourceRackPosition}</td>
                                 </tr>
                             </g:if>
+
+                            <g:if test="${assetEntity.assetType in ['Blade']}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Source Blade Chassis</th>
+                                    <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
+                                </tr>
+                            </g:if>
                         </div>
 
-                        <div class="source-target-wrapper">
+                        <div style="order: 30" class="source-target-wrapper">
                             <tr>
-                                <th colspan="2" class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
+                                <th class="${standardFieldSpecs.locationTarget.imp?:''} header-label">Target</th>
                             </tr>
                             <tr>
                                 <th class="${standardFieldSpecs.locationTarget.imp?:''}">Target Location</th>
@@ -171,9 +184,16 @@
                                     <td>${assetEntity.targetRackPosition}</td>
                                 </tr>
                             </g:if>
+
+                            <g:if test="${assetEntity.assetType in ['Blade']}">
+                                <tr>
+                                    <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Target Blade Chassis</th>
+                                    <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${targetChassis}</td>
+                                </tr>
+                            </g:if>
                         </div>
 
-                        <tr>
+                        <tr style="order: 45">
                             <tds:clrInputLabel field="${standardFieldSpecs.model}" value="${asset.model}"/>
                             <td>
                                 <a *ngIf="isModelLinkAvailable()"
@@ -182,37 +202,21 @@
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.shortName}" value="${asset.shortName}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.os}" value="${asset.os}" />
+                        <tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.ipAddress}" value="${asset.ipAddress}" />
+                        <tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.shortName}" value="${asset.shortName}" />
+                        <tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.os}" value="${asset.os}" />
+                        <tds:clrRowDetail style="order: 65" field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" />
+                        <tds:clrRowDetail style="order: 70" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+                        <tds:clrRowDetail style="order: 85" field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" />
 
-
-                        <g:if test="${assetEntity.assetType in ['Blade']}">
-                            <tr>
-                                <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Source Blade Chassis</th>
-                                <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${sourceChassis}</td>
-                            </tr>
-                        </g:if>
-
-                        <g:if test="${assetEntity.assetType in ['Blade']}">
-                            <tr>
-                                <th class="${standardFieldSpecs.sourceChassis.imp?:''}">Target Blade Chassis</th>
-                                <td class="bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}">${targetChassis}</td>
-                            </tr>
-                        </g:if>
-
-                        <tds:clrRowDetail field="${standardFieldSpecs.serialNumber}" value="${asset.serialNumber}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.assetTag}" value="${asset.assetTag}" />
-
-                        <tr>
+                        <tr style="order: 90">
                             <tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntity.retireDate}" />
                             <td>
                                 {{ '${assetEntity?.retireDate}' | tdsDate: userDateFormat }}
                             </td>
                         </tr>
 
-                        <tr>
+                        <tr style="order: 75">
                             <th class="${standardFieldSpecs.moveBundle.imp?:''}">
                                 ${standardFieldSpecs.moveBundle.label} : Dep. Group
                             </th>
@@ -224,32 +228,32 @@
                             </td>
                         </tr>
 
-                        <tr>
+                        <tr style="order: 80">
                             <th class="${standardFieldSpecs.size.imp?:''}">Size/Scale</th>
                             <td>${assetEntity.size} ${assetEntity.scale?.value()}</td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.railType}" value="${asset.railType}" />
+                        <tds:clrRowDetail style="order: 100" field="${standardFieldSpecs.railType}" value="${asset.railType}" />
 
-                        <tr>
+                        <tr style="order: 105">
                             <tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntity.maintExpDate}" />
                             <td>
                                 {{ '${assetEntity?.maintExpDate}' | tdsDate: userDateFormat }}
                             </td>
                         </tr>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
-                        <tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+                        <tds:clrRowDetail style="order: 95" field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}" />
+                        <tds:clrRowDetail style="order: 115" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+                        <tds:clrRowDetail style="order: 120" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 
                         <g:if test="! assetEntity.isVM()">
-                            <tr>
+                            <tr style="order: 125">
                                 <th class="${standardFieldSpecs.truck.imp?:''}">Truck/Cart/Shelf</th>
                                 <td>${assetEntity.truck ?: ' '} / ${assetEntity.cart ?: ' '} / ${assetEntity.shelf ?: ' '}</td>
                             </tr>
                         </g:if>
 
-                        <tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${asset.validation}" />
+                        <tds:clrRowDetail style="order: 110" field="${standardFieldSpecs.validation}" value="${asset.validation}" />
 
                         <g:render template="/angular/common/customShow"></g:render>       
                     </tbody>
@@ -261,7 +265,14 @@
 				</a>
             </div>
             <div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-				<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" (expandActionDispatched)="onExpandActionDispatched()" [linkTemplate]="linkTemplate$ | async" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
+                <tds-lib-diagram-layout
+                        [data]="data$ | async"
+                        [layout]="diagramLayout$ | async"
+                        [linkTemplate]="linkTemplate$ | async"
+                        (expandActionDispatched)="onExpandActionDispatched()"
+                        [hideExpand]="false"
+                        [hideOverview]="true"
+                        [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
 			</div>
         </div>
     
@@ -331,6 +342,10 @@
 						(click)="onDeleteAsset()">
 				</tds-button-delete>
 			</tds:hasPermission>
+            <tds-button-close
+                tooltip="Close"
+                (click)="cancelCloseDialog()">
+			</tds-button-close>
 		</nav>
 	</div>
 </div>

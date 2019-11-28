@@ -42,7 +42,7 @@
 	</div>	
 	<div class="generateWrapper">
 		<label for="generateTask">
-            <button class="btn"  id="generateTask"  ng-click="createRecipe()" ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
+            <button type="button" class="btn"  id="generateTask"  ng-disabled="!contexts.validCurrentSelection" ng-click="tasks.generateTask(this)">
                 <img ng-src="{{applyRootPath('/assets/icons/svg/file-settings-line.svg')}}" height="20px" />
                 Generate Tasks
             </button>

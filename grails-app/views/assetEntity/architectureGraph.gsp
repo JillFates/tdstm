@@ -22,7 +22,7 @@
 	<asset:stylesheet href="css/force.css" />
 </head>
 <body>
-	<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/>
+<tds:subHeader title="Architecture Graph" crumbs="['Assets','Architecture']"/>
 <div id="body" class="body" ng-app="tdsComments" ng-controller="tds.comments.controller.MainController as comments">
 	<g:if test="${flash.message}">
 		<div class="message">${flash.message}</div>

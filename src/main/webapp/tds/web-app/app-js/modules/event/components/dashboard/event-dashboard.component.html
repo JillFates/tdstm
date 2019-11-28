@@ -3,22 +3,42 @@
 		<div class="panel-body">
 			<div class="row">
 				<div class="box-header">
-					<div class="col-md-4">
+					<div class="col-md-5">
 						<div class="event-selector">
-							<span class="event-title">{{'EVENT.EVENT' | translate}}:</span>
-							<kendo-dropdownlist [data]="eventList" [(ngModel)]="selectedEvent"
-												(ngModelChange)="onSelectedEvent($event.id, $event.name)"
-												textField="name" valueField="id">
+							<span class="event-title"
+								>{{ 'EVENT.EVENT' | translate }}:</span
+							>
+							<kendo-dropdownlist
+								[data]="eventList"
+								[(ngModel)]="selectedEvent"
+								(ngModelChange)="
+									onSelectedEvent($event.id, $event.name)
+								"
+								textField="name"
+								valueField="id"
+							>
 							</kendo-dropdownlist>
-							<label for="agreement" class="aligned-label dontshow-again">
-								<input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
-									   [(ngModel)]="includeUnpublished"> {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+							<label
+								for="agreement"
+                                class="dontshow-again"
+                                style="display: flex;"
+							>
+								<input
+									type="checkbox"
+									name="agreement"
+									id="agreement"
+									clrCheckbox
+									[(ngModel)]="includeUnpublished"
+								/>
+								{{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
 							</label>
 						</div>
 					</div>
-					<div class="col-md-6"></div>
+					<div class="col-md-5"></div>
 					<div class="col-md-2 pull-right">
-						<tds-pie-countdown (timeout)="onTimeout()"></tds-pie-countdown>
+						<tds-pie-countdown
+							(timeout)="onTimeout()"
+						></tds-pie-countdown>
 					</div>
 				</div>
 			</div>
@@ -27,19 +47,26 @@
 			<div class="row">
 				<div class="col-md-2">
 					<tds-plan-versus-status
-                        #planVersusStatus
+						#planVersusStatus
 						[hasBundleSteps]="hasBundleSteps"
 						(changeProgress)="onChangeStatus($event)"
 						[currentProgress]="eventPlanStatus.dialIndicator"
-						[isDisabled]="!isEventSelected()">
+						[isDisabled]="!isEventSelected()"
+					>
 					</tds-plan-versus-status>
 				</div>
 				<div class="col-md-4">
-					<tds-event-resume [event]="eventPlanStatus"></tds-event-resume>
+					<tds-event-resume
+						[event]="eventPlanStatus"
+					></tds-event-resume>
 				</div>
 				<div class="col-md-4">
-					<tds-news [news]="newsList" [isDisabled]="!isEventSelected()" (create)="onCreateNews()"
-							  (selected)="onSelectedNews($event)"></tds-news>
+					<tds-news
+						[news]="newsList"
+						[isDisabled]="!isEventSelected()"
+						(create)="onCreateNews()"
+						(selected)="onSelectedNews($event)"
+					></tds-news>
 				</div>
 				<div class="col-md-2"></div>
 			</div>
@@ -54,223 +81,175 @@
 			<div class="row task-section">
 				<div class="col-md-2">
 					<div class="task-count-container">
-						<span class="task-count">{{eventDetails.remainTaskCount | number}}</span>
+						<span class="task-count">{{
+							eventDetails.remainTaskCount | number
+						}}</span>
 						<h5>Tasks Remaining</h5>
 					</div>
 				</div>
 				<div class="col-md-4">
 					<div class="task-effort-container">
-						<div class="task-title"># of<br/>
+						<div class="task-title">
+							# of<br />
 							Tasks
 						</div>
 						<div class="task-graph-section">
 							<div class="task-graph-container">
-								<div class="task-done task-item"
-									 [style.width.%]="eventDetails.percTaskDone">
-									{{eventDetails.percTaskDone < 5 ? '' : eventDetails.percTaskDone + '%'}}
+								<div
+									class="task-done task-item"
+									[style.width.%]="eventDetails.percTaskDone"
+								>
+									{{
+										eventDetails.percTaskDone < 5
+											? ''
+											: eventDetails.percTaskDone + '%'
+									}}
 								</div>
-								<div class="task-ready task-item"
-									 [style.width.%]="eventDetails.percTaskReady"></div>
-								<div class="task-started task-item"
-									 [style.width.%]="eventDetails.percTaskStarted"></div>
+								<div
+									class="task-ready task-item"
+									[style.width.%]="eventDetails.percTaskReady"
+								></div>
+								<div
+									class="task-started task-item"
+									[style.width.%]="
+										eventDetails.percTaskStarted
+									"
+								></div>
 							</div>
 							<div class="fixed-tasks">
 								<div class="task-done fixed-status">
-									<a [routerLink]="['/taskManager', 'list']"
-									   [queryParams]="{status: 'Completed'}">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Completed' }"
+									>
 										<div>Done</div>
-										<div>{{eventDetails.countDone}}</div>
+										<div>{{ eventDetails.countDone }}</div>
 									</a>
 								</div>
 								<div class="task-started fixed-status">
-									<a [routerLink]="['/taskManager', 'list']"
-									   [queryParams]="{status: 'Started'}">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Started' }"
+									>
 										<div>Started</div>
-										<div>{{eventDetails.countStarted}}</div>
+										<div>
+											{{ eventDetails.countStarted }}
+										</div>
 									</a>
 								</div>
 								<div class="task-ready fixed-status">
-									<a [routerLink]="['/taskManager', 'list']"
-									   [queryParams]="{status: 'Ready'}">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Ready' }"
+									>
 										<div>Ready</div>
-										<div>{{eventDetails.countReady}}</div>
+										<div>{{ eventDetails.countReady }}</div>
 									</a>
 								</div>
 								<div class="task-hold fixed-status">
-									<a [routerLink]="['/taskManager', 'list']"
-									   [queryParams]="{status: 'Hold'}">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Hold' }"
+									>
 										<div>Hold</div>
-										<div>{{eventDetails.countHold}}</div>
+										<div>{{ eventDetails.countHold }}</div>
 									</a>
 								</div>
 								<div class="task-pending fixed-status">
-									<a [routerLink]="['/taskManager', 'list']"
-									   [queryParams]="{status: 'Pending'}">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Pending' }"
+									>
 										<div>Pending</div>
-										<div>{{eventDetails.countPending}}</div>
+										<div>
+											{{ eventDetails.countPending }}
+										</div>
 									</a>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="task-effort-container">
-						<div class="task-title">Level <br/>of
-							Effort
-						</div>
+						<div class="task-title">Level <br />of Effort</div>
 						<div class="task-graph-section">
 							<div class="task-graph-container">
-								<div class="task-done task-item"
-									 [style.width.%]="eventDetails.percDurationDone">
-									{{eventDetails.percDurationDone < 5 ? '' : eventDetails.percDurationDone + '%'}}
+								<div
+									class="task-done task-item"
+									[style.width.%]="
+										eventDetails.percDurationDone
+									"
+								>
+									{{
+										eventDetails.percDurationDone < 5
+											? ''
+											: eventDetails.percDurationDone +
+											  '%'
+									}}
 								</div>
-								<div class="task-started task-item"
-									 [style.width.%]="eventDetails.percDurationStarted"></div>
-								<div class="task-ready task-item"
-									 [style.width.%]="eventDetails.percDurationReady"></div>
+								<div
+									class="task-started task-item"
+									[style.width.%]="
+										eventDetails.percDurationStarted
+									"
+								></div>
+								<div
+									class="task-ready task-item"
+									[style.width.%]="
+										eventDetails.percDurationReady
+									"
+								></div>
 							</div>
 							<div class="fixed-tasks">
 								<div class="task-done fixed-status">
 									<div>Done</div>
-									<div>{{eventDetails.effortRemainDone}}</div>
+									<div>
+										{{ eventDetails.effortRemainDone }}
+									</div>
 								</div>
 								<div class="task-started fixed-status">
 									<div>Started</div>
-									<div>{{eventDetails.effortRemainStarted}}</div>
+									<div>
+										{{ eventDetails.effortRemainStarted }}
+									</div>
 								</div>
 								<div class="task-ready fixed-status">
 									<div>Ready</div>
-									<div>{{eventDetails.effortRemainReady}}</div>
+									<div>
+										{{ eventDetails.effortRemainReady }}
+									</div>
 								</div>
 								<div class="task-hold fixed-status">
 									<div>Hold</div>
-									<div>{{eventDetails.effortRemainHold}}</div>
+									<div>
+										{{ eventDetails.effortRemainHold }}
+									</div>
 								</div>
 								<div class="task-pending fixed-status">
 									<div>Pending</div>
-									<div>{{eventDetails.effortRemainPending}}</div>
+									<div>
+										{{ eventDetails.effortRemainPending }}
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-6">
-					<tds-team-task-percents *ngIf="eventDetails" [teamTaskMatrix]="teamTaskMatrix">
+					<tds-team-task-percents
+						*ngIf="eventDetails"
+						[teamTaskMatrix]="teamTaskMatrix"
+					>
 					</tds-team-task-percents>
 				</div>
 			</div>
 			<div class="row task-category-container">
 				<tds-task-category
-                    #taskCategory
+					#taskCategory
 					*ngIf="taskCategories"
-					[taskCategories]="taskCategories">
-				</tds-task-category>
+					[taskCategories]="taskCategories"
+
+				[scrollPosition]="taskCategoryScrollPosition"></tds-task-category>
 			</div>
 		</div>
 	</div>
-
-<!--	<div class="panel">-->
-<!--		<div class="panel-body">-->
-<!--			<div class="box-header">-->
-<!--				{{'DASHBOARD.INSIGHT_DATA' | translate}}-->
-<!--			</div>-->
-<!--		</div>-->
-<!--		<div class="row">-->
-<!--			<div class="col-md-4">-->
-<!--				<div>-->
-<!--					&lt;!&ndash;					add table here&ndash;&gt;-->
-<!--					<tds-button-collapse [title]="'DASHBOARD.ASSETS_BY_VENDOR' | translate" (click)="toggleTableFor('ASSETS_BY_VENDOR')" ></tds-button-collapse>-->
-<!--					<div class="table" *ngIf="showAssetsByVendorTable">-->
-<!--						<kendo-grid [data]="insightData?.assetsByVendor" [height]="200">-->
-<!--							<kendo-grid-column field="name" title="Name" width="30">-->
-<!--							</kendo-grid-column>-->
-<!--							<kendo-grid-column field="count" title="Count" width="10">-->
-<!--							</kendo-grid-column>-->
-<!--						</kendo-grid>-->
-<!--					</div>-->
-<!--					<kendo-chart style="height: 400px;">-->
-<!--						<kendo-chart-title text="{{'DASHBOARD.ASSETS_BY_VENDOR' | translate}}"></kendo-chart-title>-->
-<!--						<kendo-chart-series>-->
-<!--							<kendo-chart-series-item-->
-<!--								type="column" [data]="insightData?.assetsByVendor"-->
-<!--								field="count" categoryField="name">-->
-<!--							</kendo-chart-series-item>-->
-<!--						</kendo-chart-series>-->
-<!--					</kendo-chart>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--			<div class="col-md-4">-->
-<!--				<div>-->
-<!--					<tds-button-collapse [title]="'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate" (click)="toggleTableFor('APPLICATION_GROUPED_BY_DEPENDENCIES')" ></tds-button-collapse>-->
-<!--					<div class="table" *ngIf="showApplicationGroupedByDependencies">-->
-<!--						<kendo-grid [data]="insightData?.applicationsGroupedByDependencies" [height]="200">-->
-<!--							<kendo-grid-column field="level" title="Level" width="30">-->
-<!--							</kendo-grid-column>-->
-<!--							<kendo-grid-column field="count" title="Count" width="10">-->
-<!--							</kendo-grid-column>-->
-<!--						</kendo-grid>-->
-<!--					</div>-->
-<!--					<kendo-chart style="height: 400px;">-->
-<!--						<kendo-chart-title text="{{'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate}}"></kendo-chart-title>-->
-<!--						<kendo-chart-series>-->
-<!--							<kendo-chart-series-item-->
-<!--								type="bar" [data]="insightData?.applicationsGroupedByDependencies"-->
-<!--								field="count" categoryField="level">-->
-<!--							</kendo-chart-series-item>-->
-<!--						</kendo-chart-series>-->
-<!--					</kendo-chart>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--			<div class="col-md-4">-->
-<!--				<div>-->
-<!--					<tds-button-collapse [title]="'DASHBOARD.DEPENDENCIES_BY_VENDOR' | translate" (click)="toggleTableFor('DEPENDENCIES_BY_VENDOR')" ></tds-button-collapse>-->
-<!--					<div class="table" *ngIf="showDependenciesByVendor">-->
-<!--						<kendo-grid [data]="insightData?.dependenciesByVendor" [height]="200">-->
-<!--							<kendo-grid-column field="name" title="Name" width="30">-->
-<!--							</kendo-grid-column>-->
-<!--							<kendo-grid-column field="count" title="Count" width="10">-->
-<!--							</kendo-grid-column>-->
-<!--						</kendo-grid>-->
-<!--					</div>-->
-<!--					<kendo-chart style="height: 400px;">-->
-<!--						<kendo-chart-title text="{{'DASHBOARD.DEPENDENCIES_BY_VENDOR' | translate}}"></kendo-chart-title>-->
-<!--						<kendo-chart-series>-->
-<!--							<kendo-chart-series-item-->
-<!--								type="column" [data]="insightData?.dependenciesByVendor"-->
-<!--								field="count" categoryField="name">-->
-<!--							</kendo-chart-series-item>-->
-<!--						</kendo-chart-series>-->
-<!--					</kendo-chart>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--		<div class="row">-->
-<!--			<div class="col-md-4">-->
-<!--				<div>-->
-<!--					<tds-button-collapse [title]="'DASHBOARD.TOP_TAGS' | translate" (click)="toggleTableFor('TOP_TAGS')" ></tds-button-collapse>-->
-<!--					<div class="table" *ngIf="showTopTags" >-->
-<!--						<kendo-grid [data]="insightData?.topTags" [height]="200">-->
-<!--							<kendo-grid-column field="name" title="Name" width="30">-->
-<!--							</kendo-grid-column>-->
-<!--							<kendo-grid-column field="count" title="Count" width="10">-->
-<!--							</kendo-grid-column>-->
-<!--						</kendo-grid>-->
-<!--					</div>-->
-<!--					<kendo-chart [pannable]="true" [zoomable]="true">-->
-<!--						<kendo-chart-title text="{{'DASHBOARD.TOP_TAGS' | translate}}"></kendo-chart-title>-->
-<!--						<kendo-chart-series>-->
-<!--							<kendo-chart-series-item-->
-<!--								type="donut"-->
-<!--								[data]="insightData?.topTags"-->
-<!--								field="count"-->
-<!--								categoryField="name">-->
-<!--							</kendo-chart-series-item>-->
-<!--						</kendo-chart-series>-->
-<!--					</kendo-chart>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--			<div class="col-md-4"></div>-->
-<!--			<div class="col-md-4"></div>-->
-<!--		</div>-->
-<!--	</div>-->
-
 </div>

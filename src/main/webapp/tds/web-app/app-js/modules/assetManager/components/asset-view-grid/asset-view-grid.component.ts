@@ -55,7 +55,7 @@ import {AssetEditComponent} from '../../../assetExplorer/components/asset/asset-
 import {AssetCreateComponent} from '../../../assetExplorer/components/asset/asset-create.component';
 import {AssetCloneComponent} from '../../../assetExplorer/components/asset-clone/asset-clone.component';
 import {CloneCLoseModel} from '../../../assetExplorer/model/clone-close.model';
-import {TaskCreateComponent} from '../../../taskManager/components/create/task-create.component';
+import {TaskEditCreateComponent} from '../../../taskManager/components/edit-create/task-edit-create.component';
 import {UserService} from '../../../auth/service/user.service';
 import {TaskDetailModel} from '../../../taskManager/model/task-detail.model';
 import {BulkChangeButtonComponent} from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
@@ -345,7 +345,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			this.dialog.open(AssetShowComponent, [
 				{ provide: 'ID', useValue: id },
 				{ provide: 'ASSET', useValue: assetClass }],
-				DIALOG_SIZE.LG).then(x => {
+				DIALOG_SIZE.XXL).then(x => {
 					this.createDependencyPromise(x.assetClass, x.id);
 				}).catch(x => {
 					console.log(x);
@@ -361,7 +361,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(AssetShowComponent, [
 			{ provide: 'ID', useValue: data['common_id'] },
 			{ provide: 'ASSET', useValue: data['common_assetClass'] }],
-			DIALOG_SIZE.LG, false)
+			DIALOG_SIZE.XXL, false)
 			.then(asset => {
 				if (asset) {
 					this.createDependencyPromise(asset.assetClass, asset.id);
@@ -382,7 +382,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		}
 		this.dialog.open(AssetCreateComponent, [
 				{provide: 'ASSET', useValue: assetEntityType}],
-			DIALOG_SIZE.LG, false).then(x => {
+			DIALOG_SIZE.XXL, false).then(x => {
 			if (x) {
 				this.createDependencyPromise(x.assetClass, 0);
 			}
@@ -427,7 +427,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
+		], DIALOG_SIZE.XXL, true).then(result => {
 			if (result) {
 				console.log('Show Task Result',  result);
 			}
@@ -457,7 +457,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			}
 		};
 
-		this.dialog.extra(TaskCreateComponent, [
+		this.dialog.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {
@@ -484,7 +484,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.dialog.open(TaskCommentDialogComponent, [
 			{provide: AssetModalModel, useValue: assetModalModel},
 			{provide: 'currentUserId', useValue: this.currentUser.id}
-		], DIALOG_SIZE.LG, true).then(result => {
+		], DIALOG_SIZE.XXL, true).then(result => {
 			if (result) {
 				console.log('Show Comment Result',  result);
 			}
@@ -529,7 +529,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 		];
 
-		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.LG)
+		this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL)
 			.then(() => {
 				this.onReload();
 				this.assetTagUIWrapperService.updateTagsWidth('.single-line-tags' , 'span.dots-for-tags');
@@ -557,7 +557,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 					{ provide: 'ASSET', useValue: dataItem.common_assetClass }
 				];
 
-				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+				this.dialog.open(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 			} else if (!result.clonedAsset && result.showView) {
 				const data: any = {
 					common_id: result.assetId,

@@ -12,7 +12,6 @@ import {TaskNotesColumnsModel} from '../../../../shared/components/task-notes/mo
 import {Permission} from '../../../../shared/model/permission.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.model';
-import {TaskEditComponent} from '../edit/task-edit.component';
 import {clone} from 'ramda';
 import {TaskEditCreateModelHelper} from '../common/task-edit-create-model.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -21,7 +20,7 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {AlertType} from '../../../../shared/model/alert.model';
 import {NotifierService} from '../../../../shared/services/notifier.service';
-import {TaskCreateComponent} from '../create/task-create.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { TaskActionSummaryComponent } from '../task-actions/task-action-summary.component';
@@ -76,9 +75,14 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
+		// DateUtils.convertFromGMT(this.value, this.userPreferenceService.getUserTimeZone())
+		this.userPreferenceService.getPreferences(PREFERENCES_LIST.CURR_TZ, PREFERENCES_LIST.CURRENT_DATE_FORMAT)
+			.subscribe((preferences: any[]) => {
 			this.hasChanges = false;
-			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+
+			this.dateFormat = preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
+			this.userTimeZone = preferences[PREFERENCES_LIST.CURR_TZ] || DateUtils.TIMEZONE_GMT;
+
 			if (this.taskDetailModel.detail && this.taskDetailModel.detail.currentUserId) {
 				this.currentUserId = parseInt(this.taskDetailModel.detail.currentUserId, 10);
 			} else {
@@ -101,7 +105,6 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 					this.dismiss();
 					return;
 				}
-				this.dateFormat = this.userPreferenceService.getUserDateFormat();
 				this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
 				this.taskDetailModel.detail = res;
 
@@ -268,7 +271,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				[UIDialogService,
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }
-				], DIALOG_SIZE.LG);
+				], DIALOG_SIZE.XXL);
 
 			this.close();
 		} else {
@@ -287,7 +290,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 	 */
 	public onAddTaskDependency(taskList: any[], gridHelper: any): void {
 		let taskCreateModel: TaskDetailModel = {
-			id: this.model.asset.id, // dataItem.common_id,
+			id: this.model.id,
 			modal: {
 				title: 'Create Task',
 				type: ModalType.CREATE
@@ -296,11 +299,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				assetClass: this.model.assetClass,
 				assetEntity: this.model.asset.id,
 				assetName:  this.model.assetName,
-				currentUserId: this.model.assignedTo.id
+				currentUserId: this.model.assignedTo.id,
+				event: this.model.event
 			}
 		};
 
-		this.dialogService.extra(TaskCreateComponent, [
+		this.dialogService.extra(TaskEditCreateComponent, [
 			{provide: TaskDetailModel, useValue: taskCreateModel}
 		], false, false)
 			.then(result => {

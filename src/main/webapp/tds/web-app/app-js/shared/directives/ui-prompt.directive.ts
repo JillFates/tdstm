@@ -13,9 +13,9 @@ declare var jQuery: any;
 @Component({
 	selector: 'tds-ui-prompt',
 	template: `
-        <div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-sm">
-                <div class="tds-modal-content with-box-shadow">
+		<div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-sm">
+				<div class="tds-modal-content with-box-shadow">
 					<div class="modal-header">
 						<button aria-label="Close" class="close" type="button" (click)="cancel()">
 							<clr-icon aria-hidden="true" shape="close"></clr-icon>
@@ -33,11 +33,16 @@ declare var jQuery: any;
                     <div class="modal-footer form-group-center">
                         <tds-button-confirm theme="primary" (click)="confirm()">{{ confirmLabel}}</tds-button-confirm>
 						<tds-button-cancel (click)="cancel()"  data-dismiss="modal"></tds-button-cancel>
-                    </div>
-                </div>
-            </div>
-        </div>
+					</div>
+				</div>
+			</div>
+		</div>
 	`,
+	styles: [`
+        .modal {
+            background: none;
+        }
+	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	title: string;
@@ -51,12 +56,15 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 
 	openNotifier: any;
 
+	private CANCEL_STR = 'cancel';
+	private CONFIRM_STR = 'confirm';
+
 	constructor(private notifierService: NotifierService) {
 		this.registerListeners();
 	}
 
 	ngAfterViewInit(): void {
-		const refControl =  'tdsUiPrompt';
+		const refControl = 'tdsUiPrompt';
 		this.tdsUiPrompt = jQuery(`#${refControl}`);
 		this.tdsUiPrompt.on('hide.bs.modal', (event) => {
 			if (this.resolve && event.target.id === refControl) {
@@ -93,37 +101,56 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	public cancel(): void {
-		this.checkMultipleModals();
+		this.checkMultipleModals(this.CANCEL_STR);
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	public dismiss(): void {
-		this.checkMultipleModals();
 		this.reject();
 		this.tdsUiPrompt.modal('hide');
 	}
 
 	public confirm(): void {
-		this.checkMultipleModals();
+		this.checkMultipleModals(this.CONFIRM_STR);
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
 	}
 
-	public checkMultipleModals() {
-		let modals = jQuery('div.modal.fade.in');
-		if (modals.length > 1) {
-			setTimeout( () => {
-				const body = document.getElementsByTagName('body')[0];
-				body.className += ' modal-open';
-			}, 500);
+	public checkMultipleModals(scenario) {
+		switch (scenario) {
+			case this.CANCEL_STR: {
+				this.addModalClass();
+				break;
+			}
+			case this.CONFIRM_STR: {
+				setTimeout(() => {
+					let modals = jQuery('div.modal.fade.in');
+					const body = document.getElementsByTagName('body')[0];
+					if (body && modals.length === 0) {
+						body.classList.remove('modal-open');
+						body.style.paddingRight = '0';
+					} else if ( modals.length >= 1) {
+						this.addModalClass();
+					}
+				}, 500);
+				break;
+			}
 		}
+	}
+
+	addModalClass() {
+		setTimeout(() => {
+			const body = document.getElementsByTagName('body')[0];
+			body.className += ' modal-open';
+		}, 500);
 	}
 }
 
 @Injectable()
 export class UIPromptService {
-	constructor(private notifier: NotifierService) {}
+	constructor(private notifier: NotifierService) {
+	}
 
 	/**
 	 * Method to open a dialog, returns a Promise that gonna be resolved ou rejected based on the UIActiveDialog Action

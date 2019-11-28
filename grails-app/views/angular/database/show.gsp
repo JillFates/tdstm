@@ -3,91 +3,98 @@
 <%@page import="net.transitionmanager.security.Permission"%>
 <%@page defaultCodec="html" %>
 
-<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content tds-angular-component-content">
+<div tds-autocenter tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="tds-modal-content has-side-nav tds-angular-component-content">
     <div class="modal-header" [ngClass]="{'modal-header-height':showDetails}">
         <button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
             <clr-icon aria-hidden="true" shape="close"></clr-icon>
         </button>
-		<div class="modal-title-container">
-			<div class="badge modal-badge" style="">D</div>
-			<h4 class="modal-title">${asset.assetName}</h4>
-			<div class="modal-subtitle">${asset?.moveBundle}</div>
-			<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
-		</div>
-		<div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
-			<div *ngIf="readMore">
-				<p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+
+		<div class="clr-row">
+			<div class="clr-col-6">
+				<div class="modal-title-container">
+					<div class="badge modal-badge" style="">D</div>
+					<h4 class="modal-title">${asset.assetName}</h4>
+					<div class="modal-subtitle">${asset?.moveBundle}</div>
+					<div class="badge modal-subbadge"><tds:showDependencyGroup groupId="${dependencyBundleNumber}" assetName="${asset.assetName}"/></div>
+				</div>
+                <div class="modal-description" [ngClass]="{'modal-description-sized':showDetails, 'modal-description-height':${!!asset.description?.trim()}}">
+                    <div *ngIf="readMore">
+                        <p>${asset.description} <a (click)="readMore = !readMore">Read Less</a></p>
+                    </div>
+                    <div *ngIf="!readMore" class="readMore">
+                        <g:if test="${asset.description?.length() > 80}">
+                            <div class="truncated-description">${asset.description.substring(0,80)}...</div>
+                            <a (click)="readMore = !readMore">Read More</a>
+                        </g:if>
+                        <g:else>
+                            <div class="truncated-description">${asset.description}</div>
+                        </g:else>
+                    </div>
+                </div>
 			</div>
-			<div *ngIf="!readMore" class="readMore">
-				<g:if test="${asset.description?.length() > 80}">
-					<div class="truncated-description">${asset.description.substring(0,80)}...</div>
-					<a (click)="readMore = !readMore">Read More</a>
-				</g:if>
-				<g:else>
-					<div class="truncated-description">${asset.description}</div>
-				</g:else>
+
+			<div  class="clr-col-6">
+				<div class="minimized-arch-thumbnail" *ngIf="!!showDetails">
+					<tds-lib-diagram-layout
+							[data]="data$ | async"
+							[layout]="diagramLayout$ | async"
+							[linkTemplate]="linkTemplate$ | async"
+							(expandActionDispatched)="onExpandActionDispatched()"
+							[hideExpand]="false"
+							[hideOverview]="true"
+							[hideControlButtons]="true" #graph></tds-lib-diagram-layout>
+				</div>
 			</div>
-		</div>
-		<tds-tab-scroller [ngClass]="{'modal-nav-margin-top':(${!asset.description?.trim()} && showDetails)}">
-			<tds-scroller-item>
-				<button tdsScrollerLink>
-					{{ showDetails ? "Details" : "Summary"}}
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Supports 					
-					<span class="badge">
-						<g:if test="${supportAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${supportAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Depends On 					
-					<span class="badge">
-						<g:if test="${dependentAssets.size() > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${dependentAssets.size()}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Tasks 					
-					<span class="badge">
-						<g:if test="${taskCount > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${taskCount}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-			<tds-scroller-item>
-				<button tdsScrollerLink>Comments 					
-					<span class="badge">
-						<g:if test="${commentCount > 99}">
-							99+
-						</g:if>
-						<g:else>
-							${commentCount}
-						</g:else>
-					</span>
-				</button>
-			</tds-scroller-item>
-		</tds-tab-scroller>
-		<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-		<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" *ngIf="!!showDetails" class="header-graph" #graph></tds-lib-diagram-layout>
+			<div class="clr-col-12">
+				<tds-tab-scroller>
+					<tds-scroller-item>
+						<button tdsScrollerLink>
+							{{ showDetails ? "Details" : "Summary"}}
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Supports
+							<span class="badge">
+								<g:if test="${supportAssets.size() > 99}">
+									99+
+								</g:if>
+								<g:else>
+									${supportAssets.size()}
+								</g:else>
+							</span>
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Depends On
+							<span class="badge">
+								<g:if test="${dependentAssets.size() > 99}">
+									99+
+								</g:if>
+								<g:else>
+									${dependentAssets.size()}
+								</g:else>
+							</span>
+						</button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Tasks
+                            <span class="badge">
+								{{ taskCount > 99 ? '99+' : taskCount }}
+                            </span>
+                        </button>
+					</tds-scroller-item>
+					<tds-scroller-item>
+						<button tdsScrollerLink>Comments
+                            <span class="badge">
+                                {{ commentCount > 99 ? '99+' : commentCount }}
+                            </span>
+                        </button>
+					</tds-scroller-item>
+				</tds-tab-scroller>
+			</div>
 		</div>
     </div>
-    <div class="modal-body" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
+    <div class="modal-body asset-crud" [ngClass]="{'has-description': (${!!asset.description?.trim()} || showDetails), 'no-description': (${!asset.description?.trim()} && !showDetails)}" tdsScrollContainer style="position: relative">
 		<div tdsScrollSection class="clr-row">
 			<div [ngClass]="{'clr-col-12':showDetails, 'clr-col-6':!showDetails}">
 				<g:if test="${errors}">
@@ -95,23 +102,23 @@
 				</g:if>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
 					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
-						<tds:clrRowDetail field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
-						<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${asset.environment}" />
+						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.dbFormat}" value="${asset.dbFormat}" />
+						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
+						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.environment}" value="${asset.environment}" />
 
-						<tr>
+						<tr style="order: 30">
 							<th class="${standardFieldSpecs.size.imp?:''}">
 								${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 							</th>
 							<td>${asset?.size}&nbsp;${asset.scale?.value()}</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 35">
 							<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${asset.retireDate}"/>
 							<td>{{ '${asset?.retireDate}' | tdsDate: userDateFormat }}</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 40">
 							<th class="${standardFieldSpecs.moveBundle.imp?:''}">
 								${standardFieldSpecs.moveBundle.label} : Dep. Group
 							</th>
@@ -122,23 +129,23 @@
 							</td>
 						</tr>
 						
-						<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
+						<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.rateOfChange}" value="${asset.rateOfChange}" />
 
-						<tr>
+						<tr style="order: 50">
 							<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${asset.maintExpDate}"/>
 							<td>
 								{{ '${asset?.maintExpDate}' | tdsDate: userDateFormat }}
 							</td>
 						</tr>
 
-						<tr>
+						<tr style="order: 55">
 							<tds:clrInputLabel field="${standardFieldSpecs.planStatus}" value="${asset.planStatus}"/>
 							<td>${asset.planStatus}</td>
 						</tr>
 
-						<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
+						<tds:clrRowDetail style="order: 60" field="${standardFieldSpecs.externalRefId}" value="${asset.externalRefId}" />
 
-						<tr>
+						<tr style="order: 65">
 							<tds:clrInputLabel field="${standardFieldSpecs.validation}" value="${asset.validation}"/>
 							<td>${asset.validation}</td>
 						</tr>
@@ -153,7 +160,14 @@
 				</a>
 			</div>
 			<div class="clr-col-6 modal-body-graph" *ngIf="!showDetails">
-				<tds-lib-diagram-layout [data]="data$ | async" [layout]="diagramLayout$ | async" [linkTemplate]="linkTemplate$ | async" (expandActionDispatched)="onExpandActionDispatched()" [hideExpand]="false" [hideOverview]="true" [hideControlButtons]="true" #graph></tds-lib-diagram-layout>
+				<tds-lib-diagram-layout
+						[data]="data$ | async"
+						[layout]="diagramLayout$ | async"
+						[linkTemplate]="linkTemplate$ | async"
+						(expandActionDispatched)="onExpandActionDispatched()"
+						[hideExpand]="false"
+						[hideOverview]="true"
+						[hideControlButtons]="true" #graph></tds-lib-diagram-layout>
 			</div>
 		</div>
 
@@ -219,6 +233,10 @@
 						(click)="onDeleteAsset()">
 				</tds-button-delete>
 			</tds:hasPermission>
+			<tds-button-close
+                tooltip="Close"
+                (click)="cancelCloseDialog()">
+			</tds-button-close>
 		</nav>
 	</div>
 </div>

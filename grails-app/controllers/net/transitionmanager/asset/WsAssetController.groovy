@@ -4,7 +4,6 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
@@ -19,14 +18,14 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
 import net.transitionmanager.task.TaskService
@@ -34,7 +33,6 @@ import net.transitionmanager.utils.Profiler
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -229,7 +227,7 @@ class WsAssetController implements ControllerMethods {
 
 		Map model = [
 			asset           : asset,
-			dependencyBundle: AssetDependencyBundle.findByAsset(asset).dependencyBundle,
+			dependencyBundle: AssetDependencyBundle.findByAsset(asset)?.dependencyBundle,
 			taskCount       : taskService.countByAssetEntity(asset),
 			commentCount    : commentService.countByAssetEntity(asset)
 		]

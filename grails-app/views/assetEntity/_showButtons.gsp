@@ -34,6 +34,9 @@
                 </button>
             </g:else>
         </tds:hasPermission>
+        <button type="button" class="btn btn-icon" type="button" value="Close" onclick="$('#showEntityView').dialog('close');">
+            <i class="fas fa-ban"></i>
+        </button>
     </nav>
 </div>
 

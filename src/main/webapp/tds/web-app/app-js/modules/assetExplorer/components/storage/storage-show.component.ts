@@ -54,7 +54,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 		}
 
 		/**
@@ -76,7 +76,7 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 						{provide: 'ASSET', useValue: DOMAIN.STORAGE}
 					];
 
-					this.dialogService.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+					this.dialogService.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.STORAGE, result.assetId);
 				}

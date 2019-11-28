@@ -5,7 +5,8 @@ import { TaskService } from '../../service/task.service';
 
 @Component({
 	template: `
-		<div tds-handle-escape
+		<div tds-autofocus
+			 tds-handle-escape
 				 id="task-action-summary"
 				 class="task-action-summary modal fade in"
 				 (escPressed)="cancelCloseDialog()"
@@ -13,7 +14,7 @@ import { TaskService } from '../../service/task.service';
 				 tabindex="-1"
 				 role="dialog">
 			<div class="modal-dialog modal-md" role="document">
-				<div class="tds-modal-content resizable" style="width: 55vw;">
+				<div class="tds-modal-content with-box-shadow resizable tds-angular-component-content">
 					<div class="modal-header">
 						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 							<clr-icon aria-hidden="true" shape="close"></clr-icon>

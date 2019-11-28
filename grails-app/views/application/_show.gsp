@@ -1,13 +1,15 @@
 <%@page defaultCodec="html" %>
-
 <table id="detailsTable" class="tds-detail-list">
 	<tbody id="detailsBody" class="one-column">
-		<tds:clrRowDetail field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}" tooltipDataPlacement="bottom"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
-		<tr>
+		<%-- NOTE: Specifying the order property will cause the element to be ordered in the table. 
+		Not specifying the property will cause the element to be positioned last.
+		Order is specified in multiples of 5 to allow for easy reordering in the future. --%>
+		<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.appVendor}" value="${applicationInstance.appVendor}"/>
+		<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.supportType}" value="${applicationInstance.supportType}"/>
+		<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.appFunction}" value="${applicationInstance.appFunction}"/>
+		<tds:clrRowDetail style="order: 30" field="${standardFieldSpecs.userCount}" value="${applicationInstance.userCount}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 35" field="${standardFieldSpecs.appVersion}" value="${applicationInstance.appVersion}"/>
+		<tr style="order: 40">
 			<tds:clrInputLabel field="${standardFieldSpecs.sme}" value="${applicationInstance.sme}"/>
 
 			<td>
@@ -16,10 +18,10 @@
 				</span>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tooltipDataPlacement="bottom"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
-		<tr>
+		<tds:clrRowDetail style="order: 45" field="${standardFieldSpecs.environment}" value="${applicationInstance.environment}"/>
+		<tds:clrRowDetail style="order: 50" field="${standardFieldSpecs.userLocations}" value="${applicationInstance.userLocations}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.appTech}" value="${applicationInstance.appTech}"/>
+		<tr style="order: 60">
 			<tds:clrInputLabel field="${standardFieldSpecs.sme2}" value="${applicationInstance.sme2}"/>
 
 			<td>
@@ -28,10 +30,10 @@
 				</span>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tooltipDataPlacement="bottom"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
-		<tr>
+		<tds:clrRowDetail style="order: 65" field="${standardFieldSpecs.criticality}" value="${applicationInstance.criticality}"/>
+		<tds:clrRowDetail style="order: 70" field="${standardFieldSpecs.useFrequency}" value="${applicationInstance.useFrequency}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 75" field="${standardFieldSpecs.appSource}" value="${applicationInstance.appSource}"/>
+		<tr style="order: 80">
 			<tds:clrInputLabel field="${standardFieldSpecs.appOwner}" value="${applicationInstance.appOwner}"/>
 			<td>
 				<span class="clickableText" onClick="Person.showPersonDialog(${applicationInstance.appOwner?.id},'generalInfoShow')" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.appOwner.tip?: standardFieldSpecs.appOwner.label}">
@@ -39,22 +41,22 @@
 				</span>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tooltipDataPlacement="bottom"/>
-		<tr>
+		<tds:clrRowDetail style="order: 85" field="${standardFieldSpecs.drRpoDesc}" value="${applicationInstance.drRpoDesc}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 90" field="${standardFieldSpecs.license}" value="${applicationInstance.license}"/>
+		<tds:clrRowDetail style="order: 95" field="${standardFieldSpecs.businessUnit}" value="${applicationInstance.businessUnit}"/>
+		<tds:clrRowDetail style="order: 100" field="${standardFieldSpecs.planStatus}" value="${applicationInstance.planStatus}"/>
+		<tds:clrRowDetail style="order: 105" field="${standardFieldSpecs.drRtoDesc}" value="${applicationInstance.drRtoDesc}" tooltipDataPlacement="bottom"/>
+		<tr style="order: 110">
 			<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${applicationInstance.retireDate}"/>
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
 					<tds:convertDate date="${applicationInstance?.retireDate}" />
 				</tds:tooltipSpan>
 			</td>
-		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}" tooltipDataPlacement="bottom"/>
-		<tr>
+		</tr style="order: 115">
+		<tds:clrRowDetail style="order: 120" field="${standardFieldSpecs.validation}" value="${applicationInstance.validation}"/>
+		<tds:clrRowDetail style="order: 125" field="${standardFieldSpecs.testProc}" value="${applicationInstance.testProc}" tooltipDataPlacement="bottom"/>
+		<tr style="order: 130">
 			<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${applicationInstance.maintExpDate}"/>
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
@@ -62,9 +64,9 @@
 				</tds:tooltipSpan>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
-		<tds:clrRowDetail field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}" tooltipDataPlacement="bottom"/>
-		<tr>
+		<tds:clrRowDetail style="order: 135" field="${standardFieldSpecs.latency}" value="${applicationInstance.latency}"/>
+		<tds:clrRowDetail style="order: 140" field="${standardFieldSpecs.startupProc}" value="${applicationInstance.startupProc}" tooltipDataPlacement="bottom"/>
+		<tr style="order: 145">
 			<tds:clrInputLabel field="${standardFieldSpecs.url}" value="${applicationInstance.url}" />
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.url}" tooltipDataPlacement="bottom">
@@ -72,8 +74,8 @@
 				</tds:tooltipSpan>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
-		<tr>
+		<tds:clrRowDetail style="order: 150" field="${standardFieldSpecs.externalRefId}" value="${applicationInstance.externalRefId}"/>
+		<tr style="order: 155">
 			<tds:clrInputLabel field="${standardFieldSpecs.shutdownBy}" value="${applicationInstance.shutdownBy}"/>
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.shutdownBy}">
@@ -92,8 +94,8 @@
 				</tds:tooltipSpan>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}" tooltipDataPlacement="bottom"/>
-		<tr>
+		<tds:clrRowDetail style="order: 160" field="${standardFieldSpecs.shutdownDuration}" value="${applicationInstance.shutdownDuration}" tooltipDataPlacement="bottom"/>
+		<tr style="order: 165">
 			<tds:clrInputLabel field="${standardFieldSpecs.startupBy}" value="${applicationInstance.startupBy}"/>
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.startupBy}">
@@ -112,8 +114,8 @@
 				</tds:tooltipSpan>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
-		<tr>
+		<tds:clrRowDetail style="order: 170" field="${standardFieldSpecs.startupDuration}" value="${applicationInstance.startupDuration}"/>
+		<tr style="order: 175">
 			<tds:clrInputLabel field="${standardFieldSpecs.testingBy}" value="${applicationInstance.testingBy}"/>
 			<td>
 				<tds:tooltipSpan field="${standardFieldSpecs.testingBy}">
@@ -132,7 +134,7 @@
 				</tds:tooltipSpan>
 			</td>
 		</tr>
-		<tds:clrRowDetail field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}" tooltipDataPlacement="bottom"/>
+		<tds:clrRowDetail style="order: 180" field="${standardFieldSpecs.testingDuration}" value="${applicationInstance.testingDuration}" tooltipDataPlacement="bottom"/>
 
 		<g:render template="/assetEntity/customShow" model="[assetEntity:applicationInstance,customs:customs]"></g:render>
 		<%-- TODO: Move the asset tags outside of the table --> There is an issue with how they're rendered when this is done... --%>

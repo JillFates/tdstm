@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
-import {ArchitectureGraphService} from '../../service/architecture-graph.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
-import {Layout, Link} from 'gojs';
+import {Diagram, Layout, Link} from 'gojs';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
@@ -40,7 +40,19 @@ export class ArchitectureGraphComponent implements OnInit {
 	loadDiagramData(params?: IArchitectureGraphParams): void {
 		this.architectureGraphService.getAssetDetails(params.assetId, params.levelsUp, params.levelsDown)
 			.subscribe(res => {
-				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(params.assetId, this.userContext.user.id, res));
+				const diagramHelper = new ArchitectureGraphDiagramHelper();
+				this.data$.next(diagramHelper.diagramData({
+					rootAsset: params.assetId,
+					currentUserId: this.userContext.user.id,
+					data: res,
+					extras: {
+						diagramOpts: {
+							allowZoom: true
+						},
+						isExpandable: true,
+						initialExpandLevels: 2
+					}
+				}));
 			});
 	}
 }

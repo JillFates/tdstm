@@ -34,11 +34,12 @@ import {AssetViewExportComponent} from './components/asset-view-export/asset-vie
 import {AssetViewGridComponent} from './components/asset-view-grid/asset-view-grid.component';
 import {AssetViewShowComponent} from './components/asset-view-show/asset-view-show.component';
 import {AssetViewManagerComponent} from './components/asset-view-manager/asset-view-manager.component';
-import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 // import {ExportComponent} from './components/asset-export/export.component';
 // import {ExportAssetService} from './service/export-asset.service';
 import { AssetViewShowSaveButtonComponent } from './components/asset-view-show/asset-view-show-save-button.component';
 import { AssetViewShowCreateButtonComponent } from './components/asset-view-show/asset-view-show-create-button.component';
+import { AssetViewConfigSaveButtonComponent } from './components/asset-view-config/asset-view-config-save-button.component';
+import { TabStripModule } from '@progress/kendo-angular-layout';
 
 @NgModule({
 	imports: [
@@ -54,6 +55,7 @@ import { AssetViewShowCreateButtonComponent } from './components/asset-view-show
 		SortableModule,
 		IntlModule,
 		DateInputsModule,
+		TabStripModule,
 		// Route
 		AssetManagerRouteModule
 	],
@@ -61,13 +63,13 @@ import { AssetViewShowCreateButtonComponent } from './components/asset-view-show
 		AssetViewSelectorComponent,
 		AssetViewManagerComponent,
 		AssetViewConfigComponent,
+		AssetViewConfigSaveButtonComponent,
 		AssetViewSaveComponent,
 		AssetViewExportComponent,
 		AssetViewGridComponent,
 		AssetViewShowComponent,
-		ArchitectureGraphComponent,
 		AssetViewShowSaveButtonComponent,
-		AssetViewShowCreateButtonComponent,
+		AssetViewShowCreateButtonComponent
 		// ExportComponent
 	],
 	providers: [

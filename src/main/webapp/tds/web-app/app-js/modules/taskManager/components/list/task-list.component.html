@@ -14,11 +14,11 @@
 								(timeout)="search()"
 								[hideRefresh]="true"
 								[customOptions]="[{seconds: 0, description: 'Manual'},
-																		{seconds: 60, description: '1 Min'},
-																		{seconds: 120, description: '2 Min'},
-																		{seconds: 180, description: '3 Min'},
-																		{seconds: 240, description: '4 Min'},
-																		{seconds: 300, description: '5 Min'}]">
+									{seconds: 60, description: '1 Min'},
+									{seconds: 120, description: '2 Min'},
+									{seconds: 180, description: '3 Min'},
+									{seconds: 240, description: '4 Min'},
+									{seconds: 300, description: '5 Min'}]">
 						</tds-pie-countdown>
 					</div>
 					<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="onFiltersChange()" class="flat" tooltip="Refresh"></tds-button-custom>
@@ -28,7 +28,6 @@
 
 		<div class="clr-row">
 			<div class="clr-col-12 actions-primary-page-container">
-				<div class="left-container">
 					<clr-select-container class="clr-form-control clr-row">
 						<label class="label-event-list">Event: </label>
 						<select clrSelect
@@ -58,7 +57,6 @@
 							<label>View Unpublished</label>
 						</clr-checkbox-wrapper>
 					</div>
-				</div>
 				<div>
 					<tds-button [icon]="'plus-circle'" (click)="onCreateTaskHandler()" [title]="'Create Task'" [iconClass]="'is-solid'"></tds-button>
 					<tds-button [icon]="'pencil'" (click)="onBulkActionHandler()" [title]="'Bulk Action'"></tds-button>
@@ -73,7 +71,7 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="task-grid"
+				class="task-grid row-actions-1-children"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
 				[pageSize]="grid.state.take"
@@ -83,7 +81,7 @@
 				[resizable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
-				[sortable]="{mode:'single'}"
+				[sortable]="{mode:'single', allowUnsort: false}"
 				(sortChange)="onSortChangeHandler($event)"
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"
@@ -140,6 +138,31 @@
 						{{dataItem.parsedInstructions[0]}}
 					</button>
 				</div>
+
+				<kendo-grid-column [width]="60"
+								   [class]="{'k-custom-command-column': true}"
+								   [sortable]="false"
+								   [columnMenu]="false"
+								   [minResizableWidth]="60">
+					<ng-template kendoGridHeaderTemplate let-column let-columnIndex="columnIndex">
+						<tds-button [flat]="true" (click)="toggleFiltering()">
+							<clr-icon shape="filter" class="grid-filter-button is-solid">
+								<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
+							</clr-icon>
+						</tds-button>
+					</ng-template>
+					<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+						<div class="action-button btn-group btn-link">
+							<clr-dropdown>
+								<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
+								<clr-dropdown-menu *clrIfOpen>
+									<a clrDropdownItem (click)="onOpenTaskEditHandler(dataItem)">Edit Task</a>
+								</clr-dropdown-menu>
+							</clr-dropdown>
+						</div>
+					</ng-template>
+				</kendo-grid-column>
+
 				<kendo-grid-column *ngFor="let column of columnsModel"
 													 [resizable]="column.resizable"
 													 field="{{column.property}}"
@@ -156,13 +179,19 @@
 						<div *ngIf="column.type !== 'action'" [ngClass]="{'sortable-column' : (column.sortable !==	false)}">
 							<label>{{column.label}}</label>
 						</div>
-						<span *ngIf="column.type === 'action'">
-							<clr-icon (click)="toggleFiltering()" shape="filter" class="is-solid grid-filter-icon"></clr-icon>
-							<span *ngIf="filterCounter(); let counter" class="badge badge-orange">{{counter}}</span>
-						</span>
+<!--						<span *ngIf="column.type === 'action'">-->
+						<!--
+							<tds-button [flat]="true" (click)="toggleFiltering()" *ngIf="column.type === 'action'">
+								<clr-icon shape="filter" class="grid-filter-button is-solid">
+								<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
+								</clr-icon>
+							</tds-button>
+						-->
+<!--						</span>-->
 					</ng-template>
 
 					<!-- edit action column -->
+					<!--
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action'" let-dataItem>
 						<div class="btn-link">
 							<clr-dropdown>
@@ -173,6 +202,7 @@
 							</clr-dropdown>
 						</div>
 					</ng-template>
+					-->
 
 					<!-- task Number -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'taskNumber'" let-dataItem>

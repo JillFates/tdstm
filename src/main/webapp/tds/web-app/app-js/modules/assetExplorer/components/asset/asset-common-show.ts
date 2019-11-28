@@ -13,10 +13,10 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
-import {ArchitectureGraphDiagramHelper} from '../../../assetManager/components/architecture-graph/architecture-graph-diagram-helper';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {Diagram, Layout, Link} from 'gojs';
+import {AssetCommonDiagramHelper} from './asset-common-diagram.helper';
 
 declare var jQuery: any;
 
@@ -30,6 +30,8 @@ export class AssetCommonShow implements OnInit {
 	protected showDetails = false;
 	protected readMore = false;
 	protected currentUser: any;
+	protected commentCount: number;
+	protected taskCount: number;
 	protected data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	protected diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
 	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
@@ -76,7 +78,7 @@ export class AssetCommonShow implements OnInit {
 		this.dialogService.replace(AssetShowComponent, [
 				{provide: 'ID', useValue: id},
 				{provide: 'ASSET', useValue: assetClass}],
-			DIALOG_SIZE.LG);
+			DIALOG_SIZE.XXL);
 		jQuery('body').addClass('modal-open');
 	}
 
@@ -132,7 +134,7 @@ export class AssetCommonShow implements OnInit {
 	}
 
 	onExpandActionDispatched(): void {
-		this.openGoJsGraphUrl();
+		this.openGraphUrl();
 	}
 
 	/**
@@ -141,7 +143,36 @@ export class AssetCommonShow implements OnInit {
 	loadThumbnailData(assetId: number | string): void {
 		this.architectureGraphService.getAssetDetails(assetId, 0, 1)
 			.subscribe(res => {
-				this.data$.next(ArchitectureGraphDiagramHelper.diagramData(assetId, this.currentUser.id, res, Diagram.Uniform));
+				const diagramHelper = new AssetCommonDiagramHelper();
+				this.data$.next(diagramHelper.diagramData({
+					rootAsset: assetId,
+					currentUserId: 1,
+					data: res,
+					iconsOnly: true,
+					extras: {
+						diagramOpts: {
+							autoScale: Diagram.Uniform,
+							allowZoom: false
+						},
+						isExpandable: false
+					}
+				}));
 			})
+	}
+
+	/**
+	 * Allows for the comment count to be updated
+	 * @param commentCount - New comment count value
+	 */
+	updateCommentCount(commentCount: number): void {
+		this.commentCount = commentCount;
+	}
+
+	/**
+	 * Allows for the task count to be updated
+	 * @param taskCount - New task count value
+	 */
+	updateTaskCount(taskCount: number): void {
+		this.taskCount = taskCount;
 	}
 }

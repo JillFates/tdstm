@@ -62,6 +62,12 @@ div.login-component {
             max-width: 100%;
           }
         }
+
+        div.build-info {
+          text-align: center;
+          font-size: 11px;
+          margin-top: 10px;
+        }
       }
       // Looks is used on Forgot and Change Password, so keep it here
       .login-box-body {
