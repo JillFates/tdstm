@@ -372,10 +372,10 @@
                                     <table class="dates-info">
                                         <tbody>
                                         <tr>
-                                            <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | date:dateFormatTime}}
+                                            <td class="date-created">Created by {{model.personCreateObj}} at {{model.dtCreated}}
                                                 {{(model.taskSpecId)? ' with spec id ' + model.taskSpecId: ''}}
                                                 <span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
-                                            <td class="last-updated">Last updated: {{model.lastUpdated | date:dateFormatTime}}</td>
+                                            <td class="last-updated">Last updated: {{model.lastUpdated}}</td>
                                         </tr>
                                         </tbody>
                                     </table>

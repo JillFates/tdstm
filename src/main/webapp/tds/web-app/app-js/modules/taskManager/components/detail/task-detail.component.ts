@@ -271,7 +271,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 				[UIDialogService,
 					{ provide: 'ID', useValue: id },
 					{ provide: 'ASSET', useValue: assetClass }
-				], DIALOG_SIZE.LG);
+				], DIALOG_SIZE.XXL);
 
 			this.close();
 		} else {

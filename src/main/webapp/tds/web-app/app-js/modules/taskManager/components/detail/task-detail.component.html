@@ -327,7 +327,7 @@
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{ model.etStart || '' | date : dateFormatTime }}</span>
+															<span>{{ model.etStart }}</span>
 														</td>
 
 														<td
@@ -339,7 +339,7 @@
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{ model.etFinish || '' | date : dateFormatTime }}</span>
+															<span>{{ model.etFinish }}</span>
 														</td>
 													</tr>
 
@@ -511,9 +511,7 @@
 														}}
 														at
 														{{
-															model.dateCreated
-																| date
-																	: dateFormatTime
+															model.dtCreated
 														}}
 														{{
 															model.taskSpecId
@@ -545,8 +543,6 @@
 														Last updated:
 														{{
 															model.lastUpdated
-																| date
-																	: dateFormatTime
 														}}
 													</td>
 												</tr>

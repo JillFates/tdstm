@@ -171,6 +171,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
+			dtCreated: detail.dtCreated || '',
+			lastUpdated: detail.lastUpdated || '',
 			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
 			percentageComplete: detail.percentageComplete,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
@@ -185,7 +187,7 @@ export class TaskEditCreateModelHelper {
 			actualDuration: detail.actualDuration || '',
 			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
-			lastUpdated: assetComment.lastUpdated,
+			// lastUpdated: assetComment.lastUpdated,
 			taskSpecId: detail.taskSpecId || '',
 			taskNumber: assetComment.taskNumber,
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
