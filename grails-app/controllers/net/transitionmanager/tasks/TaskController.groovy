@@ -34,6 +34,7 @@ import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.math.NumberUtils
