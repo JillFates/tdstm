@@ -1016,11 +1016,15 @@ class DataImportService implements ServiceMethods {
 			TagAsset tagAsset = tagAssetMap[tagEntry.key]
 			Long tagId = context.projectTags[tagEntry.value]
 
-			if (tagAsset && !tagAssetMap[tagEntry.value]) {
-				tagAssetService.removeTags(context.project, [tagAsset.id])
-				tagAssetService.applyTags(context.project, [tagId], entity.id)
-			} else {
+			if (!tagAsset) {
+				errors.add("Unable to Replace missing tag ${tagEntry.key} in asset")
+			} else if (!tagAssetMap[tagEntry.value]) {
 				errors.add("Unable to Replace tag '${tagEntry.key}' with '${tagEntry.value}' on asset")
+			} else {
+				if (tagAsset && !tagAssetMap[tagEntry.value]) {
+					tagAssetService.removeTags(context.project, [tagAsset.id])
+					tagAssetService.applyTags(context.project, [tagId], entity.id)
+				}
 			}
 		}
 
@@ -1521,9 +1525,6 @@ class DataImportService implements ServiceMethods {
 
 	/**
 	 * Used to validate tags defined in {@code ImportBatchRecord#tags}.
-	 * <pre>
-	 *
-	 * </pre>
 	 * @param tagsInfo - the Map of the record.tags to be cleared
 	 * @param projectTags - the Map of the project tags used for validation.
 	 *
@@ -1537,7 +1538,7 @@ class DataImportService implements ServiceMethods {
 		tagsNames.addAll(tagsInfo.replace.keySet())
 		tagsNames.addAll(tagsInfo.replace.values())
 
-		List tagsNotFound = tagsNames.collect { !projectTags.containsKey(it) }
+		Set tagsNotFound = tagsNames.findAll { !projectTags.containsKey(it) }
 		if (!tagsNotFound.isEmpty()){
 			return "The follow tag(s) were not found: ${tagsNotFound.join(', ')} in current project"
 		} else {
