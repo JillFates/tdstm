@@ -15,10 +15,10 @@
 							</g:if>
 							<table id="detailsTable" class="tds-detail-list">
 								<tbody id="detailsBody" class="one-column">
-									<tds:clrRowDetail field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.supportType}" value="${databaseInstance.supportType}"/>
-									<tds:clrRowDetail field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
-									<tr>
+									<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}"/>
+									<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.supportType}" value="${databaseInstance.supportType}"/>
+									<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.environment}" value="${databaseInstance.environment}"/>
+									<tr style="order: 30">
 										<th class="${standardFieldSpecs.size.imp?:''}">
 											${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
 										</th>
@@ -28,7 +28,7 @@
 											</tds:tooltipSpan>
 										</td>
 									</tr>
-									<tr>
+									<tr style="order: 35">
 										<tds:clrInputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
 										<td>
 											<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
@@ -36,8 +36,8 @@
 											</tds:tooltipSpan>
 										</td>
 									</tr>
-									<tds:clrRowDetail field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
-									<tr>							
+									<tds:clrRowDetail style="order: 40" field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance.rateOfChange}"/>
+									<tr style="order: 45">							
 										<tds:clrInputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
 										<td>
 											<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
@@ -45,7 +45,7 @@
 											</tds:tooltipSpan>
 										</td>
 									</tr>
-									<tr>							
+									<tr style="order: 50">							
 										<tds:clrInputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
 										<td>
 											<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
@@ -53,8 +53,8 @@
 											</tds:tooltipSpan>
 										</td>
 									</tr>
-									<tds:clrRowDetail field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}"/>
-									<tr>
+									<tds:clrRowDetail style="order: 55" field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}"/>
+									<tr style="order: 60">
 										<tds:clrInputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
 										<td>
 											<tds:tooltipSpan field="${standardFieldSpecs.validation}">

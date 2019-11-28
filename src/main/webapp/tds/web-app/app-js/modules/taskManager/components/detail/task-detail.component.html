@@ -10,7 +10,7 @@
 >
 	<div class="modal-dialog modal-lg" role="document">
 		<div
-			class="tds-modal-content resizable tds-angular-component-content has-side-nav"
+			class="tds-modal-content with-box-shadow resizable tds-angular-component-content has-side-nav"
 			tds-ui-modal-decorator=""
 			[options]="modalOptions"
 			[style.width.px]="SHARED_TASK_SETTINGS.DEFAULT_TASK_HEIGHT"
@@ -24,7 +24,7 @@
 			</div>
 			<div class="task-detail-container">
 				<div class="modal-body">
-					<div class="full-height">
+					<form>
 						<table class="full-height">
 							<tbody class="full-height task-layout">
 								<tr class="no-grow-container">
@@ -292,8 +292,7 @@
 														</td>
 														<td class="valueNW">
 															<span>{{
-																model.dueDate ||
-																	''
+																model.dueDate || '' | tdsDate : dateFormat
 															}}</span>
 														</td>
 													</tr>
@@ -324,17 +323,11 @@
 															nowrap="nowrap"
 														>
 															<label
-																>Estimated
-																Start</label
+																>Earliest Start</label
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{
-																model.estimatedStart ||
-																	''
-																	| tdsDateTime
-																		: userTimeZone
-															}}</span>
+															<span>{{ model.etStart }}</span>
 														</td>
 
 														<td
@@ -342,17 +335,11 @@
 															nowrap="nowrap"
 														>
 															<label
-																>Estimated
-																Finish</label
+																>Earliest Finish</label
 															>
 														</td>
 														<td class="valueNW">
-															<span>{{
-																model.estimatedFinish ||
-																	''
-																	| tdsDateTime
-																		: userTimeZone
-															}}</span>
+															<span>{{ model.etFinish }}</span>
 														</td>
 													</tr>
 
@@ -479,8 +466,9 @@
 																<div
 																	class="progress-bar"
 																	role="progressbar"
+																	*ngIf="model.percentageComplete"
 																	[style.width.%]="
-																		model.percentageComplete
+																		model.percentageComplete <= 24 ? 24 : model.percentageComplete
 																	"
 																	[attr.aria-valuenow]="
 																		model.percentageComplete
@@ -523,9 +511,7 @@
 														}}
 														at
 														{{
-															model.dateCreated
-																| date
-																	: dateFormatTime
+															model.dtCreated
 														}}
 														{{
 															model.taskSpecId
@@ -557,8 +543,6 @@
 														Last updated:
 														{{
 															model.lastUpdated
-																| date
-																	: dateFormatTime
 														}}
 													</td>
 												</tr>
@@ -901,7 +885,7 @@
 								</tr>
 							</tbody>
 						</table>
-					</div>
+					</form>
 				</div>
 				<div class="modal-footer">
 					<div class="options-container">

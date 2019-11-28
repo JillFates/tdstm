@@ -16,7 +16,7 @@
                                         name="fetch"
                                         id="fetch"
                                         class="form-control"
-                                        [disabled]="!!actionOptions">
+                                        [disabled]="actionOptions.length == 0">
                                     <option value="-1">{{'GLOBAL.PLEASE_SELECT' | translate}}</option>
                                     <option *ngFor="let option of actionOptions"
                                             [ngValue]="option">{{option.name}}</option>
@@ -29,15 +29,15 @@
                                                'fa-thumbs-down red': fetchResult?.status === 'error' && fetchInputUsed === 'action'}"></i>
                                 <span>{{'IMPORT_ASSETS.MANUAL_IMPORT.FETCH' | translate}}</span>
                             </tds-button>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
-                                <a href="javascript:void(0);"
-                                   (click)="onViewData('FETCH')" >
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                                </a>
-                            </span>
+<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'action'"-->
+<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+<!--                                <br>-->
+<!--                                <a href="javascript:void(0);"-->
+<!--                                   (click)="onViewData('FETCH')" >-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                                </a>-->
+<!--                            </span>-->
 
                         </div>
                         <div class="form-group row" style="margin-bottom: 5px;">
@@ -65,15 +65,15 @@
                                     <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
                                 </kendo-upload><!---->
                             </div>
-                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
-                                  class="control-label col-md-{{uiConfig.urlColSize}}">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
-                                <br>
-                                <a href="javascript:void(0);"
-                                   (click)="onViewData('FETCH')">
-                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}
-                                </a>
-                            </span>
+<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"-->
+<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
+<!--                                <br>-->
+<!--                                <a href="javascript:void(0);"-->
+<!--                                   (click)="onViewData('FETCH')">-->
+<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
+<!--                                </a>-->
+<!--                            </span>-->
 
                         </div>
 

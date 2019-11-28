@@ -237,9 +237,11 @@ class ArchitectureGraphService implements ServiceMethods {
 		return AssetDependency.createCriteria().list {
 			resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
 
-			and {
-				'in'('asset.id', assetList*.id)
-				'in'('dependent.id', assetList*.id)
+			if (assetList) {
+				and {
+					'in'('asset.id', assetList*.id)
+					'in'('dependent.id', assetList*.id)
+				}
 			}
 
 			projections {

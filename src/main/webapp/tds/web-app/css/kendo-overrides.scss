@@ -62,6 +62,22 @@ kendo-numerictextbox {
 }
 
 kendo-grid.k-grid {
+	// Adding the appropriate class to the grid will fix the issue with the clarity dropdown list action within the kendo-grid
+	// Example if you have a action dropdown in a row with 3 actions, add the class "row-actions-3-children"
+	@for $i from 1 through 10 {
+		&.row-actions-#{$i}-children {
+			tr:nth-last-of-type(-n + #{$i}) {
+				.action-button {
+					clr-dropdown-menu {
+						top: auto !important;
+						bottom: 0px !important;
+						transform: translateY(-25px) !important;
+					}
+				}
+			}
+		}
+	}
+
 	kendo-dropdownlist.k-dropdown,
 	kendo-combobox.k-combobox {
 		.k-dropdown-wrap {

@@ -45,9 +45,7 @@ tds-ui-dialog {
 					}
 
 					.show-hide-link {
-						display: block;
-						width: 100%;
-						text-align: right;
+						float: right;
 						font-size: 12px;
 						font-weight: 500;
 					}
@@ -237,6 +235,13 @@ tds-ui-dialog {
 					.tag + .tag {
 						margin-left: 5px;
 					}
+
+					.label.tag {
+						border-radius: 0;
+						border: 0;
+						width: unset;
+						font-weight: 500;
+					}
 				}
 			}
 
@@ -260,6 +265,10 @@ tds-ui-dialog {
 	background: $color-text-inverse;
 	min-width: 340px;
 
+	&.with-box-shadow {
+		box-shadow: 0 5px 15px $color-border;
+	}
+
 	&.has-side-nav {
 		.modal-header,
 		.modal-body,
@@ -279,6 +288,12 @@ tds-ui-dialog {
 
 		.clr-form {
 			padding: unset;
+		}
+
+		code-mirror {
+			textarea {
+				width: 100%;
+			}
 		}
 	}
 
@@ -340,6 +355,11 @@ tds-ui-dialog {
 			.modal-subbadge {
 				background-color: #f38b00;
 			}
+		}
+
+		.header-actions {
+			display: flex;
+			justify-content: flex-end;
 		}
 
 		.modal-description {

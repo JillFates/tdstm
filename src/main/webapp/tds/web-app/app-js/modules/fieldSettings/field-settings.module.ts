@@ -27,6 +27,7 @@ import { FieldsResolveService } from './resolve/fields-resolve.service';
 import { FieldSettingsService } from './service/field-settings.service';
 import { CustomDomainService } from './service/custom-domain.service';
 import { FieldConverterService } from './service/field-converter.service';
+import {ProjectService} from '../project/service/project.service';
 import { TabStripModule } from '@progress/kendo-angular-layout';
 
 @NgModule({
@@ -43,7 +44,7 @@ import { TabStripModule } from '@progress/kendo-angular-layout';
 		InputsModule,
 		TabStripModule,
 		// Route
-		FieldSettingsRouteModule,
+		FieldSettingsRouteModule
 	],
 	declarations: [
 		FieldSettingsListComponent,
@@ -52,7 +53,7 @@ import { TabStripModule } from '@progress/kendo-angular-layout';
 		FieldSettingsImportanceComponent,
 		MinMaxConfigurationPopupComponent,
 		NumberConfigurationPopupComponent,
-		FieldTypeSelectorComponent,
+		FieldTypeSelectorComponent
 	],
 	providers: [
 		// Resolve
@@ -62,11 +63,12 @@ import { TabStripModule } from '@progress/kendo-angular-layout';
 		FieldSettingsService,
 		CustomDomainService,
 		FieldConverterService,
+		ProjectService
 	],
 	entryComponents: [
 		SelectListConfigurationPopupComponent,
 		MinMaxConfigurationPopupComponent,
-		NumberConfigurationPopupComponent,
+		NumberConfigurationPopupComponent
 	],
 	exports: [],
 })

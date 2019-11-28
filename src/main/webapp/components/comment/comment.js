@@ -1915,7 +1915,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 		temp.commentId = ac.id;
 		temp.commentType = ac.commentType;
 		temp.dueDate = response.dueDate;
-		temp.durationScale = ac.durationScale ? ac.durationScale.name : 'M';
+		temp.durationScale = ac.durationScale ? ac.durationScale : 'M';
 		temp.duration = ac.duration;
 		temp.durationText = utils.date.formatDuration(ac.duration, temp.durationScale);
 		temp.estFinish = response.etFinish;
@@ -1924,7 +1924,7 @@ tds.comments.util.CommentUtils = function (q, interval, appCommonData, utils) {
 		temp.sendNotification = ac.sendNotification;
 		temp.instructionsLink = ac.instructionsLink ? ac.instructionsLink.toString() : '';
 		temp.isResolved = ac.dateResolved != null ? '1' : '0';
-		temp.moveEvent = ac.moveEvent ? ac.moveEvent.id.toString() : '';
+		temp.moveEvent = ac.moveEvent ? ac.moveEvent.toString() : '';
 		temp.mustVerify = ac.mustVerify;
 		temp.priority = ac.priority ? ac.priority.toString() : '3';
 		temp.resolution = ac.resolution;

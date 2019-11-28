@@ -30,6 +30,8 @@ export class AssetCommonShow implements OnInit {
 	protected showDetails = false;
 	protected readMore = false;
 	protected currentUser: any;
+	protected commentCount: number;
+	protected taskCount: number;
 	protected data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	protected diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
 	protected linkTemplate$: ReplaySubject<Link> = new ReplaySubject(1);
@@ -156,5 +158,21 @@ export class AssetCommonShow implements OnInit {
 					}
 				}));
 			})
+	}
+
+	/**
+	 * Allows for the comment count to be updated
+	 * @param commentCount - New comment count value
+	 */
+	updateCommentCount(commentCount: number): void {
+		this.commentCount = commentCount;
+	}
+
+	/**
+	 * Allows for the task count to be updated
+	 * @param taskCount - New task count value
+	 */
+	updateTaskCount(taskCount: number): void {
+		this.taskCount = taskCount;
 	}
 }

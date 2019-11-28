@@ -14,11 +14,11 @@
 								(timeout)="search()"
 								[hideRefresh]="true"
 								[customOptions]="[{seconds: 0, description: 'Manual'},
-																		{seconds: 60, description: '1 Min'},
-																		{seconds: 120, description: '2 Min'},
-																		{seconds: 180, description: '3 Min'},
-																		{seconds: 240, description: '4 Min'},
-																		{seconds: 300, description: '5 Min'}]">
+									{seconds: 60, description: '1 Min'},
+									{seconds: 120, description: '2 Min'},
+									{seconds: 180, description: '3 Min'},
+									{seconds: 240, description: '4 Min'},
+									{seconds: 300, description: '5 Min'}]">
 						</tds-pie-countdown>
 					</div>
 					<tds-button-custom icon="repeat" [displayLabel]="false" [flat]="true" (click)="onFiltersChange()" class="flat" tooltip="Refresh"></tds-button-custom>
@@ -28,7 +28,6 @@
 
 		<div class="clr-row">
 			<div class="clr-col-12 actions-primary-page-container">
-				<div class="left-container">
 					<clr-select-container class="clr-form-control clr-row">
 						<label class="label-event-list">Event: </label>
 						<select clrSelect
@@ -58,7 +57,6 @@
 							<label>View Unpublished</label>
 						</clr-checkbox-wrapper>
 					</div>
-				</div>
 				<div>
 					<tds-button [icon]="'plus-circle'" (click)="onCreateTaskHandler()" [title]="'Create Task'" [iconClass]="'is-solid'"></tds-button>
 					<tds-button [icon]="'pencil'" (click)="onBulkActionHandler()" [title]="'Bulk Action'"></tds-button>
@@ -73,7 +71,7 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="task-grid"
+				class="task-grid row-actions-1-children"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
 				[pageSize]="grid.state.take"
@@ -83,7 +81,7 @@
 				[resizable]="true"
 				[columnMenu]="true"
 				[sort]="grid.state.sort"
-				[sortable]="{mode:'single'}"
+				[sortable]="{mode:'single', allowUnsort: false}"
 				(sortChange)="onSortChangeHandler($event)"
 				(detailExpand)="onRowDetailExpandHandler($event)"
 				(detailCollapse)="onRowDetailCollapseHandler($event)"

@@ -287,6 +287,8 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 
 .progressWrapper .progress{
 	margin-bottom: 0px;
+    max-height: 20px;
+    margin-top: 26px;
 }
 
 .selectorsHideShow{

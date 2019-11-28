@@ -1,4 +1,13 @@
-import {Component, HostListener, OnInit, AfterViewInit, OnDestroy, ViewChild, ViewChildren, QueryList} from '@angular/core';
+import {
+	Component,
+	HostListener,
+	OnInit,
+	AfterViewInit,
+	OnDestroy,
+	ViewChild,
+	ViewChildren,
+	QueryList
+} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {NgForm} from '@angular/forms';
 import {clone} from 'ramda';
@@ -26,11 +35,12 @@ import {SHARED_TASK_SETTINGS} from '../../model/shared-task-settings';
 import {UIHandleEscapeDirective as EscapeHandler} from '../../../../shared/directives/handle-escape-directive';
 import {DropDownListComponent} from '@progress/kendo-angular-dropdowns';
 import {takeUntil} from 'rxjs/operators';
-import { SortUtils } from '../../../../shared/utils/sort.utils';
+import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {StringUtils} from '../../../../shared/utils/string.utils';
+
 declare var jQuery: any;
 
-export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnInit, AfterViewInit, OnDestroy {
+export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('taskEditCreateForm', {static: false}) public taskEditCreateForm: NgForm;
 	@ViewChildren(DropDownListComponent) dropdowns: QueryList<DropDownListComponent>;
 	@ViewChild('dueDate', {static: false}) dueDate;
@@ -46,7 +56,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public modalOptions: DecoratorOptions;
 	public model: any = null;
 	protected getAssetList: Function;
-	protected yesNoList =  [...YesNoList];
+	protected yesNoList = [...YesNoList];
 	protected predecessorSuccessorColumns: any[];
 	protected userTimeZone: string;
 	protected hasModelChanges = false;
@@ -59,6 +69,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public SHARED_TASK_SETTINGS = SHARED_TASK_SETTINGS;
 	protected metaParam: any;
 	private destroySubject: Subject<any> = new Subject<any>();
+	public taskViewType: string;
+
 	constructor(
 		private taskDetailModel: TaskDetailModel,
 		private taskManagerService: TaskService,
@@ -69,7 +81,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		private translatePipe: TranslatePipe) {
 
 		super('#task-component');
-		this.modalOptions = { isResizable: false, isCentered: true, isDraggable: false };
+		this.taskViewType = this.taskDetailModel.modal.type === ModalType.CREATE ? 'task-create-view' : 'task-edit-view';
+		this.modalOptions = {isResizable: false, isCentered: true, isDraggable: false};
 		this.getTasksForComboBox = this.getTasksForComboBox.bind(this);
 	}
 
@@ -111,19 +124,22 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			];
 
 			if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+				let assetId = this.model.asset && this.model.asset.id || null;
 				commonCalls.push(this.taskManagerService.getAssetClasses());
 				commonCalls.push(this.taskManagerService.getAssetCommentCategories());
 				commonCalls.push(this.taskManagerService.getEvents());
 				commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
-				commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
+				commonCalls.push(this.taskManagerService.getClassForAsset(assetId));
 			}
 
 			this.metaParam = this.getMetaParam();
 			Observable.forkJoin(commonCalls)
 				.subscribe((results: any[]) => {
-					const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+					const [status, persons, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+					let personList = persons || [];
 
 					this.model.statusList = status;
+					personList = personList || [];
 					// Add Unassigned and Auto options to staff list
 					personList.push({id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic'});
 					this.model.personList = personList
@@ -149,8 +165,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					if (events) {
 						this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
 					}
-					if (taskDefaults && taskDefaults.preferences) {
-						this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT'] || '', text: ''};
+					if (taskDefaults && taskDefaults.preferences && this.taskDetailModel.modal.type === ModalType.CREATE) {
 						this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
 						this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
 						this.metaParam = this.getMetaParam();
@@ -173,6 +188,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 					}
 					jQuery('[data-toggle="popover"]').popover();
 					const percentageComplete = this.taskEditCreateForm.form.controls['percentageComplete'];
+					const comment = this.taskEditCreateForm.form.controls['comment'];
 
 					if (percentageComplete) {
 						percentageComplete.markAsPristine();
@@ -326,11 +342,11 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {string}
 	 */
 	getDateTimeFormat(date = null): string {
-		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` :  this.dateFormat;
+		return date ? `${this.dateFormat} ${DateUtils.DEFAULT_FORMAT_TIME}` : this.dateFormat;
 	}
 
 	getDateFormat(date = null): string {
-		return date ? date : this.dateFormat ;
+		return date ? date : this.dateFormat;
 	}
 
 	/**
@@ -355,7 +371,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 				const {start, end, duration, locked} = result;
 				this.model.estimatedStart = start;
 				this.model.estimatedFinish = end;
-				this.model.durationParts =  duration;
+				this.model.durationParts = duration;
 				this.model.locked = locked;
 				this.hasModelChanges = true;
 			}
@@ -365,19 +381,18 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	/**
-	 * Save the changes on the task
+	 * Save the changes on the task or create it
 	 */
 	public onSave(): void {
-		this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
-			.subscribe((result) => this.close(result));
-	}
+		let observable = null;
 
-	/**
-	 * Create the task
-	*/
-	public onCreate(): void {
-		this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
-			.subscribe((result) => this.close(result));
+		if (this.taskDetailModel.modal.type === ModalType.EDIT) {
+			observable = this.taskManagerService.updateTask(this.modelHelper.getPayloadForUpdate())
+		} else {
+			observable = this.taskManagerService.createTask(this.modelHelper.getPayloadForCreate())
+		}
+
+		observable.subscribe((result) => this.close(result));
 	}
 
 	/**
@@ -393,8 +408,8 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public cancelCloseDialog(): void {
 		if (this.isFormDirty()) {
 			this.promptService.open(
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED')	,
-				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE')	,
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
+				this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.UNSAVED_CHANGES_MESSAGE'),
 				this.translatePipe.transform('GLOBAL.CONFIRM'),
 				this.translatePipe.transform('GLOBAL.CANCEL'))
 				.then(result => {
@@ -414,7 +429,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	public deleteTask(): void {
 		this.promptService.open(
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
-			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK')	,
+			this.translatePipe.transform('TASK_MANAGER.DELETE_TASK'),
 			this.translatePipe.transform('GLOBAL.CONFIRM'),
 			this.translatePipe.transform('GLOBAL.CANCEL'))
 			.then(result => {
@@ -439,7 +454,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		const diff = this.model.durationParts[unit] - originalParts[unit];
 
 		if (this.model.estimatedFinish) {
-			this.model.estimatedFinish =  DateUtils.increment(this.model.estimatedFinish, [{value: diff, unit}]);
+			this.model.estimatedFinish = DateUtils.increment(this.model.estimatedFinish, [{value: diff, unit}]);
 		}
 	}
 
@@ -495,7 +510,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 			isEmpty = true
 		}
 
-		const errors =  (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect' : true}  : null;
+		const errors = (!isEmpty && !ValidationUtils.isValidLabelURL(labelURL)) ? {'incorrect': true} : null;
 		if (this.taskEditCreateForm.form) {
 			this.taskEditCreateForm.form.controls['instructionLink'].setErrors(errors);
 		}
@@ -513,10 +528,10 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * Get the object required to query tasks, using the current commentId and eventId
 	 * @eventId Event id number if it is selected
 	 * @returns {any}
-	*/
+	 */
 	protected getMetaParam(eventId = ''): any {
 		const commentId = this.taskDetailModel.modal.type === ModalType.CREATE ? '' : this.model.id;
-		return {commentId, eventId: eventId || this.model.event.id} ;
+		return {commentId, eventId: eventId || this.model.event.id};
 	}
 
 	/**
@@ -524,7 +539,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	 * @returns {any}
 	 */
 	protected onSelectedEvent(event): void {
-		this.metaParam = this.getMetaParam(event.id) ;
+		this.metaParam = this.getMetaParam(event.id);
 	}
 
 	/**
