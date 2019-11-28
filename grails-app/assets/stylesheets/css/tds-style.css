@@ -1480,7 +1480,7 @@ div.dates-info-container {
   border-collapse: collapse; }
   .tds-table table thead th {
     font-weight: 500;
-    font-size: 11px;
+    font-size: 12px;
     line-height: 12px;
     padding: 5px 0 5px 12px;
     color: #3c8dbc;
@@ -1489,7 +1489,7 @@ div.dates-info-container {
   .tds-table table tbody tr {
     cursor: pointer; }
     .tds-table table tbody tr td {
-      font-size: 11px;
+      font-size: 12px;
       color: #333333;
       border-style: solid;
       border-color: #d9e4ea;

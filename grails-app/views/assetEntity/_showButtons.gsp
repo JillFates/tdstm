@@ -15,13 +15,6 @@
             </button>
         </tds:hasPermission>
 
-        <tds:hasPermission permission="${Permission.ArchitectureView}">
-            <button type="submit" class="btn btn-icon">
-                <g:link controller="assetEntity" action="architectureViewer" params="[assetId:assetEntity?.id, level:2]"></g:link>
-                <i class="fas fa-info"></i>
-            </button>
-        </tds:hasPermission>
-
         <tds:hasPermission permission="${Permission.AssetDelete}">
             <g:if test="${deleteChassisWarning}">
                 <button class="btn btn-icon" type="submit" onclick="return confirm('This chassis has blades assigned to it. Deleting the chassis will clear the reference for all associated blades. Click OK to continue otherwise click Cancel.');">
