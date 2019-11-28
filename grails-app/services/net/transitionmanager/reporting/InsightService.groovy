@@ -26,7 +26,7 @@ class InsightService implements ServiceMethods {
 	List<Map> assetsAndDependenciesByProvider(Project project, Integer max) {
 		namedParameterJdbcTemplate.queryForList('''
 			SELECT 
-				p.name,
+				p.name AS Name,
 				SUM(CASE WHEN ib.domain_class_name = 'Dependency' THEN 1 ELSE 0 END) AS Dependencies, 
 				SUM(CASE WHEN ib.domain_class_name <> 'Dependency' THEN 1 ELSE 0 END) AS Assets 
 			FROM import_batch ib
@@ -55,7 +55,7 @@ class InsightService implements ServiceMethods {
 	 */
 	List<Map> topTags(Project project, Integer max) {
 		Tag.executeQuery('''
-			SELECT  new MAP(t.id as id, t.name as name, count(ta.id) as count)
+			SELECT  new MAP(t.id as Id, t.name as Name, count(ta.id) as Count)
 			FROM Tag t
 			JOIN t.tagAssets as ta
 			WHERE t.project = :project
@@ -76,9 +76,9 @@ class InsightService implements ServiceMethods {
 	List<Map> assetsByOsAndEnvironment(Project project) {
 		namedParameterJdbcTemplate.queryForList('''
 			SELECT 
-				count(*), 
-				ae.os, 
-				ae.environment 
+				count(*) AS 'Count',
+				ae.os as OS,
+				ae.environment AS Environment
 			FROM asset_entity ae
 			WHERE ae.project_id = :project
 			GROUP BY 
@@ -104,7 +104,7 @@ class InsightService implements ServiceMethods {
 	List<Map> devicesByEvent(Project project, Integer max) {
 		namedParameterJdbcTemplate.queryForList('''
 			SELECT 
-				me.name,
+				me.name AS Name,
 				count(a.asset_entity_id) as Devices
 			FROM move_event me
 			JOIN asset_comment ac on ac.move_event_id = me.move_event_id
