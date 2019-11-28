@@ -42,6 +42,8 @@ import {Title} from '@angular/platform-browser';
 import {TaskTeam} from '../common/constants/task-team.constant';
 import {DiagramEventAction} from '../../../../shared/components/diagram-layout/model/diagram-event.constant';
 import {DiagramLayoutService} from '../../../../shared/services/diagram-layout.service';
+import {SetEvent} from '../../../event/action/event.actions';
+import {Store} from '@ngxs/store';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -98,7 +100,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			private location: Location,
 			private translatePipe: TranslatePipe,
 			private titleService: Title,
-			private diagramLayoutService: DiagramLayoutService
+			private diagramLayoutService: DiagramLayoutService,
+			private store: Store
 		) {
 				this.activatedRoute.queryParams
 					.pipe(takeUntil(this.unsubscribe$))
@@ -285,6 +288,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (moveEvent) { this.selectedEvent = moveEvent; }
 
 		this.loadFromSelectedEvent();
+
+		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 	}
 
 	/**

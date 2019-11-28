@@ -762,7 +762,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 **/
 	highlightNodesByText(match: string, team?: string): void {
 		this.diagram.commit(d => {
-			if (!match || match.length < 1) { return d.clearSelection(); }
+			if ((!match || match.length < 1) && (!team || team.length < 1)) { return d.clearSelection(); }
 			let highlightCollection: any;
 
 			if (match.length > 0 && team.length > 0) {
@@ -788,6 +788,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 							&& f.data.team && !!f.data.team.includes(team)
 						});
 				}
+			} else if (match.length < 1 && team.length > 0) {
+				highlightCollection = d.nodes.filter(f => team === f.data.team);
 			} else {
 				highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
 			}
