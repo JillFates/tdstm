@@ -20,10 +20,10 @@ import {ILinkPath} from '../../../taskManager/components/neighborhood/neighborho
 import {IArchitectureGraphAsset, IAssetLink, IAssetNode} from '../../model/architecture-graph-asset.model';
 import {ASSET_ICONS} from '../../model/asset-icon.constant';
 
-export class ArchitectureGraphDiagramHelper {
+export class AssetCommonDiagramHelper {
 
 	constructor() {
-		// Architecture Graph Diagram Helper Constructor
+		// Asset Common Diagram Helper Constructor
 	}
 
 	/**
@@ -140,7 +140,7 @@ export class ArchitectureGraphDiagramHelper {
 	iconOnlyNodeTemplate(opts?: any): Node {
 		const node = new Node(Panel.Viewbox);
 		node.position = new Point(0, 0);
-		node.maxSize = new Size(35, 60);
+		node.maxSize = new Size(35, 40);
 
 		const panel = new Panel(Panel.Auto);
 		const panelBody = new Panel(Panel.Vertical);
@@ -240,4 +240,5 @@ export class ArchitectureGraphDiagramHelper {
 	animationFinished(): void {
 		// TODO
 	}
+
 }
