@@ -16,12 +16,14 @@ export class InsightResolveService implements Resolve<any> {
 	 * @param route
 	 */
 	resolve(route: ActivatedRouteSnapshot): Observable<any> | boolean {
-		return this.insightService.getInsightData().map(events => {
-			return events;
-		}).catch((err) => {
-			console.error('EventsResolveService:', 'An Error Occurred trying to fetch Event List');
-			this.router.navigate(['/security/error']);
-			return Observable.of(false);
-		});
+		// return this.insightService.getInsightData().map(events => {
+		// 	return events;
+		// }).catch((err) => {
+		// 	console.error('EventsResolveService:', 'An Error Occurred trying to fetch Event List');
+		// 	this.router.navigate(['/security/error']);
+		// 	return Observable.of(false);
+		// });
+
+		return null;
 	}
 }

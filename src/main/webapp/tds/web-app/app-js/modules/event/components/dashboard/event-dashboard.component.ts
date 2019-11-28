@@ -92,10 +92,6 @@ export class EventDashboardComponent implements OnInit {
 					});
 		});
 
-		this.eventsService.getInsightData().subscribe( (insightData: any) => {
-			this.insightData = insightData;
-			console.log((insightData));
-		} );
 	}
 
 	/**
