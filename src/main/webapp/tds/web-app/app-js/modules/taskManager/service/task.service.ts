@@ -539,9 +539,9 @@ export class TaskService {
 	 * @param taskId: number | string
 	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<HttpResponse<IGraphNode[]>> {
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<HttpResponse<IGrapTaskResponseBody>> {
 		const params = this.createHttpFilterParams(filters);
-		return this.http.get<IGraphNode[]>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
+		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
 			{ params, observe: 'response' });
 	}
 

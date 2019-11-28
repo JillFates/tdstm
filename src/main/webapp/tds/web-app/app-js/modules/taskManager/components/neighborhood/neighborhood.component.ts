@@ -88,6 +88,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	isMoveEventReq: boolean;
 	requestId: number;
 	refreshTriggered: boolean;
+	isNeighbor: boolean;
 
 	constructor(
 			private taskService: TaskService,
@@ -203,7 +204,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		if (this.isFullView
 			&& this.diagramLayoutService.getRequestId() === taskId
 			&& !this.diagramLayoutService.isCacheFromMoveEvent()
-			&& !this.refreshTriggered) {
+			&& !this.refreshTriggered
+			&& !this.isNeighbor
+		) {
 			this.generateModelFromCache();
 		} else {
 			const filters = {
@@ -217,13 +220,15 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 					timeout(15000)
 				)
 				.subscribe(res => {
-					const data = res.body;
+					const data = res.body.data;
 					if (data && data.length > 0) {
 						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
-							this.diagramLayoutService.clearFullGraphCache();
-							this.requestId = taskId;
-							this.isMoveEventReq = false;
+							if (!this.isNeighbor) {
+								this.diagramLayoutService.clearFullGraphCache();
+								this.requestId = taskId;
+								this.isMoveEventReq = false;
+							}
 							this.generateModel();
 						}
 					}
@@ -347,12 +352,14 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			}
 		});
 		this.teamHighlights$.next(teams);
-		this.cacheFullGraph({
-			requestId: this.requestId,
-			isMoveEvent: this.isMoveEventReq,
-			data: nodeDataArr,
-			linksPath
-		});
+		if (!this.isNeighbor) {
+			this.cacheFullGraph({
+				requestId: this.requestId,
+				isMoveEvent: this.isMoveEventReq,
+				data: nodeDataArr,
+				linksPath
+			});
+		}
 		this.nodeData$.next({ data: nodeDataArr, linksPath });
 		this.currentUser$.next(this.userContext.user);
 		this.ctxMenuOpts$.next(this.ctxMenuOptions());
@@ -800,6 +807,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	onNeighborhood(data?: IGraphTask): void {
 		this.graph.cleanUpDiagram();
 		this.isFullView = false;
+		this.isNeighbor = true;
 		this.graph.showFullGraphBtn = true;
 		// const taskIdParam = this.urlParams && this.urlParams.taskId;
 		// const currentUrl = this.location.path().includes(taskIdParam) ?
@@ -872,6 +880,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 */
 	viewFullGraphFromCache(): void {
 		this.isFullView = true;
+		this.isNeighbor = false;
 		this.graph.showFullGraphBtn = false;
 		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
 	}
