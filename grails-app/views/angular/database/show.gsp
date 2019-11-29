@@ -224,7 +224,6 @@
 		<nav class="modal-sidenav btn-link">
 			<tds-button-edit (click)="showAssetEditView()" tooltip="Edit" icon="pencil"></tds-button-edit>
 			<tds-button-clone (click)="onCloneAsset()" tooltip="Clone" icon="copy"></tds-button-clone>
-			<tds-button-custom (click)="openGraphUrl()" tooltip="Graph" icon="sitemap"></tds-button-custom>
 			<tds:hasPermission permission="${Permission.AssetDelete}">
 				<tds-button-delete
 						tooltip="Delete Asset"
