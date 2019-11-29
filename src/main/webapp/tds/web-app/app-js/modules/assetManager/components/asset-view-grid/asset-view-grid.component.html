@@ -11,7 +11,7 @@
 	(columnResize)="onWidthChange($event)"
 	(cellClick)="cellClick($event)"
 	[ngClass]="{ 'hide-filter': !showAssetsFilter }"
-	class="row-actions-6-children"
+		class="row-actions-6-children"
 >
 	<!-- Select all -->
 	<kendo-grid-column
@@ -60,7 +60,7 @@
 	<kendo-grid-column
 		[locked]="true"
 		[width]="60"
-		[class]="{ 'k-custom-command-column': true }"
+		[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
 		[minResizableWidth]="60"
 	>
 		<ng-template
@@ -186,7 +186,7 @@
 						? 'fa-angle-double-down'
 						: 'fa-angle-double-right'
 				"
-				style="margin-top: 3px;"
+				style="margin-top: 3px; margin-left: 10px"
 				(click)="onToggleTagsView($event)"
 				title="Toggle Tags View"
 			></i>

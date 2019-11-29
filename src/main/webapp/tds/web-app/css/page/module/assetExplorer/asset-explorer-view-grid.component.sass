@@ -15,21 +15,25 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
   .label.tag
     @include asset-tag-style
 
+  // wrap overflow text in ellipsis mode.
+  kendo-grid.k-grid td
+    word-break: normal
+    text-overflow: ellipsis
+    white-space: nowrap
+    &:not(.actions-column)
+      overflow: hidden !important
+
   $grid-font-icon-size: 20px
   .k-grid
     height: 77vh
-  kendo-grid-list
-    .k-grid-content
-      .k-grid-table
-        tbody
-          tr
-            td
-              text-overflow: ellipsis !important
   .k-grid-pager
     .k-icon
       font-size: $grid-font-icon-size
 
   .k-grid-header
+    tds-checkbox
+      .clr-control-label
+        margin-left: 4px
     .k-filter-row
       td
         vertical-align: top
@@ -99,6 +103,8 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
 
+  .single-line-tags
+    white-space: normal
   .asset-detail-link
     font-weight: bold
     cursor: pointer
@@ -143,9 +149,6 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     .k-link
       margin: unset
       padding: unset
-
-  .sortable-column
-    width: 85%
 
   .text-delimited
     white-space: nowrap
