@@ -369,7 +369,8 @@ export class DataGridOperationsHelper {
 	/**
 	 * Determine based upon the rows number if grid can positioned the menu column contextual menu dinamically
 	 */
-	public canSupportColumnMenuDynamic(): boolean {
-		return (this.gridData && this.gridData.total) >= MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC;
+	public canSupportColumnMenuDynamic(minRows = 0): boolean {
+		const minimum = minRows || MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC;
+		return (this.gridData && this.gridData.total) >= minimum;
 	}
 }

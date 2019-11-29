@@ -1,9 +1,12 @@
 <!-- Main content -->
-<div class="content body tds-kendo-grid without-selectabe-rows">
+<div class="content tag-list body tds-kendo-grid without-selectabe-rows">
 	<section>
 		<div class="box-body box-with-empty-header">
 			<form novalidate #myForm="ngForm">
 				<kendo-grid
+					class="tds-table"
+					style="min-height: 500px"
+					[ngClass]="{'row-actions-3-children': gridSettings.canSupportColumnMenuDynamic(7), 'hide-filter': !showFilters}"
 					*ngIf="gridSettings"
 					[data]="gridSettings.gridData"
 					[filter]="gridSettings.state.filter"
@@ -25,8 +28,6 @@
 					(edit)="editHandler($event)"
 					(save)="saveHandler($event)"
 					(remove)="removeHandler($event)"
-					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="row-actions-5-children"
 				>
 					<!-- Toolbar Template -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
