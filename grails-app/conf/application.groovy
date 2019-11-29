@@ -1,7 +1,6 @@
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.security.Permission
 
-
 grails {
 	profile = 'web'
 	session.timeout = 3600 //60 minute session timeout
@@ -17,7 +16,10 @@ grails {
 	}
 }
 
-server.contextPath = '/tdstm'
+server.servlet['context-path'] = '/tdstm'
+
+//excluding autoconfig for ldap to work with Grails 4+
+spring.autoconfigure.exclude=['org.springframework.boot.autoconfigure.ldap.LdapAutoConfiguration', 'org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration']
 
 info {
 	app {
@@ -28,15 +30,34 @@ info {
 }
 
 spring {
-	main {
-		main['banner-mode'] = 'off'
-	}
+	jmx['unique-names'] = true
+	main['banner-mode'] = 'off'
 
 	groovy {
-		template {
-			template['check-template-location'] = false
-		}
+		template['check-template-location'] = false
 	}
+
+	devtools {
+		restart['additional-exclude:'] = [
+			'*.gsp',
+			'**/*.gsp',
+			'*.gson',
+			'**/*.gson',
+			'logback.groovy',
+			'*.properties'
+		]
+	}
+}
+
+management {
+	endpoints.web.exposure.include= "*"
+    endpoints['enabled-by-default'] = true
+}
+
+management {
+    endpoints {
+        jmx['unique-names'] = true
+    }
 }
 
 grails {
@@ -51,20 +72,20 @@ grails {
 	scaffolding.templates.domainSuffix = 'Instance'
 	//spring.bean.packages = []
 
-	mime {
+    mime {
 		file.extensions = true // enables the parsing of file extensions from URLs into the request format
-		disable {
-			accept {
-				header {
-					userAgents = [
-						'Gecko',
-						'WebKit',
-						'Presto',
-						'Trident'
-					]
-				}
-			}
-		}
+        disable {
+            accept {
+                header {
+                    userAgents = [
+                        'Gecko',
+                        'WebKit',
+                        'Presto',
+                        'Trident'
+                    ]
+                }
+            }
+        }
 
 		types {
 			all = '*/*'
@@ -205,19 +226,10 @@ environments {
 	}
 }
 
-endpoints {
-	enabled = true
-
-	jmx {
-		enabled = true
-		jmx['unique-names'] = true
-	}
-}
-
 hibernate {
 	cache {
 		queries = false
-		use_second_level_cache = true
+		use_second_level_cache = false
 		use_query_cache = false
 		region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
 	}
@@ -336,7 +348,6 @@ List staticSecurityRules = [
 	[pattern: '/ws/**', access: 'isAuthenticated()'],
 	[pattern: '/', access: 'permitAll'],
 	[pattern: '/index', access: 'permitAll'],
-	[pattern: '/index.gsp', access: 'permitAll'],
 	[pattern: '/assets/**', access: 'permitAll'],        // Don't believe it is used
 	[pattern: '/auth/**', access: 'permitAll'],        // Authentication Controller
 	[pattern: '/**/js/**', access: 'permitAll'],        // Javascript
@@ -429,8 +440,8 @@ if (System.getProperty("tdstm.gconsole")) {
 		plugin {
 			console.enabled = true
 			springsecurity {
-				staticSecurityRules << [pattern: '/health/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
-				staticSecurityRules << [pattern: '/info/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/h2-console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
+				staticSecurityRules << [pattern: '/actuator/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/monitoring', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/static/console*/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
 				staticSecurityRules << [pattern: '/console/**', access: "hasPermission(request, '${Permission.AdminUtilitiesAccess}')"]
@@ -516,3 +527,5 @@ Specify jndi name of datasource to monitor in production environment
 
 // TM-11135 Change so that GORM save defaults to failOnError:true
 grails.gorm.failOnError = true
+
+grails.plugin.databasemigration.updateOnStartFileName = 'changelog.groovy'

@@ -21,7 +21,7 @@ class PermissionsService {
 			fetch: [
 				rolePermissions: 'join'
 			]
-		)
+		).unique()
 	}
 
 	/**

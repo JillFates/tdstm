@@ -1,25 +1,22 @@
 package com.tdsops.etl
 
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import grails.test.mixin.Mock
+import net.transitionmanager.asset.Rack
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import spock.lang.See
 
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model])
-class ETLSandboxingSpec extends ETLBaseSpec {
+class ETLSandboxingSpec extends ETLBaseSpec implements DataTest {
 
 	Project GMDEMO
 	Project TMDEMO
@@ -28,17 +25,8 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	DataSetFacade simpleDataSet
 	String simpleDataSetFileName
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Model
 		String.mixin StringAppendElement
 	}
 
@@ -58,7 +46,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	}
 
 	def cleanup() {
-		if (simpleDataSetFileName) fileSystemService.deleteTemporaryFile(simpleDataSetFileName)
+		if (simpleDataSetFileName) fileSystemServiceTestBean.deleteTemporaryFile(simpleDataSetFileName)
 	}
 
 	void 'test can check syntax in an ETL script with groovy comments'() {
@@ -458,7 +446,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 
 		cleanup:
 			if (fileName) {
-				fileSystemService.deleteTemporaryFile(fileName)
+				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
 

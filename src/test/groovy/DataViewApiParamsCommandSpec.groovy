@@ -1,10 +1,6 @@
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import net.transitionmanager.command.dataview.DataviewApiParamsCommand
 import spock.lang.Specification
 
-
-@TestMixin(GrailsUnitTestMixin)
 class DataViewApiParamsCommandSpec extends Specification {
 
 	void 'test can define offset and limit'(){
