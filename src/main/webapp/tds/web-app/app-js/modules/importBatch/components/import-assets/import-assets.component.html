@@ -65,15 +65,11 @@
                                     <kendo-upload-messages select="{{'GLOBAL.PLEASE_SELECT' | translate}}"></kendo-upload-messages>
                                 </kendo-upload><!---->
                             </div>
-<!--                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"-->
-<!--                                  class="control-label col-md-{{uiConfig.urlColSize}}">-->
-<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}-->
-<!--                                <br>-->
-<!--                                <a href="javascript:void(0);"-->
-<!--                                   (click)="onViewData('FETCH')">-->
-<!--                                {{'IMPORT_ASSETS.MANUAL_IMPORT.VIEW_DATA' | translate}}-->
-<!--                                </a>-->
-<!--                            </span>-->
+                            <span *ngIf="fetchResult?.status === 'success' && fetchInputUsed === 'file'"
+                                  class="control-label col-md-{{uiConfig.urlColSize}}">
+                                {{'IMPORT_ASSETS.MANUAL_IMPORT.CURRENTLY_USED' | translate}}
+                                <br>
+                            </span>
 
                         </div>
 

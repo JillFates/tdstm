@@ -303,6 +303,8 @@ var GraphUtil = (function ($) {
 	// changes the graph to fullscreen mode
 	public.enableFullscreen = function () {
 		$('#item1').addClass('fullscreen');
+		$('#dependecyDivIdDesc').css('display', 'none');
+		$('#dependencyTableWrapperId').css('margin-top', '0');
 		if ($('#fullscreenButtonId').hasClass('showMenu'))
 			$('#fullscreenButtonId').html('Show Menu');
 		else
@@ -314,6 +316,8 @@ var GraphUtil = (function ($) {
 	// changes the graph to normal mode
 	public.disableFullscreen = function () {
 		$('#item1').removeClass('fullscreen');
+		$('#dependecyDivIdDesc').css('display', 'block');
+		$('#dependencyTableWrapperId').css('margin-top', '10px');
 		$('#fullscreenButtonId').html('Full Screen');
 		public.moveDependencyGroups();
 		public.resetGraphSize();

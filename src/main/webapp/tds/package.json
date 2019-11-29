@@ -58,7 +58,7 @@
     "core-js": "2.6.4",
     "file-saver": "^2.0.2",
     "focus-trap": "^5.0.2",
-    "gojs": "^2.0.17",
+    "gojs": "2.1.2",
     "jszip": "3.1.5",
     "moment": "2.24.0",
     "moment-timezone": "0.5.23",
@@ -68,7 +68,7 @@
     "roboto-fontface": "^0.10.0",
     "rxjs": "6.4.0",
     "rxjs-compat": "6.4.0",
-    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.20.tgz",
+    "tds-component-library": "https://tm-nexus.transitionmanager.net/repository/npm/tds-component-library/-/tds-component-library-0.0.21.tgz",
     "zone.js": "0.10.0"
   },
   "devDependencies": {

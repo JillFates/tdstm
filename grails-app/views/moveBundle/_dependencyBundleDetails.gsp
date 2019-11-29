@@ -1,7 +1,7 @@
 <%@page defaultCodec="none" %>
 <div id="dependencyBundleDetailGroupContainer">
 	<div id="dependencyDivId">
-		<div style="padding-left:0px">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
+		<div style="padding-left:0px" id="dependecyDivIdDesc">Dependency Analysis last run by ${ depGrpCrt?.modifiedBy } on &nbsp;${date} and ${dependencyBundleCount} dependency group(s) were discovered</div>
 		<div id="dependencyTableWrapperId" style="border: 1px solid #0092d1; margin-left: 0px; margin-top: 10px">
 			<table id="dependencyTableId" cellpadding="4" cellspacing="0" style="border: 0">
 				<tr id="dependencyGroupsRowId" class="odd">

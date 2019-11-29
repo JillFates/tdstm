@@ -1,6 +1,7 @@
 <div class="content body">
 	<tds-report-toggle-filters [hideFilters]="hideFilters"
 														 (toggle)="toggleFilters($event)"
+							   							 (reload)="onReload()"
 														 [disabled]="!generatedReport"></tds-report-toggle-filters>
 	<div class="box-body">
 		<form class="formly form-horizontal" role="form" novalidate>
