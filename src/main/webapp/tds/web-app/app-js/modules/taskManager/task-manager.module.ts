@@ -22,6 +22,10 @@ import {TagsResolveService} from '../assetManager/resolve/tags-resolve.service';
 import {ModuleResolveService} from '../../shared/resolves/module.resolve.service';
 import {TaskListComponent} from './components/list/task-list.component';
 import {ReportsService} from '../reports/service/reports.service';
+import {NeighborhoodComponent} from './components/neighborhood/neighborhood.component';
+import {DialogsModule} from '@progress/kendo-angular-dialog';
+import {TaskViewToggleComponent} from './components/common/task-view-toggle.component';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -38,11 +42,15 @@ import {ReportsService} from '../reports/service/reports.service';
 		IntlModule,
 		InputsModule,
 		DateInputsModule,
+		DialogsModule,
+		TooltipModule,
 		// Route
-		TaskManagerRouteModule
+		TaskManagerRouteModule,
 	],
 	declarations: [
-		TaskListComponent
+		TaskListComponent,
+		NeighborhoodComponent,
+		TaskViewToggleComponent
 	],
 	providers: [
 		// Resolve

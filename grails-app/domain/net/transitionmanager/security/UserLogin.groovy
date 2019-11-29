@@ -1,8 +1,9 @@
 package net.transitionmanager.security
 
-import com.tdsops.common.security.SecurityUtil
+
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
+import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.imports.DataTransferBatch
 import net.transitionmanager.license.LicenseActivityTrack
 import net.transitionmanager.model.ModelSyncBatch
@@ -11,7 +12,6 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.person.UserLoginProjectAccess
 import net.transitionmanager.person.UserPreference
 import net.transitionmanager.project.Project
-import net.transitionmanager.exception.DomainUpdateException
 
 class UserLogin {
 
@@ -35,7 +35,6 @@ class UserLogin {
 	Date passwordExpirationDate
 	Integer failedLoginAttempts = 0
 	Boolean passwordNeverExpires = false
-	String saltPrefix = ''
 
 	static hasMany = [dataTransferBatch: DataTransferBatch]
 
@@ -53,7 +52,6 @@ class UserLogin {
 		password password: true
 		passwordChangedDate nullable: true
 		passwordExpirationDate nullable: true
-		saltPrefix nullable: true
 		username blank: false, unique: true, size: 2..50
 	}
 
@@ -68,7 +66,6 @@ class UserLogin {
 		lastModified sqltype: 'DateTime'
 		password sqlType: 'varchar(100)' // size must me more than 20 because it will store as hashed code
 		passwordChangedDate sqltype: 'DateTime'
-		saltPrefix sqltype: 'varchar(32)'
 		username sqlType: 'varchar(50)'
 	}
 
@@ -153,18 +150,6 @@ class UserLogin {
 		person?.email
 	}
 
-	String getSaltPrefix() {
-		if (!saltPrefix && isLocal) {
-			saltPrefix = SecurityUtil.randomString(32)
-		}
-		saltPrefix
-	}
-
-	// Hash the password for the user. If the user doesn't have a salt then one will be assigned to the user
-	String encryptPassword(String password) {
-		SecurityUtil.encrypt(password, getSaltPrefix())
-	}
-
 	// Set a cleartext password on the UserLogin that will be hash. Note that the domain will
 	// create a password history record automatically in the post insert/update events
 	String applyPassword(String unhashedPassword) {
@@ -178,11 +163,10 @@ class UserLogin {
 		 * this is why when we tryied to save the password only it never worked!
 		 * https://github.com/grails/grails-data-mapping/issues/1097
 		 */
-		setPassword( encryptPassword(unhashedPassword) )
-		setFailedLoginAttempts( 0 )
-		setLockedOutUntil( null )
+		setPassword(unhashedPassword)
+		setFailedLoginAttempts(0)
+		setLockedOutUntil(null)
 
-		//We remove the forcePassword Change Flag After the password was set
 		setForcePasswordChange( 'N' )
 
 		return password
@@ -206,23 +190,6 @@ class UserLogin {
 		}
 	}
 
-	/**
-	 * Compare new cleartext password to the existing hashed password that will optionally check legacy hash method(s)
-	 * @param unhashedPassword - the new password to compare to hashed password
-	 * @param saltPrefix - the salt String to use as the prefix for hashing the user's password
-	 * @param tryLegacy - a flag to control if legacy hash methods should be tried (default true)
-	 * @return true if the passwords match otherwise false
-	 */
-	boolean comparePassword(String unhashedPassword, boolean tryLegacy = true) {
-		String newPassword = encryptPassword(unhashedPassword)
-		boolean matched = newPassword == password
-		if (!matched && tryLegacy) {
-			newPassword = SecurityUtil.encryptLegacy(unhashedPassword)
-			matched = newPassword == password
-		}
-		return matched
-	}
-
 	List<String> getSecurityRoleCodes() {
 		executeQuery('''
 			SELECT roleType.id FROM PartyRole
@@ -234,8 +201,8 @@ class UserLogin {
 	Project getCurrentProject() {
 		String prefCodeValue = executeQuery('''
 				select value from UserPreference
-				where userLogin=? and preferenceCode='CURR_PROJ'
-			''',[this], [max: 1])[0]
+				where userLogin=:user and preferenceCode='CURR_PROJ'
+			''',[user:this], [max: 1])[0]
 		Long projectId = NumberUtil.toPositiveLong(prefCodeValue, 0)
 
 		if (projectId) {
