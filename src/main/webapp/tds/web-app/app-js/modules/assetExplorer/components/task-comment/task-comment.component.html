@@ -2,7 +2,8 @@
 	<div *ngIf="(!showTask && !showComment) || showTask" class="task-content">
 		<kendo-grid
 			*ngIf="dataGridTaskHelper"
-			class="tds-table row-actions-2-children"
+			class="tds-table"
+			[ngClass]="{'row-actions-2-children': dataGridTaskHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridTaskHelper.gridData"
 			[sort]="dataGridTaskHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
@@ -128,6 +129,7 @@
 		<kendo-grid
 			*ngIf="dataGridCommentHelper"
 			class="tds-table"
+			[ngClass]="{'row-actions-2-children': dataGridCommentHelper.canSupportColumnMenuDynamic()}"
 			[data]="dataGridCommentHelper.gridData"
 			[sort]="dataGridCommentHelper.state.sort"
 			[sortable]="{ mode: 'single' }"
