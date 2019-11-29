@@ -1,6 +1,11 @@
-<div class="bulk-change-actions-component modal fade in" id="bulk-change-action-component" data-backdrop="static" tabindex="-1" role="dialog">
-	<div class="modal-dialog modal-md" role="document">
-		<div class="tds-modal-content">
+<div class="bulk-change-actions-component modal fade in"
+		 id="bulk-change-action-component"
+		 data-backdrop="static"
+		 tabindex="-1"
+		 role="dialog">
+	<div class="modal-dialog modal-md"
+			 role="document">
+		<div class="tds-modal-content has-side-nav">
 			<div class="modal-header">
 				<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
 					<clr-icon aria-hidden="true" shape="close"></clr-icon>
@@ -30,9 +35,11 @@
 					</form>
 				</div>
 			</div>
-			<div class="modal-footer form-group-center">
-				<tds-button theme="primary" (click)="onNext()" icon="step-forward" title="Next" >Next</tds-button>
-				<tds-button (click)="cancelCloseDialog($event)" icon="ban" title="Cancel">Cancel</tds-button>
+			<div class="modal-side-nav form-group-center">
+				<nav class="modal-sidenav btn-link">
+					<tds-button (click)="onNext()" [icon]="'step-forward'" [title]="'Next'"></tds-button>
+					<tds-button-close (click)="cancelCloseDialog($event)"></tds-button-close>
+				</nav>
 			</div>
 		</div>
 	</div>

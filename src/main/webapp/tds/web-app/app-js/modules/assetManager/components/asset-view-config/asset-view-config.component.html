@@ -92,10 +92,12 @@
 									</label>
 								</clr-checkbox-wrapper>
 							</div>
-							<button class="btn"	[disabled]="!isAssetSelected()" (click)="setCurrentTab(1)"
-											[ngClass]="{'btn-default':!isAssetSelected(), 'btn-success':isAssetSelected()}">
-								<i class="fa fa-fw fa-chevron-right" style="padding-right:0px;" aria-hidden="true"></i> Next
-							</button>
+							<tds-button [disabled]="!isAssetSelected()"
+													(click)="setCurrentTab(1)"
+													[icon]="'step-forward'"
+													[ngClass]="{'btn-secondary':!isAssetSelected(), 'btn-success':isAssetSelected()}">
+								Next
+							</tds-button>
 						</div>
 					</ng-template>
 				</kendo-tabstrip-tab>
@@ -112,12 +114,6 @@
 									(filter)="filterModel.search = $event; applyFilters()"
 									placeholder="Filter on field name">
 								</tds-filter-input>
-<!--								<tds-button [icon]="'filter'"-->
-<!--														[iconClass]="'is-solid'"-->
-<!--														class="btn-sm"-->
-<!--														[title]="'Apply Filter'"-->
-<!--														(click)="applyFilters()">-->
-<!--								</tds-button>-->
 								<clr-select-container class="inline">
 									<select clrSelect
 													name="selected"

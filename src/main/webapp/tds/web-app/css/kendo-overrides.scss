@@ -154,6 +154,16 @@ kendo-grid.k-grid {
 			}
 		}
 	}
+
+  kendo-dropdownlist.k-dropdown .k-dropdown-wrap,
+  .k-dropdown-wrap {
+    border-bottom: 1px solid #999;
+
+    &:hover {
+      border-bottom: 1px solid #999;
+      border-color: rgba(222,222,222,.5);
+    }
+  }
 }
 
 kendo-list {
@@ -221,6 +231,16 @@ kendo-dropdownlist {
 			color: #0092d1;
 		}
 	}
+}
+
+.k-timepicker {
+  .k-select {
+    color: #0092d1 !important;
+  }
+}
+.k-timepicker:hover .k-select {
+  background-color: inherit;
+  background-image: none;
 }
 
 kendo-datepicker {
