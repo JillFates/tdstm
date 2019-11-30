@@ -478,9 +478,9 @@
 								case "map":
 										getList("graph", '${groupId}');
 										window.setTimeout(function() {
-                        $('#searchBoxId').val(assetName);
-                        GraphUtil.performSearch();
-										}, 1900)
+                        					$('#searchBoxId').val(assetName);
+                        					GraphUtil.performSearch();
+										}, 2500)
 										break;
 								case "all":
 										getList("all", '${groupId}');
