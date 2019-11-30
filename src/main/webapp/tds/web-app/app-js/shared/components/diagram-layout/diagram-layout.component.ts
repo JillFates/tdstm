@@ -748,9 +748,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				highlightCollection = d.nodes.filter(f => matches === f.data.team);
 			}
 
-			d.selectCollection(highlightCollection);
-			if (highlightCollection.count > 0 && highlightCollection.first()) {
-				d.centerRect(highlightCollection.first().actualBounds);
+			if (highlightCollection) {
+				d.selectCollection(highlightCollection);
+				if (highlightCollection.count > 0 && highlightCollection.first()) {
+					d.centerRect(highlightCollection.first().actualBounds);
+				} else {
+					d.clearSelection();
+				}
 			}
 		});
 	}
@@ -765,7 +769,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			if ((!match || match.length < 1) && (!team || team.length < 1)) { return d.clearSelection(); }
 			let highlightCollection: any;
 
-			if (match.length > 0 && team.length > 0) {
+			if ((match && match.length > 0) && (team && team.length > 0)) {
 				if (team === TaskTeam.ALL_TEAMS) {
 					highlightCollection = d.nodes
 						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
@@ -779,26 +783,24 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				} else {
 					highlightCollection = d.nodes
 						.filter(f => {
-							console.log(!!f.data.name.toLowerCase().includes(match.toLowerCase()),
-								f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()),
-								f.data.team && !!f.data.team.includes(team), f.data.team && f.data.team.includes(team)
-								);
 							return (!!f.data.name.toLowerCase().includes(match.toLowerCase())
 								|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
 							&& f.data.team && !!f.data.team.includes(team)
 						});
 				}
-			} else if (match.length < 1 && team.length > 0) {
+			} else if ((!match || match.length < 1) && (team && team.length > 0)) {
 				highlightCollection = d.nodes.filter(f => team === f.data.team);
 			} else {
 				highlightCollection = d.nodes.filter(f => f.data.name.toLowerCase().includes(match.toLowerCase()));
 			}
 
-			d.selectCollection(highlightCollection);
-			if (highlightCollection.count > 0 && highlightCollection.first()) {
-				d.centerRect(highlightCollection.first().actualBounds);
-			} else {
-				d.clearSelection();
+			if (highlightCollection) {
+				d.selectCollection(highlightCollection);
+				if (highlightCollection.count > 0 && highlightCollection.first()) {
+					d.centerRect(highlightCollection.first().actualBounds);
+				} else {
+					d.clearSelection();
+				}
 			}
 		});
 	}
