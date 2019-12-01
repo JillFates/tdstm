@@ -177,12 +177,12 @@ class DataviewService implements ServiceMethods {
 
 		Dataview dataview = new Dataview()
 		dataview.with {
-			person = currentPerson
-            project = currentProject
-			name = dataviewJson.name
-			isSystem = dataviewJson.isSystem
-			isShared = dataviewJson.isShared
-			reportSchema = dataviewJson.schema
+			person       = currentPerson
+			project      = currentProject
+			name         = dataviewJson.name
+			isSystem     = dataviewJson.isSystem
+			isShared     = dataviewJson.isShared
+			reportSchema = JsonUtil.toJson(dataviewJson.schema)
 		}
 
 		if (!dataview.save(failOnError: false)) {
