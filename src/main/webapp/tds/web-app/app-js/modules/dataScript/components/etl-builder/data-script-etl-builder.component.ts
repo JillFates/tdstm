@@ -16,12 +16,7 @@ import {
 	PROGRESSBAR_COMPLETED_STATUS,
 	PROGRESSBAR_FAIL_STATUS,
 } from '../../service/data-script.service';
-import { NotifierService } from '../../../../shared/services/notifier.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
-import {
-	PREFERENCES_LIST,
-	PreferenceService,
-} from '../../../../shared/services/preference.service';
 import {
 	ScriptConsoleSettingsModel,
 	ScriptTestResultModel,
@@ -32,7 +27,6 @@ import {
 	CHECK_ACTION,
 	OperationStatusModel,
 } from '../../../../shared/components/check-action/model/check-action.model';
-import { DecoratorOptions } from '../../../../shared/model/ui-modal-decorator.model';
 import { ApiResponseModel } from '../../../../shared/model/ApiResponseModel';
 import { ImportAssetsService } from '../../../importBatch/service/import-assets.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
@@ -61,9 +55,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 	};
 	public script: string;
 	private filename: string;
-	public isWindowMaximized = false;
-	private initialWindowStyle = null;
-	public modalOptions: DecoratorOptions;
 	public sampleDataModel: SampleDataModel = new SampleDataModel([], []);
 	protected sampleDataGridHelper: DataGridOperationsHelper;
 	public operationStatus = {
@@ -92,19 +83,11 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 		public dataScriptModel: DataScriptModel,
 		private dataIngestionService: DataScriptService,
 		private importAssetsService: ImportAssetsService,
-		private preferenceService: PreferenceService,
-		private notifierService: NotifierService,
 		private promptService: UIPromptService,
 		private permissionService: PermissionService
 	) {
 		super('#etlBuilder');
 		this.script = '';
-		this.modalOptions = {
-			isFullScreen: false,
-			isResizable: false,
-			isDraggable: false,
-			sizeNamePreference: PREFERENCES_LIST.DATA_SCRIPT_SIZE,
-		};
 		this.loadETLScript();
 		this.fieldReferencePopupHelper = new FieldReferencePopupHelper();
 	}
@@ -113,22 +96,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 		this.MESSAGE_FIELD_WILL_BE_INITIALIZED = this.translatePipe.transform(
 			'DATA_INGESTION.DATASCRIPT.DESIGNER.FIELD_WILL_BE_INITIALIZED'
 		);
-		this.preferenceService
-			.getDataScriptDesignerSize()
-			.subscribe((size: { width: number; height: number }) => {
-				size.width =
-					size.width >= window.innerWidth - 5
-						? window.innerWidth
-						: size.width;
-				size.height =
-					size.height >= window.innerHeight - 5
-						? window.innerHeight
-						: size.height;
-				this.isWindowMaximized =
-					size.height === window.innerHeight &&
-					size.width === window.innerWidth;
-			});
-
 		setTimeout(() => {
 			this.collapsed.code = false;
 		}, 300);
@@ -549,16 +516,6 @@ export class DataScriptEtlBuilderComponent extends UIExtraDialog
 			!this.filename ||
 			this.operationStatus.test.state === CHECK_ACTION.IN_PROGRESS
 		);
-	}
-
-	protected maximizeWindow() {
-		const { width, height } = this.resizableForm.nativeElement.style;
-		this.initialWindowStyle = { width, height };
-		this.isWindowMaximized = true;
-	}
-
-	protected restoreWindow() {
-		this.isWindowMaximized = false;
 	}
 
 	/**
