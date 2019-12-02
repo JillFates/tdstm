@@ -5873,15 +5873,15 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			case 'assignedTo': result = (task.hardAssigned ? '*' : '') + (task.assignedTo?.toString() ?: ''); break
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
+			case "event": result = task.moveEvent?.name; break
+			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			case "apiAction": result = task.apiAction?.name; break
 			case { task[fieldName] instanceof Timestamp}:
 				result = task[fieldName] ? TimeUtil.formatDateTime(task[fieldName] as Date, TimeUtil.FORMAT_DATE_TIME_15) : ''
 				break
 			case { task[fieldName] instanceof Date}:
 				result = task[fieldName] ? TimeUtil.formatDate(task[fieldName] as Date) : ''
 				break
-			case "event": result = task.moveEvent?.name; break
-			case "bundle": result = task.assetEntity?.moveBundle?.name; break
-			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
 				if ( result != null && !(result instanceof String) ) {
