@@ -51,8 +51,8 @@
 							<kendo-chart-series-item
 								type="pie"
 								[data]="dataTopTags"
-								categoryField="name"
-								field="count">
+								categoryField="Name"
+								field="Count">
 								<kendo-chart-series-item-labels
 									[content]="labelContent"
 									color="#000" background="none">
@@ -66,9 +66,9 @@
 										 (click)="toggleTableFor('TOP_TAGS')"></tds-button-collapse>
 					<div class="table" *ngIf="showTopTags">
 						<kendo-grid [data]="dataTopTags" [height]="200">
-							<kendo-grid-column field="name" title="Name" width="30">
+							<kendo-grid-column field="Name" title="Name" width="30">
 							</kendo-grid-column>
-							<kendo-grid-column field="count" title="Count" width="10">
+							<kendo-grid-column field="Count" title="Count" width="10">
 							</kendo-grid-column>
 						</kendo-grid>
 					</div>
@@ -118,7 +118,7 @@
 								type="pie"
 								[data]="dataDevicesByEvent"
 								field="Devices"
-								categoryField="name">
+								categoryField="Name">
 								<kendo-chart-series-item-labels
 									[content]="labelContent"
 									color="#000" background="none">
@@ -130,7 +130,7 @@
 										 (click)="toggleTableFor('DEVICES_BY_EVENT')"></tds-button-collapse>
 					<div class="table" *ngIf="showDevicesByEvent">
 						<kendo-grid [data]="dataDevicesByEvent" [height]="200">
-							<kendo-grid-column field="name" title="Name" width="30">
+							<kendo-grid-column field="Name" title="Name" width="30">
 							</kendo-grid-column>
 							<kendo-grid-column field="Devices" title="Devices" width="10">
 							</kendo-grid-column>
@@ -191,12 +191,12 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-12">
+		<div class="col-md-6">
 			<div>
 				<!-- assets by os and evnironment-->
-				Environment:
+				Select an Environment:
 				<kendo-dropdownlist
-					[data]="splitAssetsByOsData(dataAssetsByOsAndEnvironment)"
+					[data]="dataAssetsByOsAndEnvironment && splitAssetsByOsData(dataAssetsByOsAndEnvironment)"
 					(valueChange)="osChange($event)">
 				</kendo-dropdownlist>
 				<kendo-chart>
@@ -206,7 +206,7 @@
 						<kendo-chart-series-item
 							type="pie"
 							[data]="currentOsSelection"
-							field="count(*)"
+							field="Count"
 							categoryField="os">
 						</kendo-chart-series-item>
 						<kendo-chart-series-item-labels
@@ -217,16 +217,18 @@
 				</kendo-chart>
 				<tds-button-collapse [title]="'INSIGHT.ASSETS_BY_OS_AND_ENVIRONMENT' | translate"
 									 (click)="toggleTableFor('ASSETS_BY_OS_AND_ENVIRONMENT')"></tds-button-collapse>
-				<div class="table" *ngIf="showAssetsByOs">
-					<kendo-grid [data]="dataAssetsByOsAndEnvironment" [height]="200">
-						<kendo-grid-column field="environment" title="Environment" width="30">
-						</kendo-grid-column>
-						<kendo-grid-column field="os" title="OS" width="30">
-						</kendo-grid-column>
-						<kendo-grid-column field="count(*)" title="Count" width="10">
-						</kendo-grid-column>
-					</kendo-grid>
-				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="table" *ngIf="showAssetsByOs">
+				<kendo-grid [data]="currentOsSelection" [height]="200">
+					<kendo-grid-column field="Environment" title="Environment" width="30">
+					</kendo-grid-column>
+					<kendo-grid-column field="OS" title="OS" width="30">
+					</kendo-grid-column>
+					<kendo-grid-column field="Count" title="Count" width="10">
+					</kendo-grid-column>
+				</kendo-grid>
 			</div>
 		</div>
 	</div>

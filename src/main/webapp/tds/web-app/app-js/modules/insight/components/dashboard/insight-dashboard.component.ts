@@ -119,7 +119,7 @@ export class InsightDashboardComponent implements OnInit {
 		let retVal = [];
 		if (rawData) {
 			for (let col of rawData) {
-				retVal.push(col.name);
+				retVal.push(col.Name);
 			}
 		}
 		return retVal;
@@ -207,7 +207,7 @@ export class InsightDashboardComponent implements OnInit {
 
 	splitAssetsByOsData(rawData) {
 		this.assetsByOs = rawData.reduce((h, obj) => {
-			h[obj.environment] = (h[obj.environment] || []).concat(obj);
+			h[obj.Environment] = (h[obj.Environment] || []).concat(obj);
 			return h;
 		}, {});
 		return Object.keys(this.assetsByOs);
