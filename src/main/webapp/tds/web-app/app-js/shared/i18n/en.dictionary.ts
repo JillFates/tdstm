@@ -249,6 +249,16 @@ export const en_DICTIONARY: Object = {
 		'DASHBOARD': 'Dashboard',
 		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
 	},
+	'INSIGHT': {
+		'INSIGHT': 'Insight',
+		'DASHBOARD': 'Dashboard',
+		'TITLE_DASHBOARD': 'Insight Dashboard',
+		'DATA_BY_PROVIDERS': 'Data by Providers',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Application Grouped by Dependencies',
+		'DEVICES_BY_EVENT': 'Devices By Event',
+		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
+		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by Os and Environment'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',
@@ -464,5 +474,12 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 			'SELECT_END_DATE': 'Select an end date'
 		},
 		'MY_TASKS': 'My Tasks',
+	},
+	'DASHBOARD': {
+		'INSIGHT_DATA': 'Insight Data',
+		'ASSETS_BY_VENDOR': 'Assets by Vendor',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
+		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
+		'TOP_TAGS': 'Top Tags'
 	}
 };
