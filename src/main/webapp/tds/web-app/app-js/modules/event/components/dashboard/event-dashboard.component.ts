@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
 import { pathOr } from 'ramda';
 import * as R from  'ramda';
+import 'hammerjs';
 // Store
 import {Store} from '@ngxs/store';
 // Action
@@ -12,9 +13,9 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { NotifierService } from '../../../../shared/services/notifier.service';
 import { PreferenceService, PREFERENCES_LIST } from '../../../../shared/services/preference.service';
-import { EventsService } from './../../service/events.service';
-import { NewsModel, NewsDetailModel } from './../../model/news.model';
-import { EventModel, EventPlanStatus } from './../../model/event.model';
+import { EventsService } from '../../service/events.service';
+import { NewsModel, NewsDetailModel } from '../../model/news.model';
+import { EventModel, EventPlanStatus } from '../../model/event.model';
 // Components
 import { NewsCreateEditComponent } from '../news-create-edit/news-create-edit.component';
 import {PlanVersusStatusComponent} from '../plan-versus-status/plan-versus-status.component';
@@ -45,6 +46,12 @@ export class EventDashboardComponent implements OnInit {
 	public hasBundleSteps = false;
 	private taskCategoryScrollPosition = 0;
 	readonly defaultTime = '00:00:00';
+	public insightData: any;
+
+	private showAssetsByVendorTable = false;
+	private showTopTags = false;
+	private showDependenciesByVendor = false;
+	private showApplicationGroupedByDependencies = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -84,6 +91,7 @@ export class EventDashboardComponent implements OnInit {
 						}
 					});
 		});
+
 	}
 
 	/**
@@ -234,5 +242,26 @@ export class EventDashboardComponent implements OnInit {
 
 	public isEventSelected(): boolean {
 		return this.selectedEvent != null;
+	}
+
+	toggleTableFor(chartName) {
+		switch (chartName) {
+			case 'ASSETS_BY_VENDOR': {
+				this.showAssetsByVendorTable = !this.showAssetsByVendorTable;
+				break;
+			}
+			case 'DEPENDENCIES_BY_VENDOR': {
+				this.showDependenciesByVendor = !this.showDependenciesByVendor;
+				break;
+			}
+			case 'TOP_TAGS': {
+				this.showTopTags = !this.showTopTags;
+				break;
+			}
+			case 'APPLICATION_GROUPED_BY_DEPENDENCIES': {
+				this.showApplicationGroupedByDependencies = !this.showApplicationGroupedByDependencies;
+				break;
+			}
+		}
 	}
 }
