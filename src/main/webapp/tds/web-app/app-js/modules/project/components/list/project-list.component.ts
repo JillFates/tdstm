@@ -1,19 +1,44 @@
-import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
-import {GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS} from '../../../../shared/model/constants';
-import {ActionType, COLUMN_MIN_WIDTH} from '../../../dataScript/model/data-script.model';
-import {GridDataResult} from '@progress/kendo-angular-grid';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {PreferenceService} from '../../../../shared/services/preference.service';
-import {ActivatedRoute, Event, Params, Router, NavigationEnd} from '@angular/router';
-import {ProjectService} from '../../service/project.service';
-import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
-import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
-import {ProjectCreateComponent} from '../create/project-create.component';
-import {ProjectViewEditComponent} from '../view-edit/project-view-edit.component';
-import {NotifierService} from '../../../../shared/services/notifier.service';
+import {
+	AfterContentInit,
+	Component,
+	ElementRef,
+	OnInit,
+	Renderer2,
+} from '@angular/core';
+import {
+	CompositeFilterDescriptor,
+	process,
+	State,
+} from '@progress/kendo-data-query';
+import {
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+} from '../../../../shared/model/constants';
+import {
+	ActionType,
+	COLUMN_MIN_WIDTH,
+} from '../../../dataScript/model/data-script.model';
+import { GridDataResult } from '@progress/kendo-angular-grid';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { PreferenceService } from '../../../../shared/services/preference.service';
+import {
+	ActivatedRoute,
+	Event,
+	Params,
+	Router,
+	NavigationEnd,
+} from '@angular/router';
+import { ProjectService } from '../../service/project.service';
+import { ProjectColumnModel, ProjectModel } from '../../model/project.model';
+import {
+	BooleanFilterData,
+	DefaultBooleanFilterData,
+} from '../../../../shared/model/data-list-grid.model';
+import { ProjectCreateComponent } from '../create/project-create.component';
+import { ProjectViewEditComponent } from '../view-edit/project-view-edit.component';
+import { NotifierService } from '../../../../shared/services/notifier.service';
 
 declare var jQuery: any;
 
@@ -22,15 +47,17 @@ declare var jQuery: any;
 	templateUrl: 'project-list.component.html',
 })
 export class ProjectListComponent implements OnInit, AfterContentInit {
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
+	protected state: State = {
+		sort: [
+			{
+				dir: 'asc',
+				field: 'name',
+			},
+		],
 		filter: {
 			filters: [],
-			logic: 'and'
-		}
+			logic: 'and',
+		},
 	};
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -48,6 +75,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	private projectToOpen: number;
 	private pageURL: string;
 	private projectOpen = false;
+	protected showFilters = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -59,23 +87,32 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2) {
+		private renderer: Renderer2
+	) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
-		this.showActive = this.route.snapshot.queryParams['active'] !== 'completed';
-		this.resultSet = this.showActive ? this.route.snapshot.data['projects'].activeProjects : this.route.snapshot.data['projects'].completedProjects;
+		this.showActive =
+			this.route.snapshot.queryParams['active'] !== 'completed';
+		this.resultSet = this.showActive
+			? this.route.snapshot.data['projects'].activeProjects
+			: this.route.snapshot.data['projects'].completedProjects;
 		this.gridData = process(this.resultSet, this.state);
 	}
 
 	ngOnInit() {
 		this.pageURL = this.router.url;
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
+		this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.subscribe(dateFormat => {
 				this.dateFormat = dateFormat;
-				this.projectColumnModel = new ProjectColumnModel(`{0:${dateFormat}}`);
+				this.projectColumnModel = new ProjectColumnModel(
+					`{0:${dateFormat}}`
+				);
 			});
 		this.updateBreadcrumbAndTitle();
-		this.canEditProject = this.permissionService.hasPermission('ProjectEdit');
+		this.canEditProject = this.permissionService.hasPermission(
+			'ProjectEdit'
+		);
 	}
 
 	ngAfterContentInit() {
@@ -83,7 +120,11 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 
 		this.router.events.subscribe(e => {
 			if (this.pageURL === this.router.url) {
-				if (e instanceof NavigationEnd && this.projectToOpen && !this.projectOpen) {
+				if (
+					e instanceof NavigationEnd &&
+					this.projectToOpen &&
+					!this.projectOpen
+				) {
 					this.projectToOpen = this.projectToOpen;
 					this.showProject(this.projectToOpen);
 				}
@@ -92,18 +133,25 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			}
 		});
 
-		this.route.queryParams.subscribe((params) => {
+		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
 				this.showProject(this.projectToOpen);
 			}
 		});
 	}
 
-	protected toggleShowActive(): void {
-		this.showActive = !this.showActive;
+	protected async setShowActive(to: boolean): Promise<void> {
+		if (this.showActive === to) return;
+
+		this.showActive = to;
 		this.projectToOpen = null;
-		const queryParams: Params = { active: this.showActive ? 'active' : 'completed' };
-		this.router.navigate([], { relativeTo: this.route, queryParams: queryParams });
+		const queryParams: Params = {
+			active: this.showActive ? 'active' : 'completed',
+		};
+		await this.router.navigate([], {
+			relativeTo: this.route,
+			queryParams: queryParams,
+		});
 		this.updateBreadcrumbAndTitle();
 		this.reloadData();
 	}
@@ -131,45 +179,55 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	protected updateBreadcrumbAndTitle(): void {
 		this.notifierService.broadcast({
 			name: 'notificationHeaderBreadcrumbChange',
-			menu: ['Projects', this.showActive ? 'Active' : 'Completed']
+			menu: ['Projects', this.showActive ? 'Active' : 'Completed'],
 		});
 		this.notifierService.broadcast({
 			name: 'notificationHeaderTitleChange',
-			title: 'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed')
+			title:
+				'Projects' + ' - ' + (this.showActive ? 'Active' : 'Completed'),
 		});
 	}
 
 	protected showProject(id): void {
 		if (!this.projectOpen) {
 			this.projectOpen = true;
-			this.dialogService.open(ProjectViewEditComponent,
-				[{provide: 'id', useValue: id}]).then(result => {
+			this.dialogService
+				.open(ProjectViewEditComponent, [
+					{ provide: 'id', useValue: id },
+				])
+				.then(result => {
 					this.projectOpen = false;
 					this.reloadData();
-			}).catch(result => {
-				this.projectOpen = false;
-				this.reloadData();
-			});
+				})
+				.catch(result => {
+					this.projectOpen = false;
+					this.reloadData();
+				});
 		}
 	}
 
 	protected openCreateProject(): void {
-		this.dialogService.open(ProjectCreateComponent,
-			[]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
+		this.dialogService
+			.open(ProjectCreateComponent, [])
+			.then(result => {
+				this.reloadData();
+			})
+			.catch(result => {
+				this.reloadData();
+			});
 	}
 
 	protected reloadData(): void {
 		this.projectService.getProjects().subscribe(
-			(result) => {
-				this.resultSet = this.showActive ? result.activeProjects : result.completedProjects;
+			result => {
+				this.resultSet = this.showActive
+					? result.activeProjects
+					: result.completedProjects;
 				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
+				setTimeout(() => this.forceDisplayLastRowAddedToGrid(), 100);
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -178,7 +236,9 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	 */
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
+		let target = this.elementRef.nativeElement.querySelector(
+			`tr[data-kendo-grid-item-index="${lastIndex}"]`
+		);
 		this.renderer.setStyle(target, 'height', '23px');
 	}
 
@@ -204,5 +264,17 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		this.gridData = process(this.resultSet, this.state);
 		// Adjusting the locked column(s) height to prevent cut-off issues.
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	protected filterCount(): number {
+		return this.state.filter.filters.length;
+	}
+
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
+	}
+
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
 	}
 }
