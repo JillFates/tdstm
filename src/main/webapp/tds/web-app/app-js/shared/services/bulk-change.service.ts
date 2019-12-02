@@ -104,4 +104,15 @@ export class BulkChangeService {
 			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
+
+	/**
+	 * Execute a bulk delete operation over assets or dependencies elements
+	 * @param {string[]} ids: array of ids to be deleted
+	 * @returns {Observable<any>}
+	 */
+	bulkRun(ids: string[]): Observable<any> {
+		return this.http.post(`/tdstm/wsAsset/bulkDeleteDependencies`, JSON.stringify({dependencies: ids}))
+			.map((response: any) => response)
+			.catch((error: any) => error);
+	}
 }
