@@ -418,6 +418,11 @@ class UrlMappings {
 			action = [POST: 'initiateTransformData']
 		}
 
+		"/ws/assetImport/autoBatchProcessing" {
+			controller = 'wsAssetImport'
+			action = [POST: 'autoBatchProcessing']
+		}
+
 		"/ws/assetImport/viewData" {
 			controller = 'wsAssetImport'
 			action = [GET: 'viewData']
