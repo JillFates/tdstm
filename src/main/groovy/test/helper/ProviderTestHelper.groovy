@@ -1,11 +1,9 @@
 package test.helper
 
 import grails.gorm.transactions.Transactional
-import net.transitionmanager.project.Project
 import net.transitionmanager.action.Provider
-
+import net.transitionmanager.project.Project
 import org.apache.commons.lang3.RandomStringUtils as RSU
-
 /**
  * Use this class to create provider domain objects in your tests
  */
@@ -35,7 +33,7 @@ class ProviderTestHelper {
      * @param: useForPlanning defaulted true
      * @returm the provider
      */
-    Provider createProvider(Project project, Map providerData) {
+    Provider createProviderMap(Project project, Map providerData) {
         Provider existingProvider = Provider.findWhere([name: providerData.name, project: project])
         if (!existingProvider) {
             Provider provider = new Provider(
