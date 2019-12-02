@@ -191,7 +191,7 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-8">
 			<div>
 				<!-- assets by os and evnironment-->
 				Select an Environment:
@@ -207,7 +207,7 @@
 							type="pie"
 							[data]="currentOsSelection"
 							field="Count"
-							categoryField="os">
+							categoryField="OS">
 						</kendo-chart-series-item>
 						<kendo-chart-series-item-labels
 							[content]="labelContent"
@@ -219,7 +219,7 @@
 									 (click)="toggleTableFor('ASSETS_BY_OS_AND_ENVIRONMENT')"></tds-button-collapse>
 			</div>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<div class="table" *ngIf="showAssetsByOs">
 				<kendo-grid [data]="currentOsSelection" [height]="200">
 					<kendo-grid-column field="Environment" title="Environment" width="30">
