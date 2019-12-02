@@ -12,7 +12,7 @@
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
 				<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 			</span>
-			<input class="clr-input" type="text" style="border-bottom:1px solid #999" id="searchBoxId" name="Search Box" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
+			<input class="clr-input" type="text" style="border-bottom:1px solid #999; padding-right: 24px;" id="searchBoxId" name="Search Box" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
 			<span id="filterClearId" class="ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
 			<span style="font-size:18px; color:#0077b8;" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"><i class="fas fa-binoculars"></i></span>
 		</div>

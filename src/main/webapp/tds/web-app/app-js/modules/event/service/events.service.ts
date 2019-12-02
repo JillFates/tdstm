@@ -115,6 +115,7 @@ export class EventsService {
 						effortRemainPending: model.effortRemainPending || '',
 						effortRemainReady: model.effortRemainReady || '',
 						effortRemainStarted: model.effortRemainStarted || '',
+						effortRemainHold: model.effortRemainHold || '',
 						percDurationDone: model.percDurationDone || '',
 						percDurationReady: model.percDurationReady || '',
 						percDurationStarted: model.percDurationStarted || '',
