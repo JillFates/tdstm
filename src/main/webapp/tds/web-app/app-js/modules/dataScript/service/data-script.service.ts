@@ -294,7 +294,8 @@ export class DataScriptService {
 			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
 			providerId: model.provider.id,
 			etlSourceCode: model.etlSourceCode,
-			isAutoProcess: model.isAutoProcess
+			isAutoProcess: model.isAutoProcess,
+			useWithAssetActions: model.useWithAssetActions
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))

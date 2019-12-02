@@ -81,6 +81,18 @@
 									Automatically processs Import and Posting ETL results
 								</label>
 							</div>
+							<div>
+								<input
+										id="useWithAssetActions"
+										name="useWithAssetActions"
+										type="checkbox"
+										[disabled]="modalType === actionTypes.VIEW"
+										[(ngModel)]="dataScriptModel.useWithAssetActions" />
+
+								<label for="useWithAssetActions">
+									Use with asset actions
+								</label>
+							</div>
 						</div>
 					</div>
 				</div>
