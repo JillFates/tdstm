@@ -642,7 +642,8 @@ class MoveEventService implements ServiceMethods {
 				revisedComp: moveEvent?.revisedCompletionTime,
 				calcMethod: moveEvent?.calcMethod,
 				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
-				eventStartDate: moveEvent.estStartTime,
+				eventStartDate: eventStartTime,
+				eventComplDate: eventComplTime,
 				planSum: [
 						dialInd: moveEventPlannedSnapshot?.dialIndicator,
 						compTime: moveEvent.estCompletionTime,
