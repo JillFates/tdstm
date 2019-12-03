@@ -23,7 +23,7 @@
 		</div>
 	</form>
     <section class="grid-container" *ngIf="apiActionColumnModel">
-		<div class="box-body box-with-empty-header">
+		<div class="box-body box-with-empty-header" [ngClass]="{'is-filtering': isFiltering}">
 				<kendo-grid
 						[data]="gridData"
 						[filter]="state.filter"
@@ -42,9 +42,16 @@
 					<!-- Action -->
 					<kendo-grid-command-column  [width]="52" [minResizableWidth]="52" [class]="{'k-custom-command-column': true}">
 						<ng-template kendoGridHeaderTemplate>
+							<tds-button [flat]="true" (click)="toggleFiltering()">
+								<clr-icon shape="filter" class="grid-filter-button is-solid">
+									<span *ngIf="filterCounter(); let counter" class="badge badge-warning">{{counter}}</span>
+								</clr-icon>
+							</tds-button>
+							<!--
 							<div class="text-center">
 								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
 							</div>
+							-->
 						</ng-template>
 
                         <!--
@@ -91,7 +98,7 @@
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 						</ng-template>
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div class="has-feedback" *ngIf="column.property && column.type !== 'action'" style="margin-bottom:0px;">
+							<div class="has-feedback" *ngIf="isFiltering && column.property && column.type !== 'action'" style="margin-bottom:0px;">
 								<div *ngIf="column.type === 'date'">
 									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
 									<span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>

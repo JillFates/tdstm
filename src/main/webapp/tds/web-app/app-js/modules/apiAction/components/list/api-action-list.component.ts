@@ -31,6 +31,7 @@ import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 import {ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {pathOr} from 'ramda';
 
 @Component({
 	selector: 'api-action-list',
@@ -72,6 +73,7 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	public isFiltering  = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -276,4 +278,21 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
 	}
+
+	/**
+	 * Toggle the flag to show/hide grid filters
+	 */
+	public toggleFiltering() {
+		this.isFiltering = !this.isFiltering;
+	}
+
+	/**
+	 * Get the current number of filters selected
+	 */
+	public filterCounter(): number {
+		const filters = pathOr([], [, 'filter', 'filters'], this.state);
+
+		return filters.length;
+	}
+
 }
