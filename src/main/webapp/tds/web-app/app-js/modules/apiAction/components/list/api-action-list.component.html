@@ -1,8 +1,29 @@
 <!-- Main content -->
 <div class="content body tds-kendo-grid api-action-list-component">
-	<section>
-		<div *ngIf="apiActionColumnModel">
-			<div class="box-body box-with-empty-header">
+	<form clrForm clrLayout="horizontal" class="">
+		<div class="clr-row">
+            <div class="clr-col-12">
+				<tds-button-custom
+						icon="repeat"
+						[displayLabel]="false"
+						[flat]="true"
+						(click)="reloadData()"
+						class="flat pull-right"
+						tooltip="Refresh">
+				</tds-button-custom>
+				<tds-button-create
+						[title]="createActionText"
+						class="button-create-action pull-right"
+                        [displayLabel]="false"
+						[id]="'btnCreate'"
+						(click)="onCreate()"
+						*ngIf="isCreateAvailable()">
+				</tds-button-create>
+			</div>
+		</div>
+	</form>
+    <section class="grid-container" *ngIf="apiActionColumnModel">
+		<div class="box-body box-with-empty-header">
 				<kendo-grid
 						[data]="gridData"
 						[filter]="state.filter"
@@ -18,11 +39,6 @@
 						(pageChange)="pageChange($event)"
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
-					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<tds-button-create [title]="createActionText" class="button-create-action" [id]="'btnCreate'" (click)="onCreate()" *ngIf="isCreateAvailable()"></tds-button-create>
-						<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-					</ng-template>
-
 					<!-- Action -->
 					<kendo-grid-command-column  [width]="52" [minResizableWidth]="52" [class]="{'k-custom-command-column': true}" [locked]="true">
 						<ng-template kendoGridHeaderTemplate>
@@ -31,8 +47,8 @@
 							</div>
 						</ng-template>
 						<ng-template kendoGridCellTemplate
-						             let-dataItem
-						             let-rowIndex="rowIndex">
+									 let-dataItem
+									 let-rowIndex="rowIndex">
 							<div class="tds-action-button-set">
 								<tds-button-edit *ngIf="isEditAvailable()" (click)="onEdit(dataItem)"></tds-button-edit>
 								<tds-button-delete *ngIf="isDeleteAvailable()" (click)="onDelete(dataItem)"></tds-button-delete>
@@ -54,7 +70,7 @@
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.label === 'Type'">
-								{{dataItem['actionType'].id ? dataItem['actionType'].id : dataItem['actionType']}}
+							{{dataItem['actionType'].id ? dataItem['actionType'].id : dataItem['actionType']}}
 						</ng-template>
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
@@ -78,7 +94,5 @@
 					</kendo-grid-column>
 				</kendo-grid>
 			</div>
-			<!-- /.box-body -->
-		</div>
 	</section>
 </div>
