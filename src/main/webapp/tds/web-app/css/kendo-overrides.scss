@@ -78,6 +78,36 @@ kendo-grid.k-grid {
 		}
 	}
 
+	// Adding this class and its subclasses will constrain the grid to the height of the page.
+	&.page-height {
+		--subtraction-height: 273px;
+		--filter-height: 34px;
+
+		// Example of needing to subtract more or change the height of the filter
+		&.notice-list {
+			--subtraction-height: 350px;
+			--filter-height: 37px;
+		}
+		
+		// We change the filter height to 0px when it is hidden, allowing for proper calculation of the grid-body height.
+		&.hide-filter {
+			--filter-height: 0px;
+		}
+
+		// Default is to show filter
+		.k-grid-container {
+			display: block;
+			max-height: calc(
+				100vh - var(--subtraction-height) - var(--filter-height)
+			);
+			overflow: auto;
+
+			.k-grid-content {
+				overflow: auto;
+			}
+		}
+	}
+
 	kendo-dropdownlist.k-dropdown,
 	kendo-combobox.k-combobox {
 		.k-dropdown-wrap {
@@ -155,15 +185,15 @@ kendo-grid.k-grid {
 		}
 	}
 
-  kendo-dropdownlist.k-dropdown .k-dropdown-wrap,
-  .k-dropdown-wrap {
-    border-bottom: 1px solid #999;
+	kendo-dropdownlist.k-dropdown .k-dropdown-wrap,
+	.k-dropdown-wrap {
+		border-bottom: 1px solid #999;
 
-    &:hover {
-      border-bottom: 1px solid #999;
-      border-color: rgba(222,222,222,.5);
-    }
-  }
+		&:hover {
+			border-bottom: 1px solid #999;
+			border-color: rgba(222, 222, 222, 0.5);
+		}
+	}
 }
 
 kendo-list {
@@ -234,13 +264,13 @@ kendo-dropdownlist {
 }
 
 .k-timepicker {
-  .k-select {
-    color: #0092d1 !important;
-  }
+	.k-select {
+		color: #0092d1 !important;
+	}
 }
 .k-timepicker:hover .k-select {
-  background-color: inherit;
-  background-image: none;
+	background-color: inherit;
+	background-image: none;
 }
 
 kendo-datepicker {
