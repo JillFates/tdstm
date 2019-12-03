@@ -141,7 +141,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	protected async setShowActive(to: boolean): Promise<void> {
-		if (this.showActive === to) return;
+		if (this.showActive === to) { return; }
 
 		this.showActive = to;
 		this.projectToOpen = null;
