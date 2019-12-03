@@ -773,7 +773,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				if (team === TaskTeam.ALL_TEAMS) {
 					highlightCollection = d.nodes
 						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
-							|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
+							|| (f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase())))
 						);
 				} else if (team === TaskTeam.NO_TEAM_ASSIGNMENT) {
 					highlightCollection = d.nodes
@@ -784,7 +784,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 					highlightCollection = d.nodes
 						.filter(f => {
 							return (!!f.data.name.toLowerCase().includes(match.toLowerCase())
-								|| f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase()))
+								|| (f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase())))
 							&& f.data.team && !!f.data.team.includes(team)
 						});
 				}
