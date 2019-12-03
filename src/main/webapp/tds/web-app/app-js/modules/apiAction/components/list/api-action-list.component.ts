@@ -74,6 +74,7 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	public isFiltering  = false;
+	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 
 	constructor(
 		private route: ActivatedRoute,

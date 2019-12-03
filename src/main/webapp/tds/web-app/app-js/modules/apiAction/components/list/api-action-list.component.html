@@ -35,7 +35,7 @@
 						[pageSize]="pageSize"
 						[resizable]="true"
 						(sortChange)="sortChange($event)"
-						[pageable]="{ pageSizes: defaultPageOptions, pageSize: pageSize, info: true}"
+						[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 						(pageChange)="pageChange($event)"
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
@@ -114,6 +114,21 @@
 							</div>
 						</ng-template>
 					</kendo-grid-column>
+
+					<ng-template kendoPagerTemplate let-total="total" let-totalPages="totalPages" let-currentPage="currentPage">
+						<div class="clr-col-4"></div>
+						<div class="clr-col-8">
+							<tds-grid-pager
+									[total]="total"
+									[totalPages]="totalPages"
+									[currentPage]="currentPage"
+									[pageSize]="pageSize"
+									[pageSizes]="GRID_DEFAULT_PAGINATION_OPTIONS"
+									(pageChange)="pageChange($event)">
+							</tds-grid-pager>
+						</div>
+					</ng-template>
+
 				</kendo-grid>
 			</div>
 	</section>
