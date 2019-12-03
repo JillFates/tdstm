@@ -40,12 +40,14 @@
 						(cellClick)="cellClick($event)"
 						[selectable]="true">
 					<!-- Action -->
-					<kendo-grid-command-column  [width]="52" [minResizableWidth]="52" [class]="{'k-custom-command-column': true}" [locked]="true">
+					<kendo-grid-command-column  [width]="52" [minResizableWidth]="52" [class]="{'k-custom-command-column': true}">
 						<ng-template kendoGridHeaderTemplate>
 							<div class="text-center">
 								<label class="action-header"> {{ 'GLOBAL.ACTION' | translate }} </label>
 							</div>
 						</ng-template>
+
+                        <!--
 						<ng-template kendoGridCellTemplate
 									 let-dataItem
 									 let-rowIndex="rowIndex">
@@ -54,6 +56,19 @@
 								<tds-button-delete *ngIf="isDeleteAvailable()" (click)="onDelete(dataItem)"></tds-button-delete>
 							</div>
 						</ng-template>
+						-->
+						<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+							<div class="action-button btn-group btn-link">
+								<clr-dropdown>
+									<tds-button icon="ellipsis-vertical" clrDropdownTrigger class="contextual-menu"></tds-button>
+									<clr-dropdown-menu *clrIfOpen>
+										<a clrDropdownItem [disabled]="!isEditAvailable()" (click)="onEdit(dataItem)">Edit Task</a>
+										<a clrDropdownItem [disabled]="!isDeleteAvailable()" (click)="onDelete(dataItem)">Delete Task</a>
+									</clr-dropdown-menu>
+								</clr-dropdown>
+							</div>
+						</ng-template>
+
 					</kendo-grid-command-column>
 
 
