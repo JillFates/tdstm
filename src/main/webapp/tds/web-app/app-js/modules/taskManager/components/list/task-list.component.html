@@ -71,7 +71,8 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="task-grid row-actions-1-children"
+				class="task-grid"
+				[ngClass]="{'row-actions-1-children': grid.canSupportColumnMenuDynamic()}"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
 				[pageSize]="grid.state.take"

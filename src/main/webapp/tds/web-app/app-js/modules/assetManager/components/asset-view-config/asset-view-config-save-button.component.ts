@@ -13,19 +13,19 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 				 class="btn-group">
 			<tds-button *ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
 									[id]="'btnSave'"
-									[icon]="'floppy'"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
 									[title]="'GLOBAL.SAVE' | translate"
 									(click)="onSave()"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
+				{{'GLOBAL.SAVE' | translate}}
 			</tds-button>
 			<tds-button *ngIf="!model.isOwner && !model.isSystem"
 									[id]="'btnSaveAs'"
-									[icon]="'floppy'"
 									[disabled]="!isSaveAsAvailable() || !isValid"
 									[title]="'GLOBAL.SAVE_AS' | translate"
 									(click)="onSaveAs()"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}">
+				{{'GLOBAL.SAVE_AS' | translate}}
 			</tds-button>
 			<clr-dropdown>
 				<tds-button [title]="''" icon="angle down" clrDropdownTrigger
@@ -45,15 +45,15 @@ import { ViewColumn } from '../../../assetExplorer/model/view-spec.model';
 									*ngIf="model.isOwner || (model.isSystem && isSystemSaveAvailable(true))"
 									[disabled]="!this.assetExplorerService.isSaveAvailable(this.model) || !isValid"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
-									[icon]="'floppy'"
 									(click)="onSave()">
+				{{ 'GLOBAL.SAVE' | translate }}
 			</tds-button>
 			<tds-button [id]="'btnSaveAs'"
 									*ngIf="model.id && ((model.isSystem && isSystemSaveAvailable(false)) || (!model.isOwner && !model.isSystem))"
 									[disabled]="!isSaveAsAvailable() || !isValid"
 									[ngClass]="{'btn-secondary':!isDirty() || !isSaveAsAvailable() || !isValid,'btn-success':isValid && isDirty()}"
-									[icon]="'floppy'"
 									(click)="onSaveAs()">
+				{{ 'GLOBAL.SAVE_AS' | translate }}
 			</tds-button>
 		</ng-template>
 	`,

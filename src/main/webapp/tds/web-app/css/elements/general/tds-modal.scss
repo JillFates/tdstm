@@ -265,6 +265,21 @@ tds-ui-dialog {
 	background: $color-text-inverse;
 	min-width: 340px;
 
+	&.modal-xxl {
+		background: $color-text-inverse;
+		position: fixed !important;
+		top: 56px !important;
+		left: 35px !important;
+		right: 35px !important;
+		bottom: 48px !important;
+		overflow: hidden !important;
+		width: unset !important;
+
+		.modal-body {
+			max-height: calc(100vh - 195px);
+		}
+	}
+
 	&.with-box-shadow {
 		box-shadow: 0 5px 15px $color-border;
 	}

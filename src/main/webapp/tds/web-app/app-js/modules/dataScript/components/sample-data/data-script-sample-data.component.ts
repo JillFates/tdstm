@@ -35,7 +35,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		selected: undefined,
 		useFileFrom: undefined
 	};
-	private csv: any = {
+	protected csv: any = {
 		options : [
 			{ text: 'Select a format', value: -1 },
 			{ text: 'csv', value: 0 },
@@ -46,7 +46,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		filename: null,
 		state: undefined,
 	};
-	private webService: any = {
+	protected webService: any = {
 		options: [],
 		selected: undefined,
 		state: undefined,
