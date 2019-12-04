@@ -102,7 +102,8 @@
 						<ng-template kendoGridFilterCellTemplate let-filter>
 
 							<div class="filter-input" *ngIf="isFiltering && column.property && column.type !== 'action'">
-								<div *ngIf="column.type === 'text'; then stringFilter"></div>
+								<div *ngIf="column.type === 'text' || column.type === 'date'; then stringFilter"></div>
+
 								<ng-template #stringFilter>
 									<div>Type2:{{column.type}}</div>
 									<tds-filter-input
@@ -113,6 +114,7 @@
 											(filter)="onFilter($event, column)">
 									</tds-filter-input>
 								</ng-template>
+
 								<!--
 								<div *ngIf="column.type === 'date'">
 									<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>

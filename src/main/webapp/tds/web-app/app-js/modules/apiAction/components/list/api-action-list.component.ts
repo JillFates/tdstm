@@ -116,6 +116,8 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	protected onFilter(value: string | Date, column: any): void {
 		column.filter = value;
 		const root = GridColumnModel.filterColumn(column, this.state);
+		// clear empty values
+		root.filters = (root.filters || []).filter((filter: any) => filter.value);
 		this.filterChange(root);
 	}
 
