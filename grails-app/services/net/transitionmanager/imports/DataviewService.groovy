@@ -133,7 +133,7 @@ class DataviewService implements ServiceMethods {
 		if (project && !project.defaultProject) {
 			saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())
 			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
-				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
+				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name())
 			}
 		}
 		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && project.defaultProject)
