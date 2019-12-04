@@ -102,9 +102,9 @@
 						<ng-template kendoGridFilterCellTemplate let-filter>
 
 							<div class="filter-input" *ngIf="isFiltering && column.property && column.type !== 'action'">
-								<div *ngIf="column.type === 'text' || column.type === 'date'; then stringFilter"></div>
+								<div *ngIf="column.type === 'text' || column.type === 'date' || column.type === 'boolean'; then inputFilterTemplate"></div>
 
-								<ng-template #stringFilter>
+								<ng-template #inputFilterTemplate>
 									<div>Type2:{{column.type}}</div>
 									<tds-filter-input
 											name="{{column.property}}"

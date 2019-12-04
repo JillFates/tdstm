@@ -20,7 +20,7 @@ import {
 } from '@angular/core';
 
 import { KEYSTROKE, SEARCH_QUITE_PERIOD } from '../../model/constants';
-import {GridColumnModel} from '../../model/data-list-grid.model';
+import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.model';
 
 @Component({
 	selector: 'tds-filter-input',
@@ -38,18 +38,28 @@ import {GridColumnModel} from '../../model/data-list-grid.model';
 			(onPaste)="onPaste($event)"
 		/>
         <kendo-datepicker *ngIf="columnType === 'date'"
-				#filterInput		  
+				#filterInput
 				[format]="dateFormat"
 				[value]="value"
 				(valueChange)="onFilter($event)"
                 [style.width.%]="100">
 		</kendo-datepicker>
 
-<!--		<span>Filter: {{filterInput && filterInput.nativeElement && filterInput.nativeElement.value}}</span>-->
+<!--        [(ngModel)]="column.filter"-->
+        <kendo-dropdownlist *ngIf="columnType === 'boolean'"
+				#filterInput
+				[data]="booleanFilterData"
+				[value]="value"
+				(valueChange)="onFilter($event)"
+                [style.width.%]="100">
+		</kendo-dropdownlist>
+
+
+        <!--		<span>Filter: {{filterInput && filterInput.nativeElement && filterInput.nativeElement.value}}</span>-->
 <!--		<span>Value: {{value}}</span>-->
 
         <tds-button
-			*ngIf="value"
+			*ngIf="value || value === false"
 			(click)="onClearFilter()"
 			[title]="'Clear Filter'"
 			icon="times-circle"
@@ -62,13 +72,14 @@ import {GridColumnModel} from '../../model/data-list-grid.model';
 export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	@Input() name = '';
 	@Input() placeholder = '';
-	@Input() value: String | Date = '';
+	@Input() value: String | Date | boolean = '';
 	@Input() columnType: string;
 	@Input() dateFormat = '';
 	@Input() column: GridColumnModel;
-	@Output() filter: EventEmitter<string | Date> = new EventEmitter<string | Date>();
+	@Output() filter: EventEmitter<string | Date | boolean> = new EventEmitter<string | Date | boolean>();
 	@ViewChild('filterInput', { read: ElementRef, static: false })
 	filterInput: ElementRef;
+	public booleanFilterData = BooleanFilterData;
 
 	private previousSearch = '';
 	private typingTimeout = null;
@@ -171,7 +182,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * Notify to the host component about a new search entered
 	 * @param {string} search - Current search value
 	 */
-	public onFilter(search: string | Date): void {
+	public onFilter(search: string | Date | boolean): void {
 		/* Here the search is done so the notification to the host component is made
 			within the angular zone in order to update the UI
 		*/
