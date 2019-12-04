@@ -7,6 +7,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
@@ -112,7 +113,8 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
+	protected onFilter(value: string | Date, column: any): void {
+		column.filter = value;
 		const root = GridColumnModel.filterColumn(column, this.state);
 		this.filterChange(root);
 	}
