@@ -148,9 +148,6 @@ kendo-grid.k-grid {
 			background: transparent;
 		}
 	}
-	.k-grid-table tr td:nth-child(-n + 2) {
-		overflow: visible;
-	}
 
 	// NOTE: This should probably be moved to the components library
 	.k-filter-row {
