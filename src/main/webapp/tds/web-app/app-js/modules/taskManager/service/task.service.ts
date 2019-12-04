@@ -430,6 +430,24 @@ export class TaskService {
 		);
 	}
 
+	getBulkTaskActionInfo(taskIds: Array<number>): Observable<any> {
+		return this.http.post(this.baseURL + '/ws/task/getBulkActionInfo', taskIds)
+			.map((response: any) => {
+				let data = response.data;
+				let returnObj = {};
+				if (!data) {
+					return returnObj;
+				}
+				data.forEach(task => {
+					if (task.taskId) {
+						returnObj[task.taskId] = this.convertToTaskActionInfoModel(task);
+					}
+				});
+				return returnObj;
+			})
+			.catch((error: any) => error);
+	}
+
 	/**
 	 * GET - Get the custom columns tasks.
 	 */
