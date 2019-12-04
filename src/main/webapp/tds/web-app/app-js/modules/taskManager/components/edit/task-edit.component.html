@@ -15,9 +15,9 @@
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height">
                     <table style="border: 0;" class="full-height"
-                           [ngClass]="{'has-duplicated-predecessors': modelHelper.hasDuplicatedPredecessors(),
-                                       'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors(),
-                                       'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+                           [ngClass]="{'has-duplicated-predecessors': modelHelper?.hasDuplicatedPredecessors(),
+                                       'has-duplicated-successors': modelHelper?.hasDuplicatedSuccessors(),
+                                       'has-double-assignment': modelHelper?.hasDoubleAssignment()}">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td class="task-details" colspan="2">
@@ -194,7 +194,9 @@
                                                     <td class="valueNW">
                                                         <kendo-datepicker
                                                                 name="dueDate"
-                                                                [format]="getDateTimeFormat()"
+                                                                #dueDate
+                                                                [format]="getDateFormat()"
+                                                                (open)="onOpenDueDate($event)"
                                                                 [(ngModel)]="model.dueDate">
                                                         </kendo-datepicker>
                                                     </td>

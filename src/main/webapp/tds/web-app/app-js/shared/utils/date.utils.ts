@@ -20,7 +20,7 @@ export class DateUtils {
 	public static readonly PREFERENCE_MIDDLE_ENDIAN = 'MM/DD/YYYY';
 	public static readonly PREFERENCE_LITTLE_ENDIAN = 'DD/MM/YYYY';
 
-	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_DATE = 'MM/DD/YYYY';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
 	public static readonly OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
 	public static readonly SERVER_FORMAT_DATETIME = 'YYYY-MM-DDT' + DateUtils.OUTPUT_PIPE_TIME_FORMAT;
@@ -86,6 +86,9 @@ export class DateUtils {
 	 * @returns {Date} The date adjusted to GMT (Timezone remains the same)
 	 */
 	public static adjustDateTimezoneOffset(sourceTime: Date): Date {
+		if (!sourceTime) {
+			return null;
+		}
 		let adjustedTime = new Date ( sourceTime );
 		adjustedTime.setMinutes ( sourceTime.getMinutes() + sourceTime.getTimezoneOffset() );
 		return adjustedTime;
@@ -223,9 +226,10 @@ export class DateUtils {
 	 * @returns {string}
 	 */
 	public static translateDateFormatToKendoFormat(userDateFormatPreference: string): string {
-		const defaultFormat = 'MM/dd/yyy';
+		const defaultFormat = 'MM/dd/yyyy';
 
 		const dateFormats = {
+			'dd/MM/YYYY' : 'dd/MM/yyyy',
 			'DD/MM/YYYY' : 'dd/MM/yyyy',
 			'MM/DD/YYYY' : defaultFormat
 		};

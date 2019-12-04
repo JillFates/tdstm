@@ -7,8 +7,8 @@ export class LicenseColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 108,
-				locked: true
+				width: 52,
+				locked: true,
 			}, {
 				label: 'Owner',
 				property: 'owner.name',
@@ -59,13 +59,18 @@ export class LicenseColumnModel {
 				property: 'activationDate',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 170,
 			}, {
 				label: 'Expiration',
 				property: 'expirationDate',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 170,
+			}, {
+				label: 'Reporting',
+				property: 'collectMetrics',
+				type: 'boolean',
+				width: 110,
 			}, {
 				label: 'Environment',
 				property: 'environment',
@@ -140,7 +145,8 @@ export enum LicenseType {
 
 export enum LicenseStatus {
 	PENDING = 'PENDING',
-	ACTIVE = 'ACTIVE'
+	ACTIVE 	= 'ACTIVE',
+	TERMINATED = 'TERMINATED'
 }
 
 export enum LicenseEnvironment {

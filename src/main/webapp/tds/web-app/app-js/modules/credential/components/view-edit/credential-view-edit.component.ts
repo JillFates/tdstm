@@ -101,7 +101,7 @@ export class CredentialViewEditComponent {
 		this.getProviders();
 		this.getAuthMethods();
 		this.getCredentialEnumsConfig();
-		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Create Credential' : (this.modalType === ActionType.EDIT ? 'Credential Edit' : 'Credential Detail');
+		this.modalTitle = (this.modalType === ActionType.CREATE) ? 'Credential Create' : (this.modalType === ActionType.EDIT ? 'Credential Edit' : 'Credential Detail');
 	}
 
 	/**

@@ -303,7 +303,7 @@ application id,vendor name,technology,location
 					startColumn == null
 					endColumn == null
 					fatal
-					message == "Invalid variable name specified for 'set' command. Variable names must end in 'Var' and can not be reassigned within iterate loop. at line 10"
+					message == 'Invalid variable name specified for \'set\' command. Variable can not be null and can not be reassigned within iterate loop. at line 10'
 				}
 			}
 

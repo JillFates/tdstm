@@ -20,7 +20,7 @@ class ETLScriptsDetailsPage extends Page{
         dsName { detailsModal.find('.label-detail')[1]}
         dsMode { detailsModal.find('.label-detail')[2]}
         dsDescription { detailsModal.find('.label-detail')[3]}
-        dsDesignerButton { detailsModal.find("button", text: contains("ETL Script Designer"))}
+        dsDesignerButton { detailsModal.find("button", text: contains("Edit Script"))}
         commonsModule { module CommonsModule }
     }
 

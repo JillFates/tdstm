@@ -1,6 +1,8 @@
 package net.transitionmanager.project
 
 import com.tdsops.tm.enums.domain.TimeScale
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import net.transitionmanager.asset.Application
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -85,6 +87,11 @@ class MoveEventService implements ServiceMethods {
 	private static final Integer COMPLETED_TASKS = 7
 	private static final Integer TOTAL_TASKS = 8
 
+    public static final String CLOCK_MODE_NONE 			= 'none'
+    public static final String CLOCK_MODE_COUNTDOWN 	= 'countdown'
+    public static final String CLOCK_MODE_ELAPSED 		= 'elapsed'
+    public static final String CLOCK_MODE_FINISHED 		= 'finished'
+
 	JdbcTemplate          jdbcTemplate
 	MoveBundleService     moveBundleService
 	TagEventService       tagEventService
@@ -126,7 +133,7 @@ class MoveEventService implements ServiceMethods {
 		List<Long> tagEventIdsToAdd = eventCommand.tagIds
 		// If the event had already some tags, filter those out so we don't add them twice.
 		if (existingTagEvents) {
-			tagEventIdsToAdd = eventCommand.tagIds.collect { Long tagId -> !existingTagEvents.contains(tagId)}
+			tagEventIdsToAdd = eventCommand.tagIds.findAll { Long tagId -> !existingTagEvents.contains(tagId)}
 		}
 		if (tagEventIdsToAdd) {
 			tagEventService.applyTags(project, tagEventIdsToAdd, moveEvent)
@@ -528,21 +535,6 @@ class MoveEventService implements ServiceMethods {
 
 	}
 
-	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
-		List<MoveBundleStep> moveBundleSteps = []
-
-		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
-
-			if (step) {
-				moveBundleSteps.addAll(step)
-			}
-		}
-
-		return moveBundleSteps
-	}
-
-
 	/**
 	 * Find the stats for all the tasks by category for the event
 	 * @param project  The {@code Project} to which the event belongs to.
@@ -609,6 +601,58 @@ class MoveEventService implements ServiceMethods {
 			]
 		}
 		return stats
+	}
+
+	/**
+	 * Returns data used to render the Event Dashboard
+	 * @param moveEvent  The MoveEvent
+	 * @return JSON map
+	 */
+	Map eventData(MoveEvent moveEvent) {
+		Date sysTime = TimeUtil.nowGMT()
+		MoveEventSnapshot moveEventPlannedSnapshot
+		TimeDuration dayTime
+		String eventString = ""
+        Date eventStartTime = moveEvent.estStartTime
+        Date eventComplTime = moveEvent.estCompletionTime
+        String clockMode = CLOCK_MODE_NONE
+
+        if (eventStartTime) {
+            if ( eventStartTime > sysTime ) {
+                dayTime = TimeCategory.minus(eventStartTime, sysTime)
+                eventString = "Countdown Until Event"
+                clockMode = CLOCK_MODE_COUNTDOWN
+            } else if (eventStartTime < sysTime && ( !eventComplTime || eventComplTime > sysTime )) {
+                dayTime = TimeCategory.minus(sysTime, eventStartTime)
+                eventString = "Elapsed Event Time"
+                clockMode = CLOCK_MODE_ELAPSED
+            } else {
+                dayTime = TimeCategory.minus(sysTime, eventComplTime)
+                eventString = "Time since the event finished"
+                clockMode = CLOCK_MODE_FINISHED
+            }
+        }
+        // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+
+        String eventClock = TimeUtil.formatTimeDuration(dayTime)
+
+		return [snapshot: [
+				revisedComp: moveEvent?.revisedCompletionTime,
+				calcMethod: moveEvent?.calcMethod,
+				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
+				eventStartDate: moveEvent.estStartTime,
+				planSum: [
+						dialInd: moveEventPlannedSnapshot?.dialIndicator,
+						compTime: moveEvent.estCompletionTime,
+						dayTime: eventClock,
+                        clockMode: clockMode,
+						eventDescription: moveEvent?.description,
+						eventString: eventString,
+						eventRunbook: moveEvent?.runbookStatus
+				]
+		]]
 	}
 
 	/**

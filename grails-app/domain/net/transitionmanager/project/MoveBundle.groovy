@@ -22,7 +22,7 @@ class MoveBundle extends Party {
 
 	static String alternateKey = 'name'
 
-	static hasMany = [assets: AssetEntity, moveBundleSteps: MoveBundleStep, sourceRacks: Rack, targetRacks: Rack]
+	static hasMany = [assets: AssetEntity, sourceRacks: Rack, targetRacks: Rack]
 
 	static belongsTo = [project: Project]
 

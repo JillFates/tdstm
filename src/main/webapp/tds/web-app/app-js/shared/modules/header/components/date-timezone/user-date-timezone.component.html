@@ -3,7 +3,8 @@
         <div class="modal-content" tds-ui-modal-decorator="">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <h4 class="modal-title">Date and Timezone</h4>
+                <h4 *ngIf="!shouldReturnData" class="modal-title">{{ 'GLOBAL.DATE_TIMEZONE' | translate }}</h4>
+                <h4 *ngIf="shouldReturnData" class="modal-title">{{ 'GLOBAL.TIMEZONE' | translate }}</h4>
             </div>
             <div class="modal-body">
                 <form id="userTimezoneForm">
@@ -18,7 +19,7 @@
                                 [valueField]="'code'"
                                 (valueChange)="onTimezoneSelected($event)">
                         </kendo-dropdownlist>
-                        <b *ngIf="!shouldReturnData" style="padding-left: 30px">Date Format:</b>
+                        <b *ngIf="!shouldReturnData" style="padding-left: 30px">{{ 'GLOBAL.DATE_FORMAT' | translate }}:</b>
                         <kendo-dropdownlist
                                 *ngIf="!shouldReturnData"
                                 id="dateTimeFormat"
@@ -56,7 +57,7 @@
 
                 <div class="modal-footer form-group-center">
                     <button type="button" (click)="onSave()" class="btn btn-primary pull-left">
-                        <span class="fa fa-fw fa-floppy-o"></span> Save
+                        <span class="fa fa-fw fa-floppy-o"></span> {{ 'GLOBAL.SAVE' | translate }}
                     </button>
                     <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
                         <span class="glyphicon glyphicon-ban-circle"></span>

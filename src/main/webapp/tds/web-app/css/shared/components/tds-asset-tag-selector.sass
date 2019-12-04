@@ -166,21 +166,30 @@ $asset-tag-selector-default-label-color: #656565
 
 .tds-angular-component-content, asset-explorer-view-grid
   .label.tag, .dots-for-tags
-    display: inline
+    display: inline-block
     margin: 2px
     vertical-align: baseline
     text-align: center
-    width: unset
+    width: auto
     height: 28px
     font-weight: 600
     font-size: 11px
   .dots-for-tags
-    padding-right: 100px
+    padding-right: 200px
 .single-line-tags
   margin-top: 5px
 .single-line-tags:hover, .show-full-tags
+  display: inline-block
   .label.tag
-    display: inline-block
+    display: block
+    margin: 2px
+    vertical-align: baseline
+    text-align: center
+    width: fit-content
+    height: 28px
+    font-weight: 600
+    font-size: 11px
+    float: left
   .dots-for-tags
     display: none
 
