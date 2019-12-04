@@ -1,10 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import {
+	Component,
+	EventEmitter,
+	Input,
+	OnInit,
+	Output,
+	QueryList,
+	ViewChildren,
+} from '@angular/core';
 import {
 	EVENT_BEFORE_CALL_TEXT,
 	EVENT_DEFAULT_ERROR_SCRIPT,
 	EVENT_DEFAULT_ERROR_WEB_API,
 	EventReaction,
-	EventReactionType
+	EventReactionType,
 } from '../../model/api-action.model';
 import { ActionType } from '../../../../shared/model/data-list-grid.model';
 import { CHECK_ACTION } from '../../../../shared/components/check-action/model/check-action.model';
@@ -16,7 +24,6 @@ import { APIActionService } from '../../service/api-action.service';
 @Component({
 	selector: 'api-action-view-edit-reactions',
 	templateUrl: './api-action-view-edit-reactions.component.html',
-	styles: []
 })
 export class ApiActionViewEditReactionsComponent implements OnInit {
 	@Input() eventReactions: Array<EventReaction>;
@@ -26,19 +33,22 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	@Input() isRemote: boolean;
 	@Input() codeMirrorMode: string;
 	@Input() invalidScriptSyntax: boolean;
-	@Output() invalidScriptSyntaxChange: EventEmitter<boolean> = new EventEmitter<boolean>();
-	@ViewChildren('reactionCodeMirror') codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	@Output() invalidScriptSyntaxChange: EventEmitter<
+		boolean
+	> = new EventEmitter<boolean>();
+	@ViewChildren('reactionCodeMirror') codeMirrorComponents: QueryList<
+		CodeMirrorComponent
+	>;
 	reactionCodeMirror = {
 		mode: 'Groovy',
 		rows: 10,
-		cols: 4
+		cols: 4,
 	};
 	actionTypes = ActionType;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	CHECK_ACTION = CHECK_ACTION;
 
-	constructor(private apiActionService: APIActionService) {
-	}
+	constructor(private apiActionService: APIActionService) {}
 
 	ngOnInit(): void {
 		this.reactionCodeMirror.mode = this.codeMirrorMode;
@@ -49,9 +59,11 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	 * Returns true if Api Action Before Call reaction should be disabled.
 	 */
 	disableApiActionBeforeCall(): boolean {
-		return (this.eventReactions[7].value.length > 0
-			&& this.eventReactions[7].value !== EVENT_BEFORE_CALL_TEXT)
-			|| this.modalType === this.actionTypes.VIEW;
+		return (
+			(this.eventReactions[7].value.length > 0 &&
+				this.eventReactions[7].value !== EVENT_BEFORE_CALL_TEXT) ||
+			this.modalType === this.actionTypes.VIEW
+		);
 	}
 
 	/**
@@ -74,7 +86,10 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	 */
 	isCheckSyntaxSectionDisabled(sectionIndex: number): boolean {
 		const eventReaction: EventReaction = this.eventReactions[sectionIndex];
-		return eventReaction.value === '' || eventReaction.state === CHECK_ACTION.VALID;
+		return (
+			eventReaction.value === '' ||
+			eventReaction.state === CHECK_ACTION.VALID
+		);
 	}
 
 	/**
@@ -89,9 +104,15 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	 * Show only the Event Label if one Event is selected
 	 */
 	showsEventLabel(): boolean {
-		let events = [EventReactionType.SUCCESS, EventReactionType.DEFAULT, EventReactionType.ERROR, EventReactionType.LAPSED, EventReactionType.STALLED];
-		let eventRectionItem = this.eventReactions.find((eventReaction) => {
-			let eventItem = events.find((event) => {
+		let events = [
+			EventReactionType.SUCCESS,
+			EventReactionType.DEFAULT,
+			EventReactionType.ERROR,
+			EventReactionType.LAPSED,
+			EventReactionType.STALLED,
+		];
+		let eventRectionItem = this.eventReactions.find(eventReaction => {
+			let eventItem = events.find(event => {
 				return eventReaction.type === event;
 			});
 			return eventItem !== undefined && eventReaction.selected;
@@ -104,8 +125,8 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	 */
 	showsCustomizeLabel(): boolean {
 		let events = [EventReactionType.PRE, EventReactionType.FINAL];
-		let eventRectionItem = this.eventReactions.find((eventReaction) => {
-			let eventItem = events.find((event) => {
+		let eventRectionItem = this.eventReactions.find(eventReaction => {
+			let eventItem = events.find(event => {
 				return eventReaction.type === event;
 			});
 			return eventItem !== undefined && eventReaction.selected;
@@ -119,8 +140,11 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	 */
 	onErrorReactionCheckboxChangeHandler(eventReaction: EventReaction): void {
 		if (eventReaction.selected && !eventReaction.value) {
-			const isWebAPI = this.actionType && this.actionType.id === 'WEB_API';
-			eventReaction.value = isWebAPI ? EVENT_DEFAULT_ERROR_WEB_API : EVENT_DEFAULT_ERROR_SCRIPT;
+			const isWebAPI =
+				this.actionType && this.actionType.id === 'WEB_API';
+			eventReaction.value = isWebAPI
+				? EVENT_DEFAULT_ERROR_WEB_API
+				: EVENT_DEFAULT_ERROR_SCRIPT;
 		}
 	}
 
@@ -130,15 +154,18 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	disableEnableCodeMirrors(): void {
 		this.codeMirrorComponents.forEach((comp: CodeMirrorComponent) => {
 			comp.setDisabled(this.modalType === ActionType.VIEW);
-			comp.change.pipe(takeUntil(this.unsubscribeOnDestroy$)).subscribe(change => {
-				setTimeout(() => {
-					comp.setDisabled(this.modalType === ActionType.VIEW);
-				}, 100);
-			})
+			comp.change
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(change => {
+					setTimeout(() => {
+						comp.setDisabled(this.modalType === ActionType.VIEW);
+					}, 100);
+				});
 		});
-		this.codeMirrorComponents.changes.pipe(takeUntil(this.unsubscribeOnDestroy$))
+		this.codeMirrorComponents.changes
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((comps: QueryList<CodeMirrorComponent>) => {
-				comps.forEach((child) => {
+				comps.forEach(child => {
 					setTimeout(() => {
 						child.setDisabled(this.modalType === ActionType.VIEW);
 					}, 100);
@@ -167,24 +194,34 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 			// Doing a single Event reaction Validation
 			if (singleEventReaction) {
 				if (singleEventReaction.value !== '') {
-					scripts.push({ code: singleEventReaction.type, script: singleEventReaction.value });
+					scripts.push({
+						code: singleEventReaction.type,
+						script: singleEventReaction.value,
+					});
 				}
 			} else {
 				this.eventReactions.forEach((eventReaction: EventReaction) => {
 					eventReaction.state = CHECK_ACTION.UNKNOWN;
 					eventReaction.error = '';
 					if (eventReaction.value !== '') {
-						scripts.push({ code: eventReaction.type, script: eventReaction.value });
+						scripts.push({
+							code: eventReaction.type,
+							script: eventReaction.value,
+						});
 					}
 				});
 			}
-			this.apiActionService.validateCode(scripts)
+			this.apiActionService
+				.validateCode(scripts)
 				.pipe(takeUntil(this.unsubscribeOnDestroy$))
 				.subscribe(
 					(result: any) => {
 						this.invalidScriptSyntax = false;
 						result.forEach((eventResult: any) => {
-							let eventReaction = this.eventReactions.find((r: EventReaction) => r.type === eventResult['code']);
+							let eventReaction = this.eventReactions.find(
+								(r: EventReaction) =>
+									r.type === eventResult['code']
+							);
 							if (!eventResult['validSyntax']) {
 								let errorResult = '';
 								eventResult.errors.forEach((error: string) => {
@@ -197,10 +234,13 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 								eventReaction.state = CHECK_ACTION.VALID;
 							}
 						});
-						this.invalidScriptSyntaxChange.emit(this.invalidScriptSyntax);
+						this.invalidScriptSyntaxChange.emit(
+							this.invalidScriptSyntax
+						);
 						observer.next();
 					},
-					(err) => console.log(err));
+					err => console.log(err)
+				);
 		});
 	}
 
