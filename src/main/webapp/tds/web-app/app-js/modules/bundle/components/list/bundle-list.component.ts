@@ -25,7 +25,7 @@ declare var jQuery: any;
 	templateUrl: 'bundle-list.component.html',
 })
 export class BundleListComponent implements OnInit, AfterContentInit {
-	private state: State = {
+	protected state: State = {
 		sort: [{
 			dir: 'asc',
 			field: 'name'

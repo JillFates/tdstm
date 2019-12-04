@@ -70,7 +70,7 @@ export class TaskListComponent {
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
-	private allAvailableCustomColumns: Array<any>;
+	protected allAvailableCustomColumns: Array<any>;
 	private userContext: UserContextModel;
 	// Flag that indicates that one or more rows have been expanded
 	private rowsExpanded: boolean;

@@ -141,19 +141,19 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	protected async setShowActive(to: boolean): Promise<void> {
-		if (this.showActive === to) {return; }
-
-		this.showActive = to;
-		this.projectToOpen = null;
-		const queryParams: Params = {
-			active: this.showActive ? 'active' : 'completed',
-		};
-		await this.router.navigate([], {
-			relativeTo: this.route,
-			queryParams: queryParams,
-		});
-		this.updateBreadcrumbAndTitle();
-		this.reloadData();
+		if (this.showActive !== to) {
+			this.showActive = to;
+			this.projectToOpen = null;
+			const queryParams: Params = {
+				active: this.showActive ? 'active' : 'completed',
+			};
+			await this.router.navigate([], {
+				relativeTo: this.route,
+				queryParams: queryParams,
+			});
+			this.updateBreadcrumbAndTitle();
+			this.reloadData();
+		}
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {

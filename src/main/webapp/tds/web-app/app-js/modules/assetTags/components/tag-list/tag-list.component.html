@@ -4,8 +4,7 @@
 		<div class="box-body box-with-empty-header">
 			<form novalidate #myForm="ngForm">
 				<kendo-grid
-					class="tds-table"
-					style="min-height: 500px"
+					class="page-height"
 					[ngClass]="{'row-actions-3-children': gridSettings.canSupportColumnMenuDynamic(7), 'hide-filter': !showFilters}"
 					*ngIf="gridSettings"
 					[data]="gridSettings.gridData"
