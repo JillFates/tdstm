@@ -257,7 +257,7 @@ export const en_DICTIONARY: Object = {
 		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Application Grouped by Dependencies',
 		'DEVICES_BY_EVENT': 'Devices By Event',
 		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
-		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by Os and Environment'
+		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
