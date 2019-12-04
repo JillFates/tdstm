@@ -79,7 +79,7 @@ export class APIActionParameterColumnModel {
 				property: 'action',
 				type: 'action',
 				width: 64,
-				locked: true
+				locked: false
 			},
 			{
 				label: 'custom',

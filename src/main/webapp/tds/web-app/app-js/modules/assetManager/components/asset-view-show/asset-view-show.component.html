@@ -1,28 +1,33 @@
 <div class="asset-explorer-view-show-component">
-	<section *ngIf="getDynamicConfiguration(); let config"
-					 class="page-asset-explorer-config">
+	<section
+		*ngIf="getDynamicConfiguration(); let config"
+		class="page-asset-explorer-config"
+	>
 		<div class="button-bar text-right">
 			<div>
 				<!-- Refresh button -->
-				<tds-button-custom [flat]="true"
-													 [icon]="'repeat'"
-													 [tooltip]="'Refresh View'"
-													 (click)="onQuery()">
+				<tds-button-custom
+					[flat]="true"
+					[icon]="'repeat'"
+					[tooltip]="'Refresh View'"
+					(click)="onQuery()"
+				>
 				</tds-button-custom>
 			</div>
 		</div>
 
 		<div class="button-bar">
 			<div class="inline">
-
 				<!-- Asset Views dropdown -->
 				<tds-asset-view-selector #select="tdsAssetViewSelector">
 				</tds-asset-view-selector>
 
 				<!-- Save / Save As button -->
-				<tds-asset-show-save-button [config]="config"
-																		(save)="onSave()"
-																		(saveAs)="onSaveAs()">
+				<tds-asset-show-save-button
+					[config]="config"
+					(save)="onSave()"
+					(saveAs)="onSaveAs()"
+				>
 				</tds-asset-show-save-button>
 
 				<!-- Favorite button -->
@@ -30,17 +35,33 @@
 					[flat]="true"
 					[icon]="'star'"
 					[iconClass]="model.isFavorite ? 'is-solid' : ''"
-					[tooltip]="model.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'"
+					[tooltip]="
+						model.isFavorite
+							? 'Remove from Favorites'
+							: 'Add to Favorites'
+					"
 					class="favorite-button text-yellow"
-					(click)="onFavorite()">
+					(click)="onFavorite()"
+				>
 				</tds-button-custom>
 
 				<!-- Just Planning checkbox -->
 				<clr-checkbox-wrapper class="inline">
-					<input clrCheckbox id="justPlanning" type="checkbox" name="justPlanning"
-								 class="component-action-just-planning"
-								 [(ngModel)]="justPlanning" (change)="onJustPlanningChange($event.currentTarget.checked)">
-					<label class="clr-control-label clr-control-label-sm inline" for="justPlanning">
+					<input
+						clrCheckbox
+						id="justPlanning"
+						type="checkbox"
+						name="justPlanning"
+						class="component-action-just-planning"
+						[(ngModel)]="justPlanning"
+						(change)="
+							onJustPlanningChange($event.currentTarget.checked)
+						"
+					/>
+					<label
+						class="clr-control-label clr-control-label-sm inline"
+						for="justPlanning"
+					>
 						Just Planning
 					</label>
 				</clr-checkbox-wrapper>
@@ -48,48 +69,63 @@
 
 			<div class="inline float-right">
 				<!-- Create button -->
-				<tds-asset-show-create-button *ngIf="assetExplorerViewGrid"
-																			[createButtonState]="assetExplorerViewGrid.createButtonState"
-																			(createAsset)="onCreateAsset($event)">
+				<tds-asset-show-create-button
+					*ngIf="assetExplorerViewGrid"
+					[createButtonState]="
+						assetExplorerViewGrid.createButtonState
+					"
+					(createAsset)="onCreateAsset($event)"
+				>
 				</tds-asset-show-create-button>
 
 				<!-- Export button -->
-				<tds-button-custom [icon]="'download-cloud'"
-													 (click)="onExport()"
-													 [tooltip]="'Export View'">
+				<tds-button-custom
+					[icon]="'download-cloud'"
+					(click)="onExport()"
+					[tooltip]="'Export View'"
+				>
 				</tds-button-custom>
 
 				<!-- Bulk Change button -->
-				<tds-bulk-change-button #tdsBulkChangeButton
-																*ngIf="assetExplorerViewGrid"
-																[enabled]="getGridConfig() ? getGridConfig().hasSelectedItems : false"
-																[showDelete]="true"
-																[showEdit]="true"
-																[bulkChangeType]="bulkChangeType"
-																(clickBulk)="onClickBulkButton()"
-																(operationResult)="onBulkOperationResult($event)">
+				<tds-bulk-change-button
+					#tdsBulkChangeButton
+					*ngIf="assetExplorerViewGrid"
+					[enabled]="
+						getGridConfig()
+							? getGridConfig().hasSelectedItems
+							: false
+					"
+					[showDelete]="true"
+					[showEdit]="true"
+					[bulkChangeType]="bulkChangeType"
+					(clickBulk)="onClickBulkButton()"
+					(operationResult)="onBulkOperationResult($event)"
+				>
 				</tds-bulk-change-button>
 
 				<!-- Clear All Filters button -->
-				<tds-button-custom [disabled]="!filterCount()"
-													 [icon]="'times'"
-													 (click)="onClearAllFilters()"
-													 [tooltip]="'Clear All Filters'">
+				<tds-button-custom
+					[disabled]="!filterCount()"
+					[icon]="'times'"
+					(click)="onClearAllFilters()"
+					[tooltip]="'Clear All Filters'"
+				>
 				</tds-button-custom>
 
 				<!-- Configure/Edit view button -->
-				<tds-button-custom [icon]="'cog'" (click)="onEdit()"
-													 [tooltip]="'Configure View'">
+				<tds-button-custom
+					[icon]="'cog'"
+					(click)="onEdit()"
+					[tooltip]="'Configure View'"
+				>
 				</tds-button-custom>
-
 			</div>
-
 		</div>
 		<div class="box-body">
 			<asset-explorer-view-grid
 				#assetExplorerViewGrid
 				[hiddenFilters]="hiddenFilters"
-				[data]=data
+				[data]="data"
 				(modelChange)="onQuery()"
 				[gridState]="gridState"
 				(gridStateChange)="onGridStateChange($event)"
@@ -98,7 +134,8 @@
 				[model]="model.schema"
 				[viewId]="model.id"
 				[metadata]="metadata"
-				[justPlanning]="justPlanning">
+				[justPlanning]="justPlanning"
+			>
 			</asset-explorer-view-grid>
 		</div>
 	</section>

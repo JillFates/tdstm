@@ -31,6 +31,7 @@ export class EventsService {
 	private readonly APP_EVENT_NEWS_DETAIL = `${this.baseURL}/newsEditor/retrieveCommetOrNewsData`;
 	private readonly APP_EVENT_LIST_BUNDLES = `${this.baseURL}/ws/event/listBundles`;
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/eventData`;
+	private readonly APP_EVENT_STATUS_DATA = `${this.baseURL}/ws/dashboard/insight`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
 	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/event/taskCategoriesStats`;
@@ -201,6 +202,21 @@ export class EventsService {
 				}
 
 				return result;
+			})
+			.catch((error: any) => error);
+	}
+
+	/**
+	 * Get the data for insight data for dashboard
+	 * @param {number} max
+	 * @param {number} lowRange Bundle id
+	 * @param {number} highRange Bundle id
+	 * @returns {Observable<any>} Event insight data
+	 */
+	getInsightData(max?: number, lowRange?: number, highRange?: number): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_STATUS_DATA}`)
+			.map((response: any) => {
+				return response;
 			})
 			.catch((error: any) => error);
 	}

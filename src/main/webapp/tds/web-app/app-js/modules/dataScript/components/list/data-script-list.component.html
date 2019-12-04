@@ -24,21 +24,17 @@
 					(pageChange)="pageChange($event)"
 					[rowSelected]="isRowSelected"
 					[ngClass]="{ 'hide-filter': !showFilters }"
-					class="row-actions-4-children"
+					class="page-height data-script-list row-actions-4-children"
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="button-bar text-right">
-							<!-- Refresh button -->
-							<tds-button-custom
-								[flat]="true"
-								[icon]="'repeat'"
-								[tooltip]="'Refresh'"
-								(click)="reloadDataScripts()"
-							>
-							</tds-button-custom>
-						</div>
 						<div class="button-bar">
 							<div class="inline float-right">
+								<tds-button-custom
+									[icon]="'sync'"
+									[tooltip]="'Refresh'"
+									(click)="reloadDataScripts()"
+								>
+								</tds-button-custom>
 								<tds-button-create
 									[id]="'btnCreateDataScript'"
 									[title]="
