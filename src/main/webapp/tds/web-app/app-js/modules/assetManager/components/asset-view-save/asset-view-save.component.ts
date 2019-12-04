@@ -155,7 +155,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public myMiewClass() {
-		return this.isThereOnlyAssetViewOption() ? '' : 'left30';
+		return this.isThereOnlyAssetViewOption() ? '' : 'indent';
 	}
 
 	public confirmCloseDialog() {
