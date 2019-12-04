@@ -1,18 +1,5 @@
 package net.transitionmanager.imports
 
-import net.transitionmanager.asset.AssetService
-import net.transitionmanager.common.CustomDomainService
-import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.common.ProgressService
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.exception.InvalidRequestException
-import net.transitionmanager.party.PartyRelationshipService
-import net.transitionmanager.person.PersonService
-import net.transitionmanager.project.ProjectService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
@@ -30,17 +17,30 @@ import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.AssetService
+import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.InvalidRequestException
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.imports.ImportBatch
 import net.transitionmanager.imports.ImportBatchRecord
+import net.transitionmanager.imports.ScriptProcessorService
 import net.transitionmanager.party.Party
 import net.transitionmanager.party.PartyGroup
+import net.transitionmanager.party.PartyRelationshipService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
-import net.transitionmanager.i18n.Message
-import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.task.AssetComment
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -844,7 +844,7 @@ class DataImportService implements ServiceMethods {
 
 					if (shouldBeSaved) {
 
-						if (entity.save(failOnError:false, flush:true)) {
+						if (entity.save(failOnError:false, flush:true, deepValidate: false)) {
 
 							if (record.hasComments()) {
 								List<String> comments = record.commentsAsList()

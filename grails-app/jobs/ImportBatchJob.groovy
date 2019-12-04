@@ -1,5 +1,6 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.event.ImportBatchJobSchedulerEventDetails
+import com.tdssrc.grails.StopWatch
 import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import groovy.util.logging.Slf4j
@@ -33,10 +34,12 @@ class ImportBatchJob extends SecureJob implements EventPublisher {
 			if (batchId) {
 				log.info('execute() is about to invoke dataImportService.processBatch(...) to start processing batch ({})', batchId)
 
+				def stopwatch = new StopWatch()
+				stopwatch.start()
 				// call process batch
 				Integer processedRows = dataImportService.processBatch(Project.get(projectId), batchId)
 
-				log.info('execute() return from dataImportService.processBatch(...) : processed rows={}', processedRows)
+				log.info('execute() return from dataImportService.processBatch(...) : processed rows={} in={}', processedRows, stopwatch.endDuration())
 			} else {
 				log.info('execute() did not find a import batch candidate to start processing.')
 			}
