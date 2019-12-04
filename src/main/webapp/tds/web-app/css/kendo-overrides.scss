@@ -84,17 +84,29 @@ kendo-grid.k-grid {
 		--filter-height: 34px;
 
 		// Example of needing to subtract more or change the height of the filter
-		&.notice-list {
-			--subtraction-height: 350px;
-			--filter-height: 37px;
+		&.field-settings-grid {
+			--subtraction-height: 222px;
 		}
-		
+
+		&.data-script-list {
+			--filter-height: 35px;
+		}
+
+		&.bundle-list {
+			--subtraction-height: 278px;
+			--filter-height: 35px;
+		}
+
+		&.task-grid {
+			--subtraction-height: 290px;
+			--filter-height: 33px;
+		}
+
 		// We change the filter height to 0px when it is hidden, allowing for proper calculation of the grid-body height.
 		&.hide-filter {
 			--filter-height: 0px;
 		}
 
-		// Default is to show filter
 		.k-grid-container {
 			display: block;
 			max-height: calc(
@@ -106,11 +118,10 @@ kendo-grid.k-grid {
 				overflow: auto;
 			}
 		}
+	}
 
-		// Make the grid header look better by removing the padding it had for the scroll bar.
-		.k-grid-header {
-			padding: 0px !important;
-		}
+	.k-grid-header {
+		background: #d9e4ea;
 	}
 
 	kendo-dropdownlist.k-dropdown,
