@@ -395,6 +395,10 @@ export class TaskListComponent {
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
+		if (this.urlParams.filter) {
+			delete this.urlParams.filter;
+			this.search();
+		}
 		this.columnsModel
 			.filter(column => column.filterable)
 			.forEach((column: GridColumnModel) => {
@@ -414,8 +418,8 @@ export class TaskListComponent {
 	 * Determines if current columns has been filtered (contains value).
 	 */
 	areFiltersDirty(): boolean {
-		return this.columnsModel
-			.filter(column => column.filter).length > 0;
+		return (this.columnsModel
+			.filter(column => column.filter).length > 0) || this.urlParams.filter;
 	}
 
 	/**

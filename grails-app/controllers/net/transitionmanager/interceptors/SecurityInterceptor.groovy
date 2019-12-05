@@ -14,7 +14,7 @@ class SecurityInterceptor {
 	// the controllers that we validate authorization on
 	private static final List<String> webSvcCtrl = ['moveEventNews', 'wsDashboard']
 
-	private static final List<String> skipActions = ['getDataForPlanningDashboard']
+	private static final List<String> skipActions = ['getDataForPlanningDashboard', 'eventData']
 
 	AuditService    auditService
 	SecurityService securityService

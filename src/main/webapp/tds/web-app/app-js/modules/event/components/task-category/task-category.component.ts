@@ -49,7 +49,9 @@ export class TaskCategoryComponent implements OnInit, AfterViewInit {
 	}
 
 	ngAfterViewInit() {
-		this.categoryContainer.nativeElement.scrollLeft = this.currentScroll;
+		if (this.categoryContainer) {
+			this.categoryContainer.nativeElement.scrollLeft = this.currentScroll;
+		}
 	}
 
 	public handleScroll(e): void {
