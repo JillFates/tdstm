@@ -20,7 +20,7 @@ export class DateUtils {
 	public static readonly PREFERENCE_MIDDLE_ENDIAN = 'MM/DD/YYYY';
 	public static readonly PREFERENCE_LITTLE_ENDIAN = 'DD/MM/YYYY';
 
-	public static readonly DEFAULT_FORMAT_DATE = 'dd/MM/yyyy';
+	public static readonly DEFAULT_FORMAT_DATE = 'DD/MM/YYYY';
 	public static readonly DEFAULT_FORMAT_TIME = 'hh:mm a';
 	public static readonly OUTPUT_PIPE_TIME_FORMAT = 'HH:mm:ss';
 	public static readonly SERVER_FORMAT_DATETIME = 'YYYY-MM-DDT' + DateUtils.OUTPUT_PIPE_TIME_FORMAT;
