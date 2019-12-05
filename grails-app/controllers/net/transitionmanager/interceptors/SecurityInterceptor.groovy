@@ -14,6 +14,8 @@ class SecurityInterceptor {
 	// the controllers that we validate authorization on
 	private static final List<String> webSvcCtrl = ['moveEventNews', 'wsDashboard']
 
+	private static final List<String> skipActions = ['getDataForPlanningDashboard', 'eventData']
+
 	AuditService    auditService
 	SecurityService securityService
 	UserService     userService
@@ -37,7 +39,7 @@ class SecurityInterceptor {
 			if (!webSvcCtrl.contains(controllerName)) {
 				return true
 			} else {
-				if (controllerName == 'wsDashboard' && actionName == "getDataForPlanningDashboard") {
+				if (controllerName == 'wsDashboard' && skipActions.contains(actionName)) {
 					return true
 				}
 			}

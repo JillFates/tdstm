@@ -5606,6 +5606,18 @@ class TaskService implements ServiceMethods {
 				instructionsLinkURL = it.instructionsLink
 			}
 
+			Map<String, ?> invokeActionDetails = it.getInvokeActionButtonDetails()
+			Map actionBarInfo = [
+				apiActionId: it.apiAction?.id,
+				apiActionInvokedAt: it.apiActionInvokedAt,
+				apiActionCompletedAt: it.apiActionCompletedAt,
+				invokeActionDetails: invokeActionDetails,
+				assignedTo: it.assignedTo?.id,
+				predecessorsCount: it.taskDependencies.size(),
+				successorsCount: TaskDependency.countByPredecessor(it),
+				category: it.category
+			]
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5630,7 +5642,8 @@ class TaskService implements ServiceMethods {
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
 				isPublished: it.isPublished,
-				updatedClass: updatedClass
+				updatedClass: updatedClass,
+				actionBarInfo: actionBarInfo
 			]
 		}
 		return [rows: results, totalCount: totalCount]
@@ -5810,14 +5823,14 @@ class TaskService implements ServiceMethods {
 			case 'resolvedBy': result = task.resolvedBy?.toString() ?: ''; break
 			case 'createdBy': result = task.createdBy?.toString() ?: ''; break
 			case "event": result = task.moveEvent?.name; break
+			case "bundle": result = task.assetEntity?.moveBundle?.name; break
+			case "apiAction": result = task.apiAction?.name; break
 			case { task[fieldName] instanceof Timestamp}:
 				result = task[fieldName] ? TimeUtil.formatDateTime(task[fieldName] as Date, TimeUtil.FORMAT_DATE_TIME_15) : ''
 				break
 			case { task[fieldName] instanceof Date}:
 				result = task[fieldName] ? TimeUtil.formatDate(task[fieldName] as Date) : ''
 				break
-			case "bundle": result = task.assetEntity?.moveBundle?.name; break
-			case "apiAction": result = task.apiAction?.name; break
 			default:
 				result = task[fieldName]
 				if ( result != null && !(result instanceof String) ) {

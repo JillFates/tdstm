@@ -1,4 +1,4 @@
-import {Component, ViewChild, ElementRef, OnInit} from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import {UIExtraDialog} from '../../services/ui-dialog.service';
 import { UIPromptService} from '../../directives/ui-prompt.directive';
@@ -28,16 +28,18 @@ declare var jQuery: any;
                                 <div>
                                     <div class="times-container">
                                         <div class="times-section">
+																					<!---->
                                             <kendo-dateinput
-                                                    [disabled]="model.locked"
-                                                    (valueChange)="onDateChanged('start', $event)"
-                                                    [format]="getDateTimeFormat(model.start)"
+																										(valueChange)="onDateChanged('start', $event)"
+                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
                                                     [(value)]="model.start"></kendo-dateinput>
                                         </div>
                                         <div class="times-section">
+																					<!---->
                                             <kendo-dateinput
-                                                    (valueChange)="onDateChanged('end', $event)"
-                                                    [format]="getDateTimeFormat(model.end)"
+																							(valueChange)="onDateChanged('end', $event)"
+																										[disabled]="model.locked"
+                                                    [format]="this.model.dateFormat +' '+this.model.timeFormat"
                                                     [(value)]="model.end"></kendo-dateinput>
                                         </div>
                                     </div>
@@ -95,13 +97,14 @@ declare var jQuery: any;
                         <button type="button"
                                 class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
                             <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
+                            <span> Cancel</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-	`
+	`,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnInit {
 	dataSignature: string;
@@ -221,7 +224,7 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 	}
 
 	/**
-	 * On date changed if lock is off update the duration, if lock is on shift start and end dates to keep duration intact
+	 * On date changed.
 	 * @param {string} type: Could be start or end
 	 * @param {any} value: Current date value selected
 	 * @returns {void}
@@ -230,28 +233,25 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 		if (!value) {
 			return;
 		}
-
 		const start = type === 'start' ? value : this.model.start;
 		const end = type === 'end' ? value : this.model.end;
+		// if duration lock is ON, then recalculate the end date based on the current duration values.
+		if (this.model.locked) {
+			const duration = DateUtils.getDurationPartsAmongDates(this.model.start, value);
+			this.model.start = DateUtils.increment(this.model.start,
+				[
+					{value: duration.days, unit: 'days'},
+					{value: duration.hours, unit: 'hours'},
+					{value: duration.minutes, unit: 'minutes'}]);
 
-		if (!this.model.locked) {
+			this.model.end = DateUtils.increment(this.model.end,
+				[
+					{value: duration.days, unit: 'days'},
+					{value: duration.hours, unit: 'hours'},
+					{value: duration.minutes, unit: 'minutes'}]);
+		} else { // if duration lock is OFF, then recalculate the duration based on the new start/end values.
 			if (this.model.start && this.model.end) {
 				this.model.duration = DateUtils.getDurationPartsAmongDates(start, end);
-			}
-		} else {
-			if (type === 'end' && value) {
-				const duration = DateUtils.getDurationPartsAmongDates(this.model.end, value);
-				this.model.start = DateUtils.increment(this.model.start,
-					[
-										{value: duration.days, unit: 'days'},
-										{value: duration.hours, unit: 'hours'},
-										{value: duration.minutes, unit: 'minutes'}]);
-
-				this.model.end = DateUtils.increment(this.model.end,
-					[
-										{value: duration.days, unit: 'days'},
-										{value: duration.hours, unit: 'hours'},
-										{value: duration.minutes, unit: 'minutes'}]);
 			}
 		}
 	}

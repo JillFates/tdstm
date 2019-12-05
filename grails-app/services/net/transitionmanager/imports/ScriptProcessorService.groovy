@@ -303,11 +303,11 @@ class ScriptProcessorService {
 		os.close()
 
 		// create progress key
-		String key = 'ETL-Transform-Data-' + scriptFilename + '-' + StringUtil.generateGuid()
+		String key = 'ETL-Test-Script-' + scriptFilename + '-' + StringUtil.generateGuid()
 		progressService.create(key, ProgressService.PENDING)
 
 		// Kickoff the background job to generate the tasks
-		def jobTriggerName = 'TM-ETLTransformData-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
+		def jobTriggerName = 'TM-ETLTestScript-' + project.id + '-' + scriptFilename + '-' + StringUtil.generateGuid()
 
 		// The triggerName/Group will allow us to controller on import
 		Trigger trigger = new SimpleTriggerImpl(jobTriggerName)
@@ -315,11 +315,11 @@ class ScriptProcessorService {
 		trigger.jobDataMap.scriptFilename = scriptFilename
 		trigger.jobDataMap.filename = command.filename
 		trigger.jobDataMap.progressKey = key
-		trigger.setJobName('ETLTransformDataJob')
-		trigger.setJobGroup('tdstm-etl-transform-data')
+		trigger.setJobName('ETLTestScriptJob')
+		trigger.setJobGroup('tdstm-etl-test-script')
 		quartzScheduler.scheduleJob(trigger)
 
-		log.info('scheduleJob() {} kicked of an test ETL transform data process for script and filename ({},{})',
+		log.info('scheduleJob() {} kicked of an ETL test script process for script and filename ({},{})',
 				securityService.currentUsername, scriptFilename, command.filename)
 
 		// return progress key
