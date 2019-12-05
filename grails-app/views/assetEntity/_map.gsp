@@ -3,9 +3,9 @@
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">
 		<div class="btn-group">
-			<button id="controlPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)">Control Panel</button>
-			<button id="dependenciesPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)">Dependencies</button>
-			<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)">Legend</button>
+			<button id="controlPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL, 'depAnalyzer')">Control Panel</button>
+			<button id="dependenciesPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY, 'depAnalyzer')">Dependencies</button>
+			<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND), 'depAnalyzer'">Legend</button>
 		</div>
 		<button id="fullscreenButtonId" class="btn btn-outline" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Full Screen</button>
 		<div id="highlightFormId" class="noPadding graphTabButton hasMargin newHighlightForm">
@@ -336,4 +336,7 @@
 <!-- Call the main graph function as soon as this template is added to the DOM -->
 <script type="text/javascript">
 	buildMap();
+	$('#controlPanelId').addClass('depAnalyzer');
+	$('#dependenciesPanelId').addClass('depAnalyzer');
+	$('#legendDivId').addClass('depAnalyzer');
 </script>

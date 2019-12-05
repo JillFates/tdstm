@@ -32,7 +32,7 @@
 		<div id="toolsContainerId">
 			<div id="graphToolbarId">
 				<div class="btn-group">
-					<button id="controlPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)">Control Panel</button>
+					<button id="controlPanelTabId" class="btn activeTab" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)">Control Panel</button>
 					<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)">Legend</button>
 				</div>
 
