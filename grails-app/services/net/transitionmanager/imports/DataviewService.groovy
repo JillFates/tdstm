@@ -300,13 +300,13 @@ class DataviewService implements ServiceMethods {
 
 		if (dataviewJson.isSystem) {
 			switch (dataviewJson.saveAsOption) {
-				case ViewSaveAsOptionEnum.MY_VIEW.ordinal():
+				case ViewSaveAsOptionEnum.MY_VIEW.name():
 					throwException(InvalidParameterException, 'dataview.validate.saveMyViewInDefaultProject', 'My Views are not allowed to be saved into the Default project.')
 					break
-				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.ordinal():
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name():
 					throwException(InvalidParameterException, 'dataview.validate.overrideForSelfInDefaultProject', 'Overriding system views for self is not allowed in the Default project.')
 					break
-				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal():
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name():
 					if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)) {
 						throwException(UnauthorizedException, 'dataview.validate.overrideGlobalPermission', 'You do not have the necessary permission to save override views for the Default project.')
 					}
@@ -314,17 +314,17 @@ class DataviewService implements ServiceMethods {
 			}
 		} else {
 			switch (dataviewJson.saveAsOption) {
-				case ViewSaveAsOptionEnum.MY_VIEW.ordinal():
+				case ViewSaveAsOptionEnum.MY_VIEW.name():
 					if (!securityService.hasPermission(Permission.AssetExplorerCreate)) {
 						throwException(UnauthorizedException, 'dataview.validate.createPermission', 'You do not have the necessary permission to create views.')
 					}
 					break
-				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.ordinal():
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name():
 					if (!securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
 						throwException(UnauthorizedException, 'dataview.validate.createOverridePermission', 'You do not have the necessary permission to save override views.')
 					}
 					break
-				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal():
+				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name():
 					if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)) {
 						throwException(UnauthorizedException, 'dataview.validate.overrideAllUsers', 'You do not have the necessary permission to save override views for all users.')
 					}

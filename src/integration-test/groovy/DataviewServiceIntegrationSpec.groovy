@@ -67,7 +67,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
-			dataviewJson.saveAsOption = 0
+			dataviewJson.saveAsOption = 'MY_VIEW'
 		when: 'creating a dataview with an invalid project'
 			dataviewService.create(person, null, dataviewJson)
 		then:
@@ -164,7 +164,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.MY_VIEW.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.MY_VIEW.name()
 		when: 'creating a dataview for system view as my view'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -177,7 +177,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
 		when: 'creating a dataview for system view as override for me'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -190,7 +190,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = true
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 		when: 'creating a dataview for system view as override for all'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -203,7 +203,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 		when: 'creating a dataview for non-system view as my view'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -216,7 +216,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 		when: 'creating a dataview for non-system view as override for me'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -229,7 +229,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
-			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.ordinal()
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
 		when: 'creating a dataview for non-system view as override for all'
 			dataviewService.create(person, project , dataviewJson)
 		then:
@@ -243,7 +243,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
-			dataviewJson.saveAsOption = 1
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
 			dataviewJson.overridesView = 1
 		when: 'creating a valid override dataview'
 			dataviewService.create(person, project, dataviewJson)
