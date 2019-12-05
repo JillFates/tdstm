@@ -92,7 +92,7 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public selectProjectByID(id): any {
-		const project = this.projectList.find(p => id == p.id);
+		const project = this.projectList.find(p => id === p.id);
 		if (project) {
 			this.selectedProjectID = id;
 			this.selectedProject = project;

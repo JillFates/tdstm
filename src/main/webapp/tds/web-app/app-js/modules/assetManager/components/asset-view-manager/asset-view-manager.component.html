@@ -10,7 +10,7 @@
 					<div class="box-body no-padding">
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
-								<a (click)="selectFolder(folder)" href="javascript:void(0)">
+								<a (click)="selectFolder(folder, $event)">
 									<i class="fa"
 										 [ngClass]="(folder.type !== viewType.FAVORITES)? 'fa-folder' : 'fa-star text-yellow'"></i> {{folder?.name}}
 									<span class="label label-primary pull-right">{{folder.views.length}}</span>

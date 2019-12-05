@@ -42,17 +42,16 @@ import { Router } from '@angular/router';
 				</span>
 			</ng-template>
 			<ng-template kendoDropDownListHeaderTemplate>
-				<div class="asset-view-selector has-feedback" style="padding:unset;">
+				<div class="asset-view-selector has-feedback">
 					<input #viewSelectorFilter
 								 (focusout)="onFocusOut($event)"
 								 type="text"
-								 class="form-control"
+								 class="form-control searchFilterInput"
 								 (keyup)="onSearch()"
 								 name="searchFilterSelector"
 								 [(ngModel)]='searchFilterSelector'
 								 placeholder="Search"
-								 aria-describedby="search"
-								 style="padding: unset;">
+								 aria-describedby="search">
 					<i class="fa fa-search form-control-feedback" aria-hidden="true"></i>
 				</div>
 			</ng-template>
