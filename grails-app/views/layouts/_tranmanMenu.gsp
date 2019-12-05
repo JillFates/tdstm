@@ -152,7 +152,7 @@
                                 <a href="/tdstm/module/assetsummary/list">Summary</a>
                             </li>
                             <li class="menu-child-item menu-parent-assets-asset-manager">
-                                <g:link class="mmlink" controller="module" action="asset" id="views">Manage</g:link>
+                                <g:link class="mmlink" controller="module" action="asset" id="views">Manage Views</g:link>
                             </li>
                             <li class="divider"></li>
                             <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
@@ -217,13 +217,13 @@
                                 <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                     <li class="menu-child-item menu-parent-assets-manage-dep-batches">
                                         <g:link class="mmlink" controller="module" action="importbatch" id="list">
-                                            Manage ETL Batch Import
+                                            Manage Views ETL Batch Import
                                         </g:link>
                                     </li>
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.AssetImport}">
                                     <li class="menu-child-item menu-parent-assets-manage-batches">
-                                        <g:link controller="dataTransferBatch" action="list">Manage PMXL Batch Import</g:link>
+                                        <g:link controller="dataTransferBatch" action="list">Manage Views PMXL Batch Import</g:link>
                                 </li>
                             </tds:hasPermission>
                         </ul>
