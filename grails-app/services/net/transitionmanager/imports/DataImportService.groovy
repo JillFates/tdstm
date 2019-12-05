@@ -873,6 +873,12 @@ class DataImportService implements ServiceMethods {
 							if (isNewEntity && Person.isAssignableFrom(entity.class)) {
 								associatePersonToCompanyAndProject(context.project, entity)
 							}
+						} else {
+							log.debug "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
+							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
+							allIsGoodHere = false
+						}
+					}
 
 							if (record.hasTags()) {
 								log.info "processEntityRecord() record ${record.id} contains tags ${record.tags}"
