@@ -25,7 +25,6 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<div>Type:{{columnType}}</div>
 		<input *ngIf="columnType === 'text'"
 			clrInput
 			#filterInput
@@ -44,8 +43,6 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
 				(valueChange)="onFilter($event)"
                 [style.width.%]="100">
 		</kendo-datepicker>
-
-<!--        [(ngModel)]="column.filter"-->
         <kendo-dropdownlist *ngIf="columnType === 'boolean'"
 				#filterInput
 				[data]="booleanFilterData"
@@ -53,11 +50,6 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
 				(valueChange)="onFilter($event)"
                 [style.width.%]="100">
 		</kendo-dropdownlist>
-
-
-        <!--		<span>Filter: {{filterInput && filterInput.nativeElement && filterInput.nativeElement.value}}</span>-->
-<!--		<span>Value: {{value}}</span>-->
-
         <tds-button
 			*ngIf="value || value === false"
 			(click)="onClearFilter()"

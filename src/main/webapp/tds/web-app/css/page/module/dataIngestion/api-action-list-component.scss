@@ -1,0 +1,26 @@
+.api-action-list-component {
+  height: 83vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+
+  .box-body {
+    height: 100%;
+    padding-bottom: 0;
+    padding-top: 0;
+    .k-grid {
+      height: 100%;
+    }
+  }
+
+  .button-create-action {
+    margin-right: 4px;
+  }
+}
+
+@media (min-height: 980px)  {
+  .api-action-list-component {
+    height: 88vh;
+  }
+}
+
