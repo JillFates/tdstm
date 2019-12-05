@@ -62,8 +62,10 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		this.selectedFolder.views = SortUtils.sort(this.selectedFolder.views, AssetViewManagerColumnsHelper.getCurrentSortedColumnOrDefault() );
 	}
 
-	protected selectFolder(folderOpen: ViewGroupModel): void {
-
+	protected selectFolder(folderOpen: ViewGroupModel, $event: MouseEvent = null): void {
+		if ($event) {
+			$event.preventDefault();
+		}
 		this.dictionary.set(LAST_SELECTED_FOLDER, folderOpen);
 		this.reportGroupModels.forEach((folder) => folder.open = false);
 		this.selectedFolder = this.reportGroupModels.filter((folder) => folder.name === folderOpen.name)[0];
