@@ -34,6 +34,7 @@ import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskDependency
 import net.transitionmanager.task.TaskService
 import org.apache.commons.lang3.math.NumberUtils
@@ -597,6 +598,11 @@ class TaskController implements ControllerMethods {
 	@HasPermission(Permission.TaskGraphView)
 	def neighborhood() {
 
+		String currentProjectId = userPreferenceService.getCurrentProjectId()
+		Person currentPerson = securityService.loadCurrentPerson()
+
+		List<String> teams = partyRelationshipService.getProjectStaffFunctions(currentProjectId, currentPerson.id)?.id
+
 		def taskId = params.id
 		if (! taskId || ! taskId.isNumber()) {
 			renderErrorJson("An invalid task id was supplied. Please contact support if this problem persists.")
@@ -609,7 +615,7 @@ class TaskController implements ControllerMethods {
 			return
 		}
 
-		def rootTask = AssetComment.read(taskId)
+		def rootTask = Task.read(taskId)
 		if (!rootTask || rootTask.project.id != project.id) {
 			if (rootTask) {
 				log.warn "SECURITY : User $securityService.currentUsername attempted to access graph for task ($taskId) not associated to current project ($project)"
@@ -637,61 +643,20 @@ class TaskController implements ControllerMethods {
 			return
 		}
 
-		def styleDef = "rounded, filled"
 		Map<String, Map> nodesMap = [:]
 		def tasks = []
 
 		// helper closure that creates the definition of a node
-		def outputTaskNode = { task, rootId ->
-
-			def style
-			def fontcolor
-			def fontsize
-			def color
-
+		def outputTaskNode = { AssetComment task, rootId ->
 			if (! tasks.contains(task.id) && (viewUnpublished || task.isPublished)) {
 				tasks << task.id
 
-				def label = "${task.taskNumber}:${task.comment}"
-				def tooltip = new String(label)
-				label = (label.size() < 31) ? label : label[0..30]
-				label = StringUtil.sanitizeDotString(label)
-				tooltip = StringUtil.sanitizeDotString(tooltip)
-
-				def colorKey = taskStatusColorMap.containsKey(task.status) ? task.status : 'ERROR'
-				def fillcolor = taskStatusColorMap[colorKey][1]
-
-				// TODO - JPM - outputTaskNode() the following boolean statement doesn't work any other way which is really screwy
-				if ("${task.role == AssetComment.AUTOMATIC_ROLE ? 'yes' : 'no'}" == 'yes') {
-					fontcolor = taskStatusColorMap['AUTO_TASK'][0]
-					color = taskStatusColorMap['AUTO_TASK'][1]
-					fontsize = '8'
-				} else {
-					fontcolor = taskStatusColorMap[colorKey][0]
-					color = 'black'	// edge color
-					fontsize = '10'
-				}
-
-				// Make the center root task stand out
-				if (task.id.toString() == rootId) {
-					style = "dashed, bold, filled"
-				} else {
-					style = styleDef
-				}
+				Map taskMap = task.mapForGraphs()
+				taskMap.isMyTask = task.isMyTask(currentPerson, teams)
 
 				nodesMap[task.taskNumber] = [
-					label     : label,
-					style     : style,
-					id        : task.id,
-					taskNumber: task.taskNumber,
-					color     : color,
-					fillcolor : fillcolor,
-					fontcolor : fontcolor,
-					fontsize  : fontsize,
-					tooltip   : tooltip,
-					category  : task.category,
-					status    : task.status,
-					successors: []
+						  task: taskMap,
+						  successors: []
 				]
 			}
 		}
@@ -716,7 +681,7 @@ class TaskController implements ControllerMethods {
 	 */
 	@HasPermission(Permission.TaskGraphView)
 	def moveEventTaskGraphSvg() {
-		def errorMessage = ''
+		def errorMessage
 
 		// Create a loop that we can break out of as we need to
 		while (true) {

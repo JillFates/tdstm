@@ -9,12 +9,17 @@ import { ComboBoxSearchModel } from '../../../shared/components/combo-box/model/
 import { ComboBoxSearchResultModel } from '../../../shared/components/combo-box/model/combobox-search-result.model';
 import { TaskActionInfoModel } from '../model/task-action-info.model';
 import {ITask} from '../model/task-edit-create.model';
-import {IGraphTask} from '../model/graph-task.model';
+import {IGraphNode, IGraphTask, IMoveEventTask} from '../model/graph-task.model';
 import {IMoveEvent} from '../model/move-event.model';
 
 export interface IGrapTaskResponseBody {
 	status: string;
-	data: IGraphTask[];
+	data: IGraphNode[];
+}
+
+export interface IMoveEventTaskResponseBody {
+	status?: string;
+	data?: IMoveEventTask;
 }
 
 export interface ITaskResponseBody {
@@ -26,7 +31,6 @@ export interface IMoveEventResponseBody {
 	status: string;
 	data: IMoveEvent[];
 }
-type GraphTaskType = HttpResponse<IGrapTaskResponseBody>
 
 /**
  * @name TaskService
@@ -42,7 +46,7 @@ export class TaskService {
 	private readonly TASK_ACTION_SUMMARY = `${ this.baseURL }/ws/task/{taskId}/actionLookUp`;
 	private readonly TASK_NEIGHBORHOOD_URL = `${this.baseURL}/task/neighborhood`;
 	private readonly MOVE_EVENT_URL = `${this.baseURL}/ws/moveEvent/list`;
-	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/task/moveEventTaskGraphSvg`;
+	private readonly TASK_LIST_BY_MOVE_EVENT_ID_URL = `${ this.baseURL }/wsTimeline/timeline`;
 
 	// Resolve HTTP using the constructor
 	constructor(private http: HttpClient) {
@@ -535,24 +539,35 @@ export class TaskService {
 	 * @param taskId: number | string
 	 * @param filters: {[key: string]: string}[]
 	 */
-	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<IGraphTask[]> {
-		const params = this.createHttpParams(filters);
+	findTask(taskId: number | string, filters?: {[key: string]: any}): Observable<HttpResponse<IGrapTaskResponseBody>> {
+		const params = this.createHttpFilterParams(filters);
 		return this.http.get<IGrapTaskResponseBody>(`${this.TASK_NEIGHBORHOOD_URL}/${taskId}`,
-			{ params, observe: 'response' })
-			.map(res => res.body.data);
+			{ params, observe: 'response' });
 	}
 
-	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<ITask[]> {
-		const params = this.createHttpParams(filters);
-		return this.http.get<ITaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}?moveEventId=${id}&id=-1`,
+	findTasksByMoveEventId(id: number, filters?: {[key: string]: any}): Observable<IMoveEventTask> {
+		const extraParams = { ...filters };
+		extraParams.id = id;
+		extraParams.mode = 'C';
+
+		const params = new HttpParams()
+			.set('id', extraParams.id)
+			.set('mode', extraParams.mode)
+			.set('myTasks', extraParams.myTasks)
+			.set('minimizeAutoTasks', extraParams.minimizeAutoTasks)
+			.set('viewUnpublished', extraParams.viewUnpublished);
+
+		return this.http.get<IMoveEventTaskResponseBody>(`${this.TASK_LIST_BY_MOVE_EVENT_ID_URL}`,
 			{ params, observe: 'response' })
-			.map(res => res.body.data);
+			.map(res => {
+				return res.body.data;
+			});
 	}
 
 	/**
 	 * create http params object to be passed onto requests
 	 */
-	createHttpParams(params: any): HttpParams {
+	createHttpFilterParams(params: any): HttpParams {
 		return new HttpParams()
 		.set('myTasks', params.myTasks)
 		.set('minimizeAutoTasks', params.minimizeAutoTasks)
