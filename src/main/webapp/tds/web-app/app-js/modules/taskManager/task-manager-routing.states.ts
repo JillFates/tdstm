@@ -20,7 +20,7 @@ export class TaskManagerRoutingStates {
 		url: 'list'
 	};
 	public static readonly TASK_NEIGHBORHOOD = {
-		url: 'neighborhood'
+		url: 'task-graph'
 	};
 }
 
@@ -50,9 +50,10 @@ export const TaskManagerRoute: Routes = [
 		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
 		data: {
 			page: {
-				// instruction: '',
-				// menu: ['Task', 'Task Manager'],
-				// topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-task-manager', subMenu: true}
+				title: '',
+				instruction: '',
+				menu: ['Task', 'GoJS Task Graph'],
+				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-gojs-task-graph', subMenu: true}
 			},
 			requiresAuth: true,
 		},

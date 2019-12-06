@@ -109,6 +109,9 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
+import {DiagramContextMenuComponent} from './components/diagram-layout/context-menu/diagram-context-menu.component';
+import {MenusModule} from '@progress/kendo-angular-menu';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -124,7 +127,9 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		RouterModule,
 		DialogModule,
 		ProgressBarModule,
-		FontAwesomeModule
+		FontAwesomeModule,
+		MenusModule,
+		TooltipModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -191,7 +196,8 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		TDSModalPageWrapperComponent,
 		PowerComponent,
 		DiagramLayoutComponent,
-		CircleCountdownComponent
+		CircleCountdownComponent,
+		DiagramContextMenuComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -259,7 +265,8 @@ import {CircleCountdownComponent} from './components/circle-countdown/circle-cou
 		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
-		CircleCountdownComponent
+		CircleCountdownComponent,
+		DiagramContextMenuComponent
 	],
 	entryComponents: [
 		DynamicComponent,

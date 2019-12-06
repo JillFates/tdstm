@@ -5618,7 +5618,7 @@ class TaskService implements ServiceMethods {
 				successorsCount: TaskDependency.countByPredecessor(it),
 				category: it.category
 			]
-			
+
 			AssetEntity asset = GrailsHibernateUtil.unwrapIfProxy(it.assetEntity)
 
 			// now with all this, build a row
