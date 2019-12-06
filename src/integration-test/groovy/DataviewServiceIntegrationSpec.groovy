@@ -1,31 +1,73 @@
 import com.tdsops.tm.enums.domain.AssetClass
+import com.tdsops.tm.enums.domain.SecurityRole
+import com.tdsops.tm.enums.domain.ViewSaveAsOptionEnum
 import com.tdssrc.grails.JsonUtil
 import grails.gorm.transactions.Rollback
+import grails.plugin.springsecurity.SpringSecurityService
 import grails.test.mixin.integration.Integration
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
 import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.UnauthorizedException
 import net.transitionmanager.imports.Dataview
 import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.PersonService
 import net.transitionmanager.project.Project
+import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
 import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.json.JSONObject
+import spock.lang.Shared
 import spock.lang.Specification
+
+import java.security.InvalidParameterException
 
 @Integration
 @Rollback
 class DataviewServiceIntegrationSpec extends Specification{
 
-	DataviewService               dataviewService
-	test.helper.ProjectTestHelper projectTestHelper = new test.helper.ProjectTestHelper()
-	test.helper.PersonTestHelper  personHelper      = new test.helper.PersonTestHelper()
+	@Shared
+	SecurityService securityService
+	@Shared
+	ProjectService projectService
+	@Shared
+	PersonService personService
+	@Shared
+	DataviewService dataviewService
+	test.helper.ProjectTestHelper projectTestHelper
+	test.helper.PersonTestHelper  personHelper
+	static Person person
+	static Project project
+	static UserLogin user
+
+	void setup() {
+		projectTestHelper = new test.helper.ProjectTestHelper()
+		personHelper      = new test.helper.PersonTestHelper()
+		project = projectTestHelper.createProject()
+
+		person = personHelper.createStaff(projectService.getOwner(project))
+		assert person
+
+		user = personHelper.createUserLoginWithRoles(person, ["${SecurityRole.ROLE_ADMIN}"])
+		assert user
+		assert user.username
+
+		// logs the admin user into the system
+		securityService.assumeUserIdentity(user.username, false)
+
+		assert securityService.isLoggedIn()
+
+		personService.addToProjectSecured(project, person)
+	}
 
 	void '1. test create dataview without project throws exception'() {
 		setup:
-			Person person = personHelper.createPerson()
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = 'MY_VIEW'
 		when: 'creating a dataview with an invalid project'
 			dataviewService.create(person, null, dataviewJson)
 		then:
@@ -35,9 +77,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '2. test create dataview with duplicate name within same project throws exception'() {
 		setup:
-			Project project = projectTestHelper.createProject()
-			Person person = personHelper.createPerson()
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview(null)
 			dataviewService.create(person, project, dataviewJson)
 		when: 'creating a second dataview with same name and project'
@@ -49,9 +90,8 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '4. Test that unique name validation with duplicate name within same project returns false'() {
 		setup:
-			Project project = projectTestHelper.createProject()
-			Person person = personHelper.createPerson()
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview('my dataview name')
 			dataviewService.create(person, project, dataviewJson)
 		when: 'a dataview with same name and project is tested'
@@ -62,10 +102,9 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '5. test unique name validation with duplicate name for a different project returns true'() {
 		setup:
-			Project project = projectTestHelper.createProject()
 			Project anotherProject = projectTestHelper.createProject()
-			Person person = personHelper.createPerson()
-			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
 			JSONObject dataviewJson = createDataview('my dataview name')
 			dataviewService.create(person, project, dataviewJson)
 		when: 'validate if a dataview with same name for a different project can be created'
@@ -88,9 +127,6 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '6. test getAssetIdsHql'() {
 		setup: 'given a project, a dataview, and a DataviewUserParamsCommand'
-			Project project = projectTestHelper.createProject()
-			Person person = personHelper.createPerson()
-
 			dataviewService.securityService = [
 				hasPermission        : { return true },
 				getUserCurrentProject: { return project },
@@ -121,5 +157,97 @@ class DataviewServiceIntegrationSpec extends Specification{
 			'''.stripIndent()
 
 			hql.params == [project: project, assetClasses: [AssetClass.DEVICE]]
+	}
+
+	void '7. test create dataview to throw saveMyViewInDefaultProject exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = true
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.MY_VIEW.name()
+		when: 'creating a dataview for system view as my view'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*My Views are not allowed to be saved into the Default project.*/
+	}
+
+	void '8. test create dataview to throw overrideForSelfInDefaultProject exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return true }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = true
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+		when: 'creating a dataview for system view as override for me'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*Overriding system views for self is not allowed in the Default project.*/
+	}
+
+	void '9. test create dataview to throw overrideGlobalPermission exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = true
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+		when: 'creating a dataview for system view as override for all'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views for the Default project.*/
+	}
+
+	void '10. test create dataview to throw createPermission exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+		when: 'creating a dataview for non-system view as my view'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+	}
+
+	void '11. test create dataview to throw createOverridePermission exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+		when: 'creating a dataview for non-system view as override for me'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views.*/
+	}
+
+	void '12. test create dataview to throw overrideAllUsers exception'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return false }] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name()
+		when: 'creating a dataview for non-system view as override for all'
+			dataviewService.create(person, project , dataviewJson)
+		then:
+			InvalidParameterException e = thrown()
+			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
+	}
+
+	void '13. test creating override dataview'() {
+		setup:
+			dataviewService.securityService = [hasPermission: { return true },
+											   loadCurrentPerson: {return person}] as SecurityService
+			JSONObject dataviewJson = createDataview(null)
+			dataviewJson.isSystem = false
+			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
+			dataviewJson.overridesView = 1
+		when: 'creating a valid override dataview'
+			dataviewService.create(person, project, dataviewJson)
+		then:
+			Dataview.findAll()
 	}
 }
