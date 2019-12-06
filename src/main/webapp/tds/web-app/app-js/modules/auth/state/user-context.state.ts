@@ -17,12 +17,23 @@ import {PostNoticesManagerService} from '../service/post-notices-manager.service
 // Others
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
+import {SetTimeZoneAndDateFormat} from '../action/timezone-dateformat.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
 	defaults: {}
 })
 export class UserContextState {
+
+	@Selector()
+	static getTimezone(state: UserContextModel) {
+		return state.timezone;
+	}
+
+	@Selector()
+	static getDateFormat(state: UserContextModel) {
+		return state.dateFormat;
+	}
 
 	@Selector()
 	static getUserContext(state: UserContextModel) {
@@ -168,6 +179,21 @@ export class UserContextState {
 		ctx.setState({
 			...state,
 			notices: notices
+		});
+	}
+
+	/**
+	 * Set the timezone and dateFormat
+	 * @param ctx
+	 * @param payload
+	 */
+	@Action(SetTimeZoneAndDateFormat)
+	setTimeZoneAndDateFormat(ctx: StateContext<UserContextModel>, {payload}: SetTimeZoneAndDateFormat) {
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			dateFormat: payload.dateFormat,
+			timezone: payload.timezone
 		});
 	}
 }
