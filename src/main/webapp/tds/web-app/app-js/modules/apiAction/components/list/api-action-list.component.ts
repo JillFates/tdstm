@@ -125,11 +125,6 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.filterChange(root);
 	}
 
-	protected clearValue(column: any): void {
-		this.apiActionService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
-	}
-
 	/**
 	 * Create a new API Action
 	 */
@@ -173,18 +168,16 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {SelectionEvent} dataItem
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
-			this.selectRow(apiAction.id);
-			this.apiActionService.getAPIAction(apiAction.id)
-				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe((response: APIActionModel) => {
+	protected cellClick(dataItem: any): void {
+		let apiAction: APIActionModel = dataItem as APIActionModel;
+		this.selectRow(apiAction.id);
+		this.apiActionService.getAPIAction(apiAction.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((response: APIActionModel) => {
 				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
-			}, error => console.log(error));
-		}
+		}, error => console.log(error));
 	}
 
 	protected reloadData(): void {

@@ -19,7 +19,8 @@ export class APIActionColumnModel {
 				property: 'name',
 				type: 'text',
 				width: 186,
-				locked: true
+				locked: true,
+				isActionable: true,
 			}, {
 				label: 'Provider',
 				property: 'provider.name',

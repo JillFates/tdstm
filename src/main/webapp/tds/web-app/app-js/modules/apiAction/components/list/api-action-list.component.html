@@ -23,7 +23,8 @@
 		</div>
 	</form>
 	<div class="box-body box-with-empty-header" [ngClass]="{'is-filtering': isFiltering}">
-			<kendo-grid
+<!--		(cellClick)="cellClick($event)"-->
+		<kendo-grid
 					[data]="gridData"
 					[filter]="state.filter"
 					[filterable]="true"
@@ -36,8 +37,8 @@
 					(sortChange)="sortChange($event)"
 					[pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
 					(pageChange)="pageChange($event)"
-					(cellClick)="cellClick($event)"
 					[selectable]="true">
+
 				<!-- Action -->
 				<kendo-grid-command-column  [width]="65" [minResizableWidth]="65" [class]="{'k-custom-command-column': true}">
 					<ng-template kendoGridHeaderTemplate>
@@ -93,13 +94,19 @@
 					<ng-template kendoGridCellTemplate let-dataItem *ngIf="column.label === 'Type'">
 						{{dataItem['actionType'].id ? dataItem['actionType'].id : dataItem['actionType']}}
 					</ng-template>
+
 					<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
 						<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 					</ng-template>
 
+					<ng-template kendoGridCellTemplate *ngIf="column.isActionable" let-dataItem>
+						<span class="is-grid-link" (click)="cellClick(dataItem)">
+							{{dataItem[column.property]}}
+						</span>
+					</ng-template>
+
 					<!--	Filters-->
 					<ng-template kendoGridFilterCellTemplate let-filter>
-
 						<div class="filter-input" *ngIf="isFiltering && column.property && column.type !== 'action'">
 							<div *ngIf="column.type === 'text' || column.type === 'date' || column.type === 'boolean'; then inputFilterTemplate"></div>
 							<ng-template #inputFilterTemplate>
@@ -111,21 +118,6 @@
 										(filter)="onFilter($event, column)">
 								</tds-filter-input>
 							</ng-template>
-
-							<!--
-							<div *ngIf="column.type === 'date'">
-								<kendo-datepicker [format]="dateFormat" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-datepicker>
-								<span *ngIf="column.filter" (click)="clearValue(column)" style="right:15%;cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
-							<div *ngIf="column.type === 'text'">
-								<input type="text" (keyup)="onFilter(column)" class="form-control" name="{{column.property}}" [(ngModel)]="column.filter" placeholder="Filter {{column.label}}" value="">
-								<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
-							<div *ngIf="column.type === 'boolean'">
-								<kendo-dropdownlist [data]="booleanFilterData" [(ngModel)]="column.filter" (valueChange)="onFilter(column)" [style.width.%]="100"></kendo-dropdownlist>
-								<span *ngIf="column.filter" (click)="clearValue(column)" style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 10px; line-height: 30px;" class="fa fa-times form-control-feedback" aria-hidden="true"></span>
-							</div>
-							-->
 						</div>
 
 					</ng-template>

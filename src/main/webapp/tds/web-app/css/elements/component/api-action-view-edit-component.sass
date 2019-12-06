@@ -1,4 +1,16 @@
 .api-action-view-edit-component
+  min-height: 660px
+  display: flex
+  flex-direction: column
+  .checkbox
+    display: inline-block
+    input[type=checkbox]
+      position: unset
+      top: unset
+      left: unset
+      height: unset
+      width: unset
+      opacity: unset
   .check-container
     padding-top: 7px
     input.debug
@@ -7,7 +19,9 @@
     .hide-if-remote-section
       display: none
   .modal-body
-    padding-bottom: 0px
+    flex: 1
+    max-height: unset
+    padding: 0 3px
   .form-control.ng-invalid.k-dropdown
     // border: unset
   .k-widget.form-control .k-input, .form-control.k-block .k-input
@@ -40,17 +54,20 @@
       padding-top: 6px
       label
         font-size: 14px
-    .col-md-1,
+    //.col-md-1,
     .customize
       margin-right: -32px
       padding-top: 8px
-    .col-md-2
-      width: 86px !important
+    //.col-md-2
+    //  width: 86px !important
     .col-md-3
       width: 128px !important
     .customize
       margin-left: 3px
       width: 112px !important
+  api-action-view-edit-parameters
+    form
+      padding-top: 15px
   .api-action-parameters-form
     height: 430px
     .group-boolean-fields
@@ -68,9 +85,9 @@
     input.param-text-input-boolean
       margin-top: 8px
   .all-codemirrors
-    overflow-y: scroll
+    //overflow-y: scroll
     width: 100%
-    height: 391px
+    //height: 391px
     .reaction-section-event
       margin-top: 10px
       font-size: 14px
@@ -88,6 +105,11 @@
           line-height: 17px
           width: 12px
   .nav-tabs-custom
+    box-shadow: unset
+    .tab-content
+      padding: unset
+      .tab-pane
+        overflow: hidden
     .nav-tabs
       li
         a.tab-disabled
@@ -111,5 +133,6 @@
       color: $color-message-error--red
       margin-left: 4px
   .modal-footer
+    padding: 20px
     tds-button-custom
       margin-left: 5px

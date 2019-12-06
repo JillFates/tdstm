@@ -6,7 +6,7 @@
 			<div class="col-md-12 event-wrapper">
 				<div class="row">
 					<div class="col-md-1 event-title"><label>Events:</label></div>
-					<div class="col-md-2 hide-if-remote-section" style="width: 70px !important;">
+					<div class="col-md-1 hide-if-remote-section">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionStatusDetermination" [(ngModel)]="eventReactions[0].selected"
@@ -14,7 +14,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="col-md-2" style="width: 70px !important;">
+					<div class="col-md-1">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionSuccess" [(ngModel)]="eventReactions[1].selected"
@@ -22,7 +22,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="col-md-2 hide-if-remote-section">
+					<div class="col-md-1 hide-if-remote-section">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionDefault" [(ngModel)]="eventReactions[2].selected"
@@ -30,7 +30,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="col-md-2" style="width: 70px !important;">
+					<div class="col-md-1">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionError"
@@ -40,7 +40,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="col-md-2  hide-if-remote-section" style="width: 70px !important;">
+					<div class="col-md-1  hide-if-remote-section">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionFailed" [(ngModel)]="eventReactions[4].selected"
@@ -49,7 +49,7 @@
 						</div>
 					</div>
 					<div *ngIf="isPolling">
-						<div class="col-md-2 hide-if-remote-section" style="width: 70px !important;">
+						<div class="col-md-1 hide-if-remote-section">
 							<div class="checkbox">
 								<label>
 									<input type="checkbox" name="apiActionLapsed" [(ngModel)]="eventReactions[5].selected"
@@ -57,7 +57,7 @@
 								</label>
 							</div>
 						</div>
-						<div class="col-md-2  hide-if-remote-section">
+						<div class="col-md-1  hide-if-remote-section">
 							<div class="checkbox">
 								<label>
 									<input  type="checkbox" name="apiActionStalled" [(ngModel)]="eventReactions[6].selected"
@@ -66,8 +66,8 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-2 customize event-title hide-if-remote-section"><label>Customize:</label></div>
-					<div class="col-md-3  hide-if-remote-section">
+					<div class="col-md-1 customize event-title hide-if-remote-section"><label>Customize:</label></div>
+					<div class="col-md-2  hide-if-remote-section">
 						<div class="checkbox">
 							<label>
 								<input  type="checkbox" name="apiActionBeforeCall"
@@ -77,7 +77,7 @@
 							</label>
 						</div>
 					</div>
-					<div class="col-md-3  hide-if-remote-section">
+					<div class="col-md-2  hide-if-remote-section">
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="apiActionAfterCall" [(ngModel)]="eventReactions[8].selected"
@@ -96,10 +96,19 @@
 						<div class="col-sm-4 collapse-icon-wrapper">
 							<tds-check-action *ngIf="modalType !== actionTypes.VIEW"
 																[disabled]="isCheckSyntaxSectionDisabled(0)" [(model)]="eventReactions[0]"
-																(onClick)="verifyCode(eventReactions[0])"></tds-check-action>
-							<tds-button-custom [icon]="eventReactions[0].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[0])">
-							</tds-button-custom>
+																(onClick)="verifyCode(eventReactions[0])">
+							</tds-check-action>
+
+							<tds-button-collapse *ngIf="eventReactions[0].open"
+												 (click)="openCloseCodeMirror(eventReactions[0])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[0].open"
+											   (click)="openCloseCodeMirror(eventReactions[0])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[0].open">
@@ -128,9 +137,17 @@
 																[disabled]="isCheckSyntaxSectionDisabled(1)"
 																[(model)]="eventReactions[1]" (onClick)="verifyCode(eventReactions[1])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[1].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[1])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[1].open"
+												 (click)="openCloseCodeMirror(eventReactions[1])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[1].open"
+											   (click)="openCloseCodeMirror(eventReactions[1])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[1].open">
@@ -156,9 +173,17 @@
 																[(model)]="eventReactions[2]"
 																(onClick)="verifyCode(eventReactions[2])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[2].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[2])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[2].open"
+												 (click)="openCloseCodeMirror(eventReactions[2])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[2].open"
+											   (click)="openCloseCodeMirror(eventReactions[2])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[2].open">
@@ -185,9 +210,17 @@
 																[(model)]="eventReactions[3]"
 																(onClick)="verifyCode(eventReactions[3])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[3].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[3])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[3].open"
+												 (click)="openCloseCodeMirror(eventReactions[3])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[3].open"
+											   (click)="openCloseCodeMirror(eventReactions[3])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[3].open">
@@ -213,9 +246,17 @@
 																[(model)]="eventReactions[4]"
 																(onClick)="verifyCode(eventReactions[4])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[4].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[4])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[4].open"
+												 (click)="openCloseCodeMirror(eventReactions[4])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[4].open"
+											   (click)="openCloseCodeMirror(eventReactions[4])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[4].open">
@@ -240,9 +281,17 @@
 																[disabled]="isCheckSyntaxSectionDisabled(5)"
 																[(model)]="eventReactions[5]" (onClick)="verifyCode(eventReactions[5])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[5].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[5])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[5].open"
+												 (click)="openCloseCodeMirror(eventReactions[5])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[5].open"
+											   (click)="openCloseCodeMirror(eventReactions[5])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[5].open">
@@ -271,9 +320,17 @@
 																[(model)]="eventReactions[6]" (onClick)="verifyCode(eventReactions[6])">
 
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[6].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[6])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[6].open"
+												 (click)="openCloseCodeMirror(eventReactions[6])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[6].open"
+											   (click)="openCloseCodeMirror(eventReactions[6])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[6].open">
@@ -303,9 +360,17 @@
 																[disabled]="isCheckSyntaxSectionDisabled(7)"
 																[(model)]="eventReactions[7]" (onClick)="verifyCode(eventReactions[7])">
 							</tds-check-action>
-							<tds-button-custom [icon]="eventReactions[7].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[7])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[7].open"
+												 (click)="openCloseCodeMirror(eventReactions[7])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[7].open"
+											   (click)="openCloseCodeMirror(eventReactions[7])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[7].open">
@@ -332,9 +397,17 @@
 																[disabled]="isCheckSyntaxSectionDisabled(8)"
 																[(model)]="eventReactions[8]"
 																(onClick)="verifyCode(eventReactions[8])"></tds-check-action>
-							<tds-button-custom [icon]="eventReactions[8].open ? 'angle-double-down' : 'angle-double-right'"
-																 (click)="openCloseCodeMirror(eventReactions[8])">
-							</tds-button-custom>
+
+							<tds-button-collapse *ngIf="eventReactions[8].open"
+												 (click)="openCloseCodeMirror(eventReactions[8])"
+												 [displayLabel]="false" >
+							</tds-button-collapse>
+
+							<tds-button-expand *ngIf="!eventReactions[8].open"
+											   (click)="openCloseCodeMirror(eventReactions[8])"
+											   [displayLabel]="false" >
+							</tds-button-expand>
+
 						</div>
 					</div>
 					<div class="form-group" *ngIf="eventReactions[8].open">

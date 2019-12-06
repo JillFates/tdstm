@@ -1,4 +1,4 @@
-<div tds-autofocus class="tds-modal-content api-action-view-edit-component"  #apiActionContainer>
+<div tds-autofocus class="tds-modal-content api-action-view-edit-component tds-angular-component-content has-side-nav"  #apiActionContainer>
 	<div class="modal-header">
 		<button (click)="cancelCloseDialog()" type="button"  class="close" aria-label="Close">
 			<clr-icon aria-hidden="true" shape="close"></clr-icon>
@@ -885,12 +885,32 @@
 				</div>
 			</div>
 	</div>
-	<div class="modal-footer form-group-center">
-		<tds-button-save *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE"
-		                 (click)="onSaveApiAction()" [disabled]="!canSave()"
-		                 tabindex="20" class="btn-primary pull-left">
-		</tds-button-save>
 
+	<div class="modal-sidenav form-group-center">
+		<nav class="modal-sidenav btn-link">
+            <div *ngIf="modalType === actionTypes.EDIT || modalType === actionTypes.CREATE">
+				<tds-button-save (click)="onSaveApiAction()" [disabled]="!canSave()"></tds-button-save>
+			</div>
+
+            <div *ngIf="modalType === actionTypes.VIEW">
+				<tds-button-edit (click)="changeToEditApiAction()"></tds-button-edit>
+			</div>
+
+			<div *ngIf="!loadingLists && (modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())">
+				<tds-button-cancel (click)="cancelCloseDialog()"></tds-button-cancel>
+			</div>
+
+			<div *ngIf="modalType !== actionTypes.CREATE">
+				<tds-button-delete (click)="onDeleteApiAction()"></tds-button-delete>
+			</div>
+
+			<div *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">
+				<tds-button-close  (click)="cancelCloseDialog()"></tds-button-close>
+			</div>
+		</nav>
+	</div>
+
+	<div class="modal-footer form-group-center">
 		<tds-button-custom
 		        tabindex="21"
 		        [icon]="'thumbs-o-up'"
@@ -899,27 +919,8 @@
 		        (click)="onCheckAllSyntax()" class="btn-primary pull-left">
 		</tds-button-custom>
 
-		<tds-button-edit *ngIf="modalType === actionTypes.VIEW"
-		                 (click)="changeToEditApiAction()"
-		                 tabindex="22" class="btn-primary pull-left">
-		</tds-button-edit>
-
-		<tds-button-delete
-		        tabindex="23"
-		        *ngIf="modalType !== actionTypes.CREATE" (click)="onDeleteApiAction()" class="btn-danger">
-		</tds-button-delete>
-
 		<div *ngIf="loadingLists" style="display: inline" class="loading-lists pull-right text-right">
 			<i>Loading Lists...</i>
 		</div>
-		<span *ngIf="!loadingLists">
-			<tds-button-close *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())"
-												(click)="cancelCloseDialog()" tabindex="24" class="pull-right">
-			</tds-button-close>
-
-			<tds-button-cancel *ngIf="(modalType === actionTypes.EDIT || modalType === actionTypes.CREATE) && (isDirty() || isParameterListDirty())"
-												 (click)="cancelCloseDialog()" tabindex="24" class="pull-right">
-			</tds-button-cancel>
-		</span>
 	</div>
 </div>
