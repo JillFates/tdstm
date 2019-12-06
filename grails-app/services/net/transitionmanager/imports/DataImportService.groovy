@@ -1522,7 +1522,6 @@ class DataImportService implements ServiceMethods {
 	 *
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	@CompileStatic()
 	private String validateTagReferences(Map tagsInfo, Map projectTags) {
 
 		Set tagsNames = [] as Set
