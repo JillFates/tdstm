@@ -1,8 +1,8 @@
 package net.transitionmanager.tag
 
-import net.transitionmanager.asset.AssetEntity
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.Transactional
+import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetEntityService
 import net.transitionmanager.exception.EmptyResultException
 import net.transitionmanager.project.Project
@@ -114,16 +114,27 @@ class TagAssetService implements ServiceMethods {
 
 		//This will ignore nulls resulting from a duplicate key.
 		List<TagAsset> updatedLinks = tagAssets.findResults { TagAsset link ->
-			link.tag = primary
-			return link.save(flush: true, failOnError: false)
+			TagAsset tagAsset = TagAsset.findByTagAndAsset(primary, link.asset)
+
+			if(!tagAsset) {
+				link.tag = primary
+				return link.save(flush: true, failOnError: false)
+			}
+
+			return null
 		}
 
 		List<TagEvent> tagEvents = TagEvent.findAllWhere(tag: secondary)
 
 		//This will ignore nulls resulting from a duplicate key.
 		tagEvents.findResults { TagEvent link ->
-			link.tag = primary
-			return link.save(flush: true, failOnError: false)
+			TagEvent tagEvent = TagEvent.findByTagAndEvent(primary, link.event)
+
+			if (!tagEvent) {
+				link.tag = primary
+				return link.save(flush: true, failOnError: false)
+			}
+			return null
 		}
 
 		//removes the secondary tag, and by cascade any links, that would create a duplicate key.
