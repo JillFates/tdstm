@@ -1,4 +1,4 @@
-import {Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 
 import {TaskEditCreateCommonComponent} from '../common/task-edit-create-common.component';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -16,7 +16,10 @@ declare var jQuery: any;
 	templateUrl: 'task-edit.component.html',
 	styles: []
 })
-export class TaskEditComponent extends TaskEditCreateCommonComponent  implements OnInit {
+export class TaskEditComponent extends TaskEditCreateCommonComponent implements OnInit {
+
+	@ViewChild('dueDatePicker') dueDatePicker;
+
 	constructor(
 		taskDetailModel: TaskDetailModel,
 		taskManagerService: TaskService,
@@ -28,5 +31,10 @@ export class TaskEditComponent extends TaskEditCreateCommonComponent  implements
 
 		super(taskDetailModel, taskManagerService, dialogService, promptService, userPreferenceService, permissionService, translatePipe);
 
+	}
+
+	public onOpenDueDatePicker(event): void {
+		event.preventDefault();
+		this.dueDatePicker.toggle();
 	}
 }
