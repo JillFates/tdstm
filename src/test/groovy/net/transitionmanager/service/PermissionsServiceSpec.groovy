@@ -15,24 +15,6 @@ class PermissionsServiceSpec extends Specification implements DataTest, ServiceU
 	}
 
 	@ConfineMetaClassChanges([RolePermissions])
-	void 'test can findAll permissions saved in database'() {
-
-		given:
-			RolePermissions.metaClass.static.executeUpdate = {String query -> RolePermissions.deleteAll()}
-			new Permissions(permissionItem: 'AssetExplorerView', description: 'AssetExplorerView UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerShow', description: 'AssetExplorerShow UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerUpdate', description: 'AssetExplorerUpdate UNIT TEST').save(flush: true)
-			new Permissions(permissionItem: 'AssetExplorerDelete', description: 'AssetExplorerDelete UNIT TEST').save(flush: true)
-
-		when:
-			List<Permissions> permissions = service.findAll()
-
-		then:
-			permissions.size() == 4
-
-	}
-
-	@ConfineMetaClassChanges([RolePermissions])
 	void 'test can update permissions using a Map'() {
 
 		given: 'a permissions domain instance already saved in database'
