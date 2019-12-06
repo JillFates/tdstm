@@ -304,7 +304,7 @@ class DataviewService implements ServiceMethods {
 				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL:
 
 					if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserGlobal)) {
-						throwException(UnauthorizedException, 'dataview.validate.overrideGlobalPermission', 'You do not have the necessary permission to save override views for the Default project.')
+						throwException(InvalidParameterException, 'dataview.validate.overrideGlobalPermission', 'You do not have the necessary permission to save override views for the Default project.')
 					}
 					break
 			}
@@ -313,19 +313,19 @@ class DataviewService implements ServiceMethods {
 				case ViewSaveAsOptionEnum.MY_VIEW:
 
 					if (!securityService.hasPermission(Permission.AssetExplorerCreate)) {
-						throwException(UnauthorizedException, 'dataview.validate.createPermission', 'You do not have the necessary permission to create views.')
+						throwException(InvalidParameterException, 'dataview.validate.createPermission', 'You do not have the necessary permission to create views.')
 					}
 					break
 				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ME:
 
 					if (!securityService.hasPermission(Permission.AssetExplorerSaveAs)) {
-						throwException(UnauthorizedException, 'dataview.validate.createOverridePermission', 'You do not have the necessary permission to save override views.')
+						throwException(InvalidParameterException, 'dataview.validate.createOverridePermission', 'You do not have the necessary permission to save override views.')
 					}
 					break
 				case ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL:
 
 					if (!securityService.hasPermission(Permission.AssetExplorerOverrideAllUserProject)) {
-						throwException(UnauthorizedException, 'dataview.validate.overrideAllUsers', 'You do not have the necessary permission to save override views for all users.')
+						throwException(InvalidParameterException, 'dataview.validate.overrideAllUsers', 'You do not have the necessary permission to save override views for all users.')
 					}
 					break
 			}
@@ -341,7 +341,7 @@ class DataviewService implements ServiceMethods {
 		])
 
 		if (results && viewSaveAsOption == ViewSaveAsOptionEnum.OVERRIDE_FOR_ME) {
-			throwException(UnauthorizedException, 'dataview.validation.overrideDupForMe','You already have a saved override for this system view.')
+			throwException(InvalidParameterException, 'dataview.validation.overrideDupForMe','You already have a saved override for this system view.')
 		}
 
 		results = Dataview.findWhere([
@@ -351,7 +351,7 @@ class DataviewService implements ServiceMethods {
 		])
 
 		if (results && viewSaveAsOption== ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL) {
-			throwException(UnauthorizedException, 'dataview.validation.overrideDupForAll')
+			throwException(InvalidParameterException, 'dataview.validation.overrideDupForAll', 'An overridden system view already exists for all users of this project.')
 		}
 
 		// Check if user has necessary permission(s)
