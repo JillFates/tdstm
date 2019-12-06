@@ -5,6 +5,8 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 
 import {DateUtils} from '../utils/date.utils';
+import {Store} from '@ngxs/store';
+import {UserContextState} from '../../modules/auth/state/user-context.state';
 
 // add constants as needed
 export const PREFERENCES_LIST = {
@@ -50,7 +52,9 @@ export class PreferenceService {
 	private preferencesList = new BehaviorSubject([]);
 	private currentPreferences = this.preferencesList.asObservable();
 
-	constructor(private http: HttpClient) {
+	constructor(
+		private http: HttpClient,
+		private store: Store) {
 	}
 
 	// query a set of user preferences passed as arg variables
@@ -95,9 +99,9 @@ export class PreferenceService {
 	 * Used to retrieve the format to use for Date properties based on user's preference (e.g. MM/dd/YYYY)
 	 */
 	getUserDateFormat(): string {
-		const currentUserDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-		if (currentUserDateFormat) {
-			return DateUtils.translateTimeZoneFormat(currentUserDateFormat);
+		const dateFormat  = this.store.selectSnapshot(UserContextState.getDateFormat);
+		if (dateFormat) {
+			return dateFormat;
 		}
 		return DateUtils.DEFAULT_FORMAT_DATE;
 	}
@@ -171,15 +175,5 @@ export class PreferenceService {
 				return { width, height };
 			}))
 			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
-	/**
-	 * Used to retrieve the user preference current date format
-	 */
-	// TODO: this is doing the same as the method getUserDateFormat on this same class...
-	getUserCurrentDateFormatOrDefault(): string {
-		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-
-		return userDateFormat ? userDateFormat : DateUtils.DEFAULT_FORMAT_DATE;
 	}
 }
