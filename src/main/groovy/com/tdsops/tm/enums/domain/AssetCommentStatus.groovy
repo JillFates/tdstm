@@ -26,7 +26,7 @@ class AssetCommentStatus {
 	/**
 	 * The statuses of tasks that the invocation of actions are allowed
 	 */
-	static final List<String> CanRunActionStatusCodes = [READY, STARTED].asImmutable()
+	static final List<String> CanInvokeActionStatusCodes = [READY, STARTED].asImmutable()
 
 	static final List<String> ActionableStatusCodes = [READY, STARTED, HOLD].asImmutable()
 
