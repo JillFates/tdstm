@@ -16,6 +16,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
@@ -823,7 +824,8 @@ class DataImportService implements ServiceMethods {
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
 			entity = findOrCreateEntity(fieldsInfo, context)
 			Boolean shouldSaveEntity = false
-			Boolean assetHasCommentsToSave
+			Boolean assetHasCommentsToSave = record.hasComments()
+			Boolean hasTagsToAssociate = record.hasTags()
 
 			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
@@ -834,53 +836,9 @@ class DataImportService implements ServiceMethods {
 				// Now add/update the remaining properties on the domain entity appropriately
 				boolean allIsGoodHere = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
 				if (!allIsGoodHere) {
-					log.warn 'processEntityRecord() binding values failed'
+					log.warn 'processEntityRecord() binding values failed, batch {}, record {}', batch.id, record.id
 				} else {
 					shouldSaveEntity = isNewEntity || GormUtil.hasUnsavedChanges(entity)
-					assetHasCommentsToSave = record.hasComments()
-
-					// Determine the correct Operation that was performed and if the record should be saved
-					Boolean shouldBeSaved = true
-					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
-					if (record.operation == ImportOperationEnum.UPDATE
-						&& !GormUtil.hasUnsavedChanges(entity)
-						&& !record.hasComments()
-						&& !record.hasTags()) {
-						record.operation = ImportOperationEnum.UNCHANGED
-						shouldBeSaved = false
-					}
-
-					if (shouldBeSaved) {
-
-						if (entity.save(failOnError:false, flush:true)) {
-
-							if (record.hasComments()) {
-								List<String> comments = record.commentsAsList()
-								log.info "processEntityRecord() record ${record.id} contains comments ${comments}"
-								saveCommentsForEntity(comments, entity, context)
-								entity.lastUpdated = new Date()
-							}
-							// If we still have a dependency record then the process must have finished
-							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-							// Note that I was running to some strange issues of casting that prevented from doing this originally
-							// record.status = ImportBatchRecordStatusEnum.COMPLETED
-							record.status = ImportBatchStatusEnum.COMPLETED
-
-							// if entity is Person then associate it to company and project
-							if (isNewEntity && Person.isAssignableFrom(entity.class)) {
-								associatePersonToCompanyAndProject(context.project, entity)
-							}
-						} else {
-							log.debug "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
-							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
-							allIsGoodHere = false
-						}
-					}
-
-							if (record.hasTags()) {
-								log.info "processEntityRecord() record ${record.id} contains tags ${record.tags}"
-								saveTagsForEntity(record, entity, context)
-							}
 
 					// Save the Entity domain record appropritately
 					if (shouldSaveEntity) {
@@ -890,7 +848,7 @@ class DataImportService implements ServiceMethods {
 								associatePersonToCompanyAndProject(context.project, entity)
 							}
 						} else {
-							log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
+							log.info 'processEntityRecord() batch {}, row {}, constraints errors {}', batch.id, record.id, GormUtil.allErrorsString(entity)
 							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
 							allIsGoodHere = false
 						}
@@ -899,11 +857,17 @@ class DataImportService implements ServiceMethods {
 					// Save Comments to Assets appropriately
 					if (allIsGoodHere && assetHasCommentsToSave) {
 						List<String> comments = record.commentsAsList()
-						log.info "processEntityRecord() record ${record.id} contains comments ${}"
 						saveCommentsForEntity(comments, entity, context)
-						if (!shouldSaveEntity) {
-							// Update the Asset record last updated because only comment(s) was/were added to the asset
-							entity.lastUpdated = new Date()
+					}
+
+					if (allIsGoodHere && hasTagsToAssociate) {
+						// The saveTagsForEntity will return the number of actual tag manipulations that occurred
+						Integer tagChanges = saveTagsForEntity(record, entity, context)
+						if (tagChanges == -1) {
+							hasTagsToAssociate = false
+							allIsGoodHere = false
+						} else if (tagChanges == 0) {
+							hasTagsToAssociate = false
 						}
 					}
 				}
@@ -920,11 +884,25 @@ class DataImportService implements ServiceMethods {
 					} else {
 						record.operation = ImportOperationEnum.UNCHANGED
 					}
-				} else {
+
+					// Bump the lastUpdated for assets if there were no changes on the asset other than comments. Note
+					// that the tags service automatical bumps the asset lastModified.
+					if ( !shouldSaveEntity && assetHasCommentsToSave ) {
+						entity.lastUpdated = new Date()
+						if (! entity.save(failOnError: false, flush: true, deepValidate: false)) {
+							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
+							allIsGoodHere = false
+						}
+					}
+				}
+
+				// Handle clean up if something went sideways
+				if (! allIsGoodHere) {
 					// Damn it! Couldn't save this sucker...
 					entity.discard()
 					entity = null
 					record.operation = (isNewEntity ? ImportOperationEnum.INSERT : ImportOperationEnum.UPDATE)
+					record.status = ImportBatchStatusEnum.PENDING
 				}
 			}
 		} catch (e) {
@@ -937,7 +915,7 @@ class DataImportService implements ServiceMethods {
 			} catch (Exception en) {
 				//discard throws an exception java.lang.IllegalStateException: cannot generate an EntityKey when id is null.
 				//We need to to the discard to get the errors to be populated correctly, but we don't care about this error.
-				log.debug('Discarding entity had an error.', en)
+				log.warn('entity.discard() had an error: batch {}, record {}, error {}', batch.id, record.id, en.getMessage(), )
 			}
 		}
 
@@ -964,39 +942,66 @@ class DataImportService implements ServiceMethods {
 	 * @param entity an instance of a TDS domain classes, populated and ready to be used in tag association.
 	 * @param tagsInfo a Map with tags as results of an ETL script executed.
 	 * @param context a Map with context variables. It is used for validation purposes and project with tags association.
+	 * @return The number of tags that were assigned/unassiged to the asset OR -1 if there was an error
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	void saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> context) {
+	Integer saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> context) {
 
 		Map<String, ?> tagsInfo = record.tagsAsMap()
 		String error = validateTagReferences(tagsInfo, context.projectTags)
 
-		if (error){
-			/* This scenarios occurs when ETL script uses a project tag
-			 * but at the import process time that tag was deleted. */
+		if (error) {
+			/* This scenarios would occur if after the ETL process was run and project tag(s) were deleted before
+			   the batch was processed. */
 			record.addError(error)
-			record.status = ImportBatchStatusEnum.PENDING
-			entity.discard()
-			entity = null
-			return
+			return -1
 		}
 
-		List<String> errors = bindTagInfoValuesToEntity(entity, tagsInfo, context)
-		if (!errors.isEmpty()) {
-			/* This scenarios occurs when ETL script uses a project tag
-			 * and binding it to an Asset, that Asset does not have that assigment anymore. */
-			errors.each { record.addError(it) }
-			// The entity change should be discarded
-			//The record should remain in the Pending status
-			record.status = ImportBatchStatusEnum.PENDING
-			entity.discard()
-			entity = null
-			return
+		Integer countOfTagChanges = 0
+
+		// Get the list of tags associated to the domain entity
+		List<TagAsset> entityTags = tagAssetService.list(context.project, entity.id)
+
+		// Convert the list of assigned asset tags to a Map for faster access
+		Map<String, TagAsset> assetTagMap = entityTags.collectEntries { TagAsset tagAsset ->
+			[(tagAsset.tag.name): tagAsset]
 		}
 
-		/* When there was not error in tags and Asset tags,
-		then entity.lastUpdate must be updated manually  */
-		entity.lastUpdated = new Date()
+		// Removal of tags
+		for (tagName in tagsInfo.remove) {
+			TagAsset tagAsset = assetTagMap[tagName]
+			if (tagAsset) {
+				tagAssetService.removeTags(context.project, [tagAsset.id])
+				countOfTagChanges++
+			}
+		}
+
+		// Addition of tags
+		for (tagName in tagsInfo.add) {
+			if (! assetTagMap.containsKey(tagName)) {
+				Long tagId = context.projectTags[tagName]
+				tagAssetService.applyTags(context.project, [tagId], entity.id)
+				countOfTagChanges++
+			}
+		}
+
+		// Replacement of tags which will be a map of objects with the key/value being the original tag/new tag
+		tagsInfo.replace.each { String originalTag, String newTag ->
+			// Remove the original tag if exists
+			if (assetTagMap.containsKey(originalTag)) {
+				TagAsset originalAssetTag = assetTagMap[originalTag]
+				tagAssetService.removeTags(context.project, [originalAssetTag.id])
+				countOfTagChanges++
+
+				// Add the new tag if it doesn't already exist
+				if (! assetTagMap.containsKey(newTag)) {
+					Long newTagId = context.projectTags[newTag]
+					tagAssetService.applyTags(context.project, [newTagId], entity.id)
+				}
+			}
+		}
+
+		return countOfTagChanges
 	}
 
 	/**
@@ -1014,54 +1019,8 @@ class DataImportService implements ServiceMethods {
 				comment: comment,
 				commentType: AssetCommentType.COMMENT,
 				assetEntity: entity
-			).save()
+			).save(deepValidate: false)
 		}
-	}
-
-	@Transactional(noRollbackFor=[Throwable])
-	List<String> bindTagInfoValuesToEntity(Object entity, Map tagsInfo, Map context) {
-
-		List<String> errors = []
-		List<TagAsset> entityTags = tagAssetService.list(context.project, entity.id)
-		Map<String, TagAsset> tagAssetMap = entityTags.collectEntries { TagAsset tagAsset ->
-			[(tagAsset.tag.name): tagAsset]
-		}
-
-		for (tagName in tagsInfo.remove) {
-			TagAsset tagAsset = tagAssetMap[tagName]
-			if (tagAsset) {
-				tagAssetService.removeTags(context.project, [tagAsset.id])
-			} else {
-				errors.add("Unable to Remove tag '${tagName}' on asset")
-			}
-		}
-
-		for (tagName in tagsInfo.add) {
-			Long tagId = context.projectTags[tagName]
-			if (!tagAssetMap[tagName]) {
-				tagAssetService.applyTags(context.project, [tagId], entity.id)
-			} else {
-				errors.add("Unable to Add tag '${tagName}' on asset")
-			}
-		}
-
-		for (tagEntry in tagsInfo.replace) {
-			TagAsset tagAsset = tagAssetMap[tagEntry.key]
-			Long tagId = context.projectTags[tagEntry.value]
-
-			if (!tagAsset) {
-				errors.add("Unable to Replace missing tag ${tagEntry.key} in asset")
-			} else if (!tagAssetMap[tagEntry.value]) {
-				errors.add("Unable to Replace tag '${tagEntry.key}' with '${tagEntry.value}' on asset")
-			} else {
-				if (tagAsset && !tagAssetMap[tagEntry.value]) {
-					tagAssetService.removeTags(context.project, [tagAsset.id])
-					tagAssetService.applyTags(context.project, [tagId], entity.id)
-				}
-			}
-		}
-
-		return errors
 	}
 
 	/**
@@ -1563,6 +1522,7 @@ class DataImportService implements ServiceMethods {
 	 *
 	 */
 	@Transactional(noRollbackFor=[Throwable])
+	@CompileStatic()
 	private String validateTagReferences(Map tagsInfo, Map projectTags) {
 
 		Set tagsNames = [] as Set
