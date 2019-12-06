@@ -33,6 +33,10 @@ export class TaskCreateComponent extends TaskEditCreateCommonComponent implement
 
 	}
 
+	/**
+	 * Forces kendo datepicker to open it's calendar.
+	 * @param event: any
+	 */
 	public onOpenDueDatePicker(event): void {
 		event.preventDefault();
 		this.dueDatePicker.toggle();
