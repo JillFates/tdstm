@@ -166,7 +166,20 @@ class InsightService implements ServiceMethods {
 	 */
 	List<Map> applicationsGroupedByDependencies(Project project, Integer lowRange, Integer highRange) {
 		namedParameterJdbcTemplate.queryForList("""
-				SELECT '>$lowRange dependencies' AS level, count(*) AS count
+				SELECT 'Orphaned' AS level, count(*) AS count
+				FROM (
+					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
+					FROM asset_entity ae
+					LEFT OUTER JOIN asset_dependency ad ON ad.asset_id = ae.asset_entity_id
+					LEFT OUTER JOIN asset_dependency ad2 ON ad2.dependent_id = ae.asset_entity_id
+					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
+					GROUP BY ae.asset_entity_id
+					HAVING count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id) = 0
+				) AS count
+
+				UNION 
+
+				SELECT '1-${lowRange - 1} dependencies' AS level, count(*) AS count
 				FROM (
 					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
@@ -180,7 +193,7 @@ class InsightService implements ServiceMethods {
 
 				UNION
 
-				SELECT '$lowRange>$highRange dependencies' AS level, count(*) AS count
+				SELECT '$lowRange-$highRange dependencies' AS level, count(*) AS count
 				FROM (
 					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
@@ -193,7 +206,7 @@ class InsightService implements ServiceMethods {
 
 				UNION
 
-				SELECT '$highRange+ dependencies' AS level, count(*) AS count
+				SELECT '${highRange + 1}+ dependencies' AS level, count(*) AS count
 				FROM (
 					SELECT  ae.asset_entity_id , count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
 					FROM asset_entity ae
@@ -202,19 +215,6 @@ class InsightService implements ServiceMethods {
 					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
 					GROUP BY ae.asset_entity_id
 					HAVING (count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)) >$highRange
-				) AS count
-
-				UNION 
-
-				SELECT 'Orphaned Applications' AS level, count(*) AS count
-				FROM (
-					SELECT ae.asset_entity_id, count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id)
-					FROM asset_entity ae
-					LEFT OUTER JOIN asset_dependency ad ON ad.asset_id = ae.asset_entity_id
-					LEFT OUTER JOIN asset_dependency ad2 ON ad2.dependent_id = ae.asset_entity_id
-					WHERE ae.project_id = :projectId and asset_class = '${AssetClass.APPLICATION.name()}'
-					GROUP BY ae.asset_entity_id
-					HAVING count(distinct ad.asset_dependency_id) + count(distinct ad2.asset_dependency_id) = 0
 				) AS count;
 		""", [
 			projectId: project.id
