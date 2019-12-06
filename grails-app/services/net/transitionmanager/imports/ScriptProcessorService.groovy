@@ -1,5 +1,6 @@
 package net.transitionmanager.imports
 
+import com.tdsops.ETLTagValidator
 import com.tdsops.etl.DataScriptValidateScriptCommand
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
@@ -19,6 +20,7 @@ import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.tag.TagService
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -34,6 +36,7 @@ class ScriptProcessorService {
 	SecurityService securityService
 	ProgressService progressService
 	Scheduler quartzScheduler
+	TagService tagService
 
 	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
 	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
@@ -51,7 +54,8 @@ class ScriptProcessorService {
         Dataset dataset = fileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator)
+		ETLTagValidator tagValidator = createTagValidator(project)
+        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator, tagValidator)
 	    etlProcessor.execute(scriptContent)
 
         return etlProcessor
@@ -98,7 +102,9 @@ class ScriptProcessorService {
 			project,
 			new DataSetFacade(fileSystemService.buildDataset(filename)),
 			new DebugConsole(buffer: new StringBuilder()),
-			createFieldsSpecValidator(project))
+			createFieldsSpecValidator(project),
+			createTagValidator(project)
+		)
 
 		if(dataScriptId){
 			etlProcessor.result.addDataScriptIdInETLInfo(dataScriptId)
@@ -107,6 +113,17 @@ class ScriptProcessorService {
 		etlProcessor.evaluate(scriptContent, progressCallback)
 
 		return etlProcessor.finalResult(includeConsoleLog)
+	}
+
+	/**
+	 * Base on a project it creates an instance tha implements ETLTagValidator.
+	 *
+	 * @param project a defined Project instance to be used listing tags
+	 * @see ETLTagValidator
+	 * @return an instance of ETLTagValidator.
+	 */
+	private ETLTagValidator createTagValidator(Project project) {
+		return new ETLTagValidator(tagService.tagMapByName(project))
 	}
 
     /**
@@ -149,11 +166,13 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-	        Dataset dataset = fileSystemService.buildDataset(filename)
-            etlProcessor = new ETLProcessor(project,
-                    new DataSetFacade(dataset),
-                    new DebugConsole(buffer: new StringBuilder()),
-                    createFieldsSpecValidator(project))
+			Dataset dataset = fileSystemService.buildDataset(filename)
+			etlProcessor = new ETLProcessor(project,
+				new DataSetFacade(dataset),
+				new DebugConsole(buffer: new StringBuilder()),
+				createFieldsSpecValidator(project),
+				createTagValidator(project)
+			)
 
 			etlProcessor.evaluate(scriptContent)
             result.isValid = true
@@ -241,7 +260,13 @@ class ScriptProcessorService {
 
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, new ETLFieldsValidator())
+		ETLProcessor etlProcessor = new ETLProcessor(
+			project,
+			new DataSetFacade(dataset),
+			console,
+			new ETLFieldsValidator(),
+			new ETLTagValidator([:])
+		)
 
         List<Map<String, ?>> errors = []
 

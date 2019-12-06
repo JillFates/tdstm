@@ -80,4 +80,5 @@ databaseChangeLog = {
 	include file: 'version/v4_7_2/20191009-drop-tables-move-bundle-step-and-step-snapshot.groovy'
 	include file: 'version/v4_7_2/20191028-batch-management-auto-process-import.groovy'
 	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
+	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 }
