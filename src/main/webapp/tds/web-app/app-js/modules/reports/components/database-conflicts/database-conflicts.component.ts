@@ -84,6 +84,16 @@ export class DatabaseConflictsComponent extends ReportComponent {
 	}
 
 	/**
+	 * Revert the page to its initial state.
+	 */
+	public onReload(): void {
+		this.hideFilters = false;
+		this.generatedReport = false;
+		this.reportResult = null;
+		this.load();
+	}
+
+	/**
 	 * Set up the parameters selected in the filter component and open up the report
 	 * @param params: any
 	*/
