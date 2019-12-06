@@ -194,7 +194,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 		when: 'creating a dataview for system view as override for all'
 			dataviewService.create(person, project , dataviewJson)
 		then:
-			UnauthorizedException e = thrown()
+			InvalidParameterException e = thrown()
 			e.message ==~ /.*You do not have the necessary permission to save override views for the Default project.*/
 	}
 
@@ -207,7 +207,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 		when: 'creating a dataview for non-system view as my view'
 			dataviewService.create(person, project , dataviewJson)
 		then:
-			UnauthorizedException e = thrown()
+			InvalidParameterException e = thrown()
 			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
 	}
 
@@ -220,7 +220,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 		when: 'creating a dataview for non-system view as override for me'
 			dataviewService.create(person, project , dataviewJson)
 		then:
-			UnauthorizedException e = thrown()
+			InvalidParameterException e = thrown()
 			e.message ==~ /.*You do not have the necessary permission to save override views.*/
 	}
 
@@ -233,7 +233,7 @@ class DataviewServiceIntegrationSpec extends Specification{
 		when: 'creating a dataview for non-system view as override for all'
 			dataviewService.create(person, project , dataviewJson)
 		then:
-			UnauthorizedException e = thrown()
+			InvalidParameterException e = thrown()
 			e.message ==~ /.*You do not have the necessary permission to save override views for all users.*/
 	}
 

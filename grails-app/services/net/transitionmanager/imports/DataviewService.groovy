@@ -346,8 +346,7 @@ class DataviewService implements ServiceMethods {
 
 		results = Dataview.findWhere([
 				project: project,
-				overridesView: viewToOverride,
-				isShared: true
+				overridesView: viewToOverride
 		])
 
 		if (results && viewSaveAsOption== ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL) {
