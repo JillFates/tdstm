@@ -101,6 +101,17 @@ export class DateUtils {
 		return sourceZonedTime.format('YYYY-MM-DD');
 	}
 
+	/**
+	 * Get the Date without the hh:mm:ss using an specific Date Format
+	 * @param {sourceTime} The original source in a GMT based timezone
+	 * @param {dateFormat} User dateFormat
+	 * @returns {string} The formatted day without hh:mm:ss
+	 */
+	public static getDateFromGMTWithFormat(sourceTime: Date, dateFormat): string {
+		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
+		return sourceZonedTime.format(dateFormat);
+	}
+
 	public static getTimestamp(): String {
 		let time = new Date();
 		return time.getFullYear().toString() +
