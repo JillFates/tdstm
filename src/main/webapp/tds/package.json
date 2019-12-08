@@ -78,7 +78,7 @@
     "@angular-devkit/build-angular": "0.13.9",
     "@angular/compiler-cli": "8.0.0",
     "@ngtools/webpack": "8.0.0",
-    "@progress/kendo-theme-default": "3.2.0",
+    "@progress/kendo-theme-default": "4.0.0",
     "@types/codemirror": "0.0.81",
     "@types/file-saver": "^2.0.1",
     "@types/jasmine": "3.3.8",
