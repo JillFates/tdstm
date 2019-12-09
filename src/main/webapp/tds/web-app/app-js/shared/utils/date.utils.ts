@@ -107,7 +107,7 @@ export class DateUtils {
 	 * @param {dateFormat} User dateFormat
 	 * @returns {string} The formatted day
 	 */
-	public static getDateFromFormat(sourceTime: Date, dateFormat): Date {
+	public static getDateFromFormat(sourceTime: Date, dateFormat: string): Date {
 		return new Date(moment(sourceTime, dateFormat));
 	}
 
