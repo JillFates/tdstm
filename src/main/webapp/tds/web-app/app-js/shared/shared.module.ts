@@ -117,6 +117,7 @@ import { TDSFilterInputComponent } from './components/filter-input/filter-input.
 import { TDSModalPageWrapperComponent } from './components/modal-page-wrapper/modal-page-wrapper.component';
 import { PowerComponent } from './components/power/power.component';
 import { TaskStatusIndicatorComponent } from './components/task-status-indicator/task-status-indicator.component';
+import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -211,6 +212,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DiagramLayoutComponent,
 		CircleCountdownComponent,
 		TaskStatusIndicatorComponent,
+		TDSCheckboxComponent,
 	],
 	exports: [
 		UILoaderDirective,
@@ -281,6 +283,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		CircleCountdownComponent,
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
+		TDSCheckboxComponent,
 		// Clarity
 		ClarityModule,
 	],
