@@ -328,7 +328,7 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
 		userPreferenceService.setPreference(UserPreferenceEnum.MY_TASK, params.justMyTasks)
 
-		if (params.viewUnpublished == '1') {
+		if (params.viewUnpublished) {
 			securityService.requirePermission Permission.TaskPublish
 			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, true)
 		}else{
