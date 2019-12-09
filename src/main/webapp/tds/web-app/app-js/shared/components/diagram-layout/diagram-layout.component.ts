@@ -14,12 +14,12 @@ import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../
 import {
 	Adornment,
 	Binding,
-	Diagram,
+	Diagram, GraphObject,
 	InputEvent,
 	Overview,
 	Panel,
 	Placeholder,
-	Shape,
+	Shape, Size,
 	Spot,
 	TextBlock
 } from 'gojs';
@@ -264,6 +264,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
 		this.diagram.allowSelect = true;
+		this.diagram.toolManager.hoverDelay = 200;
 		this.diagram.commitTransaction('generateDiagram');
 		this.setTreeLayout();
 		this.diagram.model = this.myModel;
@@ -425,10 +426,15 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		linkTemplate.corner = 5;
 
 		const linkShape = new go.Shape();
-		linkShape.strokeWidth = 5;
+		linkShape.strokeWidth = 3;
 		linkShape.stroke = '#ddd';
+		const arrowHead = new Shape();
+		arrowHead.strokeWidth = 4;
+		arrowHead.stroke = '#afafaf';
+		arrowHead.toArrow = 'Standard';
 
 		linkTemplate.add(linkShape);
+		linkTemplate.add(arrowHead);
 
 		return linkTemplate;
 	}
@@ -529,6 +535,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		container.fill = 'white';
 		container.margin = new go.Margin(0, 0, 0, 0);
 
+		container.mouseOver = () => {
+			this.diagram.currentCursor = 'pointer';
+		};
+		container.mouseLeave = () => {
+			this.diagram.currentCursor = 'none';
+		};
+
 		return container;
 	}
 
@@ -540,6 +553,12 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		panel.background = '#fff';
 		panel.padding = new go.Margin(0, 0, 0, 0);
 
+		panel.mouseOver = () => {
+			this.diagram.currentCursor = 'pointer';
+		};
+		panel.mouseLeave = () => {
+			this.diagram.currentCursor = 'none';
+		};
 		panel.add(this.containerShape());
 		panel.add(this.panelBody());
 
@@ -553,6 +572,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		const panel = new go.Panel(go.Panel.Horizontal);
 		panel.padding = new go.Margin(0, 0, 0, 0);
 		panel.margin = new go.Margin(0, 0, 0, 0);
+
+		panel.mouseOver = () => {
+			this.diagram.currentCursor = 'pointer';
+		};
+		panel.mouseLeave = () => {
+			this.diagram.currentCursor = 'none';
+		};
 		panel.add(this.iconShape());
 		panel.add(this.assetIconShape());
 		panel.add(this.textBlockShape());
@@ -576,6 +602,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		iconShape.margin = new go.Margin(0, 0, 0, 5);
 		iconShape.desiredSize = new go.Size(35, 35);
 		iconShape.font = '25px FontAwesome';
+
+		iconShape.mouseOver = () => {
+			this.diagram.currentCursor = 'pointer';
+		};
+		iconShape.mouseLeave = () => {
+			this.diagram.currentCursor = 'none';
+		};
 
 		iconShape.bind(new Binding('text', 'status',
 			(val: string) => this.getIcon(this.stateIcons[val.toLowerCase()])));
@@ -643,12 +676,48 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		if (options) { return options; }
 
 		const textBlock = new TextBlock();
+		textBlock.maxSize = new Size(250, 15);
 		textBlock.margin = 8;
 		textBlock.stroke = 'black';
-		textBlock.font = 'bold 16px sans-serif';
-		// textBlock.wrap = TextBlock.WrapBreakAll;
+		textBlock.font = '16px sans-serif';
+		textBlock.overflow = TextBlock.OverflowEllipsis;
 		textBlock.bind(new Binding('text', 'name'));
+		textBlock.bind(new Binding('name', 'assignedTo'));
+
+		textBlock.mouseOver = (e: InputEvent, obj: TextBlock) => {
+			this.diagram.currentCursor = 'pointer';
+			if ((obj.name && obj.name.length > 0) && obj.name.toLowerCase() === 'auto') {
+				obj.stroke = '#ddd';
+				obj.font = 'bold 16px sans-serif';
+			} else {
+				obj.font = 'bold 16px sans-serif';
+			}
+
+			if (obj.text && obj.text.length > 26) {
+				obj.toolTip = this.textBlockTooltip(obj.text);
+			}
+		};
+
+		textBlock.mouseLeave = (e: InputEvent, obj: TextBlock) => {
+			obj.stroke = 'black';
+			obj.font = '16px sans-serif';
+			this.diagram.currentCursor = 'pointer';
+		};
 		return textBlock;
+	}
+
+	textBlockTooltip(tooltipText: string) {
+		const $ = go.GraphObject.make;
+		return $(Adornment,
+			$(TextBlock,
+				{
+					text: tooltipText,
+					background: '#ddd',
+					stroke: 'black',
+					font: '14px sans-serif'
+				}
+			)
+	); // end Adornment
 	}
 
 	/**

@@ -555,8 +555,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	highlightByTeam(team: any): void {
 		const matches = team.label;
-		if (this.filterText.length > 0) {
-			this.textFilter.next(this.filterText);
+		if (this.filterText && this.filterText.length > 0) {
+			this.graph.highlightNodesByText(this.filterText, matches);
 		} else {
 			this.graph.highlightNodesByTeam(matches);
 		}
