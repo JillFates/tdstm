@@ -76,7 +76,7 @@ export function ApplicationCreateComponent(template: string, model: any, metadat
 
 			this.model.asset.moveBundle = this.model.dependencyMap.moveBundleList[0];
 			this.moveBundleList = this.model.dependencyMap.moveBundleList;
-			this.model.asset.planStatus = this.model.planStatusOptions[0];
+			this.model.asset.planStatus = this.model.planStatusOptions.find((plan: string) => plan === this.defaultPlanStatus);
 			this.model.asset.assetClass = {
 				name: ASSET_ENTITY_DIALOG_TYPES.APPLICATION
 			};
