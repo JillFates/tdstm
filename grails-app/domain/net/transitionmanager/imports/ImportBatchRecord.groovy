@@ -1,6 +1,7 @@
 package net.transitionmanager.imports
 
 import com.tdsops.etl.DomainClassQueryHelper
+import com.tdsops.etl.TagResults
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
@@ -324,6 +325,16 @@ class ImportBatchRecord {
 	 * @see ImportBatchRecord#tags
 	 */
 	void saveTagsAsMap(Map tags) {
+		this.tags = JsonUtil.toJson(tags)
+	}
+
+	/**
+	 * Saves {@code ImportBatchRecord#tags}
+	 * previously transforming it to a JSON.
+	 * @param tags a Map with tags structure.
+	 * @see ImportBatchRecord#tags
+	 */
+	void saveTagsAsMap(TagResults tags) {
 		this.tags = JsonUtil.toJson(tags)
 	}
 
