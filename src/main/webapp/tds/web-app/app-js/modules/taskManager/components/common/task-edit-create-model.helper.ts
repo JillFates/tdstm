@@ -45,7 +45,7 @@ export class TaskEditCreateModelHelper {
 		this.model = model;
 		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
 		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
-		this.model.dueDate = this.model.assetCommentDueDate ? new Date(this.model.assetCommentDueDate) : null;
+		this.model.dueDate = this.model.assetCommentDueDate ? new Date(DateUtils.getDateFromGMTWithFormat(new Date(this.model.assetCommentDueDate), this.userCurrentDateFormat)) : null;
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
