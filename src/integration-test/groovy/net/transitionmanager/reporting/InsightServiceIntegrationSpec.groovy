@@ -472,19 +472,20 @@ class InsightServiceIntegrationSpec extends Specification {
 		then: 'the different levels of  the counts of dependencies(parent+dependant) are returned'
 			applicationsGroupedByDependencies == [
 				[
-					level: '>5 dependencies',
-					count: 29
-				], [
-					level: '5>10 dependencies',
-					count: 2
-				], [
-					level: '10+ dependencies',
-					count: 1
+					level: 'Orphaned',
+					count: 3
 				],
 				[
-					level: 'Orphaned Applications',
-					count: 3
+					level: '1-4 dependencies',
+					count: 29
+				], [
+					level: '5-10 dependencies',
+					count: 2
+				], [
+					level: '11+ dependencies',
+					count: 1
 				]
+
 			]
 	}
 

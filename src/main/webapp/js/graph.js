@@ -952,10 +952,13 @@ var GraphUtil = (function ($) {
 
 	// Used by the defaults button to reset all control values to their default state
 	public.resetToDefaults = function (preferenceName) {
+		let defaults;
 		// resets the force layout parameters
 		$('table.labelTree input[type="text"]').each(function() {
-			if (defaults[$(this).attr('name')])
-				$(this).val( defaults[$(this).attr('name')] )
+			if(defaults){
+				if (defaults[$(this).attr('name')])
+					$(this).val( defaults[$(this).attr('name')] )
+			}
 		});
 
 		// resets the user's graph preferences to the defaults
