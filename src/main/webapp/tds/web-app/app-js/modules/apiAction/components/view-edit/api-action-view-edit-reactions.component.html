@@ -8,28 +8,28 @@
 					<div class="col-md-1 event-title"><label>Events:</label></div>
 					<div class="col-md-1 hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionStatusDetermination'"
-							[value]="eventReactions[0].selected"
+							[(value)]="eventReactions[0].selected"
 							[disabled]="eventReactions[0].value.length > 0 || modalType === actionTypes.VIEW"
 							[title]="'Status'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1">
 						<tds-checkbox [name]="'apiActionSuccess'"
-									  [value]="eventReactions[1].selected"
+									  [(value)]="eventReactions[1].selected"
 									  [disabled]="true"
 									  [title]="'Sucess'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1 hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionDefault'"
-									  [value]="eventReactions[2].selected"
+									  [(value)]="eventReactions[2].selected"
 									  [disabled]="eventReactions[2].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Default'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1">
 						<tds-checkbox [name]="'apiActionError'"
-									  [value]="eventReactions[3].selected"
+									  [(value)]="eventReactions[3].selected"
 									  (change)="onErrorReactionCheckboxChangeHandler(eventReactions[3])"
 									  [disabled]="isRemote || modalType === actionTypes.VIEW"
 									  [title]="'Error'">
@@ -37,7 +37,7 @@
 					</div>
 					<div class="col-md-1  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionFailed'"
-									  [value]="eventReactions[4].selected"
+									  [(value)]="eventReactions[4].selected"
 									  [disabled]="eventReactions[4].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Failed'">
 						</tds-checkbox>
@@ -45,14 +45,14 @@
 					<div *ngIf="isPolling">
 						<div class="col-md-1 hide-if-remote-section">
 							<tds-checkbox [name]="'apiActionLapsed'"
-										  [value]="eventReactions[5].selected"
+										  [(value)]="eventReactions[5].selected"
 										  [disabled]="eventReactions[5].value.length > 0 || modalType === actionTypes.VIEW"
 										  [title]="'Lapsed'">
 							</tds-checkbox>
 						</div>
 						<div class="col-md-1  hide-if-remote-section">
 							<tds-checkbox [name]="'apiActionStalled'"
-										  [value]="eventReactions[6].selected"
+										  [(value)]="eventReactions[6].selected"
 										  [disabled]="eventReactions[6].value.length > 0 || modalType === actionTypes.VIEW"
 										  [title]="'Stalled'">
 							</tds-checkbox>
@@ -61,7 +61,7 @@
 					<div class="col-md-1 customize event-title hide-if-remote-section"><label>Customize:</label></div>
 					<div class="col-md-2  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionBeforeCall'"
-									  [value]="eventReactions[7].selected"
+									  [(value)]="eventReactions[7].selected"
 									  (change)="onEventReactionSelect(eventReactions[7])"
 									  [disabled]="disableApiActionBeforeCall()"
 									  [title]="'Before Invocation'">
@@ -69,7 +69,7 @@
 					</div>
 					<div class="col-md-2  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionAfterCall'"
-									  [value]="eventReactions[8].selected"
+									  [(value)]="eventReactions[8].selected"
 									  [disabled]="eventReactions[8].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Post Invocation'">
 						</tds-checkbox>

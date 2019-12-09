@@ -3,7 +3,7 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 @Component({
 	selector: 'tds-checkbox',
 	template: `
-        <input type="checkbox" [name]="name" (change)="onChange($event)" [(ngModel)]="value" [disabled]="disabled">{{title}}
+        <input type="checkbox" [name]="name" (change)="onChange($event)" [(ngModel)]="inputValue" [disabled]="disabled">{{title}}
         <label [for]="name"></label>
 	`,
 	styles: [
@@ -22,11 +22,12 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 })
 
 export class TDSCheckboxComponent implements OnChanges {
-	@Input() value: boolean;
 	@Input() disabled: boolean;
 	@Input() name: string;
 	@Input() title: string;
 	@Output() change: EventEmitter<any> = new EventEmitter<any>() ;
+	@Output() changeValue: EventEmitter<any> = new EventEmitter<any>() ;
+	inputValue: any;
 
 	/**
 	 * Hook when the new Value is assigned to the ComboBox
@@ -34,6 +35,16 @@ export class TDSCheckboxComponent implements OnChanges {
 	 */
 	ngOnChanges(changes: SimpleChanges) {
 		console.log('on changes');
+	}
+
+	@Input('value')
+	get value() {
+		return this.inputValue;
+	}
+
+	set value(val: any) {
+		this.inputValue = val;
+		this.changeValue.emit(this.inputValue);
 	}
 
 	onChange(event): void {
