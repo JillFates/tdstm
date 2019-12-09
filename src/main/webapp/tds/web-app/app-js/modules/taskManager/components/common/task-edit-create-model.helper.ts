@@ -45,7 +45,7 @@ export class TaskEditCreateModelHelper {
 		this.model = model;
 		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
 		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
-		this.model.dueDate = this.model.assetCommentDueDate ? new Date(DateUtils.getDateFromGMTWithFormat(new Date(this.model.assetCommentDueDate), this.userCurrentDateFormat)) : null;
+		this.model.dueDate = this.model.dueDate ? DateUtils.getDateFromFormat(this.model.dueDate, this.userCurrentDateFormat) : null;
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -179,7 +179,6 @@ export class TaskEditCreateModelHelper {
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			assetCommentDueDate: assetComment.dueDate,
 			dueDate: detail.dueDate ? detail.dueDate : '',
 			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
 			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
