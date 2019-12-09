@@ -426,10 +426,15 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		linkTemplate.corner = 5;
 
 		const linkShape = new go.Shape();
-		linkShape.strokeWidth = 5;
+		linkShape.strokeWidth = 3;
 		linkShape.stroke = '#ddd';
+		const arrowHead = new Shape();
+		arrowHead.strokeWidth = 4;
+		arrowHead.stroke = '#afafaf';
+		arrowHead.toArrow = 'Standard';
 
 		linkTemplate.add(linkShape);
+		linkTemplate.add(arrowHead);
 
 		return linkTemplate;
 	}
