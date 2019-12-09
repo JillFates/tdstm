@@ -21,11 +21,12 @@ export class PageService {
 	public updateLastPage(path = ''): Observable<any> {
 
 		let pathUrl = `${this.internalPath}user/updateLastPage`;
+		let reqBody = {};
 		if (path && path !== '') {
-			pathUrl += '?path=' + path;
+			reqBody['path'] = path;
 		}
 
-		return this.http.get(pathUrl).pipe(
+		return this.http.put(pathUrl, reqBody).pipe(
 			map((result: any) => {
 				return result.successful;
 			})
