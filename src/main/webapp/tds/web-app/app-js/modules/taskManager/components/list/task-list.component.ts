@@ -429,17 +429,22 @@ export class TaskListComponent {
 		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
-			taskRows.forEach((taskRow: any, index: number) => {
-				// Only expand rows that can be acted upon (Ready or Started)
-				if ([TaskStatus.READY, TaskStatus.STARTED].includes(taskRow.status)) {
-					index = this.grid.getRowPaginatedIndex(index);
-					expandedEvent.dataItem = taskRow;
-					expandedEvent.index = index;
-					this.onRowDetailExpandHandler(expandedEvent);
-					this.gridComponent.expandRow(index);
-					this.rowsExpanded = true;
+			let taskIds = taskRows.map(task => task.id);
+			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
+					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+						this.gridComponent.expandRow(i);
+						this.rowsExpandedMap[i] = true;
+					}
 				}
 			});
+			this.rowsExpanded = true;
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
@@ -688,11 +693,13 @@ export class TaskListComponent {
 	 */
 	private colapseAllExandedRows(): void {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
-		for (let rowIndex of this.rowsExpandedMap) {
-			let rowNum = parseInt(rowIndex, 10);
-			expandedEvent.index = rowNum;
-			this.onRowDetailCollapseHandler(expandedEvent);
-			this.gridComponent.collapseRow(rowNum);
+		for (let rowIndex in this.rowsExpandedMap) {
+			if (rowIndex) {
+				let rowNum = parseInt(rowIndex, 0);
+				expandedEvent.index = rowNum;
+				this.onRowDetailCollapseHandler(expandedEvent);
+				this.gridComponent.collapseRow(rowNum);
+			}
 		}
 		this.rowsExpandedMap = {};
 		// Clear out any expanded rows
@@ -731,22 +738,26 @@ export class TaskListComponent {
 			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
-					this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-
-					// Update the grid row with new information from the endpoint (status, assignTo, etc)
-					for (let i = 0; i < this.grid.gridData.data.length; i++) {
-						if (this.grid.gridData.data[i].id === taskId ) {
-							this.grid.gridData.data[i].status = taskActionInfoModel.status;
-							this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
-							this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
-							this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
-							break;
-						}
-					}
+					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
 					observer.next(result);
 					observer.complete();
 				});
 		});
+	}
+
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+
+		// Update the grid row with new information from the endpoint (status, assignTo, etc)
+		for (let i = 0; i < this.grid.gridData.data.length; i++) {
+			if (this.grid.gridData.data[i].id === taskId ) {
+				this.grid.gridData.data[i].status = taskActionInfoModel.status;
+				this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
+				this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
+				this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
+				break;
+			}
+		}
 	}
 
 	/**

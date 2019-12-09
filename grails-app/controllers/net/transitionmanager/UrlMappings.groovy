@@ -503,6 +503,11 @@ class UrlMappings {
 			action = [GET: "getInfoForActionBar"]
 		}
 
+		"/ws/task/getBulkActionInfo" {
+			controller = "wsTask"
+			action = [POST: "getBulkInfoForActionBar"]
+		}
+
 		"/ws/task/customColumns" {
 			controller = "wsTask"
 			action = [
