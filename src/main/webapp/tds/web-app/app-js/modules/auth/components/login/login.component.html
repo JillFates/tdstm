@@ -11,7 +11,7 @@
 								name="authority"
 								[(ngModel)]="loginModel.authority"
 								required>
-							<option value="">Select {{ loginInfo.config?.authorityLabel }}</option>
+							<option value="Select {{ loginInfo.config?.authorityLabel }}" disabled>Select {{ loginInfo.config?.authorityLabel }}</option>
 							<option *ngFor=" let authority of loginInfo.config.authorityList"
                                     [value]="authority"
 								    [attr.selected]="authority === defaultAuthorityItem">
@@ -73,6 +73,7 @@
 					</div>
 					<div class="clr-col-12 login-button__wrapper">
 						<tds-button
+								id="loginBtn"
 								class="login-button"
 								theme="primary"
 								state="{{onLoginProgress? 'loading' : 'default'}}"

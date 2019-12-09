@@ -35,9 +35,6 @@ declare var jQuery: any;
 	templateUrl: 'field-settings-grid.component.html',
 	styles: [
 		`
-			.k-grid {
-				height: calc(100vh - 225px);
-			}
 			tr .text-center {
 				text-align: center;
 			}

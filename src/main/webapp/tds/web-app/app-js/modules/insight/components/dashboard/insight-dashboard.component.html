@@ -32,7 +32,7 @@
 										 (click)="toggleTableFor('DATA_BY_PROVIDERS')"></tds-button-collapse>
 					<div class="table" *ngIf="showDataByProviders">
 						<kendo-grid [data]="dataForProviders" [height]="200">
-							<kendo-grid-column field="name" title="Name" width="30">
+							<kendo-grid-column field="Name" title="Name" width="30">
 							</kendo-grid-column>
 							<kendo-grid-column field="Dependencies" title="Dependencies" width="15">
 							</kendo-grid-column>
@@ -81,7 +81,7 @@
 						<!--						<kendo-chart-title-->
 						<!--							text="{{'DASHBOARD.DEPENDENCIES_BY_VENDOR' | translate}}"></kendo-chart-title>-->
 						<kendo-chart-title
-							text="Applications Groups by Dependencies"></kendo-chart-title>
+							text="{{ 'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate}}"></kendo-chart-title>
 						<kendo-chart-series>
 							<kendo-chart-series-item
 								type="pie" [data]="dataApplicationsGroupedByDependencies"
@@ -93,7 +93,7 @@
 							</kendo-chart-series-item>
 						</kendo-chart-series>
 					</kendo-chart>
-					<tds-button-collapse [title]="'DASHBOARD.DEPENDENCIES_BY_VENDOR' | translate"
+					<tds-button-collapse [title]="'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate"
 										 (click)="toggleTableFor('DEPENDENCIES_BY_VENDOR')"></tds-button-collapse>
 					<div class="table" *ngIf="showDependenciesByVendor">
 						<kendo-grid [data]="dataApplicationsGroupedByDependencies" [height]="200">
@@ -194,7 +194,7 @@
 		<div class="col-md-8">
 			<div>
 				<!-- assets by os and evnironment-->
-				Select an Environment:
+				<h2>Select an Environment:</h2>
 				<kendo-dropdownlist
 					[data]="dataAssetsByOsAndEnvironment && splitAssetsByOsData(dataAssetsByOsAndEnvironment)"
 					(valueChange)="osChange($event)">
@@ -215,11 +215,11 @@
 						</kendo-chart-series-item-labels>
 					</kendo-chart-series>
 				</kendo-chart>
-				<tds-button-collapse [title]="'INSIGHT.ASSETS_BY_OS_AND_ENVIRONMENT' | translate"
-									 (click)="toggleTableFor('ASSETS_BY_OS_AND_ENVIRONMENT')"></tds-button-collapse>
 			</div>
 		</div>
 		<div class="col-md-4">
+			<tds-button-collapse [title]="'INSIGHT.ASSETS_BY_OS_AND_ENVIRONMENT' | translate"
+								 (click)="toggleTableFor('ASSETS_BY_OS_AND_ENVIRONMENT')"></tds-button-collapse>
 			<div class="table" *ngIf="showAssetsByOs">
 				<kendo-grid [data]="currentOsSelection" [height]="200">
 					<kendo-grid-column field="Environment" title="Environment" width="30">

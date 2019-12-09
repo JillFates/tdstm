@@ -16,6 +16,9 @@ export class InsightStates {
 	};
 }
 
+const TOP_MENU_PARENT_SECTION = 'menu-parent-dashboard';
+const TOP_MENU_PARENT_PLANNING_SECTION = 'menu-parent-planning';
+
 export const InsightRoute: Routes = [
 
 	{
@@ -24,7 +27,8 @@ export const InsightRoute: Routes = [
 			page: {
 				title: 'INSIGHT.TITLE_DASHBOARD',
 				instruction: '',
-				menu: ['INSIGHT.DASHBOARD', 'INSIGHT.INSIGHT']
+				menu: ['INSIGHT.DASHBOARD', 'INSIGHT.INSIGHT'],
+				topMenu: { parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-dashboard-insight-dashboard', subMenu: true}
 			},
 			requiresAuth: true,
 			requiresLicense: true

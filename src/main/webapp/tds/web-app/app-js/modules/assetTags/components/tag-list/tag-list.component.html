@@ -4,8 +4,7 @@
 		<div class="box-body box-with-empty-header">
 			<form novalidate #myForm="ngForm">
 				<kendo-grid
-					class="tds-table"
-					style="min-height: 500px"
+					class="page-height"
 					[ngClass]="{'row-actions-3-children': gridSettings.canSupportColumnMenuDynamic(7), 'hide-filter': !showFilters}"
 					*ngIf="gridSettings"
 					[data]="gridSettings.gridData"
@@ -99,7 +98,7 @@
 							let-isComment="dataItem.taskAndCommentFlags.comment"
 							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
-							<div class="action-button btn-group btn-link">
+							<div class="action-button btn-link">
 								<clr-dropdown>
 									<tds-button
 										icon="ellipsis-vertical"

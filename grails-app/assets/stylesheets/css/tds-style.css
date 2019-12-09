@@ -780,17 +780,16 @@ div.graphContainer {
       border: 1px solid #0077b8;
       margin-left: 15px;
       margin-top: 15px;
-      padding: 5px;
+      padding: 10px 5px 5px 5px;
       background-color: white;
       position: absolute;
-      padding-top: 10px;
       z-index: 1;
       overflow-y: scroll;
-      height: 430px;
+      min-height: 90px;
       max-height: 430px;
       top: 50px; }
       div.graphContainer div#toolsContainerId div.graphPanel::-webkit-scrollbar {
-        width: 0px; }
+        width: 0; }
       div.graphContainer div#toolsContainerId div.graphPanel.openPanel {
         display: block;
         z-index: 75; }
@@ -906,9 +905,8 @@ div.graphContainer {
         width: 40px; }
   div.graphContainer div#svgContainerId {
     border: 1px solid #0077b8;
-    border-width: 1px;
-    padding: 0px !important;
-    margin: 0px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     overflow: hidden;
     font-size: 0;
     position: relative;
@@ -917,6 +915,51 @@ div.graphContainer {
       border: none !important; }
   div.graphContainer button.baseline-btn {
     margin: 0 10px; }
+
+@media screen and (min-height: 601px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 400px !important; } }
+
+@media screen and (max-height: 600px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 250px !important; } }
+
+@media screen and (max-height: 445px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 142px !important; } }
+
+@media screen and (max-height: 344px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel:not(.depAnalyzer) {
+    height: 90px !important; } }
+
+@media screen and (min-height: 825px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 385px !important; } }
+
+@media screen and (max-height: 824px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 300px !important; } }
+
+@media screen and (max-height: 731px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 200px !important; } }
+
+@media screen and (max-height: 640px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 150px !important; } }
+
+@media screen and (max-height: 590px) {
+  div.graphContainer:not(.fullscreen) div#toolsContainerId div.graphPanel.depAnalyzer {
+    height: 100px !important; } }
+
+div.content-wrapper {
+  z-index: 70 !important;
+  overflow: auto; }
+  div.content-wrapper div.container {
+    z-index: 75 !important; }
+
+div.main-footer {
+  position: relative; }
 
 div.graphContainer.fullscreen {
   background-color: #ffffff;
@@ -946,7 +989,11 @@ div.graphContainer.fullscreen {
     div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
       margin-top: -1px;
       top: 50px;
-      left: 0px; }
+      left: 0px;
+      height: 400px; }
+      @media screen and (max-width: 440px) {
+        div.graphContainer.fullscreen div#toolsContainerId div.graphPanel {
+          height: 280px !important; } }
     div.graphContainer.fullscreen div#toolsContainerId div#controlPanelId .controlPanelLabel {
       padding: 0px;
       text-align: right;

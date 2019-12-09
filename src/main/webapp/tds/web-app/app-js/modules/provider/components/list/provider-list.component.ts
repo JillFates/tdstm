@@ -7,55 +7,71 @@ import {
 	OnInit,
 	Renderer2,
 } from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 // Services
-import {ProviderService} from '../../service/provider.service';
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import {DateUtils} from '../../../../shared/utils/date.utils';
+import { ProviderService } from '../../service/provider.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { UserContextService } from '../../../auth/service/user-context.service';
+import { DateUtils } from '../../../../shared/utils/date.utils';
 // Components
-import {ProviderViewEditComponent} from '../view-edit/provider-view-edit.component';
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
-import {ProviderAssociatedComponent} from '../provider-associated/provider-associated.component';
+import { ProviderViewEditComponent } from '../view-edit/provider-view-edit.component';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { ProviderAssociatedComponent } from '../provider-associated/provider-associated.component';
 // Models
-import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {ProviderModel, ProviderColumnModel} from '../../model/provider.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
-import {UserContextModel} from '../../../auth/model/user-context.model';
-import {ProviderAssociatedModel} from '../../model/provider-associated.model';
-import {Permission} from '../../../../shared/model/permission.model';
+import {
+	COLUMN_MIN_WIDTH,
+	ActionType,
+} from '../../../dataScript/model/data-script.model';
+import { ProviderModel, ProviderColumnModel } from '../../model/provider.model';
+import {
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGE_SIZE,
+} from '../../../../shared/model/constants';
+import { UserContextModel } from '../../../auth/model/user-context.model';
+import { ProviderAssociatedModel } from '../../model/provider-associated.model';
+import { Permission } from '../../../../shared/model/permission.model';
 // Kendo
-import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
+import {
+	CompositeFilterDescriptor,
+	State,
+	process,
+} from '@progress/kendo-data-query';
 import {
 	CellClickEvent,
 	GridDataResult,
-	PageChangeEvent
+	PageChangeEvent,
 } from '@progress/kendo-angular-grid';
 import { ReplaySubject } from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 declare var jQuery: any;
 
 @Component({
 	selector: 'provider-list',
 	templateUrl: 'provider-list.component.html',
-	styles: [`
-        #btnCreateProvider { margin-left: 16px; }
-	`]
+	styles: [
+		`
+			#btnCreateProvider {
+				margin-left: 16px;
+			}
+		`,
+	],
 })
 export class ProviderListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
+	protected state: State = {
+		sort: [
+			{
+				dir: 'asc',
+				field: 'name',
+			},
+		],
 		filter: {
 			filters: [],
-			logic: 'and'
-		}
+			logic: 'and',
+		},
 	};
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -68,6 +84,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	public selectedRows = [];
 	public dateFormat = '';
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	protected showFilters = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -77,7 +94,8 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
-		private userContext: UserContextService) {
+		private userContext: UserContextService
+	) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['providers'];
@@ -85,12 +103,19 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
-		this.userContext.getUserContext()
+		this.userContext
+			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
-				this.providerColumnModel = new ProviderColumnModel(`{0:${this.dateFormat}}`);
-				this.gridColumns = this.providerColumnModel.columns.filter((column) => column.type !== 'action');
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(
+					userContext.dateFormat
+				);
+				this.providerColumnModel = new ProviderColumnModel(
+					`{0:${this.dateFormat}}`
+				);
+				this.gridColumns = this.providerColumnModel.columns.filter(
+					column => column.type !== 'action'
+				);
 			});
 	}
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -117,7 +142,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		let providerModel: ProviderModel = {
 			name: '',
 			description: '',
-			comment: ''
+			comment: '',
 		};
 		this.openProviderDialogViewEdit(providerModel, ActionType.CREATE);
 	}
@@ -135,23 +160,36 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.providerService.deleteContext(dataItem.id)
+		this.providerService
+			.deleteContext(dataItem.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((result: any) => {
-			this.dialogService.extra(ProviderAssociatedComponent,
-				[{provide: ProviderAssociatedModel, useValue: result}],
-				false, false)
-				.then((toDelete: any) => {
-					if (toDelete) {
-						this.providerService.deleteProvider(dataItem.id).subscribe(
-							(result) => {
-								this.reloadData();
+				this.dialogService
+					.extra(
+						ProviderAssociatedComponent,
+						[
+							{
+								provide: ProviderAssociatedModel,
+								useValue: result,
 							},
-							(err) => console.log(err));
-					}
-				})
-				.catch(error => console.log('Closed'));
-		});
+						],
+						false,
+						false
+					)
+					.then((toDelete: any) => {
+						if (toDelete) {
+							this.providerService
+								.deleteProvider(dataItem.id)
+								.subscribe(
+									result => {
+										this.reloadData();
+									},
+									err => console.log(err)
+								);
+						}
+					})
+					.catch(error => console.log('Closed'));
+			});
 	}
 
 	/**
@@ -166,15 +204,20 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	}
 
 	protected reloadData(): void {
-		this.providerService.getProviders()
+		this.providerService
+			.getProviders()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
-			(result) => {
-				this.resultSet = result;
-				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
-			},
-			(err) => console.log(err));
+				result => {
+					this.resultSet = result;
+					this.gridData = process(this.resultSet, this.state);
+					setTimeout(
+						() => this.forceDisplayLastRowAddedToGrid(),
+						100
+					);
+				},
+				err => console.log(err)
+			);
 	}
 
 	/**
@@ -183,7 +226,9 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 */
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
+		let target = this.elementRef.nativeElement.querySelector(
+			`tr[data-kendo-grid-item-index="${lastIndex}"]`
+		);
 		this.renderer.setStyle(target, 'height', '36px');
 	}
 
@@ -192,16 +237,22 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	 * @param {ProviderModel} providerModel
 	 * @param {number} actionType
 	 */
-	private openProviderDialogViewEdit(providerModel: ProviderModel, actionType: number): void {
-		this.dialogService.open(ProviderViewEditComponent, [
-			{ provide: ProviderModel, useValue: providerModel },
-			{ provide: Number, useValue: actionType}
-		]).then(result => {
-			// update the list to reflect changes, it keeps the filter
-			this.reloadData();
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+	private openProviderDialogViewEdit(
+		providerModel: ProviderModel,
+		actionType: number
+	): void {
+		this.dialogService
+			.open(ProviderViewEditComponent, [
+				{ provide: ProviderModel, useValue: providerModel },
+				{ provide: Number, useValue: actionType },
+			])
+			.then(result => {
+				// update the list to reflect changes, it keeps the filter
+				this.reloadData();
+			})
+			.catch(result => {
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	private selectRow(dataItemId: number): void {
@@ -254,5 +305,17 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	}
+
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	protected filterCount(): number {
+		return this.state.filter.filters.length;
+	}
+
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
 	}
 }

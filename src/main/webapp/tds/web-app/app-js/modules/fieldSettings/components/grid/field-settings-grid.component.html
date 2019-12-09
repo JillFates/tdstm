@@ -48,7 +48,7 @@
 	[sortable]="sortable"
 	[sort]="state.sort"
 	(dataStateChange)="dataStateChange($event)"
-	class="field-settings-grid row-actions-1-children"
+	class="page-height field-settings-grid row-actions-1-children"
 >
 	<!--// toolbar editing-->
 	<ng-template
@@ -114,7 +114,7 @@
 			let-isComment="dataItem.taskAndCommentFlags.comment"
 			let-isIssue="dataItem.taskAndCommentFlags.issue"
 		>
-			<div class="action-button btn-group btn-link" *ngIf="dataItem.udf">
+			<div class="action-button btn-link" *ngIf="dataItem.udf">
 				<clr-dropdown>
 					<tds-button
 						icon="ellipsis-vertical"

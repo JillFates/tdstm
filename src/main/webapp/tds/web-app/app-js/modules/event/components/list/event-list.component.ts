@@ -1,26 +1,49 @@
 // Angular
-import {AfterContentInit, Component, ElementRef, OnInit, Renderer2} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {
+	AfterContentInit,
+	Component,
+	ElementRef,
+	OnInit,
+	Renderer2,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 // Store
-import {Store} from '@ngxs/store';
+import { Store } from '@ngxs/store';
 // Actions
-import {SetEvent} from '../../action/event.actions';
+import { SetEvent } from '../../action/event.actions';
 // Services
-import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {PermissionService} from '../../../../shared/services/permission.service';
-import {EventsService} from '../../service/events.service';
-import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/preference.service';
+import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
+import { PermissionService } from '../../../../shared/services/permission.service';
+import { EventsService } from '../../service/events.service';
+import {
+	PreferenceService,
+	PREFERENCES_LIST,
+} from '../../../../shared/services/preference.service';
 // Components
-import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 // Models
-import {COLUMN_MIN_WIDTH, ActionType} from '../../../dataScript/model/data-script.model';
-import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {
+	COLUMN_MIN_WIDTH,
+	ActionType,
+} from '../../../dataScript/model/data-script.model';
+import {
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGE_SIZE,
+} from '../../../../shared/model/constants';
 // Kendo
-import {CompositeFilterDescriptor, State, process} from '@progress/kendo-data-query';
-import {CellClickEvent, GridDataResult, PageChangeEvent} from '@progress/kendo-angular-grid';
-import {EventColumnModel, EventModel} from '../../model/event.model';
-import {EventCreateComponent} from '../create/event-create.component';
-import {EventViewEditComponent} from '../view-edit/event-view-edit.component';
+import {
+	CompositeFilterDescriptor,
+	State,
+	process,
+} from '@progress/kendo-data-query';
+import {
+	CellClickEvent,
+	GridDataResult,
+	PageChangeEvent,
+} from '@progress/kendo-angular-grid';
+import { EventColumnModel, EventModel } from '../../model/event.model';
+import { EventCreateComponent } from '../create/event-create.component';
+import { EventViewEditComponent } from '../view-edit/event-view-edit.component';
 
 declare var jQuery: any;
 
@@ -31,15 +54,17 @@ declare var jQuery: any;
 export class EventListComponent implements OnInit, AfterContentInit {
 	protected gridColumns: any[];
 
-	private state: State = {
-		sort: [{
-			dir: 'asc',
-			field: 'name'
-		}],
+	protected state: State = {
+		sort: [
+			{
+				dir: 'asc',
+				field: 'name',
+			},
+		],
 		filter: {
 			filters: [],
-			logic: 'and'
-		}
+			logic: 'and',
+		},
 	};
 	public skip = 0;
 	public pageSize = GRID_DEFAULT_PAGE_SIZE;
@@ -52,6 +77,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	public selectedRows = [];
 	public dateFormat = '';
 	public canEditEvent = false;
+	protected showFilters = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -62,7 +88,8 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
 		private store: Store,
-		private preferenceService: PreferenceService) {
+		private preferenceService: PreferenceService
+	) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['events'];
@@ -70,20 +97,30 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
-		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
-		this.preferenceService.getUserDatePreferenceAsKendoFormat()
-			.subscribe((dateFormat) => {
+		this.preferenceService
+			.getPreference(PREFERENCES_LIST.CURR_TZ)
+			.subscribe();
+		this.preferenceService
+			.getUserDatePreferenceAsKendoFormat()
+			.subscribe(dateFormat => {
 				this.dateFormat = dateFormat;
-				this.eventColumnModel = new EventColumnModel(`{0:${dateFormat}}`);
-				this.gridColumns = this.eventColumnModel.columns.filter((column) => column.type !== 'action');
-			})
+				this.eventColumnModel = new EventColumnModel(
+					`{0:${dateFormat}}`
+				);
+				this.gridColumns = this.eventColumnModel.columns.filter(
+					column => column.type !== 'action'
+				);
+			});
 		this.canEditEvent = this.permissionService.hasPermission('EventEdit');
 	}
 
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
-			let {id, name} = this.resultSet.find((bundle: any) => {
-				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0);
+			let { id, name } = this.resultSet.find((bundle: any) => {
+				return (
+					bundle.id ===
+					parseInt(this.route.snapshot.queryParams['show'], 0)
+				);
 			});
 			setTimeout(() => {
 				this.showEvent(id, name);
@@ -121,12 +158,13 @@ export class EventListComponent implements OnInit, AfterContentInit {
 
 	protected reloadData(): void {
 		this.eventsService.getEventsForList().subscribe(
-			(result) => {
+			result => {
 				this.resultSet = result;
 				this.gridData = process(this.resultSet, this.state);
-				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
+				setTimeout(() => this.forceDisplayLastRowAddedToGrid(), 100);
 			},
-			(err) => console.log(err));
+			err => console.log(err)
+		);
 	}
 
 	/**
@@ -135,19 +173,24 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	 */
 	private forceDisplayLastRowAddedToGrid(): void {
 		const lastIndex = this.gridData.data.length - 1;
-		let target = this.elementRef.nativeElement.querySelector(`tr[data-kendo-grid-item-index="${lastIndex}"]`);
+		let target = this.elementRef.nativeElement.querySelector(
+			`tr[data-kendo-grid-item-index="${lastIndex}"]`
+		);
 		if (target) {
 			this.renderer.setStyle(target, 'height', '36px');
 		}
 	}
 
 	protected openEventDialogCreate(): void {
-		this.dialogService.open(EventCreateComponent, []).then(result => {
-			// update the list to reflect changes, it keeps the filter
-			this.reloadData();
-		}).catch(result => {
-			console.log('Dismissed Dialog');
-		});
+		this.dialogService
+			.open(EventCreateComponent, [])
+			.then(result => {
+				// update the list to reflect changes, it keeps the filter
+				this.reloadData();
+			})
+			.catch(result => {
+				console.log('Dismissed Dialog');
+			});
 	}
 
 	protected selectRow(dataItemId: number): void {
@@ -171,13 +214,15 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	 * @param id
 	 */
 	protected showEvent(id, name): void {
-		this.store.dispatch(new SetEvent({id: id, name: name}));
-		this.dialogService.open(EventViewEditComponent,
-			[{provide: 'id', useValue: id}]).then(result => {
-			this.reloadData();
-		}).catch(result => {
-			this.reloadData();
-		});
+		this.store.dispatch(new SetEvent({ id: id, name: name }));
+		this.dialogService
+			.open(EventViewEditComponent, [{ provide: 'id', useValue: id }])
+			.then(result => {
+				this.reloadData();
+			})
+			.catch(result => {
+				this.reloadData();
+			});
 	}
 
 	/**
@@ -192,5 +237,17 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		this.gridData = process(this.resultSet, this.state);
 		// Adjusting the locked column(s) height to prevent cut-off issues.
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+	}
+
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	protected filterCount(): number {
+		return this.state.filter.filters.length;
+	}
+
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
 	}
 }

@@ -78,6 +78,8 @@ export class LoginComponent implements OnInit {
 	 */
 	public defaultAuthorityItem: string;
 
+	isSelectPrompt: boolean;
+
 	constructor(
 		private loginService: LoginService,
 		private store: Store,
@@ -136,6 +138,7 @@ export class LoginComponent implements OnInit {
 				if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
 					this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
 					this.loginModel.authority = this.defaultAuthorityItem;
+					this.isSelectPrompt = true;
 					selector = '.k-dropdown-wrap';
 				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
 					selector = '.authority';
@@ -154,9 +157,14 @@ export class LoginComponent implements OnInit {
 	 * Dispatch Action Login
 	 */
 	public onLogin(): void {
+		this.errMessage = '';
 		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
 		} else {
+			if (this.isSelectPrompt && this.loginModel.authority === this.defaultAuthorityItem) {
+				this.errMessage = 'Please select a domain';
+				return;
+			}
 			this.onLoginProgress = true;
 			this.store.dispatch(
 				new Login({
