@@ -1,78 +1,56 @@
 // Angular
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
 // Services
-import { APIActionService } from '../../service/api-action.service';
-import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
-import { PermissionService } from '../../../../shared/services/permission.service';
-import { UserContextService } from '../../../auth/service/user-context.service';
-import { DateUtils } from '../../../../shared/utils/date.utils';
-import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {APIActionService} from '../../service/api-action.service';
+import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {UserContextService} from '../../../auth/service/user-context.service';
+import {DateUtils} from '../../../../shared/utils/date.utils';
+import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
-import { APIActionViewEditComponent } from '../view-edit/api-action-view-edit.component';
-import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
+import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 // Models
-import {
-	GRID_DEFAULT_PAGINATION_OPTIONS,
-	GRID_DEFAULT_PAGE_SIZE,
-} from '../../../../shared/model/constants';
-import {
-	APIActionColumnModel,
-	APIActionModel,
-} from '../../model/api-action.model';
-import { Permission } from '../../../../shared/model/permission.model';
-import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
+import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
+import {APIActionColumnModel, APIActionModel} from '../../model/api-action.model';
+import {Permission} from '../../../../shared/model/permission.model';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {
 	COLUMN_MIN_WIDTH,
 	ActionType,
 	BooleanFilterData,
-	DefaultBooleanFilterData,
+	DefaultBooleanFilterData
 } from '../../../../shared/model/data-list-grid.model';
-import { DIALOG_SIZE, INTERVAL } from '../../../../shared/model/constants';
-import { UserContextModel } from '../../../auth/model/user-context.model';
-import { APIActionType } from '../../model/api-action.model';
+import {DIALOG_SIZE, INTERVAL} from '../../../../shared/model/constants';
+import {UserContextModel} from '../../../auth/model/user-context.model';
+import {APIActionType} from '../../model/api-action.model';
 // Kendo
-import {
-	process,
-	CompositeFilterDescriptor,
-	State,
-} from '@progress/kendo-data-query';
-import { CellClickEvent, GridDataResult } from '@progress/kendo-angular-grid';
-import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import {
-	COMMON_SHRUNK_COLUMNS,
-	COMMON_SHRUNK_COLUMNS_WIDTH,
-} from '../../../../shared/constants/common-shrunk-columns';
+import {process, CompositeFilterDescriptor, State} from '@progress/kendo-data-query';
+import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 
 @Component({
 	selector: 'api-action-list',
 	templateUrl: 'api-action-list.component.html',
-	styles: [
-		`
-			#btnCreate {
-				margin-left: 16px;
-			}
-			.action-header {
-				width: 100%;
-				text-align: center;
-			}
-		`,
-	],
+	styles: [`
+		#btnCreate { margin-left: 16px; }
+		.action-header { width:100%; text-align:center; }
+	`]
 })
 export class APIActionListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
-	protected state: State = {
-		sort: [
-			{
-				dir: 'asc',
-				field: 'name',
-			},
-		],
+	private state: State = {
+		sort: [{
+			dir: 'asc',
+			field: 'name'
+		}],
 		filter: {
 			filters: [],
-			logic: 'and',
-		},
+			logic: 'and'
+		}
 	};
 
 	public skip = 0;
@@ -94,7 +72,6 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
-	protected showFilters = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -103,34 +80,22 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		private apiActionService: APIActionService,
 		private prompt: UIPromptService,
 		private userContext: UserContextService,
-		private translate: TranslatePipe
-	) {
-		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(
-			Permission.EarlyAccessTMR
-		);
+		private translate: TranslatePipe) {
+		this.hasEarlyAccessTMRPermission = this.permissionService.hasPermission(Permission.EarlyAccessTMR);
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['apiActions'];
 		this.gridData = process(this.resultSet, this.state);
-		this.createActionText = this.translate.transform(
-			'API_ACTION.CREATE_ACTION'
-		);
+		this.createActionText = this.translate.transform('API_ACTION.CREATE_ACTION');
 	}
 
 	ngOnInit() {
-		this.userContext
-			.getUserContext()
+		this.userContext.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
-				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(
-					userContext.dateFormat
-				);
-				this.apiActionColumnModel = new APIActionColumnModel(
-					`{0:${this.dateFormat}}`
-				);
-				this.gridColumns = this.apiActionColumnModel.columns.filter(
-					column => column.type !== 'action'
-				);
+				this.dateFormat = DateUtils.translateDateFormatToKendoFormat(userContext.dateFormat);
+				this.apiActionColumnModel = new APIActionColumnModel(`{0:${this.dateFormat}}`);
+				this.gridColumns = this.apiActionColumnModel.columns.filter((column) => column.type !== 'action');
 			});
 	}
 
@@ -169,19 +134,11 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 */
 	protected onEdit(dataItem: any): void {
 		let apiAction: APIActionModel = dataItem as APIActionModel;
-		this.apiActionService
-			.getAPIAction(apiAction.id)
+		this.apiActionService.getAPIAction(apiAction.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-				(response: APIActionModel) => {
-					this.openAPIActionDialogViewEdit(
-						response,
-						ActionType.EDIT,
-						apiAction
-					);
-				},
-				error => console.log(error)
-			);
+			.subscribe((response: APIActionModel) => {
+			this.openAPIActionDialogViewEdit(response, ActionType.EDIT, apiAction);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -189,24 +146,16 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 * @param dataItem
 	 */
 	protected onDelete(dataItem: any): void {
-		this.prompt
-			.open(
-				'Confirmation Required',
-				'Do you want to proceed?',
-				'Yes',
-				'No'
-			)
-			.then(res => {
+		this.prompt.open('Confirmation Required', 'Do you want to proceed?', 'Yes', 'No')
+			.then((res) => {
 				if (res) {
-					this.apiActionService
-						.deleteAPIAction(dataItem.id)
+					this.apiActionService.deleteAPIAction(dataItem.id)
 						.pipe(takeUntil(this.unsubscribeOnDestroy$))
 						.subscribe(
-							result => {
-								this.reloadData();
-							},
-							err => console.log(err)
-						);
+						(result) => {
+							this.reloadData();
+						},
+						(err) => console.log(err));
 				}
 			});
 	}
@@ -219,60 +168,40 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		if (event.columnIndex > 0) {
 			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
 			this.selectRow(apiAction.id);
-			this.apiActionService
-				.getAPIAction(apiAction.id)
+			this.apiActionService.getAPIAction(apiAction.id)
 				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe(
-					(response: APIActionModel) => {
-						this.openAPIActionDialogViewEdit(
-							response,
-							ActionType.VIEW,
-							apiAction
-						);
-					},
-					error => console.log(error)
-				);
+				.subscribe((response: APIActionModel) => {
+				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
+			}, error => console.log(error));
 		}
 	}
 
 	protected reloadData(): void {
-		this.apiActionService
-			.getAPIActions()
+		this.apiActionService.getAPIActions()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
-				result => {
-					this.resultSet = result;
-					this.gridData = process(this.resultSet, this.state);
+			(result) => {
+				this.resultSet = result;
+				this.gridData = process(this.resultSet, this.state);
 
-					if (this.openLastItemId !== 0) {
-						setTimeout(() => {
-							this.selectRow(this.openLastItemId);
-							let lastApiActionModel = this.gridData.data.find(
-								dataItem => dataItem.id === this.openLastItemId
-							);
-							this.openLastItemId = 0;
-							this.openAPIActionDialogViewEdit(
-								lastApiActionModel,
-								ActionType.VIEW,
-								lastApiActionModel
-							);
-						}, 700);
-					}
-				},
-				err => console.log(err)
-			);
+				if (this.openLastItemId !== 0) {
+					setTimeout(() => {
+						this.selectRow(this.openLastItemId);
+						let lastApiActionModel = this.gridData.data.find((dataItem) => dataItem.id === this.openLastItemId);
+						this.openLastItemId = 0;
+						this.openAPIActionDialogViewEdit(lastApiActionModel, ActionType.VIEW, lastApiActionModel);
+					}, 700);
+				}
+			},
+			(err) => console.log(err));
 	}
 
 	private reloadItem(originalModel: APIActionModel): void {
-		this.apiActionService
-			.getAPIAction(originalModel.id)
+		this.apiActionService.getAPIAction(originalModel.id)
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-				(response: APIActionModel) => {
-					Object.assign(originalModel, response);
-				},
-				error => console.log(error)
-			);
+			.subscribe((response: APIActionModel) => {
+				Object.assign(originalModel, response);
+		}, error => console.log(error));
 	}
 
 	/**
@@ -283,31 +212,22 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	private openAPIActionDialogViewEdit(
 		apiActionModel: APIActionModel,
 		actionType: number,
-		originalModel?: APIActionModel
-	): void {
-		this.dialogService
-			.open(
-				APIActionViewEditComponent,
-				[
-					{ provide: APIActionModel, useValue: apiActionModel },
-					{ provide: Number, useValue: actionType },
-				],
-				DIALOG_SIZE.XXL,
-				false
-			)
-			.then(result => {
-				if (result) {
-					if (actionType === ActionType.CREATE) {
-						this.reloadData();
-					} else {
-						this.reloadItem(originalModel);
-					}
+		originalModel?: APIActionModel): void {
+		this.dialogService.open(APIActionViewEditComponent, [
+			{ provide: APIActionModel, useValue: apiActionModel },
+			{ provide: Number, useValue: actionType }
+		], DIALOG_SIZE.XLG, false).then(result => {
+			if (result) {
+				if (actionType === ActionType.CREATE) {
+					this.reloadData();
+				} else {
+					this.reloadItem(originalModel);
 				}
-			})
-			.catch(result => {
-				this.reloadData();
-				console.log('Dismissed Dialog');
-			});
+			}
+		}).catch(result => {
+			this.reloadData();
+			console.log('Dismissed Dialog');
+		});
 	}
 
 	private selectRow(dataItemId: number): void {
@@ -344,18 +264,6 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.state.take = event.take || this.state.take;
 		this.pageSize = this.state.take;
 		this.gridData = process(this.resultSet, this.state);
-	}
-
-	protected toggleFilter(): void {
-		this.showFilters = !this.showFilters;
-	}
-
-	protected filterCount(): number {
-		return this.state.filter.filters.length;
-	}
-
-	protected hasFilterApplied(): boolean {
-		return this.state.filter.filters.length > 0;
 	}
 
 	/**
