@@ -25,14 +25,14 @@
 			let-column
 			let-columnIndex="columnIndex"
 		>
-			<tds-checkbox
+			<tds-indeterminate-checkbox
 				name="assetsSelector"
 				[hasThirdState]="true"
 				[disabled]="!isBulkSelectAvailable()"
 				(changeState)="onChangeBulkCheckbox($event)"
 				id="assetSelector"
-				[setStateSubject]="bulkCheckboxService.setStateSubject"
-			></tds-checkbox>
+				[setStateSubject]="bulkCheckboxService.setStateSubject">
+			</tds-indeterminate-checkbox>
 		</ng-template>
 		<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
 			<label class="selectall-checkbox-column text-center">

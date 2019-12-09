@@ -104,7 +104,7 @@ import { FieldReferencePopupComponent } from './components/field-reference-popup
 import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
-import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
+import { TDSIndeterminateCheckboxComponent } from './components/tds-indeterminate-checkbox/tds-indeterminate-checkbox.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -196,7 +196,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -263,7 +263,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
@@ -289,7 +289,6 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DependentCommentComponent,
 		AddPersonComponent,
 		DateRangeSelectorComponent,
-		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,

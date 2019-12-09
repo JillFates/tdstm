@@ -1,19 +1,19 @@
 import {Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import { CheckboxState, CheckboxStates} from './model/tds-checkbox.model';
+import { CheckboxState, CheckboxStates} from './model/tds-indeterminate-checkbox.model';
 
 const CHECKED_ATTRIBUTE = 'checked';
 const INDETERMINATE_ATTRIBUTE = 'indeterminate';
 
 @Component({
-	selector: 'tds-checkbox',
+	selector: 'tds-indeterminate-checkbox',
 	template: `
-        <div class="tds-checkbox-component">
+        <div class="tds-indeterminate-checkbox">
             <input clrCheckbox class="component-action-change" [disabled]="disabled" type="checkbox" #tdsCheckbox (change)="onChange()" [attr.style]=" disabled ? 'cursor: text' : 'cursor: pointer'" />
         </div>
 	`
 })
-export class TDSCheckboxComponent implements OnInit {
+export class TDSIndeterminateCheckboxComponent implements OnInit {
 	@Input() hasThirdState: boolean;
 	@Input() disabled = false;
 	@Input() setStateSubject: Subject<CheckboxState>;

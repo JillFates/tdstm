@@ -39,12 +39,13 @@
                            [filterable]="false">
 			<ng-template kendoGridHeaderTemplate>
 				<div class="row text-center">
-                    <tds-checkbox name="assetsSelector"
+                    <tds-indeterminate-checkbox checkbox name="assetsSelector"
 								  [hasThirdState]="true"
 								  [disabled]="!isBulkSelectAvailable()"
                                   (changeState)="bulkCheckboxService.changeState(($event))"
                                   id="assetSelector"
-                                  [setStateSubject]="bulkCheckboxService.setStateSubject"></tds-checkbox>
+                                  [setStateSubject]="bulkCheckboxService.setStateSubject">
+					</tds-indeterminate-checkbox>
 				</div>
 			</ng-template>
 
