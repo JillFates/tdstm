@@ -788,6 +788,13 @@ class UrlMappings {
 			]
 		}
 
+		"/ws/project/default" {
+			controller = "wsProject"
+			action = [
+					GET: "defaultProject"
+			]
+		}
+
 		"/ws/manufacturer/merge" {
 			controller = "wsManufacturer"
 			action = [POST:"merge"]
