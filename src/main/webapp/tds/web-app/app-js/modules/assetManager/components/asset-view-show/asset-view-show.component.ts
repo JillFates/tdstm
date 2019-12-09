@@ -26,8 +26,8 @@ import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.compone
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
 import {SaveOptions} from '../../../../shared/model/save-options.model';
-import {UserContextService} from '../../../auth/service/user-context.service';
-import DEFAULT_PROJECT from '../../../../shared/constants/default-project';
+import { Store } from '@ngxs/store';
+import { UserContextModel } from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
 
@@ -46,7 +46,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public metadata: any = {};
 	private lastSnapshot;
 	protected navigationSubscription;
-	private currentProject: any;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
@@ -55,6 +54,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
+	private userContext:UserContextModel;
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
@@ -72,8 +72,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private userContextService: UserContextService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService,
+		private store: Store) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -82,9 +82,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
-        this.userContextService.getUserContext().subscribe((userContext) => {
-            this.currentProject = userContext.project;
-        });
 	}
 
 	ngOnInit(): void {
@@ -96,6 +93,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 		this.reloadStrategy();
 		this.initialiseComponent();
+
+		this.store.select(state => state.TDSApp.userContext).subscribe((userContext: UserContextModel) => {
+			this.userContext = userContext;
+		});
 	}
 
 	/**
@@ -377,7 +378,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public isDefaultProject(): boolean {
-        return this.currentProject.id === DEFAULT_PROJECT.id;
+		return (
+			this.userContext && 
+			this.userContext.project &&
+			this.userContext.defaultProject && 
+			this.userContext.project.id === this.userContext.defaultProject.id
+		);
 	}
 
 	public isSaveButtonDisabled(): boolean {
