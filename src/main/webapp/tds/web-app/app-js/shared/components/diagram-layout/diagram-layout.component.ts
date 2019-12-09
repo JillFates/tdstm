@@ -14,7 +14,7 @@ import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../
 import {
 	Adornment,
 	Binding,
-	Diagram,
+	Diagram, GraphObject,
 	InputEvent,
 	Overview,
 	Panel,
@@ -264,6 +264,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
 		this.diagram.allowSelect = true;
+		this.diagram.toolManager.hoverDelay = 200;
 		this.diagram.commitTransaction('generateDiagram');
 		this.setTreeLayout();
 		this.diagram.model = this.myModel;
@@ -555,7 +556,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		panel.margin = new go.Margin(0, 0, 0, 0);
 		panel.add(this.iconShape());
 		panel.add(this.assetIconShape());
-		panel.add(this.textBlockShape());
+		const textBlock = this.textBlockShape();
+
+		panel.add(textBlock);
 
 		return panel;
 	}
@@ -645,9 +648,15 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		const textBlock = new TextBlock();
 		textBlock.margin = 8;
 		textBlock.stroke = 'black';
-		textBlock.font = 'bold 16px sans-serif';
-		// textBlock.wrap = TextBlock.WrapBreakAll;
+		textBlock.font = '16px sans-serif';
 		textBlock.bind(new Binding('text', 'name'));
+
+		textBlock.mouseHover = (e: InputEvent, obj: TextBlock) => {
+			obj.font = 'bold 16px sans-serif';
+		};
+		textBlock.mouseLeave = (e: InputEvent, obj: TextBlock) => {
+			obj.font = '16px sans-serif';
+		};
 		return textBlock;
 	}
 
@@ -771,10 +780,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 			if ((match && match.length > 0) && (team && team.length > 0)) {
 				if (team === TaskTeam.ALL_TEAMS) {
-					highlightCollection = d.nodes
-						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
-							|| (f.data.assignedTo && !!f.data.assignedTo.toLowerCase().includes(match.toLowerCase())))
-						);
+					return d.clearSelection();
 				} else if (team === TaskTeam.NO_TEAM_ASSIGNMENT) {
 					highlightCollection = d.nodes
 						.filter(f => (!!f.data.name.toLowerCase().includes(match.toLowerCase())
