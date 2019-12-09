@@ -160,13 +160,13 @@
                         <a [routerLink]="['/importbatch','assets']">Import Assets (ETL)</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-import-assets">
-                        <a href="/tdstm/assetEntity/assetImport">Import Assest (Excel)</a>
+                        <a href="/tdstm/assetEntity/assetImport">Import Assets (TM Excel)</a>
                     </li>
                     <li *ngIf="hasPermission(permission.DataTransferBatchView)" class="menu-child-item menu-parent-assets-manage-dep-batches">
-                        <a [routerLink]="['/importbatch','list']">Manage Views Import Batches (ETL)</a>
+                        <a [routerLink]="['/importbatch','list']">Manage Import Batches (ETL)</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetImport)" class="menu-child-item menu-parent-assets-manage-batches">
-                        <a href="/tdstm/dataTransferBatch/list">Manage Views Import Batches (Excel)</a>
+                        <a href="/tdstm/dataTransferBatch/list">Manage Import Batches (TM Excel)</a>
                     </li>
                 </ul>
             </li>
