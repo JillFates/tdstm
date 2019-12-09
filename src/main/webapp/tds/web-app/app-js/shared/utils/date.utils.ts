@@ -105,7 +105,7 @@ export class DateUtils {
 	 * Get the Date without the hh:mm:ss using an specific Date Format
 	 * @param {sourceTime} String Format, no time
 	 * @param {dateFormat} User dateFormat
-	 * @returns {string} The formatted day
+	 * @returns {date} The formatted day
 	 */
 	public static getDateFromFormat(sourceTime: Date, dateFormat: string): Date {
 		return new Date(moment(sourceTime, dateFormat));
