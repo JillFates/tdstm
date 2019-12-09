@@ -59,10 +59,11 @@ class TimeLine {
 		// Build all the paths results.
 		timelineTable.calculateAllPaths(graph, timelineSummary)
 
+		determineFullyCyclicalGraph(graph, timelineSummary)
+
 		timelineSummary.elapsedTime = TimeUtil.ago(stopWatch.lap(tag))
 		return timelineSummary
 	}
-
 
 	/**
 	 * Executes the Critical Path Analysis on the graph.
@@ -81,6 +82,22 @@ class TimeLine {
 			GraphPath graphPath = new GraphPath()
 			timelineTable.updateSinkLatestTimes(sink)
 			doDijkstraForLatestTimes(sink, graphPath)
+		}
+	}
+
+	/**
+	 * Calculate if there are cyclical references for the special edge case where:
+	 * - There are no cycles yet present
+	 * - There is more than one task
+	 * - There are no start vectors or sink vectors present
+	 * If this is the case, then add the list of {@code vertices} to the {@code cycles} element on {@code TimelineSummary}
+	 * so it will represent a cycle present on the Graph.
+	 * @param taskGraph an instance of {@code TaskTimeLineGraph}
+	 * @param timelineSummary an instance of {@code timelineSummary}
+	 */
+	private void determineFullyCyclicalGraph(TaskTimeLineGraph taskGraph, TimelineSummary timelineSummary) {
+		if (!timelineSummary.hasCycles() && taskGraph.vertices.size() > 1 && (taskGraph.hasNoStarts() || taskGraph.hasNoSinks())) {
+			timelineSummary.cycles.add(taskGraph.vertices as List)
 		}
 	}
 

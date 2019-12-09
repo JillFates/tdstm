@@ -6,38 +6,47 @@ import {
 	Component, OnDestroy, AfterViewInit, Injectable
 } from '@angular/core';
 
-import { NotifierService } from '../services/notifier.service';
-import { UIActiveDialogService } from '../services/ui-dialog.service';
+import {NotifierService} from '../services/notifier.service';
+import {UIActiveDialogService} from '../services/ui-dialog.service';
+
 declare var jQuery: any;
 
 @Component({
 	selector: 'tds-ui-prompt',
 	template: `
-        <div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button (click)="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title">{{title}}</h4>
-                    </div>
-                    <div class="modal-body">
-                        <form name="dialogActionForm" role="form" data-toggle="validator" class="form-horizontal left-alignment ng-pristine ng-valid">
-                            <div class="box-body">
-                                <p>{{message}}</p>
-                            </div>
-                            <!-- /.box-body -->
-                        </form>
-                    </div>
-                    <div class="modal-footer form-group-center">
-                        <button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
-                        <button (click)="cancel()" type="button" class="btn btn-default pull-right" data-dismiss="modal"><span *ngIf="!hideIconButtons" class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button (click)="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">×</span></button>
+						<h4 class="modal-title">{{title}}</h4>
+					</div>
+					<div class="modal-body">
+						<form name="dialogActionForm" role="form" data-toggle="validator"
+							  class="form-horizontal left-alignment ng-pristine ng-valid">
+							<div class="box-body">
+								<p>{{message}}</p>
+							</div>
+							<!-- /.box-body -->
+						</form>
+					</div>
+					<div class="modal-footer form-group-center">
+						<button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span
+							*ngIf="!hideIconButtons" class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
+						<button (click)="cancel()" type="button" class="btn btn-default pull-right"
+								data-dismiss="modal"><span *ngIf="!hideIconButtons"
+														   class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	`,
 	styles: [`
-		.modal { background:none;}
+        .modal {
+            background: none;
+        }
 	`]
 })
 export class UIPromptDirective implements OnDestroy, AfterViewInit {
@@ -52,12 +61,15 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 
 	openNotifier: any;
 
+	private CANCEL_STR = 'cancel';
+	private CONFIRM_STR = 'confirm';
+
 	constructor(private notifierService: NotifierService) {
 		this.registerListeners();
 	}
 
 	ngAfterViewInit(): void {
-		const refControl =  'tdsUiPrompt';
+		const refControl = 'tdsUiPrompt';
 		this.tdsUiPrompt = jQuery(`#${refControl}`);
 		this.tdsUiPrompt.on('hide.bs.modal', (event) => {
 			if (this.resolve && event.target.id === refControl) {
@@ -94,6 +106,7 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	};
 
 	public cancel(): void {
+		this.checkMultipleModals(this.CANCEL_STR);
 		this.resolve(false);
 		this.tdsUiPrompt.modal('hide');
 	}
@@ -104,15 +117,44 @@ export class UIPromptDirective implements OnDestroy, AfterViewInit {
 	}
 
 	public confirm(): void {
+		this.checkMultipleModals(this.CONFIRM_STR);
 		this.resolve(true);
 		this.tdsUiPrompt.modal('hide');
+	}
+
+	public checkMultipleModals(scenario) {
+		switch (scenario) {
+			case this.CANCEL_STR: {
+				this.addModalClass();
+				break;
+			}
+			case this.CONFIRM_STR: {
+				setTimeout(() => {
+					let modals = jQuery('div.modal.fade.in');
+					const body = document.getElementsByTagName('body')[0];
+					if (body && modals.length === 0) {
+						body.classList.remove('modal-open');
+						body.style.paddingRight = '0';
+					} else if ( modals.length >= 1) {
+						this.addModalClass();
+					}
+				}, 500);
+				break;
+			}
+		}
+	}
+
+	addModalClass() {
+		setTimeout(() => {
+			const body = document.getElementsByTagName('body')[0];
+			body.className += ' modal-open';
+		}, 500);
 	}
 }
 
 @Injectable()
 export class UIPromptService {
 	constructor(private notifier: NotifierService) {
-
 	}
 
 	/**

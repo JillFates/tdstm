@@ -2,6 +2,7 @@
 	<tds-report-toggle-filters 
 		[hideFilters]="hideFilters" 
 		[disabled]="!generatedReport"
+		(reload)="onReload()"
 		(toggle)="toggleFilters($event)"></tds-report-toggle-filters>
 	<div class="box-body">
 		<div class="box box-primary">

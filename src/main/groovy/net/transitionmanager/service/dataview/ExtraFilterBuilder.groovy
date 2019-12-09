@@ -70,14 +70,17 @@ class ExtraFilterBuilder {
 
 		} else {
 			DomainFieldNameResult domainFieldNameResult = resultsDomainAndFieldName(dataviewSpec.domains, fieldSpecProject)
-			// build FieldName Filter and add it to dataviewSpec.fieldNameExtraFilters List
-			dataviewSpec.fieldNameExtraFilters.add(new FieldNameExtraFilter(
-				domain: domainFieldNameResult.domain,
-				property: domainFieldNameResult.fieldName,
-				fieldSpec: domainFieldNameResult.fieldSpec,
-				filter: this.filter,
-				referenceProperty: this.referenceProperty)
-			)
+			FieldSpec fieldSpec = domainFieldNameResult.fieldSpec
+			if (fieldSpec) {
+				// build FieldName Filter and add it to dataviewSpec.fieldNameExtraFilters List
+				dataviewSpec.fieldNameExtraFilters.add(new FieldNameExtraFilter(
+					domain: domainFieldNameResult.domain,
+					property: domainFieldNameResult.fieldName,
+					fieldSpec: fieldSpec,
+					filter: this.filter,
+					referenceProperty: this.referenceProperty)
+				)
+			}
 		}
 	}
 
@@ -118,9 +121,6 @@ class ExtraFilterBuilder {
 		String domain = parts[0]
 		String fieldName = parts[1]
 		FieldSpec fieldSpec = fieldSpecProject.getFieldSpec(domain, fieldName)
-		if (!fieldSpec) {
-			throw new InvalidParamException("Unresolved domain $domain and field $fieldName")
-		}
 
 		return new DomainFieldNameResult(
 			domain,
@@ -147,10 +147,6 @@ class ExtraFilterBuilder {
 		String selectedDomain = domains.find { String domain ->
 			fieldSpec = fieldSpecProject.getFieldSpec(domain, this.property)
 			return fieldSpec != null
-		}
-
-		if (!fieldSpec) {
-			throw new InvalidParamException("Field Spec '$property' not found")
 		}
 
 		return new DomainFieldNameResult(

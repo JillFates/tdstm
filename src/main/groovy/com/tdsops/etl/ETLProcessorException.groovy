@@ -230,7 +230,7 @@ class ETLProcessorException extends GroovyRuntimeException {
 
     static ETLProcessorException invalidSetParameter() {
         new ETLProcessorException("Invalid variable name specified for 'set' command. " +
-                "Variable names must end in 'Var' and can not be reassigned within iterate loop.")
+                "Variable can not be null and can not be reassigned within iterate loop.")
     }
 
     static ETLProcessorException incorrectWhenCommandStructure() {
@@ -271,6 +271,14 @@ class ETLProcessorException extends GroovyRuntimeException {
 
     static ETLProcessorException invalidTransformationOnNotNumericValue(Object value) {
         new ETLProcessorException("Invalid transformation on not numeric value: $value")
+    }
+
+	static ETLProcessorException domainWithoutFieldSpec(ETLDomain domain) {
+		new ETLProcessorException("Domain ${domain} does not have field spec definitions. Use [Application, Device, Database, Storage]")
+	}
+
+    static ETLProcessorException unknownTag(String tagName) {
+        new ETLProcessorException("Unknown Tag: '$tagName'")
     }
 }
 

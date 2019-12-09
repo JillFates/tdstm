@@ -3,8 +3,8 @@ package net.transitionmanager.project
 import com.tdssrc.grails.TimeUtil
 
 /**
- * A point in time representation of the status of a MoveEvent. The values are computed via an
- * aggregate of MoveBundle.MoveBundleStep.StepSnapshot records.  These records are created as part of the MoveBundleService.
+ * A point in time representation of the status of a MoveEvent.
+ * These records are created as part of the MoveBundleService.
  */
 class MoveEventSnapshot {
 

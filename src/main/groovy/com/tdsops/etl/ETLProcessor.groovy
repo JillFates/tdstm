@@ -1,11 +1,13 @@
 package com.tdsops.etl
 
 import com.tdsops.AssetDependencyTypesCache
+import com.tdsops.ETLTagValidator
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
 import getl.data.Field
 import groovy.time.TimeDuration
+import groovy.transform.CompileStatic
 import groovy.transform.TimedInterrupt
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.ScriptExpressionChecker
@@ -45,7 +47,7 @@ import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
 
-/**
+/*
  * Class that receives all the ETL initial commands.
  * <pre>
  * 	extract 'dataSetFieldName' load 'assetFieldName'
@@ -59,6 +61,7 @@ import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
  * @see com.tdsops.etl.ETLProcessor#set
  * @see com.tdsops.etl.ETLProcessor#iterate
  */
+
 class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 	/**
@@ -100,8 +103,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * DataSet wrapper used to mange commands sent to DataSet object.
 	 * It wrapps a GETL Datasource instance.
-	 * @see getl.data.Dataset
-	 * @see getl.data.Field
+	 * @see getl.data.Dataset* @see getl.data.Field
 	 */
 	DataSetFacade dataSetFacade
 	/**
@@ -110,6 +112,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @see com.tdsops.etl.ETLProcessor#lookUpFieldDefinition(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
 	ETLFieldsValidator fieldsValidator
+	/**
+	 * An instance of {@code ETLTagValidator} is used by {@code ETLProcessor}
+	 * to validate relates tags command.
+	 * @see ETLTagValidator* @see ETLProcessor#tagAdd(java.lang.String)
+	 * @see ETLProcessor#tagRemove(java.lang.String)
+	 * @see ETLProcessor#tagReplace(java.lang.String, java.lang.String)
+	 */
+	ETLTagValidator tagValidator
 	/**
 	 * Represents the variable bindings of an ETL script.
 	 */
@@ -216,12 +226,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		result.addComments(commentElement)
 	}
 /**
-	 * Some words to be used in an ETL script.
-	 * <b> read labels</b>
-	 * <b> console on/off</b>
-	 * <b> ignore record</b>
-	 * <b> ... transform with ...</b>
-	 */
+ * Some words to be used in an ETL script.
+ * <b> read labels</b>
+ * <b> console on/off</b>
+ * <b> ignore record</b>
+ * <b> ... transform with ...</b>
+ */
 	static enum ReservedWord {
 
 		labels, with, on, off, record, ControlCharacters, populated
@@ -243,11 +253,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param console
 	 * @param fieldsValidator
 	 */
-	ETLProcessor(Project project, DataSetFacade dataSetFacade, DebugConsole console, ETLFieldsValidator fieldsValidator) {
+	ETLProcessor(
+		Project project,
+		DataSetFacade dataSetFacade,
+		DebugConsole console,
+		ETLFieldsValidator fieldsValidator,
+		ETLTagValidator tagValidator = null
+	) {
 		this.project = project
 		this.dataSetFacade = dataSetFacade
 		this.debugConsole = console
 		this.fieldsValidator = fieldsValidator
+		this.tagValidator = tagValidator
 		this.binding = new ETLBinding(this)
 		this.result = new ETLProcessorResult(this)
 		this.findCache = new FindResultsCache()
@@ -260,6 +277,18 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	// ------------------------------------
 	// ETL DSL methods
 	// ------------------------------------
+
+	/**
+	 * Traps ETL expression with undefined variable therefore throws an exception
+	 * <pre>
+	 * 	domain aBogusVariableName
+	 * </pre>
+	 * @param localVariableDefinition
+	 * @throws ETLProcessorException#missingPropertyException
+	 */
+	Element domain(LocalVariableDefinition localVariableDefinition) {
+		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
+	}
 	/**
 	 * <p>Selects a domain</p>
 	 * <p>Every domain command also clean up bound variables and results in the lookup command</p>
@@ -343,16 +372,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this
 	}
 
-	/**
+	/*
 	 * Iterate command from one row to another one using their position in the DataSet.
 	 * <code>
 	 *  from 1 to 3 iterate {
 	 *  	...
-	 *  }
-	 * <code>
+	 *	}
+	 *<code>
 	 * @param from
 	 * @return a Map with the next steps in this command.
 	 */
+
 	Map<String, ?> from(int from) {
 		validateStack()
 		return [to: { int to ->
@@ -367,16 +397,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		}]
 	}
 
-	/**
+	/*
 	 * Iterates a given number of rows based on its ordinal position
 	 * <code>
-	 * from 1, 3, 5 iterate {
+	 * 	from 1, 3, 5 iterate {
 	 * 		......
 	 *	}
-	 *	</code>
+	 * </code>
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
+
 	Map<String, ?> from(int[] numbers) {
 		validateStack()
 		return [iterate: { Closure closure ->
@@ -394,11 +425,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Aborts processing of the current row for the domain in the context
 	 * <pre>
-	 *   if (SOURCE.Env == 'Development) {*      ignore record
+	 *  if (SOURCE.Env == 'Development) {*  	ignore record
 	 *}* </pre>
 	 * @param label just a label to detect if the command was used with 'row' label
 	 * @return current instance of ETLProcessor
 	 */
+
 	ETLProcessor ignore(ReservedWord reservedWord) {
 		validateStack()
 		if (reservedWord == ReservedWord.record) {
@@ -604,16 +636,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		dataSetFacade.setRootNode(rootNode)
 	}
 
-	/**
+	/*
 	 * Extracts an element from dataSource by its index in the row
 	 * <code>
-	 *     domain Application
-	 *     iterate {*          extract 1 load 'appName'
-	 *          extract 3 load 'description'
-	 *}* <code>
+	 * 	domain Application
+	 *  iterate {
+	 *  	extract 1 load 'appName'
+	 *      extract 3 load 'description'
+	 * }
+	 * <code>
 	 * @param index
 	 * @return
 	 */
+
 	Element extract(Integer index) {
 		validateStack()
 		checkReadLabelCommandAlreadyInvoked()
@@ -624,18 +659,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		doExtract()
 	}
 
-	/**
+	/*
 	 * Extracts an element from dataSource by its column name
 	 * <code>
-	 *      domain Application
+	 *  domain Application
 	 *  iterate {
 	 *  	extract 'column name' load 'appName'
-	 *          extract 'assets.device' load 'assetName'
+	 *      extract 'assets.device' load 'assetName'
 	 *	}
 	 * <code>
 	 * @param columnName
 	 * @return an instance of Element
 	 */
+
 	Element extract(String columnName) {
 		validateStack()
 
@@ -659,10 +695,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	extract aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
-	Element extract(LocalVariableDefinition localVariableDefinition){
+	Element extract(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -680,9 +715,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *    load 'assetName' with SOURCE.'data name'
 	 *    load 'assetName' with concat(',', SOURCE.'column 1', SOURCE.'column 2')
 	 *    ...
-	 *	  load 'comments' with myCommentContentVar
-	 *	  load 'assetName' with DOMAIN.id
-	 *	  load 'assetName' with SOURCE.'data name'
+	 * 	  load 'comments' with myCommentContentVar
+	 * 	  load 'assetName' with DOMAIN.id
+	 * 	  load 'assetName' with SOURCE.'data name'
 	 * </pre>
 	 * @param fieldName a field name used to create a load command
 	 * @return an instance of {@code CommentElement} or an instance of {@code Element}
@@ -702,8 +737,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	load aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
 	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
@@ -728,7 +762,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return new CommentElement(this, this.selectedDomain.domain)
 	}
 
-	/**
+	/*
 	 * Create a local variable using variableName parameter.
 	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
@@ -739,15 +773,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 		set environmentVar with SOURCE.'application id'
 	 * 		set environmentVar with DOMAIN.id
 	 * 		.....
-	 *} </pre>
+	 *	}
+	 * </pre>
 	 * @param field
 	 * @return
 	 */
+
 	Map<String, ?> set(LocalVariableDefinition localVariable) {
 		doSet(localVariable.name)
 	}
 
-	/**
+	/*
 	 * Create a local variable using variableName parameter.
 	 * It adds a new dynamic variable in he current script row execution.
 	 * <pre>
@@ -757,16 +793,14 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	    def varName = 'myVarName'
 	 * 		set varName with 'Production'
 	 * 		.....
-	 * }
+	 *  }
 	 * </pre>
 	 * @param field
 	 * @return
 	 */
+
 	Map<String, ?> set(final Object variableName) {
-		if (!(variableName instanceof String) ||
-			hasVariable(variableName) ||
-			!binding.isValidETLVariableName(variableName)
-		) {
+		if (!(variableName instanceof String) || hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
 		}
 		doSet((String) variableName)
@@ -780,7 +814,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @see ETLProcessor#set(LocalVariableDefinition)
 	 * @see ETLProcessor#set(java.lang.Object)
 	 */
-	private Map<String, ?> doSet(String variableName){
+	private Map<String, ?> doSet(String variableName) {
 		validateStack()
 		return [
 			with: { value ->
@@ -797,7 +831,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		]
 	}
 
-	/**
+	/*
 	 * Lookup ETL command implementation:
 	 * <pre>
 	 *  iterate {
@@ -808,16 +842,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *      def clusterName = CE
 	 *
 	 *      lookup 'assetName' with 'clusterName'
-	 *	}
-	 *	</pre>
+	 * }
+	 * </pre>
 	 * @param fieldNames
 	 */
+
 	LookupElement lookup(final Object fieldName) {
 		validateStack()
 		return new LookupElement(this, [fieldName])
 	}
 
-	/**
+	/*
 	 * Lookup ETL command for multiple parameters implementation:
 	 * <pre>
 	 *  set lookupNameVar = 'assetName'
@@ -834,6 +869,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * </pre>
 	 * @param fieldNames
 	 */
+
 	LookupElement lookup(Object... fieldNames) {
 		validateStack()
 		List fieldNamesList = fieldNames as List
@@ -842,8 +878,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Initialize a fieldName using a default value
 	 * <pre>
-	 * 	iterate {
-	 * 		domain Application
+	 * 	iterate {* 		domain Application
 	 * 		initialize 'environment' with 'Production'
 	 * 	    initialize 'environment' with Production
 	 * 	    initialize 'environment' with SOURCE.'application id'
@@ -851,11 +886,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *
 	 * 	    extract 'application id'
 	 * 	    initialize 'environment' with CE
-	 *	}
-	 * </pre>
+	 *}* </pre>
 	 * @param field
 	 * @return
 	 */
+
 	Map<String, ?> initialize(String field) {
 		validateStack()
 		return [
@@ -875,20 +910,19 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	initialize aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
-	Map<String, ?> initialize(LocalVariableDefinition localVariableDefinition){
+	Map<String, ?> initialize(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
-	/**
+	/*
 	 * Initialize a fieldName using a default value
 	 * <pre>
 	 * 	iterate {
 	 * 		domain Application
 	 * 		init 'environment' with 'Production'
-	 *	}
+	 * }
 	 * </pre>
 	 * @param field
 	 * @return
@@ -905,10 +939,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * 	init aBogusVariableNameVar
 	 * </pre>
 	 * @param localVariableDefinition
-	 * @throws ETLProcessorException
-	 * @See ETLProcessorException.missingPropertyException
+	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
-	Map<String, ?> init(LocalVariableDefinition localVariableDefinition){
+	Map<String, ?> init(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
 
@@ -1049,13 +1082,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * WhenFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 * 		whenNotFound 'asset' create {
-	 * 			assetClass: Application
+	 * 		whenNotFound 'asset' create {* 			assetClass: Application
 	 * 			assetName: primaryNameVar
 	 * 			assetType: primaryTypeVar
 	 * 			"SN Last Seen": NOW
-	 *	}
-	 *	</pre>
+	 *}* 	</pre>
 	 * @param fieldName
 	 * @return the current find Element
 	 */
@@ -1070,10 +1101,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * WhenNotFound ETL command. It defines what should based on find command results
 	 * <pre>
-	 * 		whenFound asset update {
-	 * 			"TN Last Seen": NOW
-	 *	}
-	 *	</pre>
+	 * 		whenFound asset update {* 			"TN Last Seen": NOW
+	 *}* 	</pre>
 	 * @param fieldName
 	 * @return the current find Element
 	 */
@@ -1085,6 +1114,144 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return new WhenFoundElement(fieldName, currentFindElement.mainSelectedDomain, this)
 	}
 
+	/**
+	 * Adds a single tag to an asset if not already associated
+	 * <pre>
+	 * 	tagAdd 'Code Blue'
+	 * </pre>
+	 * @param tagName a String with a tag name content to be added
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagAdd(Object tagName) {
+		result.addTag(validateTagValue(tagName))
+		return this
+	}
+
+	/**
+	 * Adds a list of tags to an asset if not already associated.
+	 * <pre>
+	 * 	tagAdd 'FUBAR','SNAFU'
+	 * </pre>
+	 * @param tags a List of String with a tag names
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagAdd(List<Object> tags) {
+		for (Object tag : tags) {
+			tagAdd(tag)
+		}
+		return this
+	}
+
+	/**
+	 * Adds a list of tags to an asset if not already associated.
+	 * <pre>
+	 * 	tagAdd 'FUBAR','SNAFU'
+	 * </pre>
+	 * @param tags a List of String with a tag names
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagAdd(Object... tags) {
+		for (Object tag : tags) {
+			tagAdd(tag)
+		}
+		return this
+	}
+
+	/**
+	 * Removes a single tag from an asset if associated.
+	 * <pre>
+	 * 	tagRemove 'Code Blue'
+	 * </pre>
+	 * @param tagName a String with a tag name content to be removed
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagRemove(Object tagName) {
+		result.removeTag(validateTagValue(tagName))
+		return this
+	}
+
+	/**
+	 * Removes a list of tags from an asset if associated.
+	 * <pre>
+	 * 	tagRemove 'FUBAR','SNAFU'
+	 * 	tagRemove ['FUBAR','SNAFU']
+	 * </pre>
+	 * @param tags a List of String with a tag names
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagRemove(Object... tags) {
+		for (Object tag : tags) {
+			tagRemove(tag)
+		}
+		return this
+	}
+
+	/**
+	 * Removes a list of tags from an asset if associated.
+	 * <pre>
+	 * 	tagRemove 'FUBAR','SNAFU'
+	 * 	tagRemove ['FUBAR','SNAFU']
+	 * </pre>
+	 * @param tags a List of String with a tag names
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagRemove(List tags) {
+		for (Object tag : tags) {
+			tagRemove(tag)
+		}
+		return this
+	}
+	/**
+	 * Replaces one tag with another tag on an asset if associated
+	 * <pre>
+	 * 	tagReplace 'a', 'b'
+	 * </pre>
+	 * @param currentTag a Tag name to be replaced
+	 * @param newTag a new Tag for replacing
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagReplace(Object currentTag, Object newTag) {
+		result.replaceTag(validateTagValue(currentTag), validateTagValue(newTag))
+		return this
+	}
+
+	/**
+	 * Replaces a list of tag defined by the map key with map value on an asset if associated
+	 * <pre>
+	 * 	tagReplace 'c':'d', 'g':'h'
+	 * </pre>
+	 * @param currentTag a Tag name to be replaced
+	 * @param newTag a new Tag for replacing
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagReplace(Map<String, ?>... tags) {
+		tags.each { Map<String, ?> tag -> tagReplace(tag) }
+		return this
+	}
+	/**
+	 * Replaces a list of tag defined by the map key with map value on an asset if associated
+	 * <pre>
+	 * 	tagReplace 'e':'f'
+	 * </pre>
+	 * @param currentTag a Tag name to be replaced
+	 * @param newTag a new Tag for replacing
+	 * @return an instance of {@code ETLProcessor}
+	 */
+	@CompileStatic
+	ETLProcessor tagReplace(Map map) {
+		map.each { Object key, Object value ->
+			tagReplace(key, value)
+		}
+		return this
+	}
 	/**
 	 * <b>Cache ETL command.</b><br>
 	 * ETL Script evaluation is using internally a findCache of find command results.
@@ -1151,9 +1318,50 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		return this
 	}
 
+	/*
+	 * Returns a field specs definition for a given {@code ETLDomain}
+	 * <pre>
+	 * 	iterate {
+	 * 		fieldSpec Application each {
+	 * 			if (SOURCE.contains(it.label)) {
+	 * 				extract it.label load it.fieldName
+	 *			}
+	 *			....
+	 *		}
+	 *	}
+	 * </pre>
+	 */
+
+	List<Map<String, ?>> fieldSpec(ETLDomain domain) {
+
+		if (!domain.isAsset()) {
+			throw ETLProcessorException.domainWithoutFieldSpec(domain)
+		}
+
+		return this.fieldsValidator.lookupFieldSpec(domain).collect {
+			[
+				'name' : it.field,
+				'label': it.label,
+				'type' : it.control
+			]
+		}
+	}
+
 	// ------------------------------------
 	// Support methods
 	// ------------------------------------
+
+	/**
+	 * Takes tag name from tag parameter using {@code ETLValueHelper#valueOf}
+	 * and after that it validate tag name using {@code ETLTagValidator#validate}
+	 * @param tag an Object param used in ETL command
+	 * @return String tag name after transforming and validating tag parameter
+	 */
+	private String validateTagValue(Object tag) {
+		String tagValue = ETLValueHelper.valueOf(tag)
+		tagValidator.validate(tagValue)
+		return tagValue
+	}
 
 	/**
 	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
@@ -1649,7 +1857,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * and an instance of SecureASTCustomizer.
 	 * @see CompilerConfiguration* @see SecureASTCustomizer* @see ImportCustomizer* @return a default instance of CompilerConfiguration
 	 */
-	private CompilerConfiguration defaultCompilerConfiguration() {
+	static CompilerConfiguration defaultCompilerConfiguration() {
 
 		SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
 		secureASTCustomizer.with {
@@ -1677,13 +1885,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 			].asImmutable()
 			// Types allowed to be used (Including primitive types)
 			constantTypesClassesWhiteList = [
-				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean,
+				Object, Integer, Float, Long, Double, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
 				Integer.TYPE, Long.TYPE, Float.TYPE, Double.TYPE, Boolean.TYPE, List
 			].asImmutable()
 			// Classes who are allowed to be receivers of method calls
 			receiversClassesWhiteList = [
 				Object, // TODO: This is too much generic class.
-				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List,
+				Integer, Float, Double, Long, BigDecimal, String, Map, Boolean, List, ArrayList, Set, HashSet,
 				Math, GroovyCollections, RandomStringUtils, RandomUtils, RegExUtils, StringUtils
 			].asImmutable()
 		}
@@ -1697,6 +1905,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		secureASTCustomizer.addExpressionCheckers(new ScriptExpressionChecker())
 		CompilerConfiguration configuration = new CompilerConfiguration()
 		configuration.addCompilationCustomizers customizer, secureASTCustomizer
+		configuration.scriptBaseClass = ETProcessorBaseScript.class.name
 		return configuration
 	}
 

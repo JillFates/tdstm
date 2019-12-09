@@ -15,4 +15,8 @@ class LocalVariableDefinition {
 	LocalVariableDefinition(String name) {
 		this.name = name
 	}
+
+	String toString() {
+		return name
+	}
 }

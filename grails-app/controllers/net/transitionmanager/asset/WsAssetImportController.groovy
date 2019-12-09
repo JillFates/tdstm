@@ -2,21 +2,22 @@ package net.transitionmanager.asset
 
 import com.tdsops.common.security.spring.HasPermission
 import com.tdssrc.grails.JsonUtil
+import com.tdssrc.grails.StopWatch
 import grails.plugin.springsecurity.annotation.Secured
 import groovy.util.logging.Slf4j
-import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.action.ApiAction
+import net.transitionmanager.action.ApiActionService
+import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.controller.ControllerMethods
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.imports.DataScript
+import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
-import net.transitionmanager.integration.ApiActionResponse
 import net.transitionmanager.security.Permission
-import net.transitionmanager.action.ApiActionService
-import net.transitionmanager.imports.DataImportService
-import net.transitionmanager.common.FileSystemService
-import net.transitionmanager.exception.InvalidParamException
+import org.apache.commons.io.FilenameUtils
 import org.grails.web.json.JSONObject
-import com.tdssrc.grails.StopWatch
 
 /**
  * Handles WS calls of the ApplicationService.
@@ -236,7 +237,11 @@ class WsAssetImportController implements ControllerMethods {
 			return
 		}
 
-		response.outputStream << is
+		if(FilenameUtils.getExtension(filename) == 'json') { // TODO: Add support for Excel/CSV file JSON responses in WS.
+			renderSuccessJson(JsonUtil.parseFile(is))
+		} else {
+			renderErrorJson("Error: Preview must be in JSON format.")
+		}
 		is.close()
 
 	}

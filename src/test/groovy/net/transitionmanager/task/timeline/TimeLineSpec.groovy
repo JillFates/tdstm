@@ -10,8 +10,12 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.text.SimpleDateFormat
+
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
+import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 
@@ -55,17 +59,17 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	}
 
 	/*
-		   +-----+---+-----|
-		   |06:00| A |06:30|
-		   +-----+---+-----+
-		   |06:00| 30|06:30|
-		   +-----+---+-----|
-		   +---------------+---------------+
-		 06:00           06:30           07:00
+						+-----+---+-----|
+						|06:00| A |06:30|
+						+-----+---+-----+
+						|06:00| 30|06:30|
+						+-----+---+-----|
+		+---------------+---------------+---------------+
+	  05:00		      06:00           06:30           07:00
  	*/
 
 	@Unroll
-	void 'test can calculate critical path for a graph with only one TaskVertex with status=#status, actual start=#actStart, status updated=#statusUpdated and window end time=#endTime'() {
+	void 'test can calculate critical path for a graph with only one TaskVertex with event in range [#startTime, #endTime], status=#status, actual start=#actStart and status updated=#statusUpdated'() {
 
 		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
 			Date windowStartDate = hourInDay(startTime)
@@ -80,7 +84,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.build()
 
 		and: 'TimeLine calculates its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+			new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartDate, windowEndTime, currentTime)
 
 		expect:
@@ -97,6 +101,12 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 
 		where:
 			startTime | endTime | now     | actStart | status     | statusUpdated || dur | rem | elap | sla | es      | ef      | ls      | lf
+			'06:00'   | null    | '06:00' | '05:00'  | STARTED    | '05:00'       || 30  | 30  | 0    | 0   | '05:00' | '05:30' | '05:00' | '05:30'
+			'07:00'   | null    | '06:00' | '05:00'  | STARTED    | '05:00'       || 30  | 30  | 0    | 0   | '05:00' | '05:30' | '05:00' | '05:30'
+			'06:00'   | null    | '07:00' | '05:00'  | STARTED    | '05:00'       || 30  | 30  | 0    | 0   | '05:00' | '05:30' | '05:00' | '05:30'
+			'06:00'   | null    | '06:00' | '05:00'  | HOLD       | '05:10'       || 30  | 20  | 10   | 0   | '05:00' | '05:30' | '05:00' | '05:30'
+			'07:00'   | null    | '06:00' | '05:00'  | HOLD       | '05:10'       || 30  | 20  | 10   | 0   | '05:00' | '05:30' | '05:00' | '05:30'
+			'06:00'   | null    | '07:00' | '05:00'  | HOLD       | '05:10'       || 30  | 20  | 10   | 0   | '05:00' | '05:30' | '05:00' | '05:30'
 			'06:00'   | '06:30' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:00'   | null    | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 0   | '06:00' | '06:30' | '06:00' | '06:30'
 			'06:00'   | '07:00' | '06:00' | '06:00'  | PLANNED    | '05:00'       || 30  | 30  | 0    | 30  | '06:00' | '06:30' | '06:30' | '07:00'
@@ -444,7 +454,7 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				.build()
 
 		when: 'TimeLine calculates its critical path'
-			TimelineSummary timelineSummary = new TimeLine(taskTimeLineGraph)
+			new TimeLine(taskTimeLineGraph)
 				.calculate(windowStartTime, windowEndTime, currentTime)
 
 		then:
@@ -456,11 +466,10 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 				remaining == 20
 				elapsed == 10
 				slack == 0
-				//TODO: dcorrea. Review this result with John.
 				earliestStartDate == hourInDay('06:00')
 				earliestFinishDate == hourInDay('06:30')
-				latestStartDate == hourInDay('06:10')
-				latestFinishDate == hourInDay('06:40')
+				latestStartDate == hourInDay('06:00')
+				latestFinishDate == hourInDay('06:30')
 			}
 			with(taskTimeLineGraph.getVertex(2), TaskVertex) {
 				criticalPath
@@ -610,7 +619,6 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 	}
 
-	//TODO: dcorrea add graph examples
 	void 'test can calculate critical path for a graph with three TaskVertex defining one start finding one route'() {
 
 		given: 'a TaskTimeLineGraph with a list of TaskVertex'
@@ -677,11 +685,11 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 	}
 
 	/*
-                                             +-----+---+-----+
-                                             |06:30| B |07:10|
-                               +------------>+-----+---+-----+
-                               |             |06:30| 40|07:10|
-                               |             +-----+---+-----+
+                                       +------------+-------+-----------+
+                                       |    06:30   |   B   |   07:30   |
+                               +------>+------------+-------+-----------+
+                               |       |    06:30   |   60  |   07:30   |
+                               |       +------------+-------+-----------+
                                |
                +-----+---+-----|
                |06:00| A |06:30|
@@ -690,27 +698,27 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
                +-----+---+-----|
                                |
                                |       +-----+---+-----+
-                               |       |06:30| A |06:50|
+                               |       |06:30| A |07:00|
                                +------>+-----+---+-----+
-                                       |06:50| 20|07:10|
+                                       |07:00| 30|07:30|
                                        +-----+---+-----+
-               +-----------------------+---------------+--------+
-             06:00                   06:30           06:50    07:10
+               +-----------------------+---------------+--------------+
+             06:00                   06:30           07:00           07:30
 	 */
 
 	@Unroll
-	void 'test can calculate critical path for a graph with three TaskVertex A status=#statusA, B status=#statusB and C status=#statusC, window end time=#endTime and current time=#current'() {
+	void 'test can calculate critical path for a graph with three TaskVertex in event range [#startTime, #endTime], A [status=#statusA, start=#startA ], B [status=#statusB, start=#startB ], C [status=#statusC, start=#startC ] and current time=#current'() {
 
 		setup: 'a TaskTimeLineGraph with a list of TaskVertex'
-			Date windowStartTime = hourInDay('06:00')
+			Date windowStartTime = hourInDay(startTime)
 			Date windowEndTime = hourInDay(endTime)
 			Date currentTime = hourInDay(current)
 
 			Task taskA = new Task(project: project, taskNumber: 1, comment: A, duration: 30,
 				actStart: hourInDay(startA), status: statusA)
-			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 40,
+			Task taskB = new Task(project: project, taskNumber: 2, comment: B, duration: 60,
 				actStart: hourInDay(startB), status: statusB)
-			Task taskC = new Task(project: project, taskNumber: 3, comment: C, duration: 20,
+			Task taskC = new Task(project: project, taskNumber: 3, comment: C, duration: 30,
 				actStart: hourInDay(startC), status: statusC)
 			TaskDependency edgeAB = new TaskDependency(id: 101, predecessor: taskA, assetComment: taskB, type: 'SS')
 			TaskDependency edgeAC = new TaskDependency(id: 102, predecessor: taskA, assetComment: taskC, type: 'SS')
@@ -756,17 +764,40 @@ class TimeLineSpec extends Specification implements TaskTimeLineDataTest {
 			}
 
 		where:
-			endTime | current | startA  | statusA    | startB  | statusB    | startC  | statusC    || cpA  | slackA | esA     | efA     | lsA     | lfA     | cpB  | slackB | esB     | efB     | lsB     | lfB     | cpC   | slackC | esC     | efC     | lsC     | lfC
-			'07:10' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
-			null    | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
-			'07:20' | '06:00' | null    | PLANNED    | null    | PLANNED    | null    | PLANNED    || true | 10     | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
-			'07:10' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
-			null    | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
-			'07:10' | '06:10' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 20     | '06:30' | '06:50' | '06:50' | '07:10'
-			'07:20' | '06:00' | '06:00' | STARTED    | null    | PLANNED    | null    | PLANNED    || true | 0      | '06:00' | '06:30' | '06:10' | '06:40' | true | 10     | '06:30' | '07:10' | '06:40' | '07:20' | false | 30     | '06:30' | '06:50' | '07:00' | '07:20'
-			'07:10' | '06:40' | '06:00' | TERMINATED | '06:30' | STARTED    | '06:30' | STARTED    || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
-			'07:10' | '07:10' | '06:00' | TERMINATED | '06:30' | TERMINATED | '06:30' | TERMINATED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
-			null    | '07:10' | '06:00' | TERMINATED | '06:30' | TERMINATED | '06:30' | TERMINATED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:10' | '06:30' | '07:10' | false | 0      | '06:30' | '06:50' | '06:30' | '06:50'
+			startTime | endTime | current  | startA  | statusA    | startB  | statusB | startC | statusC || cpA  | slackA | esA     | efA     | lsA         | lfA     | cpB  | slackB | esB     | efB     | lsB     | lfB     | cpC   | slackC | esC     | efC     | lsC     | lfC
+			/* Initial example. Event inside [06:00, 07:30]. current: 06:00 */
+			'06:00'   | '07:30' | '06:00'  | null    | PLANNED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			//'06:00'   | '07:30' | '06:30' | null    | PLANNED   | null   | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00' | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			// First task status and current time variations
+			'06:00'   | '07:30' | '06:15'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '06:25'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '06:30'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '06:30'  | '06:00' | TERMINATED | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '06:30'  | '06:00' | HOLD       | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '06:30'  | '06:00' | COMPLETED  | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			// Example with slacks. Event inside [06:00, 07:30] with task status and current time variations
+			'06:00'   | '08:00' | '06:00'  | null    | PLANNED    | null    | PLANNED | null   | PLANNED || true | 60     | '06:00' | '06:30' | '07:00'     | '07:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:00'  | '06:00' | PLANNED    | null    | PLANNED | null   | PLANNED || true | 60     | '06:00' | '06:30' | '07:00'     | '07:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:00'  | '06:00' | READY      | null    | PLANNED | null   | PLANNED || true | 60     | '06:00' | '06:30' | '07:00'     | '07:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:15'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:	00' | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:15'  | '06:00' | HOLD       | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:30'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06: 30' | '06:00' | HOLD       | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:30'  | '06:00' | COMPLETED  | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			'06:00'   | '08:00' | '06:30'  | '06:00' | TERMINATED | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			//When Event does not have start time, it uses current time
+			null      | null    | '06:00'  | null    | PLANNED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			null      | '07:30' | '06:00'  | null    | PLANNED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			null      | '08:00' | '06:00'  | null    | PLANNED    | null    | PLANNED | null   | PLANNED || true | 60     | '06:00' | '06:30' | '07:00'     | '07:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			null      | '07:30' | '06:10'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			null      | '07:30' | '06:10'  | '06:00' | HOLD       | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 0      | '06:30' | '07:30' | '06:30' | '07:30' | false | 30     | '06:30' | '07:00' | '07:00' | '07:30'
+			null      | '08:00' | '06:10'  | '06:00' | STARTED    | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			null      | '08:00' | '06:30'  | '06:00' | COMPLETED  | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			null      | '08:00' | '06:30'  | '06:00' | TERMINATED | null    | PLANNED | null   | PLANNED || true | 0      | '06:00' | '06:30' | '06:00'     | '06:30' | true | 30     | '06:30' | '07:30' | '07:00' | '08:00' | false | 60     | '06:30' | '07:00' | '07:30' | '08:00'
+			/// Examples with Task A started before event start Time
+			'06:00'   | '07:30' | '05:40'  | '05:00' | COMPLETED  | null    | PLANNED | null   | PLANNED || true | 0      | '05:00' | '05:30' | '05:00'     | '05:30' | true | 30     | '06:00' | '07:00' | '06:30' | '07:30' | false | 60     | '06:00' | '06:30' | '07:00' | '07:30'
+			'06:00'   | '07:30' | '05:45'  | '05:00' | COMPLETED  | '05:45' | STARTED | null   | PLANNED || true | 0      | '05:00' | '05:30' | '05:00'     | '05:30' | true | 0      | '05:45' | '06:45' | '05:45' | '06:45' | false | 60     | '06:00' | '06:30' | '07:00' | '07:30'
+
 	}
 
 	void 'test can calculate critical path for a graph with three TaskVertex defining one sink'() {

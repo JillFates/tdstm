@@ -65,6 +65,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
+		if ( commentId == null ) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateAssignedToSelect?format=json&forView=&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -89,6 +93,10 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getStatusList(commentId: any): Observable<any> {
+		if ( commentId == null ) {
+			return Observable.of([]);
+		}
+
 		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json&id=${ commentId }`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
@@ -398,6 +406,24 @@ export class TaskService {
 				return error;
 			})
 		);
+	}
+
+	getBulkTaskActionInfo(taskIds: Array<number>): Observable<any> {
+		return this.http.post(this.baseURL + '/ws/task/getBulkActionInfo', taskIds)
+			.map((response: any) => {
+				let data = response.data;
+				let returnObj = {};
+				if (!data) {
+					return returnObj;
+				}
+				data.forEach(task => {
+					if (task.taskId) {
+						returnObj[task.taskId] = this.convertToTaskActionInfoModel(task);
+					}
+				});
+				return returnObj;
+			})
+			.catch((error: any) => error);
 	}
 
 	/**

@@ -16,6 +16,7 @@ import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
+	LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY,
 	ModalType
 } from '../../../../shared/model/constants';
 import {
@@ -28,6 +29,7 @@ import {
 // Kendo
 import {CompositeFilterDescriptor, process, State} from '@progress/kendo-data-query';
 import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
+import {BooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 
 declare var jQuery: any;
 
@@ -48,7 +50,7 @@ export class LicenseListComponent implements OnInit {
 		}
 	};
 	public skip = 0;
-	public pageSize = GRID_DEFAULT_PAGE_SIZE;
+	private _pageSize;
 	public defaultPageOptions = GRID_DEFAULT_PAGINATION_OPTIONS;
 	public licenseColumnModel = null;
 	public COLUMN_MIN_WIDTH = COLUMN_MIN_WIDTH;
@@ -59,6 +61,7 @@ export class LicenseListComponent implements OnInit {
 	public licenseType = LicenseType;
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
+	public booleanFilterData = BooleanFilterData;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -72,11 +75,26 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.state.skip = 0;
+		this.pageSize = parseFloat(localStorage.getItem(LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY));
+
 		this.preferenceService.getUserDatePreferenceAsKendoFormat()
 			.subscribe((dateFormat) => {
 				this.dateFormat = dateFormat;
 				this.licenseColumnModel = new LicenseColumnModel(`{0:${this.dateFormat}}`);
 			});
+	}
+
+	get pageSize(): number {
+		return this._pageSize;
+	}
+	set pageSize(pageSize: number) {
+		if ( !pageSize ) {
+			pageSize = GRID_DEFAULT_PAGE_SIZE;
+		}
+		this._pageSize = pageSize;
+		localStorage.setItem(LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY, pageSize.toFixed());
+		this.applyPageSize();
 	}
 
 	protected filterChange(filter: CompositeFilterDescriptor): void {
@@ -193,9 +211,22 @@ export class LicenseListComponent implements OnInit {
 	public pageChange(event: any): void {
 		this.skip = event.skip;
 		this.state.skip = this.skip;
-		this.state.take = event.take || this.state.take;
-		this.pageSize = this.state.take;
+		this.pageSize = event.take || this.state.take;
+	}
+
+	private applyPageSize(): void {
+		this.state.take = this.pageSize;
+		// Limit render result to what is in state (skip, take)
 		this.gridData = process(this.resultSet, this.state);
+		// Next code crops the viewport to fit the number of rows (re-apply the class)
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
+
+		// Hack to avoid that the horizontal scroll bar keep showing when resizing
+		// 1st we hide it
+		jQuery('.k-grid.k-grid-no-scrollbar .k-grid-content').css('overflow-x', 'hidden');
+		// then we add a timeout to add the action at the end of the event-loop and re-show the scrollbar after the DOM has rendered
+		setTimeout( () => {
+			jQuery('.k-grid.k-grid-no-scrollbar .k-grid-content').css('overflow-x', '');
+		}, 50);
 	}
 }

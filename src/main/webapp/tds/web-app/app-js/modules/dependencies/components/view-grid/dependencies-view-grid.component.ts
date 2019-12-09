@@ -57,6 +57,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {Permission} from '../../../../shared/model/permission.model';
 import {OpenAssetDependenciesService, AssetDependency} from '../../service/open-asset-dependencies.service';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
+import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
 
 declare var jQuery: any;
 
@@ -131,6 +132,13 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	private setupBulkCheckboxService() {
 		this.bulkCheckboxService.setCurrentState(CheckboxStates.unchecked);
 		this.bulkCheckboxService.setIdFieldName('id');
+	}
+
+	/**
+	 * Returns whether or not any filters are applied to the grid.
+	 */
+	hasFilterApplied(): boolean {
+		return this.state.gridState.filter.filters.length > 0;
 	}
 
 	/**
@@ -371,6 +379,14 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.componentState.next(clonedState);
 	}
 
+	public onClearFilters(): void {
+		this.state.gridState.filter.filters = [];
+		this.dependenciesColumnModel.columns.forEach((column) => {
+			delete column.filter;
+		});
+		this.onFilter({filter: ''});
+	}
+
 	/**
 	 * Ensure the clean and execute the search again
 	 * @param column
@@ -453,5 +469,17 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 
 	protected isBulkSelectAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.AssetDependenciesBulkSelect);
+	}
+
+	/**
+	 * reloads data when the user clicks on refresh
+	 */
+	protected reloadData(): void {
+		this.setupGridColumns();
+		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(this.actionableAssets);
+		this.state = this.getInitialComponentState();
+		this.setupBulkCheckboxService();
+		this.setupComponentStateObservable();
+		this.setupTagsFilterStateObservable();
 	}
 }

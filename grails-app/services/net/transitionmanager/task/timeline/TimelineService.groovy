@@ -49,18 +49,20 @@ class TimelineService implements ServiceMethods {
 	 *
 	 * @param moveEvent the event to retrieve tasks for
 	 * @param viewUnpublished show only published tasks or all tasks
-	 * @return List<Task>          a list of tasks
+	 * @return List<Task> a list of tasks
 	 */
 	List<Task> getEventTasks(MoveEvent event, Boolean viewUnpublished = false) {
-		List<Task> tasks = []
+		List<Task> tasks
 
-		if (event) {
+		if ( event ) {
 			tasks = Task.where {
 				moveEvent == event
 				if (!viewUnpublished) {
 					isPublished == true
 				}
 			}.list()
+		} else {
+			tasks = []
 		}
 
 		return tasks
@@ -70,16 +72,18 @@ class TimelineService implements ServiceMethods {
 	 * Used to get the list of task dependencies for a given list of tasks
 	 *
 	 * @param List <AssetComment> a list of tasks
-	 * @return List<TaskDependency>          a list of the dependencies associated to the tasks
+	 * @return List<TaskDependency> a list of the dependencies associated to the tasks
 	 */
 	List<TaskDependency> getTaskDependencies(List<Task> tasks) {
-		List<TaskDependency> dependencies = []
+		List<TaskDependency> dependencies
 
-		if (tasks) {
+		if ( tasks ) {
 			dependencies = TaskDependency.where {
 				assetComment in tasks
 				predecessor in tasks
 			}.list()
+		} else {
+			dependencies = []
 		}
 
 		return dependencies
@@ -93,13 +97,13 @@ class TimelineService implements ServiceMethods {
 	 * It throws an Exception if {@code TimelineSummary#cycles} is not empty.
 	 *
 	 * @param event an instance of {@code MoveEvent}
-	 * @param viewUnpublished show only published tasks or all tasks
+	 *
 	 * @return CPA calculation results in an instance of {@code TimelineSummary} and
 	 * 			and instance of {@code TaskTimeLineGraph}
 	 */
-	CPAResults updateTaskFromCPA(MoveEvent event, Boolean viewUnpublished = false) {
+	CPAResults updateTaskFromCPA(MoveEvent event) {
 
-		List<Task> tasks = getEventTasks(event, viewUnpublished)
+		List<Task> tasks = getEventTasks(event)
 		List<TaskDependency> taskDependencies = getTaskDependencies(tasks)
 
 		TaskTimeLineGraph graph = createTaskTimeLineGraph(tasks, taskDependencies)

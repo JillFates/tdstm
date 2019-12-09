@@ -15,9 +15,9 @@
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height create-form">
                     <table style="border: 0;" class="full-height"
-                           [ngClass]="{'has-duplicated-predecessors': modelHelper.hasDuplicatedPredecessors(),
-                                       'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors(),
-                                       'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+                           [ngClass]="{'has-duplicated-predecessors': modelHelper?.hasDuplicatedPredecessors(),
+                                       'has-duplicated-successors': modelHelper?.hasDuplicatedSuccessors(),
+                                       'has-double-assignment': modelHelper?.hasDoubleAssignment()}">
                         <tbody class="full-height task-layout">
                         <tr class="no-grow-container">
                             <td class="task-details" colspan="2">
@@ -137,7 +137,7 @@
                                                 <kendo-dropdownlist
                                                         name="assetClass"
                                                         class="form-control"
-                                                        [data]="model.assetClasses"
+                                                        [data]="model?.assetClasses"
                                                         [textField]="'text'"
                                                         [valueField]="'id'"
                                                         (selectionChange)="onAssetClassChange($event)"
@@ -192,7 +192,9 @@
                                                 <kendo-datepicker
                                                         #dueDatePicker (open)="onOpenDueDatePicker($event)"
                                                         name="dueDate"
-                                                        [format]="getDateTimeFormat()"
+                                                        #dueDate
+                                                        [format]="getDateFormat()"
+                                                        (open)="onOpenDueDate($event)"
                                                         [(ngModel)]="model.dueDate">
                                                 </kendo-datepicker>
                                             </td>
@@ -352,7 +354,7 @@
                                 <tr>
                                     <td valign="top">
                                         <kendo-grid
-                                                *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
+                                                *ngIf="modelHelper && dataGridTaskPredecessorsHelper"
                                                 class="successor-predecessor-table create-table has-duplicated-predecessors"
                                                 [data]="dataGridTaskPredecessorsHelper.gridData"
                                                 [resizable]="false"
@@ -400,7 +402,7 @@
                                     </td>
                                     <td valign="top">
                                         <kendo-grid
-                                                *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
+                                                *ngIf="modelHelper && dataGridTaskSuccessorsHelper "
                                                 class="successor-predecessor-table create-table has-duplicated-successors"
                                                 [data]="dataGridTaskSuccessorsHelper.gridData"
                                                 [resizable]="false"
