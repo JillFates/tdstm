@@ -109,7 +109,7 @@ export class DateUtils {
 	 */
 	public static getDateFromGMTWithFormat(sourceTime: Date, dateFormat): string {
 		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
-		return sourceZonedTime.format(dateFormat);
+		return moment(sourceZonedTime, dateFormat);
 	}
 
 	public static getTimestamp(): String {
