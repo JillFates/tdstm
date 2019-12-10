@@ -3,8 +3,17 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 @Component({
 	selector: 'tds-checkbox',
 	template: `
-        <input clrCheckbox type="checkbox" [name]="name" (change)="onChange($event)" [(ngModel)]="inputValue" [disabled]="disabled">{{title}}
-        <label [for]="name"></label>
+        <clr-checkbox-container clrInline>
+            <clr-checkbox-wrapper>
+        		<input clrCheckbox
+					   type="checkbox"
+					   [name]="name"
+					   (change)="onChange($event)"
+					   [(ngModel)]="inputValue"
+					   [disabled]="disabled">
+        		<label [for]="name">{{title}}</label>
+			</clr-checkbox-wrapper>
+		</clr-checkbox-container>
 	`,
 	styles: [
 		`
