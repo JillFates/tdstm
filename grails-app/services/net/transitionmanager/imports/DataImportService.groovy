@@ -41,7 +41,6 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
-import org.apache.commons.collections4.multimap.HashSetValuedHashMap
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -617,7 +616,6 @@ class DataImportService implements ServiceMethods {
 		Exception ex = null
 		try {
 			setBatchToRunning(batch.id)
-			batch.refresh()
 
 			// Get the list of the ImportBatchRecord IDs to be processed
 			List<Long> recordIds = ImportBatchRecord.where {
@@ -662,9 +660,10 @@ class DataImportService implements ServiceMethods {
 					}
 
 					log.debug 'processBatch({}) clearing Hibernate Session', batchId
-						GormUtil.flushAndClearSession()
+					GormUtil.flushAndClearSession()
+					project.refresh()
 				}
-
+				batch.refresh()
 				aborted = ! updateBatchProgress( batchId, rowsProcessed, totalRowCount)
 
 				if (aborted) {
