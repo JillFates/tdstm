@@ -71,7 +71,7 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	public dateFormat = '';
 	protected createActionText = '';
 	protected hasEarlyAccessTMRPermission: boolean;
-	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS.filter((column: string) => !['Created', 'Last Updated'].includes(column) );
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	public isFiltering  = false;

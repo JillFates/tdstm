@@ -58,13 +58,13 @@ export class APIActionColumnModel {
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				width: 150
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				width: 150
 			}
 		];
 	}

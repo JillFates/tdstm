@@ -21,18 +21,19 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 		tds-button-cancel,
 		tds-button-clone,
 		tds-button-close,
+		tds-button-collapse,
 		tds-button-confirm,
 		tds-button-create,
 		tds-button-custom,
 		tds-button-delete,
 		tds-button-edit,
+		tds-button-expand,
 		tds-button-export,
 		tds-button-filter,
 		tds-button-save,
-		tds-button-undo,
+		tds-button-sync,
 		tds-button-script,
-		tds-button-collapse,
-		tds-button-expand
+		tds-button-undo,
 	`,
 	template: `
 <!--        [ngClass]="hostClasses.length ? hostClasses.value : ''"-->
