@@ -3,7 +3,7 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 @Component({
 	selector: 'tds-checkbox',
 	template: `
-        <input type="checkbox" [name]="name" (change)="onChange($event)" [(ngModel)]="inputValue" [disabled]="disabled">{{title}}
+        <input clrCheckbox type="checkbox" [name]="name" (change)="onChange($event)" [(ngModel)]="inputValue" [disabled]="disabled">{{title}}
         <label [for]="name"></label>
 	`,
 	styles: [

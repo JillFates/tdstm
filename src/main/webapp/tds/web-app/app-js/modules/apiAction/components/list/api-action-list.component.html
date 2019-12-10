@@ -78,7 +78,7 @@
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
-							<input type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
+							<input clrCheckbox type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;" disabled/>
 						</ng-template>
 
 						<ng-template kendoGridCellTemplate *ngIf="column.isActionable" let-dataItem>
