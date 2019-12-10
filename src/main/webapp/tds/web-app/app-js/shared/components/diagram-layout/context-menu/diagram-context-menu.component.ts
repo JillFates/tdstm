@@ -42,7 +42,7 @@ import {DiagramContextMenuHelper} from './diagram-context-menu.helper';
 })
 export class DiagramContextMenuComponent implements OnInit {
 	@Input() data: IDiagramContextMenuModel;
-	@ViewChild('ctxMenu') ctxMenu: ElementRef;
+	@ViewChild('ctxMenu', {static: false}) ctxMenu: ElementRef;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;
 	hideBtn: IHideBtn = new HideBtn();
 

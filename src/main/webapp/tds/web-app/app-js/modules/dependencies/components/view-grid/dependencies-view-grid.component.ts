@@ -136,13 +136,6 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Returns whether or not any filters are applied to the grid.
-	 */
-	hasFilterApplied(): boolean {
-		return this.state.gridState.filter.filters.length > 0;
-	}
-
-	/**
 	 * Define the chain of operations that are executed every time the component state has suffered changes
 	 */
 	private setupComponentStateObservable(): void {

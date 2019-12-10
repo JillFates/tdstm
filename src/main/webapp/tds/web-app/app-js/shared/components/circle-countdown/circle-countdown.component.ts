@@ -45,7 +45,7 @@ export class CircleCountdownComponent {
 	refreshCount: number;
 	refreshAnimation = `countdown ${this.refreshCountdownTime}s linear infinite forwards`;
 	@ViewChild('refreshCircle', {static: false}) refreshCircle: ElementRef;
-	@ViewChild('countdownContainer') countdownContainer: ElementRef<any>;
+	@ViewChild('countdownContainer', {static: false}) countdownContainer: ElementRef<any>;
 	circleTimerOptions: CircleCountdownOption;
 	started: boolean;
 
