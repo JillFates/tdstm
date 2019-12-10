@@ -111,7 +111,7 @@ export class BulkChangeService {
 	 * @returns {Observable<any>}
 	 */
 	bulkRun(payload:any): Observable<any> {
-		return this.http.put(`/tdstm/wsAsset/bulkChange/etl`, JSON.stringify(payload))
+		return this.http.put(`../ws/bulkChange/etl`, JSON.stringify(payload))
 			.map((response: any) => response)
 			.catch((error: any) => error);
 	}
