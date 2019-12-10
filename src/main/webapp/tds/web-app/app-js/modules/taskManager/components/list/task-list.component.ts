@@ -15,7 +15,7 @@ import { TaskService } from '../../service/task.service';
 import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
-	GRID_DEFAULT_PAGINATION_OPTIONS,
+	GRID_DEFAULT_PAGINATION_OPTIONS, LOADER_IDLE_PERIOD,
 	ModalType
 } from '../../../../shared/model/constants';
 import { forkJoin } from 'rxjs';
@@ -42,6 +42,7 @@ import { TaskEditComponent } from '../edit/task-edit.component';
 import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.helper';
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
+import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 
 @Component({
 	selector: 'task-list',
@@ -65,6 +66,7 @@ export class TaskListComponent {
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
+	private dashboardFilters = ['filter', 'status', 'role', 'category'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -81,6 +83,7 @@ export class TaskListComponent {
 		private taskService: TaskService,
 		private reportService: ReportsService,
 		private userPreferenceService: PreferenceService,
+		private loaderService: UILoaderService,
 		private store: Store,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
@@ -201,6 +204,8 @@ export class TaskListComponent {
 					});
 				} else if (result.shouldOpenTask) {
 					this.onOpenTaskDetailHandler(result.commentInstance);
+				} else if (result.shouldEdit) {
+					this.onOpenTaskEditHandler(result.id);
 				} else {
 					this.search(parseInt(taskRow.id, 0));
 				}
@@ -388,9 +393,28 @@ export class TaskListComponent {
 	}
 
 	/**
+	 * Checks if any filters from the dashboards are applied.
+	 */
+	hasDashboardFilters(): boolean {
+		let hasFilters = false;
+		this.dashboardFilters.forEach(filter => {
+			if (this.urlParams.hasOwnProperty(filter)) {
+				hasFilters = true;
+			}
+		});
+		return hasFilters;
+	}
+
+	/**
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
+		if (this.hasDashboardFilters()) {
+			this.dashboardFilters.forEach(filter => {
+				delete this.urlParams[filter];
+			});
+			this.search();
+		}
 		this.columnsModel
 			.filter(column => column.filterable)
 			.forEach((column: GridColumnModel) => {
@@ -410,8 +434,8 @@ export class TaskListComponent {
 	 * Determines if current columns has been filtered (contains value).
 	 */
 	areFiltersDirty(): boolean {
-		return this.columnsModel
-			.filter(column => column.filter).length > 0;
+		return (this.columnsModel
+			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
@@ -421,17 +445,22 @@ export class TaskListComponent {
 		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
-			taskRows.forEach((taskRow: any, index: number) => {
-				// Only expand rows that can be acted upon (Ready or Started)
-				if ([TaskStatus.READY, TaskStatus.STARTED].includes(taskRow.status)) {
-					index = this.grid.getRowPaginatedIndex(index);
-					expandedEvent.dataItem = taskRow;
-					expandedEvent.index = index;
-					this.onRowDetailExpandHandler(expandedEvent);
-					this.gridComponent.expandRow(index);
-					this.rowsExpanded = true;
+			let taskIds = taskRows.map(task => task.id);
+			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
+					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+						this.gridComponent.expandRow(i);
+						this.rowsExpandedMap[i] = true;
+					}
 				}
 			});
+			this.rowsExpanded = true;
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
@@ -665,6 +694,14 @@ export class TaskListComponent {
 					}
 				}
 			});
+		this.loaderService.stopProgress();
+
+		setTimeout(() => {
+			if (this.loading) {
+				this.loaderService.initProgress();
+				this.loaderService.toggle();
+			}
+		}, LOADER_IDLE_PERIOD * 10);
 	}
 
 	/**
@@ -673,7 +710,7 @@ export class TaskListComponent {
 	private colapseAllExandedRows(): void {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
-			if (this.rowsExpandedMap.hasOwnProperty(rowIndex)) {
+			if (rowIndex) {
 				let rowNum = parseInt(rowIndex, 0);
 				expandedEvent.index = rowNum;
 				this.onRowDetailCollapseHandler(expandedEvent);
@@ -717,22 +754,26 @@ export class TaskListComponent {
 			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
-					this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-
-					// Update the grid row with new information from the endpoint (status, assignTo, etc)
-					for (let i = 0; i < this.grid.gridData.data.length; i++) {
-						if (this.grid.gridData.data[i].id === taskId ) {
-							this.grid.gridData.data[i].status = taskActionInfoModel.status;
-							this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
-							this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
-							this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
-							break;
-						}
-					}
+					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
 					observer.next(result);
 					observer.complete();
 				});
 		});
+	}
+
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+
+		// Update the grid row with new information from the endpoint (status, assignTo, etc)
+		for (let i = 0; i < this.grid.gridData.data.length; i++) {
+			if (this.grid.gridData.data[i].id === taskId ) {
+				this.grid.gridData.data[i].status = taskActionInfoModel.status;
+				this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
+				this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
+				this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
+				break;
+			}
+		}
 	}
 
 	/**

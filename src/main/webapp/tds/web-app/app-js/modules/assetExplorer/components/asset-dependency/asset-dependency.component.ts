@@ -1,8 +1,8 @@
-import { Component, Inject } from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {forkJoin} from 'rxjs/observable/forkJoin';
 
-import { UIExtraDialog } from '../../../../shared/services/ui-dialog.service';
-import { DependecyService } from '../../service/dependecy.service';
+import {UIExtraDialog} from '../../../../shared/services/ui-dialog.service';
+import {DependecyService} from '../../service/dependecy.service';
 import {DependencyChange, DependencyType} from './model/asset-dependency.model';
 import {BulkActions} from '../../../../shared/components/bulk-change/model/bulk-change.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -107,7 +107,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		this.isEditing = false;
 
 		this.dependencyA = assetDependency.assetA && assetDependency.assetA.dependency || null;
-		this.dependencyB = assetDependency.assetB && assetDependency.assetB.dependency || null ;
+		this.dependencyB = assetDependency.assetB && assetDependency.assetB.dependency || null;
 
 		// while dateCreated and lastUpdated are not coming from server inside of assetDependency.assetX.dependency
 		// we need to get them from assetDependency.assetX
@@ -121,7 +121,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
-	 * Add to the dependency provided as argument the dateCreated and lastUpdated field of the asset parameter
+	 * Add to the dependency provided as argument the created and updated info of the asset parameter
 	 * @param {any} dependency Object containing the dependency to change
 	 * @param {any} asset Asset containing the dateCreated and lastUpdated fields
 	 * @return {any) Original dependency modified adding the extra date field
@@ -131,8 +131,8 @@ export class AssetDependencyComponent extends UIExtraDialog {
 			return dependency;
 		}
 
-		const { dateCreated, lastUpdated }  = asset;
-		return Object.assign({}, dependency, { dateCreated, lastUpdated });
+		const {dateCreated, lastUpdated, createdBy, updatedBy} = asset;
+		return Object.assign({}, dependency, {dateCreated, lastUpdated, createdBy, updatedBy});
 	}
 
 	/**
@@ -160,7 +160,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		let updates = [];
 
 		if (this.editedDependencies.aDependencyHasChanged) {
-			updates.push(this.assetService.updateDependency({dependency: {...this.dependencyA,  ...this.editedDependencies.dependencies.a}}));
+			updates.push(this.assetService.updateDependency({dependency: {...this.dependencyA, ...this.editedDependencies.dependencies.a}}));
 		}
 
 		if (this.editedDependencies.bDependencyHasChanged) {
@@ -170,14 +170,14 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		forkJoin(updates)
 			.subscribe((result: any[]) => {
 				if (this.editedDependencies.aDependencyHasChanged) {
-					this.dependencyA = { ...this.dependencyA, ...this.editedDependencies.dependencies.a };
+					this.dependencyA = {...this.dependencyA, ...this.editedDependencies.dependencies.a};
 				}
 				if (this.editedDependencies.bDependencyHasChanged) {
-					this.dependencyB = { ...this.dependencyB, ...this.editedDependencies.dependencies.b };
+					this.dependencyB = {...this.dependencyB, ...this.editedDependencies.dependencies.b};
 				}
 				this.setEditMode(false);
 				this.editedDependencies = this.getInitialEditDependencies();
-		});
+			});
 	}
 
 	/**
@@ -218,6 +218,17 @@ export class AssetDependencyComponent extends UIExtraDialog {
 	}
 
 	/**
+	 * Return the name of the person name who created or update the dependency
+	 * @param {any}  person  Person who created or updated the dependency
+	 * @returns {string}
+	 */
+	protected getPersonName(person: any): string {
+		const {firstName, lastName = ''} = person;
+
+		return `${firstName} ${lastName}`;
+	}
+
+	/**
 	 * Delete a dependency previous confirmation
 	 * @param {DependencyType} dependencyType Type of dependency to be deleted
 	 * @return {void)
@@ -237,7 +248,7 @@ export class AssetDependencyComponent extends UIExtraDialog {
 					this.assetService.deleteDependency(dependencyChange)
 						.subscribe((result) => {
 							if (result) {
-								if (dependencyType === DependencyType.dependencyA ) {
+								if (dependencyType === DependencyType.dependencyA) {
 									this.cancelCloseDialog();
 								} else {
 									this.dependencyB = null;
@@ -256,9 +267,10 @@ export class AssetDependencyComponent extends UIExtraDialog {
 		const message = this.translatePipe
 			.transform('DEPENDENCIES.CONFIRM_DELETE_DEPENDENCY');
 
-		return this.promptService.open(this.translatePipe.transform('GLOBAL.CONFIRMATION_PROMPT.CONFIRMATION_REQUIRED'),
-					message, this.translatePipe.transform('GLOBAL.CONFIRM'),
-					this.translatePipe.transform('GLOBAL.CANCEL'));
+		return this.promptService.open(this.translatePipe.transform(
+			'GLOBAL.CONFIRMATION_PROMPT.CONTINUE_WITH_CHANGES'),
+			message, this.translatePipe.transform('GLOBAL.CONFIRM'),
+			this.translatePipe.transform('GLOBAL.CANCEL'));
 	}
 
 	public isEditAvailable(): boolean {

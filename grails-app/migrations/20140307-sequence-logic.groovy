@@ -29,7 +29,7 @@ databaseChangeLog = {
 		validCheckSum('7:c739cef05b8e4252557b8998c5541222')
 		preConditions(onFail:'MARK_RAN') {
 			sqlCheck(expectedResult:'0', """SELECT count(*) 
-				FROM INFORMATION_SCHEMA.ROUTINES Ø
+				FROM INFORMATION_SCHEMA.ROUTINES
 				WHERE 
 				   ROUTINE_TYPE='PROCEDURE' and 
 				   ROUTINE_SCHEMA='tdstm' and 

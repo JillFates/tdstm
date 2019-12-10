@@ -74,7 +74,9 @@
                     </div>
                     <!-- /.col -->
                     <div class="col-xs-4">
-                        <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()">Sign In</button>
+                        <button type="submit" id="submitButton" class="btn btn-primary btn-block btn-flat submit-button" (click)="onLogin()" [disabled]="onLoginProgress">
+                            <img src="/tdstm/tds/web-app/assets/images/loader.gif" border="0" *ngIf="onLoginProgress" /> Sign In
+                        </button>
                     </div>
                     <!-- /.col -->
                 </div>

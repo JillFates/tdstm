@@ -31,6 +31,7 @@ export const en_DICTIONARY: Object = {
 		'SAVE': 'Save',
 		'SAVE_ALL': 'Save All',
 		'SAVE_AS': 'Save As',
+		'SCRIPT': 'Script',
 		'UNDO': 'Undo',
 		'DEFAULT': 'Default',
 		'SHOW': 'Show',
@@ -46,6 +47,7 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
 		'UPLOAD': 'Upload',
@@ -53,6 +55,7 @@ export const en_DICTIONARY: Object = {
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'CONTINUE_WITH_CHANGES': 'Continue with Changes?',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
@@ -71,7 +74,10 @@ export const en_DICTIONARY: Object = {
 			'VIEW' : 'View',
 			'VIEWS' : 'Views'
 		},
-		'TOTAL': 'Total'
+		'TOTAL': 'Total',
+		'TIMEZONE': 'Time Zone Select',
+		'DATE_TIMEZONE': 'Date and Timezone',
+		'DATE_FORMAT': 'Date Format'
 	},
 	'AKA': {
 		'ADD': 'Add AKA'
@@ -112,6 +118,7 @@ export const en_DICTIONARY: Object = {
 			'INITIAL_VALUE': 'Hit Preview to populate grid'
 		},
 		'DEPENDENCY_DETAIL': 'Dependency Detail',
+		'DEPENDENCY_EDIT': 'Dependency Edit',
 		'INDEX': {
 			'SAVED_VIEWS': 'Saved Views',
 			'ACTION': 'Action',
@@ -205,7 +212,8 @@ export const en_DICTIONARY: Object = {
 				'SAMPLE_DATA_PREVIEW': 'Sample Data Preview',
 				'TRANSFORMED_DATA_PREVIEW': 'Transformed Data Preview',
 				'SYNTAX_ERRORS': 'Syntax Errors',
-				'ETL_BUILDER_TITLE': 'ETL Script Designer',
+				'ETL_BUILDER_TITLE': 'ETL Script Edit',
+				'ETL_SCRIPT_EDIT_BUTTON': 'Edit Script',
 				'CONSOLE_TITLE': 'ETL Console',
 				'SAMPLE_DATA_TITLE': 'Sample Data',
 				'TEST': 'Test',
@@ -398,6 +406,7 @@ export const en_DICTIONARY: Object = {
 		'ADMIN': 'Admin',
 		'SHOW_NOTICE': 'Notice Detail',
 		'CREATE_NOTICE': 'Create Notice',
+		'NOTICE_CREATE': 'Notice Create',
 		'EDIT_NOTICE': 'Notice Edit',
 		'NOTICE_ADMINISTRATION': 'Notice Administration',
 		'NOTICE': 'Notice',

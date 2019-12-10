@@ -76,4 +76,7 @@ databaseChangeLog = {
 	include file: 'version/v4_7_1/20190905-add-dictionaryMethodName.groovy'
 	include file: 'version/v4_7_1/20191030-remove-plan-methodology-from-application-fieldspecs.groovy'
 	include file: 'version/v4_7_1/20191112-fixing-role-prefix-in-asset-comment.groovy'
+	include file: 'version/v4_7_2/20190930-update-dataviews.groovy'
+	include file: 'version/v4_7_2/20191009-drop-tables-move-bundle-step-and-step-snapshot.groovy'
+	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 }

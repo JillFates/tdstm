@@ -9,6 +9,7 @@ import {ReportComponent} from '../report.component';
 		<div class="content body">
 			<tds-report-toggle-filters
 				[hideFilters]="hideFilters"
+				(reload)="onReload()"
 				(toggle)="toggleFilters($event)"
 				[disabled]="!generatedReport">
 			</tds-report-toggle-filters>
@@ -116,6 +117,16 @@ export class ActivityMetricsReportComponent extends ReportComponent {
 			this.endDate = new Date(result.endDate);
 			this.loadingLists = false;
 		})
+	}
+
+	/**
+	 * Revert the page to its initial state.
+	 */
+	public onReload(): void {
+		this.hideFilters = false;
+		this.generatedReport = false;
+		this.reportResult = null;
+		this.onLoad();
 	}
 
 	/**

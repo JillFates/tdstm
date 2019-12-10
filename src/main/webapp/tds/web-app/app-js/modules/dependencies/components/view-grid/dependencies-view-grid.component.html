@@ -27,7 +27,19 @@
 					<span class="badge badge-light">{{counter.count}}</span><label>{{counter.entityName}} selected</label>
 				</div>
 			</div>
-			<div class="col-sm-6 filters-section"></div>
+			<div class="col-sm-6 filters-section">
+				<div class="pull-right">
+					<tds-button-custom
+							class="component-action-clear-filters"
+							id="btnClean"
+							icon="times"
+							title="Clear filters"
+							[disabled]="!hasFilterApplied()"
+							(click)="onClearFilters()">
+					</tds-button-custom>
+					<div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn pull-right"><i class="fa fa-fw fa-refresh"></i></div>
+				</div>
+			</div>
 		</ng-template>
 
 		<!-- Select All column -->

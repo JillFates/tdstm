@@ -1209,7 +1209,7 @@ class AssetEntityService implements ServiceMethods {
 	 */
 	List<Map> getMoveBundles(Project project) {
 		List<String> properties = [
-			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'moveBundleSteps', 'completionTime',
+			'id', 'name', 'description', 'dateCreated', 'lastUpdated', 'completionTime',
 			'operationalOrder', 'operationalOrder', 'useForPlanning', 'project'
 		]
 		return GormUtil.listDomainForProperties(project, MoveBundle, properties, [['name']])
@@ -3149,7 +3149,9 @@ class AssetEntityService implements ServiceMethods {
 				dependency: dependencyA?.toMap(),
 				dependencyClass: dependencyA?.dependent?.assetClass,
 				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.dateCreated, formatter),
-				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter)
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetA.lastUpdated, formatter),
+				createdBy: dependencyA?.createdBy,
+				updatedBy: dependencyA?.updatedBy
 			],
 			assetB: [
 				name: assetB.assetName,
@@ -3160,7 +3162,9 @@ class AssetEntityService implements ServiceMethods {
 				dependency: dependencyB?.toMap(),
 				dependencyClass: dependencyB?.dependent?.assetClass,
 				dateCreated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.dateCreated, formatter),
-				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter)
+				lastUpdated: TimeUtil.formatDateTimeWithTZ(userTzId, assetB.lastUpdated, formatter),
+				createdBy: dependencyB?.createdBy,
+				updatedBy: dependencyB?.updatedBy,
 			],
 			dataFlowFreq: GormUtil.getConstrainedProperties(AssetDependency).dataFlowFreq.inList,
 			dependencyType: entityInfo(project).dependencyType,

@@ -12,7 +12,6 @@ import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -76,12 +75,7 @@ import java.sql.Timestamp
 import java.text.DateFormat
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
@@ -424,7 +418,7 @@ class TaskService implements ServiceMethods {
 				throw new EmptyResultException('Task was not found')
 			}
 
-			if (! AssetCommentStatus.ActionableStatusCodes.contains(taskWithLock.status)) {
+			if (! AssetCommentStatus.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
 				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
 			}
 
@@ -585,7 +579,7 @@ class TaskService implements ServiceMethods {
 		// Trigger the action if it is automatic and the action is local
 		// and task already exist (it fails with task not found when task has not been saved yet)
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally() && task.id) {
-			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
+			if (AssetCommentStatus.CanInvokeActionStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
@@ -1276,57 +1270,6 @@ class TaskService implements ServiceMethods {
 					'''<span class="clear_filter"><u>X</u></span></a></td>'''
 		}
 		return html
-	}
-
-   /**
-	 * Used to calculate the dial indicator speed that reflects how well the move is going for a given set of datetimes
-	 */
-	def calcStepDialIndicator (planStartTime, planCompTime, actualStartTime, actFinish, int tasksCount, int tasksCompleted) {
-
-		// TODO - calcStepDialIndicator() - need to further refine this method and test
-		return 0
-
-		// timeAsOf = timeAsOf.getTime() / 1000
-		def timeAsOf = TimeUtil.nowGMT().getTime() / 1000  // Remove the millisec
-
-		// def planCompletionTime = (stepSnapshot.moveBundleStep.planCompletionTime.getTime() / 1000) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
-		planCompTime = (planCompTime.getTime() / 1000) + 59  	// 59s added to planCompletion to consider the minuits instead of seconds
-		planStartTime = planStartTime.getTime()  / 1000 + 59
-
-		// log.info "timeAsOf is ${timeAsOf.getClass()}, planCompTime is ${planCompTime.getClass()}, planStartTime is ${planStartTime.getClass()} $planStartTime}"
-
-		def remainingStepTime = timeAsOf > planCompTime ? 0 : planCompTime - timeAsOf
-		//def planTaskPace = stepSnapshot.getPlanTaskPace()
-		def planDuration = planCompTime - planStartTime
-		def planTaskPace = planDuration / (tasksCount == 0 ? 1 : tasksCount)
-
-		def tasksRemaining = tasksCount - tasksCompleted
-
-		def remainingEffort =  tasksRemaining * planTaskPace
-
-		int projectedMinOver
-		if(actualStartTime || tasksCompleted > 0){
-			projectedMinOver  = remainingEffort - remainingStepTime
-		} else {
-			projectedMinOver  =  timeAsOf + planDuration
-		}
-		def adjust
-
-		if (remainingEffort && projectedMinOver > 0) {
-			adjust =  -50 * (1-(remainingStepTime / remainingEffort))
-		} else {
-			adjust =  50 * (1-(remainingEffort / (planCompTime - timeAsOf)))
-		}
-		def result = (50 + adjust).intValue()
-
-		// to show the dial inbetween 0 to 100
-		result = result > 100 ? 100 : result
-		result = result < 0 ? 0 : result
-
-log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTime, planCompTime=$planCompTime, tasksCompleted=$tasksCompleted, remainingStepTime=$remainingStepTime, planDuration=$planDuration, planTaskPace=$planTaskPace, tasksRemaining=$tasksRemaining, " +
-	"remainingEffort=$remainingEffort, projectedMinOver=$projectedMinOver, adjust=$adjust, result=$result"
-
-		return result
 	}
 
 	/**
@@ -5171,7 +5114,7 @@ log.info "tasksCount=$tasksCount, timeAsOf=$timeAsOf, planStartTime=$planStartTi
 			results.each { field ->
 				if (field[0] == null || field[0] == '') {
 					if (teamTaskMap[RoleType.NO_ROLE] == null) {
-						teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount: 0, teamDoneCount: 0, role: [id: RoleType.NO_ROLE, description: 'Not Assigned']]
+						teamTaskMap[RoleType.NO_ROLE] = [teamTaskCount: 0, teamDoneCount: 0, role: [id: RoleType.NO_ROLE, description: 'No Team Assigned']]
 					}
 					teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] = teamTaskMap[RoleType.NO_ROLE]['teamTaskCount'] + field[1]
 					teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] = teamTaskMap[RoleType.NO_ROLE]['teamDoneCount'] + field[2]

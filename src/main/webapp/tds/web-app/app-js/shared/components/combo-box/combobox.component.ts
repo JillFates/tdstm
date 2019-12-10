@@ -63,7 +63,7 @@ export class TDSComboBoxComponent implements OnChanges {
 	@Output() modelChange = new EventEmitter<string>();
 	@Input('model') model: any;
 	@Input('metaParam') metaParam: any;
-	@Input('tabindex') tabindex: string;
+	@Input('tabindex') tabindex: any;
 	// Passing Callback functions
 	@Input('serviceRequest') serviceRequest: Function;
 	// Params
