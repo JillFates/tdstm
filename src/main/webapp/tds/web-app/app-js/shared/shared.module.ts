@@ -124,6 +124,9 @@ import { PreferencesResolveService } from './resolves/preferences-resolve.servic
 import { DiagramLayoutComponent } from './components/diagram-layout/diagram-layout.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
+import {DiagramContextMenuComponent} from './components/diagram-layout/context-menu/diagram-context-menu.component';
+import {MenusModule} from '@progress/kendo-angular-menu';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -142,7 +145,9 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DialogModule,
 		ProgressBarModule,
 		FontAwesomeModule,
-		TdsComponentLibraryModule,
+		MenusModule,
+		TooltipModule,
+		TdsComponentLibraryModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -210,7 +215,8 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		PowerComponent,
 		DiagramLayoutComponent,
 		CircleCountdownComponent,
-		TaskStatusIndicatorComponent,
+		DiagramContextMenuComponent,
+		TaskStatusIndicatorComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -278,11 +284,12 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
+		DiagramContextMenuComponent,
 		CircleCountdownComponent,
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
 		// Clarity
-		ClarityModule,
+		ClarityModule
 	],
 	entryComponents: [
 		DynamicComponent,

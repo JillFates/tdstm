@@ -16,6 +16,7 @@ import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
@@ -41,6 +42,13 @@ import net.transitionmanager.project.ProjectService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagAsset
+import net.transitionmanager.tag.TagAssetService
+import net.transitionmanager.tag.TagService
+import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.AssetComment
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap
 import org.grails.web.json.JSONObject
 import org.quartz.Scheduler
 import org.quartz.Trigger
@@ -63,15 +71,17 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 class DataImportService implements ServiceMethods {
 
 	// IOC
+	AssetService             assetService
+	CustomDomainService      customDomainService
 	FileSystemService        fileSystemService
 	PartyRelationshipService partyRelationshipService
 	PersonService            personService
 	ProgressService          progressService
+	ProjectService           projectService
 	Scheduler                quartzScheduler
 	ScriptProcessorService   scriptProcessorService
-	ProjectService           projectService
-	AssetService             assetService
-	CustomDomainService      customDomainService
+	TagAssetService			 tagAssetService
+	TagService 				 tagService
 
 	// TODO : JPM 3/2018 : Move these strings to messages.properties
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
@@ -339,6 +349,10 @@ class DataImportService implements ServiceMethods {
 			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
+		if (rowData.tags){
+			batchRecord.saveTagsAsMap(rowData.tags)
+		}
+
 		if (! batchRecord.save(failOnError:false)) {
 			// TODO : JPM 2/2018 : MINOR - Should use the GormUtil.i18n version of the errors
 			String gmsg = GormUtil.allErrorsString(batchRecord)
@@ -571,7 +585,10 @@ class DataImportService implements ServiceMethods {
 			staffList: getStaffReferencesForProject(project),
 
 			// Prepares field Specs cache from database
-			fieldSpecProject: customDomainService.createFieldSpecProject(project)
+			fieldSpecProject: customDomainService.createFieldSpecProject(project),
+
+			// Tags Map used to validate tags in an ImportBatchRecord creation
+			projectTags: tagService.tagMapByName(project)
 		]
 	}
 
@@ -805,10 +822,11 @@ class DataImportService implements ServiceMethods {
 
 		try {
 			fieldsInfo = record.fieldsInfoAsMap()
-
 			resetRecordAndFieldsInfoErrors(record, fieldsInfo)
-
 			entity = findOrCreateEntity(fieldsInfo, context)
+			Boolean shouldSaveEntity = false
+			Boolean assetHasCommentsToSave = record.hasComments()
+			Boolean hasTagsToAssociate = record.hasTags()
 
 			if (entity && entity != -1) {
 				log.debug 'processEntityRecord() calling bindFieldsInfoValuesToEntity with entity {}, fieldsInfo isa {}', entity, fieldsInfo.getClass().getName()
@@ -817,75 +835,88 @@ class DataImportService implements ServiceMethods {
 				boolean isNewEntity = entity.id == null
 
 				// Now add/update the remaining properties on the domain entity appropriately
-				Boolean bindingOkay = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
-				Boolean abandonEntity = true
-				if (!bindingOkay) {
-					log.warn 'processEntityRecord() binding values failed'
-				} else if (recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo) ) {
-					log.warn "processEntityRecord() binding constraints errors ${GormUtil.allErrorsString(entity)}"
+				boolean allIsGoodHere = bindFieldsInfoValuesToEntity(entity, fieldsInfo, context)
+				if (!allIsGoodHere) {
+					log.warn 'processEntityRecord() binding values failed, batch {}, record {}', batch.id, record.id
 				} else {
-					abandonEntity = false
-				}
+					shouldSaveEntity = isNewEntity || GormUtil.hasUnsavedChanges(entity)
 
-				if (abandonEntity) {
-					// Damn it! Couldn't save this sucker...
-					entity.discard()
-					entity = null
-				} else {
-
-					// Determine the correct Operation that was performed and if the record should be saved
-					Boolean shouldBeSaved = true
-					record.operation = (entity.id ? ImportOperationEnum.UPDATE : ImportOperationEnum.INSERT)
-					if ( record.operation == ImportOperationEnum.UPDATE && ! GormUtil.hasUnsavedChanges(entity) && !record.hasComments()) {
-						record.operation = ImportOperationEnum.UNCHANGED
-						shouldBeSaved = false
-					}
-
-					if (shouldBeSaved) {
-
-						if (entity.save(failOnError:false, flush:true)) {
-
-							if (record.hasComments()) {
-								List<String> comments = record.commentsAsList()
-								log.info "processEntityRecord() record ${record.id} contains comments ${}"
-								saveCommentsForEntity(comments, entity, context)
-								entity.lastUpdated = new Date()
-							}
-							// If we still have a dependency record then the process must have finished
-							// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
-							// Note that I was running to some strange issues of casting that prevented from doing this originally
-							// record.status = ImportBatchRecordStatusEnum.COMPLETED
-							record.status = ImportBatchStatusEnum.COMPLETED
-
-							// if entity is Person then associate it to company and project
+					// Save the Entity domain record appropritately
+					if (shouldSaveEntity) {
+						if (entity.save(failOnError: false, flush: true, deepValidate: false)) {
+							// If the entity is a Person then it should automatically be associate it to company and project
 							if (isNewEntity && Person.isAssignableFrom(entity.class)) {
 								associatePersonToCompanyAndProject(context.project, entity)
 							}
-
 						} else {
-							log.warn 'processEntityRecord() failed to create entity due to {}', GormUtil.allErrorsString(entity)
-							record.addError(GormUtil.allErrorsString(entity))
-							entity.discard()
-							entity = null
+							log.info 'processEntityRecord() batch {}, row {}, constraints errors {}', batch.id, record.id, GormUtil.allErrorsString(entity)
+							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
+							allIsGoodHere = false
 						}
-					} else {
-						entity.discard()
-						record.status = ImportBatchStatusEnum.COMPLETED
+					}
+
+					// Save Comments to Assets appropriately
+					if (allIsGoodHere && assetHasCommentsToSave) {
+						List<String> comments = record.commentsAsList()
+						saveCommentsForEntity(comments, entity, context)
+					}
+
+					if (allIsGoodHere && hasTagsToAssociate) {
+						// The saveTagsForEntity will return the number of actual tag manipulations that occurred
+						Integer tagChanges = saveTagsForEntity(record, entity, context)
+						if (tagChanges == -1) {
+							hasTagsToAssociate = false
+							allIsGoodHere = false
+						} else if (tagChanges == 0) {
+							hasTagsToAssociate = false
+						}
 					}
 				}
+
+				// Finalize the record status or clean up from encountering errors
+				if (allIsGoodHere) {
+					// If we still have a dependency record then the process must have finished
+					// TODO : JPM 3/2018 : Change to use ImportBatchRecordStatusEnum -
+					// Note that I was running to some strange issues of casting that prevented from doing this originally
+					// record.status = ImportBatchRecordStatusEnum.COMPLETED
+					record.status = ImportBatchStatusEnum.COMPLETED
+					if (shouldSaveEntity || assetHasCommentsToSave) {
+						record.operation = (isNewEntity ? ImportOperationEnum.INSERT : ImportOperationEnum.UPDATE)
+					} else {
+						record.operation = ImportOperationEnum.UNCHANGED
+					}
+
+					// Bump the lastUpdated for assets if there were no changes on the asset other than comments. Note
+					// that the tags service automatical bumps the asset lastModified.
+					if ( !shouldSaveEntity && assetHasCommentsToSave ) {
+						entity.lastUpdated = new Date()
+						if (! entity.save(failOnError: false, flush: true, deepValidate: false)) {
+							recordDomainConstraintErrorsToFieldsInfoOrRecord(entity, context.record, fieldsInfo)
+							allIsGoodHere = false
+						}
+					}
+				}
+
+				// Handle clean up if something went sideways
+				if (! allIsGoodHere) {
+					// Damn it! Couldn't save this sucker...
+					entity.discard()
+					entity = null
+					record.operation = (isNewEntity ? ImportOperationEnum.INSERT : ImportOperationEnum.UPDATE)
+					record.status = ImportBatchStatusEnum.PENDING
+				}
 			}
-
-
 		} catch (e) {
 			record.addError(e.getMessage())
 			log.error ExceptionUtil.stackTraceToString("processEntityRecord() Error while processing record ${recordCount}", e, 80)
 
 			try {
 				entity.discard()
-			}catch(Exception en){
+				record.status = ImportBatchStatusEnum.PENDING
+			} catch (Exception en) {
 				//discard throws an exception java.lang.IllegalStateException: cannot generate an EntityKey when id is null.
 				//We need to to the discard to get the errors to be populated correctly, but we don't care about this error.
-				log.debug('Discarding entity had an error.',en)
+				log.warn('entity.discard() had an error: batch {}, record {}, error {}', batch.id, record.id, en.getMessage(), )
 			}
 		}
 
@@ -895,14 +926,83 @@ class DataImportService implements ServiceMethods {
 		record.errorCount = tallyNumberOfErrors(record, fieldsInfo)
 
 		// log.debug "processEntityRecord() Saving the ImportBatchRecord with status ${record.status}"
-		if (!record.save(failOnError: false, flush: true)) {
+		if (! record.save(failOnError: false, flush: true, deepValidate: false)) {
 			// Catch the error here but need to throw it outside the try/catch so that it gets recorded at the batch level
 			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
 			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg
 			throw new DomainUpdateException("Unable to update row $recordCount due to " + domainUpdateErrorMsg)
-		} else {
-			log.info "Record saved in database ID: ${record?.id}"
 		}
+	}
+
+	/**
+	 * Saves, deletes or replaces tags associated with entity parameter.
+	 * It uses {@code context#projectTags} for validations.
+	 * It also manages {@code ImportBatchRecord#status} and
+	 * {@code ImportBatchRecord#operation} logic.
+	 * @param record an instance of {@code ImportBatchRecord} used in the import process.
+	 * @param entity an instance of a TDS domain classes, populated and ready to be used in tag association.
+	 * @param tagsInfo a Map with tags as results of an ETL script executed.
+	 * @param context a Map with context variables. It is used for validation purposes and project with tags association.
+	 * @return The number of tags that were assigned/unassiged to the asset OR -1 if there was an error
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	Integer saveTagsForEntity(ImportBatchRecord record, Object entity, Map<String, ?> context) {
+
+		Map<String, ?> tagsInfo = record.tagsAsMap()
+		String error = validateTagReferences(tagsInfo, context.projectTags)
+
+		if (error) {
+			/* This scenarios would occur if after the ETL process was run and project tag(s) were deleted before
+			   the batch was processed. */
+			record.addError(error)
+			return -1
+		}
+
+		Integer countOfTagChanges = 0
+
+		// Get the list of tags associated to the domain entity
+		List<TagAsset> entityTags = tagAssetService.list(context.project, entity.id)
+
+		// Convert the list of assigned asset tags to a Map for faster access
+		Map<String, TagAsset> assetTagMap = entityTags.collectEntries { TagAsset tagAsset ->
+			[(tagAsset.tag.name): tagAsset]
+		}
+
+		// Removal of tags
+		for (tagName in tagsInfo.remove) {
+			TagAsset tagAsset = assetTagMap[tagName]
+			if (tagAsset) {
+				tagAssetService.removeTags(context.project, [tagAsset.id])
+				countOfTagChanges++
+			}
+		}
+
+		// Addition of tags
+		for (tagName in tagsInfo.add) {
+			if (! assetTagMap.containsKey(tagName)) {
+				Long tagId = context.projectTags[tagName]
+				tagAssetService.applyTags(context.project, [tagId], entity.id)
+				countOfTagChanges++
+			}
+		}
+
+		// Replacement of tags which will be a map of objects with the key/value being the original tag/new tag
+		tagsInfo.replace.each { String originalTag, String newTag ->
+			// Remove the original tag if exists
+			if (assetTagMap.containsKey(originalTag)) {
+				TagAsset originalAssetTag = assetTagMap[originalTag]
+				tagAssetService.removeTags(context.project, [originalAssetTag.id])
+				countOfTagChanges++
+
+				// Add the new tag if it doesn't already exist
+				if (! assetTagMap.containsKey(newTag)) {
+					Long newTagId = context.projectTags[newTag]
+					tagAssetService.applyTags(context.project, [newTagId], entity.id)
+				}
+			}
+		}
+
+		return countOfTagChanges
 	}
 
 	/**
@@ -920,10 +1020,10 @@ class DataImportService implements ServiceMethods {
 				comment: comment,
 				commentType: AssetCommentType.COMMENT,
 				assetEntity: entity
-			).save()
+			).save(deepValidate: false)
 		}
 	}
-  
+
 	/**
 	 * This method should be used after any SearchQueryHelper.findEntityByMetaData calls to record errors
 	 * into the field or import batch record errors appropriately.
@@ -1401,6 +1501,8 @@ class DataImportService implements ServiceMethods {
 	 * It also removes previousValue key from fieldsInfo when it exist so previous value data shown is more accurate.
 	 * @param record - the import batch record to clear
 	 * @param fieldsInfo - the Map of the record.fieldsInfo to be cleared
+	 * @param tagsInfo - the Map of the record.tags to be cleared
+	 *
 	 */
 	@Transactional(noRollbackFor=[Throwable])
 	private void resetRecordAndFieldsInfoErrors(ImportBatchRecord record, Map fieldsInfo) {
@@ -1415,35 +1517,50 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * This is used to perform the validate on a domain object and will save the errors back into the
+	 * Used to validate tags defined in {@code ImportBatchRecord#tags}.
+	 * @param tagsInfo - the Map of the record.tags to be cleared
+	 * @param projectTags - the Map of the project tags used for validation.
+	 *
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	private String validateTagReferences(Map tagsInfo, Map projectTags) {
+
+		Set tagsNames = [] as Set
+		tagsNames.addAll(tagsInfo.add)
+		tagsNames.addAll(tagsInfo.remove)
+		tagsNames.addAll(tagsInfo.replace.keySet())
+		tagsNames.addAll(tagsInfo.replace.values())
+
+		Set tagsNotFound = tagsNames.findAll { !projectTags.containsKey(it) }
+		if (!tagsNotFound.isEmpty()){
+			return "The follow tag(s) were not found: ${tagsNotFound.join(', ')} in current project"
+		} else {
+			return null
+		}
+	}
+
+	/**
+	 * This is used record any coinstraints violation erros on a domain object and will save the errors back into the
 	 * fieldsInfo map appropriately or into the ImportBatchRecord if the constraint failure was on a property
 	 * that is not in the fieldsInfo.
 	 *
 	 * @param domain - the domain that is being created or updated
 	 * @param record - the import record being processed (errors can be logged to this object)
 	 * @param fieldsInfo - the Map of the fields that came from the ETL process
-	 * @return true if an error was recognized otherwise false
 	 */
 	@Transactional(noRollbackFor=[Throwable])
-	private Boolean recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
-		boolean errorsFound = ! domain.validate()
-
-		if (errorsFound) {
-
-			for (error in domain.errors.allErrors) {
-				log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
-				String property = error.getField()
-				String errorMsg = i18nMessage(error)
-				if (fieldsInfo[property]) {
-					fieldsInfo[property].errors << errorMsg
-				} else {
-					// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
-					record.addError(errorMsg)
-				}
+	private void recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
+		for (error in  domain.errors.allErrors) {
+			log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
+			String property = error.getField()
+			String errorMsg = i18nMessage(error)
+			if (fieldsInfo[property]) {
+				fieldsInfo[property].errors << errorMsg
+			} else {
+				// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
+				record.addError(errorMsg)
 			}
 		}
-
-		return errorsFound
 	}
 
 	/**

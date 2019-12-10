@@ -280,7 +280,7 @@
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-gojs-graph">
-                                    <g:link controller="module" action="neighborhood">GoJS Graph</g:link>
+                                    <g:link controller="module" action="taskManager/task-graph">GoJS Task Graph</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskTimelineView}">
