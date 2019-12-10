@@ -14,7 +14,6 @@ import {DOMAIN} from '../../../shared/model/constants';
 import * as R from 'ramda';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {Flatten, DefaultBooleanFilterData} from '../../../shared/model/data-list-grid.model';
 
 @Injectable()
 export class APIActionService {
@@ -29,8 +28,11 @@ export class APIActionService {
 	constructor(private http: HttpClient) {
 	}
 
-	getDataScripts(): Observable<DataScriptModel[]> {
-		return this.http.get(`${this.dataIngestionUrl}/datascript/list`)
+	getDataScripts(useWithAssetActions:boolean = false): Observable<DataScriptModel[]> {
+		const params = useWithAssetActions? `?useWithAssetActions?=${useWithAssetActions}`: '';
+		const url = `${this.dataIngestionUrl}/datascript/list${params}`;
+		
+		return this.http.get(url)
 			.map((response: any) => {
 				let dataScriptModels = response && response.status === 'success' && response.data;
 				dataScriptModels.forEach((r) => {

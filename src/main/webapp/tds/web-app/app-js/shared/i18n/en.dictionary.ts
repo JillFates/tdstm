@@ -142,6 +142,10 @@ export const en_DICTIONARY: Object = {
 				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
 			},
+			'RUN': {
+				'CONFIRM_RUN_ASSETS': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel',
+				'CONFIRM_RUN_DEPENDENCIES': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel'
+			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
 				'CLEAR': 'Clear field',
