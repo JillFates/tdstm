@@ -26,7 +26,6 @@
 													[defaultItem]="dataScriptModel.provider"
 													[(ngModel)]="dataScriptModel.provider"
 													required
-													class="form-control"
 													[ngClass]="{'has-error': dataScriptForm.touched && (dataScriptModel.provider && !dataScriptModel.provider.id) }">
 								</kendo-dropdownlist>
 							</div>
@@ -79,6 +78,18 @@
 
 								<label for="isAutoProcess">
 									Used to automatically transform, import and post data into TM
+								</label>
+							</div>
+							<div>
+								<input
+										id="useWithAssetActions"
+										name="useWithAssetActions"
+										type="checkbox"
+										[disabled]="modalType === actionTypes.VIEW"
+										[(ngModel)]="dataScriptModel.useWithAssetActions" />
+
+								<label for="useWithAssetActions">
+									Use with asset actions
 								</label>
 							</div>
 						</div>

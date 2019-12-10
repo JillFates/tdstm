@@ -27,6 +27,42 @@
 										</label>
 									</div>
 
+									<div class="form-group" *ngIf="showRun ">
+										<label>
+											<input type="radio" [value]="ACTION.Run" name="operation" [(ngModel)]="selectedAction">Action {{itemType}}
+										</label>
+										<div class="row" *ngIf="selectedAction === ACTION.Run">
+											<div class="col-sm-6">
+												<select [(ngModel)]="selectedScriptOption"
+														name="dataScriptOptions"
+														id="dataScriptOptions"
+														class="form-control pd-top-5">
+													<option *ngFor="let option of dataScriptOptions"
+															[ngValue]="option">{{option.name | translate}}</option>
+												</select>
+
+												<div>
+													<div class="form-group">
+														<div class="col-sm-12">
+															<div>
+																<input
+																		id="sendEmailNotification"
+																		name="sendEmailNotification"
+																		type="checkbox"
+																		[(ngModel)]="sendEmailNotification" />
+
+																<label for="sendEmailNotification">
+																	Email results to me
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+
 								</div>
 							</div>
 						</div>
