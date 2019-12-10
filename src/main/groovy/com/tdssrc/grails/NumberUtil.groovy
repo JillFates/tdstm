@@ -92,6 +92,8 @@ class NumberUtil {
 	static Long toLong(value, Long defVal = null) {
 		if (value instanceof Long) {
 			value
+		} else if ( value instanceof  BigDecimal){
+			value.longValue()
 		} else if (value instanceof Integer) {
 			value.longValue()
 		} else if (value instanceof CharSequence) {
