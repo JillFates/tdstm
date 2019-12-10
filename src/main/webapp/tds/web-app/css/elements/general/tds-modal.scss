@@ -26,10 +26,6 @@ tds-ui-dialog {
 				overflow: hidden !important;
 				width: unset !important;
 
-				.active {
-					box-shadow: 0 -3px 0 #0077b8 inset;
-				}
-
 				.modal-body {
 					&.asset-crud {
 						margin-right: 20px;
@@ -244,10 +240,15 @@ tds-ui-dialog {
 					}
 				}
 			}
-
 			// This is necessary to fix a bug with the clarity tabs classes.
-
 			// @include modalSideNav();
+
+			&.modal-xxl,
+			&.modal-xlg {
+				.nav-link.active {
+					box-shadow: 0 -3px 0 #0077b8 inset;
+				}
+			}
 		}
 	}
 	.close {

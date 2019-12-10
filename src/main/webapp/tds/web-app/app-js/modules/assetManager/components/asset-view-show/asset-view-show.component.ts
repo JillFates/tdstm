@@ -184,7 +184,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.data = result;
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
-		});
+		}, 2000);
 	}
 
 	public onEdit(): void {
