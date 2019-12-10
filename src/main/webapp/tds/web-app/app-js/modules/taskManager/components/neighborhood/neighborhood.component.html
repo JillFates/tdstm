@@ -89,6 +89,12 @@
         <span class="checkmark"></span>
         View Unpublished
       </label>
+
+      <label class="task-chk-container" *ngIf="hasCycles">
+        <input  type="checkbox" [(ngModel)]="showCycles" (ngModelChange)="highlightCycles()" />
+        <span class="checkmark"></span>
+        Highlight Cycles
+      </label>
     </div>
 
   </div>

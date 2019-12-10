@@ -875,6 +875,26 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
+	 * highlight nodes by cycle
+	 **/
+	highlightNodesByCycle(cycles: number[]): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes.filter(f => !!cycles.find(m => m === f.data.id));
+			if (highlightCollection.count > 0 && highlightCollection.first()) {
+				d.selectCollection(highlightCollection);
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		});
+	}
+
+	/**
+	 * Clear highlighted nodes
+	 **/
+	clearHighlights(): void {
+		this.diagram.commit(d => d.clearSelection())
+	}
+
+	/**
 	 * Override mousewheel handler to add the zooming scales
 	 **/
 	overrideMouseWheel(): void {

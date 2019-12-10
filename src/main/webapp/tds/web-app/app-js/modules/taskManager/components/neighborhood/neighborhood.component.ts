@@ -89,6 +89,9 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	requestId: number;
 	refreshTriggered: boolean;
 	isNeighbor: boolean;
+	taskCycles: number[][];
+	hasCycles: boolean;
+	showCycles: boolean;
 
 	constructor(
 			private taskService: TaskService,
@@ -268,15 +271,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			};
 			this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
 				.pipe(
-					takeUntil(this.unsubscribe$),
-					timeout(15000)
+					takeUntil(this.unsubscribe$)
 				)
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
+					// res.cycles = [[234167, 234168], [237899, 237900]];
 					if (this.tasks) {
 						this.diagramLayoutService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
 						this.isMoveEventReq = false;
+						if (res.cycles && res.cycles.length > 0) {
+							this.hasCycles = true;
+							this.taskCycles = res.cycles;
+						}
 						this.generateModel();
 					}
 				},
@@ -559,6 +566,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			this.graph.highlightNodesByText(this.filterText, matches);
 		} else {
 			this.graph.highlightNodesByTeam(matches);
+		}
+	}
+
+	/**
+	 * highlight nodes by cycles
+	 **/
+	highlightCycles(): void {
+		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
+			const cycles = [];
+			this.taskCycles.forEach(arr => cycles.push(...arr));
+			this.graph.highlightNodesByCycle(cycles);
+		} else {
+			this.graph.clearHighlights();
 		}
 	}
 

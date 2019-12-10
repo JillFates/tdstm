@@ -103,7 +103,7 @@ interface IMoveEvent {
 }
 
 export interface IMoveEventTask {
-	cycles?: number[];
+	cycles?: number[][];
 	sinks?: number[];
 	starts?: number[];
 	startDate?: string;
