@@ -741,7 +741,7 @@ class UrlMappings {
 
 		"/ws/user/updateLastPage" {
 			controller = "wsUser"
-			action = [GET:"updateLastPage"]
+			action = [PUT:"updateLastPage"]
 		}
 
 		"/ws/progress" {
