@@ -33,7 +33,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	public showDelete: boolean;
 	public showRun: boolean;
 	public sendEmailNotification = false;
-	
 	public dataScriptOptions: Array<any> = [this.SELECT_DATA_MODEL];
 	public selectedScriptOption = this.dataScriptOptions[0];
 
@@ -184,12 +183,12 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 				const edits = [];
 				console.log(this.bulkChangeModel);
 				const userParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
-				const payload = { 
+				const payload = {
 					userParams,
-					dataViewId: -1,
+					dataViewId: this.bulkChangeModel.viewId,
 					ids: this.bulkChangeModel.selectedItems,
 					dataScriptId:this.selectedScriptOption.id
-				}
+				};
                 this.bulkChangeService.bulkRun(payload).subscribe(
                     result =>
                         resolve({

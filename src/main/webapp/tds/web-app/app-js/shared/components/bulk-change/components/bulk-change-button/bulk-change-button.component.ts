@@ -23,6 +23,7 @@ export class BulkChangeButtonComponent {
 	@Input() showEdit: boolean;
 	@Input() showDelete: boolean;
 	@Input() bulkChangeType: BulkChangeType;
+	@Input() viewId: number;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();
 	@Output() clickBulk = new EventEmitter<void>();
 
@@ -58,7 +59,8 @@ export class BulkChangeButtonComponent {
 			affected: this.selectedItems.length,
 			showDelete: this.showDelete,
 			showEdit: this.showEdit,
-			bulkChangeType: this.bulkChangeType
+			bulkChangeType: this.bulkChangeType,
+			viewId: this.viewId
 		};
 
 		this.dialogService.extra(BulkChangeActionsComponent, [

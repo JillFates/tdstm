@@ -21,6 +21,7 @@ export class BulkChangeModel {
 	public showDelete?: boolean;
 	public showAction?: boolean;
 	public bulkChangeType?: BulkChangeType;
+	public viewId?: number;
 	selectedAssets: Array<any>;
 }
 
