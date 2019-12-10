@@ -92,7 +92,8 @@ export class UserDashboardComponent implements OnInit {
 	}
 
 	public selectProjectByID(id): any {
-		const project = this.projectList.find(p => id === p.id);
+	// Please disregard linting on the following line, comparison should be '==' (See TM-16490)
+		const project = this.projectList.find(p => id == p.id); // tslint:disable-line
 		if (project) {
 			this.selectedProjectID = id;
 			this.selectedProject = project;

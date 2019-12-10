@@ -1,5 +1,7 @@
+<tds-grid [gridModel]="gridModel" (cellClick)="cellClick($event)"></tds-grid>
+
 <!-- Main content -->
-<div class="content body tds-kendo-grid notice-list-component">
+<!-- <div class="content body tds-kendo-grid notice-list-component">
 	<section>
 		<div *ngIf="noticeColumnModel">
 			<div class="box-body box-with-empty-header">
@@ -28,7 +30,6 @@
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
 							<div class="clr-col-4 grid-label">
-								<!-- <strong>Notice List</strong> -->
 							</div>
 							<div class="clr-col-8 grid-actions">
 								<tds-button
@@ -47,7 +48,6 @@
 						</div>
 					</ng-template>
 
-					<!-- Show Filters / Actions column -->
 					<kendo-grid-column
 						[width]="60"
 						[class]="{ 'k-custom-command-column': true }"
@@ -76,10 +76,8 @@
 							kendoGridCellTemplate
 							let-dataItem
 							let-rowIndex="rowIndex"
-							let-isComment="dataItem.taskAndCommentFlags.comment"
-							let-isIssue="dataItem.taskAndCommentFlags.issue"
 						>
-							<div class="action-button btn-group btn-link">
+							<div class="action-button btn-link">
 								<clr-dropdown>
 									<tds-button
 										icon="ellipsis-vertical"
@@ -279,7 +277,6 @@
 							</div>
 						</ng-template>
 					</kendo-grid-column>
-					<!-- PAGER COMPONENT -->
 					<ng-template
 						kendoPagerTemplate
 						let-total="total"
@@ -301,4 +298,4 @@
 			</div>
 		</div>
 	</section>
-</div>
+</div> -->
