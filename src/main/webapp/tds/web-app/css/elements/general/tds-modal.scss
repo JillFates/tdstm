@@ -247,6 +247,11 @@ tds-ui-dialog {
 			&.modal-xlg {
 				.nav-link.active {
 					box-shadow: 0 -3px 0 #0077b8 inset;
+                	background: transparent;
+				}
+				.tab-disabled {
+					color: lightgray;
+					cursor: not-allowed;
 				}
 			}
 		}

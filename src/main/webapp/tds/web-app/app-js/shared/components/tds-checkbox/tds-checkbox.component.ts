@@ -22,6 +22,9 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 				justify-content: flex-start;
 				font-weight: normal;
 			}
+            clr-checkbox-container {
+				margin-top: unset;
+			}
 			input {
 				margin-right: 5px;
 				margin-top: 5px;
