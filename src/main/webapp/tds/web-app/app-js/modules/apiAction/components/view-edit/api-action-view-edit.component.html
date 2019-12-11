@@ -220,10 +220,10 @@
 										</div>
 									</div>
 									<div class="col-md-5">
-                                        <div class="popup-section">
+										<div class="popup-section">
 											<tds-checkbox [name]="'apiActionPollingInterval'"
 														  tabindex="10"
-														  [(value)]="apiActionModel.isPolling"
+														  [(inputModel)]="apiActionModel.isPolling"
 														  [disabled]="modalType === actionTypes.VIEW"
 														  [title]="'Polling'">
 											</tds-checkbox>
@@ -319,7 +319,7 @@
 										<div class="popup-section">
 											<tds-checkbox [name]="'apiActionProduceData'"
 														  tabindex="17"
-														  [(value)]="apiActionModel.producesData"
+														  [(inputModel)]="apiActionModel.producesData"
 														  [disabled]="modalType === actionTypes.VIEW"
 														  [title]="'Provides Data'">
 											</tds-checkbox>
@@ -489,8 +489,8 @@
 											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
 												<tds-checkbox [name]="'simpleApiActionRemote'"
 															  tabindex="5"
-															  [(value)]="apiActionModel.isRemote"
-															  [disabled]="true">
+															  [(inputModel)]="apiActionModel.isRemote"
+															  [disabled]="false">
 												</tds-checkbox>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -504,7 +504,7 @@
 											<div class="col-sm-8 check-container" *ngIf="modalType !== actionTypes.VIEW">
 												<tds-checkbox [name]="'debugEnabled'"
 															  tabindex="6"
-															  [(value)]="apiActionModel.debugEnabled">
+															  [(inputModel)]="apiActionModel.debugEnabled">
 												</tds-checkbox>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
@@ -631,7 +631,7 @@
 										<div class="popup-section">
 											<tds-checkbox [name]="'httpTabApiActionPollingInterval'"
                                                           tabindex="10"
-														  [(value)]="apiActionModel.isPolling"
+														  [(inputModel)]="apiActionModel.isPolling"
 														  [disabled]="modalType === actionTypes.VIEW"
 														  [title]="'Polling'">
 											</tds-checkbox>
@@ -727,7 +727,7 @@
 										<div class="popup-section">
 											<tds-checkbox [name]="'httpTabApiActionProduceData'"
 														  tabindex="17"
-														  [(value)]="apiActionModel.producesData"
+														  [(inputModel)]="apiActionModel.producesData"
 														  [disabled]="modalType === actionTypes.VIEW"
 														  [title]="'Provides Data'">
 											</tds-checkbox>

@@ -8,28 +8,28 @@
 					<div class="col-md-1 event-title"><label>Events:</label></div>
 					<div class="col-md-1 hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionStatusDetermination'"
-							[(value)]="eventReactions[EventReactions.Status].selected"
+							[(inputModel)]="eventReactions[EventReactions.Status].selected"
 							[disabled]="eventReactions[EventReactions.Status].value.length > 0 || modalType === actionTypes.VIEW"
 							[title]="'Status'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1">
 						<tds-checkbox [name]="'apiActionSuccess'"
-									  [(value)]="eventReactions[EventReactions.Success].selected"
+									  [(inputModel)]="eventReactions[EventReactions.Success].selected"
 									  [disabled]="true"
 									  [title]="'Sucess'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1 hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionDefault'"
-									  [(value)]="eventReactions[EventReactions.Default].selected"
+									  [(inputModel)]="eventReactions[EventReactions.Default].selected"
 									  [disabled]="eventReactions[EventReactions.Default].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Default'">
 						</tds-checkbox>
 					</div>
 					<div class="col-md-1">
 						<tds-checkbox [name]="'apiActionError'"
-									  [(value)]="eventReactions[EventReactions.Error].selected"
+									  [(inputModel)]="eventReactions[EventReactions.Error].selected"
 									  (change)="onErrorReactionCheckboxChangeHandler(eventReactions[EventReactions.Error])"
 									  [disabled]="isRemote || modalType === actionTypes.VIEW"
 									  [title]="'Error'">
@@ -37,7 +37,7 @@
 					</div>
 					<div class="col-md-1  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionFailed'"
-									  [(value)]="eventReactions[EventReactions.Failed].value.length > 0 || modalType === actionTypes.VIEW"
+									  [(inputModel)]="eventReactions[EventReactions.Failed].value.length > 0 || modalType === actionTypes.VIEW"
 									  [disabled]="eventReactions[EventReactions.Failed].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Failed'">
 						</tds-checkbox>
@@ -45,14 +45,14 @@
 					<div *ngIf="isPolling">
 						<div class="col-md-1 hide-if-remote-section">
 							<tds-checkbox [name]="'apiActionLapsed'"
-										  [(value)]="eventReactions[EventReactions.Lapsed].selected"
+										  [(inputModel)]="eventReactions[EventReactions.Lapsed].selected"
 										  [disabled]="eventReactions[EventReactions.Lapsed].value.length > 0 || modalType === actionTypes.VIEW"
 										  [title]="'Lapsed'">
 							</tds-checkbox>
 						</div>
 						<div class="col-md-1  hide-if-remote-section">
 							<tds-checkbox [name]="'apiActionStalled'"
-										  [(value)]="eventReactions[EventReactions.Stalled].selected"
+										  [(inputModel)]="eventReactions[EventReactions.Stalled].selected"
 										  [disabled]="eventReactions[EventReactions.Stalled].value.length > 0 || modalType === actionTypes.VIEW"
 										  [title]="'Stalled'">
 							</tds-checkbox>
@@ -61,7 +61,7 @@
 					<div class="col-md-1 customize event-title hide-if-remote-section"><label>Customize:</label></div>
 					<div class="col-md-2  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionBeforeCall'"
-									  [(value)]="eventReactions[EventReactions.BeforeInvocation].selected"
+									  [(inputModel)]="eventReactions[EventReactions.BeforeInvocation].selected"
 									  (change)="onEventReactionSelect(eventReactions[EventReactions.BeforeInvocation])"
 									  [disabled]="disableApiActionBeforeCall()"
 									  [title]="'Before Invocation'">
@@ -69,7 +69,7 @@
 					</div>
 					<div class="col-md-2  hide-if-remote-section">
 						<tds-checkbox [name]="'apiActionAfterCall'"
-									  [(value)]="eventReactions[EventReactions.PostInvocation].selected"
+									  [(inputModel)]="eventReactions[EventReactions.PostInvocation].selected"
 									  [disabled]="eventReactions[EventReactions.PostInvocation].value.length > 0 || modalType === actionTypes.VIEW"
 									  [title]="'Post Invocation'">
 						</tds-checkbox>
