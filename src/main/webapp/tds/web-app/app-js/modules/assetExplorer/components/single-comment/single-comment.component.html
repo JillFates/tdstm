@@ -44,10 +44,10 @@
 								</div>
 								<div class="col-md-12 single-comment-date-container" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 									<div class="col-md-6 pad-left-0">
-										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | tdsDateTime:userTimeZone:dateFormatTime}}</label>
 									</div>
 									<div class="col-md-6">
-										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{singleCommentModel.lastUpdated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{singleCommentModel.lastUpdated | tdsDateTime:userTimeZone:dateFormatTime}}</label>
 									</div>
 								</div>
 							</div>

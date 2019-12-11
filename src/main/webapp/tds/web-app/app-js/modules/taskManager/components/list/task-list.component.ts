@@ -67,6 +67,7 @@ export class TaskListComponent {
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
+	private dashboardFilters = ['filter', 'status', 'role', 'category'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -395,11 +396,26 @@ export class TaskListComponent {
 	}
 
 	/**
+	 * Checks if any filters from the dashboards are applied.
+	 */
+	hasDashboardFilters(): boolean {
+		let hasFilters = false;
+		this.dashboardFilters.forEach(filter => {
+			if (this.urlParams.hasOwnProperty(filter)) {
+				hasFilters = true;
+			}
+		});
+		return hasFilters;
+	}
+
+	/**
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
-		if (this.urlParams.filter) {
-			delete this.urlParams.filter;
+		if (this.hasDashboardFilters()) {
+			this.dashboardFilters.forEach(filter => {
+				delete this.urlParams[filter];
+			});
 			this.search();
 		}
 		this.columnsModel
@@ -420,7 +436,7 @@ export class TaskListComponent {
 	 */
 	areFiltersDirty(): boolean {
 		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.urlParams.filter;
+			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
