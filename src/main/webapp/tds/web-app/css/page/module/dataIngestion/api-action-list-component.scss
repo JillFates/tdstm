@@ -3,6 +3,9 @@
   display: flex;
   flex-direction: column;
   padding-bottom: 0;
+  input[type="checkbox"]:disabled + label {
+    cursor: not-allowed
+  }
 
   .box-body {
     height: 100%;

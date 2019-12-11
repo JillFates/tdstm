@@ -39,7 +39,6 @@ import { NgForm } from '@angular/forms';
 							<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i
 								class="fa fa-fw fa-code api-boolean-icon"></i></span>
 						</ng-template>
-						
                         <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
                             <div class="action-button btn-link">
                                 <clr-dropdown *ngIf="dataItem.required === 0  || dataItem.required === false">
@@ -50,7 +49,6 @@ import { NgForm } from '@angular/forms';
                                 </clr-dropdown>
                             </div>
                         </ng-template>
-						
 						<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem
 												 let-rowIndex="rowIndex">
 							<div
