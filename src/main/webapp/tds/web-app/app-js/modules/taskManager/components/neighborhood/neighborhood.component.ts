@@ -92,6 +92,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	taskCycles: number[][];
 	hasCycles: boolean;
 	showCycles: boolean;
+	rootId: number;
 
 	constructor(
 			private taskService: TaskService,
@@ -225,6 +226,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.subscribe(res => {
 					const data = res.body.data;
 					if (data && data.length > 0) {
+						this.rootId = taskId;
 						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
 							if (!this.isNeighbor) {
@@ -275,7 +277,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				)
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
-					res.cycles = [[234167, 234168], [237899, 237900]];
 					if (this.tasks) {
 						this.diagramLayoutService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
@@ -348,6 +349,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			const predecessorIds = t.predecessorIds && t.predecessorIds;
 
 			t.key = t.id;
+			t.rootNodeKey = this.rootId;
 			if (t.team && !teams
 				.find(team => t.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
 				teams.push({label: t.team});

@@ -275,6 +275,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.overrideMouseWheel();
 		this.overviewTemplate();
 		this.diagramListeners();
+		this.overrideDoubleClick();
 	}
 
 	/**
@@ -516,9 +517,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		linkShape.isPanelMain = true;
 		linkShape.strokeWidth = 5;
 		linkShape.stroke = 'red';
+		const arrowHead = new Shape();
+		arrowHead.strokeWidth = 4;
+		arrowHead.stroke = '#af1102';
+		arrowHead.toArrow = 'Standard';
 
 		selAdornmentTemplate.add(linkShape);
-
+		selAdornmentTemplate.add(arrowHead);
 		return selAdornmentTemplate;
 	}
 
@@ -929,6 +934,18 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			go.Tool.prototype.standardMouseWheel.call(tool);
 			this.setNodeTemplateByScale(this.diagram.scale, this.diagram.lastInput);
 		};
+	}
+
+	/**
+	 * Override double click handler to add new behaviour
+	 **/
+	overrideDoubleClick(): void {
+		this.diagram.doubleClick = e => {
+			const rootNode = e.diagram.nodes && e.diagram.nodes.first().data.rootNodeKey ?
+				e.diagram.nodes.filter(n => n.data.key === n.data.rootNodeKey).first()
+				: e.diagram.findTreeRoots().first();
+			if (rootNode) { e.diagram.centerRect(rootNode.actualBounds); }
+		}
 	}
 
 	/**
