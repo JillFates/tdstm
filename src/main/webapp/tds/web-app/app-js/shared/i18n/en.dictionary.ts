@@ -14,6 +14,7 @@ export const en_DICTIONARY: Object = {
 		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
+		'CHECK_SYNTAX': 'Check Syntax',
 		'COLLAPSE': 'Collapse',
 		'CONFIGURE': 'Configure',
 		'CREATE': 'Create',

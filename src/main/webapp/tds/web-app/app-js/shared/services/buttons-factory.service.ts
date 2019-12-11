@@ -19,6 +19,11 @@ export class ButtonsFactoryService {
 			},
 			['tds-button-clone']: {icon: 'clone', title: translate('GLOBAL.CLONE'), tooltip: translate('GLOBAL.CLONE')},
 			['tds-button-close']: {icon: 'ban', title: translate('GLOBAL.CLOSE'), tooltip: translate('GLOBAL.CLOSE')},
+			['tds-button-check-syntax']: {
+				icon: 'thumbs-up',
+				title: translate('GLOBAL.CHECK_SYNTAX'),
+				tooltip: translate('GLOBAL.CHECK_SYNTAX')
+			},
 			['tds-button-create']: {
 				icon: 'plus',
 				title: translate('GLOBAL.CREATE'),

@@ -925,14 +925,12 @@
 		</nav>
 	</div>
 
-	<div class="modal-footer form-group-center">
-		<tds-button-custom
+	<div class="modal-footer">
+		<tds-button-check-syntax
 		        tabindex="21"
-		        [icon]="'thumbs-o-up'"
-		        [title]="'Check Syntax'"
 		        *ngIf="modalType !== actionTypes.VIEW && isCurrentTab(tabsEnum.Reactions)"
 		        (click)="onCheckAllSyntax()" class="btn-primary pull-left">
-		</tds-button-custom>
+		</tds-button-check-syntax>
 
 		<div *ngIf="loadingLists" style="display: inline" class="loading-lists pull-right text-right">
 			<i>Loading Lists...</i>

@@ -19,6 +19,7 @@ import {ButtonsFactoryService} from '../../services/buttons-factory.service';
 	selector: `
 		tds-button-add,
 		tds-button-cancel,
+		tds-button-check-syntax,
 		tds-button-clone,
 		tds-button-close,
 		tds-button-collapse,
