@@ -5,7 +5,6 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
-import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -330,7 +329,14 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 
 		userPreferenceService.setPreference(UserPreferenceEnum.JUST_REMAINING, params.justRemaining)
 		userPreferenceService.setPreference(UserPreferenceEnum.MY_TASK, params.justMyTasks)
-		userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == 1)
+
+		if (params.viewUnpublished) {
+			securityService.requirePermission Permission.TaskPublish
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, true)
+		}else{
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, false)
+		}
+
 		userPreferenceService.setMoveEventId params.moveEvent
 
 		// Determine if only unpublished tasks need to be fetched.

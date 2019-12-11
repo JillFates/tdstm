@@ -12,7 +12,6 @@ import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
-import com.tdsops.tm.enums.domain.RoleTypeGroup
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
@@ -77,12 +76,7 @@ import java.sql.Timestamp
 import java.text.DateFormat
 
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.COMPLETED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.HOLD
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PLANNED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.PENDING
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.READY
 import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
-import static com.tdsops.tm.enums.domain.AssetCommentStatus.TERMINATED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
@@ -425,7 +419,7 @@ class TaskService implements ServiceMethods {
 				throw new EmptyResultException('Task was not found')
 			}
 
-			if (! AssetCommentStatus.ActionableStatusCodes.contains(taskWithLock.status)) {
+			if (! AssetCommentStatus.CanInvokeActionStatusCodes.contains(taskWithLock.status)) {
 				throwException(InvalidRequestException, 'apiAction.task.message.taskNotInActionableState', 'Task status must be in the Ready or Started state in order to invoke an action')
 			}
 
@@ -586,7 +580,7 @@ class TaskService implements ServiceMethods {
 		// Trigger the action if it is automatic and the action is local
 		// and task already exist (it fails with task not found when task has not been saved yet)
 		if (task.isAutomatic() && status == ACS.READY && task.isActionInvocableLocally() && task.id) {
-			if (AssetCommentStatus.ActionableStatusCodes.contains(status) ) {
+			if (AssetCommentStatus.CanInvokeActionStatusCodes.contains(status) ) {
 				// Attempt to invoke the task action if an ApiAction is set. Depending on the
 				// Action excution method (sync vs async), if async the status will be changed to
 				// STARTED instead of the default to DONE.
