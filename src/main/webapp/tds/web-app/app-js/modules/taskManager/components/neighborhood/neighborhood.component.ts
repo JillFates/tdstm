@@ -275,7 +275,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				)
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
-					// res.cycles = [[234167, 234168], [237899, 237900]];
+					res.cycles = [[234167, 234168], [237899, 237900]];
 					if (this.tasks) {
 						this.diagramLayoutService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;

@@ -14,12 +14,15 @@ import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../
 import {
 	Adornment,
 	Binding,
-	Diagram, GraphObject,
+	Diagram,
 	InputEvent,
+	Link,
+	GraphObject,
 	Overview,
 	Panel,
 	Placeholder,
-	Shape, Size,
+	Shape,
+	Size,
 	Spot,
 	TextBlock
 } from 'gojs';
@@ -501,6 +504,25 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
+	 * Node Adornment template configuration
+	 * @param {go.Node} node > optional node to add the adornment to
+	 **/
+	linkSelectionAdornmentTemplate(node?: go.Node): Adornment {
+		const selAdornmentTemplate = new Adornment(Panel.Link);
+		selAdornmentTemplate.selectionAdorned = true;
+		if (node) { selAdornmentTemplate.adornedObject = node; }
+
+		const linkShape = new go.Shape();
+		linkShape.isPanelMain = true;
+		linkShape.strokeWidth = 5;
+		linkShape.stroke = 'red';
+
+		selAdornmentTemplate.add(linkShape);
+
+		return selAdornmentTemplate;
+	}
+
+	/**
 	 * Node Adornment template configuration for neighbors
 	 **/
 	neighborAdornmentTemplate(): Adornment {
@@ -882,6 +904,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			const highlightCollection = d.nodes.filter(f => !!cycles.find(m => m === f.data.id));
 			if (highlightCollection.count > 0 && highlightCollection.first()) {
 				d.selectCollection(highlightCollection);
+				highlightCollection.each(n => n.linksConnected.each(l => {
+					l.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
+					l.isSelected = true;
+				}));
 				d.centerRect(highlightCollection.first().actualBounds);
 			}
 		});
