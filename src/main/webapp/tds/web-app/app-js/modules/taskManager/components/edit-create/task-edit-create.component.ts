@@ -17,7 +17,7 @@ declare var jQuery: any;
 })
 export class TaskEditCreateComponent extends TaskEditCreateCommonComponent implements OnInit {
 
-	@ViewChild('dueDatePicker') dueDatePicker;
+	@ViewChild('dueDatePicker', { static: false}) dueDatePicker;
 	constructor(
 		taskDetailModel: TaskDetailModel,
 		taskManagerService: TaskService,
