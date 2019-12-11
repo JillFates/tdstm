@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 import { Observable, ReplaySubject } from 'rxjs';
 import { CodeMirrorComponent } from '../../../../shared/modules/code-mirror/code-mirror.component';
 import { APIActionService } from '../../service/api-action.service';
+import { EventReactions } from '../../model/api-action.model';
 
 @Component({
 	selector: 'api-action-view-edit-reactions',
@@ -28,6 +29,7 @@ export class ApiActionViewEditReactionsComponent implements OnInit {
 	@Input() invalidScriptSyntax: boolean;
 	@Output() invalidScriptSyntaxChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 	@ViewChildren('reactionCodeMirror') codeMirrorComponents: QueryList<CodeMirrorComponent>;
+	public EventReactions = EventReactions;
 	reactionCodeMirror = {
 		mode: 'Groovy',
 		rows: 10,

@@ -2,6 +2,18 @@ import { INTERVAL } from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
 import {AgentMethodModel} from './agent.model';
 
+export enum EventReactions {
+	Status,
+	Success,
+	Default ,
+	Error   ,
+	Failed,
+	Lapsed  ,
+	Stalled,
+	BeforeInvocation,
+	PostInvocation,
+};
+
 export class APIActionColumnModel {
 	columns: any[];
 
@@ -79,8 +91,7 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 64,
-				locked: true
+				width: 64
 			},
 			{
 				label: 'custom',
