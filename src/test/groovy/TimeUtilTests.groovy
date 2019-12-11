@@ -1,12 +1,16 @@
 import com.tdssrc.grails.TimeUtil
-import grails.test.mixin.Mock
-import grails.test.mixin.TestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.plugin.springsecurity.SpringSecurityService
+import grails.testing.gorm.DataTest
+import grails.testing.web.controllers.ControllerUnitTest
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
+import net.transitionmanager.application.CommonController
 import net.transitionmanager.person.Person
-import net.transitionmanager.security.UserLogin
 import net.transitionmanager.person.UserPreference
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.SecurityService
+import net.transitionmanager.security.UserLogin
+import org.springframework.security.authentication.AuthenticationTrustResolverImpl
 import spock.lang.Issue
 import spock.lang.Unroll
 import test.AbstractUnitSpec
@@ -16,13 +20,33 @@ import java.text.SimpleDateFormat
 
 import static com.tdssrc.grails.TimeUtil.ABBREVIATED
 import static com.tdssrc.grails.TimeUtil.FULL
-
 /**
  * Unit test cases for the TimeUtil class
  */
-@Mock([UserLogin, UserPreference, Person])
-@TestMixin(ControllerUnitTestMixin)
-class TimeUtilTests extends AbstractUnitSpec {
+class TimeUtilTests extends AbstractUnitSpec implements DataTest, ControllerUnitTest<CommonController> {
+
+	Closure doWithSpring() {
+		{ ->
+			authenticationTrustResolver(AuthenticationTrustResolverImpl)
+
+			springSecurityService(SpringSecurityService) {
+				authenticationTrustResolver = ref('authenticationTrustResolver')
+			}
+
+			securityService(SecurityService) {
+				grailsApplication = ref('grailsApplication')
+				springSecurityService = ref('springSecurityService')
+			}
+
+			userPreferenceService(UserPreferenceService) {
+				springSecurityService = ref('springSecurityService')
+			}
+		}
+	}
+
+	void setupSpec(){
+		mockDomains UserLogin, UserPreference, Person
+	}
 
 	void setup() {
 		// Set timezone to GMT because Idea doesn't respect the -Duser.timezone=GMT

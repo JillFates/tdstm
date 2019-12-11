@@ -106,6 +106,12 @@ import {PowerComponent} from './components/power/power.component';
 import {DictionaryService} from './services/dictionary.service';
 import {en_DICTIONARY} from './i18n/en.dictionary';
 import {PreferencesResolveService} from './resolves/preferences-resolve.service';
+import {DiagramLayoutComponent} from './components/diagram-layout/diagram-layout.component';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {CircleCountdownComponent} from './components/circle-countdown/circle-countdown.component';
+import {DiagramContextMenuComponent} from './components/diagram-layout/context-menu/diagram-context-menu.component';
+import {MenusModule} from '@progress/kendo-angular-menu';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -120,7 +126,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		InputsModule,
 		RouterModule,
 		DialogModule,
-		ProgressBarModule
+		ProgressBarModule,
+		FontAwesomeModule,
+		MenusModule,
+		TooltipModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -185,7 +194,10 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		PieCountdownComponent,
 		TDSFilterInputComponent,
 		TDSModalPageWrapperComponent,
-		PowerComponent
+		PowerComponent,
+		DiagramLayoutComponent,
+		CircleCountdownComponent,
+		DiagramContextMenuComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -250,7 +262,11 @@ import {PreferencesResolveService} from './resolves/preferences-resolve.service'
 		TDSFilterInputComponent,
 		SafeHtmlPipe,
 		TDSModalPageWrapperComponent,
-		PowerComponent
+		PowerComponent,
+		DiagramLayoutComponent,
+		FontAwesomeModule,
+		CircleCountdownComponent,
+		DiagramContextMenuComponent
 	],
 	entryComponents: [
 		DynamicComponent,

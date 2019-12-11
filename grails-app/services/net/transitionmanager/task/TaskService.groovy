@@ -63,6 +63,7 @@ import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
@@ -1376,7 +1377,7 @@ class TaskService implements ServiceMethods {
 		neighbors = { tId, depth ->
 			// log.info "In the hood $depth for $tId"
 			if (depth > 0 && (viewUnpublished || AssetComment.read(tId)?.isPublished)) {
-				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?', [tId])
+				def td = TaskDependency.executeQuery('from TaskDependency td where td.' + findProp + '.id=?0', [tId])
 				// log.info "Found ${td.size()} going to $predOrSucc"
 				if (td.size() > 0) {
 					if (depth > 0) {
@@ -5612,6 +5613,8 @@ class TaskService implements ServiceMethods {
 				category: it.category
 			]
 
+			AssetEntity asset = GrailsHibernateUtil.unwrapIfProxy(it.assetEntity)
+
 			// now with all this, build a row
 			[
 				id:it.id,
@@ -5629,9 +5632,9 @@ class TaskService implements ServiceMethods {
 				score: it.score ?: 0,
 				taskStatus: status ? 'task_' + it.status.toLowerCase() : 'task_na',
 				dueClass: dueClass,
-				assetEntityId: it.assetEntity?.id,
-				assetEntityAssetType: it.assetEntity?.assetType ,
-				assetEntityAssetClass: it.assetEntity?.assetClass?.toString(),
+				assetEntityId: asset?.id,
+				assetEntityAssetType: asset?.assetType ,
+				assetEntityAssetClass: asset?.assetClass?.toString(),
 				instructionsLinkURL: instructionsLinkURL ?: '',
 				estStartClass: estStartClass,
 				estFinishClass: estFinishClass,
