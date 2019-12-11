@@ -915,12 +915,12 @@
 				<tds-button-cancel (click)="cancelCloseDialog()"></tds-button-cancel>
 			</div>
 
-			<div *ngIf="modalType !== actionTypes.CREATE">
-				<tds-button-delete (click)="onDeleteApiAction()"></tds-button-delete>
-			</div>
-
 			<div *ngIf="(modalType === actionTypes.VIEW) || (!isDirty() && !isParameterListDirty())">
 				<tds-button-close  (click)="cancelCloseDialog()"></tds-button-close>
+			</div>
+
+			<div *ngIf="modalType !== actionTypes.CREATE">
+				<tds-button-delete (click)="onDeleteApiAction()"></tds-button-delete>
 			</div>
 		</nav>
 	</div>

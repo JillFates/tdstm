@@ -14,13 +14,15 @@ import { NgForm } from '@angular/forms';
 				<kendo-grid
 					[data]="parameterList"
 					[pageSize]="25"
-					[height]="430">
+                    class="row-actions-1-children"
+                    [height]="430">
 					<ng-template kendoGridToolbarTemplate [position]="'top'" *ngIf="modalType !== actionTypes.VIEW">
-						<tds-button-add class="float-right mar-right-15"
-														[id]="'btnAddParameter'"
-														[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
-														(click)="onAddParameter()">
-						</tds-button-add>
+						<tds-button-create class="float-right"
+						                   [displayLabel]="false"
+											[id]="'btnAddParameter'"
+											[title]="'DATA_INGESTION.ADD_PARAMETER' | translate "
+											(click)="onAddParameter()">
+						</tds-button-create>
 					</ng-template>
 					<kendo-grid-column *ngFor="let column of apiActionParameterColumnModel.columns; let columnIndex = index"
 														 field="{{column.property}}"
@@ -37,14 +39,18 @@ import { NgForm } from '@angular/forms';
 							<span title="Parameter value is already URL Encoded" *ngIf="column.property === 'encoded'"><i
 								class="fa fa-fw fa-code api-boolean-icon"></i></span>
 						</ng-template>
-						<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW"
-												 let-dataItem>
-							<div class="tds-action-button-set">
-								<tds-button-delete *ngIf="dataItem.required === 0  || dataItem.required === false"
-																	 (click)="onDeleteParameter($event, dataItem)">
-								</tds-button-delete>
-							</div>
-						</ng-template>
+						
+                        <ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && modalType !== actionTypes.VIEW" let-dataItem let-rowIndex="rowIndex">
+                            <div class="action-button btn-link">
+                                <clr-dropdown *ngIf="dataItem.required === 0  || dataItem.required === false">
+                                    <tds-button icon="ellipsis-vertical" clrDropdownTrigger></tds-button>
+                                    <clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
+                                        <a clrDropdownItem (click)="onDeleteParameter($event, dataItem)">Delete</a>
+                                    </clr-dropdown-menu>
+                                </clr-dropdown>
+                            </div>
+                        </ng-template>
+						
 						<ng-template kendoGridCellTemplate *ngIf="modalType !== actionTypes.VIEW" let-dataItem
 												 let-rowIndex="rowIndex">
 							<div
