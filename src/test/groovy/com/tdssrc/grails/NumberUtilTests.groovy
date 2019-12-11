@@ -16,7 +16,7 @@ class NumberUtilTests extends Specification {
 		4L == NumberUtil.toLong(four)
 		99L == NumberUtil.toLong('', 99L)
 		NumberUtil.toLong(12.34) == 12
-		NumberUtil.toLong("123.56") == 123
+		NumberUtil.toLong("123.56") == null
 		NumberUtil.toLong(false) == null
 		NumberUtil.toLong('') == null
 	}
@@ -48,7 +48,7 @@ class NumberUtilTests extends Specification {
 		// real number
 		NumberUtil.toInteger(12.34) == 12
 		// real # string'
-		NumberUtil.toInteger("123.56") == 123
+		NumberUtil.toInteger("123.56") == null
 		// boolean'
 		NumberUtil.toInteger(false) == null
 		// blank
@@ -82,7 +82,7 @@ class NumberUtilTests extends Specification {
 		// real number
 		NumberUtil.toTinyInt(12.34) == 12
 		// real # string'
-		NumberUtil.toTinyInt("123.56") == 123
+		NumberUtil.toTinyInt("123.56") == null
 		// boolean
 		NumberUtil.toTinyInt(false) == null
 		// blank
