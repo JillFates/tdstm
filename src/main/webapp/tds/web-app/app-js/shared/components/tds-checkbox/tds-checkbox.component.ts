@@ -3,17 +3,14 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 @Component({
 	selector: 'tds-checkbox',
 	template: `
-        <clr-checkbox-container clrInline>
-            <clr-checkbox-wrapper>
-        		<input clrCheckbox
-					   type="checkbox"
-					   [name]="name"
-					   (change)="onChange($event)"
-					   [(ngModel)]="inputValue"
-					   [disabled]="disabled">
-        		<label [for]="name">{{title}}</label>
-			</clr-checkbox-wrapper>
-		</clr-checkbox-container>
+			<input clrCheckbox
+				   type="checkbox"
+				   [name]="name"
+			       [id]="name"
+				   (change)="onChange($event)"
+				   [(ngModel)]="inputValue"
+				   [disabled]="disabled">
+			<label [for]="name">{{title}}</label>
 	`,
 	styles: [
 		`
@@ -22,8 +19,8 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 				justify-content: flex-start;
 				font-weight: normal;
 			}
-            clr-checkbox-container {
-				margin-top: unset;
+			label {
+				font-weight: normal;
 			}
 			input {
 				margin-right: 5px;
@@ -36,7 +33,7 @@ import {Component, Input, SimpleChanges, OnChanges, Output, EventEmitter} from '
 export class TDSCheckboxComponent implements OnChanges {
 	@Input() disabled: boolean;
 	@Input() name: string;
-	@Input() title: string;
+	@Input() title = '';
 	@Output() change: EventEmitter<any> = new EventEmitter<any>() ;
 	@Output() changeValue: EventEmitter<any> = new EventEmitter<any>() ;
 	inputValue: any;

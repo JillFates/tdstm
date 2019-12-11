@@ -49,14 +49,14 @@ import { NgForm } from '@angular/forms';
 												 let-rowIndex="rowIndex">
 							<div
 								*ngIf="column.type === 'boolean' && (column.property === 'readonly' || column.property === 'required' || column.property === 'encoded')">
-								<input (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
+								<input clrCheckbox (keypress)="getOnInputKey($event)" type="checkbox" class="param-text-input-boolean"
 											 name="{{column.property + columnIndex + rowIndex}}-param" (change)="onValuesChange()"
 											 [(ngModel)]="dataItem[column.property]"/>
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'paramName'">
 								<!-- Name -->
 								<input (keypress)="getOnInputKey($event)"
-											 type="text" required class="param-text-input"
+								       clrInput type="text" required class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-param"
 											 (change)="onValuesChange()"
 											 [(ngModel)]="dataItem.paramName"
@@ -78,7 +78,7 @@ import { NgForm } from '@angular/forms';
 							</div>
 							<div *ngIf="column.type === 'text' && column.property === 'value'">
 								<!-- Value -->
-								<input (keypress)="getOnInputKey($event)"
+								<input (keypress)="getOnInputKey($event)" clrInput
 											 *ngIf="dataItem.context === 'USER_DEF' || dataItem.context?.assetClass === 'USER_DEF'"
 											 type="text" class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-user-defined"
@@ -104,7 +104,7 @@ import { NgForm } from '@angular/forms';
 							</div>
 							<!-- Description -->
 							<div *ngIf="column.type === 'text' && column.property === 'desc'">
-								<input (keypress)="getOnInputKey($event)" type="text" class="param-text-input"
+								<input (keypress)="getOnInputKey($event)" type="text" clrInput class="param-text-input"
 											 name="{{column.property + columnIndex + rowIndex}}-desc" [(ngModel)]="dataItem.description"/>
 							</div>
 						</ng-template>
