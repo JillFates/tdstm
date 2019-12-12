@@ -263,6 +263,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.diagram.startTransaction('generateDiagram');
 		this.diagram.initialDocumentSpot = Spot.TopLeft;
 		this.diagram.initialViewportSpot = Spot.TopLeft;
+		this.diagram.hasHorizontalScrollbar = false;
+		this.diagram.hasVerticalScrollbar = false;
 		this.diagram.allowZoom = true;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
@@ -439,6 +441,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);
+		linkTemplate.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
 
 		return linkTemplate;
 	}
@@ -916,6 +919,19 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				d.centerRect(highlightCollection.first().actualBounds);
 			}
 		});
+	}
+
+	/**
+	 * highlight nodes by cycle
+	 **/
+	highlightBy(field: string, value: any): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes && d.nodes.filter(n => n.data[field] && n.data[field] === value);
+			if (highlightCollection && highlightCollection.count > 0) {
+				d.selectCollection(highlightCollection);
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		})
 	}
 
 	/**

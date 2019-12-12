@@ -36,13 +36,13 @@
       </kendo-dropdownlist>
     </div>
     <div class="col-md-2  k-align-self-center">
-      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Teams:</label>
+      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Team:</label>
       <kendo-dropdownlist
         id="neighborhood-teams-dropdown"
         textField="label"
         valueField="label"
         [ngClass]="'neighborhood-custom-dropdown'"
-        [value]="selectedEvent"
+        [value]="selectedTeam"
         [data]="teamHighlights$ | async"
         (selectionChange)="highlightByTeam($event)"
         [(ngModel)]="selectedTeam"

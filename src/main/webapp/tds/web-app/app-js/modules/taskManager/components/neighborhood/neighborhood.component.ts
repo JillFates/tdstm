@@ -309,7 +309,11 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * load tasks with new filter criteria
 	 **/
 	onMyTasksFilterChange(): void {
-		this.checkboxFilterChange();
+		if (this.myTasks) {
+			this.graph.highlightBy('isMyTask', true);
+		} else {
+			this.graph.clearHighlights();
+		}
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {FA_ICONS} from '../../../../shared/constants/fontawesome-icons';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TaskManagerRoutingStates} from '../../task-manager-routing.states';
@@ -45,7 +45,7 @@ const routeNames = {
 			</span>
 		</div>`
 })
-export class TaskViewToggleComponent implements OnInit {
+export class TaskViewToggleComponent implements AfterViewInit {
 	icons = FA_ICONS;
 	@ViewChild('taskManager', {static: false}) taskManager: ElementRef;
 	@ViewChild('neighborhood', {static: false}) neighborhood: ElementRef;
@@ -60,7 +60,7 @@ export class TaskViewToggleComponent implements OnInit {
 		private renderer: Renderer2
 	) {	}
 
-	ngOnInit(): void {
+	ngAfterViewInit(): void {
 		this.subscribeToActivatedRoute();
 	}
 
