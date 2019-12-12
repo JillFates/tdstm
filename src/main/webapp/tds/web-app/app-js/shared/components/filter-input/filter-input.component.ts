@@ -39,6 +39,7 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
         <kendo-datepicker *ngIf="columnType === 'date'"
 				#filterInput
 				[format]="dateFormat"
+                [ngClass]="{'is-filtered': value}"
 				[value]="value"
 				(valueChange)="onFilter($event)"
                 [style.width.%]="100">
