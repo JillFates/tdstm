@@ -16,7 +16,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 	template: `
         <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="asset-clone-component modal fade in tds-ui-modal-decorator" id="asset-clone-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content resizable tds-angular-component-content"
+                <div class="tds-modal-content with-box-shadow resizable tds-angular-component-content"
                      tds-ui-modal-decorator=""
                      [options]="modalOptions"
                      [style.width.px]="750"
@@ -24,7 +24,7 @@ import {AssetModalModel} from '../../model/asset-modal.model';
 
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
                         <h4 class="modal-title">Clone Asset</h4>
                     </div>
@@ -90,7 +90,7 @@ export class AssetCloneComponent extends UIExtraDialog implements OnInit {
 	public assetName: string;
 	public uniqueAssetName: boolean;
 	public existAsset: any;
-	@ViewChild('includeDependencies') includeDependencies: ElementRef;
+	@ViewChild('includeDependencies', {static: false}) includeDependencies: ElementRef;
 
 	constructor(
 		public cloneModalModel: AssetModalModel,

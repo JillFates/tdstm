@@ -14,7 +14,7 @@ import {DecoratorOptions} from '../../../../shared/model/ui-modal-decorator.mode
 })
 export class ImportBatchRecordDialogComponent extends UIExtraDialog {
 
-	@ViewChild('detailFieldsComponent') detailFieldsComponent: ImportBatchRecordFieldsComponent;
+	@ViewChild('detailFieldsComponent', {static: false}) detailFieldsComponent: ImportBatchRecordFieldsComponent;
 	private batchRecordUpdatedFlag = false;
 	public modalOptions: DecoratorOptions;
 	public isWindowMaximized;

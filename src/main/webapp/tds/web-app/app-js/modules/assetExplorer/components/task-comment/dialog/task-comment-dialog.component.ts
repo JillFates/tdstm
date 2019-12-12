@@ -8,7 +8,7 @@ import {AssetModalModel} from '../../../model/asset-modal.model';
         <div tds-autofocus tds-handle-escape (escPressed)="cancelCloseDialog()" class="task-comment-dialog-component modal-content " id="task-comment-dialog-component">
             <div class="modal-header">
                 <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                    <span aria-hidden="true">×</span>
+                    <clr-icon aria-hidden="true" shape="close"></clr-icon>
                 </button>
                 <h4 *ngIf="assetModalModel.modalType == 'COMMENT'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_COMMENTS' | translate}}</h4>
                 <h4 *ngIf="assetModalModel.modalType == 'TASK'" class="modal-title">{{ 'ASSET_EXPLORER.SHOW_TASKS' | translate}}</h4>

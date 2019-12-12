@@ -25,7 +25,7 @@ declare var jQuery: any;
 	templateUrl: 'bundle-list.component.html',
 })
 export class BundleListComponent implements OnInit, AfterContentInit {
-	private state: State = {
+	protected state: State = {
 		sort: [{
 			dir: 'asc',
 			field: 'name'
@@ -47,6 +47,7 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	public dateFormat = '';
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	public showFilters = false;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -131,6 +132,18 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
 			},
 			(err) => console.log(err));
+	}
+
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	protected filterCount(): number {
+		return this.state.filter.filters.length;
+	}
+
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
 	}
 
 	/**

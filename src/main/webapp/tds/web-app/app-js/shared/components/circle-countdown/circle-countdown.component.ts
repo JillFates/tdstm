@@ -43,7 +43,9 @@ export class CircleCountdownComponent {
 	refreshCountdownSubscription: Subscription;
 	refreshCountdownTime = 30;
 	refreshCount: number;
-	@ViewChild('countdownContainer') countdownContainer: ElementRef<any>;
+	refreshAnimation = `countdown ${this.refreshCountdownTime}s linear infinite forwards`;
+	@ViewChild('refreshCircle', {static: false}) refreshCircle: ElementRef;
+	@ViewChild('countdownContainer', {static: false}) countdownContainer: ElementRef<any>;
 	circleTimerOptions: CircleCountdownOption;
 	started: boolean;
 

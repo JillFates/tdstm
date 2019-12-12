@@ -14,12 +14,12 @@ declare var jQuery: any;
 	template: `
         <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="modal fade in date-range-selector-component" id="date-range-selector-component" data-backdrop="static" tabindex="0" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content" tds-ui-modal-decorator=""
+                <div class="tds-modal-content with-box-shadow tds-angular-component-content" tds-ui-modal-decorator=""
                      [options]="modalOptions">
                     <div class="modal-header">
-                        <button (click)="cancelCloseDialog()" type="button" class="close component-action-close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
+						</button>
                         <h4 class="modal-title">{{getTitle()}}</h4>
                     </div>
                     <div class="modal-body">
@@ -89,16 +89,8 @@ declare var jQuery: any;
                         </div>
                     </div>
                     <div class="modal-footer form-group-center">
-                        <button type="button"
-                                [disabled]="!canSave()"
-                                class="btn btn-primary pull-left component-action-save" (click)="save()"><span
-                                class="fa fa-fw fa-floppy-o"></span> Save
-                        </button>
-                        <button type="button"
-                                class="btn btn-default pull-right component-action-cancel" (click)="cancelCloseDialog()">
-                            <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span> Cancel</span>
-                        </button>
+						<tds-button-save theme="primary" [disabled]="!canSave()" (click)="save()">Save</tds-button-save>
+						<tds-button-cancel (click)="cancelCloseDialog()">Cancel</tds-button-cancel>
                     </div>
                 </div>
             </div>

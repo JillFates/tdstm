@@ -31,7 +31,7 @@
   -webkit-transition: width 0.6s ease;
   transition: width 0.6s ease;
 }
-.btn {
+/* .btn {
   display: inline-block;
   padding: 6px 12px;
   margin-bottom: 0;
@@ -50,7 +50,7 @@
       -ms-user-select: none;
        -o-user-select: none;
           user-select: none;
-}
+} */
 
 .btn:focus {
 

@@ -1,36 +1,43 @@
-<div class="modal fade in dialog-draggable-no-background data-script-console-component tds-ui-modal-decorator" id="viewConsole" data-backdrop="static" tabindex="-1" role="dialog">
-	<div id="console-modal-dialog" class="modal-dialog modal-md" role="document">
-		<div class="modal-content resizable"
-		     tds-ui-modal-decorator=""
-		     [isWindowMaximized]="isWindowMaximized"
-		     [options]="modalOptions"
-		     [style.width.px]="consoleSettings.width"
-		     [style.height.px]="consoleSettings.height">
+<div
+	class="modal fade in dialog-draggable-no-background data-script-console-component tds-ui-modal-decorator"
+	id="viewConsole"
+	data-backdrop="static"
+	tabindex="-1"
+	role="dialog"
+>
+	<div
+		id="console-modal-dialog"
+		class="modal-dialog tds-modal-content modal-xxl"
+		role="document"
+	>
+		<div class="tds-modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">{{'DATA_INGESTION.DATASCRIPT.DESIGNER.CONSOLE_TITLE'|translate}}</h4>
-
-				<div class="tool-box">
-					<button id="btnMaximizeModal" *ngIf="!isWindowMaximized" (click)="maximizeWindow()" type="button"  class="full-screen" aria-label="Full screen">
-						<span class="glyphicon glyphicon-fullscreen" title="Full screen"></span>
-					</button>
-
-					<button id="btnRestoreModal" *ngIf="isWindowMaximized" (click)="restoreWindow()" type="button"  class="restore-screen" aria-label="Restore window size">
-						<span class="glyphicon glyphicon-resize-full" title="Restore window size"></span>
-					</button>
-
-					<button id="btnCloseDialog" (click)="cancelCloseDialog()" type="button" class="close-screen" aria-label="Close" title="Close">
-						<span class="glyphicon glyphicon-remove" title="Close"></span>
-					</button>
+				<tds-button-custom
+					class="close"
+					[icon]="'close'"
+					(click)="cancelCloseDialog($event)"
+					[displayLabel]="false"
+					[flat]="true"
+				></tds-button-custom>
+				<div class="modal-title-container">
+					<div class="modal-title">
+						{{
+							'DATA_INGESTION.DATASCRIPT.DESIGNER.CONSOLE_TITLE'
+								| translate
+						}}
+					</div>
 				</div>
 			</div>
 			<div class="modal-body">
-				<textarea id="textAreaLog" class="form-control console"
-						  [(ngModel)]="consoleSettings.scriptTestResult.consoleLog" disabled cols="30" rows="10" >
+				<textarea
+					id="textAreaLog"
+					class="form-control console"
+					[(ngModel)]="consoleSettings.scriptTestResult.consoleLog"
+					disabled
+					cols="30"
+					rows="10"
+				>
 				</textarea>
-				<button (click)="cancelCloseDialog()"
-				        type="button" class="btn btn-default text-center">
-								<span class="glyphicon glyphicon-ban-circle"></span> {{'GLOBAL.CLOSE' | translate }}
-				</button>
 			</div>
 		</div>
 	</div>

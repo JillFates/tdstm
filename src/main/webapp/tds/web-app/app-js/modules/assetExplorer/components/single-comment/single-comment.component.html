@@ -1,9 +1,9 @@
 <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="single-comment-component modal fade in" id="single-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content resizable" [style.width.px]="500">
+		<div class="tds-modal-content with-box-shadow resizable" [style.width.px]="500">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
+					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
 				<h4 class="modal-title">{{getModalTitle(singleCommentModel.modal.type)}}</h4>
 			</div>

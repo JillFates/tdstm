@@ -9,9 +9,9 @@ import {DateUtils} from '../../../../shared/utils/date.utils';
 @Component({
 	selector: 'asset-explorer-view-export',
 	template: `
-        <div class="modal-content">
+        <div class="tds-modal-content">
             <div class="modal-header">
-                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close"><clr-icon aria-hidden="true" shape="close"></clr-icon></button>
                 <h4 class="modal-title">Export to Excel</h4>
             </div>
             <div class="modal-body">
@@ -48,7 +48,7 @@ export class AssetViewExportComponent {
 	public dataToExport: any[] = [];
 	private allProperties = false;
 	private fieldImportance = new FieldImportance();
-	@ViewChild('excelexport') public excelexport: ExcelExportComponent;
+	@ViewChild('excelexport', {static: false}) public excelexport: ExcelExportComponent;
 
 	constructor(public assetExportModel: AssetExportModel, public activeDialog: UIActiveDialogService, private assetExpService: AssetExplorerService) {
 

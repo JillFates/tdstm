@@ -7,7 +7,11 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
-import { GRID_DEFAULT_PAGE_SIZE, GRID_DEFAULT_PAGINATION_OPTIONS } from '../model/constants';
+import {
+	GRID_DEFAULT_PAGE_SIZE,
+	GRID_DEFAULT_PAGINATION_OPTIONS,
+	MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC
+} from '../model/constants';
 import { DateUtils } from './date.utils';
 import { NotifierService } from '../services/notifier.service';
 
@@ -360,5 +364,13 @@ export class DataGridOperationsHelper {
 	 */
 	public getPageSize(): number {
 		return this.state.take;
+	}
+
+	/**
+	 * Determine based upon the rows number if grid can positioned the menu column contextual menu dinamically
+	 */
+	public canSupportColumnMenuDynamic(minRows = 0): boolean {
+		const minimum = minRows || MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC;
+		return (this.gridData && this.gridData.total) >= minimum;
 	}
 }

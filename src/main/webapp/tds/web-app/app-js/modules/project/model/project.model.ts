@@ -37,14 +37,14 @@ export class ProjectColumnModel {
 			{
 				label: 'Start Date',
 				property: 'startDate',
-				type: 'text',
+				type: 'date',
 				format: dateFormat,
 				width: 'auto'
 			},
 			{
 				label: 'Completion Date',
 				property: 'completionDate',
-				type: 'text',
+				type: 'date',
 				format: dateFormat,
 				width: 'auto'
 			},

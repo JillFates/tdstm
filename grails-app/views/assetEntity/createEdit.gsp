@@ -59,418 +59,445 @@
 	<input type="hidden" id="updateView" 			name="updateView" value="">
 	<input type="hidden" id="updateViewId" 			name="updateViewId" value=""/>
 
-	<table style="border:0;width:1000px;" class="ui-widget asset-entities-dialog-table-content">
-		<tr>
-			<td colspan="2">
-				<div class="dialog">
-					<table>
-						<tbody>
-							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntityInstance.assetName}"/>
-								<td colspan="3">
-									<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />
-								</td>
+	<div class="legacy-modal-dialog">
+		<div class="legacy-modal-content">
+			<%-- Header Content Here --%>
+			<g:render template="/assetEntity/showHeader" model="[assetEntity:assetEntityInstance]"></g:render>
+			<div id="modalBody" class="legacy-modal-body">
+				<div class="legacy-modal-body-content">
+					<div class="grid-form" id="details">
 
-								<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntityInstance.description}"/>
-								<td colspan="3">
-									<tds:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetEntityInstance.description}" tooltipDataPlacement="bottom"/>
-								</td>
-							</tr>
-							<tr>
-								<td class="label ${standardFieldSpecs.assetType.imp?:''}" nowrap="nowrap">
-									<label for="model">
-										<span id="assetTypeLabel" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
-											${standardFieldSpecs.assetType.label}
-										</span>
-									</label>
-								</td>
-								<td class="${standardFieldSpecs.assetType.imp?:''}" data-for="model" style="border-top: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-									<div id="modelEditId" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
-										<div id="assetTypeSelect" tabindex="102">
-										</div>
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${assetEntityInstance.assetName}"/>
+							<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="100" value="${assetEntityInstance.assetName}" />
+						</div>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.description}" value="${assetEntityInstance.description}"/>
+							<tds:inputControl field="${standardFieldSpecs.description}" tabindex="101" value="${assetEntityInstance.description}" tooltipDataPlacement="bottom"/>
+						</div>
+
+						<div class="clr-form-control">
+							<label class="clr-control-label ${standardFieldSpecs.assetType.imp?:''}" for="model">
+								<span id="assetTypeLabel" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
+									${standardFieldSpecs.assetType.label}
+								</span>
+							</label>
+							<div id="modelEditId" style="flex:1;" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.assetType.tip?: standardFieldSpecs.assetType.label}">
+								<div id="assetTypeSelect" tabindex="102">
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${assetEntityInstance.environment}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="environment" name="environment" from="${environmentOptions}"
+											value="${assetEntityInstance.environment}" noSelection="${['':'Please select...']}"
+											tabindex="205"/>		
+								</div>
+							</div>
+						</div>
+						
+						<%-- SOURCE --%>
+						<div class="source-target-wrapper">
+							<label class="header-label ${standardFieldSpecs.locationSource.imp?:''}">Source</label>
+							<div class="clr-form-control useRoomS">
+								<label class="clr-control-label ${standardFieldSpecs.locationSource.imp?:''}" for="locationSourceId">Location/Room</label>
+								<div class="clr-control-container">
+									<div class="clr-select-wrapper">
+										<g:select class="clr-select" id="roomSelectS" name="roomSourceId"
+												from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
+												optionKey="id" optionValue="${{it.value}}"
+												noSelection="${[0:'Please select...']}"
+												onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"
+												tabindex="300" />	
 									</div>
-								</td>
-
-								<tds:inputLabel field="${standardFieldSpecs.environment}" value="${assetEntityInstance.environment}"/>
-								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select id="environment" name="environment" class="${standardFieldSpecs.environment.imp?:''}" from="${environmentOptions}"
-											  value="${assetEntityInstance.environment}" noSelection="${['':'Please select...']}"
-											  tabindex="205"
-											/>
-								</tds:tooltipSpan>
-								</td>
-								<td colspan="1"></td>
-								<td class="label_sm">Source</td>
-								<td class="label_sm">Target</td>
-							</tr>
-							<tr>
-								<td class="label ${standardFieldSpecs.manufacturer.imp?:''}" nowrap="nowrap">
-									<g:if test="${assetEntityInstance.manufacturer?.id}">
-										<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
-											<a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
-										</label>
-									</g:if>
-									<g:else>
-										<label for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
-											${standardFieldSpecs.manufacturer.label}
-										</label>
-									</g:else>
-								</td>
-								<td class="${standardFieldSpecs.manufacturer.imp?:''}" data-for="manufacturer" style="border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-									<div id="manufacturerEditId" style="display:inline" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
-										<div id="manufacturerSelect" tabindex="103">
-										</div>
-									</div>
-								</td>
-
-								<tds:inputLabel field="${standardFieldSpecs.priority}" value="${assetEntityInstance.priority}"/>
-								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.priority}">
-									<g:select id="priority" name ="priority"
-											  from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':'Please select...']}"
-											  class="${standardFieldSpecs.priority.imp?:''}" tabindex="210"
-											/>
-								</tds:tooltipSpan>
-								</td>
-								<td class="label ${standardFieldSpecs.locationSource.imp?:''}" nowrap="nowrap">
-									<label for="locationSourceId">Location/Room</label>
-								</td>
-								<td class="${standardFieldSpecs.locationSource.imp?:''}" style="vertical-align: text-top;" data-for="locationSourceId">
-										<tds:tooltipSpan class="useRoomS" field="${standardFieldSpecs.locationSource}">
-											<g:select id="roomSelectS"  name="roomSourceId"
-													  from="${sourceRoomSelect}" value="${assetEntityInstance.roomSource?.id}"
-													  optionKey="id" optionValue="${{it.value}}"
-													  noSelection="${[0:'Please select...']}"
-													  class="${standardFieldSpecs.locationSource.imp?:''} assetSelect roomSelectS"
-													  onchange="EntityCrud.updateOnRoomSelection(this, 'S', 'Edit')"
-													  tabindex="300"
-													/>
-										</tds:tooltipSpan>
-									<%-- Theses fields are used to allow user to create a source room on the fly --%>
-										<span class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationSource.tip?: standardFieldSpecs.locationSource.label}">
+								</div>
+							</div>
+						
+							<%-- Theses fields are used to allow user to create a source room on the fly --%>		
+							<div class="newRoomS" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationSource.tip?: standardFieldSpecs.locationSource.label}">
+								<div class="clr-form-control">
+								<label class="clr-control-label ${standardFieldSpecs.locationSource.imp?:''}">Location Name</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
 											<input type="text" id="locationSourceId" name="locationSource" value=""
-												   placeholder="Location"
-												   class="${standardFieldSpecs.locationSource.imp?:''}"
-												   size=10
-												   tabindex="301"
-													/>
-											<input type="text" id="roomSourceId" name="roomSource" value=""
-												   placeholder="Room Name"
-												   class="${standardFieldSpecs.roomSource.imp?:''}"
-												   size=10
-												   tabindex="302"
-													/>
-										</span>
-								</td>
-								<td nowrap style="vertical-align: text-top;" class="${standardFieldSpecs.locationTarget.imp?:''}" data-for="locationSourceId">
-										<tds:tooltipSpan class="useRoomT" field="${standardFieldSpecs.locationTarget}">
-											<g:select id="roomSelectT" name="roomTargetId"
-													  from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
-													  optionKey="id" optionValue="${{it.value}}"
-													  noSelection="${[0:'Please select...']}"
-													  class="${standardFieldSpecs.locationTarget.imp?:''} assetSelect roomSelectT"
-													  onchange="EntityCrud.updateOnRoomSelection(this, 'T', 'Edit')"
-													  tabindex="330"
-													/>
-										</tds:tooltipSpan>
-									<%-- Theses fields are used to allow user to create a source room on the fly --%>
-										<span class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationTarget.tip?: standardFieldSpecs.locationTarget.label}">
-											<br/>
-											<input type="text" id="locationTargetId" name="locationTarget" value=""
-												   placeholder="Location"
-												   class="${standardFieldSpecs.locationTarget.imp?:''}"
-												   size=10 tabindex="331"
-													/>
-											<input type="text" id="roomTargetId" name="roomTarget" value=""
-												   placeholder="Room Name"
-												   class="${standardFieldSpecs.roomTarget.imp?:''}"
-												   size=10 tabindex="332"
-													/>
-										</span>
-								</td>
-
-							</tr>
-							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntityInstance.model}"/>
-								<td class="${standardFieldSpecs.model.imp?:''}" data-for="assetType"  style="border-bottom: 1px solid #BBBBBB; border-left: 1px solid #BBBBBB; border-right: 1px solid #BBBBBB;">
-								<tds:tooltipSpan field="${standardFieldSpecs.model}">
-									<div id="modelSelect" tabindex="104">
+												placeholder="Location"
+												class="clr-input"
+												tabindex="301"/>
+										</div>
 									</div>
-									<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
-								</tds:tooltipSpan>
-								</td>
+								</div>
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.locationSource.imp?:''}">RoomName</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="text" id="roomSourceId" name="roomSource" value=""
+												placeholder="Room Name"
+												class="clr-input"
+												tabindex="302"/>
+										</div>
+									</div>
+								</div>
+							</div>
 
-								<td class="label ${standardFieldSpecs.ipAddress.imp?:''}" nowrap="nowrap">
-									<label for="ipAddress" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.ipAddress.tip ?: standardFieldSpecs.ipAddress.label}">
-										${standardFieldSpecs.ipAddress.label}
-									</label>
-								</td>
-								<td>
-									<tds:tooltipSpan field="${standardFieldSpecs.ipAddress}">
-										<input type="text" id="ipAddress" name="ipAddress"
-											   value="${assetEntityInstance.ipAddress}"
-											   class="${standardFieldSpecs.ipAddress.imp?:''}" tabindex="215"
-												/>
-									</tds:tooltipSpan>
-								</td>
+							<div class="clr-form-control">
+								<label class="clr-control-label ${standardFieldSpecs.rackSource.imp?:''}" for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cabinet" >Rack/Cabinet</label>
+									
+								<div class="clr-control-container">
+  									<div class="clr-select-wrapper">
+										<g:render template="deviceRackSelect" model="[options:sourceRackSelect, rackId:assetEntityInstance?.rackSource?.id,
+											rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
+									</div>
+								</div>	
+							</div>
 
-								<td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}" nowrap="nowrap" id="rackId">
-									<label for="rackSourceId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cabinet" >Rack/Cabinet</label>
-								</td>
-								<td class="label bladeLabel ${standardFieldSpecs.sourceChassis.imp?:''}" nowrap="nowrap" id="bladeId" style="display:none">
-									<label for="sourceChassisId" data-toggle="popover" data-trigger="hover" data-content="Blade Chassis">Blade Chassis</label>
-								</td>
+							<div style="display:none" class="newRackS">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.rackSource.imp?:''}">Rack Name</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="text" id="rackSourceId" name="rackSource" value=""
+												placeholder="New Rack Name"
+												class="clr-input"
+												tabindex="311"/>
+											<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
+										</div>
+									</div>
+								</div>
+							</div>
 
-								<td class="label rackLabel ${standardFieldSpecs.rackSource.imp?:''}" data-for="rackSourceId">
-									<tds:tooltipSpan class="useRackS" field="${standardFieldSpecs.rackSource}" tooltipDataPlacement="bottom">
-										<g:render template="deviceRackSelect" model="[clazz:standardFieldSpecs.rackSource.imp?:'', options:sourceRackSelect, rackId:assetEntityInstance?.rackSource?.id,
-																					  rackDomId:'rackSourceId', rackDomName:'rackSourceId', sourceTarget:'S', forWhom:'Edit', tabindex:'310']" />
-									</tds:tooltipSpan>
-									<tds:tooltipSpan class="newRackS" tooltipDataPlacement="bottom" field="${standardFieldSpecs.rackSource}">
-										<input type="text" id="rackSourceId" name="rackSource" value=""
-											   placeholder="New rack name"
-											   class="${standardFieldSpecs.rackSource.imp?:''}"
-											   xstyle="display:none"
-											   size=20 tabindex="311"
-										/>
-										<input type="hidden" id="newRackSourceId" name="newRackSourceId" value="-1">
-									</tds:tooltipSpan>
-								</td>
-								<td class="label rackLabel ${standardFieldSpecs.rackTarget.imp?:''}" data-for="rackSourceId">
-									<tds:tooltipSpan class="useRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.rackTarget}">
-										<g:render template="deviceRackSelect"  model="[clazz:standardFieldSpecs.rackTarget.imp?:'', options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
-																					   rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
-									</tds:tooltipSpan>
-									<tds:tooltipSpan class="newRackT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.rackTarget}">
-										<input type="text" id="rackTargetId" name="rackTarget" value=""
-											   placeholder="New rack name"
-											   class="${standardFieldSpecs.rackTarget.imp?:''}"
-											   xstyle="display:none"
-											   size=20 tabindex="341" />
-										<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
-									</tds:tooltipSpan>
-								</td>
+							<div class="useBladeS" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceChassis.imp?:''}" for="sourceChassisSelectId">Chassis</label>
+									<div class="clr-control-container">
+										<div class="clr-select-wrapper">
+											<g:render template="deviceChassisSelect"
+													model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
+															options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
+															sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"/>
+										</div>
+									</div>
+								</div>
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceBladePosition.imp?:''}">Chassis Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+										<input type="number" id="sourceBladePositionId" name="sourceBladePosition"
+											value="${assetEntityInstance.sourceBladePosition}"
+											placeholder="Chassis Position"
+											class="clr-input"
+											tabindex="320"/>
+										</div>
+									</div>
+								</div>
+							</div>
 
-								<td class="label bladeLabel" style="display:none">
-									<tds:tooltipSpan class="useBladeS" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceChassis}">
-										<g:render template="deviceChassisSelect"
-												  model="[ domId:'sourceChassisSelectId', domName:'sourceChassis',
-														   options:sourceChassisSelect, value:assetEntityInstance.sourceChassis?.id,
-														   domClass: standardFieldSpecs.sourceChassis.imp?:'',
-														   sourceTarget:'S', forWhom:'$forWhom', tabindex:'312']"
-										/>
-									</tds:tooltipSpan>
-								</td>
-								<td class="label bladeLabel" style="display:none">
-									<tds:tooltipSpan class="useBladeT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.targetChassis}">
-										<g:render template="deviceChassisSelect"
-												  model="[ domId:'targetChassisSelectId', domName:'targetChassis',
-														   options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
-														   domClass: standardFieldSpecs.targetChassis.imp?:'',
-														   sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"
-										/>
-									</tds:tooltipSpan>
-								</td>
+							<div class="useRackS" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.sourceRackPosition.imp?:''}" for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="sourceRackPositionId" name="sourceRackPosition"
+												value="${assetEntityInstance.sourceRackPosition}"
+												placeholder="Position"
+												class="clr-input"
+												tabindex="320"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
+						<%-- TARGET --%>
+						<div class="source-target-wrapper">
+							<label class="header-label ${standardFieldSpecs.locationTarget.imp?:''}">Target</label>
+							
+							<div class="clr-form-control useRoomT">
+								<label class="clr-control-label ${standardFieldSpecs.locationTarget.imp?:''}" for="locationTargetId">Location/Room</label>
+								<div class="clr-control-container">
+									<div class="clr-select-wrapper">
+										<g:select class="clr-select" id="roomSelectT" name="roomTargetId"
+											from="${targetRoomSelect}" value="${assetEntityInstance.roomTarget?.id}"
+											optionKey="id" optionValue="${{it.value}}"
+											noSelection="${[0:'Please select...']}"
+											onchange="EntityCrud.updateOnRoomSelection(this, 'T', 'Edit')"
+											tabindex="330"/>
+									</div>
+								</div>
+							</div>
 
-							</tr>
-							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntityInstance.shortName}" tabindex="105"/>
+							<%-- Theses fields are used to allow user to create a source room on the fly --%>
+							<div class="newRoomT" style="display:none" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.locationTarget.tip?: standardFieldSpecs.locationTarget.label}">
+								<div class="clr-form-control">
+								<label class="clr-control-label ${standardFieldSpecs.locationTarget.imp?:''}">Location Name</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="text" id="locationTargetId" name="locationTarget" value=""
+												placeholder="Location"
+												class="clr-input"
+												tabindex="331"/>
+										</div>
+									</div>
+								</div>
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.locationTarget.imp?:''}">RoomName</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="text" id="roomTargetId" name="roomTarget" value=""
+												placeholder="Room Name"
+												class="clr-input"
+												tabindex="332"/>
+										</div>
+									</div>
+								</div>
+							</div>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetEntityInstance.os}" tabindex="220"/>
+							<div class="clr-form-control">
+								<label class="clr-control-label ${standardFieldSpecs.rackTarget.imp?:''}" for="rackTargetId" data-toggle="popover" data-trigger="hover" data-content="Rack/Cabinet" >Rack/Cabinet</label>
+								<div class="clr-control-container">
+  									<div class="clr-select-wrapper">
+										<g:render template="deviceRackSelect"  model="[options:targetRackSelect, rackId: assetEntityInstance.rackTarget?.id,
+											rackDomId:'rackTargetId', rackDomName:'rackTargetId', sourceTarget:'T', forWhom:'Edit', tabindex:'340']" />
+									</div>
+								</div>	
+							</div>
 
-								<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
-								<td class="label positionLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" nowrap="nowrap">
-									<label for="sourceRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
-								</td>
-								<td class="rackLabel">
-									<tds:tooltipSpan class="sourceRackPositionT" tooltipDataPlacement="bottom" field="${standardFieldSpecs.sourceRackPosition}">
-										<input type="text" id="sourceRackPositionId" name="sourceRackPosition"
-											   value="${assetEntityInstance.sourceRackPosition}"
-											   placeholder="U position"
-											   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useRackS"
-											   size=10 tabindex="320"
-										/>
-									</tds:tooltipSpan>
-								</td>
-								<td class="rackLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetRackPosition.tip?: standardFieldSpecs.targetRackPosition.label}">
-									<input type="text" id="targetRackPositionId" name="targetRackPosition"
-										   value="${assetEntityInstance.targetRackPosition}"
-										   placeholder="U position"
-										   class="${standardFieldSpecs.targetRackPosition.imp?:''} useRackT"
-										   targetRackPosition tabindex="350" />
-								</td>
-								<td class="bladeLabel ${standardFieldSpecs.sourceRackPosition.imp?:''}" data-toggle="popover" data-placement="bottom" data-trigger="hover" data-content="${standardFieldSpecs.sourceBladePosition.tip?: standardFieldSpecs.sourceBladePosition.label}">
-									<input type="text" id="sourceBladePositionId" name="sourceBladePosition"
-										   value="${assetEntityInstance.sourceBladePosition}"
-										   placeholder="Chassis position"
-										   class="${standardFieldSpecs.sourceRackPosition.imp?:''} useBladeS"
-										   size=10 tabindex="320"
-									/>
-								</td>
-								<td class="bladeLabel" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="${standardFieldSpecs.targetBladePosition.tip?: standardFieldSpecs.targetBladePosition.label}">
-									<input type="text" id="targetRackPositionId" name="targetBladePosition"
-										   value="${assetEntityInstance.targetBladePosition}"
-										   placeholder="Chassis position"
-										   class="${standardFieldSpecs.targetRackPosition.imp?:''} useBladeT"
-										   size=10 tabindex="350"
-									/>
-								</td>
+							<div style="display:none" class="newRackT">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.rackTarget.imp?:''}">Rack Name</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="text" id="rackTargetId" name="rackTarget" value=""
+												placeholder="New rack name"
+												class="clr-input"
+												tabindex="311"/>
+											<input type="hidden" id="newRackTargetId" name="newRackTargetId" value="-1">
+										</div>
+									</div>
+								</div>
+							</div>
 
-							</tr>
-							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntityInstance.serialNumber}" tabindex="106"/>
+							<div class="useBladeT" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetChassis.imp?:''}" for="targetChassisSelectId">Chassis</label>
+									<div class="clr-control-container">
+										<div class="clr-select-wrapper">
+											<g:render template="deviceChassisSelect"
+												model="[domId:'targetChassisSelectId', domName:'targetChassis',
+														options:targetChassisSelect, value:assetEntityInstance.targetChassis?.id,
+														sourceTarget:'T', forWhom:'$forWhom', tabindex:'342']"/>
+										</div>
+									</div>
+								</div>
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetBladePosition.imp?:''}">Chassis Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="targetRackPositionId" name="targetBladePosition"
+												value="${assetEntityInstance.targetBladePosition}"
+												placeholder="Chassis Position"
+												class="clr-input"
+												tabindex="350"/>
+										</div>
+									</div>
+								</div>
+							</div>
 
-								<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntityInstance.supportType}" tabindex="225"/>
+							<div class="useRackT" style="display:none">
+								<div class="clr-form-control">
+									<label class="clr-control-label ${standardFieldSpecs.targetRackPosition.imp?:''}" for="targetRackPositionId" data-toggle="popover" data-trigger="hover" data-content="Position">Position</label>
+									<div class="clr-control-container">
+										<div class="clr-input-wrapper">
+											<input type="number" id="targetRackPositionId" name="targetRackPosition"
+												value="${assetEntityInstance.targetRackPosition}"
+												placeholder="Position"
+												class="clr-input"
+												tabindex="355"/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="clr-form-control">
+							<g:if test="${assetEntityInstance.manufacturer?.id}">
+								<label class="clr-control-label ${standardFieldSpecs.manufacturer.imp?:''}" for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
+									<a href='javascript:showManufacturer(${assetEntityInstance.manufacturer?.id})' style='color:#00E'>Manufacturer</a>
+								</label>
+							</g:if>
+							<g:else>
+								<label class="clr-control-label ${standardFieldSpecs.manufacturer.imp?:''}" for="manufacturer" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
+									${standardFieldSpecs.manufacturer.label}
+								</label>
+							</g:else>
+							<div id="manufacturerEditId" style="display:inline; flex:1;" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.manufacturer.tip?: standardFieldSpecs.manufacturer.label}">
+								<div id="manufacturerSelect" tabindex="103">
+								</div>
+							</div>
+						</div>
 
-								<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetEntityInstance.moveBundle?.id}"/>
-								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									<g:select from="${moveBundleList}" id="moveBundle" name="moveBundle.id"
-											  value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name"
-											  class="${standardFieldSpecs.moveBundle.imp?:''}"
-											  tabindex="360"
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.priority}" value="${assetEntityInstance.priority}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="priority" name ="priority"
+											from="${priorityOption}" value= "${assetEntityInstance.priority}" noSelection="${['':'Please select...']}"
+											tabindex="210"
 											/>
-								</tds:tooltipSpan>
-								</td>
+								</div>
+							</div>							
+						</div>
 
-								<tds:inputLabel field="${standardFieldSpecs.size}" value="${assetEntityInstance.size}" />
-								<td nowrap="nowrap" class="sizeScale">
-								<tds:tooltipSpan tooltipDataPlacement="bottom" field="${standardFieldSpecs.size}">
-									<input type="number" min="0"  id="size" name="size" class="${standardFieldSpecs.size.imp?:''}" value="${assetEntityInstance.size}" tabindex="410"/>
-									<g:select id="scale" name="scale"
-											  from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetEntityInstance.class).scale.inList}"
-											  optionValue="value" noSelection="${['':'Please select...']}"
-											  value="${assetEntityInstance.scale}"
-											  class="${standardFieldSpecs.scale.imp?:''}"
-											  tabindex="412"
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.model}" value="${assetEntityInstance.model}"/>
+							<div id="modelSelect" style="flex:1;" tabindex="104">
+							</div>
+							<input type="hidden" value="${assetEntityInstance?.model?.id}" id="hiddenModel" name="model">
+						</div>
+
+						<tds:inputLabelAndField field="${standardFieldSpecs.ipAddress}" value="${assetEntityInstance.ipAddress}"data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.ipAddress.tip ?: standardFieldSpecs.ipAddress.label}" tabindex="215"/>
+
+
+							<tds:inputLabelAndField field="${standardFieldSpecs.shortName}" value="${assetEntityInstance.shortName}" tabindex="105"/>
+							<tds:inputLabelAndField field="${standardFieldSpecs.os}" value="${assetEntityInstance.os}" tabindex="220"/>
+
+							<%-- Note that the next set of TDs are toggled on/off based on the assetType selected --%>
+
+
+						<tds:inputLabelAndField field="${standardFieldSpecs.serialNumber}" value="${assetEntityInstance.serialNumber}" tabindex="106"/>
+						<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${assetEntityInstance.supportType}" tabindex="225"/>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${assetEntityInstance.moveBundle?.id}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" from="${moveBundleList}" id="moveBundle" name="moveBundle.id"
+											value="${assetEntityInstance.moveBundle?.id}" optionKey="id" optionValue="name"
+											tabindex="360"
+											/>									
+								</div>
+							</div>
+
+						</div>
+
+						<div class="clr-form-control">
+							<label for="size" class="clr-control-label ${standardFieldSpecs.size.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+								${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+							</label>
+							<tds:inputControl field="${standardFieldSpecs.size}" tabindex="14" value="${assetEntityInstance.size}"/>
+
+							<div class="clr-control-container" style="padding-left: 30px;">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="scale" name="scale"
+										from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetEntityInstance.class).scale.inList}"
+										optionValue="value" noSelection="${['':'Please select...']}"
+										value="${assetEntityInstance.scale}"
+										tabindex="412"/>
+								</div>
+							</div>
+						</div>
+
+						<tds:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntityInstance.assetTag}" tabindex="107"/>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntityInstance.retireDate}"/>
+							<script type="text/javascript" charset="utf-8">
+								jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
+							</script>
+							<input type="text" id="retireDate" name="retireDate"
+								value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
+								class="dateRange ${standardFieldSpecs.retireDate.imp?:''}"
+								style="width: 138px;"
+								tabindex="230"/>
+						</div>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetEntityInstance.planStatus}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="planStatus" name ="planStatus"
+											from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}"
+											noSelection="${['':'Please select']}"
+											tabindex="365"
 											/>
-								</tds:tooltipSpan>
-								</td>
-							</tr>
+								</div>
+							</div>
+
+						</div>
+
+						<tds:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntityInstance.rateOfChange}" tabindex="420" tooltipDataPlacement="bottom"/>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.railType}" value="${assetEntityInstance.railType}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="railType" name ="railType"
+											from="${railTypeOption}" value= "${assetEntityInstance.railType}"
+											noSelection="${['':'Please select...']}"
+											tabindex="108"/>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntityInstance.maintExpDate}"/>
+							<input type="text" id="maintExpDate" name="maintExpDate"
+								value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
+								class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
+								tabindex="235"/>
+						</div>
+
+						<div class="clr-form-control">
+							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${assetEntityInstance.validation}"/>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="validation" name="validation"
+										from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetEntityInstance.class).validation.inList}"
+										value="${assetEntityInstance.validation}"
+										tabindex="370"/>
+								</div>
+							</div>
+
+						</div>
+
+						<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntityInstance.externalRefId}" tabindex="109"/>
+
+						<div class="clr-form-control">
+							<label class="clr-control-label ${standardFieldSpecs.truck.imp?:''}" for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">Truck/Cart/Shelf</label>
+							<tds:inputControl id="truck" field="${standardFieldSpecs.truck}" tabindex="101" name="truck" value="${assetEntityInstance.truck}" tabindex="240"/>
+							<tds:inputControl id="cart" field="${standardFieldSpecs.cart}" tabindex="101" name="cart" value="${assetEntityInstance.cart}" tabindex="241"/>
+							<tds:inputControl id="shelf" field="${standardFieldSpecs.shelf}" tabindex="101" name="shelf" value="${assetEntityInstance.shelf}" tabindex="242"/>
+							
+							<%-- <input type="text" id="truck" class="${standardFieldSpecs.truck.imp?:''}" name="truck" value="${assetEntityInstance.truck}" tabindex="240" />
+							<input type="text" id="cart" class="${standardFieldSpecs.cart.imp?:''}" name="cart" value="${assetEntityInstance.cart}" tabindex="241" />
+							<input type="text" id="shelf" class="${standardFieldSpecs.shelf.imp?:''}" name="shelf" value="${assetEntityInstance.shelf}" tabindex="242" /> --%>
+						</div>
+
+						<g:render template="customEdit"></g:render>
+					</div>
+					
+					<g:render template="/comment/assetTagsEdit"></g:render>
+
+					<table class="ui-widget asset-entities-dialog-table-content">
+						<g:if test="${action == 'save'}">
 							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.assetTag}" value="${assetEntityInstance.assetTag}" tabindex="107"/>
-
-								<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${assetEntityInstance.retireDate}"/>
-								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'retireDate','errors')}">
-									<tds:tooltipSpan field="${standardFieldSpecs.retireDate}">
-										<script type="text/javascript" charset="utf-8">
-											jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat()  }); });
-										</script>
-										<input type="text" id="retireDate" name="retireDate"
-											value="<tds:convertDate date="${assetEntityInstance?.retireDate}" />"
-											class="dateRange ${standardFieldSpecs.retireDate.imp?:''}"
-											size="15" style="width: 138px;"
-											tabindex="230"
-										/>
-									</tds:tooltipSpan>
-								</td>
-
-								<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${assetEntityInstance.planStatus}"/>
-								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
-									<g:select id="planStatus" name ="planStatus"
-											  from="${planStatusOptions}" value= "${assetEntityInstance.planStatus}"
-											  noSelection="${['':'Please select']}"
-											  class="${standardFieldSpecs.planStatus.imp?:''}"
-											  tabindex="365"
-											/>
-								</tds:tooltipSpan>
-								</td>
-
-								<tds:inputLabelAndField field="${standardFieldSpecs.rateOfChange}" value="${assetEntityInstance.rateOfChange}" tabindex="420" tooltipDataPlacement="bottom"/>
+								<g:render template="dependentCreateEdit" model="[whom:'create', supportAssets:[], dependentAssets:[]]"></g:render>
 							</tr>
-							<tr>
-								<tds:inputLabel field="${standardFieldSpecs.railType}" value="${assetEntityInstance.railType}"/>
-								<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.railType}">
-									<g:select id="railType" name ="railType"
-											  from="${railTypeOption}" value= "${assetEntityInstance.railType}"
-											  noSelection="${['':'Please select...']}"
-											  class="${standardFieldSpecs.railType.imp?:''}"
-											  tabindex="108"/>
-								</tds:tooltipSpan>
-								</td>
-
-								<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${assetEntityInstance.maintExpDate}"/>
-								<td valign="top" class="value ${hasErrors(bean:assetEntityInstance,field:'maintExpDate','errors')}">
-								<tds:tooltipSpan field="${standardFieldSpecs.maintExpDate}">
-									<input type="text" id="maintExpDate" name="maintExpDate"
-										value="<tds:convertDate date="${assetEntityInstance?.maintExpDate}" />"
-										class="dateRange ${standardFieldSpecs.maintExpDate.imp?:''}"
-										size="15" style="width: 138px;"
-										tabindex="235"
-									/>
-								</tds:tooltipSpan>
-								</td>
-
-								<tds:inputLabel field="${standardFieldSpecs.validation}" value="${assetEntityInstance.validation}"/>
-								<td  colspan="2">
-									<tds:tooltipSpan field="${standardFieldSpecs.validation}">
-										<g:select id="validation" name="validation"
-											  from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(assetEntityInstance.class).validation.inList}"
-											  value="${assetEntityInstance.validation}"
-											  class="${standardFieldSpecs.validation.imp?:''}"
-											  tabindex="370"
-											/>
-									</tds:tooltipSpan>
-								</td>
-							</tr>
-							<tr>
-								<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${assetEntityInstance.externalRefId}" tabindex="109"/>
-
-								<td class="label ${standardFieldSpecs.truck.imp?:''}" nowrap="nowrap">
-									<label for="truck" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.truck.tip?: standardFieldSpecs.truck.label}">Truck/Cart/Shelf</label>
-								</td>
-								<td>
-									<tds:tooltipSpan field="${standardFieldSpecs.truck}">
-										<input type="text" id="truck" class="${standardFieldSpecs.truck.imp?:''}" name="truck" value="${assetEntityInstance.truck}" size=3 tabindex="240" />
-										<input type="text" id="cart" class="${standardFieldSpecs.cart.imp?:''}" name="cart" value="${assetEntityInstance.cart}" size=3 tabindex="241" />
-										<input type="text" id="shelf" class="${standardFieldSpecs.shelf.imp?:''}" name="shelf" value="${assetEntityInstance.shelf}" size=2 tabindex="242" />
-									</tds:tooltipSpan>
-								</td>
-							</tr>
-							<tbody class="customTemplate">
-								<g:render template="customEdit"></g:render>
-							</tbody>
-
-							<g:render template="/comment/assetTagsEdit"></g:render>
-						</tbody>
+						</g:if><g:else>
+						<tr id="assetDependentId" class="assetDependent">
+							<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
+						</tr>
+						</g:else>
 					</table>
 				</div>
-			</td>
-		</tr>
-
-
-
-		<g:if test="${action == 'save'}">
-			<tr>
-				<g:render template="dependentCreateEdit" model="[whom:'create', supportAssets:[], dependentAssets:[]]"></g:render>
-			</tr>
-		</g:if><g:else>
-		<tr id="assetDependentId" class="assetDependent">
-			<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
-		</tr>
-	</g:else>
-
-		<tr>
-			<td colspan="2">
-				<div class="buttons">
-					 <span class="button">
-					 	<input type="button" class="save updateDep" data-redirect='${redirectTo}' data-action='show'
-							   value="${actionLabel}" onclick="EntityCrud.${jsAction}($(this), '${assetEntityInstance.assetClass}'); " />
-					 </span>
-					<tds:hasPermission permission="${Permission.AssetDelete}">
-						 <span class="button"><g:actionSubmit class="delete"
-															  onclick=" return confirm('You are about to delete selected asset for which there is no undo. Are you sure? Click OK to delete otherwise press Cancel');" value="Delete" /> </span>
-					</tds:hasPermission>
-					<span class="button"><input type="button" class="cancel" value="Cancel" onclick="$('#createEntityView').dialog('close'); $('#showEntityView').dialog('close'); $('#editEntityView').dialog('close');"/> </span>
-                    <input type="submit" id="assetUpdateSubmit" style="display:none;">
-				</div>
-			</td>
-		</tr>
-	</table>
+			</div>
+		</div>
+		<g:render template="/assetEntity/editButtons" model="[assetEntity:assetEntityInstance]"></g:render>
+	</div>
 </g:form>
 
 <script type="text/javascript">

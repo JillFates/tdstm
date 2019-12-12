@@ -2,13 +2,17 @@
 
 /* Applicable to All Forms */
 form
-    .form-horizontal
+  .form-horizontal
     &.left-alignment
         div.form-group
             label
                 text-align: left
             &.sub-option-50
                 padding-left: 50px
+  .required-field::after
+    content: "*"
+    color: $color-danger--red
+    margin-left: 4px
 
 .form-group
   label.label-detail
@@ -111,6 +115,8 @@ form
   height: 100%
 .element-height-100-per-i
   height: 100% !important
+.float-left
+  float: left
 .float-right
   float: right
 
@@ -212,3 +218,12 @@ button.invisible-button:focus
 .hide, .invisible
   visibility: hidden !important
   display: none !important
+
+.inline
+  display: inline-block
+
+input[type="text"]
+  padding-left: 5px
+
+.overflow-visible
+  overflow: visible !important

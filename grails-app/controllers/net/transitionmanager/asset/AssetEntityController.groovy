@@ -23,6 +23,7 @@ import groovy.transform.CompileStatic
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.AssetOptionsCommand
+import net.transitionmanager.command.architecturegraph.ArchitectureGraphCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
@@ -2806,6 +2807,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderSuccessJson(assetTypes: assetEntityService.assetTypesOf(params.manufacturerId, params.term))
 	}
 
+	@Deprecated
 	@HasPermission(Permission.ArchitectureView)
 	def architectureViewer() {
 		licenseAdminService.checkValidForLicenseOrThrowException()
@@ -2843,14 +2845,13 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	/**
 	 * Returns the data needed to generate the application architecture graph
 	 */
+	@Deprecated
 	@HasPermission(Permission.ArchitectureView)
 	def applicationArchitectureGraph() {
 		Project project = securityService.userCurrentProject
-		Integer assetId = NumberUtils.toInt(params.assetId)
-		Integer levelsUp = NumberUtils.toInt(params.levelsUp)
-		Integer levelsDown = NumberUtils.toInt(params.levelsDown)
-
-		AssetEntity rootAsset = AssetEntity.get(assetId)
+		ArchitectureGraphCommand context = populateCommandObject(ArchitectureGraphCommand)
+		validateCommandObject(context)
+		AssetEntity rootAsset = AssetEntity.get(context.assetId)
 
 		if (rootAsset && rootAsset.project != project) {
 			throw new UnauthorizedException()
@@ -2860,14 +2861,14 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		Set dependencyList = [] as Set
 
 		// Check if the parameters are null
-		if ((assetId == null || assetId == -1) || (levelsUp == null || levelsDown == null)) {
-			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(assetId, levelsUp, levelsDown))
+		if ((context.assetId == null || context.assetId == -1) || (context.levelsUp == null || context.levelsDown == null)) {
+			render(view: '_applicationArchitectureGraph', model: architectureGraphService.architectureGraphModel(rootAsset, context.levelsUp, context.levelsDown, context.mode))
 			return
 		}
 
-		if (params.mode == "assetId") {
-			architectureGraphService.buildArchitectureGraph([rootAsset.id], levelsDown + 1, assetsList, dependencyList)
-			architectureGraphService.buildArchitectureGraph([rootAsset.id], levelsUp, assetsList, dependencyList, false)
+		if (context.mode == "assetId") {
+			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsDown + 1, assetsList, dependencyList)
+			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsUp, assetsList, dependencyList, false)
 		}
 
 		dependencyList.addAll architectureGraphService.extraDependencies(assetsList, dependencyList)
@@ -2878,12 +2879,11 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		architectureGraphService.addLinksToNodes(graphLinks, graphNodes)
 
 		render(view: '_applicationArchitectureGraph',
-			   model: architectureGraphService.architectureGraphModel(graphNodes, graphLinks, assetId, levelsUp, levelsDown)
+			   model: architectureGraphService.architectureGraphModelLegacy(graphNodes, graphLinks, context.assetId, context.levelsUp, context.levelsDown)
 		)
 	}
 
-
-
+	@Deprecated
 	@HasPermission(Permission.UserGeneralAccess)
 	def graphLegend() {
 		render(view: '_graphLegend', model: [assetTypes: assetEntityService.ASSET_TYPE_NAME_MAP])

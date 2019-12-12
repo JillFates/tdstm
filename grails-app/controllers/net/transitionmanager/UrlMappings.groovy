@@ -321,11 +321,6 @@ class UrlMappings {
 			action = [GET:"getDataForPlanningDashboard"]
 		}
 
-		"/ws/dashboard/insight" {
-			controller = "WsInsight"
-			action = [GET: "insightData"]
-		}
-
 		"/ws/dashboard/insight/$action" {
 			controller = "WsInsight"
 		}
@@ -1587,6 +1582,17 @@ class UrlMappings {
                     POST: "generateProjectMetrics"
             ]
         }
+
+		"/ws/architectureGraph/" {
+			controller = "wsArchitectureGraph"
+			action = [
+				GET: "architectureGraph"
+			]
+		}
+
+		"/ws/architectureGraph/$action" {
+			controller = "wsArchitectureGraph"
+		}
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

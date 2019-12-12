@@ -108,10 +108,10 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@Output() showTaskDetailsClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
 	@Output() backTofullGraph: EventEmitter<void> = new EventEmitter<void>();
 	@Output() nodeUpdated: EventEmitter<any> = new EventEmitter<any>();
-	@ViewChild('diagramLayout') diagramLayout: ElementRef;
-	@ViewChild('overviewContainer') overviewContainer: ElementRef;
-	@ViewChild('taskCtxMenu') taskCtxMenu: DiagramContextMenuComponent;
-	@ViewChild('nodeTooltip') nodeTooltip: ElementRef;
+	@ViewChild('diagramLayout', {static: false}) diagramLayout: ElementRef;
+	@ViewChild('overviewContainer', {static: false}) overviewContainer: ElementRef;
+	@ViewChild('taskCtxMenu', {static: false}) taskCtxMenu: DiagramContextMenuComponent;
+	@ViewChild('nodeTooltip', {static: false}) nodeTooltip: ElementRef;
 	stateIcons = STATE_ICONS_PATH;
 	assetIcons = ASSET_ICONS_PATH;
 	ctxMenuIcons = CTX_MENU_ICONS_PATH;

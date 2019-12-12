@@ -19,57 +19,67 @@ import {
 	ViewChild,
 } from '@angular/core';
 
-import {KEYSTROKE, SEARCH_QUITE_PERIOD} from '../../model/constants';
+import { KEYSTROKE, SEARCH_QUITE_PERIOD } from '../../model/constants';
 
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<div class="tds-filter-input">
-			<input type="text"
-				#filterInput
-				[name]="name"
-				[value]="value"
-				[placeholder]="placeholder"
-				input-paste (onPaste)="onPaste($event)"
-				class="form-control">
-			<span *ngIf="filterInput.value"
-				(click)="onClearFilter()"
-				[title]="'GLOBAL.CLEAR_FILTER' | translate"
-				class="clear-filter fa fa-times form-control-feedback component-action-clear-filter"
-				aria-hidden="true">
-			</span>
-		</div>
-	`
+		<input
+			clrInput
+			#filterInput
+			type="text"
+			class="text-filter"
+			[name]="name"
+			[value]="value"
+			[placeholder]="placeholder"
+			input-paste
+			(onPaste)="onPaste($event)"
+		/>
+		<tds-button
+			*ngIf="filterInput.value"
+			(click)="onClearFilter()"
+			[title]="'Clear Filter'"
+			icon="times-circle"
+			[small]="true"
+			[flat]="true"
+		>
+		</tds-button>
+	`,
 })
 export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	@Input() name = '';
 	@Input() placeholder = '';
-	@Input() value = ' ';
+	@Input() value = '';
 	@Output() filter: EventEmitter<string> = new EventEmitter<string>();
-	@ViewChild('filterInput') filterInput: ElementRef;
+	@ViewChild('filterInput', { read: ElementRef, static: true })
+	filterInput: ElementRef;
 
 	private previousSearch = '';
 	private typingTimeout = null;
 	private readonly NOT_ALLOWED_CHAR_REGEX = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
 
-	constructor(private zone: NgZone) {
-	}
+	constructor(private zone: NgZone) {}
 
 	ngOnInit() {
 		/* The handler to react on keyup event for the search input
 		 * is running outside of the angular zone in order to don't trigger
 		 * the angular change detection process on every key stroked
-		*/
+		 */
 		this.zone.runOutsideAngular(() => {
-			this.filterInput.nativeElement
-				.addEventListener('keyup', this.keyPressedListener.bind(this));
+			this.filterInput.nativeElement.addEventListener(
+				'keyup',
+				this.keyPressedListener.bind(this)
+			);
 		});
+		if (this.value === undefined) {
+			this.value = '';
+		}
 	}
 
 	/**
 	 * Event handler to be attached to the listener input keypress event of the search input
 	 * @param {KeyboardEvent} keyEvent - Key press event info
-	*/
+	 */
 	private keyPressedListener(keyEvent: KeyboardEvent): void {
 		this.onFilterKeyUp(keyEvent, this.filterInput.nativeElement.value);
 	}
@@ -77,7 +87,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	/**
 	 * On input changes update the value of the input control
 	 * @param {SimpleChanges} changes - Object with the input properties updated bye the host component
-	*/
+	 */
 	ngOnChanges(changes: SimpleChanges) {
 		if (changes.value) {
 			this.filterInput.nativeElement.value = changes.value.currentValue;
@@ -86,14 +96,17 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 
 	/**
 	 * On destroying the component remove the event listener associated
-	*/
+	 */
 	ngOnDestroy() {
-		this.filterInput.nativeElement.removeEventListener('keyup', this.keyPressedListener.bind(this));
+		this.filterInput.nativeElement.removeEventListener(
+			'keyup',
+			this.keyPressedListener.bind(this)
+		);
 	}
 
 	/**
 	 * Clear the entered search string and notify to the host component
-	*/
+	 */
 	public onClearFilter(): void {
 		this.filterInput.nativeElement.value = '';
 		this.previousSearch = '';
@@ -105,7 +118,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * Otherwise point the previous search to the new one search string
 	 * @param {string} search - Current search value
 	 * @return {boolean}  Boolean indicating if search is cancelled
-	*/
+	 */
 	private preventFilterSearch(search: string): boolean {
 		if (this.previousSearch === search) {
 			return true;
@@ -118,7 +131,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	/**
 	 * Notify to the host component about a new search entered
 	 * @param {string} search - Current search value
-	*/
+	 */
 	private onFilter(search: string): void {
 		/* Here the search is done so the notification to the host component is made
 			within the angular zone in order to update the UI
@@ -133,7 +146,7 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * it ignores the input of special characters
 	 * @param {KeyboardEvent} keyEvent - Key press event info
 	 * @param {string} search - Current search value
-	*/
+	 */
 	private onFilterKeyUp(keyEvent: KeyboardEvent, search: string): void {
 		if (this.preventFilterSearch(search)) {
 			return; // prevent search
@@ -144,7 +157,8 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 		} else if (!this.NOT_ALLOWED_CHAR_REGEX.test(keyEvent.code)) {
 			clearTimeout(this.typingTimeout);
 			this.typingTimeout = setTimeout(
-				() => this.onFilter(search), SEARCH_QUITE_PERIOD
+				() => this.onFilter(search),
+				SEARCH_QUITE_PERIOD
 			);
 		}
 	}
@@ -154,14 +168,17 @@ export class TDSFilterInputComponent implements OnInit, OnDestroy {
 	 * Notify to the host component about a new search, validate previousSearch is different
 	 * from new one
 	 * @param {string} search - Current search value
-	*/
+	 */
 	public onPaste(search: string): void {
 		this.filterInput.nativeElement.value = search;
 
-		if ( this.preventFilterSearch(search)) {
+		if (this.preventFilterSearch(search)) {
 			return; // prevent search
 		}
 		clearTimeout(this.typingTimeout);
-		this.typingTimeout = setTimeout(() => this.onFilter(search), SEARCH_QUITE_PERIOD);
+		this.typingTimeout = setTimeout(
+			() => this.onFilter(search),
+			SEARCH_QUITE_PERIOD
+		);
 	}
 }

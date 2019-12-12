@@ -19,7 +19,7 @@ import {ReportsService} from '../../../reports/service/reports.service';
 import {TaskDetailModel} from '../../model/task-detail.model';
 import {TaskDetailComponent} from '../detail/task-detail.component';
 import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {TaskEditComponent} from '../edit/task-edit.component';
+import {TaskEditCreateComponent} from '../edit-create/task-edit-create.component';
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TaskActionEvents} from '../common/constants/task-action-events.constant';
 import {TaskStatus} from '../../model/task-edit-create.model';
@@ -53,10 +53,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	tasks: IGraphTask[];
 	nodeData$: BehaviorSubject<any> = new BehaviorSubject({});
 	ctxMenuOpts$: ReplaySubject<IDiagramContextMenuOption> = new ReplaySubject(2);
-	@ViewChild('graph') graph: DiagramLayoutComponent;
-	@ViewChild('eventsDropdown') eventsDropdown: DropDownListComponent;
-	@ViewChild('teamHighlightDropdown') teamHighlightDropdown: DropDownButtonComponent;
-	@ViewChild('highlightFilterText') highlightFilterText: ElementRef<HTMLElement>;
+	@ViewChild('graph', {static: false}) graph: DiagramLayoutComponent;
+	@ViewChild('eventsDropdown', {static: false}) eventsDropdown: DropDownListComponent;
+	@ViewChild('teamHighlightDropdown', {static: false}) teamHighlightDropdown: DropDownButtonComponent;
+	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -759,7 +759,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				model.durationText = DateUtils.formatDuration(model.duration, model.durationScale);
 				model.modal = taskDetailModel.modal;
 
-				this.dialogService.extra(TaskEditComponent, [
+				this.dialogService.extra(TaskEditCreateComponent, [
 					{provide: TaskDetailModel, useValue: clone(model)}
 				], false, false)
 					.then(result => {

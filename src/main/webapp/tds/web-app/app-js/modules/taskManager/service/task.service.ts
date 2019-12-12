@@ -91,7 +91,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getAssignedTeam(commentId: any): Observable<any> {
-		if ( commentId == null ) {
+		if ( !commentId || commentId === null ) {
 			return Observable.of([]);
 		}
 
@@ -119,7 +119,7 @@ export class TaskService {
 	 * @returns {Observable<any>}
 	 */
 	getStatusList(commentId: any): Observable<any> {
-		if ( commentId == null ) {
+		if ( !commentId || commentId === null ) {
 			return Observable.of([]);
 		}
 

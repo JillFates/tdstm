@@ -1,78 +1,164 @@
-<div tds-autofocus class="bundle-create-component modal-content" id="bundle-create-component">
-    <div class="modal-header">
-        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-        <h4 class="modal-title">Bundle Create</h4>
-    </div>
-    <div class="modal-body">
-        <div class="modal-body-container">
-            <form action="save" method="post" name="bundleCreateForm">
-                <div class="dialog">
-                    <table>
-                        <tbody>
-                        <tr>
-                            <td colspan="2"><div class="required"> Fields marked ( * ) are mandatory </div> </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name"><b>Name:&nbsp;<span style="color: red">*</span></b></td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="bundleModel.name" style="width:180px" id="name" name="name"/>
-                            </td>
-                        </tr>
+<div
+	tds-autofocus
+	tds-handle-escape
+	class="tds-modal-content has-side-nav bundle-create-component"
+	id="bundle-create-component"
+>
+	<div class="modal-header">
+		<button
+			(click)="cancelCloseDialog()"
+			type="button"
+			class="close"
+			aria-label="Close"
+		>
+			<clr-icon aria-hidden="true" shape="close"></clr-icon>
+		</button>
+		<div class="modal-title-container">
+			<div class="modal-title">
+				Bundle Create
+			</div>
+		</div>
+	</div>
+	<div class="modal-body">
+		<div class="modal-body-container">
+			<form action="save" method="post" name="bundleCreateForm">
+				<div class="dialog">
+					<table>
+						<tbody>
+							<tr>
+								<td colspan="2">
+									<div class="required">
+										Fields marked ( * ) are mandatory
+									</div>
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+									<b
+										>Name:&nbsp;<span style="color: red"
+											>*</span
+										></b
+									>
+								</td>
+								<td valign="top" class="value">
+                                    <input
+                                        class="clr-input"
+										type="text"
+										[(ngModel)]="bundleModel.name"
+										id="name"
+										name="name"
+									/>
+								</td>
+							</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Description:</td>
-                            <td valign="top" class="value">
-                                <input type="text" [(ngModel)]="bundleModel.description"  style="width:98%" id="description" name="description"/>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">From:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="sourceRoomId" name="sourceRoom" [(ngModel)]="bundleModel.fromId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
-                            </td>
-                        </tr>
-                        <tr class="prop">
-                            <td valign="top" class="name">To:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="targetRoomId" name="targetRoom" [(ngModel)]="bundleModel.toId" [valuePrimitive]="true" [textField]="'roomName'" [valueField]="'id'" [data]="rooms"></kendo-dropdownlist>
-                            </td>
-                        </tr>
+							<tr class="prop">
+								<td valign="top" class="name">Description:</td>
+								<td valign="top" class="value">
+									<input
+                                        type="text"
+                                        class="clr-input"
+										[(ngModel)]="bundleModel.description"
+										id="description"
+										name="description"
+									/>
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">From:</td>
+								<td valign="top" class="value">
+									<kendo-dropdownlist
+										id="sourceRoomId"
+										name="sourceRoom"
+										[(ngModel)]="bundleModel.fromId"
+										[valuePrimitive]="true"
+										[textField]="'roomName'"
+										[valueField]="'id'"
+										[data]="rooms"
+									></kendo-dropdownlist>
+								</td>
+							</tr>
+							<tr class="prop">
+								<td valign="top" class="name">To:</td>
+								<td valign="top" class="value">
+									<kendo-dropdownlist
+										id="targetRoomId"
+										name="targetRoom"
+										[(ngModel)]="bundleModel.toId"
+										[valuePrimitive]="true"
+										[textField]="'roomName'"
+										[valueField]="'id'"
+										[data]="rooms"
+									></kendo-dropdownlist>
+								</td>
+							</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Start Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control name="startTime" [(ngModel)]="bundleModel.startTime"></tds-datetime-control>
-                            </td>
-                        </tr>
+							<tr class="prop">
+								<td valign="top" class="name">Start Time:</td>
+								<td valign="top" class="value">
+									<tds-datetime-control
+										name="startTime"
+										[(ngModel)]="bundleModel.startTime"
+									></tds-datetime-control>
+								</td>
+							</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Completion Time:</td>
-                            <td valign="top" class="value">
-                                <tds-datetime-control name="completionTime" [(ngModel)]="bundleModel.completionTime"></tds-datetime-control>
-                            </td>
-                        </tr>
+							<tr class="prop">
+								<td valign="top" class="name">
+									Completion Time:
+								</td>
+								<td valign="top" class="value">
+									<tds-datetime-control
+										name="completionTime"
+										[(ngModel)]="bundleModel.completionTime"
+									></tds-datetime-control>
+								</td>
+							</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Order:</td>
-                            <td valign="top" class="value">
-                                <kendo-dropdownlist id="operationalOrderId" name="operationalOrder" [(ngModel)]="bundleModel.operationalOrder" [data]="orderNums"></kendo-dropdownlist>
-                            </td>
-                        </tr>
+							<tr class="prop">
+								<td valign="top" class="name">Order:</td>
+								<td valign="top" class="value">
+									<kendo-dropdownlist
+										id="operationalOrderId"
+										name="operationalOrder"
+										[(ngModel)]="
+											bundleModel.operationalOrder
+										"
+										[data]="orderNums"
+									></kendo-dropdownlist>
+								</td>
+							</tr>
 
-                        <tr class="prop">
-                            <td valign="top" class="name">Use for Planning:</td>
-                            <td> <input type="checkbox" name="useForPlanning" id="useForPlanning" value="true" checked="checked" style="margin: 0px" [(ngModel)]="bundleModel.useForPlanning"/></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="buttons modal-footer">
-        <tds-button-save [disabled]="!validateRequiredFields(bundleModel)" class="btn-primary pull-left" (click)="saveForm()"></tds-button-save>
-        <tds-button-close class="pull-right" (click)="cancelCloseDialog()"></tds-button-close>
-    </div>
+							<tr class="prop">
+								<td valign="top" class="name">
+									Use for Planning:
+								</td>
+								<td>
+                                    <input
+                                        clrCheckbox
+										type="checkbox"
+										name="useForPlanning"
+										id="useForPlanning"
+										value="true"
+										checked="checked"
+										[(ngModel)]="bundleModel.useForPlanning"
+									/>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</form>
+		</div>
+	</div>
+	<nav class="modal-sidenav btn-link">
+		<tds-button-save
+			[disabled]="!validateRequiredFields(bundleModel)"
+			(click)="saveForm()"
+			[type]="'button'"
+		></tds-button-save>
+		<tds-button-close
+			[type]="'button'"
+			(click)="cancelCloseDialog()"
+		></tds-button-close>
+	</nav>
 </div>

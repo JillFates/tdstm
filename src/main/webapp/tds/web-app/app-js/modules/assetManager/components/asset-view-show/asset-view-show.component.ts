@@ -25,6 +25,12 @@ import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import { BulkActionResult, BulkChangeType } from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
+import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-entity.model';
+import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
+import { takeUntil } from 'rxjs/operators';
+import { Observable, ReplaySubject } from 'rxjs';
 
 declare var jQuery: any;
 
@@ -54,9 +60,11 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
-
-	@ViewChild('select') select: AssetViewSelectorComponent;
-	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
+	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
+	private unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
+	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -67,7 +75,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		private notifier: NotifierService,
 		protected translateService: TranslatePipe,
 		private assetGlobalFiltersService: AssetGlobalFiltersService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService,
+		private preferenceService: PreferenceService) {
 
 		this.metadata.tagList = this.route.snapshot.data['tagList'];
 		this.fields = this.route.snapshot.data['fields'];
@@ -77,12 +86,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-
 		// Get all Query Params
 		this.route.queryParams.subscribe(map => map);
 		this.globalQueryParams = this.route.snapshot.queryParams;
 		this.hiddenFilters = !ValidationUtils.isEmptyObject(this.globalQueryParams);
-
 		this.reloadStrategy();
 		this.initialiseComponent();
 	}
@@ -130,7 +137,13 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			name: 'notificationHeaderTitleChange',
 			title: this.model.name
 		});
-
+		this.getPreferences()
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((preferences: any) => {
+				this.justPlanning = (preferences[PREFERENCES_LIST.ASSET_JUST_PLANNING])
+					? preferences[PREFERENCES_LIST.ASSET_JUST_PLANNING].toString() === 'true'
+					: false;
+			});
 		this.gridState = Object.assign({}, this.gridState, {sort: [
 				{
 					field: `${this.model.schema.sort.domain}_${this.model.schema.sort.property}`,
@@ -238,7 +251,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 					this.select.loadData();
 				});
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
@@ -343,14 +356,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Whenever the just planning change, grab the new value
-	 * @param justPlanning
-	 */
-	public onJustPlanningChange(justPlanning: boolean): void {
-		this.justPlanning = justPlanning;
-	}
-
-	/**
 	 * After every time the hidden filter changes, propagate the value
 	 * @param hiddenFilters
 	 */
@@ -370,18 +375,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * Determines which save operation to call based on the button id.
-	 */
-	public save(saveButtonId: string) {
-		saveButtonId === this.SAVE_BUTTON_ID ? this.onSave() : this.onSaveAs()
-	}
-
-	/**
 	 * Determines if primary button can be Save or Save all based on permissions.
 	 */
 	public getSaveButtonId(): string {
 		return this.canSave() ? this.SAVE_BUTTON_ID : this.SAVEAS_BUTTON_ID;
 	}
+
 	/**
 	 * Group all the dynamic information required by the view in just one function
 	 * @return {any} Object with the values required dynamically by the view
@@ -395,5 +394,69 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
 		}
+	}
+
+	/**
+	 * On bulk edit call grid bulk edit action
+	 */
+	onClickBulkButton(): void {
+		this.assetExplorerViewGrid.onClickBulkButton(this.tdsBulkChangeButton);
+	}
+
+	/**
+	 * Handle Bulk edit result.
+	 */
+	onBulkOperationResult(operationResult: BulkActionResult): void {
+		this.assetExplorerViewGrid.onBulkOperationResult(operationResult);
+	}
+
+	/**
+	 * Returns the grid configuration.
+	 */
+	getGridConfig(): any {
+		return this.assetExplorerViewGrid ?
+			this.assetExplorerViewGrid.getDynamicConfiguration() : null;
+	}
+
+	/**
+	 * On create asset, call grid create asset action.
+	 * @param assetEntityType
+	 */
+	onCreateAsset(assetEntityType: ASSET_ENTITY_DIALOG_TYPES): void {
+		this.assetExplorerViewGrid.onCreateAsset(assetEntityType);
+		this.assetExplorerViewGrid.setCreatebuttonState(assetEntityType);
+	}
+
+	/**
+	 * Calls to grid clear all filters.
+	 */
+	onClearAllFilters(): void {
+		this.assetExplorerViewGrid.onClearFilters();
+	}
+
+	/**
+	 * Returns the number of current filters applied from grid.
+	 */
+	filterCount(): number {
+		return this.assetExplorerViewGrid ? this.assetExplorerViewGrid.filterCount() : 0;
+	}
+
+	/**
+	 * Save Just Planning preference and launch the search again.
+	 * @param isChecked
+	 */
+	onJustPlanningChange(isChecked = false): void {
+		this.preferenceService.setPreference(PREFERENCES_LIST.ASSET_JUST_PLANNING, isChecked.toString())
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe(() => {
+				this.onQuery();
+			});
+	}
+
+	/**
+	 * Returns the preferences from service.
+	 */
+	private getPreferences(): Observable<any> {
+		return this.preferenceService.getPreferences(PREFERENCES_LIST.ASSET_JUST_PLANNING);
 	}
 }

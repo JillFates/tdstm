@@ -1,0 +1,82 @@
+/* Cookbook */
+
+.code-diff-modal {
+  .modal-dialog {
+    width: 1060px;
+  }
+}
+
+.modal-dialog-fullscreen {
+  .tds-modal-content {
+    height: 100%;
+    .modal-body {
+      max-height: 100%;
+      .CodeMirror {
+        height: 100% !important;
+        .CodeMirror-linenumber {
+          margin-top: -4px;
+        }
+      }
+    }
+  }
+}
+
+.code-editor-modal {
+  .modal-body {
+    padding: 15px !important;
+  }
+}
+
+.cookbook_recipes_editor,
+.recipeDetail {
+  .clr-select-wrapper {
+    display: block;
+    select {
+      display: inherit;
+    }
+  }
+}
+
+.cookbook_recipes_editor {
+  .recipe-add {
+    width: 40px;
+    button {
+      max-height: 30px;
+      line-height: 30px;
+      min-width: 44px;
+    }
+  }
+}
+
+.taskGeneration {
+  .container-fluid {
+    padding-left: 0px;
+  }
+  .tm-asset-tag-selector-container {
+    label {
+      display: block;
+    }
+    .asset-tag-selector-component {
+      max-width: unset;
+      width: 100%;
+
+      .k-widget {
+        width: 100%;
+        max-width: unset;
+
+        .k-multiselect-wrap {
+          ul {
+            max-width: 90%;
+          }
+        }
+      }
+    }
+  }
+  .settings-container {
+    padding-top: 28px;
+  }
+  .settings-container.recipe-editor {
+    height: 82px;
+    padding-top: 23px;
+  }
+}
