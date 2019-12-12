@@ -83,4 +83,5 @@ databaseChangeLog = {
 	include file: 'version/v5_0_0/20191112-add_fk_to_asset_comment_asset.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 	include file: 'version/v5_0_0/20190925-updating-password-hashing.groovy'
+	include file: 'version/v5_0_0/20191126-permissions-for-consolidating-task-view-and-task-manager.groovy'
 }

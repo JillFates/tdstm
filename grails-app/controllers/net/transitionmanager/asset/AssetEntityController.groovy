@@ -450,7 +450,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		renderAsJson assetCommentsList
 	}
 
-	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
+	@HasPermission(Permission.TaskView)
 	def showComment() {
 		def commentList = []
 		def personResolvedObj
@@ -668,7 +668,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 	}
 
-	@HasPermission([Permission.CommentCreate, Permission.TaskCreate])
+	@HasPermission(Permission.TaskEdit)
 	def updateComment() {
 		String tzId = userPreferenceService.timeZone
 		String userDTFormat = userPreferenceService.dateFormat

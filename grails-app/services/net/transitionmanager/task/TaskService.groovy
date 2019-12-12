@@ -38,6 +38,7 @@ import net.transitionmanager.asset.CommentService
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
 import net.transitionmanager.command.task.ListTaskCommand
+import net.transitionmanager.command.task.TaskCommand
 import net.transitionmanager.command.task.TaskGenerationCommand
 import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.CoreService
@@ -59,6 +60,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.security.CredentialService
 import net.transitionmanager.security.Permission
 import net.transitionmanager.security.RoleType
+import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.Tag
 import org.apache.commons.lang3.StringUtils
@@ -80,6 +82,10 @@ import static com.tdsops.tm.enums.domain.AssetCommentStatus.STARTED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.ARCHIVED
 import static com.tdsops.tm.enums.domain.AssetDependencyStatus.NA
 import static com.tdsops.tm.enums.domain.AssetDependencyType.BATCH
+
+import static net.transitionmanager.security.SecurityService.AUTOMATIC_PERSON_CODE
+
+
 /**
  * Methods useful for working with Task related domain (a.k.a. AssetComment). Eventually we should migrate
  * away from using AssetComment to persist our task functionality.
@@ -106,6 +112,7 @@ class TaskService implements ServiceMethods {
 	LinkGenerator              grailsLinkGenerator
 	CoreService                coreService
 	CredentialService          credentialService
+	UserPreferenceService      userPreferenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
@@ -5847,5 +5854,156 @@ class TaskService implements ServiceMethods {
 				}
 		}
 		return result
+	}
+
+
+	/**
+	 * Create or update an existing Task based on the given TaskCommand instance.
+	 * @param project - user's active project.
+	 * @param taskCommand - Command Object containing the fields for updating the Task.
+	 * @return a Map with information required by the front-end -- along with the task we send other things just as CSS based on the status.
+	 */
+	Map createOrUpdateTask(Project project, TaskCommand taskCommand) {
+		UserLogin userLogin = securityService.userLogin
+		Task task
+		Date now = new Date()
+
+		// If a task id was provided, then fetch that task (fail if not found).
+		if (taskCommand.id) {
+			// Fetch the Task from the database.
+			task = GormUtil.findInProject(project, Task, taskCommand.id, true)
+			// Validate that the status hasn't been updated by someone else. If so, fail accordingly.
+			if (taskCommand.currentStatus && taskCommand.currentStatus != task.status && task.status != READY) {
+				Person responsible = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
+				String errorMsg
+				switch (task.status) {
+					case STARTED:
+						boolean isProjMgr = partyRelationshipService.staffHasFunction(project, userLogin.person, RoleType.CODE_TEAM_PROJ_MGR)
+						log.debug "Task already STARTED - isPM? $isProjMgr, whoDidIt=$responsible, username=${userLogin.username}"
+						if (responsible.id != userLogin.person.id && !isProjMgr) {
+							errorMsg = "The task was previously STARTED by $responsible"
+						}
+						break
+					case COMPLETED:
+						errorMsg = "The task was previously COMPLETED by $responsible"
+						break
+					default:
+						errorMsg = "The task status was changed to ${task.status}."
+				}
+				if (errorMsg) {
+					throw new InvalidParamException(errorMsg)
+				}
+			}
+			// If there's no task id, a new Task should be created.
+		} else {
+			// Create a new Task instance.
+			task = new Task(project: project, createdBy: userLogin.person)
+			// Assign the task a new number.
+			task.taskNumber = sequenceService.next(project.client.id, 'TaskNumber')
+			// Update a few preferences as needed.
+			userPreferenceService.setPreference(userLogin, UserPreferenceEnum.TASK_CREATE_STATUS, taskCommand.status)
+			if (taskCommand.category) {
+				userPreferenceService.setPreference(userLogin, UserPreferenceEnum.TASK_CREATE_CATEGORY, taskCommand.category)
+			}
+		}
+
+		// List of TaskCommand properties that are to be skipped when assigning values to the task domain instance.
+		List<String> ignoreProperties = [ 'apiActionId', 'assetEntity', 'assignedTo', 'currentStatus', 'deletedPreds',
+										  'id', 'moveEvent', 'note', 'override', 'prevAsset', 'taskDependency', 'taskSuccessor' ]
+
+		// Populate the domain object with some basic fields.
+		taskCommand.populateDomain(task, false, ignoreProperties)
+
+		List<Map> references = [
+				[taskField: 'apiAction', commandField: 'apiActionId', domain: ApiAction],
+				[taskField: 'assetEntity', commandField: 'assetEntity', domain: AssetEntity],
+				[taskField: 'moveEvent', commandField: 'moveEvent', domain: MoveEvent]
+		]
+
+		references.each { Map referenceInfo ->
+			Long referenceId = taskCommand[referenceInfo['commandField']]
+			def reference = null
+			if (referenceId) {
+				reference = GormUtil.findInProject(project, referenceInfo['domain'], referenceId, true)
+			}
+			task[referenceInfo['taskField']] = reference
+		}
+
+		// Deal with task assignment.
+		if (taskCommand.assignedTo != null) {
+			// If the parameter is '0', then the task is unassigned.
+			if (taskCommand.assignedTo == '0') {
+				task.assignedTo = null
+				// Check if assigned to Automatic.
+			} else if (taskCommand.assignedTo.toString() == AUTOMATIC_PERSON_CODE) {
+				task.assignedTo = securityService.getAutomaticPerson()
+			} else {
+				Person person = Person.get(taskCommand.assignedTo)
+				List<Map> projectStaff = partyRelationshipService.getProjectStaff(project.id)
+				if (projectStaff.find { it.staff.id.toString() == taskCommand.assignedTo }) {
+					task.assignedTo = person
+				} else {
+					throw new InvalidParamException("User (${userLogin.username}) attempted to assign unrelated person (${task.assignedTo}) to project ($project).")
+				}
+			}
+		}
+
+		setTaskStatus(task, taskCommand.status, userLogin.person)
+
+		// Having set all the fields, save the domain object.
+		task.save(flush: true)
+
+		Closure manageDependencies = { List<String> dependencies, boolean isPred ->
+			dependencies.each { String dependency ->
+				String[] depInfo = dependency.split("_")
+				String taskDependencyId = depInfo[0]
+				String taskId = depInfo[1]
+				Task depTask = get(Task, taskId, project)
+				if (isPred) {
+					commentService.saveAndUpdateTaskDependency(depTask, task, taskDependencyId, task.id)
+				} else {
+					commentService.saveAndUpdateTaskDependency(task, depTask, taskDependencyId, taskId)
+				}
+			}
+		}
+
+
+		// Check if we need add / delete dependencies.
+		if (taskCommand.manageDependency) {
+			// Delete dependencies if needed.
+			if (taskCommand.deletedPreds) {
+				TaskDependency.executeUpdate("DELETE TaskDependency t WHERE t.id in ( :deletedPreds ) ", [deletedPreds:taskCommand.deletedPreds])
+			}
+			// Update dependencies where the current task is the successor.
+			manageDependencies(taskCommand.taskDependency, false)
+			// Update dependencies where the current task is the predecessor.
+			manageDependencies(taskCommand.taskSuccessor, true)
+
+		}
+
+		boolean addingNote = taskCommand.note != null
+		if (addingNote) {
+			CommentNote note = new CommentNote(createdBy: userLogin.person, dateCreated: now, note: taskCommand.note, isAudit: 0, assetComment: task)
+			note.save(flush: true)
+		}
+
+		if (commentService.shouldSendNotification(task, userLogin.person, addingNote)) {
+			String tzId = userPreferenceService.timeZone
+			String userDTFormat = userPreferenceService.dateFormat
+			commentService.dispatchTaskEmail([taskId: task.id, tzId: tzId, isNew: !taskCommand.id , userDTFormat: userDTFormat])
+		}
+
+		String css = task.dueDate < now ? 'Lightpink' : 'White'
+		boolean isNotResolved = task.isResolved()
+
+		return [
+				assetComment: task.taskToMap(),
+				status: isNotResolved,
+				cssClass: css,
+				statusCss: getCssClassForStatus(task.status),
+				assignedToName: task.assignedTo ? (task.assignedTo.firstName + " " + task.assignedTo.lastName): "",
+				lastUpdatedDate: TimeUtil.formatDateTime(task.lastUpdated, TimeUtil.FORMAT_DATE_TIME_13),
+				lastUpdatedTimePassed: TimeUtil.elapsed(task.lastUpdated)
+		]
 	}
 }
