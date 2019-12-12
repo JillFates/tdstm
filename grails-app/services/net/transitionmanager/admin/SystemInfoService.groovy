@@ -131,7 +131,7 @@ class SystemInfoService implements ServiceMethods {
 	 */
 	String getCpuProcesses() {
 		try {
-			return 'ps -eo pid,ppid,pcpu,pmem,comm --sort=-pcpu'.execute().text.split('\n')[0..11]
+			return 'ps -eo pid,ppid,pcpu,pmem,comm --sort=-pcpu'.execute().text.split('\n')[0..11].join('\n)')
 		} catch (Exception e) {
             log.info(e.message)
 			return i18nMessage('tdstm.admin.getCpuProcesses.not.supported')
