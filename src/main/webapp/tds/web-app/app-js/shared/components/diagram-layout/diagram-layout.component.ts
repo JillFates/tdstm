@@ -713,7 +713,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		textBlock.mouseOver = (e: InputEvent, obj: TextBlock) => {
 			this.diagram.currentCursor = 'pointer';
-			if ((obj.name && obj.name.length > 0) && obj.name.toLowerCase() === 'auto') {
+			if ((obj.name && obj.name.length > 0) && obj.name.toLowerCase() === 'automated task') {
 				obj.stroke = '#ddd';
 				obj.font = 'bold 16px sans-serif';
 			} else {
