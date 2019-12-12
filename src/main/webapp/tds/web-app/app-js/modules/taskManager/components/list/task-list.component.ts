@@ -67,6 +67,7 @@ export class TaskListComponent {
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
+	private dashboardFilters = ['filter', 'status', 'role', 'category'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
@@ -360,7 +361,6 @@ export class TaskListComponent {
 			// loaded.
 		});
 	}
-
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
@@ -396,11 +396,26 @@ export class TaskListComponent {
 	}
 
 	/**
+	 * Checks if any filters from the dashboards are applied.
+	 */
+	hasDashboardFilters(): boolean {
+		let hasFilters = false;
+		this.dashboardFilters.forEach(filter => {
+			if (this.urlParams.hasOwnProperty(filter)) {
+				hasFilters = true;
+			}
+		});
+		return hasFilters;
+	}
+
+	/**
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
-		if (this.urlParams.filter) {
-			delete this.urlParams.filter;
+		if (this.hasDashboardFilters()) {
+			this.dashboardFilters.forEach(filter => {
+				delete this.urlParams[filter];
+			});
 			this.search();
 		}
 		this.columnsModel
@@ -421,7 +436,7 @@ export class TaskListComponent {
 	 */
 	areFiltersDirty(): boolean {
 		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.urlParams.filter;
+			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
@@ -431,17 +446,22 @@ export class TaskListComponent {
 		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
-			taskRows.forEach((taskRow: any, index: number) => {
-				// Only expand rows that can be acted upon (Ready or Started)
-				if ([TaskStatus.READY, TaskStatus.STARTED].includes(taskRow.status)) {
-					index = this.grid.getRowPaginatedIndex(index);
-					expandedEvent.dataItem = taskRow;
-					expandedEvent.index = index;
-					this.onRowDetailExpandHandler(expandedEvent);
-					this.gridComponent.expandRow(index);
-					this.rowsExpanded = true;
+			let taskIds = taskRows.map(task => task.id);
+			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
+					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+						this.gridComponent.expandRow(i);
+						this.rowsExpandedMap[i] = true;
+					}
 				}
 			});
+			this.rowsExpanded = true;
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
@@ -737,22 +757,26 @@ export class TaskListComponent {
 			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
-					this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-
-					// Update the grid row with new information from the endpoint (status, assignTo, etc)
-					for (let i = 0; i < this.grid.gridData.data.length; i++) {
-						if (this.grid.gridData.data[i].id === taskId ) {
-							this.grid.gridData.data[i].status = taskActionInfoModel.status;
-							this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
-							this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
-							this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
-							break;
-						}
-					}
+					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
 					observer.next(result);
 					observer.complete();
 				});
 		});
+	}
+
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+
+		// Update the grid row with new information from the endpoint (status, assignTo, etc)
+		for (let i = 0; i < this.grid.gridData.data.length; i++) {
+			if (this.grid.gridData.data[i].id === taskId ) {
+				this.grid.gridData.data[i].status = taskActionInfoModel.status;
+				this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
+				this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
+				this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
+				break;
+			}
+		}
 	}
 
 	/**

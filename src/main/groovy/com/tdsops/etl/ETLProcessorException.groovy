@@ -276,5 +276,9 @@ class ETLProcessorException extends GroovyRuntimeException {
 	static ETLProcessorException domainWithoutFieldSpec(ETLDomain domain) {
 		new ETLProcessorException("Domain ${domain} does not have field spec definitions. Use [Application, Device, Database, Storage]")
 	}
+
+    static ETLProcessorException unknownTag(String tagName) {
+        new ETLProcessorException("Unknown Tag: '$tagName'")
+    }
 }
 

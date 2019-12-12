@@ -147,7 +147,7 @@ export class NoticeListComponent implements OnInit {
 
 			return data;
 		} catch (error) {
-			error && console.error(error);
+			console.error(error);
 		}
 	};
 
@@ -158,7 +158,7 @@ export class NoticeListComponent implements OnInit {
 				await this.gridComponent.reloadData();
 			}
 		} catch (error) {
-			error && console.error(error);
+			console.error(error);
 		}
 	};
 
@@ -177,7 +177,7 @@ export class NoticeListComponent implements OnInit {
 				await this.gridComponent.reloadData();
 			}
 		} catch (error) {
-			error && console.error(error);
+			console.error(error);
 		}
 	};
 
@@ -189,7 +189,7 @@ export class NoticeListComponent implements OnInit {
 			]);
 			await this.gridComponent.reloadData();
 		} catch (error) {
-			error && console.error(error);
+			console.error(error);
 		}
 	};
 
@@ -205,7 +205,7 @@ export class NoticeListComponent implements OnInit {
 			]);
 			await this.gridComponent.reloadData();
 		} catch (error) {
-			error && console.error(error);
+			console.error(error);
 		}
 	}
 

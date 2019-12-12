@@ -280,7 +280,7 @@
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.TaskGraphView}">
                                 <li class="menu-child-item menu-parent-tasks-gojs-graph">
-                                    <g:link controller="module" action="neighborhood">GoJS Graph</g:link>
+                                    <g:link controller="module" action="taskManager/task-graph">GoJS Task Graph</g:link>
                                 </li>
                             </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.TaskTimelineView}">
@@ -322,6 +322,9 @@
 
                                 <li class="menu-child-item menu-parent-dashboard-event-dashboard">
                                 <g:link class="mlink" controller="module" action="event" id="dashboard">Event Dashboard</g:link>
+                            </li>
+                            <li class="menu-child-item menu-parent-dashboard-event-dashboard">
+                                <g:link class="mlink" controller="module" action="insight" id="dashboard">Insight Dashboard</g:link>
                             </li>
                                 <%-- Removed until this report will be implemented using tasks
                             <tds:hasPermission permission="${Permission.ShowCartTracker}">
