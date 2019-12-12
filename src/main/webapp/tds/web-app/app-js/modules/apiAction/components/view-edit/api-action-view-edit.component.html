@@ -1,9 +1,18 @@
 <div tds-autofocus class="tds-modal-content api-action-view-edit-component tds-angular-component-content has-side-nav"  #apiActionContainer>
 	<div class="modal-header">
-		<button (click)="cancelCloseDialog()" type="button"  class="close" aria-label="Close">
-			<clr-icon aria-hidden="true" shape="close"></clr-icon>
-		</button>
-		<h4 class="modal-title">{{modalTitle}}<span *ngIf="apiActionModel.name"> - </span>{{apiActionModel.name}}</h4>
+		<tds-button-custom
+				class="close"
+				[icon]="'close'"
+				(click)="cancelCloseDialog()"
+				[displayLabel]="false"
+				[flat]="true">
+		</tds-button-custom>
+		<div class="modal-title-container">
+			<div class="modal-title">
+				{{ modalTitle }}<span *ngIf="apiActionModel.name"> - </span>
+				{{ apiActionModel.name }}
+			</div>
+		</div>
 	</div>
 	<div class="modal-body"
 	     [ngClass]="{'is-edit-mode': modalType !== actionTypes.VIEW }">
