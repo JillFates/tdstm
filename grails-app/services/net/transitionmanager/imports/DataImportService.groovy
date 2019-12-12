@@ -630,6 +630,7 @@ class DataImportService implements ServiceMethods {
 		Exception ex = null
 		try {
 			setBatchToRunning(batch.id)
+
 			// Get the list of the ImportBatchRecord IDs to be processed
 			List<Long> recordIds = ImportBatchRecord.where {
 				importBatch.id == batch.id

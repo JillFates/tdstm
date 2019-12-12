@@ -65,6 +65,7 @@ import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.m
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {NavigationEnd, Router} from '@angular/router';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -150,7 +151,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
 		private userContextService: UserContextService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService,
+		private router: Router) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -160,6 +162,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		this.router.events.subscribe((e) => {
+			if (e instanceof NavigationEnd) {
+				this.onClearHiddenFilters();
+			}
+		});
+
 		this.gridData = {
 			data: [],
 			total: 0
