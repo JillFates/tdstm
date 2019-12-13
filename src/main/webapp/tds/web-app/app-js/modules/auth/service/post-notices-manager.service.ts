@@ -60,6 +60,10 @@ export class PostNoticesManagerService {
 		);
 	}
 
+	/**
+	 * Remove the Notice from the Storage instead of the local so we have just single source of truth
+	 * @param id
+	 */
 	private removeNoticeFromCollection(id: number) {
 		this.store.dispatch(new PostNoticeRemove({id: id}));
 	}
