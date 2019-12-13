@@ -3,7 +3,8 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
 import {UserContextModel} from '../model/user-context.model';
 // Actions
-import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired, PostNotices} from '../action/login.actions';
+import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
+import {PostNoticeRemove, PostNotices} from '../action/notice.actions';
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
 import {SetProject} from '../../project/actions/project.actions';
@@ -18,6 +19,8 @@ import {PostNoticesManagerService} from '../service/post-notices-manager.service
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
 import {SetTimeZoneAndDateFormat} from '../action/timezone-dateformat.actions';
+import {PostNoticesService} from '../service/post-notices.service';
+import {NoticeModel} from '../../noticeManager/model/notice.model';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -43,7 +46,7 @@ export class UserContextState {
 	constructor(
 		private authService: AuthService,
 		private permissionService: PermissionService,
-		private postNoticesManagerService: PostNoticesManagerService,
+		private postNoticesService: PostNoticesService,
 		private loginService: LoginService,
 		private userService: UserService) {
 	}
@@ -120,7 +123,7 @@ export class UserContextState {
 	@Action(PostNotices)
 	postNotices(ctx: StateContext<UserContextModel>) {
 		const state = ctx.getState();
-		return this.postNoticesManagerService.getNotices().pipe(
+		return this.postNoticesService.getPostNotices().pipe(
 			tap(result => {
 				ctx.setState({
 					...state,
@@ -128,6 +131,21 @@ export class UserContextState {
 				});
 			}),
 		);
+	}
+
+	/**
+	 * Removes one Notice from the List if it was Acknowledge
+	 * @param ctx
+	 */
+	@Action(PostNoticeRemove)
+	postNoticeRemove(ctx: StateContext<UserContextModel>, {payload}: PostNoticeRemove) {
+		const state = ctx.getState();
+		let postNotices = Object.assign([], state.postNotices);
+		postNotices = postNotices.filter( (notice: NoticeModel) => notice.id !== payload.id);
+		ctx.setState({
+			...state,
+			postNotices: postNotices
+		});
 	}
 
 	@Action(SetEvent)
