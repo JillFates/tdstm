@@ -389,8 +389,7 @@
                                                     *ngIf="dataGridTaskPredecessorsHelper && modelHelper"
                                                     class="successor-predecessor-table has-duplicated-predecessors dependency-tasks"
                                                     [data]="dataGridTaskPredecessorsHelper.gridData"
-                                                    [resizable]="false"
-                                                    [rowClass]="modelHelper.rowStatusColor">
+                                                    [resizable]="false">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <div class="table-container">
@@ -451,8 +450,7 @@
                                                     *ngIf="dataGridTaskSuccessorsHelper && modelHelper"
                                                     class="successor-predecessor-table has-duplicated-successors dependency-tasks"
                                                     [data]="dataGridTaskSuccessorsHelper.gridData"
-                                                    [resizable]="false"
-                                                    [rowClass]="modelHelper.rowStatusColor">
+                                                    [resizable]="false">
                                                 <!-- Toolbar Template -->
                                                 <ng-template kendoGridToolbarTemplate [position]="'top'">
                                                     <div class="table-container">
