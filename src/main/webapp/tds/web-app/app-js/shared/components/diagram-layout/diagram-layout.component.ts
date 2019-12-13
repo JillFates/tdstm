@@ -905,7 +905,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
-	 * highlight nodes by cycle
+	 * highlight nodes by cycles
+	 * @param {number[]} cycles > array of ids on that are in a cycle
 	 **/
 	highlightNodesByCycle(cycles: number[]): void {
 		this.diagram.commit(d => {
@@ -922,7 +923,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
-	 * highlight nodes by cycle
+	 * highlight nodes by custom field and value
+	 * @param {string} field - name of the field
+	 * @param {any} value - value to match against
 	 **/
 	highlightBy(field: string, value: any): void {
 		this.diagram.commit(d => {
@@ -957,9 +960,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 **/
 	overrideDoubleClick(): void {
 		this.diagram.doubleClick = e => {
-			const rootNode = e.diagram.nodes && e.diagram.nodes.first().data.rootNodeKey ?
-				e.diagram.nodes.filter(n => n.data.key === n.data.rootNodeKey).first()
-				: e.diagram.findTreeRoots().first();
+			const diagramNodes = e.diagram && e.diagram.nodes;
+			let rootNode;
+			if (diagramNodes && diagramNodes.first().data.rootNodeKey) {
+				rootNode = e.diagram.nodes.filter(n => n.data.key === n.data.rootNodeKey).first();
+			} else {
+				rootNode = e.diagram.findTreeRoots().first();
+			}
 			if (rootNode) { e.diagram.centerRect(rootNode.actualBounds); }
 		}
 	}

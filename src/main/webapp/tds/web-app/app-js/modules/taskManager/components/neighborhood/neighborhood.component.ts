@@ -281,7 +281,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						this.diagramLayoutService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
 						this.isMoveEventReq = false;
-						if (res.cycles && res.cycles.length > 0) {
+						if (res.cycles && res.cycles.length) {
 							this.hasCycles = true;
 							this.taskCycles = res.cycles;
 						}
