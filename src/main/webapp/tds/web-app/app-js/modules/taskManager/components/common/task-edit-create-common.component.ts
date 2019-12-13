@@ -81,7 +81,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 
 		this.modelHelper = new TaskEditCreateModelHelper(
 			this.userTimeZone,
-			this.userPreferenceService.getUserCurrentDateFormatOrDefault(),
+			this.userPreferenceService.getUserDateFormat(),
 			this.taskManagerService,
 			this.dialogService,
 			this.translatePipe);
@@ -89,7 +89,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 		this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
 			this.modelHelper.getModelForCreate(this.taskDetailModel)
 			:
-			this.modelHelper.getModelForEdit(this.taskDetailModel, this.userTimeZone);
+			this.modelHelper.getModelForEdit(this.taskDetailModel);
 
 		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
 		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;

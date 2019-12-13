@@ -23,6 +23,8 @@ import { UserContextModel } from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {takeWhile} from 'rxjs/operators';
 import {TaskCategoryComponent} from '../task-category/task-category.component';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'event-dashboard',
@@ -45,6 +47,7 @@ export class EventDashboardComponent implements OnInit {
 	public hasBundleSteps = false;
 	private taskCategoryScrollPosition = 0;
 	readonly defaultTime = '00:00:00';
+	public hasViewUnpublishedPermission = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -52,10 +55,12 @@ export class EventDashboardComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
+		private permissionService: PermissionService,
 		private store: Store) {}
 
 	ngOnInit() {
 		this.populateData();
+		this.hasViewUnpublishedPermission = this.permissionService.hasPermission(Permission.TaskViewUnpublished);
 	}
 
 	/**
@@ -98,6 +103,7 @@ export class EventDashboardComponent implements OnInit {
 	/**
 	 * Whenever an event is selected call the endpoint to get the details to refresh the report
  	 * @param {number} id  Event id
+	 * @param {string} name  Event name
 	*/
 	public onSelectedEvent(id: number, name: string, refreshing = false): void {
 		if (!refreshing) {
@@ -109,7 +115,7 @@ export class EventDashboardComponent implements OnInit {
 		this.getNewsFromEvent(id);
 
 		this.eventDetails = null;
-		this.eventsService.getEventDetails(id, true)
+		this.eventsService.getEventDetails(id, this.includeUnpublished)
 			.subscribe((eventDetails: any) => {
 				this.eventDetails = eventDetails;
 
@@ -144,6 +150,14 @@ export class EventDashboardComponent implements OnInit {
 					this.eventPlanStatus = eventPlanStatus;
 				});
 			});
+	}
+
+		/**
+	 * On Any other change.
+	 * @param selection: Array<any>
+	 */
+	onFiltersChange($event ?: any): void {
+		this.onSelectedEvent($event.selectedEvent.id, $event.selectedEvent.name);
 	}
 
 	/**

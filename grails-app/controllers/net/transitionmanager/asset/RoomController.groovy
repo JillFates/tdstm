@@ -1,28 +1,26 @@
 package net.transitionmanager.asset
 
-
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentStatus
-import com.tdssrc.grails.GormUtil
+import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
 import com.tdssrc.grails.HtmlUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import net.transitionmanager.asset.AssetEntityService
+import net.transitionmanager.asset.RackService
+import net.transitionmanager.asset.RoomService
 import net.transitionmanager.command.RoomCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.model.Model
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.asset.AssetEntityService
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.asset.RackService
-import net.transitionmanager.asset.RoomService
-import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import net.transitionmanager.task.TaskService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 
 @Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
 class RoomController implements ControllerMethods {
@@ -144,14 +142,21 @@ class RoomController implements ControllerMethods {
 			moveBundleList = [id: 'all']
 		} else if (userPreferenceService.getPreference(PREF.HIGHLIGHT_TASKS) || moveBundleId?.contains("taskReady")) {
 			def roomAssets = room.sourceAssets + room.targetAssets
-			Set assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets,
-																						[AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD]).assetEntity
-			racks = assetsByStatus.rackSource + assetsByStatus.rackTarget
-			racks.removeAll([null])
-			racks.each {
-				def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
-				statusList[it.id] = statuses.contains("Hold") ? "task_hold" : statuses.contains("Started") ? "task_started" : "task_ready"
+			Set assetsByStatus
+
+			if (roomAssets) {
+				assetsByStatus = AssetComment.findAllByAssetEntityInListAndStatusInList(roomAssets, [
+					AssetCommentStatus.STARTED, AssetCommentStatus.READY, AssetCommentStatus.HOLD
+				]).assetEntity
+
+				racks = assetsByStatus?.rackSource + assetsByStatus?.rackTarget
+				racks.removeAll([null])
+				racks.each {
+					def statuses = AssetComment.findAllByAssetEntityInListOrAssetEntityInList(it.sourceAssets, it.targetAssets)?.status
+					statusList[it.id] = statuses.contains("Hold") ? "task_hold" : statuses.contains("Started") ? "task_started" : "task_ready"
+				}
 			}
+
 			userPreferenceService.setPreference(PREF.HIGHLIGHT_TASKS, moveBundleId)
 			moveBundleId = 'taskReady'
 		}
@@ -159,10 +164,23 @@ class RoomController implements ControllerMethods {
 		def browserTestiPad = request.getHeader("User-Agent").toLowerCase().contains("ipad") ?:
 		                      request.getHeader("User-Agent").toLowerCase().contains("mobile")
 
-		[roomInstance: room, roomInstanceList: rooms, moveBundleList: moveBundleList, project: project,
-		 racksList: racksList, source: params.source, target: params.target, projectId: project.id,
-		 capacityView: params.capView, capacityType: params.capType ?: 'Remaining', auditPref: auditView,
-		 browserTestiPad: browserTestiPad, statusList: statusList, bundleList: bundleLists, moveBundleId: moveBundleId]
+		[
+			roomInstance    : room,
+			roomInstanceList: rooms,
+			moveBundleList  : moveBundleList,
+			project         : project,
+			racksList       : racksList,
+			source          : params.source,
+			target          : params.target,
+			projectId       : project.id,
+			capacityView    : params.capView,
+			capacityType    : params.capType ?: 'Remaining',
+			auditPref       : auditView,
+			browserTestiPad : browserTestiPad,
+			statusList      : statusList,
+			bundleList      : bundleLists,
+			moveBundleId    : moveBundleId
+		]
 	}
 
 	@HasPermission(Permission.RoomEdit)
