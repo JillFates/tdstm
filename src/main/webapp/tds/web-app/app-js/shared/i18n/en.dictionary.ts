@@ -55,6 +55,7 @@ export const en_DICTIONARY: Object = {
 		'CONFIRM': 'Confirm',
 		'CONFIRMATION_PROMPT' : {
 			'CONFIRMATION_REQUIRED': 'Abandon Changes?',
+			'CONTINUE_WITH_CHANGES': 'Continue with Changes?',
 			'UNSAVED_CHANGES_MESSAGE' : 'You have unsaved changes. Click Confirm to abandon your changes.',
 			'DELETE_ITEM_CONFIRMATION' : 'Are you sure you want to delete this item?',
 			'DELETE_ITEMS_CONFIRMATION' : 'Are you sure you want to delete these items?',
@@ -141,6 +142,10 @@ export const en_DICTIONARY: Object = {
 			'DELETE': {
 				'CONFIRM_DELETE_ASSETS': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel',
 				'CONFIRM_DELETE_DEPENDENCIES': 'You are about to delete {param1} {param2}. There is no undo for this action. Click confirm to delete the {param3}, otherwise click Cancel'
+			},
+			'RUN': {
+				'CONFIRM_RUN_ASSETS': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel',
+				'CONFIRM_RUN_DEPENDENCIES': 'You are about to run {param1} {param2}. There is no undo for this action. Click confirm to run the {param3}, otherwise click Cancel'
 			},
 			'ACTIONS': {
 				'ADD': 'Add to existing',
@@ -338,6 +343,11 @@ export const en_DICTIONARY: Object = {
 		'PRODUCTION': 'Production',
 	},
 	'IMPORT_ASSETS': {
+		'AUTO_IMPORT': {
+			'HEADLINE': 'The results will be automatically loaded into Imported Batch(es) and posted',
+			'INITIATE_IMPORT': 'Import',
+			'CHECKBOX_LABEL': 'Email me the results of the Import process'
+		},
 		'MANUAL_IMPORT': {
 			'IMPORT_ASSETS_ETL': 'Import Assets (ETL)',
 			'MANUAL_ASSET_IMPORT': 'Manual Asset Import',

@@ -20,7 +20,19 @@
                         (cellClick)="cellClick($event)"
                         [selectable]="true">
                     <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
+                        <div class="col-sm-6 filters-section pull-right">
+                            <div class="pull-right">
+                                <tds-button-custom
+                                        class="component-action-clear-filters"
+                                        id="btnClean"
+                                        icon="times"
+                                        title="Clear filters"
+                                        [disabled]="!hasFilterApplied()"
+                                        (click)="onClearFilters()">
+                                </tds-button-custom>
+                                <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn pull-right"><i class="fa fa-fw fa-refresh"></i></div>
+                            </div>
+                        </div>
                     </ng-template>
                     <kendo-grid-column
                             *ngFor="let column of assetCommentColumnModel.columns"

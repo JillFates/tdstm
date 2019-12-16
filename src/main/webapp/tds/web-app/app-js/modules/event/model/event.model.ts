@@ -77,19 +77,20 @@ export enum CatagoryRowType {
 
 export interface CategoryTask {
 	percComp: string;
-	tskTot: string;
-	tskComp: string;
+	totalTasks: string;
+	completedTasks: string;
 	category: string;
-	actStart: string;
-	actFinish: string;
-	estStart: string;
-	estFinish: string;
+	minActStart: string;
+	maxActFinish: string;
+	minEstStart: string;
+	maxEstFinish: string;
 }
 
 export class EventPlanStatus {
 	dialIndicator: number;
 	cssClass: string;
 	dayTime: string;
+	clockMode: string;
 	description: string;
 	eventTitle: string;
 	startDate: string;
@@ -99,6 +100,7 @@ export class EventPlanStatus {
 		this.dialIndicator = 0;
 		this.cssClass = '';
 		this.dayTime = '';
+		this.clockMode = 'none';
 		this.description = '';
 		this.eventTitle = '';
 		this.status = '';

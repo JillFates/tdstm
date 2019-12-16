@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.action.ApiActionService
 import net.transitionmanager.command.InitiateTransformDataActionCommand
+import net.transitionmanager.command.InitiateAutoTransformDataActionCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
@@ -167,6 +168,29 @@ class WsAssetImportController implements ControllerMethods {
 	}
 
 	/**
+	 *
+	 * @return
+	 */
+	@HasPermission(Permission.AssetImport)
+	def autoBatchProcessing(InitiateAutoTransformDataActionCommand actionCommand){
+		def stopwatch = new StopWatch()
+		stopwatch.start()
+
+		String fileName = fileSystemService.transferFileToFileSystem(actionCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX)
+
+		validateCommandObject(actionCommand)
+
+		Project project = getProjectForWs()
+		Map result = dataImportService.scheduleETLTransformDataJob(
+			project,
+			actionCommand.dataScriptId,
+			fileName,
+			actionCommand.sendNotification
+		)
+		renderSuccessJson(result)
+		log.info 'autoBatchProcessing() took {}', stopwatch.endDuration()
+	}
+		/**
 	 * Returns a collection of data lists including the actions and datascripts used to populate the form
 	 * @param
 	 * @return JSON map containing the following:
@@ -212,7 +236,11 @@ class WsAssetImportController implements ControllerMethods {
 		List<Map> dataScripts = []
 		where = DataScript.where { project == project }.readOnly(true)
 		where.list().each() {
-			dataScripts << [ id:it.id, name: "${it.provider.name} - ${it.name}" ]
+			dataScripts << [
+					id:it.id,
+					name: "${it.provider.name} - ${it.name}",
+					isAutoProcess: it.isAutoProcess
+			]
 		}
 		dataScripts = dataScripts.sort { it.name }
 		results.dataScripts = dataScripts

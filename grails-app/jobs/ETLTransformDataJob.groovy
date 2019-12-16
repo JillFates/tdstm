@@ -1,13 +1,12 @@
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.ETLProcessor
 import groovy.util.logging.Slf4j
-import net.transitionmanager.common.ProgressService
 import net.transitionmanager.imports.DataImportService
+import net.transitionmanager.common.ProgressService
 import net.transitionmanager.imports.ScriptProcessorService
 import net.transitionmanager.security.UserLogin
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
-
 /**
  * ETL Transform Data Job
  */
@@ -18,7 +17,6 @@ class ETLTransformDataJob {
 
 	ProgressService progressService
 	DataImportService dataImportService
-	ScriptProcessorService scriptProcessorService
 
 	/**
 	 * Launch a ETL transform data process with given job execution context parameters
@@ -34,21 +32,12 @@ class ETLTransformDataJob {
 		UserLogin userLogin = (UserLogin)dataMap.get('userLogin')
 
 		try {
-			if (dataMap.containsKey('scriptFilename')) {
-				// test script temporary filename
-				String scriptFilename = dataMap.getString('scriptFilename')
+			// data script id
+			long dataScriptId = dataMap.getLongValue('dataScriptId')
 
-				log.info('ETLTransformDataJob started for test script: {}', scriptFilename)
-				Map result = scriptProcessorService.testScript(projectId, scriptFilename, filename, progressKey)
-				log.info('ETL transform data execution result: {}', result)
-			} else {
-				// data script id
-				long dataScriptId = dataMap.getLongValue('dataScriptId')
-
-				log.info('ETLTransformDataJob started for dataScriptId: {}', dataScriptId)
-				Map result = dataImportService.transformEtlData(projectId, userLogin, dataScriptId, filename, sendNotification, progressKey)
-				log.info('ETL transform data execution result: {}', result)
-			}
+			log.info('ETLTransformDataJob started for dataScriptId: {}', dataScriptId)
+			Map result = dataImportService.transformEtlData(projectId, userLogin, dataScriptId, filename, sendNotification, progressKey)
+			log.info('ETL transform data execution result: {}', result)
 		} catch (Throwable e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"
 			progressService.update(progressKey, 100I, ProgressService.FAILED, e.getMessage(), null, ETLProcessor.getErrorMessage(e))

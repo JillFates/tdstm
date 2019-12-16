@@ -42,6 +42,7 @@ json {
 			op rowResult.op
 			rowNum rowResult.rowNum
 			warn rowResult.warn
+			tags rowResult.tags
 		}
 
 		domain result.domain

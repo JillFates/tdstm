@@ -15,9 +15,9 @@
             <div class="modal-body">
                 <form #taskEditCreateForm="ngForm" class="full-height">
                     <table style="border: 0;" class="full-height"
-                           [ngClass]="{'has-duplicated-predecessors': modelHelper.hasDuplicatedPredecessors(),
-                                       'has-duplicated-successors': modelHelper.hasDuplicatedSuccessors(),
-                                       'has-double-assignment': modelHelper.hasDoubleAssignment()}">
+                           [ngClass]="{'has-duplicated-predecessors': modelHelper?.hasDuplicatedPredecessors(),
+                                       'has-duplicated-successors': modelHelper?.hasDuplicatedSuccessors(),
+                                       'has-double-assignment': modelHelper?.hasDoubleAssignment()}">
                         <tbody class="full-height task-layout">
                             <tr class="no-grow-container">
                                 <td class="task-details" colspan="2">
@@ -195,7 +195,7 @@
                                                         <kendo-datepicker
                                                                 name="dueDate"
                                                                 #dueDate
-                                                                [format]="getDateTimeFormat()"
+                                                                [format]="getDateFormat()"
                                                                 (open)="onOpenDueDate($event)"
                                                                 [(ngModel)]="model.dueDate">
                                                         </kendo-datepicker>
@@ -231,7 +231,7 @@
                                                             </div>
                                                             <label data-toggle="popover"
                                                                    data-trigger="hover"
-                                                                   data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+                                                                   data-content="Click to toggle the lock. When locked, changes to the Earliest Start/Finish will preserve the Duration">
                                                                 <i class="fa fa-fw  lock-state"
                                                                    [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
                                                                    (click)="toggleLocked()">
@@ -240,7 +240,7 @@
                                                         </div>
                                                     </td>
                                                     <td class="label N edge-cell" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
+                                                        <label><span>Earliest Start</span></label>
                                                     </td>
                                                     <td class="valueNW">
                                                         <kendo-dateinput
@@ -253,7 +253,7 @@
                                                     </td>
 
                                                     <td class="label N edge-cell" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
+                                                        <label><span>Earliest Finish</span></label>
                                                     </td>
 
                                                     <td class="valueNW estimated-finish">

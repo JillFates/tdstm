@@ -134,11 +134,6 @@
                         </a>
                     </li>
                     <li class="divider"></li>
-                    <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',1,'show']" id="1">
-                            <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
-                        </a>
-                    </li>
                     <li class="menu-child-item menu-parent-assets-application-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',7,'show']" id="7">
                             <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/application_menu.svg"></image></svg> Applications
@@ -162,6 +157,11 @@
                     <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',6,'show']" id="6">
                             <svg style="height: 16px; width: 16px;" class="tds-svg-icons " viewBox="0 0 115 115" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <image x="0" y="0" height="110px" width="110px" fill="#1f77b4" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/tdstm/assets/icons/svg/storageLogical_menu.svg"></image></svg> Logical Storage
+                        </a>
+                    </li>
+                    <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                        <a [routerLink]="['/asset','views',1,'show']" id="1">
+                            <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
                         </a>
                     </li>
                     <li class="divider"></li>
@@ -222,7 +222,7 @@
                         <a href="/tdstm/newsEditor/newsEditorList">List Event News</a>
                     </li>
                     <li *ngIf="hasPermission(permission.ReportViewEventPrep)" class="menu-child-item menu-planning-pre-checklist">
-                        <a href="/tdstm/module/reports/preEventCheckList">Pre-Event Checklist</a>
+                        <a [routerLink]="['reports','preEventCheckList']">Pre-Event Checklist</a>
                     </li>
                     <li class="menu-child-item menu-parent-planning-export-runbook">
                         <a href="/tdstm/moveEvent/exportRunbook">Export Runbook</a>

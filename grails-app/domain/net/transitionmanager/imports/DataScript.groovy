@@ -33,7 +33,7 @@ enum DataScriptMode {
 
 class DataScript {
 	 static enum PROPS {
-		 id, name, description, target, mode, isAutoProcess, etlSourceCode, provider, dateCreated,
+		 id, name, description, target, mode, isAutoProcess, useWithAssetActions, etlSourceCode, provider, dateCreated,
 		 lastUpdated, sampleFilename, originalSampleFilename
 	 }
 	 static Set<PROPS> MINIMAL_INFO = [ PROPS.id, PROPS.name ]
@@ -66,6 +66,9 @@ class DataScript {
 
 	// Flag to indicate that the ETL Script when used will automatically Import and Post the transformation results
 	Boolean isAutoProcess = false
+
+	// Flag to indicate that the ETL Script is for running on bulk change of assets.
+	Boolean useWithAssetActions = false
 
     static belongsTo = [project: Project, provider: Provider ]
 

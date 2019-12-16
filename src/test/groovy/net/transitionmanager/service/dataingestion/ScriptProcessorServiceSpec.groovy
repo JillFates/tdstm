@@ -25,6 +25,7 @@ import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.tag.TagService
 import org.apache.poi.ss.usermodel.Cell
 import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
@@ -40,6 +41,7 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 	String sixRowsDataSetFileName
 	String applicationDataSetFileName
 	FileSystemService fileSystemService
+	TagService tagService
 
 	static doWithConfig(c) {
 		c.graph.tmpDir = '/tmp/'
@@ -64,9 +66,11 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
+			tagService(TagService)
 		}
 
 		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
+		tagService = grailsApplication.mainContext.getBean(TagService)
 
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetFileName = fileName
