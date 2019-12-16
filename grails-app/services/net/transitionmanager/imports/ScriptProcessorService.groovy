@@ -13,12 +13,14 @@ import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.util.JsonViewRenderService
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.control.ErrorCollector
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
@@ -29,11 +31,12 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Transactional
 class ScriptProcessorService {
 
-	CustomDomainService customDomainService
-	FileSystemService fileSystemService
-	SecurityService securityService
-	ProgressService progressService
-	Scheduler quartzScheduler
+	JsonViewRenderService jsonViewRenderService
+	CustomDomainService   customDomainService
+	FileSystemService     fileSystemService
+	SecurityService       securityService
+	ProgressService       progressService
+	Scheduler             quartzScheduler
 
 	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
 	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
@@ -64,11 +67,13 @@ class ScriptProcessorService {
 	 * @return file name created and saved in a temporary directory
 	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
 	 */
+	@CompileStatic
 	String saveResultsInFile(ETLProcessorResult processorResult) {
 
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-		os << (processorResult as JSON)
-		os.close()
+		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+		String outputFilename = tmpFile[0]
+		OutputStream os = (OutputStream) tmpFile[1]
+		jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
 
 		return outputFilename
 	}
