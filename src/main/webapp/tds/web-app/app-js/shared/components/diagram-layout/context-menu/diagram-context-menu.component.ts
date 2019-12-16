@@ -30,11 +30,17 @@ import {DiagramContextMenuHelper} from './diagram-context-menu.helper';
 				<li id="hold"
 						*ngFor="let option of data.options.fields"
 						[ngStyle]="{display: hasPermission(option.permission) && componentSpecificValidations(option) ? 'block' : 'none'}">
-					<button class="btn ctx-menu-btn" (click)="dispatchAction(option.event)">
-						<fa-icon [icon]="option.icon.icon"
+					<button class="btn ctx-menu-btn clr-align-self-center" (click)="dispatchAction(option.event)">
+						<div class="clr-row">
+							<div class="clr-col-2 clr-align-self-center">
+								<fa-icon [icon]="option.icon.icon"
 										 [styles]="{ color: option.icon.color, float: 'left' }">
-						</fa-icon>
-						{{ option.label }}
+								</fa-icon>
+							</div>
+							<div class="clr-col-10 clr-align-self-center">
+								{{ option.label }}
+							</div>
+						</div>
 					</button>
 				</li>
 			</ul>

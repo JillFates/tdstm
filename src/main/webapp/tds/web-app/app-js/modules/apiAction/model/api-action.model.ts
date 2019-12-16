@@ -2,6 +2,18 @@ import { INTERVAL } from '../../../shared/model/constants';
 import {CHECK_ACTION} from '../../../shared/components/check-action/model/check-action.model';
 import {AgentMethodModel} from './agent.model';
 
+export enum EventReactions {
+	Status,
+	Success,
+	Default ,
+	Error   ,
+	Failed,
+	Lapsed  ,
+	Stalled,
+	BeforeInvocation,
+	PostInvocation,
+};
+
 export class APIActionColumnModel {
 	columns: any[];
 
@@ -19,7 +31,8 @@ export class APIActionColumnModel {
 				property: 'name',
 				type: 'text',
 				width: 186,
-				locked: true
+				locked: true,
+				isActionable: true,
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
@@ -57,13 +70,13 @@ export class APIActionColumnModel {
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				width: 150
 			}, {
 				label: 'Last Updated',
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
-				width: 160
+				width: 150
 			}
 		];
 	}
@@ -78,8 +91,7 @@ export class APIActionParameterColumnModel {
 				label: 'Action',
 				property: 'action',
 				type: 'action',
-				width: 64,
-				locked: false
+				width: 64
 			},
 			{
 				label: 'custom',

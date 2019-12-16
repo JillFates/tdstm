@@ -38,11 +38,8 @@ import {
 import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
-import {
-	BulkActionResult,
-	BulkChangeType
-} from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
