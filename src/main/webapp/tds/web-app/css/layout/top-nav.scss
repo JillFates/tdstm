@@ -9,7 +9,7 @@ body > .wrapper {
 	font-weight: 500;
 	font-size: 14px !important;
 	z-index: 80 !important;
-	position: fixed;
+	position: relative;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -157,7 +157,7 @@ body > .wrapper {
 		}
 
 		.notifications-menu > a {
-			padding: inherit 10px;
+			padding: 10px;
 		}
 		.search-dialog-dropdown-menu {
 			width: 400px;
