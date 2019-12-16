@@ -967,7 +967,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			} else {
 				rootNode = e.diagram.findTreeRoots().first();
 			}
-			if (rootNode) { e.diagram.centerRect(rootNode.actualBounds); }
+			if (rootNode) {
+				e.diagram.centerRect(rootNode.actualBounds);
+			}
 		}
 	}
 
