@@ -26,12 +26,6 @@ tds-ui-dialog {
 				overflow: hidden !important;
 				width: unset !important;
 
-				.nav-item {
-					.active {
-						box-shadow: 0 -3px 0 #0077b8 inset !important;
-					}
-				}
-
 				.modal-body {
 					&.asset-crud {
 						margin-right: 20px;
@@ -246,10 +240,20 @@ tds-ui-dialog {
 					}
 				}
 			}
-
 			// This is necessary to fix a bug with the clarity tabs classes.
-
 			// @include modalSideNav();
+
+			&.modal-xxl,
+			&.modal-xlg {
+				.nav-link.active {
+					box-shadow: 0 -3px 0 #0077b8 inset;
+                	background: transparent;
+				}
+				.tab-disabled {
+					color: lightgray;
+					cursor: not-allowed;
+				}
+			}
 		}
 	}
 	.close {
@@ -267,13 +271,6 @@ tds-ui-dialog {
 	background: $color-text-inverse;
 	min-width: 340px;
 
-	// This is here to fix an issue with the style overrides of clarity tabs.
-	.nav-item {
-		.active {
-			box-shadow: 0 -3px 0 #0077b8 inset !important;
-		}
-	}
-
 	&.modal-xxl {
 		background: $color-text-inverse;
 		position: fixed !important;
@@ -287,18 +284,6 @@ tds-ui-dialog {
 		.modal-body {
 			max-height: calc(100vh - 195px);
 		}
-
-		&.has-footer {
-			.modal-body {
-				&.full-height {
-					min-height: calc(100vh - 270px);
-				}
-			}
-		}
-	}
-
-	&.full-height {
-		min-height: calc(100vh - 195px);
 	}
 
 	&.with-box-shadow {
@@ -476,32 +461,6 @@ tds-ui-dialog {
 					border-radius: unset;
 					background: #0077b8;
 					cursor: default;
-				}
-			}
-		}
-	}
-}
-
-.modal-xxl {
-	.tds-modal-content {
-		&.api-action-layout {
-			.modal-body {
-				max-height: calc(100vh - 250px);
-
-				&.full-height {
-					min-height: calc(100vh - 250px);
-					margin-bottom: 25px;
-				}
-			}
-
-			&.has-footer {
-				.modal-body {
-					max-height: calc(100vh - 325px);
-
-					&.full-height {
-						min-height: calc(100vh - 325px);
-						margin-bottom: 25px;
-					}
 				}
 			}
 		}

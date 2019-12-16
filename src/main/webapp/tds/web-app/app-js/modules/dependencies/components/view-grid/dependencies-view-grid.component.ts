@@ -34,7 +34,7 @@ import {
 	BulkActionResult,
 	BulkChangeType,
 } from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import { CheckboxStates } from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import { CheckboxStates } from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { DependencyResults } from '../../model/dependencies.model';
 import {

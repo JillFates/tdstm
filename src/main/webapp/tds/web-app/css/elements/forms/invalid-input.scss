@@ -1,0 +1,32 @@
+form {
+  .clr-input.ng-untouched.ng-invalid {
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+
+  .k-combobox.ng-untouched.ng-invalid,
+  .k-dropdown.ng-untouched.ng-invalid {
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+  }
+
+  .k-combobox.ng-touched.ng-invalid,
+  .k-dropdown.ng-touched.ng-invalid,
+  .clr-input.ng-touched.ng-invalid {
+    //border: initial;
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom: 1px solid $color-danger--red;
+  }
+
+  .k-dropdown.ng-touched.ng-invalid {
+    span.k-dropdown-wrap {
+      border-bottom-width: 0;
+    }
+  }
+}
+

@@ -83,8 +83,8 @@ export class GridColumnModel {
 				const filters = (state.filter && state.filter.filters) || [];
 				state.filter.filters = filters.filter((r: any) => r['field'] !== column.property);
 			}
-			root.filters.push({ field: column.property, operator: 'gte', value: init, });
-			root.filters.push({ field: column.property, operator: 'lte', value: end });
+			root.filters.push({ field: column.property, operator: 'gte', value: init || '', });
+			root.filters.push({ field: column.property, operator: 'lte', value: end || ''});
 		}
 
 		if (column.type === 'boolean') {

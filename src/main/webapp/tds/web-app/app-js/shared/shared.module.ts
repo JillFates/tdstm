@@ -104,7 +104,7 @@ import { FieldReferencePopupComponent } from './components/field-reference-popup
 import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
-import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
+import { TDSIndeterminateCheckboxComponent } from './components/tds-indeterminate-checkbox/tds-indeterminate-checkbox.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -117,6 +117,7 @@ import { TDSFilterInputComponent } from './components/filter-input/filter-input.
 import { TDSModalPageWrapperComponent } from './components/modal-page-wrapper/modal-page-wrapper.component';
 import { PowerComponent } from './components/power/power.component';
 import { TaskStatusIndicatorComponent } from './components/task-status-indicator/task-status-indicator.component';
+import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -201,7 +202,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -215,6 +216,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		PowerComponent,
 		DiagramLayoutComponent,
 		CircleCountdownComponent,
+		TDSCheckboxComponent,
 		DiagramContextMenuComponent,
 		TaskStatusIndicatorComponent
 	],
@@ -269,7 +271,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
@@ -288,6 +290,7 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		CircleCountdownComponent,
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
+		TDSCheckboxComponent,
 		// Clarity
 		ClarityModule
 	],
@@ -296,7 +299,6 @@ import {TooltipModule} from '@progress/kendo-angular-tooltip';
 		DependentCommentComponent,
 		AddPersonComponent,
 		DateRangeSelectorComponent,
-		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
