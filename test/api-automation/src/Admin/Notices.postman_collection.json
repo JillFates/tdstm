@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9ddcfa58-1e34-4497-814f-950839e1ab39",
+		"_postman_id": "3d79b34f-2de1-4427-b072-42805a230125",
 		"name": "Notices CRUD",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -240,12 +240,9 @@
 					}
 				},
 				"url": {
-					"raw": "https://tmqa12.transitionmanager.net/tdstm/ws/notices",
-					"protocol": "https",
+					"raw": "{{host}}/tdstm/ws/notices",
 					"host": [
-						"tmqa12",
-						"transitionmanager",
-						"net"
+						"{{host}}"
 					],
 					"path": [
 						"tdstm",
