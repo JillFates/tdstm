@@ -47,6 +47,7 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'CORRUPT': 'Corrupt',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
