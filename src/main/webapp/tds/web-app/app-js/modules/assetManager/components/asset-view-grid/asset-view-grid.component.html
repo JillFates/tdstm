@@ -25,14 +25,14 @@
 			let-column
 			let-columnIndex="columnIndex"
 		>
-			<tds-checkbox
+			<tds-indeterminate-checkbox
 				name="assetsSelector"
 				[hasThirdState]="true"
 				[disabled]="!isBulkSelectAvailable()"
 				(changeState)="onChangeBulkCheckbox($event)"
 				id="assetSelector"
-				[setStateSubject]="bulkCheckboxService.setStateSubject"
-			></tds-checkbox>
+				[setStateSubject]="bulkCheckboxService.setStateSubject">
+			</tds-indeterminate-checkbox>
 		</ng-template>
 		<ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
 			<label class="selectall-checkbox-column text-center">
@@ -232,7 +232,7 @@
 				!fieldPipeMap.pipe[column.domain + '_' + column.property]
 			"
 		>
-			<span [ngClass]="getCellClass(column)">
+			<span [ngClass]="getCellClass(column)" [title]="dataItem[column.domain + '_' + column.property]">
 				{{ fieldPipeMap[column.domain + '_' + column.property] }}
 				{{ dataItem[column.domain + '_' + column.property] }}
 			</span>
@@ -248,8 +248,8 @@
 		>
 			<div>
 				{{
-					dataItem[column.domain + '_' + column.property]
-						| tdsDateTime: userTimeZone
+				dataItem[column.domain + '_' + column.property]
+					| tdsDateTime: userTimeZone
 				}}
 			</div>
 		</ng-template>
@@ -264,8 +264,8 @@
 		>
 			<div>
 				{{
-					dataItem[column.domain + '_' + column.property]
-						| tdsDate: userDateFormat
+				dataItem[column.domain + '_' + column.property]
+					| tdsDate: userDateFormat
 				}}
 			</div>
 		</ng-template>
@@ -280,11 +280,11 @@
 		>
 			<div>
 				{{
-					dataItem[column.domain + '_' + column.property]
-						| tdsNumber
-							: fieldPipeMap.metadata[
-									column.domain + '_' + column.property
-							  ]
+				dataItem[column.domain + '_' + column.property]
+					| tdsNumber
+					: fieldPipeMap.metadata[
+					column.domain + '_' + column.property
+						]
 				}}
 			</div>
 		</ng-template>
@@ -307,7 +307,7 @@
 				>
 					<span class="label tag" [ngClass]="tag.css">{{
 						tag.name
-					}}</span>
+						}}</span>
 				</ng-template>
 			</div>
 		</ng-template>
@@ -320,8 +320,19 @@
 		let-currentPage="currentPage"
 	>
 		<div class="clr-col-4 selected-assets-counter">
-			<clr-icon class="icon" shape="check"> </clr-icon>
+			<clr-icon class="icon" shape="check"></clr-icon>
 			<h6 class="inline">{{ getSelectedItemsCount() }}</h6>
+			<!-- Bulk Change button -->
+			<tds-bulk-change-button
+				#tdsBulkChangeButton
+				[enabled]="hasSelectedItems()"
+				[showDelete]="true"
+				[showEdit]="true"
+				[flat]="true"
+				[bulkChangeType]="bulkChangeType"
+				(clickBulk)="onClickBulkButton()"
+				(operationResult)="onBulkOperationResult($event)">
+			</tds-bulk-change-button>
 		</div>
 		<div class="clr-col-8">
 			<tds-grid-pager

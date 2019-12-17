@@ -104,7 +104,7 @@ import { FieldReferencePopupComponent } from './components/field-reference-popup
 import { TDSDateControlComponent } from './components/custom-control/date-time/date-control.component';
 import { TDSDateTimeControlComponent } from './components/custom-control/date-time/datetime-control.component';
 import { TDSNumberControlComponent } from './components/custom-control/number/number-control.component';
-import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
+import { TDSIndeterminateCheckboxComponent } from './components/tds-indeterminate-checkbox/tds-indeterminate-checkbox.component';
 import { BulkChangeButtonComponent } from './components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { BulkChangeActionsComponent } from './components/bulk-change/components/bulk-change-actions/bulk-change-actions.component';
 import { BulkChangeEditComponent } from './components/bulk-change/components/bulk-change-edit/bulk-change-edit.component';
@@ -117,6 +117,7 @@ import { TDSFilterInputComponent } from './components/filter-input/filter-input.
 import { TDSModalPageWrapperComponent } from './components/modal-page-wrapper/modal-page-wrapper.component';
 import { PowerComponent } from './components/power/power.component';
 import { TaskStatusIndicatorComponent } from './components/task-status-indicator/task-status-indicator.component';
+import { TDSCheckboxComponent } from './components/tds-checkbox/tds-checkbox.component';
 // Dictionary
 import { DictionaryService } from './services/dictionary.service';
 import { en_DICTIONARY } from './i18n/en.dictionary';
@@ -124,6 +125,9 @@ import { PreferencesResolveService } from './resolves/preferences-resolve.servic
 import { DiagramLayoutComponent } from './components/diagram-layout/diagram-layout.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CircleCountdownComponent } from './components/circle-countdown/circle-countdown.component';
+import {DiagramContextMenuComponent} from './components/diagram-layout/context-menu/diagram-context-menu.component';
+import {MenusModule} from '@progress/kendo-angular-menu';
+import {TooltipModule} from '@progress/kendo-angular-tooltip';
 
 @NgModule({
 	imports: [
@@ -142,7 +146,9 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		DialogModule,
 		ProgressBarModule,
 		FontAwesomeModule,
-		TdsComponentLibraryModule,
+		MenusModule,
+		TooltipModule,
+		TdsComponentLibraryModule
 	],
 	declarations: [
 		UIAutofocusDirective,
@@ -196,7 +202,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,
@@ -210,7 +216,9 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		PowerComponent,
 		DiagramLayoutComponent,
 		CircleCountdownComponent,
-		TaskStatusIndicatorComponent,
+		TDSCheckboxComponent,
+		DiagramContextMenuComponent,
+		TaskStatusIndicatorComponent
 	],
 	exports: [
 		UILoaderDirective,
@@ -263,7 +271,7 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		TDSDateTimeControlComponent,
 		TDSNumberControlComponent,
 		TDSDateControlComponent,
-		TDSCheckboxComponent,
+		TDSIndeterminateCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeEditComponent,
 		BulkChangeActionsComponent,
@@ -278,18 +286,19 @@ import { CircleCountdownComponent } from './components/circle-countdown/circle-c
 		PowerComponent,
 		DiagramLayoutComponent,
 		FontAwesomeModule,
+		DiagramContextMenuComponent,
 		CircleCountdownComponent,
 		TdsComponentLibraryModule,
 		TaskStatusIndicatorComponent,
+		TDSCheckboxComponent,
 		// Clarity
-		ClarityModule,
+		ClarityModule
 	],
 	entryComponents: [
 		DynamicComponent,
 		DependentCommentComponent,
 		AddPersonComponent,
 		DateRangeSelectorComponent,
-		TDSCheckboxComponent,
 		BulkChangeButtonComponent,
 		BulkChangeActionsComponent,
 		BulkChangeEditComponent,

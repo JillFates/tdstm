@@ -110,7 +110,7 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 
 				this.modelHelper = new TaskEditCreateModelHelper(
 					this.userTimeZone,
-					this.userPreferenceService.getUserCurrentDateFormatOrDefault(),
+					this.userPreferenceService.getUserDateFormat(),
 					this.taskManagerService,
 					this.dialogService,
 					this.translatePipe);

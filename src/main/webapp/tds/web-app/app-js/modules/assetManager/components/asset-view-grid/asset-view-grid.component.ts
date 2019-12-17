@@ -27,9 +27,7 @@ import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
-	KEYSTROKE,
 	ModalType,
-	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {
@@ -41,7 +39,7 @@ import {NotifierService} from '../../../../shared/services/notifier.service';
 import {TagModel} from '../../../assetTags/model/tag.model';
 import {AssetTagSelectorComponent} from '../../../../shared/components/asset-tag-selector/asset-tag-selector.component';
 import {BulkActionResult, BulkChangeType} from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import {CheckboxState, CheckboxStates} from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import {BulkCheckboxService} from '../../../../shared/services/bulk-checkbox.service';
 import {ASSET_ENTITY_MENU} from '../../../../shared/modules/header/model/asset-menu.model';
 import {PermissionService} from '../../../../shared/services/permission.service';
@@ -65,6 +63,7 @@ import {SELECT_ALL_COLUMN_WIDTH} from '../../../../shared/model/data-list-grid.m
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
+import {NavigationEnd, Router} from '@angular/router';
 
 const {
 	ASSET_JUST_PLANNING: PREFERENCE_JUST_PLANNING,
@@ -91,10 +90,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() metadata: any;
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
-
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
-	private displayCreateButton: boolean;
-	private showFullTags = false;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -105,7 +102,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.gridStateChange.emit({...this.gridState, skip: 0});
 		this.modelChange.emit();
 	}
-
 	public currentFields = [];
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
@@ -118,6 +114,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	protected userTimeZone: string;
 	protected userDateFormat: string;
 	protected showAssetsFilter = false;
+	private displayCreateButton: boolean;
+	private showFullTags = false;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -149,7 +147,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		private assetExplorerService: AssetExplorerService,
 		private userService: UserService,
 		private userContextService: UserContextService,
-		private assetTagUIWrapperService: AssetTagUIWrapperService) {
+		private assetTagUIWrapperService: AssetTagUIWrapperService,
+		private router: Router) {
 		this.fieldPipeMap = {pipe: {}, metadata: {}};
 		this.userContextService.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -159,6 +158,12 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		this.router.events.subscribe((e) => {
+			if (e instanceof NavigationEnd) {
+				this.onClearHiddenFilters();
+			}
+		});
+
 		this.gridData = {
 			data: [],
 			total: 0
@@ -685,7 +690,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	 * Gather the List of Selected Items for the Bulk Process
 	 */
-	public onClickBulkButton(tdsBulkChangeButton: BulkChangeButtonComponent): void {
+	public onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems({
 			viewId: this._viewId,
 			model: this.model,
@@ -695,7 +700,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe((results: any) => {
 				this.bulkItems = [...results.selectedAssetsIds];
 				this.selectedAssetsForBulk = [...results.selectedAssets];
-				tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
 			}, (err) => console.log('Error:', err));
 	}
 

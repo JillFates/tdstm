@@ -18,20 +18,13 @@
 								valueField="id"
 							>
 							</kendo-dropdownlist>
-							<label
-								for="agreement"
-                                class="dontshow-again"
-                                style="display: flex;"
-							>
-								<input
-									type="checkbox"
-									name="agreement"
-									id="agreement"
-									clrCheckbox
-									[(ngModel)]="includeUnpublished"
-								/>
-								{{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
-							</label>
+                            <label for="agreement" class="aligned-label dontshow-again">
+                                    <span  *ngIf="hasViewUnpublishedPermission">
+                                        <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
+                                               [(ngModel)]="includeUnpublished" (ngModelChange)="onFiltersChange(this)">
+                                        {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                                    </span>
+                            </label>
 						</div>
 					</div>
 					<div class="col-md-5"></div>

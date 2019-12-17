@@ -70,7 +70,7 @@
 
 		<!-- Tabs configuration -->
 		<div class="clr-margin-top-lg tabs-section" *ngIf="!collapsed">
-			<kendo-tabstrip [keepTabContent]="true">
+			<kendo-tabstrip [keepTabContent]="true" (tabSelect)="setCurrentTab($event.index)">
 
 				<!-- Tab 1 -->
 				<kendo-tabstrip-tab [title]="'Asset Classes'" [selected]="isCurrentTab(0)">

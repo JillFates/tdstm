@@ -14,6 +14,7 @@ export const en_DICTIONARY: Object = {
 		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
+		'CHECK_SYNTAX': 'Check Syntax',
 		'COLLAPSE': 'Collapse',
 		'CONFIGURE': 'Configure',
 		'CREATE': 'Create',
@@ -100,6 +101,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
+		'EDIT_ACTION': 'Edit Action',
+		'DELETE_ACTION': 'Delete Action',
 		'API_ACTION': 'Action',
 		'API_ACTIONS': 'Actions',
 	},

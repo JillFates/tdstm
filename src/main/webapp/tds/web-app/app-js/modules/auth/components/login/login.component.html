@@ -3,7 +3,9 @@
 		<div class="clr-row clr-justify-content-center">
 			<section class="login-component-form__section clr-col-8 clr-align-self-center">
 				<h1>
-					<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
+					<a href="https://spencerbrewery.com/">
+						<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
+					</a>
 				</h1>
 				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" >
 					<clr-select-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
@@ -77,6 +79,7 @@
 								class="login-button"
 								theme="primary"
 								state="{{onLoginProgress? 'loading' : 'default'}}"
+								title="Click here to login"
 								(click)="onLogin()">
 							Log In
 						</tds-button>

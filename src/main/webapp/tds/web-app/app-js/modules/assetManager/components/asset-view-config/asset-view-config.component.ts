@@ -11,7 +11,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
 import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
 import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import {Permission} from '../../../../shared/model/permission.model';
 import {VIEW_COLUMN_MIN_WIDTH} from '../../../assetExplorer/model/view-spec.model';
 import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';

@@ -121,6 +121,14 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.filterChange(root);
 	}
 
+	public onClearFilters(): void {
+		this.state.filter.filters = [];
+		this.assetCommentColumnModel.columns.forEach((column) => {
+			delete column.filter;
+		});
+		this.onFilter({filter: ''});
+	}
+
 	protected clearValue(column: any): void {
 		this.assetCommentService.clearFilter(column, this.state);
 		this.filterChange(this.state.filter);
@@ -239,15 +247,18 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
-	protected filterCount(): number {
+	public filterCount(): number {
 		return this.state.filter.filters.length;
 	}
 
-	protected hasFilterApplied(): boolean {
+	/**
+	 * Returns whether or not any filters are applied to the grid.
+	 */
+	public hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}
 
-	protected toggleFilter(): void {
+	public toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 

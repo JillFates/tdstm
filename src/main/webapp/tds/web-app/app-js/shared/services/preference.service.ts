@@ -54,7 +54,9 @@ export class PreferenceService {
 	 */
 	private preferencesList = new BehaviorSubject([]);
 
-	constructor(private http: HttpClient, private store: Store) {
+	constructor(
+		private http: HttpClient,
+		private store: Store) {
 	}
 
 	// query a set of user preferences passed as arg variables
@@ -175,15 +177,5 @@ export class PreferenceService {
 				return {width, height};
 			}))
 			.filter((size: any) => size.width !== null && size.height !== null);
-	}
-
-	/**
-	 * Used to retrieve the user preference current date format
-	 */
-	// TODO: this is doing the same as the method getUserDateFormat on this same class...
-	getUserCurrentDateFormatOrDefault(): string {
-		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-
-		return userDateFormat ? userDateFormat : DateUtils.DEFAULT_FORMAT_DATE;
 	}
 }

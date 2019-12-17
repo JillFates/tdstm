@@ -1,18 +1,25 @@
+
 .diagram-layout-container {
   position: relative;
-  padding-left: 15px;
-  padding-right: 15px;
-  min-height: 530px;
+  //padding-left: 15px;
+  //padding-right: 15px;
+  height: 100%;
+}
+
+#diagram-layout {
+  width: 100% !important;
 }
 
 .overview-container {
   position: absolute;
-  width: 200px;
-  height: 100px;
+  width: 20%;
+  max-width: 250px;
+  height: 20%;
+  max-height: 150px;
   top: 10px;
-  left: 15px;
+  left: 20px;
   background-color: aliceblue;
-  z-index: 300; /* make sure its in front */
+  z-index: 71; /* make sure its in front */
   border: solid 1px blue;
 }
 
@@ -24,59 +31,85 @@
   position: absolute;
   bottom: 40px;
   left: 40px;
-  z-index: 9999;
+  z-index: 999;
 }
 
 #graph-control-btn-group > .btn {
-  background-color: #dddddd;
+  background-color: #dddddd !important;
+  border-color: #c4d0dc !important;
+  color: #333333 !important;
+  width: 100% !important;
+  padding: 0 .2rem 0 .2rem !important;
+  min-width: 1.5rem !important;
+  border-radius: 0.3rem !important;
+  margin: 0 0 0.05rem 0 !important;
 }
 
+#graph-control-btn-group > .btn:hover {
+  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+}
 
-/* CSS for the traditional context menu */
-#ctx-menu {
-  z-index: 10002;
-  position: absolute;
-  left: 5px;
-  border: 1px solid #444;
-  background-color: #F5F5F5;
+#graph-control-btn-group > .btn:active {
+  box-shadow: 0 2rem 0 0 #c4d0dc inset !important;
+}
+
+#graph-control-btn-group > .btn:focus {
+  outline: none !important;
+}
+
+.diagram-card {
   display: none;
+  z-index: 999;
   box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
-  font-size: 12px;
-  font-family: sans-serif;
-  font-weight: bold;
+  position: absolute;
+  width: auto;
+  height: auto;
+  min-width: 300px;
+  border-radius: 5px;
+
+  .diagram-card-header {
+    width: auto;
+    height: auto;
+    min-height: 45px;
+    padding: 0 3px 0 3px;
+    text-align: center;
+    font-size: 1.5em;
+    background-color: #0b63a8;
+    color: #fff;
+    word-wrap: break-spaces;
+    font-weight: bold;
+    h4 {
+      word-break: break-word;
+    }
+  }
+
+  .diagram-card-content {
+    width: auto;
+    padding: 5px;
+    font-size: 1em;
+    background-color: #fff;
+    color: #333;
+  }
+
+  .diagram-card-content > .row:nth-child(odd){
+    background-color: #333;
+    color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
+  }
 }
-#ctx-menu ul {
-  list-style: none;
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-}
-#ctx-menu li a {
-  position: relative;
-  min-width: 60px;
-  color: #444;
-  display: inline-block;
-  padding: 6px;
-  text-decoration: none;
-  cursor: pointer;
-}
-#ctx-menu li:hover {
-  background: #CEDFF2;
-  color: #EEE;
-}
-#ctx-menu li ul li {
-  display: none;
-}
-#ctx-menu li ul li a {
-  position: relative;
-  min-width: 60px;
-  padding: 6px;
-  text-decoration: none;
-  cursor: pointer;
-}
-#ctx-menu li:hover ul li {
-  display: block;
-  margin-left: 0px;
-  margin-top: 0px;
+
+#show-full-graph {
+  z-index: 999;
+  box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
+  position: absolute;
+  width: auto;
+  height: 30px;
+  top: 15px;
+  left: 48%;
+  text-align: center;
+  background-color: #0b63a8;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
 }

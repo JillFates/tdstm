@@ -2,7 +2,7 @@
 	tds-autofocus
 	tds-handle-escape
 	(escPressed)="cancelCloseDialog()"
-	class="task-detail-component modal fade in tds-ui-modal-decorator"
+	class="task-common modal fade in tds-ui-modal-decorator"
 	id="task-detail-component"
 	data-backdrop="static"
 	tabindex="-1"
@@ -575,11 +575,7 @@
 														dataGridTaskPredecessorsHelper.sortChange(
 															$event
 														)
-													"
-													[rowClass]="
-														modelHelper.rowStatusColor
-													"
-												>
+													">
 													<!-- Toolbar Template -->
 													<ng-template kendoGridToolbarTemplate [position]="'top'">
 														<div class="table-container">
@@ -723,11 +719,7 @@
 														dataGridTaskSuccessorsHelper.sortChange(
 															$event
 														)
-													"
-													[rowClass]="
-														modelHelper.rowStatusColor
-													"
-												>
+													">
 													<!-- Toolbar Template -->
 													<ng-template
 														kendoGridToolbarTemplate

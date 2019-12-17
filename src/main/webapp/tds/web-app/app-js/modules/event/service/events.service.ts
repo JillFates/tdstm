@@ -184,9 +184,9 @@ export class EventsService {
 	}
 
 	/**
-	 * Get the event status details for an specific bundle
-	 * @param {string} userTimeZone
- 	 * @param {number} bundleId Bundle id
+	 * Get the event status details
+	 * @param {string} userTimeZone User Time Zone
+ 	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Event status details
 	*/
 	getEventStatusDetails(userTimeZone: string, eventId: number): Observable<any> {
@@ -395,6 +395,10 @@ export class EventsService {
 	/**
 	 * Get the relationship among categories and tasks
  	 * @param {number} eventId Event id
+	 * @param {string} userTimeZone User Time Zone
+	 * @param {string} plannedStart The Event Estimated Start
+	 * @param {string} plannedCompletion The Event Estimated Completion
+	  *@param {boolean} viewUnpublished Flag to filter unpublished events
 	 * @returns {Observable<any>} Category status details
 	*/
 	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any, viewUnpublished: boolean): Observable<any> {

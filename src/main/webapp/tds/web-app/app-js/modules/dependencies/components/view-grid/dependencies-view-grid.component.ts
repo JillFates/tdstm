@@ -34,7 +34,7 @@ import {
 	BulkActionResult,
 	BulkChangeType,
 } from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import { CheckboxStates } from '../../../../shared/components/tds-checkbox/model/tds-checkbox.model';
+import { CheckboxStates } from '../../../../shared/components/tds-indeterminate-checkbox/model/tds-indeterminate-checkbox.model';
 import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { DependencyResults } from '../../model/dependencies.model';
 import {
@@ -50,6 +50,7 @@ import {
 	AssetDependency,
 } from '../../service/open-asset-dependencies.service';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import {ViewColumn} from '../../../assetExplorer/model/view-spec.model';
 
 declare var jQuery: any;
 
@@ -406,6 +407,14 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		const clonedState = clone(this.state);
 		clonedState.gridState.filter.filters = filters;
 		this.componentState.next(clonedState);
+	}
+
+	public onClearFilters(): void {
+		this.state.gridState.filter.filters = [];
+		this.dependenciesColumnModel.columns.forEach((column) => {
+			delete column.filter;
+		});
+		this.onFilter({filter: ''});
 	}
 
 	/**

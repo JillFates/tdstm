@@ -135,6 +135,11 @@
                     <li class="menu-child-item menu-parent-assets-storage-logical-list assets-asset-explorer-child">
                         <a [routerLink]="['/asset','views',6,'show']" id="6">Logical Storage</a>
                     </li>
+                    <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
+                        <a [routerLink]="['/asset','views',1,'show']" id="1">
+                            <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
+                        </a>
+                    </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-parent-assets-dependencies-list">
                         <a [routerLink]="['dependencies','list']">Dependencies</a>
@@ -151,6 +156,9 @@
                     </li>
                     <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-architecture-graph">
                         <a [routerLink]="['/asset','architecture-graph']">GoJS Architecture Graph</a>
+                    </li>
+                    <li *ngIf="hasPermission(permission.ArchitectureView)" class="menu-child-item menu-parent-assets-gojs-architecture-graph">
+                        <a [routerLink]="['/asset/architecture-graph']">GoJS Architecture Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.AssetExport) || hasPermission(permission.AssetImport) || hasPermission(permission.DataTransferBatchView)" class="divider"></li>
                     <li *ngIf="hasPermission(permission.AssetExport)" class="menu-child-item menu-parent-assets-export-assets">
@@ -213,7 +221,7 @@
                         <a href="/tdstm/task/taskGraph?initSession=true">Task Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-gojs-task-graph">
-                        <a [routerLink]="['/neighborhood']">GoJS Graph</a>
+                        <a [routerLink]="['taskManager', 'task-graph']">GoJS Task Graph</a>
                     </li>
                     <li *ngIf="hasPermission(permission.TaskGraphView)" class="menu-child-item menu-parent-tasks-task-timeline">
                         <a href="/tdstm/task/taskTimeline">Task Timeline</a>

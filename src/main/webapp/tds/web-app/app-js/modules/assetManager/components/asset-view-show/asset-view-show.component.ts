@@ -25,8 +25,6 @@ import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
 import {ValidationUtils} from '../../../../shared/utils/validation.utils';
 import {AssetTagUIWrapperService} from '../../../../shared/services/asset-tag-ui-wrapper.service';
-import { BulkActionResult, BulkChangeType } from '../../../../shared/components/bulk-change/model/bulk-change.model';
-import { BulkChangeButtonComponent } from '../../../../shared/components/bulk-change/components/bulk-change-button/bulk-change-button.component';
 import { ASSET_ENTITY_DIALOG_TYPES } from '../../../assetExplorer/model/asset-entity.model';
 import { PREFERENCES_LIST, PreferenceService } from '../../../../shared/services/preference.service';
 import { takeUntil } from 'rxjs/operators';
@@ -60,11 +58,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
 	public hiddenFilters = false;
-	bulkChangeType: BulkChangeType = BulkChangeType.Assets;
 	private unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid', {static: false}) assetExplorerViewGrid: AssetViewGridComponent;
-	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -184,7 +180,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				this.data = result;
 				jQuery('[data-toggle="popover"]').popover();
 			}, err => console.log(err));
-		});
+		}, 2000);
 	}
 
 	public onEdit(): void {
@@ -394,20 +390,6 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			isEditAvailable: this.isEditAvailable(),
 			canShowSaveButton: this.canShowSaveButton(),
 		}
-	}
-
-	/**
-	 * On bulk edit call grid bulk edit action
-	 */
-	onClickBulkButton(): void {
-		this.assetExplorerViewGrid.onClickBulkButton(this.tdsBulkChangeButton);
-	}
-
-	/**
-	 * Handle Bulk edit result.
-	 */
-	onBulkOperationResult(operationResult: BulkActionResult): void {
-		this.assetExplorerViewGrid.onBulkOperationResult(operationResult);
 	}
 
 	/**

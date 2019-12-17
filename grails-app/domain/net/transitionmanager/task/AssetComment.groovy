@@ -5,6 +5,7 @@ import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.TimeConstraintType
 import com.tdsops.tm.enums.domain.TimeScale
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import net.transitionmanager.action.ApiAction
 import net.transitionmanager.asset.AssetEntity
@@ -117,6 +118,9 @@ class AssetComment {
 	static final List<String> postMoveCategories = AssetCommentCategory.postMoveCategories
 	static final List<String> discoveryCategories = AssetCommentCategory.discoveryCategories
 	static final List<String> planningCategories = AssetCommentCategory.planningCategories
+
+	// Used by the isMyTask method
+	static final List<AssetCommentStatus> canBeMyTasksForTheseStatuses = [AssetCommentStatus.PENDING, AssetCommentStatus.PLANNED, AssetCommentStatus.READY]
 
 	/* Transient properties for Task Generation. */
 	Boolean tmpIsFunnellingTask
@@ -451,6 +455,51 @@ class AssetComment {
     */
 	boolean isActionable() {
 		!(status in [ COMPLETED, TERMINATED ])
+	}
+
+	/**
+	 * Used to determine if the current task can be assumed to be a task assignable/assigned to the give person
+	 * @param person - the individual to check for assignability to for the task
+	 * @param teams - the list of team (aka role) codes that the person is assigned
+	 * @return true if the task can be considered theirs based on the status and assignment
+	 */
+	boolean isMyTask(Person person, List<String> teams) {
+		boolean myTask = ( assignedTo == person )
+		if ( !myTask ) {
+			myTask = this.role in teams &&
+					  this.status in canBeMyTasksForTheseStatuses &&
+					  (this.assignedTo == null || this.assignedTo && this.hardAssigned == 0 )
+		}
+		return myTask
+	}
+
+	/**
+	 * Map definition of the Task that will be used for the Graph Endpoints
+	 * @return a Map definition of the Task
+	 */
+	Map mapForGraphs() {
+		[
+				  id            : id,
+				  number        : taskNumber,
+				  asset         : GormUtil.domainObjectToMap(assetEntity,['id', 'assetName', 'assetType', 'assetClass']),
+				  name          : comment,
+				  criticalPath  : isCriticalPath,
+				  duration      : duration,
+				  durationScale : durationScale?.name(),
+				  slack         : slack,
+				  actualStart   : actStart,
+				  status        : status,
+				  actFinish     : actFinish,
+				  estStart      : estStart,
+				  estFinish     : estFinish,
+				  assignedTo    : assignedTo?.toString(),
+				  team          : role,
+				  isAutomatic   : isAutomatic(),
+				  hasAction     : hasAction(),
+				  predecessorIds: taskDependencies.findAll { it.successor.id == id }.collect {
+					  it.predecessor.id
+				  }
+		]
 	}
 
 	/**

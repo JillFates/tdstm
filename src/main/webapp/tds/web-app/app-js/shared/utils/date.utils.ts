@@ -104,6 +104,16 @@ export class DateUtils {
 		return sourceZonedTime.format('YYYY-MM-DD');
 	}
 
+	/**
+	 * Get the Date without the hh:mm:ss using an specific Date Format
+	 * @param {sourceTime} String Format, no time
+	 * @param {dateFormat} User dateFormat
+	 * @returns {date} The formatted day
+	 */
+	public static getDateFromFormat(sourceTime: Date, dateFormat: string): Date {
+		return new Date(moment(sourceTime, dateFormat));
+	}
+
 	public static getTimestamp(): String {
 		let time = new Date();
 		return time.getFullYear().toString() +
@@ -214,8 +224,8 @@ export class DateUtils {
 	 * @returns {init, end}
 	 */
 	public static getInitEndFromDate(date: Date): {init: Date, end: Date} {
-		const init = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-		const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+		const init = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+		const end = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59) : null;
 
 		return {init, end};
 	}
