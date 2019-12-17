@@ -25,41 +25,44 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<input *ngIf="columnType === 'text'"
-			clrInput
-			#filterInput
-			type="text"
-			class="text-filter"
-			[name]="name"
-			[value]="value"
-			[placeholder]="placeholder"
-			input-paste
-			(onPaste)="onPaste($event)"
-		/>
-        <kendo-datepicker *ngIf="columnType === 'date'"
-				#filterInput
-				[format]="dateFormat"
-                [ngClass]="{'is-filtered': value}"
-				[value]="value"
+		<div class="tds-filter-input">
+            <input *ngIf="columnType === 'text'"
+                   clrInput
+                   #filterInput
+                   type="text"
+                   class="text-filter"
+                   [name]="name"
+                   [value]="value"
+                   [placeholder]="placeholder"
+                   input-paste
+                   (onPaste)="onPaste($event)"
+            />
+            <kendo-datepicker *ngIf="columnType === 'date'"
+                              #filterInput
+                              [format]="dateFormat"
+                              [ngClass]="{'is-filtered': value}"
+                              [value]="value"
 				(valueChange)="onFilter($event)"
-                [style.width.%]="100">
-		</kendo-datepicker>
-        <kendo-dropdownlist *ngIf="columnType === 'boolean'"
-				#filterInput
-				[data]="booleanFilterData"
-				[value]="value"
-				(valueChange)="onFilter($event)"
-                [style.width.%]="100">
-		</kendo-dropdownlist>
-        <tds-button
-			*ngIf="value || value === false"
-			(click)="onClearFilter()"
-			[title]="'Clear Filter'"
-			icon="times-circle"
-			[small]="true"
-			[flat]="true"
-		>
-		</tds-button>
+                [style.width.%]="value ? 80 : 100">
+            </kendo-datepicker>
+            <kendo-dropdownlist *ngIf="columnType === 'boolean'"
+                                #filterInput
+                                [data]="booleanFilterData"
+                                [value]="value"
+                                (valueChange)="onFilter($event)"
+                                [style.width.%]="value ? 70 : 100">
+            </kendo-dropdownlist>
+            <tds-button
+                    *ngIf="value || value === false"
+                    (click)="onClearFilter()"
+                    [title]="'Clear Filter'"
+                    icon="times-circle"
+                    [small]="true"
+                    [flat]="true"
+            >
+            </tds-button>
+		</div>
+
 	`,
 })
 export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
