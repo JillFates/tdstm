@@ -2,6 +2,8 @@ package com.tdsops.etl
 
 import com.tdsops.AssetDependencyTypesCache
 import com.tdsops.ETLTagValidator
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.etl.dataset.ETLRow
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -106,6 +108,10 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @see getl.data.Dataset* @see getl.data.Field
 	 */
 	DataSetFacade dataSetFacade
+	/**
+	 * An instance of {@code Dataset}
+	 */
+	ETLDataset dataset
 	/**
 	 * An instance of this interface should be assigned
 	 * to be used in fieldDefinition validations
@@ -256,13 +262,35 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	ETLProcessor(
 		Project project,
 		DataSetFacade dataSetFacade,
-		DebugConsole console,
+		DebugConsole debugConsole,
 		ETLFieldsValidator fieldsValidator,
 		ETLTagValidator tagValidator = null
 	) {
+		this(project, null, dataSetFacade, debugConsole, fieldsValidator, tagValidator)
+	}
+
+	ETLProcessor(
+			Project project,
+			ETLDataset dataset,
+			DebugConsole debugConsole,
+			ETLFieldsValidator fieldsValidator,
+			ETLTagValidator tagValidator = null
+	) {
+ 		this(project, dataset, null, debugConsole, fieldsValidator, tagValidator)
+	}
+
+	ETLProcessor(
+			Project project,
+			ETLDataset dataset,
+			DataSetFacade dataSetFacade,
+			DebugConsole debugConsole,
+			ETLFieldsValidator fieldsValidator,
+			ETLTagValidator tagValidator
+	) {
 		this.project = project
+		this.dataset = dataset
 		this.dataSetFacade = dataSetFacade
-		this.debugConsole = console
+		this.debugConsole = debugConsole
 		this.fieldsValidator = fieldsValidator
 		this.tagValidator = tagValidator
 		this.binding = new ETLBinding(this)
@@ -349,6 +377,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		throw ETLProcessorException.invalidDomain(domainName)
 	}
 
+	@Deprecated
+	private ETLProcessor readWithGETL(){
+		columnsMap = [:]
+		this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
+			Column column = new Column(label: fieldNameToLabel(field), index: index)
+			columns.add(column)
+			columnsMap[column.label] = column
+		}
+		currentRowIndex++
+		dataSetFacade.setCurrentRowIndex(currentRowIndex)
+		debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
+
+	}
+
 	/**
 	 * Read Labels from source of data
 	 * @param reservedWord
@@ -356,19 +398,17 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 */
 	ETLProcessor read(ReservedWord reservedWord) {
 		validateStack()
-		if (reservedWord == ReservedWord.labels) {
-			columnsMap = [:]
-			this.dataSetFacade.fields().eachWithIndex { getl.data.Field field, Integer index ->
-				Column column = new Column(label: fieldNameToLabel(field), index: index)
-				columns.add(column)
-				columnsMap[column.label] = column
-			}
-			currentRowIndex++
-			dataSetFacade.setCurrentRowIndex(currentRowIndex)
-			debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
-		} else {
+		if (reservedWord != ReservedWord.labels) {
 			throw ETLProcessorException.invalidReadCommand()
 		}
+		if (!dataset){
+			//dcorrea: Remove older code using GETL
+			return readWithGETL()
+		}
+
+		this.dataset.readColumns()
+		columnsMap
+
 		return this
 	}
 
@@ -392,7 +432,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 				List<Map> rows = this.dataSetFacade.rows()
 				subListRangeCheck(from, to, rows.size())
 				List subList = rows.subList(from, to)
-				doIterate(subList, closure)
+				doIterateWithGETL(subList, closure)
 			}]
 		}]
 	}
@@ -418,7 +458,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 				rangeCheck(number, rows.size())
 				rows.get(number)
 			}
-			doIterate(subList, closure)
+			doIterateWithGETL(subList, closure)
 		}]
 	}
 
@@ -448,7 +488,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 	/**
 	 * Method invoked at the begin within the iterate loop
-	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @see ETLProcessor#doIterateWithGETL(java.util.List, groovy.lang.Closure)
 	 */
 	void topOfIterate() {
 		result.startRow()
@@ -456,7 +496,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 	/**
 	 * Method invoked at the begin within the iterate loop
-	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @see ETLProcessor#doIterateWithGETL(java.util.List, groovy.lang.Closure)
 	 * @param rowNum the current number de the rows
 	 * @param totalNumRows total number of rows for the current iterate loop
 	 */
@@ -474,7 +514,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return the ETLProcesor instance
 	 * @see ETLBinding#getVariable(java.lang.String)
 	 */
-	ETLProcessor doIterate(List rows, Closure closure) {
+	@Deprecated
+	ETLProcessor doIterateWithGETL(List rows, Closure closure) {
 
 		iterateIndex = new IterateIndex(rows.size())
 		currentRowIndex = 1
@@ -507,7 +548,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 */
 	ETLProcessor iterate(Closure closure) {
 		validateStack()
-		doIterate(this.dataSetFacade.rows(), closure)
+
+		if (!this.dataset){
+			return doIterateWithGETL(this.dataSetFacade.rows(), closure)
+		}
+
+		Iterator<ETLRow> iterator = this.dataset.iterator()
+
+
+		return this
 	}
 
 	/**
@@ -1464,7 +1513,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	/**
 	 * Add a variable within the script as a global variable.
 	 * Tipically this variable is defined outside a iterate command
-	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
+	 * @see ETLProcessor#doIterateWithGETL(java.util.List, groovy.lang.Closure)
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
 	 */
