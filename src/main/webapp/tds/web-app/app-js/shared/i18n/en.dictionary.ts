@@ -259,6 +259,9 @@ export const en_DICTIONARY: Object = {
 		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
 		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
+	'ARCHITECTURE': {
+		'ARCHITECTURE_GRAPH': 'Architecture Graph'
+	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
 		'APPLICATION_CONFLICTS': 'Application Conflicts',

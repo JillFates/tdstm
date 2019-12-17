@@ -1,8 +1,79 @@
-<div class="container architecture-graph-container">
-	<tds-lib-diagram-layout
-		[data]="data$ | async"
-		[layout]="diagramLayout$ | async"
-		[contextMenuOptions]="ctxOpts"
-		[hideExpand]="true"
-	></tds-lib-diagram-layout>
+
+<tds-button>Control Panel</tds-button>
+<tds-button>Legend</tds-button>
+<tds-button>Fullscreen</tds-button>
+<div class="graphContainer">
+	<div class="graph-control-panel">
+		<p>Select an Asset</p>
+		<kendo-dropdownlist [data]="dataForSelect">
+		</kendo-dropdownlist>
+		<p>Filter: All classes</p>
+		<kendo-dropdownlist
+			[data]="dataForSelect2"
+			[textField]="'text'"
+			[valueField]="'id'"
+		>
+		</kendo-dropdownlist>
+		<div class="tiers-above">
+			<tds-button icon="minus"></tds-button>
+			<label>{{levelsUp}}</label>
+			<tds-button icon="plus"></tds-button>
+			<label>Tiers Above</label>
+		</div>
+		<div class="tiers-below">
+			<tds-button icon="minus"></tds-button>
+			<label>{{levelsDown}}</label>
+			<tds-button icon="plus"></tds-button>
+			<label>Tiers Below</label>
+		</div>
+		<div class="graph-checkbox">
+			<input type="checkbox" class="k-checkbox" checked="{{showCycles}}">
+			<label class="k-checkbox-label" for="auth-2fa">Show Cyclical References</label>
+		</div>
+		<div class="graph-checkbox">
+			<input type="checkbox" class="k-checkbox" checked="checked">
+			<label class="k-checkbox-label" for="auth-2fa">Black Background</label>
+		</div>
+		<div class="labels">
+			<label>Show Labels: </label> <tds-button icon="plus"></tds-button>
+			<div class="label-items">
+<!--				Add all options here via ng for and add icon-->
+				<div class="graph-checkbox">
+					<input type="checkbox" class="k-checkbox" checked="checked">
+					<label class="k-checkbox-label" for="auth-2fa">Black Background</label>
+				</div>
+			</div>
+		</div>
+		<div class="graph-spacing">
+			<tds-button icon="arrow_in"></tds-button>
+			<tds-button icon="arrow_out"></tds-button>
+			<label>Spacing</label>
+		</div>
+		<div class="graph-commands">
+			<div class="graph-command">
+				<tds-button>Regenerate Graph</tds-button>
+			</div>
+			<div class="graph-command">
+				<tds-button>Save Preferences</tds-button>
+			</div>
+			<div class="graph-command">
+				<tds-button>Reset Defaults</tds-button>
+			</div>
+		</div>
+	</div>
+
+	<div class="container architecture-graph-container">
+<!--		<tds-lib-diagram-layout-->
+<!--			[data]="data$ | async"-->
+<!--			[layout]="diagramLayout$ | async"-->
+<!--			[contextMenuOptions]="ctxOpts"-->
+<!--			[hideExpand]="true"-->
+<!--		></tds-lib-diagram-layout>-->
+<!--		<tds-diagram-layout-->
+<!--			[data]="data$ | async"-->
+<!--			[layout]="diagramLayout$ | async"-->
+<!--			[contextMenuOptions]="ctxOpts"-->
+<!--			[hideExpand]="true"-->
+<!--		></tds-diagram-layout>-->
+	</div>
 </div>
