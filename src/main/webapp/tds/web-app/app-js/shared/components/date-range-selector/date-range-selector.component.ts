@@ -77,6 +77,7 @@ declare var jQuery: any;
                                         <label data-toggle="popover"
                                                data-trigger="hover"
                                                class="duration-value label-part"
+                                               data-container="body"
                                                data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
                                             <i class="fa fa-fw  lock-state"
                                                [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
@@ -115,7 +116,10 @@ export class DateRangeSelectorComponent extends UIExtraDialog  implements  OnIni
 
 	ngOnInit() {
 		this.dataSignature = JSON.stringify(this.model);
-		jQuery('[data-toggle="popover"]').popover();
+		jQuery('[data-toggle="popover"]')
+			.popover({
+				container: 'body'
+			});
 	}
 	/**
 	 * Verify the Object has not changed

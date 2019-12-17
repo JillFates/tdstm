@@ -1,4 +1,4 @@
-.task-detail-component {
+.task-common {
   .modal-header {
     padding-bottom: 15px;
   }
@@ -185,6 +185,12 @@
             border-spacing: 3px;
             padding: 0;
 
+            tds-task-status-indicator {
+              span {
+                font-weight: bold;
+              }
+            }
+
             .k-widget.k-dropdown,
             .k-widget.k-dateinput,
             .k-widget.k-datepicker {
@@ -281,6 +287,15 @@
 
         .k-grid-toolbar {
           padding-bottom: 0;
+        }
+
+        .k-grid-content {
+          label {
+            font-weight: normal;
+          }
+          label.pointer {
+            font-weight: bold;
+          }
         }
 
       }
