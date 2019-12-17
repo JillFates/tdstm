@@ -146,7 +146,7 @@
 				modalType === actionTypes.CREATE
 			"
 			(click)="onSaveProvider()"
-			[disabled]="!providerForm.form.valid || !isUnique || isEmptyValue()"
+			[disabled]="!providerForm.form.valid || !isUnique || isEmptyValue() || !providerForm.form.dirty"
 		>
 		</tds-button-save>
 
