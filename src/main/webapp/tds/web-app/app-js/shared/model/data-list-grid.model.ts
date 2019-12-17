@@ -124,6 +124,13 @@ export class GridColumnModel {
 			}
 		}
 
+		// clear (string/date) values
+		root.filters = (root.filters || []).filter((filter: any) => filter.value !== '');
+		// clear boolean filter value
+		if (column.filter === '' && column.type === 'boolean') {
+			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
+		}
+
 		return root;
 	}
 

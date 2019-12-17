@@ -44,6 +44,7 @@ import {
 } from '@progress/kendo-angular-grid';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 declare var jQuery: any;
 
@@ -128,8 +129,9 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
-		const root = this.providerService.filterColumn(column, this.state);
+	protected onFilter(value: any, column: any): void {
+		column.filter = value;
+		const root = GridColumnModel.filterColumn(column, this.state)
 		this.filterChange(root);
 	}
 
