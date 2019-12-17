@@ -89,6 +89,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	requestId: number;
 	refreshTriggered: boolean;
 	isNeighbor: boolean;
+	taskCycles: number[][];
+	hasCycles: boolean;
+	showCycles: boolean;
+	rootId: number;
 
 	constructor(
 			private taskService: TaskService,
@@ -222,6 +226,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 				.subscribe(res => {
 					const data = res.body.data;
 					if (data && data.length > 0) {
+						this.rootId = taskId;
 						this.tasks = data && data.map(r => r.task);
 						if (this.tasks) {
 							if (!this.isNeighbor) {
@@ -268,8 +273,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			};
 			this.taskService.findTasksByMoveEventId(this.selectedEvent.id, filters)
 				.pipe(
-					takeUntil(this.unsubscribe$),
-					timeout(15000)
+					takeUntil(this.unsubscribe$)
 				)
 				.subscribe(res => {
 					this.tasks = res && res.tasks;
@@ -277,6 +281,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 						this.diagramLayoutService.clearFullGraphCache();
 						this.requestId = this.selectedEvent.id;
 						this.isMoveEventReq = false;
+						if (res.cycles && res.cycles.length) {
+							this.hasCycles = true;
+							this.taskCycles = res.cycles;
+						}
 						this.generateModel();
 					}
 				},
@@ -301,7 +309,11 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 * load tasks with new filter criteria
 	 **/
 	onMyTasksFilterChange(): void {
-		this.checkboxFilterChange();
+		if (this.myTasks) {
+			this.graph.highlightBy('isMyTask', true);
+		} else {
+			this.graph.clearHighlights();
+		}
 	}
 
 	/**
@@ -341,6 +353,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			const predecessorIds = t.predecessorIds && t.predecessorIds;
 
 			t.key = t.id;
+			t.rootNodeKey = this.rootId;
 			if (t.team && !teams
 				.find(team => t.team.trim().toLowerCase() === team.label.trim().toLowerCase())) {
 				teams.push({label: t.team});
@@ -559,6 +572,19 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			this.graph.highlightNodesByText(this.filterText, matches);
 		} else {
 			this.graph.highlightNodesByTeam(matches);
+		}
+	}
+
+	/**
+	 * highlight nodes by cycles
+	 **/
+	highlightCycles(): void {
+		if ((this.taskCycles && this.taskCycles.length > 0) && this.showCycles) {
+			const cycles = [];
+			this.taskCycles.forEach(arr => cycles.push(...arr));
+			this.graph.highlightNodesByCycle(cycles);
+		} else {
+			this.graph.clearHighlights();
 		}
 	}
 

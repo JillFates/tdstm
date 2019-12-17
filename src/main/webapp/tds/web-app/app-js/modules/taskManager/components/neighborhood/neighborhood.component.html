@@ -36,13 +36,13 @@
       </kendo-dropdownlist>
     </div>
     <div class="col-md-2  k-align-self-center">
-      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Teams:</label>
+      <label class="neighborhood-control-label" for="neighborhood-teams-dropdown">Team:</label>
       <kendo-dropdownlist
         id="neighborhood-teams-dropdown"
         textField="label"
         valueField="label"
         [ngClass]="'neighborhood-custom-dropdown'"
-        [value]="selectedEvent"
+        [value]="selectedTeam"
         [data]="teamHighlights$ | async"
         (selectionChange)="highlightByTeam($event)"
         [(ngModel)]="selectedTeam"
@@ -88,6 +88,12 @@
         <input  type="checkbox" [(ngModel)]="viewUnpublished" (ngModelChange)="onViewUnpublishedFilterChange()" />
         <span class="checkmark"></span>
         View Unpublished
+      </label>
+
+      <label class="task-chk-container" *ngIf="hasCycles">
+        <input  type="checkbox" [(ngModel)]="showCycles" (ngModelChange)="highlightCycles()" />
+        <span class="checkmark"></span>
+        Highlight Cycles
       </label>
     </div>
 

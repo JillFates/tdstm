@@ -14,12 +14,15 @@ import {ASSET_ICONS_PATH, CTX_MENU_ICONS_PATH, STATE_ICONS_PATH} from '../../../
 import {
 	Adornment,
 	Binding,
-	Diagram, GraphObject,
+	Diagram,
 	InputEvent,
+	Link,
+	GraphObject,
 	Overview,
 	Panel,
 	Placeholder,
-	Shape, Size,
+	Shape,
+	Size,
 	Spot,
 	TextBlock
 } from 'gojs';
@@ -260,6 +263,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.diagram.startTransaction('generateDiagram');
 		this.diagram.initialDocumentSpot = Spot.TopLeft;
 		this.diagram.initialViewportSpot = Spot.TopLeft;
+		this.diagram.hasHorizontalScrollbar = false;
+		this.diagram.hasVerticalScrollbar = false;
 		this.diagram.allowZoom = true;
 		this.setDiagramNodeTemplate();
 		this.setDiagramLinksTemplate();
@@ -272,6 +277,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.overrideMouseWheel();
 		this.overviewTemplate();
 		this.diagramListeners();
+		this.overrideDoubleClick();
 	}
 
 	/**
@@ -435,6 +441,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		linkTemplate.add(linkShape);
 		linkTemplate.add(arrowHead);
+		linkTemplate.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
 
 		return linkTemplate;
 	}
@@ -497,6 +504,29 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		selAdornmentTemplate.add(selAdornmentShape);
 		selAdornmentTemplate.add(placeholder);
 
+		return selAdornmentTemplate;
+	}
+
+	/**
+	 * Node Adornment template configuration
+	 * @param {go.Node} node > optional node to add the adornment to
+	 **/
+	linkSelectionAdornmentTemplate(node?: go.Node): Adornment {
+		const selAdornmentTemplate = new Adornment(Panel.Link);
+		selAdornmentTemplate.selectionAdorned = true;
+		if (node) { selAdornmentTemplate.adornedObject = node; }
+
+		const linkShape = new go.Shape();
+		linkShape.isPanelMain = true;
+		linkShape.strokeWidth = 5;
+		linkShape.stroke = 'red';
+		const arrowHead = new Shape();
+		arrowHead.strokeWidth = 4;
+		arrowHead.stroke = '#af1102';
+		arrowHead.toArrow = 'Standard';
+
+		selAdornmentTemplate.add(linkShape);
+		selAdornmentTemplate.add(arrowHead);
 		return selAdornmentTemplate;
 	}
 
@@ -686,7 +716,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		textBlock.mouseOver = (e: InputEvent, obj: TextBlock) => {
 			this.diagram.currentCursor = 'pointer';
-			if ((obj.name && obj.name.length > 0) && obj.name.toLowerCase() === 'auto') {
+			if ((obj.name && obj.name.length > 0) && obj.name.toLowerCase() === 'automated task') {
 				obj.stroke = '#ddd';
 				obj.font = 'bold 16px sans-serif';
 			} else {
@@ -875,6 +905,46 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
+	 * highlight nodes by cycles
+	 * @param {number[]} cycles > array of ids on that are in a cycle
+	 **/
+	highlightNodesByCycle(cycles: number[]): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes.filter(f => !!cycles.find(m => m === f.data.id));
+			if (highlightCollection.count > 0 && highlightCollection.first()) {
+				d.selectCollection(highlightCollection);
+				highlightCollection.each(n => n.linksConnected.each(l => {
+					l.selectionAdornmentTemplate = this.linkSelectionAdornmentTemplate();
+					l.isSelected = true;
+				}));
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		});
+	}
+
+	/**
+	 * highlight nodes by custom field and value
+	 * @param {string} field - name of the field
+	 * @param {any} value - value to match against
+	 **/
+	highlightBy(field: string, value: any): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes && d.nodes.filter(n => n.data[field] && n.data[field] === value);
+			if (highlightCollection && highlightCollection.count > 0) {
+				d.selectCollection(highlightCollection);
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		})
+	}
+
+	/**
+	 * Clear highlighted nodes
+	 **/
+	clearHighlights(): void {
+		this.diagram.commit(d => d.clearSelection())
+	}
+
+	/**
 	 * Override mousewheel handler to add the zooming scales
 	 **/
 	overrideMouseWheel(): void {
@@ -883,6 +953,24 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			go.Tool.prototype.standardMouseWheel.call(tool);
 			this.setNodeTemplateByScale(this.diagram.scale, this.diagram.lastInput);
 		};
+	}
+
+	/**
+	 * Override double click handler to add new behaviour
+	 **/
+	overrideDoubleClick(): void {
+		this.diagram.doubleClick = e => {
+			const diagramNodes = e.diagram && e.diagram.nodes;
+			let rootNode;
+			if (diagramNodes && diagramNodes.first().data.rootNodeKey) {
+				rootNode = e.diagram.nodes.filter(n => n.data.key === n.data.rootNodeKey).first();
+			} else {
+				rootNode = e.diagram.findTreeRoots().first();
+			}
+			if (rootNode) {
+				e.diagram.centerRect(rootNode.actualBounds);
+			}
+		}
 	}
 
 	/**
