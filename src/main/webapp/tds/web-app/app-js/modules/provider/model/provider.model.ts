@@ -14,6 +14,7 @@ export class ProviderColumnModel {
 				property: 'name',
 				type: 'text',
 				width: 246,
+				isActionable: true,
 			}, {
 				label: 'Description',
 				property: 'description',

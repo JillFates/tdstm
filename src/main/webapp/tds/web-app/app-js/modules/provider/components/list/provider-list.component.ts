@@ -196,13 +196,11 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {any} dataItem
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			this.selectRow(event['dataItem'].id);
-			this.openProviderDialogViewEdit(event['dataItem'], ActionType.VIEW);
-		}
+	protected cellClick(dataItem: any): void {
+		this.selectRow(dataItem.id);
+		this.openProviderDialogViewEdit(dataItem, ActionType.VIEW);
 	}
 
 	protected reloadData(): void {

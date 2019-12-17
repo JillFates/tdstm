@@ -126,6 +126,12 @@
 							</div>
 						</ng-template>
 
+						<ng-template kendoGridCellTemplate *ngIf="column.isActionable" let-dataItem>
+								<span class="is-grid-link" (click)="cellClick(dataItem)">
+									{{dataItem[column.property]}}
+								</span>
+						</ng-template>
+
 						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div
 								class="filter-input"
