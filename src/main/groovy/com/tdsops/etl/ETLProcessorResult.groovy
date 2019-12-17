@@ -84,6 +84,7 @@ class ETLProcessorResult {
 	 * After that, It saves the new element in the data results.
 	 * @param element an instance of Element
 	 */
+	@CompileStatic
 	void loadElement(Element element) {
 		RowResult currentRow = findOrCreateCurrentRow()
 		currentRow.ignore = false
@@ -257,6 +258,7 @@ class ETLProcessorResult {
 	 *
 	 * @return and instance of RowResult
 	 */
+	@CompileStatic
 	RowResult findOrCreateCurrentRow() {
 		if (resultIndex == -1) {
 			reference.data.add(new RowResult(
@@ -274,6 +276,7 @@ class ETLProcessorResult {
 	 * @return an instance of RowResult
 	 * @see RowResult* @see ETLProcessorResult#resultIndex
 	 */
+	@CompileStatic
 	RowResult currentRow() {
 		return reference.data[resultIndex]
 	}
@@ -283,6 +286,7 @@ class ETLProcessorResult {
 	 * @param fieldNameOrLabel a name or label for a domain field.
 	 * @return an object with value content
 	 */
+	@CompileStatic
 	Object getFieldValue(String fieldNameOrLabel) {
 		if (resultIndex >= 0) {
 
@@ -569,6 +573,7 @@ class RowResult {
 	 * Add element to the current row data
 	 * @param element
 	 */
+	@CompileStatic
 	void addLoadElement(Element element) {
 		FieldResult fieldData = findOrCreateFieldData(element.fieldDefinition)
 		fieldData.addLoadElement(element)
@@ -673,6 +678,7 @@ class RowResult {
 	 * @param element
 	 * @return
 	 */
+	@CompileStatic
 	FieldResult findOrCreateFieldData(ETLFieldDefinition fieldDefinition) {
 		if (!fields.containsKey(fieldDefinition.name)) {
 			fields[fieldDefinition.name] = new FieldResult(fieldOrder: fields.size(), fieldDefinition: fieldDefinition)

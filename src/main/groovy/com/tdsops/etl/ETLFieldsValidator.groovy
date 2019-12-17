@@ -1,9 +1,11 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
+import groovy.transform.CompileStatic
 import net.transitionmanager.person.Person
 import org.grails.datastore.mapping.model.PersistentProperty
 
+@CompileStatic
 class ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]

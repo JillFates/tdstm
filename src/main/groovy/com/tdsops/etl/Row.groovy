@@ -1,13 +1,14 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.JsonUtil
-
+import groovy.transform.CompileStatic
 /**
  * <p>Row from GETL DataSet.<p>
  * <p>Every iteration in an ETLScript will use this structure to take values from the source data set.<p>
  * It collects also Element instances created during an ETL script iterate execution.
  * That collection is used internally or as a validation of the internal status of an ETL command.
  */
+@CompileStatic
 class Row {
 
 	/**
