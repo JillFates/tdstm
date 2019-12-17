@@ -9,14 +9,15 @@
 										 (click)="reloadData()"
 										 class="flat pull-right">
 						</tds-button-sync>
-						<tds-button-create
+						<tds-button-add
+								iconClass="is-solid"
 								[title]="createActionText"
 								class="button-create-action pull-right"
 								[displayLabel]="false"
 								[id]="'btnCreate'"
 								(click)="onCreate()"
 								*ngIf="isCreateAvailable()">
-						</tds-button-create>
+						</tds-button-add>
 					</div>
 				</div>
 			</div>

@@ -28,9 +28,8 @@
 						<div class="clr-row">
 							<div class="clr-col-12">
 								<div class="pull-right">
-									<tds-button-sync [displayLabel]="false" (click)="reloadData()">
-									</tds-button-sync>
-									<tds-button-create
+									<tds-button-add
+                                            iconClass="is-solid"
 											[disabled]="!isCreateAvailable()"
 											[displayLabel]="false"
 											[title]="
@@ -38,7 +37,9 @@
 									"
 											(click)="onCreateProvider()"
 											[id]="'btnCreateProvider'">
-									</tds-button-create>
+									</tds-button-add>
+									<tds-button-sync [displayLabel]="false" (click)="reloadData()">
+									</tds-button-sync>
 								</div>
 							</div>
 						</div>
