@@ -12,11 +12,16 @@
   color: black
 
 asset-explorer-view-grid, .asset-explorer-view-grid-component
+  kendo-grid-list
+    height: 70vh
+
   .label.tag
     @include asset-tag-style
 
   // wrap overflow text in ellipsis mode.
   kendo-grid.k-grid td
+    padding: 0px 8px
+    line-height: 10px
     word-break: normal
     text-overflow: ellipsis
     white-space: nowrap
@@ -213,6 +218,13 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
     h6
       margin-top: 0
       margin-left: 5px
+    tds-bulk-change-button
+      margin-left: 10px
+      .tds-button
+        margin-bottom: 0
+        margin-top: 0
+        clr-icon
+          margin-bottom: 2px
 
 kendo-popup.assets-view-grid
   kendo-list
