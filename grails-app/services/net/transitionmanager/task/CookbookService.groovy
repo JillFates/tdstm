@@ -244,7 +244,14 @@ class CookbookService implements ServiceMethods {
 		Recipe recipe = Recipe.get(recipeId)
 		assertProject(recipe, project)
 
-		def rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
+		RecipeVersion rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
+		Integer recipeVersionCount = RecipeVersion.countByRecipe(recipe)
+
+		if(recipeVersionCount < 2){
+			log.warn('You can not delete the last recipe version.')
+			throw new InvalidParamException('You can not delete the last recipe version.')
+		}
+
 		if (rv == null) {
 			throw new EmptyResultException()
 		}
