@@ -3,18 +3,10 @@
     top: 0px;
 }
 </style>
-<tr>
-    <td class="label N" nowrap="nowrap">
-        <label>
-            Tags
-        </label>
-    </td>
-    <td nowrap="nowrap" class="N" colspan="7">
-        <tds-asset-tag-selector *ngIf="tagList"
-                                [model]="assetTagsModel"
-                                [tagList]="tagList"
-                                [showSwitch]="false"
-                                (valueChange)="onTagValueChange($event)">
-        </tds-asset-tag-selector>
-    </td>
-</tr>
+<label>Tags</label>
+<tds-asset-tag-selector *ngIf="tagList"
+                        [model]="assetTagsModel"
+                        [tagList]="tagList"
+                        [showSwitch]="false"
+                        (valueChange)="onTagValueChange($event)">
+</tds-asset-tag-selector>

@@ -6,7 +6,6 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 import {DateUtils} from '../../../../shared/utils/date.utils';
 import {KEYSTROKE} from '../../../../shared/model/constants';
-import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
 	selector: `event-create`,

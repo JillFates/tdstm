@@ -2,7 +2,7 @@ import { SortInfo } from '../utils/sort.utils';
 import { DateUtils } from '../utils/date.utils';
 
 export const COLUMN_MIN_WIDTH = 360;
-export const SELECT_ALL_COLUMN_WIDTH = 28;
+export const SELECT_ALL_COLUMN_WIDTH = 50;
 export const BooleanFilterData: Array<string> = ['True', 'False'];
 export const DefaultBooleanFilterData = 'All';
 
@@ -83,8 +83,8 @@ export class GridColumnModel {
 				const filters = (state.filter && state.filter.filters) || [];
 				state.filter.filters = filters.filter((r: any) => r['field'] !== column.property);
 			}
-			root.filters.push({ field: column.property, operator: 'gte', value: init, });
-			root.filters.push({ field: column.property, operator: 'lte', value: end });
+			root.filters.push({ field: column.property, operator: 'gte', value: init || '', });
+			root.filters.push({ field: column.property, operator: 'lte', value: end || ''});
 		}
 
 		if (column.type === 'boolean') {

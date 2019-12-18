@@ -7,6 +7,7 @@ import {UIDialogService} from '../../../../shared/services/ui-dialog.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {DateUtils} from '../../../../shared/utils/date.utils';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
@@ -31,6 +32,7 @@ import {CellClickEvent, GridDataResult} from '@progress/kendo-angular-grid';
 import {ReplaySubject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH} from '../../../../shared/constants/common-shrunk-columns';
+import {pathOr} from 'ramda';
 
 @Component({
 	selector: 'api-action-list',
@@ -69,9 +71,11 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	public dateFormat = '';
 	protected createActionText = '';
 	protected hasEarlyAccessTMRPermission: boolean;
-	commonShrunkColumns = COMMON_SHRUNK_COLUMNS;
+	commonShrunkColumns = COMMON_SHRUNK_COLUMNS.filter((column: string) => !['Created', 'Last Updated'].includes(column) );
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
+	public isFiltering  = false;
+	GRID_DEFAULT_PAGINATION_OPTIONS = GRID_DEFAULT_PAGINATION_OPTIONS;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -109,14 +113,16 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
-	protected onFilter(column: any): void {
+	protected onFilter(value: string | Date, column: any): void {
+		column.filter = value;
 		const root = GridColumnModel.filterColumn(column, this.state);
+		// clear (string/date) values
+		root.filters = (root.filters || []).filter((filter: any) => filter.value !== '');
+		// clear boolean filter value
+		if (column.filter === '' && column.type === 'boolean') {
+			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
+		}
 		this.filterChange(root);
-	}
-
-	protected clearValue(column: any): void {
-		this.apiActionService.clearFilter(column, this.state);
-		this.filterChange(this.state.filter);
 	}
 
 	/**
@@ -162,18 +168,16 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 
 	/**
 	 * Catch the Selected Row
-	 * @param {SelectionEvent} event
+	 * @param {SelectionEvent} dataItem
 	 */
-	protected cellClick(event: CellClickEvent): void {
-		if (event.columnIndex > 0) {
-			let apiAction: APIActionModel = event['dataItem'] as APIActionModel;
-			this.selectRow(apiAction.id);
-			this.apiActionService.getAPIAction(apiAction.id)
-				.pipe(takeUntil(this.unsubscribeOnDestroy$))
-				.subscribe((response: APIActionModel) => {
+	protected cellClick(dataItem: any): void {
+		let apiAction: APIActionModel = dataItem as APIActionModel;
+		this.selectRow(apiAction.id);
+		this.apiActionService.getAPIAction(apiAction.id)
+			.pipe(takeUntil(this.unsubscribeOnDestroy$))
+			.subscribe((response: APIActionModel) => {
 				this.openAPIActionDialogViewEdit(response, ActionType.VIEW, apiAction);
-			}, error => console.log(error));
-		}
+		}, error => console.log(error));
 	}
 
 	protected reloadData(): void {
@@ -276,4 +280,21 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.next();
 		this.unsubscribeOnDestroy$.complete();
 	}
+
+	/**
+	 * Toggle the flag to show/hide grid filters
+	 */
+	public toggleFiltering() {
+		this.isFiltering = !this.isFiltering;
+	}
+
+	/**
+	 * Get the current number of filters selected
+	 */
+	public filterCounter(): number {
+		const filters = pathOr([], ['filter', 'filters'], this.state);
+
+		return filters.length;
+	}
+
 }

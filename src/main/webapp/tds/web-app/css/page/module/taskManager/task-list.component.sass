@@ -1,152 +1,83 @@
-task-list
-  .button-toolbar
-    padding-top: 5px
-    padding-left: 8px
-
-  .form-control
-    padding-right: 20px !important
-
-  .component-action-clear-filter
-    width: 20px
-    height: 20px
-
-  .top-filters
-    .tds-action-button
-      margin-right:  10px
-    .event-dropdown
-      .k-input
-        height: inherit
-    .refresh-control
-      display: inline-block
-
-      .pie-countdown-container
-        .k-dropdown
-          width: 80px
-          background-color: white
-        .pie-countdown-timer
-          background-color: white
-
-  .task-grid
-    margin-top:  10px
-    height:  80vh
-
+.task-list
+  font-family: Roboto
+  padding-top: 40px
+  form
+    height: 12%
+    padding-top: 0
+  $secondary-fore-color: #18394B
+  .btn-link
+    .contextual-menu
+  .refresh-container
+    display: flex
+  .page-header
+    display: flex
+    justify-content: space-between
+    border-bottom-width: 0
+    margin-bottom: 0
+    padding-bottom: 0
+    h1
+      font-weight: bold
+      font-size: 18px
+      line-height: 24px
+      color: #18394B
+      margin-top: 5px
+  .badge
+    padding: 0
+  .task-action-buttons
+    display: inline
+  .grid-container
+    height: 88%
     .k-grid-header
       .k-header
-        > .k-link
-          padding-right: 5px
-          > div
-            text-align: left
-            label
-              margin-bottom: 0
-            .sortable-column label
-              padding-right: 0px
-            .k-icon
-              position: relative
-              left: -5px
-              top: 1px
-      .k-filter-row
-        .component-action-clear-filter
-          line-height: 28px
-
-    .k-grid-content
-      .k-hierarchy-cell
-        > .k-icon
-          height: unset
-          padding: 0
-          &.k-plus:before
-            content: '\e014'
-          &.k-minus:before
-            content: '\e015'
-
-      tr td
-        padding-top: 0px
-        padding-bottom: 0px
-        text-overflow: ellipsis
-        white-space: nowrap
-        line-height: 0px
-
-      tr.k-grid-norecords td
-        line-height: 22px
-        text-align: center
-
-    .k-grid-toolbar
+        top: 3px
+        overflow: unset
+    .box-with-empty-header
+      height: 100%
+    .task-grid
+      height: 100%
+      max-height: 100%
+      display: -webkit-box
+  .label-event-list
+    font-style: normal
+    font-weight: 500
+    font-size: 14px
+    line-height: 24px
+    margin: unset
+  .select-event-list
+    //width: 176px
+    width: 150px
+    max-width: 150px
+    font-style: normal
+    font-weight: 500
+    font-size: 13px
+    line-height: 18px
+  .checkboxes-container
+    display: flex
+    align-items: flex-end
+    justify-content: space-around
+  .actions-primary-page-container
+    display: flex
+    justify-content: space-between
+    align-items: flex-end
+    clr-select-container
+      margin-top: unset
+    tds-button
       button
-        margin-right:  5px
-
-    .task-updated
-      padding-left: 0px
-      padding-top: 0px !important
-      padding-right: 0px
-      padding-bottom: 0px !important
-
-    .task-updated-cell
-      display: block
-      padding-left: 3px
-      margin: 0 auto
-      padding-top: 12px
-      padding-bottom: 10px
-      padding-left: 3px
-
-    .task-status
-      padding-left: 0px
-      padding-right: 100%
-      text-overflow: unset !important
-      span
-        padding: 50px 100vw 50px 3px
-        font-weight: bold
-    .task_hold
-      background-color: #FFFF33 !important
-      color: black
-    .task_hold_overtime
-      background-color: #FF0000
-      color: black
-    .task_planned
-      background-color:  #FFFFFF
-      color:  gray
-    .task_pending
-      background-color:  #FFFFFF
-      color:  black
-    .task_ready
-      background-color:  green !important
-      color:  white
-    .task_started
-      background-color:  darkturquoise!important
-      color:  white
-    .task_completed2
-      background-color:  #5478BA
-    .task_completed5
-      background-color:  #4468AA
-    .task_completed
-      background-color:  #24488A
-      color:  white
-    .task_done2
-      background-color:  #5478BA
-    .task_done5
-      background-color:  #4468AA
-    .task_done
-      background-color:  #24488A
-      color:  white
-    .task_na
-      background-color:  lightgray
-    .task_term
-      background-color:  black
-    .task_tardy
-      background-color:  #FFC266
-    .task_late
-      background-color:  #FF9900
-    .task_overdue
-      color:  red
-
-    .task-action-buttons-wrapper
-      margin: 2px 1px
-      .btn:first-child
-        margin-left: 15px
-      .btn
-        font-size: 11px
-        padding: 1px 10px
+        color: unset
+        border-color: unset
+    //.left-container
+    //  display: flex
+    //  clr-select-container
+    //    margin-top: 10px
+    .check-container
+      display: flex
+      clr-checkbox-wrapper
         margin-right: 15px
-        i
-          font-size: inherit
-          padding-right: 5px
-      .task-action-buttons
-        display: inline
+  .actions-secondary-page-container
+    display: flex
+    justify-content: flex-end
+    padding-top: 4px
+  .buttons-container
+    display: flex
+    align-items: flex-end
+    justify-content: flex-end

@@ -37,7 +37,7 @@ export class AssetShowComponent extends DynamicComponent implements AfterViewIni
 		@Inject('ASSET') private asset: 'APPLICATION' | 'DATABASE' | 'DEVICE' | 'STORAGE') {
 		super(inj, comp, mod);
 	}
-	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
+	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
 	ngAfterViewInit() {
 		this.prepareMetadata().then( (metadata: any) => {

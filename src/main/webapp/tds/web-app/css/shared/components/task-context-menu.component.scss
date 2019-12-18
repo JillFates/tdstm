@@ -1,0 +1,61 @@
+
+#ctx-menu {
+  width: 150px;
+  z-index: 999;
+  position: absolute;
+  left: 5px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  display: none;
+  box-shadow: 0 0 10px rgba( 0, 0, 0, .4 );
+  font-size: 12px;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+#ctx-menu ul {
+  list-style: none;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+}
+#ctx-menu li a {
+  position: relative;
+  min-width: 60px;
+  color: #444;
+  display: inline-block;
+  padding: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+#ctx-menu li:hover {
+  background: #CEDFF2;
+  color: #EEE;
+}
+#ctx-menu li ul li {
+  display: none;
+}
+#ctx-menu li ul li a {
+  position: relative;
+  min-width: 60px;
+  padding: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+#ctx-menu li:hover ul li {
+  display: block;
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.ctx-menu-btn {
+  width: 100% !important;
+  background-color: transparent !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+.ctx-menu-divider {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}

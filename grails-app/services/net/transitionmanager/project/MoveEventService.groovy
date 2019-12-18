@@ -1,42 +1,36 @@
 package net.transitionmanager.project
 
-import com.tdsops.tm.enums.domain.TimeScale
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
-import net.transitionmanager.asset.Application
-import net.transitionmanager.exception.DomainUpdateException
-import net.transitionmanager.exception.InvalidParamException
-import net.transitionmanager.person.UserPreferenceService
-import net.transitionmanager.reporting.ReportsService
-import net.transitionmanager.service.ServiceMethods
-import net.transitionmanager.tag.TagEvent
-import net.transitionmanager.tag.TagEventService
-import net.transitionmanager.task.AssetComment
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
-import net.transitionmanager.exception.ServiceException
+import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.TimeScale
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.ExportUtil
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import com.tdssrc.grails.WorkbookUtil
 import grails.gorm.transactions.Transactional
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import groovy.util.logging.Slf4j
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
 import net.transitionmanager.command.event.CreateEventCommand
+import net.transitionmanager.exception.DomainUpdateException
+import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.party.PartyRelationship
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.reporting.ReportsService
 import net.transitionmanager.security.RoleType
-import org.apache.poi.ss.usermodel.CellStyle
-import org.apache.poi.ss.usermodel.FillPatternType
-import org.apache.poi.ss.usermodel.Font
-import org.apache.poi.ss.usermodel.IndexedColors
-import org.apache.poi.ss.usermodel.Sheet
+import net.transitionmanager.service.ServiceMethods
+import net.transitionmanager.tag.TagEvent
+import net.transitionmanager.tag.TagEventService
+import net.transitionmanager.task.AssetComment
+import org.apache.poi.ss.usermodel.*
 import org.springframework.jdbc.core.JdbcTemplate
-import com.tdsops.tm.enums.domain.AssetCommentCategory
-
-import java.sql.Timestamp
 
 @Slf4j
 @Transactional
@@ -118,7 +112,7 @@ class MoveEventService implements ServiceMethods {
 		moveEvent.save()
 
 		// Determine if there are any tagEvents to delete.
-		List<TagEvent> tagEventsToDelete = moveEvent.tagEvents?.findAll{ TagEvent tagEvent -> !eventCommand.tagIds.contains( tagEvent.tagId ) }
+		List<TagEvent> tagEventsToDelete = moveEvent.tagEvents?.findAll{ TagEvent tagEvent -> !eventCommand.tagIds.contains(tagEvent.tagId ) }
 		if (tagEventsToDelete) {
 			moveEvent.tagEvents.removeAll(tagEventsToDelete)
 			tagEventService.removeTags(project, tagEventsToDelete*.id)
@@ -297,9 +291,9 @@ class MoveEventService implements ServiceMethods {
 			// Deletes all UserPreference pointing to this event.
 			jdbcTemplate.update('DELETE FROM user_preference WHERE preference_code = ? and value = ?', UserPreferenceEnum.MOVE_EVENT as String, moveEvent.id)
 			// Deletes all AppMoveEvent related to this event.
-			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?', [moveEvent.id])
+			AppMoveEvent.executeUpdate('DELETE AppMoveEvent WHERE moveEvent.id =  ?0', [moveEvent.id])
 			// Nulls out references to this event in comments and tasks.
-			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?", [moveEvent.id])
+			AssetComment.executeUpdate("UPDATE AssetComment SET moveEvent = NULL WHERE moveEvent.id = ?0", [moveEvent.id])
 			// Deletes the event.
 			moveEvent.delete()
 		}
@@ -631,8 +625,8 @@ class MoveEventService implements ServiceMethods {
             }
         }
         // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
-        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent =: moveEvent AND mes.type =:type ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED] )[0]
 
         String eventClock = TimeUtil.formatTimeDuration(dayTime)
 

@@ -1,0 +1,53 @@
+.nav-tabs-custom > .nav-tabs > li > a {
+  background-color: $c_grey3;
+}
+
+.nav-tabs-custom>.nav-tabs>li:not(.active):hover, .nav-tabs-custom>.nav-tabs>li:not(.active):focus, .nav-tabs-custom>.nav-tabs>li:not(.active):active {
+  border-top: 3px solid $material_c_blue2;
+}
+
+.nav-tabs-custom>.nav-tabs>li.active {
+  border-top-color: $material_c_blue2;
+}
+
+/* Cookbook Tabs  to Clarity */
+
+@mixin tab-colored() {
+  box-shadow: 0 -3px 0 #0077b8 inset;
+  transition: box-shadow .2s ease-in;
+}
+
+.cookbook_recipes_editor,
+.create-recipe-form {
+  div.tabbable {
+    ul.nav-tabs {
+      li {
+        a {
+          cursor: pointer;
+          border: 0px;
+          background: none;
+          color: $c_black3;
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+        a:first-child {
+          margin-left: 0px;
+        }
+        a:hover {
+          @include tab-colored();
+        }
+        &.active {
+          a {
+            @include tab-colored();
+          }
+        }
+      }
+    }
+  }
+}
+
+.create-recipe-form {
+  .tab-content {
+    border: none !important;
+  }
+}

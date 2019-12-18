@@ -12,6 +12,7 @@ import {CloneCLoseModel} from '../../model/clone-close.model';
 import {AssetCommonShow} from '../asset/asset-common-show';
 import {WindowService} from '../../../../shared/services/window.service';
 import {UserContextService} from '../../../auth/service/user-context.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 
 export function StorageShowComponent(template, modelId: number, metadata: any) {
 	@Component({
@@ -27,20 +28,33 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			assetExplorerService: AssetExplorerService,
 			notifierService: NotifierService,
 			userContextService: UserContextService,
-			windowService: WindowService) {
-				super(activeDialog, dialogService, assetService, prompt, assetExplorerService, notifierService, userContextService, windowService);
-				this.mainAsset = modelId;
-				this.assetTags = metadata.assetTags;
+			windowService: WindowService,
+			architectureGraphService: ArchitectureGraphService
+		) {
+			super(
+				activeDialog,
+				dialogService,
+				assetService,
+				prompt,
+				assetExplorerService,
+				notifierService,
+				userContextService,
+				windowService,
+				architectureGraphService
+			);
+			this.mainAsset = modelId;
+			this.assetTags = metadata.assetTags;
+			this.loadThumbnailData(this.mainAsset);
 		}
 
 		showAssetEditView(): Promise<any> {
 			const componentParameters = [
-				{ provide: 'ID', useValue: this.mainAsset },
-				{ provide: 'ASSET', useValue: DOMAIN.STORAGE }
+				{provide: 'ID', useValue: this.mainAsset},
+				{provide: 'ASSET', useValue: DOMAIN.STORAGE}
 			];
 
 			return this.dialogService
-				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.LG);
+				.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 		}
 
 		/**
@@ -54,23 +68,23 @@ export function StorageShowComponent(template, modelId: number, metadata: any) {
 			}
 			this.dialogService.extra(AssetCloneComponent, [
 				{provide: AssetModalModel, useValue: cloneModalModel}
-			], false, false).then( (result: CloneCLoseModel)  => {
+			], false, false).then((result: CloneCLoseModel) => {
 
 				if (result.clonedAsset && result.showEditView) {
 					const componentParameters = [
-						{ provide: 'ID', useValue: result.assetId },
-						{ provide: 'ASSET', useValue: DOMAIN.STORAGE }
+						{provide: 'ID', useValue: result.assetId},
+						{provide: 'ASSET', useValue: DOMAIN.STORAGE}
 					];
 
-					this.dialogService
-						.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XLG);
+					this.dialogService.replace(AssetEditComponent, componentParameters, DIALOG_SIZE.XXL);
 				} else if (!result.clonedAsset && result.showView) {
 					this.showAssetDetailView(DOMAIN.STORAGE, result.assetId);
 				}
 			})
-				.catch( error => console.log('error', error));
+				.catch(error => console.log('error', error));
 		}
 
 	}
+
 	return StorageShowComponent;
 }

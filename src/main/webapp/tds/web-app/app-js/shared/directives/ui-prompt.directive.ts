@@ -6,9 +6,8 @@ import {
 	Component, OnDestroy, AfterViewInit, Injectable
 } from '@angular/core';
 
-import {NotifierService} from '../services/notifier.service';
-import {UIActiveDialogService} from '../services/ui-dialog.service';
-
+import { NotifierService } from '../services/notifier.service';
+import { UIActiveDialogService } from '../services/ui-dialog.service';
 declare var jQuery: any;
 
 @Component({
@@ -16,28 +15,24 @@ declare var jQuery: any;
 	template: `
 		<div class="modal fade tds-ui-prompt" id="tdsUiPrompt" data-backdrop="static" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-sm">
-				<div class="modal-content">
+				<div class="tds-modal-content with-box-shadow">
 					<div class="modal-header">
-						<button (click)="cancel()" type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">×</span></button>
-						<h4 class="modal-title">{{title}}</h4>
-					</div>
-					<div class="modal-body">
-						<form name="dialogActionForm" role="form" data-toggle="validator"
-							  class="form-horizontal left-alignment ng-pristine ng-valid">
-							<div class="box-body">
-								<p>{{message}}</p>
-							</div>
-							<!-- /.box-body -->
-						</form>
-					</div>
-					<div class="modal-footer form-group-center">
-						<button (click)="confirm()" type="submit" class="btn btn-primary pull-left"><span
-							*ngIf="!hideIconButtons" class="glyphicon glyphicon-ok"></span> {{confirmLabel}}</button>
-						<button (click)="cancel()" type="button" class="btn btn-default pull-right"
-								data-dismiss="modal"><span *ngIf="!hideIconButtons"
-														   class="glyphicon glyphicon-ban-circle"></span> {{cancelLabel}}
+						<button aria-label="Close" class="close" type="button" (click)="cancel()">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
 						</button>
+                        <h4 class="modal-title">{{title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form name="dialogActionForm" role="form" data-toggle="validator" class="form-horizontal left-alignment ng-pristine ng-valid">
+                            <div class="box-body">
+                                <p>{{message}}</p>
+                            </div>
+                            <!-- /.box-body -->
+                        </form>
+                    </div>
+                    <div class="modal-footer form-group-center">
+                        <tds-button-confirm theme="primary" (click)="confirm()">{{ confirmLabel}}</tds-button-confirm>
+						<tds-button-cancel (click)="cancel()"  data-dismiss="modal"></tds-button-cancel>
 					</div>
 				</div>
 			</div>

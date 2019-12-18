@@ -5,7 +5,8 @@ import { TaskService } from '../../service/task.service';
 
 @Component({
 	template: `
-		<div tds-handle-escape
+		<div tds-autofocus
+			 tds-handle-escape
 				 id="task-action-summary"
 				 class="task-action-summary modal fade in"
 				 (escPressed)="cancelCloseDialog()"
@@ -13,10 +14,10 @@ import { TaskService } from '../../service/task.service';
 				 tabindex="-1"
 				 role="dialog">
 			<div class="modal-dialog modal-md" role="document">
-				<div class="modal-content resizable" style="width: 55vw;">
+				<div class="tds-modal-content with-box-shadow resizable tds-angular-component-content">
 					<div class="modal-header">
-						<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-							<span aria-hidden="true">×</span>
+						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog($event)">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
 						</button>
 						<h4 class="modal-title">Action Summary</h4>
 					</div>
@@ -93,11 +94,7 @@ import { TaskService } from '../../service/task.service';
 						</div>
 					</div>
 					<div class="modal-footer form-group-center">
-						<button (click)="cancelCloseDialog()" type="button"
-										class="btn btn-default component-action-cancel pull-right">
-							<i class="glyphicon glyphicon-ban-circle action-button"></i>
-							<span>Close</span>
-						</button>
+						<tds-button (click)="cancelCloseDialog($event)" icon="ban" title="Cancel">Cancel</tds-button>
 					</div>
 				</div>
 			</div>

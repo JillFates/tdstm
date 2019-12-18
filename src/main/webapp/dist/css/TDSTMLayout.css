@@ -1726,6 +1726,7 @@ a:focus {
   font-size: 18px;
   margin: 0;
   line-height: 1;
+  font-weight: 500;
 }
 .box-header > .fa,
 .box-header > .glyphicon,

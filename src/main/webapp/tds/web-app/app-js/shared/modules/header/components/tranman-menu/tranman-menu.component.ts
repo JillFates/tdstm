@@ -16,7 +16,7 @@ import { TaskService } from '../../../../../modules/taskManager/service/task.ser
 export class TranmanMenuComponent implements OnInit {
 	protected permission: Permission = Permission;
 	public userContext: UserContextModel;
-	taskTodoCount: number
+	taskTodoCount: number;
 
 	constructor(
 		private appSettingsService: UserContextService,

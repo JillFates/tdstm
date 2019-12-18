@@ -1,11 +1,10 @@
 import com.tdsops.common.grails.ApplicationContextHolder
+import com.tdsops.common.security.UserPasswordEncoderListener
 import com.tdsops.common.security.spring.SecurityBeanFactoryPostProcessor
 import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
-import com.tdsops.common.security.spring.TdsPasswordEncoder
 import com.tdsops.common.security.spring.TdsPermissionEvaluator
 import com.tdsops.common.security.spring.TdsPostAuthenticationChecks
 import com.tdsops.common.security.spring.TdsPreAuthenticationChecks
-import com.tdsops.common.security.spring.TdsSaltSource
 import com.tdsops.common.security.spring.TdsUserDetailsService
 import com.tdsops.ldap.TdsBindAuthenticator
 import com.tdsops.ldap.TdsLdapAuthenticationProvider
@@ -14,7 +13,6 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.ldap.core.GrailsSimpleDirContextAuthenticationStrategy
 import grails.plugin.springsecurity.ldap.core.SimpleAuthenticationSource
 import net.transitionmanager.integration.ApiActionScriptBindingBuilder
-import net.transitionmanager.security.CustomSecurityProvider
 import net.transitionmanager.task.TaskFacade
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -37,12 +35,9 @@ beans = {
 		bean.factoryMethod = 'getInstance'
 	}
 
-
-
 	permissionEvaluator(TdsPermissionEvaluator)
 
 	userDetailsService(TdsUserDetailsService)
-	saltSource(TdsSaltSource)
 
 	preAuthenticationChecks(TdsPreAuthenticationChecks) {
 		auditService = ref('auditService')
@@ -55,10 +50,7 @@ beans = {
 		passwordService = ref('passwordService')
 	}
 
-	passwordEncoder(TdsPasswordEncoder) {
-		grailsApplication = ref('grailsApplication')
-		passwordService = ref('passwordService')
-	}
+	userPasswordEncoderListener(UserPasswordEncoderListener)
 
 	// See: SpringSecurityCoreGrailsPlugin for reference
 	requestCache(TdsHttpSessionRequestCache) {
@@ -72,17 +64,6 @@ beans = {
 		accessDeniedHandler = ref('accessDeniedHandler')
 		authenticationTrustResolver = ref('authenticationTrustResolver')
 		throwableAnalyzer = ref('throwableAnalyzer')
-	}
-
-	daoAuthenticationProvider(CustomSecurityProvider){
-		passwordService = ref('passwordService')
-		userDetailsService = ref('userDetailsService')
-		passwordEncoder = ref('passwordEncoder')
-		saltSource = ref('saltSource')
-		preAuthenticationChecks = ref('preAuthenticationChecks')
-		postAuthenticationChecks = ref('postAuthenticationChecks')
-		authoritiesMapper = ref('authoritiesMapper')
-		userCache = ref('userCache')
 	}
 
 	securityBeanFactoryPostProcessor(SecurityBeanFactoryPostProcessor)

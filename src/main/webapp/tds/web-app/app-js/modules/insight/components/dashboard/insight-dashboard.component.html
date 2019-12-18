@@ -1,0 +1,236 @@
+<div class="insight-dashboard-component">
+	<div class="panel">
+		<div class="panel-body">
+			<div class="box-header">
+				{{'DASHBOARD.INSIGHT_DATA' | translate}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div>
+					<!--	add table here-->
+					<!-- data for providers-->
+					<kendo-chart>
+						<!--						<kendo-chart-title text="{{'DASHBOARD.ASSETS_BY_VENDOR' | translate}}"></kendo-chart-title>-->
+						<kendo-chart-title text="{{ 'INSIGHT.DATA_BY_PROVIDERS' | translate }}"></kendo-chart-title>
+						<kendo-chart-series>
+							<kendo-chart-category-axis>
+								<kendo-chart-category-axis-item [categories]="dataForCategoriesChart(dataForProviders)">
+								</kendo-chart-category-axis-item>
+							</kendo-chart-category-axis>
+							<kendo-chart-series-item
+								type="column" name="Dependencies" [stack]="false" [gap]="2" [spacing]="0.25"
+								[data]="dataForProviderChartDependencies(dataForProviders)">
+							</kendo-chart-series-item>
+							<kendo-chart-series-item
+								type="column" name="Assets" [data]="dataForProviderChartAssets(dataForProviders)">
+							</kendo-chart-series-item>
+						</kendo-chart-series>
+						<kendo-chart-legend position="bottom"></kendo-chart-legend>
+					</kendo-chart>
+					<tds-button-collapse [title]="'INSIGHT.DATA_BY_PROVIDERS' | translate"
+										 (click)="toggleTableFor('DATA_BY_PROVIDERS')"></tds-button-collapse>
+					<div class="table" *ngIf="showDataByProviders">
+						<kendo-grid [data]="dataForProviders" [height]="200">
+							<kendo-grid-column field="Name" title="Name" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="Dependencies" title="Dependencies" width="15">
+							</kendo-grid-column>
+							<kendo-grid-column field="Assets" title="Assets" width="15">
+							</kendo-grid-column>
+						</kendo-grid>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div>
+					<!-- top tags-->
+					<kendo-chart>
+						<kendo-chart-title text="{{'DASHBOARD.TOP_TAGS' | translate}}"></kendo-chart-title>
+						<kendo-chart-series>
+							<kendo-chart-series-item
+								type="pie"
+								[data]="dataTopTags"
+								categoryField="Name"
+								field="Count">
+								<kendo-chart-series-item-labels
+									[content]="labelContent"
+									color="#000" background="none">
+								</kendo-chart-series-item-labels>
+							</kendo-chart-series-item>
+						</kendo-chart-series>
+						<kendo-chart-legend [visible]="true"></kendo-chart-legend>
+					</kendo-chart>
+
+					<tds-button-collapse [title]="'DASHBOARD.TOP_TAGS' | translate"
+										 (click)="toggleTableFor('TOP_TAGS')"></tds-button-collapse>
+					<div class="table" *ngIf="showTopTags">
+						<kendo-grid [data]="dataTopTags" [height]="200">
+							<kendo-grid-column field="Name" title="Name" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="Count" title="Count" width="10">
+							</kendo-grid-column>
+						</kendo-grid>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div>
+					<!-- applications grouped by dependencies-->
+					<kendo-chart>
+						<!--						<kendo-chart-title-->
+						<!--							text="{{'DASHBOARD.DEPENDENCIES_BY_VENDOR' | translate}}"></kendo-chart-title>-->
+						<kendo-chart-title
+							text="{{ 'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate}}"></kendo-chart-title>
+						<kendo-chart-series>
+							<kendo-chart-series-item
+								type="pie" [data]="dataApplicationsGroupedByDependencies"
+								field="count" categoryField="level">
+								<kendo-chart-series-item-labels
+									[content]="labelContent"
+									color="#000" background="none">
+								</kendo-chart-series-item-labels>
+							</kendo-chart-series-item>
+						</kendo-chart-series>
+					</kendo-chart>
+					<tds-button-collapse [title]="'DASHBOARD.APPLICATION_GROUPED_BY_DEPENDENCIES' | translate"
+										 (click)="toggleTableFor('DEPENDENCIES_BY_VENDOR')"></tds-button-collapse>
+					<div class="table" *ngIf="showDependenciesByVendor">
+						<kendo-grid [data]="dataApplicationsGroupedByDependencies" [height]="200">
+							<kendo-grid-column field="level" title="Level" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="count" title="Count" width="10">
+							</kendo-grid-column>
+						</kendo-grid>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div>
+					<!-- devices by event-->
+					<kendo-chart>
+						<!--						<kendo-chart-title text="{{'DASHBOARD.TOP_TAGS' | translate}}"></kendo-chart-title>-->
+						<kendo-chart-title text="{{'INSIGHT.DEVICES_BY_EVENT'| translate}}"></kendo-chart-title>
+						<kendo-chart-series>
+							<kendo-chart-series-item
+								type="pie"
+								[data]="dataDevicesByEvent"
+								field="Devices"
+								categoryField="Name">
+								<kendo-chart-series-item-labels
+									[content]="labelContent"
+									color="#000" background="none">
+								</kendo-chart-series-item-labels>
+							</kendo-chart-series-item>
+						</kendo-chart-series>
+					</kendo-chart>
+					<tds-button-collapse [title]="'INSIGHT.DEVICES_BY_EVENT'| translate"
+										 (click)="toggleTableFor('DEVICES_BY_EVENT')"></tds-button-collapse>
+					<div class="table" *ngIf="showDevicesByEvent">
+						<kendo-grid [data]="dataDevicesByEvent" [height]="200">
+							<kendo-grid-column field="Name" title="Name" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="Devices" title="Devices" width="10">
+							</kendo-grid-column>
+						</kendo-grid>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8">
+				<div>
+					<!-- assets by provider and asset type-->
+					<kendo-chart>
+						<!--						<kendo-chart-title text="{{'DASHBOARD.TOP_TAGS' | translate}}"></kendo-chart-title>-->
+						<kendo-chart-title
+							text="{{ 'INSIGHT.ASSETS_BY_PROVIDERS_AND_ASSET_TYPE' | translate}}"></kendo-chart-title>
+						<kendo-chart-series>
+							<kendo-chart-category-axis>
+								<kendo-chart-category-axis-item
+									[categories]="dataForAssetsByProvidersChart(dataAssetsByProvidersAndAssetsType)">
+								</kendo-chart-category-axis-item>
+							</kendo-chart-category-axis>
+							<kendo-chart-series-item
+								type="column" [gap]="2" [spacing]=".25" name="Processed"
+								[data]="dataForAssetsChartProcessed(dataAssetsByProvidersAndAssetsType)">
+							</kendo-chart-series-item>
+							<kendo-chart-series-item
+								name="Pending" [data]="dataForAssetsChartPending(dataAssetsByProvidersAndAssetsType)">
+							</kendo-chart-series-item>
+							<kendo-chart-series-item
+								name="Errors" [data]="dataForAssetsChartErrors(dataAssetsByProvidersAndAssetsType)">
+							</kendo-chart-series-item>
+							<kendo-chart-series-item
+								name="Total" [data]="dataForAssetsChartTotal(dataAssetsByProvidersAndAssetsType)">
+							</kendo-chart-series-item>
+						</kendo-chart-series>
+						<kendo-chart-legend position="bottom"></kendo-chart-legend>
+					</kendo-chart>
+					<tds-button-collapse [title]="'INSIGHT.ASSETS_BY_PROVIDERS_AND_ASSET_TYPE' | translate"
+										 (click)="toggleTableFor('ASSETS_BY_PROVIDERS_AND_ASSET_TYPE')"></tds-button-collapse>
+					<div class="table" *ngIf="showAssetsByProvider">
+						<kendo-grid [data]="dataAssetsByProvidersAndAssetsType" [height]="200">
+							<kendo-grid-column field="Asset Type" title="Asset Type" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="Provider" title="Provider" width="30">
+							</kendo-grid-column>
+							<kendo-grid-column field="Processed" title="Processed" width="10">
+							</kendo-grid-column>
+							<kendo-grid-column field="Pending" title="Pending" width="10">
+							</kendo-grid-column>
+							<kendo-grid-column field="Total" title="Total" width="10">
+							</kendo-grid-column>
+							<kendo-grid-column field="Errors" title="Errors" width="10">
+							</kendo-grid-column>
+						</kendo-grid>
+					</div>
+				</div>
+			</div>
+			<!--			<div class="col-md-4"></div>-->
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-8">
+			<div>
+				<!-- assets by os and evnironment-->
+				<h2>Select an Environment:</h2>
+				<kendo-dropdownlist
+					[data]="dataAssetsByOsAndEnvironment && splitAssetsByOsData(dataAssetsByOsAndEnvironment)"
+					(valueChange)="osChange($event)">
+				</kendo-dropdownlist>
+				<kendo-chart>
+					<!--						<kendo-chart-title text="{{'DASHBOARD.TOP_TAGS' | translate}}"></kendo-chart-title>-->
+					<kendo-chart-title text="{{ 'INSIGHT.ASSETS_BY_OS_AND_ENVIRONMENT' | translate}}"></kendo-chart-title>
+					<kendo-chart-series>
+						<kendo-chart-series-item
+							type="pie"
+							[data]="currentOsSelection"
+							field="Count"
+							categoryField="OS">
+						</kendo-chart-series-item>
+						<kendo-chart-series-item-labels
+							[content]="labelContent"
+							color="#000" background="none">
+						</kendo-chart-series-item-labels>
+					</kendo-chart-series>
+				</kendo-chart>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<tds-button-collapse [title]="'INSIGHT.ASSETS_BY_OS_AND_ENVIRONMENT' | translate"
+								 (click)="toggleTableFor('ASSETS_BY_OS_AND_ENVIRONMENT')"></tds-button-collapse>
+			<div class="table" *ngIf="showAssetsByOs">
+				<kendo-grid [data]="currentOsSelection" [height]="200">
+					<kendo-grid-column field="Environment" title="Environment" width="30">
+					</kendo-grid-column>
+					<kendo-grid-column field="OS" title="OS" width="30">
+					</kendo-grid-column>
+					<kendo-grid-column field="Count" title="Count" width="10">
+					</kendo-grid-column>
+				</kendo-grid>
+			</div>
+		</div>
+	</div>
+
+</div>

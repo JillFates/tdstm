@@ -22,7 +22,7 @@ export class TaskCategoryComponent implements OnInit, AfterViewInit {
 	@Input() taskCategories: any;
 	@Input() scrollPosition: number;
 	@Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
-	@ViewChild('categoryContainer') categoryContainer: ElementRef;
+	@ViewChild('categoryContainer', {static: false}) categoryContainer: ElementRef;
 
 	public userTimeZone = '';
 	public dateFormat = '';
