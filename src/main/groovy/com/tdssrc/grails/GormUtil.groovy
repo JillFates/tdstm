@@ -1432,7 +1432,6 @@ class GormUtil{
 					params.put(paramName, criteria.value)
 				}
 			}
-			println "hql = ${hql.toString()}, params=$params"
 			// Try finding the entity or more...
 			entities = domainClass.findAll(hql.toString(), params)
 
