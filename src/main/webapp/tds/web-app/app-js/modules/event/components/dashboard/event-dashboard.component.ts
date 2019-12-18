@@ -146,7 +146,7 @@ export class EventDashboardComponent implements OnInit {
 					eventPlanStatus.eventTitle = pathOr('', ['planSum', 'eventString'], statusDetails);
 					eventPlanStatus.status = pathOr('', ['planSum', 'eventRunbook'], statusDetails);
 					eventPlanStatus.startDate = pathOr('', ['eventStartDate'], statusDetails);
-					eventPlanStatus.complDate = pathOr('', ['eventComplDate'], statusDetails);
+					eventPlanStatus.complDate = pathOr('', ['eventCompletionDate'], statusDetails);
 					this.eventPlanStatus = eventPlanStatus;
 				});
 			});
