@@ -86,32 +86,6 @@ export class ProviderService {
 	}
 
 	/**
-	 * Update the filters state structure removing the column filter provided
-	 * @param {any} column: Column to exclude from filters
-	 * @param {any} state: Current filters state
-	 * @returns void
-	 */
-	/*
-	clearFilter(column: any, state: any): void {
-		column.filter = '';
-		state.filter.filters = this.getFiltersExcluding(column.property, state);
-	}
-	 */
-
-	/**
-	 * Get the filters state structure excluding the column filter name provided
-	 * @param {string} excludeFilterName:  Name of the filter column to exclude
-	 * @param {any} state: Current filters state
-	 * @returns void
-	 */
-	/*
-	getFiltersExcluding(excludeFilterName: string, state: any): any {
-		const filters = (state.filter && state.filter.filters) || [];
-		return filters.filter((r) => r['field'] !== excludeFilterName);
-	}
-	 */
-
-	/**
 	 * GET - Gets any job current progresss based on progressKey used as a unique job identifier.
 	 * @param {string} progressKey
 	 * @returns {Observable<ApiResponseModel>}
