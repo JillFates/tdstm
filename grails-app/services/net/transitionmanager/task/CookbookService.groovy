@@ -254,7 +254,7 @@ class CookbookService implements ServiceMethods {
 			throw new InvalidParamException('Recipe and version does not have a common recipe')
 		}
 
-		if (recipe.releasedVersion == rv) {
+		if (recipe.releasedVersion.id == rv.id) {
 			log.warn('Can not delete the currently published version')
 			throw new InvalidParamException('Can not delete the currently published version')
 		}
