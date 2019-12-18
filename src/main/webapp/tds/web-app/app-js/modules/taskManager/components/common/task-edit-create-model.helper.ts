@@ -720,16 +720,6 @@ export class TaskEditCreateModelHelper {
 	}
 
 	/**
-	 * Change the background color based on the task status
-	 * @param {any} context
-	 * @returns {string}
-	 */
-	public rowStatusColor(context: any) {
-		const status = context.dataItem && context.dataItem.status || '';
-		return 'task-' + status.toLowerCase();
-	}
-
-	/**
 	 * Add a note
 	 */
 	protected createNote(id: string, note: string): Observable<any> {

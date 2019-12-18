@@ -2837,7 +2837,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 			assetTypes: AssetEntityService.ASSET_TYPE_NAME_MAP,
 			defaultPrefs:defaultPrefs as JSON,
 			graphPrefs:prefsObject,
-			assetClassesForSelect2: AssetClass.classOptionsDefinition
+			assetClassesForSelect2: AssetClass.classOptionsDefinitionsLegacy
 		]
 		render(view: 'architectureGraph', model: model, assetId: params.assetId)
 	}

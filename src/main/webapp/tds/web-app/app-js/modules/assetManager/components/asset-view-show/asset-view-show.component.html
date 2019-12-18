@@ -86,23 +86,6 @@
 				>
 				</tds-button-custom>
 
-				<!-- Bulk Change button -->
-				<tds-bulk-change-button
-					#tdsBulkChangeButton
-					*ngIf="assetExplorerViewGrid"
-					[enabled]="
-						getGridConfig()
-							? getGridConfig().hasSelectedItems
-							: false
-					"
-					[showDelete]="true"
-					[showEdit]="true"
-					[bulkChangeType]="bulkChangeType"
-					(clickBulk)="onClickBulkButton()"
-					(operationResult)="onBulkOperationResult($event)"
-				>
-				</tds-bulk-change-button>
-
 				<!-- Clear All Filters button -->
 				<tds-button-custom
 					[disabled]="!filterCount()"

@@ -27,9 +27,7 @@ import {
 	DIALOG_SIZE,
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
-	KEYSTROKE,
 	ModalType,
-	SEARCH_QUITE_PERIOD
 } from '../../../../shared/model/constants';
 import {AssetShowComponent} from '../../../assetExplorer/components/asset/asset-show.component';
 import {
@@ -92,10 +90,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() metadata: any;
 	@Input() fields: any;
 	@Input() hiddenFilters = false;
-
 	@ViewChild('tagSelector', {static: false}) tagSelector: AssetTagSelectorComponent;
-	private displayCreateButton: boolean;
-	private showFullTags = false;
+	@ViewChild('tdsBulkChangeButton', {static: false}) tdsBulkChangeButton: BulkChangeButtonComponent;
 	@Input()
 	set viewId(viewId: number) {
 		this._viewId = viewId;
@@ -106,7 +102,6 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 		this.gridStateChange.emit({...this.gridState, skip: 0});
 		this.modelChange.emit();
 	}
-
 	public currentFields = [];
 	public toggleTagsColumn = false;
 	public VIEW_COLUMN_MIN_WIDTH = VIEW_COLUMN_MIN_WIDTH;
@@ -119,6 +114,8 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	protected userTimeZone: string;
 	protected userDateFormat: string;
 	protected showAssetsFilter = false;
+	private displayCreateButton: boolean;
+	private showFullTags = false;
 
 	// Pagination Configuration
 	notAllowedCharRegex = /ALT|ARROW|F+|ESC|TAB|SHIFT|CONTROL|PAGE|HOME|PRINT|END|CAPS|AUDIO|MEDIA/i;
@@ -693,7 +690,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	 * Gather the List of Selected Items for the Bulk Process
 	 */
-	public onClickBulkButton(tdsBulkChangeButton: BulkChangeButtonComponent): void {
+	public onClickBulkButton(): void {
 		this.bulkCheckboxService.getBulkSelectedItems({
 			viewId: this._viewId,
 			model: this.model,
@@ -703,7 +700,7 @@ export class AssetViewGridComponent implements OnInit, OnChanges, OnDestroy {
 			.subscribe((results: any) => {
 				this.bulkItems = [...results.selectedAssetsIds];
 				this.selectedAssetsForBulk = [...results.selectedAssets];
-				tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
+				this.tdsBulkChangeButton.bulkData({bulkItems: this.bulkItems, assetsSelectedForBulk: this.selectedAssetsForBulk});
 			}, (err) => console.log('Error:', err));
 	}
 
