@@ -20,7 +20,7 @@ declare var jQuery: any;
                attr.data-trigger="focus"
                attr.data-content="
 		            <div class='license-warning-message' style='word-wrap: break-word;'>
-		                <p>{{userContext.licenseInfo?.license.message}}</p>
+		                <p>{{userContext.license?.message}}</p>
 		            </div>
 		            <div class='license-warning-message-button'>
 		                <button type='button' class='btn btn-primary' onClick='location.href=&quot;/tdstm/module/license/admin/list&quot;'>Administer License</button>
