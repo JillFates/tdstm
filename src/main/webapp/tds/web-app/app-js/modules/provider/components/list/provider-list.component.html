@@ -4,23 +4,19 @@
 		<div *ngIf="providerColumnModel">
 			<div class="box-body box-with-empty-header">
 				<kendo-grid
-					[data]="gridData"
-					[filter]="state.filter"
+					*ngIf="dataGridOperationsHelper"
+					[data]="dataGridOperationsHelper.gridData"
+					[filter]="dataGridOperationsHelper.state.filter"
 					[filterable]="true"
-					(filterChange)="filterChange($event)"
-					[sort]="state.sort"
+					(filterChange)="dataGridOperationsHelper.filterChange($event)"
+					[sort]="dataGridOperationsHelper.state.sort"
 					[sortable]="{mode:'single', allowUnsort: false}"
-					[skip]="skip"
-					[pageSize]="pageSize"
 					[resizable]="true"
-					(sortChange)="sortChange($event)"
-					[pageable]="{
-						pageSizes: defaultPageOptions,
-						pageSize: pageSize,
-						info: true
-					}"
-					(pageChange)="pageChange($event)"
-					[selectable]="true"
+					(sortChange)="dataGridOperationsHelper.sortChange($event)"
+					[pageSize]="dataGridOperationsHelper.state.take"
+					[skip]="dataGridOperationsHelper.state.skip"
+					[pageable]="{pageSizes: dataGridOperationsHelper.defaultPageOptions, info: true}"
+					[selectable]="selectableSettings"
 					[ngClass]="{ 'hide-filter': !showFilters }"
 					class="page-height row-actions-2-children"
 				>
@@ -62,10 +58,10 @@
 									class="grid-filter-button is-solid"
 								>
 									<span
-										*ngIf="hasFilterApplied()"
+										*ngIf="filterCount(); let filterCounter"
 										class="badge badge-warning"
 									>
-										{{ filterCount() }}
+										{{ filterCounter }}
 									</span>
 								</clr-icon>
 							</tds-button>
@@ -143,7 +139,7 @@
 										[value]="column.filter || ''"
                                         [columnType]="column.type"
 										placeholder="{{'GLOBAL.FILTER' | translate}}"
-										(filter)="onFilter($event, column)">
+										(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
 								</tds-filter-input>
 							</div>
 						</ng-template>
@@ -161,8 +157,9 @@
 								[total]="total"
 								[totalPages]="totalPages"
 								[currentPage]="currentPage"
+								[pageSize]="pageSize"
 								[pageSizes]="defaultPageOptions"
-								(pageChange)="pageChange($event)"
+								(pageChange)="dataGridOperationsHelper.pageChange($event)"
 							>
 							</tds-grid-pager>
 						</div>
