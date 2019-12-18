@@ -24,6 +24,10 @@ export class UserService {
 			}).catch((error: any) => error);
 	}
 
+	/**
+	 * Get only the license applied to the user
+	 * That helps to show or hide different sections of the app
+	 */
 	getLicense(): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/license/info`)
 			.map((response: any) => {
