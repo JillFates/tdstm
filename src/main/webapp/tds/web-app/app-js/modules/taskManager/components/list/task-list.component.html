@@ -404,30 +404,19 @@
 					</ng-template>
 
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div
-							*ngIf="isFiltering && column.filterable"
-							class="filter-input"
-						>
-							<div
-								*ngIf="
-									column.type === 'text';
-									then stringFilter
+						<div *ngIf="isFiltering && column.filterable" class="filter-input">
+							<tds-filter-input
+								name="{{ column.property }}"
+								[value]="column.filter || ''"
+								[columnType]="column.type"
+								placeholder="{{
+									'GLOBAL.FILTER' | translate
+								}}"
+								(filter)="
+									onFilterChangeHandler($event, column)
 								"
-							></div>
-							<ng-template #stringFilter>
-								<tds-filter-input
-									name="{{ column.property }}"
-									[value]="column.filter || ''"
-									[columnType]="column.type"
-									placeholder="{{
-										'GLOBAL.FILTER' | translate
-									}}"
-									(filter)="
-										onFilterChangeHandler($event, column)
-									"
-								>
-								</tds-filter-input>
-							</ng-template>
+							>
+							</tds-filter-input>
 						</div>
 					</ng-template>
 				</kendo-grid-column>

@@ -25,8 +25,40 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
 @Component({
 	selector: 'tds-filter-input',
 	template: `
-		<div class="tds-filter-input">
-            <input *ngIf="columnType === 'text'"
+		<div class="tds-filter-input" [ngSwitch]="columnType">
+			<!-- number -->
+            <input *ngSwitchCase="'number'"
+                   clrInput
+                   #filterInput
+                   type="number"
+                   class="text-filter"
+                   [name]="name"
+                   [value]="value"
+                   [placeholder]="placeholder"
+                   input-paste
+                   (onPaste)="onPaste($event)"/>
+
+            <!-- date -->
+            <kendo-datepicker *ngSwitchCase="'date'"
+                              #filterInput
+                              [format]="dateFormat"
+                              [ngClass]="{'is-filtered': value}"
+                              [value]="value"
+				(valueChange)="onFilter($event)"
+                [style.width.%]="value ? 80 : 100">
+            </kendo-datepicker>
+
+            <!-- boolean -->
+            <kendo-dropdownlist *ngSwitchCase="'boolean'"
+                                #filterInput
+                                [data]="booleanFilterData"
+                                [value]="value"
+                                (valueChange)="onFilter($event)"
+                                [style.width.%]="value ? 70 : 100">
+            </kendo-dropdownlist>
+
+			<!-- Text as well the default if not provided -->
+            <input *ngSwitchDefault
                    clrInput
                    #filterInput
                    type="text"
@@ -35,23 +67,9 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
                    [value]="value"
                    [placeholder]="placeholder"
                    input-paste
-                   (onPaste)="onPaste($event)"
-            />
-            <kendo-datepicker *ngIf="columnType === 'date'"
-                              #filterInput
-                              [format]="dateFormat"
-                              [ngClass]="{'is-filtered': value}"
-                              [value]="value"
-				(valueChange)="onFilter($event)"
-                [style.width.%]="value ? 80 : 100">
-            </kendo-datepicker>
-            <kendo-dropdownlist *ngIf="columnType === 'boolean'"
-                                #filterInput
-                                [data]="booleanFilterData"
-                                [value]="value"
-                                (valueChange)="onFilter($event)"
-                                [style.width.%]="value ? 70 : 100">
-            </kendo-dropdownlist>
+                   (onPaste)="onPaste($event)"/>
+
+			<!-- Clear filter button -->
             <tds-button
                     *ngIf="value || value === false"
                     (click)="onClearFilter()"
@@ -88,7 +106,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 	* is running outside of the angular zone in order to don't trigger
 	 	* the angular change detection process on every key stroked
 	 	*/
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			this.zone.runOutsideAngular(() => {
 				this.filterInput.nativeElement.addEventListener(
 					'keyup',
@@ -105,10 +123,10 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 * Determines if the current filter is of 'text' type
+	 * Determines if the current filter is available
 	 */
-	private isTextType(): boolean {
-		return this.columnType === 'text' && !!this.filterInput;
+	private isFilterInputAvailable(): boolean {
+		return !!this.filterInput;
 	}
 
 	/**
@@ -116,7 +134,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * @param {KeyboardEvent} keyEvent - Key press event info
 	 */
 	private keyPressedListener(keyEvent: KeyboardEvent): void {
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			this.onFilterKeyUp(keyEvent, this.filterInput.nativeElement.value);
 		}
 	}
@@ -127,7 +145,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 */
 	ngOnChanges(changes: SimpleChanges) {
 		if (changes.value) {
-			if (this.isTextType()) {
+			if (this.isFilterInputAvailable()) {
 				this.filterInput.nativeElement.value = changes.value.currentValue;
 			}
 			// if (changes.value.currentValue.columnType) {
@@ -140,7 +158,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * On destroying the component remove the event listener associated
 	 */
 	ngOnDestroy() {
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			this.filterInput.nativeElement.removeEventListener(
 				'keyup',
 				this.keyPressedListener.bind(this)
@@ -152,7 +170,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * Clear the entered search string and notify to the host component
 	 */
 	public onClearFilter(): void {
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			this.filterInput.nativeElement.value = '';
 		}
 		this.previousSearch = '';
@@ -194,7 +212,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * @param {string} search - Current search value
 	 */
 	private onFilterKeyUp(keyEvent: KeyboardEvent, search: string): void {
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			if (this.preventFilterSearch(search)) {
 				return; // prevent search
 			}
@@ -218,7 +236,7 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 * @param {string} search - Current search value
 	 */
 	public onPaste(search: string): void {
-		if (this.isTextType()) {
+		if (this.isFilterInputAvailable()) {
 			this.filterInput.nativeElement.value = search;
 
 			if (this.preventFilterSearch(search)) {
