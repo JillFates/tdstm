@@ -292,9 +292,7 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 * Get the current number of filters selected
 	 */
 	public filterCounter(): number {
-		const filters = pathOr([], ['filter', 'filters'], this.state);
-
-		return filters.length;
+		return GridColumnModel.getFilterCounter(this.state);
 	}
 
 }

@@ -59,7 +59,7 @@ export class APIActionColumnModel {
 				label: 'Data',
 				property: 'producesData',
 				type: 'boolean',
-				width: 90
+				width: 100
 			}, {
 				label: 'Default DataScript',
 				property: 'defaultDataScript.name',
