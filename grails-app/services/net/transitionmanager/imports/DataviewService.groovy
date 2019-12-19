@@ -126,17 +126,23 @@ class DataviewService implements ServiceMethods {
 		return dataview
 	}
 
-	Map generateSaveOptions(Dataview dataview, Project project) {
+	/**
+	 * Generates the list of ways a dataview can be saved to override another view
+	 * @param dataview - The dataview being saved
+	 * @param project - The user's current project
+	 * @return - A list of the save as methods that are available for the dataview.
+	 */
+	Map generateSaveOptions(Dataview dataview, Project userProject) {
 		List saveAsOptions = []
-		if (project && !project.defaultProject) {
+		if (userProject && !userProject.isDefaultProject()) {
 			saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())
-			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
+			if (dataview.isSystem && dataview.overridesView == null) {
 				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
 			}
 		}
-		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && project.defaultProject)
-			|| (securityService.hasPermission('AssetExplorerOverrideAllUserProject') && !project.defaultProject)) {
-			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
+		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && userProject.isDefaultProject())
+			|| (securityService.hasPermission('AssetExplorerOverrideAllUserProject') && !userProject.isDefaultProject())) {
+			if (dataview.isSystem && dataview.project.isDefaultProject() && dataview.overridesView == null) {
 				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
 			}
 		}
