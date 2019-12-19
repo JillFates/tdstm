@@ -68,12 +68,13 @@ export class HeaderComponent {
 			});
 	}
 
+	/**
+	 * Get Proper icon based on the user name
+	 */
 	public getUserIconText(): string {
-		const [first, last] = this.userContext.person.fullName.split(' ');
-		return `${first.substr(0, 1).toUpperCase()}${last
-			.substr(0, 1)
-			.toUpperCase()}`;
+		return this.userContext.person.fullName.split(' ').map(x => x.charAt(0)).join('').substr(0, 2).toUpperCase();
 	}
+
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			//
