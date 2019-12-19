@@ -1,27 +1,29 @@
-<div class="content body task-list">
+<div class="task-list">
 	<form clrForm clrLayout="horizontal" class="">
 		<div class="clr-row">
-			<div class="clr-col-12 page-header">
-				<h1>Task Manager</h1>
-				<div>
+			<div class="clr-offset-3"></div>
+            <div class="clr-col-6">
+				<div class="header-controls">
 					<tds-button
-						[icon]="'organization'"
-						(click)="onViewTaskGraphHandler()"
-						[title]="'View Task Graph'"
+							[icon]="'organization'"
+							(click)="onViewTaskGraphHandler()"
+							[title]="'View Task Graph'"
 					></tds-button>
 					<tds-button
-						[icon]="'list'"
-						(click)="onViewTimelineHandler()"
-						[title]="'View Timeline'"
+							[icon]="'list'"
+							(click)="onViewTimelineHandler()"
+							[title]="'View Timeline'"
 					></tds-button>
 				</div>
-				<div class="refresh-container">
+			</div>
+            <div class="clr-col-3">
+				<div class="header-controls counter-down pull-right">
 					<div class="refresh-control">
 						<tds-pie-countdown
-							[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
-							(timeout)="search()"
-							[hideRefresh]="true"
-							[customOptions]="[
+								[refreshPreference]="TASK_MANAGER_REFRESH_TIMER"
+								(timeout)="search()"
+								[hideRefresh]="true"
+								[customOptions]="[
 								{ seconds: 0, description: 'Manual' },
 								{ seconds: 60, description: '1 Min' },
 								{ seconds: 120, description: '2 Min' },
@@ -33,90 +35,96 @@
 						</tds-pie-countdown>
 					</div>
 					<tds-button-custom
-						icon="repeat"
-						[displayLabel]="false"
-						[flat]="true"
-						(click)="onFiltersChange()"
-						class="flat"
-						tooltip="Refresh"
+							icon="repeat"
+							[displayLabel]="false"
+							[flat]="true"
+							(click)="onFiltersChange()"
+							class="flat"
+							tooltip="Refresh"
 					></tds-button-custom>
 				</div>
 			</div>
 		</div>
 
-		<div class="clr-row">
-			<div class="clr-col-12 actions-primary-page-container">
-				<clr-select-container class="clr-form-control clr-row">
-					<label class="label-event-list">Event: </label>
-					<select
-						clrSelect
-						class="select-event-list"
-						name="selectedEventId"
-						[(ngModel)]="selectedEventId"
-						(ngModelChange)="onEventSelect($event)"
-					>
-						<option
-							*ngFor="let event of eventList"
-							[attr.selected]="selectedEventId === event.id"
-							[value]="event.id"
-							>{{ event.name }}</option
+		<div class="clr-row row-controls">
+			<div class="clr-col-3">
+                <div class="header-controls pull-left">
+					<clr-select-container class="clr-form-control clr-row">
+						<label class="label-event-list">Event: </label>
+						<select
+								clrSelect
+								class="select-event-list"
+								name="selectedEventId"
+								[(ngModel)]="selectedEventId"
+								(ngModelChange)="onEventSelect($event)"
 						>
-					</select>
-				</clr-select-container>
-				<div class="check-container">
+							<option
+									*ngFor="let event of eventList"
+									[attr.selected]="selectedEventId === event.id"
+									[value]="event.id"
+							>{{ event.name }}</option
+							>
+						</select>
+					</clr-select-container>
+				</div>
+			</div>
+			<div class="clr-col-6">
+				<div class="header-controls">
 					<clr-checkbox-wrapper>
 						<input
-							clrCheckbox
-							type="checkbox"
-							name="justRemaining"
-							id="justRemaining"
-							[(ngModel)]="justRemaining"
-							(ngModelChange)="onFiltersChange()"
+								clrCheckbox
+								type="checkbox"
+								name="justRemaining"
+								id="justRemaining"
+								[(ngModel)]="justRemaining"
+								(ngModelChange)="onFiltersChange()"
 						/>
 						<label>Just Remaining</label>
 					</clr-checkbox-wrapper>
 
 					<clr-checkbox-wrapper>
 						<input
-							clrCheckbox
-							type="checkbox"
-							name="justMine"
-							id="justMine"
-							[(ngModel)]="justMyTasks"
-							(ngModelChange)="onFiltersChange()"
+								clrCheckbox
+								type="checkbox"
+								name="justMine"
+								id="justMine"
+								[(ngModel)]="justMyTasks"
+								(ngModelChange)="onFiltersChange()"
 						/>
 						<label>Just Mine</label>
 					</clr-checkbox-wrapper>
 
 					<clr-checkbox-wrapper>
 						<input
-							clrCheckbox
-							type="checkbox"
-							name="viewUnpublished"
-							id="viewUnpublished"
-							[(ngModel)]="viewUnpublished"
-							(ngModelChange)="onFiltersChange()"
+								clrCheckbox
+								type="checkbox"
+								name="viewUnpublished"
+								id="viewUnpublished"
+								[(ngModel)]="viewUnpublished"
+								(ngModelChange)="onFiltersChange()"
 						/>
 						<label>View Unpublished</label>
 					</clr-checkbox-wrapper>
 				</div>
-				<div>
+			</div>
+			<div class="clr-col-3 pull-right">
+				<div class="header-controls pull-right">
 					<tds-button
-						[icon]="'plus-circle'"
-						(click)="onCreateTaskHandler()"
-						[title]="'Create Task'"
-						[iconClass]="'is-solid'"
+							[icon]="'plus-circle'"
+							(click)="onCreateTaskHandler()"
+							[title]="'Create Task'"
+							[iconClass]="'is-solid'"
 					></tds-button>
 					<tds-button
-						[icon]="'pencil'"
-						(click)="onBulkActionHandler()"
-						[title]="'Bulk Action'"
+							[icon]="'pencil'"
+							(click)="onBulkActionHandler()"
+							[title]="'Bulk Action'"
 					></tds-button>
 					<tds-button
-						[icon]="'times'"
-						[disabled]="!areFiltersDirty()"
-						(click)="onClearFiltersHandler()"
-						[title]="'Clear Filters'"
+							[icon]="'times'"
+							[disabled]="!areFiltersDirty()"
+							(click)="onClearFiltersHandler()"
+							[title]="'Clear Filters'"
 					></tds-button>
 				</div>
 			</div>
@@ -410,6 +418,7 @@
 								<tds-filter-input
 									name="{{ column.property }}"
 									[value]="column.filter || ''"
+									[columnType]="column.type"
 									placeholder="{{
 										'GLOBAL.FILTER' | translate
 									}}"
