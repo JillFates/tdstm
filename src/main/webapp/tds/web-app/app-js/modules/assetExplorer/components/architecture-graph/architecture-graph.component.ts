@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {ITdsContextMenuOption} from 'tds-component-library/lib/context-menu/model/tds-context-menu.model';
-// import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
+import {ArchitectureGraphService} from '../../../assetManager/service/architecture-graph.service';
 import {ReplaySubject} from 'rxjs';
 import {IDiagramData} from 'tds-component-library/lib/diagram-layout/model/diagram-data.model';
 import {ArchitectureGraphDiagramHelper} from './architecture-graph-diagram-helper';
@@ -10,7 +10,7 @@ import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
 
-import {ArchitectureGraphService} from './service/architecture-graph.service';
+// import {ArchitectureGraphService} from './service/architecture-graph.service';
 
 @Component({
 	selector: 'tds-architecture-graph',
@@ -28,13 +28,15 @@ export class ArchitectureGraphComponent implements OnInit {
 	public graphPreferences;
 	public dataForSelect;
 	public dataForSelect2;
-	public levelsUp;
-	public levelsDown;
+	public levelsUp = 0;
+	public levelsDown = 3;
 	public showCycles;
 	public appLbl;
 	public labelOffset;
 	public assetClasses;
-
+	public assetId;
+	public mode = 'assetId';
+	public dataForGraph;
 
 	constructor(
 		// private architectureGraphService: ArchitectureGraphService,
@@ -43,58 +45,80 @@ export class ArchitectureGraphComponent implements OnInit {
 		private architectureGraphService: ArchitectureGraphService
 	) {
 		this.activatedRoute.queryParams.subscribe((data: IArchitectureGraphParams) => this.urlParams = data);
-		// this.userContextService.getUserContext().subscribe(res => this.userContext = res)
+		this.userContextService.getUserContext().subscribe(res => this.userContext = res)
 	}
 
 	ngOnInit(): void {
 		if (this.urlParams && this.urlParams.assetId) {
 			console.log('params', this.urlParams);
-			// this.loadDiagramData(this.urlParams)
-		}
+			this.loadDiagramData(this.urlParams)
+		} else {
+			this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
+				console.log('res', res);
+				this.dataForSelect = Object.keys(res.assetClassesForSelect).map(function(key) {
+					return [key, res.assetClassesForSelect[key]];
+				});
+				this.assetId = res.assetId || 144762;
+				// this.mode = res.
+				this.levelsUp = +res.graphPrefs.levelsUp;
+				this.levelsDown = +res.graphPrefs.levelsDown;
+				this.showCycles = res.graphPrefs.showCycles;
+				this.appLbl = res.graphPrefs.appLbl;
+				this.labelOffset = res.graphPrefs.labelOffset;
+				this.assetClasses = res.graphPrefs.assetClasses;
+				// this.dataForSelect2 = JSON.parse(res.assetClassesForSelect2);
+				// let newJson = res.assetClassesForSelect2.replace(/([a-zA-Z0-9]+?):/g, '"$1":');
+				// newJson = newJson.replace(/'/g, '');
+				// newJson = newJson.replace(/"/g, '');
+				// // newJson = newJson.replace('""Filter": All Classes"', '"Filter: All Classes"');
+				// console.log(newJson);
 
-		this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
-			console.log('res', res);
-			this.dataForSelect = Object.keys(res.assetClassesForSelect).map(function(key) {
-				return [key, res.assetClassesForSelect[key]];
+				// this.dataForSelect2 = JSON.parse(newJson);
+				console.log('this.dataForSelect', this.dataForSelect);
+				// this.graphPreferences = res;
 			});
+		}
+	}
 
-			this.levelsUp = +res.graphPrefs.levelsUp;
-			this.levelsDown = +res.graphPrefs.levelsDown;
-			this.showCycles = res.graphPrefs.showCycles;
-			this.appLbl = res.graphPrefs.appLbl;
-			this.labelOffset = res.graphPrefs.labelOffset;
-			this.assetClasses = res.graphPrefs.assetClasses;
-			// this.dataForSelect2 = JSON.parse(res.assetClassesForSelect2);
-			// let newJson = res.assetClassesForSelect2.replace(/([a-zA-Z0-9]+?):/g, '"$1":');
-			// newJson = newJson.replace(/'/g, '');
-			// newJson = newJson.replace(/"/g, '');
-			// // newJson = newJson.replace('""Filter": All Classes"', '"Filter: All Classes"');
-			// console.log(newJson);
-
-			// this.dataForSelect2 = JSON.parse(newJson);
-			console.log('this.dataForSelect', this.dataForSelect);
-			// this.graphPreferences = res;
+	onAssetSelected(event) {
+		console.log('asset selected', event);
+		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
+			.subscribe( (res: any) => {
+				this.dataForGraph = res;
+				console.log('graph data', res);
+				const diagramHelper = new ArchitectureGraphDiagramHelper();
+				const n = diagramHelper.diagramData({
+					rootAsset: this.assetId,
+					currentUserId: this.userContext.user.id,
+					data: res,
+					extras: {
+						diagramOpts: {
+							allowZoom: true
+						},
+						isExpandable: true,
+						initialExpandLevel: 2
+					}
+				});
+				this.data$.next(n);
 		});
-
 	}
 
 	loadDiagramData(params?: IArchitectureGraphParams): void {
-	// 	this.architectureGraphService.getAssetDetails(params.assetId, params.levelsUp, params.levelsDown)
-	// 		.subscribe(res => {
-	// 			const diagramHelper = new ArchitectureGraphDiagramHelper();
-	// 			this.data$.next(diagramHelper.diagramData({
-	// 				rootAsset: params.assetId,
-	// 				currentUserId: this.userContext.user.id,
-	// 				data: res,
-	// 				extras: {
-	// 					diagramOpts: {
-	// 						allowZoom: true
-	// 					},
-	// 					isExpandable: true,
-	// 					initialExpandLevels: 2
-	// 				}
-	// 			}));
-	// 		});
-	// }
+		this.architectureGraphService.getAssetDetails(params.assetId, this.levelsUp, this.levelsDown)
+			.subscribe(res => {
+				const diagramHelper = new ArchitectureGraphDiagramHelper();
+				this.data$.next(diagramHelper.diagramData({
+					rootAsset: params.assetId,
+					currentUserId: this.userContext.user.id,
+					data: res,
+					extras: {
+						diagramOpts: {
+							allowZoom: true
+						},
+						isExpandable: true,
+						initialExpandLevels: 2
+					}
+				}));
+			});
 	}
 }

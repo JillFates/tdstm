@@ -36,7 +36,7 @@ export class ArchitectureGraphService {
 			.set('mode', mode);
 		return this.http.get(`${this.ARCHITECTURE_GRAPH_DATA}`, {params})
 			.map((response: any) => {
-				return response && response.data || [];
+				return response;
 			})
 			.catch((error: any) => error);
 	}

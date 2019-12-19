@@ -5,10 +5,14 @@
 <div class="graphContainer">
 	<div class="graph-control-panel">
 		<p>Select an Asset</p>
-		<kendo-dropdownlist [data]="dataForSelect">
+		<kendo-dropdownlist
+			[defaultItem]="'Select an Asset...'"
+			[data]="dataForSelect"
+			(selectionChange)="onAssetSelected($event)">
 		</kendo-dropdownlist>
 		<p>Filter: All classes</p>
 		<kendo-dropdownlist
+			[defaultItem]="'Filter: All Classes'"
 			[data]="dataForSelect2"
 			[textField]="'text'"
 			[valueField]="'id'"
@@ -63,14 +67,16 @@
 	</div>
 
 	<div class="container architecture-graph-container">
-<!--		<tds-lib-diagram-layout-->
-<!--			[data]="data$ | async"-->
-<!--			[layout]="diagramLayout$ | async"-->
-<!--			[contextMenuOptions]="ctxOpts"-->
-<!--			[hideExpand]="true"-->
-<!--		></tds-lib-diagram-layout>-->
+		<tds-lib-diagram-layout
+			[data]="data$ | async"
+			[layout]="diagramLayout$ | async"
+			[contextMenuOptions]="ctxOpts"
+			[hideExpand]="true"
+		></tds-lib-diagram-layout>
+<!--			[data]="dataForGraph"-->
+
+
 <!--		<tds-diagram-layout-->
-<!--			[data]="data$ | async"-->
 <!--			[layout]="diagramLayout$ | async"-->
 <!--			[contextMenuOptions]="ctxOpts"-->
 <!--			[hideExpand]="true"-->
