@@ -17,4 +17,9 @@ class Column {
 
     String label
     Integer index
+
+    Column(String label, Integer index) {
+        this.label = label
+        this.index = index
+    }
 }

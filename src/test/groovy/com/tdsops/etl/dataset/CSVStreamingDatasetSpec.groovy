@@ -1,10 +1,6 @@
 package com.tdsops.etl.dataset
 
-import com.tdsops.etl.DebugConsole
-import com.tdsops.etl.ETLBaseSpec
-import com.tdsops.etl.ETLFieldsValidator
-import com.tdsops.etl.ETLProcessor
-import com.tdsops.tm.enums.domain.ImportOperationEnum
+import com.tdsops.etl.*
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
@@ -43,16 +39,16 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
     void 'test can read labels from csv dataset and create a map of columns'() {
 
         given:
-            def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+            String fileName = createCSVFIle("""
 				name,cpu,description
 				xraysrv01,100,Description FOOBAR
 				zuludb01,10,Some description
-			""".stripIndent())
+			""")
 
         and:
             ETLProcessor etlProcessor = new ETLProcessor(
                     GMDEMO,
-                    sixRowsDataSet,
+                    new CSVStreamingDataset(fileName),
                     debugConsole,
                     validator
             )
@@ -64,16 +60,16 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
 			""".stripIndent())
 
         then: 'A column map is created'
-            etlProcessor.column('device id').index == 0
-            etlProcessor.column(0).label == 'device id'
+            etlProcessor.column('name').index == 0
+            etlProcessor.column(0).label == 'name'
 
         and:
-            etlProcessor.column('model name').index == 1
-            etlProcessor.column(1).label == 'model name'
+            etlProcessor.column('cpu').index == 1
+            etlProcessor.column(1).label == 'cpu'
 
         and:
-            etlProcessor.column('manufacturer name').index == 2
-            etlProcessor.column(2).label == 'manufacturer name'
+            etlProcessor.column('description').index == 2
+            etlProcessor.column(2).label == 'description'
 
         and:
             etlProcessor.currentRowIndex == 1
@@ -83,4 +79,133 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
                 fileSystemService.deleteTemporaryFile(fileName)
             }
     }
+
+    @See('TM-16579')
+    void 'test can skip rows until read labels from csv dataset and create a map of columns'() {
+
+        given:
+            String fileName = createCSVFIle("""
+                UNKNOWN
+                UNNECESSARY
+				name,cpu,description
+				xraysrv01,100,Description FOOBAR
+				zuludb01,10,Some description
+			""")
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(
+                    GMDEMO,
+                    new CSVStreamingDataset(fileName),
+                    debugConsole,
+                    validator
+            )
+
+        when: 'The ETL script is evaluated'
+            etlProcessor.evaluate("""
+				domain Device
+				skip 2
+				read labels
+			""".stripIndent())
+
+        then: 'A column map is created'
+            etlProcessor.column('name').index == 0
+            etlProcessor.column(0).label == 'name'
+
+        and:
+            etlProcessor.column('cpu').index == 1
+            etlProcessor.column(1).label == 'cpu'
+
+        and:
+            etlProcessor.column('description').index == 2
+            etlProcessor.column(2).label == 'description'
+
+        and:
+            etlProcessor.currentRowIndex == 3
+
+        cleanup:
+            if (fileName) {
+                fileSystemService.deleteTemporaryFile(fileName)
+            }
+    }
+
+    @See('TM-16579')
+    void 'test can extract a field value over all rows based on column ordinal position'() {
+
+        given:
+            String fileName = createCSVFIle("""
+				name,cpu,description
+				xraysrv01,100,Description FOOBAR
+				zuludb01,10,Some description
+			""")
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(
+                    GMDEMO,
+                    new CSVStreamingDataset(fileName),
+                    debugConsole,
+                    validator
+            )
+
+        when: 'The ETL script is evaluated'
+            etlProcessor.evaluate("""
+				domain Device
+				read labels
+				iterate {
+					extract 1
+				}
+			""".stripIndent())
+
+        then:
+
+            assertWith(etlProcessor.currentRow.getElement(0), Element) {
+                value == "zuludb01"
+                originalValue == "zuludb01"
+            }
+
+        cleanup:
+            if (fileName) {
+                fileSystemService.deleteTemporaryFile(fileName)
+            }
+    }
+
+    @See('TM-16579')
+    void 'test can extract a field value over all rows based on column name'() {
+
+        given:
+            String fileName = createCSVFIle("""
+				name,cpu,description
+				xraysrv01,100,Description FOOBAR
+				zuludb01,10,Some description
+			""")
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(
+                    GMDEMO,
+                    new CSVStreamingDataset(fileName),
+                    debugConsole,
+                    validator
+            )
+
+        when: 'The ETL script is evaluated'
+            etlProcessor.evaluate("""
+				domain Device
+				read labels
+				iterate {
+					extract 'name'
+				}
+			""".stripIndent())
+
+        then:
+
+            assertWith(etlProcessor.currentRow.getElement(0), Element) {
+                value == "zuludb01"
+                originalValue == "zuludb01"
+            }
+
+        cleanup:
+            if (fileName) {
+                fileSystemService.deleteTemporaryFile(fileName)
+            }
+    }
+
 }

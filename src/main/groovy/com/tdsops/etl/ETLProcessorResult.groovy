@@ -55,7 +55,7 @@ class ETLProcessorResult {
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName(),
+			originalFilename: processor.getFilename()
 		]
 	}
 
