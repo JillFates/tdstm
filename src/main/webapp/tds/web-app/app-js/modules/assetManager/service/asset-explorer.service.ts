@@ -68,7 +68,7 @@ export class AssetExplorerService {
 		return this.http.get(`${this.assetExplorerUrl}/view/${id}`)
 			.map((response: any) => {
 				if (response && response.status === 'success' && response.data) {
-					return response.data.dataView;
+					return response.data;
 				} else {
 					throw new Error(response.errors.join(';'));
 				}

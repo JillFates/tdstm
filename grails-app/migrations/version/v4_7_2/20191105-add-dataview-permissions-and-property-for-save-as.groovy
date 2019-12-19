@@ -43,22 +43,9 @@ databaseChangeLog = {
         }
 
         addColumn(tableName: 'dataview') {
-            column(name: 'overrides_view_id', type: 'BIGINT') {
+            column(name: 'overrides_view_id', type: 'LONG') {
                 constraints(nullable: 'true')
             }
         }
-
-        createIndex(indexName: 'FK_override_view', tableName: 'dataview') {
-            column(name: 'overrides_view_id')
-        }
-
-        addForeignKeyConstraint(
-                baseColumnNames: 'overrides_view_id',
-                baseTableName: 'dataview',
-                constraintName: 'FK_override_view',
-                onDelete: 'CASCADE',
-                referencedColumnNames: 'id',
-                referencedTableName: 'dataview'
-        )
     }
 }

@@ -6,13 +6,12 @@ import {UserContextModel} from '../model/user-context.model';
 import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired, PostNotices} from '../action/login.actions';
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
-import {SetProject} from '../../project/actions/project.actions';
+import {SetProject, SetDefaultProject} from '../../project/actions/project.actions';
 import {SetPageChange} from '../action/page.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
-import {LoginService} from '../service/login.service';
 import {PostNoticesManagerService} from '../service/post-notices-manager.service';
 // Others
 import {tap, catchError} from 'rxjs/operators';
@@ -33,7 +32,6 @@ export class UserContextState {
 		private authService: AuthService,
 		private permissionService: PermissionService,
 		private postNoticesManagerService: PostNoticesManagerService,
-		private loginService: LoginService,
 		private userService: UserService) {
 	}
 
@@ -136,6 +134,19 @@ export class UserContextState {
 			...state,
 			bundle: payload,
 		});
+	}
+
+	@Action(SetDefaultProject)
+	setDefaultProject(ctx: StateContext<UserContextModel>, { payload }: SetDefaultProject) {
+		return this.userService.getLicenseInfo().pipe(
+			tap(result => {
+				const state = ctx.getState();
+				ctx.setState({
+					...state,
+					defaultProject: { id: payload.id, name: payload.name, logoUrl: payload.logoUrl }
+				});
+			}),
+		);
 	}
 
 	@Action(SetProject)

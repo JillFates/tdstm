@@ -18,8 +18,13 @@
 							<i class="fa fa-fw fa-floppy-o"></i> {{ 'GLOBAL.SAVE_AS' | translate }}
 				</button>
 
-				<button type="button" class="btn dropdown-toggle" [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
-				 [disabled]="!isValid()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				<button type="button"
+                        class="btn dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        [ngClass]="{'btn-default':!isDirty() || !isSaveAsAvailable() || !isValid(),'btn-success':isValid() && isDirty()}"
+				        [disabled]="!isValid()" >
 					<span class="caret"></span>
 					<span class="sr-only">Toggle Dropdown</span>
 				</button>

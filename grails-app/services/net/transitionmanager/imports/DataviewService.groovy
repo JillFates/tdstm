@@ -38,6 +38,7 @@ import net.transitionmanager.service.dataview.DataviewSpec
 import net.transitionmanager.service.dataview.filter.FieldNameExtraFilter
 import net.transitionmanager.service.dataview.filter.special.SpecialExtraFilter
 import net.transitionmanager.task.AssetComment
+import org.apache.poi.ss.usermodel.DataValidation
 import org.grails.web.json.JSONObject
 
 import java.security.InvalidParameterException
@@ -129,7 +130,7 @@ class DataviewService implements ServiceMethods {
 		if (project && !project.defaultProject) {
 			saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())
 			if (dataview.isSystem && dataview.project.defaultProject && dataview.overridesView == null) {
-				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name())
+				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
 			}
 		}
 		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && project.defaultProject)

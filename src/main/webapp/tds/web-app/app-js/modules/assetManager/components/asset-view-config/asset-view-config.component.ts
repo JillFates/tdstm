@@ -21,7 +21,7 @@ import {GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {ActivatedRoute, Router} from '@angular/router';
 import {clone} from 'ramda';
 import {AssetViewShowComponent} from '../asset-view-show/asset-view-show.component';
-
+import {SaveOptions} from '../../../../shared/model/save-options.model';
 declare var jQuery: any;
 @Component({
 	selector: 'tds-asset-view-config',
@@ -33,6 +33,7 @@ export class AssetViewConfigComponent implements OnInit {
 	public data: any = null;
 	private dataSignature: string;
 	protected justPlanning: boolean;
+	public saveOptions: any;
 	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
@@ -79,10 +80,12 @@ export class AssetViewConfigComponent implements OnInit {
 		this.allFields = this.route.snapshot.data['fields'];
 		this.fields = this.route.snapshot.data['fields'];
 		this.domains = this.route.snapshot.data['fields'];
-		this.model = {...this.route.snapshot.data['report']};
+		const {dataView, saveOptions} = this.route.snapshot.data['report'];
+		this.model = dataView ? dataView : this.route.snapshot.data['report'];
+		this.saveOptions = saveOptions;
 		this.dataSignature = JSON.stringify(this.model);
 		this.draggableColumns = [];
-		if (this.model.id) {
+		if (this.model && this.model.id) {
 			this.updateFilterbyModel();
 			this.currentTab = 1;
 			this.draggableColumns = this.model.schema.columns.slice();
@@ -91,7 +94,7 @@ export class AssetViewConfigComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.justPlanning = false;
-		if (this.model.id) {
+		if (this.model && this.model.id) {
 			this.notifier.broadcast({
 				name: 'notificationHeaderTitleChange',
 				title: this.model.name
@@ -224,7 +227,8 @@ export class AssetViewConfigComponent implements OnInit {
 		const selectedData = this.select.data.filter(x => x.name === 'Favorites')[0];
 		this.dialogService.open(AssetViewSaveComponent, [
 			{ provide: ViewModel, useValue: this.model },
-			{ provide: ViewGroupModel, useValue: selectedData }
+			{ provide: ViewGroupModel, useValue: selectedData },
+			{ provide: SaveOptions, useValue: this.saveOptions }
 		]).then(result => {
 			this.model = result;
 			this.dataSignature = JSON.stringify(this.model);
@@ -247,7 +251,12 @@ export class AssetViewConfigComponent implements OnInit {
 	}
 
 	public isValid(): boolean {
-		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
+		return (
+			this.isAssetSelected() &&
+			this.isColumnSelected() &&
+			this.hasAtLeastOneNonLockedColumnOrEmpty()
+		)
+
 	}
 
 	protected isDirty(): boolean {
