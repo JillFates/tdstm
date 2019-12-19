@@ -199,6 +199,7 @@
 		>
 			<div class="filter-input">
 				<tds-filter-input
+					[columnType]="column.type"
 					name="{{ column.domain }}.{{ column.property }}"
 					[value]="column.filter"
 					placeholder="{{ 'GLOBAL.FILTER' | translate }}"

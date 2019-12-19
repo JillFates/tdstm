@@ -1,6 +1,9 @@
 import { SortInfo } from '../utils/sort.utils';
 import { DateUtils } from '../utils/date.utils';
 
+import { State } from '@progress/kendo-data-query';
+import { pathOr, uniq } from 'ramda';
+
 export const COLUMN_MIN_WIDTH = 360;
 export const SELECT_ALL_COLUMN_WIDTH = 50;
 export const BooleanFilterData: Array<string> = ['True', 'False'];
@@ -125,6 +128,15 @@ export class GridColumnModel {
 		}
 
 		return root;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 * - Remove when all grids support data grid operations helper
+	 */
+	public static getFilterCounter(state: State): number {
+		const filters = pathOr(0, ['filter', 'filters'], state);
+		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 
 }
