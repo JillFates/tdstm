@@ -17,6 +17,8 @@ import {IArchitectureGraphParams} from '../../model/url-params.model';
 	templateUrl: './architecture-graph.component.html'
 })
 export class ArchitectureGraphComponent implements OnInit {
+	public showControlPanel = true;
+
 	data$: ReplaySubject<IDiagramData> = new ReplaySubject(1);
 	ctxOpts:  ITdsContextMenuOption;
 	diagramLayout$: ReplaySubject<Layout> = new ReplaySubject(1);
@@ -55,27 +57,16 @@ export class ArchitectureGraphComponent implements OnInit {
 		} else {
 			this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
 				console.log('res', res);
-				this.dataForSelect = Object.keys(res.assetClassesForSelect).map(function(key) {
-					return [key, res.assetClassesForSelect[key]];
-				});
+				this.dataForSelect = res.assetClassesForSelect;
+				this.dataForSelect2 = res.assetClassesForSelect2;
+
 				this.assetId = res.assetId || 144762;
-				// this.mode = res.
 				this.levelsUp = +res.graphPrefs.levelsUp;
 				this.levelsDown = +res.graphPrefs.levelsDown;
 				this.showCycles = res.graphPrefs.showCycles;
 				this.appLbl = res.graphPrefs.appLbl;
 				this.labelOffset = res.graphPrefs.labelOffset;
 				this.assetClasses = res.graphPrefs.assetClasses;
-				// this.dataForSelect2 = JSON.parse(res.assetClassesForSelect2);
-				// let newJson = res.assetClassesForSelect2.replace(/([a-zA-Z0-9]+?):/g, '"$1":');
-				// newJson = newJson.replace(/'/g, '');
-				// newJson = newJson.replace(/"/g, '');
-				// // newJson = newJson.replace('""Filter": All Classes"', '"Filter: All Classes"');
-				// console.log(newJson);
-
-				// this.dataForSelect2 = JSON.parse(newJson);
-				console.log('this.dataForSelect', this.dataForSelect);
-				// this.graphPreferences = res;
 			});
 		}
 	}
@@ -116,9 +107,34 @@ export class ArchitectureGraphComponent implements OnInit {
 							allowZoom: true
 						},
 						isExpandable: true,
-						initialExpandLevels: 2
+						initialExpandLevel: 2
 					}
 				}));
 			});
 	}
+
+	toggleControlPanel() {
+		this.showControlPanel = !this.showControlPanel;
+	}
+
+	extractLevelsUp() {
+		if (this.levelsUp > 0) {
+			this.levelsUp--;
+		}
+	}
+
+	addLevelsUp() {
+		this.levelsUp++;
+	}
+
+	addLevelsDown() {
+		this.levelsDown++;
+	}
+
+	extractLevelsDown() {
+		if (this.levelsDown > 0) {
+			this.levelsDown--;
+		}
+	}
+
 }

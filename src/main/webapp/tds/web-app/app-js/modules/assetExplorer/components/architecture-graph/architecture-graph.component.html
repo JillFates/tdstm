@@ -1,13 +1,15 @@
 
-<tds-button>Control Panel</tds-button>
+<tds-button (click)="toggleControlPanel()">Control Panel</tds-button>
 <tds-button>Legend</tds-button>
 <tds-button>Fullscreen</tds-button>
 <div class="graphContainer">
-	<div class="graph-control-panel">
+	<div class="graph-control-panel" *ngIf="showControlPanel">
 		<p>Select an Asset</p>
 		<kendo-dropdownlist
 			[defaultItem]="'Select an Asset...'"
 			[data]="dataForSelect"
+			[textField]="'value'"
+			[valueField]="'id'"
 			(selectionChange)="onAssetSelected($event)">
 		</kendo-dropdownlist>
 		<p>Filter: All classes</p>
@@ -19,15 +21,15 @@
 		>
 		</kendo-dropdownlist>
 		<div class="tiers-above">
-			<tds-button icon="minus"></tds-button>
+			<tds-button icon="minus" (click)="extractLevelsUp()"></tds-button>
 			<label>{{levelsUp}}</label>
-			<tds-button icon="plus"></tds-button>
+			<tds-button icon="plus" (click)="addLevelsUp()"></tds-button>
 			<label>Tiers Above</label>
 		</div>
 		<div class="tiers-below">
-			<tds-button icon="minus"></tds-button>
+			<tds-button icon="minus" (click)="extractLevelsDown()"></tds-button>
 			<label>{{levelsDown}}</label>
-			<tds-button icon="plus"></tds-button>
+			<tds-button icon="plus" (click)="addLevelsDown()"></tds-button>
 			<label>Tiers Below</label>
 		</div>
 		<div class="graph-checkbox">
