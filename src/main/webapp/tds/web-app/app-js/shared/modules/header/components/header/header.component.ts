@@ -19,6 +19,8 @@ import {PageMetadataModel} from '../../model/page-metadata.model';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
+import {ReplaySubject} from 'rxjs';
+import {SetUserContext} from '../../../../../modules/user/actions/user-context.actions';
 
 declare var jQuery: any;
 
@@ -32,6 +34,8 @@ export class HeaderComponent {
 	public searchForm = new FormGroup({
 		search: new FormControl(''),
 	});
+	public fullName: ReplaySubject<string> = new ReplaySubject<string>(1);
+	public iconText: ReplaySubject<string> = new ReplaySubject<string>(1);
 
 	constructor(
 		private userContextService: UserContextService,
@@ -40,7 +44,9 @@ export class HeaderComponent {
 		private store: Store
 	) {
 		this.pageMetaData.hideTopNav = true;
-		this.getUserContext();
+		this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
+		this.store.dispatch(new SetUserContext())
+			.subscribe(() => this.getUserContext());
 		this.headerListeners();
 	}
 
@@ -65,15 +71,18 @@ export class HeaderComponent {
 						'/tdstm/tds/web-app/assets/images/transitionLogo.svg';
 				}
 				this.userContext = userContext;
+				const fName = userContext.person && userContext.person.fullName;
+				if (fName) {
+					this.fullName.next(fName);
+					this.iconText.next(this.getUserIconText(fName));
+				}
 			});
 	}
 
-	public getUserIconText(): string {
-		const [first, last] = this.userContext.person.fullName.split(' ');
-		return `${first.substr(0, 1).toUpperCase()}${last
-			.substr(0, 1)
-			.toUpperCase()}`;
+	public getUserIconText(fullName: string): string {
+		return fullName.split(' ').map(t => t.substring(0, 1)).join('').toUpperCase();
 	}
+
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
 			//
