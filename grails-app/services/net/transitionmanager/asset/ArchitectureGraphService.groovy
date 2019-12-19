@@ -77,33 +77,37 @@ class ArchitectureGraphService implements ServiceMethods {
 
 		String graphPrefs = userPreferenceService.getPreference(UserPreferenceEnum.ARCH_GRAPH)
 		Map prefsObject = graphPrefs ? (Map) JSON.parse(graphPrefs) : defaultPrefs
+		List assetClassesForSelect = [[id: 'ALL', value: 'All Classes']]
+		assetClassesForSelect.addAll(AssetClass.classOptions.collect {
+			[id: it.key, value: it.value]
+		})
 
 		return [
 			assetId               : assetId,
 			assetName             : assetName,
 			levelsUp              : levelsUp,
 			levelsDown            : levelsDown,
-			assetClassesForSelect : [ALL: 'All Classes'] + AssetClass.classOptions,
+			assetClassesForSelect : assetClassesForSelect,
 			dependencyStatus      : assetEntityService.getDependencyStatuses(),
 			dependencyType        : assetEntityService.getDependencyTypes(),
 			assetTypes            : AssetEntityService.ASSET_TYPE_NAME_MAP,
 			defaultPrefs          : defaultPrefs as JSON,
 			graphPrefs            : prefsObject,
-			assetClassesForSelect2: AssetClass.classOptionsDefinition
+			assetClassesForSelect2: AssetClass.classOptionsDefinitions
 		]
 	}
 
 	/**
-		 * Build the architecture model map to be rendered to the view.
-		 *
-		 * @param rootAsset The root asset node of the graph
-		 * @param assetId The id of the asset, that is the root of the graph.
-		 * @param levelsUp The numbers of levels up, for the graph.
-		 * @param levelsDown The number of levels down for the graph.
-	     * @param mode the mode of the graph if 'assetId' then buildArchitectureGraph is called
-		 *
-		 * @return A map representing the architecture graph to be rendered in the view.
-		 */
+	 * Build the architecture model map to be rendered to the view.
+	 *
+	 * @param rootAsset The root asset node of the graph
+	 * @param assetId The id of the asset, that is the root of the graph.
+	 * @param levelsUp The numbers of levels up, for the graph.
+	 * @param levelsDown The number of levels down for the graph.
+	 * @param mode the mode of the graph if 'assetId' then buildArchitectureGraph is called
+	 *
+	 * @return A map representing the architecture graph to be rendered in the view.
+	 */
 	Map architectureGraphModel(AssetEntity rootAsset, Integer levelsUp, Integer levelsDown, String mode) {
 
 		Set assetsList = [] as Set

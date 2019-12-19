@@ -5,7 +5,7 @@ import {FormsModule} from '@angular/forms';
 // Shared
 import {SharedModule} from '../../shared/shared.module';
 // Kendo
-import {DropDownListModule} from '@progress/kendo-angular-dropdowns';
+import { ComboBoxModule, DropDownListModule } from '@progress/kendo-angular-dropdowns';
 import {GridModule} from '@progress/kendo-angular-grid';
 import {SortableModule} from '@progress/kendo-angular-sortable';
 import {IntlModule} from '@progress/kendo-angular-intl';
@@ -52,6 +52,7 @@ import {ArchitectureGraphComponent} from './components/architecture-graph/archit
 		FormsModule,
 		// Kendo
 		DropDownListModule,
+		ComboBoxModule,
 		GridModule,
 		SortableModule,
 		IntlModule,
