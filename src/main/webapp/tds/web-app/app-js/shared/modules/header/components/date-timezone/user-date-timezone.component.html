@@ -30,8 +30,8 @@
 			</div>
 			<div class="modal-body">
 				<form id="userTimezoneForm">
-					<div style="padding: 5px">
-						<b>Time Zone:</b>
+					<div class="filters">
+						<label>Time Zone:</label>
 						<kendo-dropdownlist
 							id="dateTimezone"
 							name="timezone"
@@ -42,9 +42,9 @@
 							(valueChange)="onTimezoneSelected($event)"
 						>
 						</kendo-dropdownlist>
-						<b *ngIf="!shouldReturnData" style="padding-left: 30px"
-							>{{ 'GLOBAL.DATE_FORMAT' | translate }}:</b
-						>
+						<label *ngIf="!shouldReturnData">
+							{{ 'GLOBAL.DATE_FORMAT' | translate }}:
+						</label>
 						<kendo-dropdownlist
 							*ngIf="!shouldReturnData"
 							id="dateTimeFormat"
