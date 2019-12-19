@@ -195,6 +195,11 @@
                                     </g:link>
                                 </li>
                             </tds:hasPermission>
+                            <tds:hasPermission permission="${Permission.ArchitectureView}">
+                                <li class="menu-child-item menu-parent-assets-architecture-graph">
+                                    <g:link controller="module" action="architecture-graph">GoJS Architecture Graph</g:link>
+                                </li>
+                            </tds:hasPermission>
                             <tds:hasPermission permission="${Permission.DataTransferBatchView}">
                                 <li class="divider"></li>
                             </tds:hasPermission>
