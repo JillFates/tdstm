@@ -304,7 +304,7 @@ export class ImportAssetsComponent implements OnInit {
 		const tempServerFilesToDelete = [ this.fetchResult.filename ];
 
 		// delete temporary transformed file
-		if (this.transformResult) {
+		if (this.transformResult && this.transformResult.status !== 'error') {
 			tempServerFilesToDelete.push(this.transformResult.data.filename)
 		}
 
