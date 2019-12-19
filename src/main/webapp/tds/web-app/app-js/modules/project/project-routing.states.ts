@@ -28,7 +28,8 @@ export const ProjectRoute: Routes = [
 			page: {
 				title: 'Projects',
 				instruction: '',
-				menu: ['GLOBAL.PROJECTS', 'GLOBAL.LIST'],
+				menu: ['GLOBAL.PROJECT.PROJECTS', 'GLOBAL.LIST'],
+				onSameUrlNavigation: 'reload'
 			},
 			requiresAuth: true
 		},

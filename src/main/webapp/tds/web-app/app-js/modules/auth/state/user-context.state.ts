@@ -3,18 +3,20 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
 import {UserContextModel} from '../model/user-context.model';
 // Actions
-import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
+import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired, PostNotices} from '../action/login.actions';
 import {SetEvent} from '../../event/action/event.actions';
+import {SetBundle} from '../../bundle/action/bundle.actions';
+import {SetProject} from '../../project/actions/project.actions';
+import {SetPageChange} from '../action/page.actions';
 // Services
 import {AuthService} from '../service/auth.service';
 import {PermissionService} from '../../../shared/services/permission.service';
 import {UserService} from '../service/user.service';
 import {LoginService} from '../service/login.service';
+import {PostNoticesManagerService} from '../service/post-notices-manager.service';
 // Others
 import {tap, catchError} from 'rxjs/operators';
 import {of} from 'rxjs';
-import {SetBundle} from '../../bundle/action/bundle.actions';
-import {SetProject} from '../../project/actions/project.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -30,6 +32,7 @@ export class UserContextState {
 	constructor(
 		private authService: AuthService,
 		private permissionService: PermissionService,
+		private postNoticesManagerService: PostNoticesManagerService,
 		private loginService: LoginService,
 		private userService: UserService) {
 	}
@@ -103,6 +106,19 @@ export class UserContextState {
 		);
 	}
 
+	@Action(PostNotices)
+	postNotices(ctx: StateContext<UserContextModel>) {
+		const state = ctx.getState();
+		return this.postNoticesManagerService.getNotices().pipe(
+			tap(result => {
+				ctx.setState({
+					...state,
+					postNotices: result
+				});
+			}),
+		);
+	}
+
 	@Action(SetEvent)
 	setEvent(ctx: StateContext<UserContextModel>, {payload}: SetEvent) {
 		const state = ctx.getState();
@@ -133,9 +149,25 @@ export class UserContextState {
 					project: payload,
 					event: null,
 					bundle: null,
+					alternativeProjects: []
 				});
 			}),
 		);
 	}
 
+	/**
+	 * Set the new Latest Page to the context
+	 * @param ctx
+	 * @param payload
+	 */
+	@Action(SetPageChange)
+	setPageChange(ctx: StateContext<UserContextModel>, {payload}: SetPageChange) {
+		const state = ctx.getState();
+		let notices = state.notices;
+		notices.redirectUrl = payload.path;
+		ctx.setState({
+			...state,
+			notices: notices
+		});
+	}
 }

@@ -6,6 +6,7 @@ package net.transitionmanager.asset
 
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
+import com.tdsops.tm.enums.domain.ViewSaveAsOptionEnum as SaveAsOptionsEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
@@ -16,6 +17,7 @@ import net.transitionmanager.person.Person
 import net.transitionmanager.project.Project
 import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.UserPreferenceService
+import net.transitionmanager.security.SecurityService
 import org.grails.web.json.JSONObject
 
 /**
@@ -31,6 +33,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 
 	DataviewService dataviewService
 	UserPreferenceService userPreferenceService
+	SecurityService securityService
 
 	// TODO: JPM 11/2017 - Need to add Permissions on ALL methods
 	// TODO: JPM 11/2017 - Methods do NOT need try/catches
@@ -55,8 +58,11 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	 * @return
 	 */
 	def getDataview(Integer id) {
+		Dataview dataview = dataviewService.fetch(id)
+		Project currentProject = securityService.userCurrentProject
+		Map saveOptions = dataviewService.generateSaveOptions(dataview, currentProject)
 		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
-		renderSuccessJson([dataView: dataviewMap])
+		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 
 	/**

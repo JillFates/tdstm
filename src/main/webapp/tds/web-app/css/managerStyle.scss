@@ -44,6 +44,16 @@ header.main-header {
   }
 }
 
+// Kendo Grid Table Header
+.k-grid .k-grid-toolbar {
+  border-color: $baseOrangeColor !important;
+  background-color: $baseOrangeColor !important;
+}
+
+.k-grid .k-grid-toolbar .kendo-grid-toolbar__refresh-btn {
+  margin-top: 6px;
+}
+
 div.content-wrapper {
   div.container {
     tds-app {

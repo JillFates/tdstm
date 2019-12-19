@@ -406,4 +406,15 @@ class NumberUtil {
 
 		return value
 	}
+
+	/**
+	 * Calculate the percentage 'value' is of 'total'.
+	 * @param total - the total that represents 100%
+	 * @param value - a given proportion
+	 * @param defaultIfZero - a default value to use, should the total be 0.
+	 * @return
+	 */
+	static int percentage(Long total, Long value, int defaultIfZero = 0) {
+		return total ? Math.round((value /  total) * 100) : defaultIfZero
+	}
 }

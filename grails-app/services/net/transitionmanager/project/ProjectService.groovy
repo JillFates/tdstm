@@ -258,9 +258,9 @@ class ProjectService implements ServiceMethods {
 
 			if (projectStatus != ProjectStatus.ANY) {
 				if (projectStatus == ProjectStatus.ACTIVE) {
-					gt("completionDate", today)
+					ge("completionDate", today)
 				} else {
-					le('completionDate', today)
+					lt('completionDate', today)
 				}
 			}
 
@@ -391,12 +391,12 @@ class ProjectService implements ServiceMethods {
 	}
 
 	/**
-	 * Get all clients, partners, managers.
+	 * Get all clients, partners, managers(id and name only).
 	 */
 	Map getCompanyPartnerAndManagerDetails(PartyGroup company) {
 
 		//	Populate a SELECT listbox with a list of all STAFF relationship to COMPANY
-		def managers = PartyRelationship.executeQuery("""
+		List<PartyRelationship> managers = PartyRelationship.executeQuery("""
 			from PartyRelationship pr
 			where pr.partyRelationshipType.id = 'STAFF'
 			  and pr.partyIdFrom = :company
@@ -404,10 +404,16 @@ class ProjectService implements ServiceMethods {
 			  and pr.roleTypeCodeTo.id = '$RoleType.CODE_PARTY_STAFF'
 			""".toString(), [company: company])
 
+		managers = managers.sort { it.partyIdTo?.lastName }
+		List<Map<String,?>> managersMap = managers.collect { it -> [
+				  id  : it.partyIdTo.id,
+				  name: it.partyIdTo.toString()
+		]}
+
 		[
 			clients : getAllClients(),
 			partners: partyRelationshipService.getCompanyPartners(company)*.partyIdTo,
-			managers: managers.sort { it.partyIdTo?.lastName }
+			managers: managersMap
 		]
 	}
 
@@ -610,14 +616,17 @@ class ProjectService implements ServiceMethods {
 	 *@return message
 	 */
 	@Transactional
-	def deleteProject(projectId, includeProject=false) throws UnauthorizedException {
-		def message
-		List projects = getUserProjects(securityService.hasPermission(Permission.ProjectShowAll))
-		Project projectInstance = Project.get(projectId)
+	void deleteProject(Long projectId, includeProject=false) throws UnauthorizedException {
 
-		if (!(projectInstance in projects)) {
+		if(projectId == Project.DEFAULT_PROJECT_ID) {
+			throw new InvalidParamException('The default project cannot be deleted.')
+		}
+
+		if (!securityService.hasAccessToProject(projectId)) {
 			throw new UnauthorizedException('You do not have access to the specified project')
 		}
+
+		Project projectInstance = Project.get(projectId)
 
 		// remove preferences
 		String bundleQuery = "select mb.id from MoveBundle mb where mb.project = :project"
@@ -627,15 +636,15 @@ class ProjectService implements ServiceMethods {
 		List bundleCodes = [UserPreferenceEnum.MOVE_BUNDLE.name(), UserPreferenceEnum.CURR_BUNDLE.name()]
 		List eventCodes = [UserPreferenceEnum.MOVE_EVENT.name(), UserPreferenceEnum.MYTASKS_MOVE_EVENT_ID.name()]
 		String roomCode = UserPreferenceEnum.CURR_ROOM.name()
-		String prefDelSql = '''
+		String prefDelSql = """
 			delete from UserPreference up where
-			(up.preferenceCode in :projectCodesList and up.value = '$projectInstance.id') or
-			(up.preferenceCode in :bundleCodesList and up.value in ('$bundleQuery')) or
-			(up.preferenceCode in :eventCodesList and up.value in ('$eventQuery')) or
-			(up.preferenceCode = '$roomCode' and up.value in ('$roomQuery'))
-			'''
-		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes]
-		UserPreference.executeUpdate(prefDelSql, prefDelMap)
+			(up.preferenceCode in(:projectCodesList) and up.value = :projectId) or
+			(up.preferenceCode in (:bundleCodesList) and up.value in ($bundleQuery)) or
+			(up.preferenceCode in (:eventCodesList) and up.value in ($eventQuery)) or
+			(up.preferenceCode = '$roomCode' and up.value in ($roomQuery))
+			"""
+		Map prefDelMap = [projectCodesList: projectCodes, bundleCodesList: bundleCodes, eventCodesList: eventCodes, projectId: projectInstance.id.toString(), project: projectInstance]
+		Integer cant = UserPreference.executeUpdate(prefDelSql, prefDelMap)
 
 		// Setting Configuration settings
 		Setting.executeUpdate('delete from Setting s where s.project=:p', [p:projectInstance])
@@ -666,8 +675,6 @@ class ProjectService implements ServiceMethods {
 		// remove Move Bundle
 
 		AssetEntity.executeUpdate("Update AssetEntity ae SET ae.moveBundle = null where ae.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
-		StepSnapshot.executeUpdate("delete from StepSnapshot ss where ss.moveBundleStep in (select mbs.id from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery))".toString(), [project: projectInstance ])
-		MoveBundleStep.executeUpdate("delete from MoveBundleStep mbs where mbs.moveBundle in ($bundleQuery)".toString(), [project: projectInstance ])
 
 		String teamQuery = "select pt.id From ProjectTeam pt where pt.moveBundle in ($bundleQuery)"
 		PartyRelationship.executeUpdate("delete from PartyRelationship pr where pr.partyIdFrom in ($teamQuery) or pr.partyIdTo in ($teamQuery)".toString(), [project: projectInstance ])
@@ -700,15 +707,15 @@ class ProjectService implements ServiceMethods {
 		Model.executeUpdate("update Model mo set mo.modelScope = null where mo.modelScope  = $projectInstance")
 		ModelSync.executeUpdate("update ModelSync ms set ms.modelScope = null where ms.modelScope  = $projectInstance")
 
-		def recipesQuery = "select r.id from Recipe r where r.project.id = :projectId"
+		String recipesQuery = "select r.id from Recipe r where r.project.id =:projectId"
 		Recipe.executeUpdate("update Recipe r set r.releasedVersion=null where r.project.id = $projectInstance.id")
-		def recipeVersions = RecipeVersion.find("from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		def recipeVersions = RecipeVersion.executeQuery("from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		if (recipeVersions) {
 			recipeVersions.each {
 				RecipeVersion.executeUpdate("update RecipeVersion rv set rv.clonedFrom=null where rv.clonedFrom.id = $it.id")
 			}
 		}
-		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in ($recipesQuery)".toString(), [projectId: projectInstance.id ])
+		RecipeVersion.executeUpdate("delete from RecipeVersion rv where rv.recipe.id in (" + recipesQuery + ")", [projectId: projectInstance.id ])
 		Recipe.executeUpdate("delete from Recipe r where r.project.id  = $projectInstance.id")
 
 		Dataview.executeUpdate("delete from Dataview dv where dv.project.id = $projectInstance.id")
@@ -726,7 +733,6 @@ class ProjectService implements ServiceMethods {
 			Project.executeUpdate("delete from Project p where p.id = :projectId", [projectId: projectInstance.id])
 		}
 
-		return message
 	}
 
 	/**

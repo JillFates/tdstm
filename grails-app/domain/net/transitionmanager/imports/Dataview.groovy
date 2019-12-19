@@ -21,11 +21,13 @@ class Dataview {
 	String  reportSchema
 	Date    dateCreated
 	Date    lastModified
+	Dataview overridesView
 
 	static constraints = {
 		name size: 1..255, unique: 'project', validator: uniqueNameValidator()
 		person nullable: true
 		lastModified nullable: true
+		overridesView nullable: true
 	}
 
 	static mapping = {

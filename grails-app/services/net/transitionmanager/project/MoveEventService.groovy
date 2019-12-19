@@ -1,6 +1,8 @@
 package net.transitionmanager.project
 
 import com.tdsops.tm.enums.domain.TimeScale
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
 import net.transitionmanager.asset.Application
 import net.transitionmanager.exception.DomainUpdateException
 import net.transitionmanager.exception.InvalidParamException
@@ -119,7 +121,7 @@ class MoveEventService implements ServiceMethods {
 		List<Long> tagEventIdsToAdd = eventCommand.tagIds
 		// If the event had already some tags, filter those out so we don't add them twice.
 		if (existingTagEvents) {
-			tagEventIdsToAdd = eventCommand.tagIds.collect { Long tagId -> !existingTagEvents.contains(tagId)}
+			tagEventIdsToAdd = eventCommand.tagIds.findAll { Long tagId -> !existingTagEvents.contains(tagId)}
 		}
 		if (tagEventIdsToAdd) {
 			tagEventService.applyTags(project, tagEventIdsToAdd, moveEvent)
@@ -521,21 +523,6 @@ class MoveEventService implements ServiceMethods {
 
 	}
 
-	List<MoveBundleStep> getMoveBundleSteps(List<MoveBundle> moveBundleList) {
-		List<MoveBundleStep> moveBundleSteps = []
-
-		moveBundleList.each { MoveBundle moveBundle ->
-			List<MoveBundleStep> step = MoveBundleStep.findAll("FROM MoveBundleStep mbs where mbs.moveBundle=${moveBundle}")
-
-			if (step) {
-				moveBundleSteps.addAll(step)
-			}
-		}
-
-		return moveBundleSteps
-	}
-
-
 	/**
 	 * Find different stats for the given event, grouped by category.
 	 * @param project
@@ -551,8 +538,8 @@ class MoveEventService implements ServiceMethods {
 					ac.category,
 					min(ac.actStart),
 					max(ac.dateResolved),
-					min(ac.estStart),
-					max(ac.estFinish),
+					min(ac.estStart), 
+					max(ac.latestFinish),
 					max(ac.duration),
 					ac.durationScale,
 					count(*),
@@ -586,8 +573,50 @@ class MoveEventService implements ServiceMethods {
 			// Sort by the category "natural" sort order
 			stats.sort { stat  -> AssetCommentCategory.list.indexOf(stat.category)}
 		}
-
 		return stats
+	}
+
+	/**
+	 * Returns data used to render the Event Dashboard
+	 * @param moveEvent  The MoveEvent
+	 * @return JSON map
+	 */
+	Map eventData(MoveEvent moveEvent) {
+		Date sysTime = TimeUtil.nowGMT()
+		MoveEventSnapshot moveEventPlannedSnapshot
+		TimeDuration dayTime
+		String eventString = ""
+        Date eventStartTime = moveEvent.estStartTime
+
+        if (eventStartTime) {
+
+            if (eventStartTime>sysTime) {
+                dayTime = TimeCategory.minus(eventStartTime, sysTime)
+                eventString = "Countdown Until Event"
+            } else {
+                dayTime = TimeCategory.minus(sysTime, eventStartTime)
+                eventString = "Elapsed Event Time"
+            }
+        }
+        // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+		String eventClockCountdown = TimeUtil.formatTimeDuration(dayTime)
+
+		return [snapshot: [
+				revisedComp: moveEvent?.revisedCompletionTime,
+				calcMethod: moveEvent?.calcMethod,
+				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
+				eventStartDate: moveEvent.estStartTime,
+				planSum: [
+						dialInd: moveEventPlannedSnapshot?.dialIndicator,
+						compTime: moveEvent.estCompletionTime,
+						dayTime: eventClockCountdown,
+						eventDescription: moveEvent?.description,
+						eventString: eventString,
+						eventRunbook: moveEvent?.runbookStatus
+				]
+		]]
 	}
 
 	/**

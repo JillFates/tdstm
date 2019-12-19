@@ -179,13 +179,14 @@
 													</tdsAngular:tooltipSpan>
 												</label>
 											</td>
-											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap" tabindex="25">
+											<td class="tm-input-control ${standardFieldSpecs.shutdownBy.imp?:''}" data-for="shutdownBy" nowrap="nowrap">
 												<tds-combobox-group
 														[model]="model.asset.shutdownBy"
 														(modelChange)="model.asset.shutdownBy.id = $event"
 														(isFixedChange)="model.asset.shutdownFixed = $event"
 														[isFixed]="${asset.shutdownFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="25"
 														[team]="${availableRoles as JSON}">
 												</tds-combobox-group>
 											</td>
@@ -203,7 +204,6 @@
 										<tr>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.startupBy}" value="${asset.startupBy}"/>
 											<td colspan="1" nowrap="nowrap" data-for="startupBy"
-												tabindex="9"
 												class="tm-input-control ${standardFieldSpecs.startupBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.startupBy"
@@ -211,18 +211,20 @@
 														(isFixedChange)="model.asset.startupFixed = $event"
 														[isFixed]="${asset.startupFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="9"
 														[team]="${availableRoles as JSON}"></tds-combobox-group>
 											</td>
 											<tdsAngular:inputLabelAndField field="${standardFieldSpecs.startupDuration}" value="${asset.startupDuration}" ngmodel="model.asset.startupDuration" tabindex="17"/>
 											<tdsAngular:inputLabel field="${standardFieldSpecs.testingBy}" value="${asset.testingBy}"/>
 
-											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}" tabindex="26">
+											<td colspan="1" nowrap="nowrap" data-for="testingBy" class="tm-input-control ${standardFieldSpecs.testingBy.imp?:''}">
 												<tds-combobox-group
 														[model]="model.asset.testingBy"
 														(modelChange)="model.asset.testingBy.id = $event"
 														(isFixedChange)="model.asset.testingFixed = $event"
 														[isFixed]="${asset.testingFixed}"
 														[namedStaff]="${personList as JSON}"
+														[tabIndex]="26"
 														[team]="${availableRoles as JSON}">
                                                 </tds-combobox-group>
 											</td>

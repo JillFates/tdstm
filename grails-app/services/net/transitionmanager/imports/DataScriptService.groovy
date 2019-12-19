@@ -4,8 +4,6 @@ import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.TDSJSONDriver
 import com.tdssrc.grails.GormUtil
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
 import getl.data.Dataset
 import getl.data.Field
 import getl.exception.ExceptionGETL
@@ -28,15 +26,8 @@ import net.transitionmanager.project.ProviderService
 import net.transitionmanager.service.ServiceMethods
 import org.apache.commons.io.FilenameUtils
 import org.apache.poi.poifs.filesystem.NotOLE2FileException
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.grails.web.json.JSONObject
 import org.supercsv.exception.SuperCsvException
-
-import java.text.DecimalFormat
 
 class DataScriptService implements ServiceMethods{
 
@@ -356,6 +347,9 @@ class DataScriptService implements ServiceMethods{
 
 			Dataset dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
 			DataSetFacade dataSetFacade = new DataSetFacade(dataset)
+			if (dataSetFacade.isJson && rootNode != null) {
+				dataSetFacade.setRootNode(rootNode)
+			}
 
 			return [
 				config: dataSetFacade.fields().collect {

@@ -272,5 +272,9 @@ class ETLProcessorException extends GroovyRuntimeException {
     static ETLProcessorException invalidTransformationOnNotNumericValue(Object value) {
         new ETLProcessorException("Invalid transformation on not numeric value: $value")
     }
+
+	static ETLProcessorException domainWithoutFieldSpec(ETLDomain domain) {
+		new ETLProcessorException("Domain ${domain} does not have field spec definitions. Use [Application, Device, Database, Storage]")
+	}
 }
 

@@ -83,7 +83,6 @@ class DashboardController implements ControllerMethods {
 				projectLogo                   : projectLogo,
 				moveEvent                     : moveEvent,
 				moveEventsList                : moveEventsList,
-				moveBundleSteps               : moveEventService.getMoveBundleSteps(moveBundleList),
 				moveBundleList                : moveBundleList,
 				timeToUpdate                  : timeToUpdate ? timeToUpdate.DASHBOARD_REFRESH : 'never',
 				EventDashboardDialOverridePerm: securityService.hasPermission(Permission.EventDashboardDialOverride),

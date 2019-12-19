@@ -41,10 +41,13 @@ export class TaskEditCreateModelHelper {
 	 * @param {any} model Model to set
 	 * @returns {any}
 	 */
-	public getModelForEdit(model: any): any {
+	public getModelForEdit(model: any, userTimeZone: string): any {
 		this.model = model;
-		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
-		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
+		this.model.estimatedStart = this.model.estimatedStart ?
+			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedStart), userTimeZone).slice(0, -6)) : null; // Slice removes the offset from the date string to ensure correct timezone
+		this.model.estimatedFinish = this.model.estimatedFinish ?
+			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedFinish), userTimeZone).slice(0, -6)) : null;
+		this.model.dueDate = this.model.dueDate ? new Date(this.model.dueDate) : null;
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -145,7 +148,8 @@ export class TaskEditCreateModelHelper {
 	public getModelForDetails(task: any): any {
 		const detail = clone(task.detail);
 		const assetComment = detail['assetComment'] || {};
-		const durationScale = assetComment.durationScale && assetComment.durationScale.name || null;
+		const asset = assetComment['asset'] || {};
+		const durationScale = assetComment.durationScale || null;
 		const [yes, no] = YesNoList;
 
 		const categories =  [...(detail.categories || [])];
@@ -172,20 +176,20 @@ export class TaskEditCreateModelHelper {
 			taskNumber: assetComment.taskNumber,
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
 			sendNotification: Boolean(assetComment.sendNotification) ? yes : no,
-			durationScale,
+			durationScale: durationScale,
 			durationParts: DateUtils.getDurationParts(assetComment.duration, durationScale),
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			dueDate: detail.dueDate ? detail.dueDate : '',
-			estimatedStart: detail.etStart ? detail.etStart : '',
-			estimatedFinish: detail.etFinish ? detail.etFinish : '',
-			instructionLink,
+			dueDate: assetComment.dueDate ? assetComment.dueDate : '',
+			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
+			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
+			instructionLink: assetComment.instuctionLink,
 			instructionsLinkLabel: detail.instructionsLinkLabel || '',
 			instructionsLinkURL: detail.instructionsLinkURL || '',
 			priority: assetComment.priority,
-			assetName: detail.assetName,
-			comment:  assetComment.comment || '',
+			assetName: asset.name,
+			comment:  assetComment.title || '',
 			assetClass: {id: detail.assetClass, text: detail.assetClasses && detail.assetClasses[detail.assetClass] || ''},
 			assetClasses: Object.keys(detail.assetClasses || {}).map((key: string) => ({id: key, text: detail.assetClasses[key]}) ),
 			status: assetComment && assetComment.status || '',
@@ -201,10 +205,10 @@ export class TaskEditCreateModelHelper {
 			categoriesList: categories.sort(),
 			eventList: (detail.eventList || []).map((event) => ({id: event.id, text: event.name})),
 			priorityList: PriorityList,
-			asset: {id: detail.assetId, text: detail.assetName},
-			assignedTo: {id : (assetComment.assignedTo && assetComment.assignedTo.id) || null, text: detail.assignedTo},
+			asset: {id: asset.id, text: asset.name},
+			assignedTo: {id : (assetComment.assignedTo) || null, text: detail.assignedTo},
 			assignedTeam: {id: assetComment.role, text: detail.roles},
-			event: {id: (assetComment.moveEvent && assetComment.moveEvent.id) || null, text: detail.eventName},
+			event: {id: (assetComment.moveEvent) || null, text: detail.eventName},
 			category: assetComment.category,
 			apiAction: {id: detail.apiAction && detail.apiAction.id || '', text: detail.apiAction && detail.apiAction.name || ''},
 			deletedPredecessorList: [],
