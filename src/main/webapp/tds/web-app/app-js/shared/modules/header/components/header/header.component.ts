@@ -79,6 +79,10 @@ export class HeaderComponent {
 			});
 	}
 
+	/**
+	 * transform full name to be only the initials
+	 * @param fullName
+	 */
 	public getUserIconText(fullName: string): string {
 		return fullName.split(' ').map(t => t.substring(0, 1)).join('').toUpperCase();
 	}
