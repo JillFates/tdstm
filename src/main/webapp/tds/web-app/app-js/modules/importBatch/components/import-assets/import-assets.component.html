@@ -83,9 +83,20 @@
                                            [ngValue]="option">{{option.name | translate}}</option>
                                </select>
                             </div>
-                            <button *ngIf="uiConfig.showTransformButton"
+                            <button *ngIf="uiConfig.showManuaProcesslElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onTransform()"
+                                    class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
+                                <i aria-hidden="true" class="fa"
+                                   [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
+                                               'fa-check green': transformResult?.status === 'success',
+                                               'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
+                                <span>{{uiConfig.transformBtnLabel | translate}}</span>
+                            </button>
+
+                            <button *ngIf="uiConfig.showAutoProcessElements"
+                                    [disabled]="disableTransformButton() || transformInProcess"
+                                    (click)="onImport()"
                                     class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
                                 <i aria-hidden="true" class="fa"
                                    [ngClass]="{'fa-fw fa-spinner fast-right-spinner': transformInProcess,
@@ -154,9 +165,8 @@
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.GOTO_MANAGE_ASSET_BATCHES' | translate}}
                            </a>
                         </div>
-
                         <!-- Clear Button Row -->
-                        <div class="form-group row">
+                        <div class="row clear-button">
                            <button (click)="onClear()"
                                    class="btn btn-default col-md-offset-{{(uiConfig.labelColSize + uiConfig.inputColSize)}} col-sm-{{uiConfig.buttonColSize}}">
                                {{'GLOBAL.CLEAR' | translate}}

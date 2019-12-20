@@ -59,10 +59,9 @@ export class ImportAssetsService {
 			filename,
 			sendNotification
 		};
-		const path = Object.entries(params).map( ([key, value]) => `${key}=${value}`).join('&');
+		const queryParams = Object.entries(params).map( ([key, value]) => `${key}=${value}`).join('&');
 
-		// let url = this.importEndpointURL + 'initiateTransformData?dataScriptId=' + datascript.id + '&filename=' + filename;
-		let url = `${this.importEndpointURL}initiateTransformData?${path}`;
+		let url = `${this.importEndpointURL}initiateTransformData?${queryParams}`;
 		return this.http.post(url, null)
 			.map((response: any) => response)
 			.catch((error: any) => error);
