@@ -28,9 +28,9 @@ export class APIActionService {
 	constructor(private http: HttpClient) {
 	}
 
-	getDataScripts(useWithAssetActions:boolean = false): Observable<DataScriptModel[]> {
-		const params = useWithAssetActions? `?useWithAssetActions?=${useWithAssetActions}`: '';
-		const url = `${this.dataIngestionUrl}/datascript/list${params}`;
+	getDataScripts(params:any = {}): Observable<DataScriptModel[]> {
+		const queryParams = Object.entries(params).map( ([key, value]) => `${key}=${value}`).join('&');
+		const url = `${this.dataIngestionUrl}/datascript/list?${queryParams}`;
 		
 		return this.http.get(url)
 			.map((response: any) => {

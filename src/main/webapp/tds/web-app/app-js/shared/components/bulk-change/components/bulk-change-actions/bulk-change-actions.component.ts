@@ -11,6 +11,8 @@ import {Permission} from '../../../../model/permission.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {BulkChangeEditComponent} from '../bulk-change-edit/bulk-change-edit.component';
 import { APIActionService } from '../../../../../modules/apiAction/service/api-action.service';
+import { NotifierService } from '../../../../services/notifier.service';
+import {AlertType} from '../../../../model/alert.model';
 @Component({
 	selector: 'tds-bulk-change-actions',
 	templateUrl: 'bulk-change-actions.component.html',
@@ -43,6 +45,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
 		private apiActionService: APIActionService,
+		private notifier: NotifierService,
 		private translatePipe: TranslatePipe) {
 			super('#bulk-change-action-component');
 			this.selectedItems = this.bulkChangeModel.selectedItems || [];
@@ -58,7 +61,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	}
 
 	ngOnInit() {
-        this.apiActionService.getDataScripts(true).subscribe(result => {
+        this.apiActionService.getDataScripts({useWithAssetActions:true, isAutoProcess:true}).subscribe(result => {
             this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
         });
     }
@@ -175,12 +178,8 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	}
 
 	private runBulk(): Promise<BulkActionResult> {
-        const items = this.selectedItems.map((value: number) =>
-            value.toString()
-        );
         return new Promise((resolve, reject) => {
             if (this.hasAssetRunPermission()) {
-				const edits = [];
 				console.log(this.bulkChangeModel);
 				const userParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
 				const payload = {
@@ -190,18 +189,30 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 					dataScriptId:this.selectedScriptOption.id
 				};
                 this.bulkChangeService.bulkRun(payload).subscribe(
-                    result =>
-                        resolve({
+                    result =>{
+						this.notifier.broadcast({
+							name: AlertType.SUCCESS,
+							message: 'The ETL import process was succesfully initiated'
+						});
+
+						return resolve({
                             action: BulkActions.Run,
                             success: true,
                             message: result.message || result.resp
-                        }),
-                    err =>
-                        reject({
+                        })
+					}
+					,
+					err => {
+						this.notifier.broadcast({
+							name: AlertType.DANGER,
+							message: err.message || err
+						});
+                        return reject({
                             action: BulkActions.Run,
                             success: false,
                             message: err.message || err
                         })
+					}
                 );
             } else {
                 reject({
