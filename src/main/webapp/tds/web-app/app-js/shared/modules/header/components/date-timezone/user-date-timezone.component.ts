@@ -125,7 +125,6 @@ export class UserDateTimezoneComponent extends UIExtraDialog implements OnInit {
 			.each((m, areaElement) => {
 				// Find the timezone attribute from the map itself
 				if ( areaElement.getAttribute('data-timezone') === timezone.code) {
-					console.log(areaElement);
 					// Emulate the click to get the PIN in place
 					this.timezonePinShow = true;
 					setTimeout(() => {
