@@ -180,7 +180,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	private runBulk(): Promise<BulkActionResult> {
         return new Promise((resolve, reject) => {
             if (this.hasAssetRunPermission()) {
-				console.log(this.bulkChangeModel);
 				const userParams = { sortDomain: 'device', sortProperty: 'id', filters: {domains: ['device']}};
 				const payload = {
 					userParams,
