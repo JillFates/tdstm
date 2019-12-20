@@ -44,9 +44,10 @@ export class HeaderComponent {
 		private store: Store
 	) {
 		this.pageMetaData.hideTopNav = true;
-		this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
-		this.store.dispatch(new SetUserContext())
-			.subscribe(() => this.getUserContext());
+		this.getUserContext();
+		// this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
+		// this.store.dispatch(new SetUserContext())
+		// 	.subscribe(() => );
 		this.headerListeners();
 	}
 
