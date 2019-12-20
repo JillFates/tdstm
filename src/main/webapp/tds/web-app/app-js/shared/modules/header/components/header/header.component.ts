@@ -20,7 +20,7 @@ import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 import {ReplaySubject} from 'rxjs';
-import {SetUserContext} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
 
 declare var jQuery: any;
 
@@ -45,7 +45,7 @@ export class HeaderComponent {
 	) {
 		this.pageMetaData.hideTopNav = true;
 		this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
-		this.store.dispatch(new SetUserContext())
+		this.store.dispatch(new SetUserContextPerson())
 			.subscribe(() => this.getUserContext());
 		this.headerListeners();
 	}

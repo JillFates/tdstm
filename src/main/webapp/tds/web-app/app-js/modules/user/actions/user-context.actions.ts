@@ -1,6 +1,6 @@
-export class SetUserContext {
+export class SetUserContextPerson {
 
-	static readonly type = '[User] SetUserContext';
+	static readonly type = '[User] SetUserContextPerson';
 
 	constructor() {
 		// UserContext Action
