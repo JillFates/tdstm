@@ -1,4 +1,4 @@
-<td colspan="2" id="commentsInnerList">
+<div class="clr-col-12">
 	<task-comment
 			[show-comment]="${showComment}"
 			[show-task]="${showTask}"
@@ -14,4 +14,4 @@
 			<g:if test="${showComment}">(commentCount)=updateCommentCount($event)</g:if>
 			>
 	</task-comment>
-</td>
+</div>
