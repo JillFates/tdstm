@@ -806,9 +806,7 @@ export class TaskListComponent {
 	 * Get the current number of filters selected
 	 */
 	public filterCounter(): number {
-		const filters = pathOr([], ['state', 'filter', 'filters'], this.grid);
-
-		return filters.length;
+		return GridColumnModel.getFilterCounter(this.grid.state);
 	}
 
 	/**

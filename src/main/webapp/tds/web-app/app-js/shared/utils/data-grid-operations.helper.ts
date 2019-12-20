@@ -7,6 +7,7 @@ import {
 	CellClickEvent, GridDataResult, PageChangeEvent, RowArgs,
 	SelectableSettings
 } from '@progress/kendo-angular-grid';
+import { pathOr, uniq } from 'ramda';
 import {
 	GRID_DEFAULT_PAGE_SIZE,
 	GRID_DEFAULT_PAGINATION_OPTIONS,
@@ -114,8 +115,8 @@ export class DataGridOperationsHelper {
 			if (filter) {
 				this.state.filter.filters = this.getFiltersExcluding(column.property);
 			}
-			root.filters.push({ field: column.property, operator: 'gte', value: init, });
-			root.filters.push({ field: column.property, operator: 'lte', value: end });
+			root.filters.push({ field: column.property, operator: 'gte', value: init || '', });
+			root.filters.push({ field: column.property, operator: 'lte', value: end || '' });
 		}
 		if (column.type === 'boolean') {
 			if (!filter) {
@@ -174,7 +175,7 @@ export class DataGridOperationsHelper {
 	}
 
 	/**
-	 * On Clear Value for filter event.
+	 * On Clear Value for filter event (Remove the column filter of the current selected filters).
 	 * @param column
 	 */
 	public clearValue(column: GridColumnModel): void {
@@ -372,5 +373,42 @@ export class DataGridOperationsHelper {
 	public canSupportColumnMenuDynamic(minRows = 0): boolean {
 		const minimum = minRows || MINIMUM_ROWS_TO_MAKE_MENU_COLUMN_POSITIONED_DYNAMIC;
 		return (this.gridData && this.gridData.total) >= minimum;
+	}
+
+	/**
+	 * Set the value of the filter and call the filtering process
+	 * @param value Value to be sent to the filter, could be boolean, date, string, etc...
+	 * @param column Column to filtering
+	 * @param operator Type of filter operation
+	 */
+	public onFilterWithValue(value: any, column: GridColumnModel, operator?: string): void {
+		column.filter = value;
+		let root = this.getFilter(column, operator);
+		root = this.removeEmptyFilters(root, column) ;
+		this.filterChange(root);
+	}
+
+	/**
+	 * Remove any empty filters who remains over the currenc selected filters collection
+	 * @param root Collection containing all filters
+	 * @param column column of the current filter selected
+	 */
+	public removeEmptyFilters(root: CompositeFilterDescriptor, column: GridColumnModel): CompositeFilterDescriptor {
+		// clear (string/date) values
+		root.filters = (root.filters || []).filter((filter: any) => filter.value !== '');
+		// clear boolean filter value
+		if (column.filter === '' && column.type === 'boolean') {
+			root.filters = root.filters.filter((filter: any) => filter.field !== column.property);
+		}
+
+		return root;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
+	public getFilterCounter(): number {
+		const filters = pathOr(0, ['filter', 'filters'], this.state);
+		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 }
