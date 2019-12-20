@@ -157,7 +157,7 @@
 									<span
 										*ngIf="column.filter"
 										(click)="clearValue(column)"
-										style="right:15%;cursor:pointer;color:#656565;pointer-events:all"
+										style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 22px; line-height: 25px;"
 										class="fa fa-times form-control-feedback"
 										aria-hidden="true"
 									></span>
@@ -184,40 +184,6 @@
 										[flat]="true"
 									>
 									</tds-button>
-								</div>
-								<div *ngIf="column.type === 'number'">
-									<kendo-numerictextbox
-										(valueChange)="onFilter(column)"
-										[decimals]="0"
-										style="width:100%"
-										format="\#"
-										placeholder="Filter {{ column.label }}"
-										name="{{ column.property }}"
-										[(ngModel)]="column.filter"
-									>
-									</kendo-numerictextbox>
-									<span
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										style="cursor:pointer;color:#656565;pointer-events:all;width:80%;top:-2px"
-										class="fa fa-times form-control-feedback"
-										aria-hidden="true"
-									></span>
-								</div>
-								<div *ngIf="column.type === 'boolean'">
-									<kendo-dropdownlist
-										[data]="booleanFilterData"
-										[(ngModel)]="column.filter"
-										(valueChange)="onFilter(column)"
-										[style.width.%]="100"
-									></kendo-dropdownlist>
-									<span
-										*ngIf="column.filter"
-										(click)="clearValue(column)"
-										style="cursor:pointer;color:#656565;pointer-events:all; margin-right: 10px; line-height: 30px;"
-										class="fa fa-times form-control-feedback"
-										aria-hidden="true"
-									></span>
 								</div>
 							</div>
 						</ng-template>
