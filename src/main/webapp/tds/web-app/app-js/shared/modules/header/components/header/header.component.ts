@@ -20,7 +20,7 @@ import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 import {ReplaySubject} from 'rxjs';
-import {SetUserContext} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
 
 declare var jQuery: any;
 
@@ -44,10 +44,9 @@ export class HeaderComponent {
 		private store: Store
 	) {
 		this.pageMetaData.hideTopNav = true;
-		this.getUserContext();
-		// this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
-		// this.store.dispatch(new SetUserContext())
-		// 	.subscribe(() => );
+		this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
+		this.store.dispatch(new SetUserContextPerson())
+			.subscribe(() => this.getUserContext());
 		this.headerListeners();
 	}
 
@@ -85,7 +84,7 @@ export class HeaderComponent {
 	 * @param fullName
 	 */
 	public getUserIconText(fullName: string): string {
-		return fullName.split(' ').map(x => x.charAt(0)).join('').substr(0, 2).toUpperCase();
+		return fullName.split(' ').map(x => x.charAt(0)).join('').substring(0, 3).toUpperCase();
 	}
 	public openPrefModal(): void {
 		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
