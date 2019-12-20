@@ -62,9 +62,10 @@
 										<div *ngIf="column.filterable && showAssetsFilter">
 											<div class="filter-input">
 												<tds-filter-input
-													[value]="searchText || ''"
-													(filter)="searchText = $event;"
-													placeholder="{{'GLOBAL.FILTER' | translate}}">
+                                                        [columnType]="column.type"
+														[value]="searchText || ''"
+														(filter)="searchText = $event;"
+														placeholder="{{'GLOBAL.FILTER' | translate}}">
 												</tds-filter-input>
 											</div>
 										</div>

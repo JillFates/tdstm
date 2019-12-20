@@ -21,6 +21,7 @@ import {of} from 'rxjs';
 import {SetTimeZoneAndDateFormat} from '../action/timezone-dateformat.actions';
 import {PostNoticesService} from '../service/post-notices.service';
 import {NoticeModel} from '../../noticeManager/model/notice.model';
+import {SetUserContext} from '../../user/actions/user-context.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -213,5 +214,27 @@ export class UserContextState {
 			dateFormat: payload.dateFormat,
 			timezone: payload.timezone
 		});
+	}
+
+	/**
+	 * Set the User Context
+	 * @param ctx
+	 */
+	@Action(SetUserContext)
+	setUserContext(ctx: StateContext<UserContextModel>) {
+		const state = ctx.getState();
+		return this.userService.getUserContext()
+			.pipe(
+				tap(result => {
+					ctx.patchState(result);
+				}),
+				catchError(err => {
+					ctx.setState({
+						...state,
+						error: err
+					});
+					return of(err);
+				})
+			);
 	}
 }
