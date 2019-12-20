@@ -45,7 +45,7 @@ class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name
 12323434,A1 PDU1 A
 ${device.id},${device.assetName}""".stripIndent())
@@ -96,7 +96,7 @@ ${device.id},${device.assetName}""".stripIndent())
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,environment
 12323434,A1 PDU1 A,Development
 ${device.id},${device.assetName},${device.environment}""".stripIndent())
@@ -149,7 +149,7 @@ ${device.id},${device.assetName},${device.environment}""".stripIndent())
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name
 12323434,A1 PDU1 A
 ${device.id},${device.assetName}""".stripIndent())
@@ -199,7 +199,7 @@ ${device.id},${device.assetName}""".stripIndent())
 		given:
 			Person person = personTestHelper.createPerson()
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 sme
 John Doe
 ${person.toString()}""".stripIndent())
@@ -266,7 +266,7 @@ ${person.toString()}""".stripIndent())
 			device.save(flush: true)
 
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 mfg,model
 Dell 11111,PPPPAAAAA
 ${manufacturer.name},${model.modelName}
@@ -338,7 +338,7 @@ ${manufacturer.name},${model.modelName}
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 model,manufacturer
 Dell 11111,PPAA
 ${model.modelName},${manufacturer.name}""".stripIndent())
@@ -409,7 +409,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			device.save(flush: true)
 
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,model,manufacturer
 12323434,A1 PDU1 A,Dell 11111,
 ${device.id},${device.assetName},${device.model.modelName},${device.model.manufacturer.name}""".stripIndent())
@@ -464,7 +464,7 @@ ${device.id},${device.assetName},${device.model.modelName},${device.model.manufa
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg
 12323434,A1 PDU1 A,
 ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
@@ -532,7 +532,7 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg
 12323434,A1 PDU1 A,Dell2332
 ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())

@@ -890,8 +890,10 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * <p>Defines if current {@code Element} instance value is populated in {@code ETLProcessorResult}</p>
 	 * <code>
-	 *  extract 1 load 'description' when { it > 1000 }*     ...
-	 * 	load 'description' with myVar when { it > 1000 }* </code>
+	 *  extract 1 load 'description' when { it > 1000 } //
+	 *  ...
+	 * 	load 'description' with myVar when { it > 1000 } //
+	 * 	</code>
 	 * @param closure Closure to determine if it is necessary
 	 * 			to remove current {@code Element} instance from {@code ETLProcessorResult}
 	 * @return current{@code Element} instance

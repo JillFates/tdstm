@@ -1,14 +1,12 @@
 package net.transitionmanager.common
 
+import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.TDSExcelDriver
 import com.tdsops.etl.TDSJSONDriver
+import com.tdsops.etl.dataset.CSVDataset
 import com.tdssrc.grails.FileSystemUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.WorkbookUtil
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
-import getl.data.Dataset
-import getl.data.Field
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
 import getl.json.JSONConnection
@@ -25,24 +23,13 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.openxml4j.opc.OPCPackage
-import org.apache.poi.openxml4j.opc.PackageAccess
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.apache.poi.xssf.eventusermodel.XSSFReader
-import org.apache.poi.xssf.model.SharedStringsTable
-import org.apache.poi.xssf.model.StylesTable
-import org.apache.poi.xssf.streaming.SXSSFWorkbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.web.multipart.MultipartFile
-import org.xml.sax.InputSource
-import org.xml.sax.XMLReader
-import org.xml.sax.helpers.DefaultHandler
-import org.xml.sax.helpers.XMLReaderFactory
-import org.xml.sax.ContentHandler
+
 /**
  * FileSystemService provides a number of methods to use to interact with the application server file system.
  */
@@ -154,8 +141,7 @@ class FileSystemService implements ServiceMethods {
 	 */
 	CSVDataset buildCVSDataset(String fileName) {
 		validateFilename(fileName)
-		CSVConnection con = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fileName))
-		return new CSVDataset(connection: con, fileName: FileUtils.FileName(fileName), header: true)
+		return new CSVDataset(fileName)
 	}
 
 	/**
@@ -190,24 +176,19 @@ class FileSystemService implements ServiceMethods {
 	 * @param fileName it can be a type CSV, XLSX or XLS
 	 * @return
 	 */
-	Dataset buildDataset(String fileName) {
+	Object buildDataset(String fileName) {
 		validateFilename(fileName)
 		String ext = FileUtils.FileExtension(fileName)?.toUpperCase()
 
-		Dataset dataset
 		if (ext == 'CSV'){
-			dataset = buildCVSDataset(fileName)
-
+			return buildCVSDataset(fileName)
 		} else if ( ext == 'JSON' ) {
-			dataset = buildJSONDataset(fileName)
-
+			return new DataSetFacade(buildJSONDataset(fileName))
 		} else if ( ['XLSX', 'XLS'].contains(ext) ) {
-			dataset = buildExcelDataset(fileName)
-
+			return new DataSetFacade(buildExcelDataset(fileName))
 		}
 
-		return dataset
-
+		throw new InvalidParamException('There is not support for file type. Filename: ' + fileName)
 	}
 
 

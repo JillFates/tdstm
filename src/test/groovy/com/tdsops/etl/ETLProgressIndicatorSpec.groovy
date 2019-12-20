@@ -1,21 +1,22 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Files
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.See
 
 import static com.tdsops.etl.ProgressCallback.ProgressStatus.RUNNING
@@ -49,7 +50,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count number of iterate loop used in a simple ETL script using a ProgressCallback'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -89,7 +90,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count zero loops used in a simple ETL script using a ProgressCallback'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -123,7 +124,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test cannot count number of iterate loop used in a simple ETL script without a ProgressCallback'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -159,7 +160,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count number of iterate loop used in a complex ETL script'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -209,7 +210,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can count create a ProgressCallback using a simple closure'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -252,7 +253,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using an iterator'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -298,7 +299,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using a iterator using from and to'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -346,7 +347,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress without having an iterator'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -390,7 +391,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using more than one iterate loop'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -444,7 +445,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using 3 iterate loops'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -505,7 +506,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress in an empty ETL script'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -544,7 +545,7 @@ class ETLProgressIndicatorSpec extends ETLBaseSpec {
 
 	void 'test can report progress using more than one iterate loop with different number the rows'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server

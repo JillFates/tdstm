@@ -1,9 +1,8 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.CSVDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.WorkbookUtil
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
 import getl.excel.ExcelConnection
 import getl.excel.ExcelDataset
 import getl.json.JSONConnection
@@ -206,28 +205,24 @@ abstract class ETLBaseSpec extends Specification {
      * @return
      */
     protected List buildCSVDataSet(String csvContent) {
-
         String fullName = createCSVFIle(csvContent)
-        CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
-        CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
-
-        return [fullName, new DataSetFacade(dataSet)]
+        return [fullName, new CSVDataset(fullName)]
     }
 
-	/**
-	 * Create CSV file using csvContent parameter
-	 *
-	 * @param csvContent CSV String content
-	 * @return a filename created
-	 */
-	protected String createCSVFIle(String csvContent) {
+    /**
+     * Create CSV file using csvContent parameter
+     *
+     * @param csvContent CSV String content
+     * @return a filename created
+     */
+    protected String createCSVFIle(String csvContent) {
 
-		def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'csv')
-		dataSetOS << csvContent.stripIndent().trim()
-		dataSetOS.close()
+        def (String fileName, OutputStream dataSetOS) = getFileSystemService().createTemporaryFile('unit-test-', 'csv')
+        dataSetOS << csvContent.stripIndent().trim()
+        dataSetOS.close()
 
-		return getFileSystemService().getTemporaryFullFilename(fileName)
-	}
+        return getFileSystemService().getTemporaryFullFilename(fileName)
+    }
 
     /**
      * Builds a JSON dataSet for json content

@@ -8,6 +8,8 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ProgressCallback
+import com.tdsops.etl.dataset.CSVDataset
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
@@ -50,11 +52,11 @@ class ScriptProcessorService {
      */
     ETLProcessor execute (Project project, String scriptContent, String filename) {
 
-        Dataset dataset = fileSystemService.buildDataset(filename)
+        Object dataset = fileSystemService.buildDataset(filename)
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 	    ETLFieldsValidator validator = createFieldsSpecValidator(project)
 		ETLTagValidator tagValidator = createTagValidator(project)
-        ETLProcessor etlProcessor = new ETLProcessor(project, new DataSetFacade(dataset), console, validator, tagValidator)
+        ETLProcessor etlProcessor = new ETLProcessor(project, dataset, console, validator, tagValidator)
 	    etlProcessor.execute(scriptContent)
 
         return etlProcessor
@@ -82,12 +84,14 @@ class ScriptProcessorService {
 		ProgressCallback progressCallback = null,
 		Boolean includeConsoleLog=false) {
 
+		Object dataset = fileSystemService.buildDataset(filename)
+
 		ETLProcessor etlProcessor = new ETLProcessor(
-			project,
-			new DataSetFacade(fileSystemService.buildDataset(filename)),
-			new DebugConsole(buffer: new StringBuilder()),
-			createFieldsSpecValidator(project),
-			createTagValidator(project)
+				project,
+				dataset,
+				new DebugConsole(buffer: new StringBuilder()),
+				createFieldsSpecValidator(project),
+				createTagValidator(project)
 		)
 
 		if(dataScriptId){
@@ -160,9 +164,9 @@ class ScriptProcessorService {
         Map<String, ?> result = [isValid: false]
 
         try {
-			Dataset dataset = fileSystemService.buildDataset(filename)
+			Object dataset = fileSystemService.buildDataset(filename)
 			etlProcessor = new ETLProcessor(project,
-				new DataSetFacade(dataset),
+				dataset,
 				new DebugConsole(buffer: new StringBuilder()),
 				createFieldsSpecValidator(project),
 				createTagValidator(project)
@@ -242,13 +246,13 @@ class ScriptProcessorService {
      */
     Map<String, ?> checkSyntax (Project project, String scriptContent, String filename) {
 
-	    Dataset dataset = fileSystemService.buildDataset(filename)
+	    Object dataset = fileSystemService.buildDataset(filename)
 
         DebugConsole console = new DebugConsole(buffer: new StringBuilder())
 
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
-			new DataSetFacade(dataset),
+			dataset,
 			console,
 			new ETLFieldsValidator(),
 			new ETLTagValidator([:])

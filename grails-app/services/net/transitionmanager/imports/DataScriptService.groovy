@@ -1,10 +1,12 @@
 package net.transitionmanager.imports
 
 import com.tdsops.common.lang.ExceptionUtil
+import com.tdsops.etl.Column
 import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.TDSJSONDriver
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.etl.dataset.ETLIterator
 import com.tdssrc.grails.GormUtil
-import getl.data.Dataset
 import getl.data.Field
 import getl.exception.ExceptionGETL
 import getl.json.JSONConnection
@@ -328,6 +330,44 @@ class DataScriptService implements ServiceMethods{
         return [canDelete: !foundReferences, references: foundReferences]
     }
 
+	Map<String, ?> buildMapResultForETLDataset(ETLDataset dataset, String rootNode, Long maxRows) {
+
+		Map<String, ?> results = [
+				config: dataset.readColumns().collect {[property: it.label, type: 'text']},
+				rows: []
+		]
+
+		ETLIterator iterator = dataset.iterator()
+		Long rowsCount = 0
+		try {
+			while (iterator.hasNext() && rowsCount++ < maxRows) {
+				Map<String, ?> row = iterator.next()
+				results.rows.add(row)
+			}
+		} finally {
+			iterator.close()
+		}
+
+		return results
+	}
+
+	@Deprecated
+	Map<String, ?> buildMapResultForGETLDataset(DataSetFacade dataSetFacade, String rootNode, Long maxRows){
+		if (dataSetFacade.isJson && rootNode != null) {
+			dataSetFacade.setRootNode(rootNode)
+		}
+
+		return [
+				config: dataSetFacade.fields().collect {
+					[
+							property: it.name,
+							type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
+					]
+				},
+				rows  : dataSetFacade.rows().take(maxRows.intValue())
+		]
+
+	}
 	/**
 	* Parse a file that represent a MAP of data
 	* Current Formats supported:
@@ -341,25 +381,17 @@ class DataScriptService implements ServiceMethods{
 		String message
 		try {
 
-			if ( id ) {
+			if (id) {
 				saveSampleFile(id, originalFileName, fileName)
 			}
 
-			Dataset dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
-			DataSetFacade dataSetFacade = new DataSetFacade(dataset)
-			if (dataSetFacade.isJson && rootNode != null) {
-				dataSetFacade.setRootNode(rootNode)
-			}
+			Object dataset = fileSystemService.buildDataset(fileSystemService.getTemporaryFullFilename(fileName))
 
-			return [
-				config: dataSetFacade.fields().collect {
-					[
-						property: it.name,
-						type    : (it.type == Field.Type.STRING) ? 'text' : it.type?.toString().toLowerCase()
-					]
-				},
-				rows  : dataSetFacade.rows().take(maxRows.intValue())
-			]
+			if (dataset instanceof ETLDataset) {
+				return buildMapResultForETLDataset((ETLDataset)dataset, rootNode, maxRows)
+			} else {
+				return buildMapResultForGETLDataset((DataSetFacade) dataset, rootNode, maxRows)
+			}
 
 		} catch (ex) {
 			log.info(ex.message)

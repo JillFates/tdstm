@@ -382,6 +382,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
         columns = this.dataset.readColumns()
         columnsMap = this.columns.collectEntries { [(it.label): it] }
+        debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
 
         return this
     }
@@ -485,7 +486,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      *
      * @param rows
      * @param closure
-     * @return the ETLProcesor instance
+     * @return current instance of {@code ETLProcessor}
      * @see ETLBinding#getVariable(java.lang.String)
      */
     @Deprecated
@@ -520,35 +521,38 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     ETLProcessor iterate(Closure closure) {
-        validateStack()
+        this.validateStack()
 
         if (this.dataset == null) {
             return doIterateWithGETL(this.dataSetFacade.rows(), closure)
         }
 
+        iterateIndex = new IterateIndex(rows.size())
+        this.checkReadLabelCommandAlreadyInvoked()
         ETLIterator iterator = this.dataset.iterator()
         try {
             while (iterator.hasNext()) {
-                Map<String, ?> row = iterator.next()
-                topOfIterate()
 
-                bindVariable(ROW_VARNAME, currentRowIndex)
-                cleanUpBindingAndReleaseLookup()
-                bindVariable(SOURCE_VARNAME, new DataSetRowFacade(row))
-                bindVariable(DOMAIN_VARNAME, new DomainFacade(result))
+                List<String> row = iterator.next()
+                this.topOfIterate()
 
-                currentRow = new Row(row.values().toList(), this)
-                rows.add(currentRow)
+                bindVariable(ROW_VARNAME, this.currentRowIndex)
+                this.cleanUpBindingAndReleaseLookup()
+                bindVariable(SOURCE_VARNAME, new DataSetRowFacade(this.columns, row))
+                bindVariable(DOMAIN_VARNAME, new DomainFacade(this.result))
 
-                closure(currentRow)
-
-                bottomOfIterate(currentRowIndex, this.dataset.rowsSize())
-                currentRowIndex++
-                binding.removeAllDynamicVariables()
+                this.currentRow = new Row(row, this)
+                rows.add(this.currentRow)
+                closure(this.currentRow)
+                bottomOfIterate(this.currentRowIndex, this.dataset.rowsSize())
+                this.currentRowIndex++
+                iterateIndex.next()
+                this.binding.removeAllDynamicVariables()
             }
 
-            finishIterate()
-            currentRowIndex--
+            this.finishIterate()
+            iterateIndex = null
+            this.currentRowIndex--
 
         } finally {
             iterator.close()
@@ -649,7 +653,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         }
         dataSetFacade.setCurrentRowIndex(currentRowIndex)
         debugConsole.info "Reading labels ${columnsMap.values().collectEntries { [("${it.index}"): it.label] }}"
-
     }
 
     @Deprecated

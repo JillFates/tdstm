@@ -1,6 +1,7 @@
 package com.tdsops.etl.dataset
 
 import com.tdsops.etl.*
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.test.mixin.Mock
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
@@ -12,7 +13,7 @@ import spock.lang.See
 
 @TestMixin(ControllerUnitTestMixin)
 @Mock([AssetEntity])
-class CSVStreamingDatasetSpec extends ETLBaseSpec {
+class CSVDatasetSpec extends ETLBaseSpec {
 
     static doWithSpring = {
         coreService(CoreService) {
@@ -48,7 +49,7 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(
                     GMDEMO,
-                    new CSVStreamingDataset(fileName),
+                    new CSVDataset(fileName),
                     debugConsole,
                     validator
             )
@@ -95,7 +96,7 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(
                     GMDEMO,
-                    new CSVStreamingDataset(fileName),
+                    new CSVDataset(fileName),
                     debugConsole,
                     validator
             )
@@ -141,7 +142,7 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(
                     GMDEMO,
-                    new CSVStreamingDataset(fileName),
+                    new CSVDataset(fileName),
                     debugConsole,
                     validator
             )
@@ -181,7 +182,7 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
         and:
             ETLProcessor etlProcessor = new ETLProcessor(
                     GMDEMO,
-                    new CSVStreamingDataset(fileName),
+                    new CSVDataset(fileName),
                     debugConsole,
                     validator
             )
@@ -205,6 +206,80 @@ class CSVStreamingDatasetSpec extends ETLBaseSpec {
         cleanup:
             if (fileName) {
                 fileSystemService.deleteTemporaryFile(fileName)
+            }
+    }
+
+    @See('TM-16579')
+    void 'test can load field with an extracted element value after validate fields specs'() {
+
+        given:
+            String fileName = createCSVFIle("""
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+				152255,Mozilla,NGM,ACME Data Center
+			""")
+
+        and:
+            ETLProcessor etlProcessor = new ETLProcessor(
+                    GMDEMO,
+                    new CSVDataset(fileName),
+                    debugConsole,
+                    validator
+            )
+
+        when: 'The ETL script is evaluated'
+            etlProcessor.evaluate("""
+				read labels
+				domain Application
+				iterate {
+					extract 'vendor name' load 'Vendor'
+					extract 'technology' load 'appTech'
+				}
+			""".stripIndent())
+
+        then: 'Results should contain domain results associated'
+            assertWith(etlProcessor.finalResult()) {
+                domains.size() == 1
+                assertWith(domains[0], DomainResult) {
+                    domain == ETLDomain.Application.name()
+                    fieldNames == ['appVendor', 'appTech'] as Set
+                    assertWith(fieldLabelMap) {
+                        appVendor == 'Vendor'
+                        appTech == 'Technology'
+                    }
+
+                    data.size() == 2
+                    assertWith(data[0], RowResult) {
+                        op == ImportOperationEnum.INSERT.toString()
+                        rowNum == 1
+                        fields.keySet().size() == 2
+                        assertWith(fields.appVendor, FieldResult) {
+                            value == 'Microsoft'
+                            originalValue == 'Microsoft'
+                            init == null
+                        }
+                        assertWith(fields.appTech, FieldResult) {
+                            value == '(xlsx updated)'
+                            originalValue == '(xlsx updated)'
+                            init == null
+                        }
+                    }
+
+                    assertWith(data[1], RowResult) {
+                        op == ImportOperationEnum.INSERT.toString()
+                        rowNum == 2
+                        fields.keySet().size() == 2
+                        assertWith(fields.appVendor, FieldResult) {
+                            value == 'Mozilla'
+                            originalValue == 'Mozilla'
+                        }
+                        assertWith(fields.appTech, FieldResult) {
+                            value == 'NGM'
+                            originalValue == 'NGM'
+                            init == null
+                        }
+                    }
+                }
             }
     }
 

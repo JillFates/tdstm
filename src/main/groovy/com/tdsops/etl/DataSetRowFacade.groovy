@@ -3,39 +3,50 @@ package com.tdsops.etl
 /**
  * Defines a Row Facade used in commands like the following:
  * <pre>
- *		find Application 'for' id by id with SOURCE.'application id'
+ * 		find Application 'for' id by id with SOURCE.'application id'
  * </pre>
- * Source application will recover the Dataset 'application id' over each row
+ * <p>Source application will recover the Dataset 'application id' over each row</p>
+ *
+ *
  */
 class DataSetRowFacade {
 
-	private Map row
+    private Map row = [:]
 
-	DataSetRowFacade(Map row) {
-		this.row = row
-	}
+    DataSetRowFacade(List<Column> columns, List<String> rowValues) {
+        Integer columnSize = columns.size()
+        Integer rowValuesSize = rowValues.size()
 
-	Object getProperty(String name) {
-		// TODO - remove toLowerCase once GETL library is fixed - see TM-9268
-		if(!row.containsKey(name.toLowerCase())) {
-			throw ETLProcessorException.unknownDataSetProperty(name)
-		}
-		return new SourceField(row[name.toLowerCase()])
-	}
-	/**
-	 * Checks if Dataset contains a particular column name.
-	 * @param name a column name
-	 * @return true if {@code DataSetRowFacade#row} contains a key with name parameter
-	 * 			otherwise it returns false
-	 */
-	boolean containsKey(String name){
-		return row.containsKey(name.toLowerCase())
-	}
+        for (int index; index < columnSize; index++) {
+            row[columns.get(index).label] = index < rowValuesSize ? rowValues.get(index) : null
+        }
+    }
 
-	@Override
-	String toString() {
-		return """SOURCE {
+    DataSetRowFacade(Map row) {
+        this.row = row
+    }
+
+    Object getProperty(String name) {
+        // TODO - remove toLowerCase once GETL library is fixed - see TM-9268
+        if (!row.containsKey(name)) {
+            throw ETLProcessorException.unknownDataSetProperty(name)
+        }
+        return new SourceField(row[name])
+    }
+    /**
+     * Checks if Dataset contains a particular column name.
+     * @param name a column name
+     * @return true if {@code DataSetRowFacade#row} contains a key with name parameter
+     * 			otherwise it returns false
+     */
+    boolean containsKey(String name) {
+        return row.containsKey(name)
+    }
+
+    @Override
+    String toString() {
+        return """SOURCE {
 			row=${row}
 		}"""
-	}
+    }
 }
