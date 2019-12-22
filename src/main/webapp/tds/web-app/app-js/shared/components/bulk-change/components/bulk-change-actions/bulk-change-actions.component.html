@@ -28,12 +28,12 @@
 									</div>
 									
 
-									<div class="form-group" *ngIf="showRun ">
+									<div class="form-group" *ngIf="showRun">
 										<label>
 											<input type="radio" [value]="ACTION.Run" name="operation" [(ngModel)]="selectedAction">Action {{itemType}}
 										</label>
 										<div class="row" *ngIf="selectedAction === ACTION.Run">
-											<div class="col-sm-6">
+											<div class="col-sm-9">
 												<select [(ngModel)]="selectedScriptOption"
 														name="dataScriptOptions"
 														id="dataScriptOptions"
@@ -45,14 +45,13 @@
 												<div>
 													<div class="form-group">
 														<div class="col-sm-12">
-															<div>
-																<input
+															<div class= "checkbox">
+																<label for="sendEmailNotification">
+																	<input
 																		id="sendEmailNotification"
 																		name="sendEmailNotification"
 																		type="checkbox"
 																		[(ngModel)]="sendEmailNotification" />
-
-																<label for="sendEmailNotification">
 																	Email results to me
 																</label>
 															</div>

@@ -113,10 +113,12 @@
                                 <span>
                                     <h4>{{ 'IMPORT_ASSETS.AUTO_IMPORT.HEADLINE' | translate}}</h4>
                                 </span>
-                                <span>
-                                    <input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>
-                                    <label for="emailMe">{{'IMPORT_ASSETS.AUTO_IMPORT.CHECKBOX_LABEL' | translate}}</label>
-                                </span>
+                                <div class="checkbox">
+                                    <label for="emailMe">
+                                        <input type="checkbox" id="emailMe" name="emailMe" [(ngModel)]="uiConfig.sendNotification"/>    
+                                        {{'IMPORT_ASSETS.AUTO_IMPORT.CHECKBOX_LABEL' | translate}}
+                                    </label>
+                                </div>
                             </div>
                         </div>
 

@@ -33,7 +33,7 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 	protected itemType: string;
 	public showEdit: boolean;
 	public showDelete: boolean;
-	public showRun: boolean;
+	public showRun: boolean = false;
 	public sendEmailNotification = false;
 	public dataScriptOptions: Array<any> = [this.SELECT_DATA_MODEL];
 	public selectedScriptOption = this.dataScriptOptions[0];
@@ -53,8 +53,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 			this.selectedAction = this.bulkChangeModel.showEdit ? this.ACTION.Edit : this.ACTION.Delete;
 			this.showDelete = this.bulkChangeModel.showDelete;
 			this.showEdit = this.bulkChangeModel.showEdit;
-			// this.showAction = this.bulkChangeModel.showRun;
-			this.showRun = true;
 			this.bulkChangeType = this.bulkChangeModel.bulkChangeType;
 			this.itemType =  this.bulkChangeType === BulkChangeType.Assets ?
 				this.getSinglePluralAssetName() : this.getSinglePluralDependenceName()
@@ -62,7 +60,13 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 
 	ngOnInit() {
         this.apiActionService.getDataScripts({useWithAssetActions:true, isAutoProcess:true}).subscribe(result => {
-            this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
+			console.log(result);
+			if(Array.isArray(result) && result.length > 0) {
+				this.showRun = true;
+				this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
+			}else {
+				this.showRun = false;
+			}
         });
     }
 
