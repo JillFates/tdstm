@@ -327,7 +327,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {...this.UI_CONFIG};
 		this.selectedScriptOption = this.dataScriptOptionsInitial;
 		this.selectedActionOption = -1;
-		this.removeFileByUID();
+		this.clearFileList();
 		this.importResult = null;
 		this.importInProcess = false;
 		this.transformInProcess = false;
@@ -365,9 +365,13 @@ export class ImportAssetsComponent implements OnInit {
 			tempServerFilesToDelete.push(this.transformResult.data.filename)
 		}
 
-		// get the coma separated file names to delete
-		e.data = { filename: tempServerFilesToDelete.join(',') };
+		if (this.selectedScriptOption.isAutoProcess) {
+			tempServerFilesToDelete.push( this.fetchResult.filename);
+		}
 
+		// get the coma separated file names to delete
+		e.data = { filename: tempServerFilesToDelete.join(',') };	
+		
 		this.fetchResult = null;
 		this.fetchFileContent = null;
 		this.transformResult = null;
@@ -380,6 +384,10 @@ export class ImportAssetsComponent implements OnInit {
 		e.data = {};
 		e.data[FILE_UPLOAD_TYPE_PARAM] = ASSET_IMPORT_FILE_UPLOAD_TYPE;
 		this.clearFilename();
+	}
+
+	private clearFileList(): void {
+		this.kendoUploadInstance.fileList.clear();
 	}
 
 	private removeFileByUID(): void {
