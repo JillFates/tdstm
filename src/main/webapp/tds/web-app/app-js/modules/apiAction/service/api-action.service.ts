@@ -28,10 +28,9 @@ export class APIActionService {
 	constructor(private http: HttpClient) {
 	}
 
-	getDataScripts(params:any = {}): Observable<DataScriptModel[]> {
+	getDataScripts(params: any = {}): Observable<DataScriptModel[]> {
 		const queryParams = Object.entries(params).map( ([key, value]) => `${key}=${value}`).join('&');
 		const url = `${this.dataIngestionUrl}/datascript/list?${queryParams}`;
-		
 		return this.http.get(url)
 			.map((response: any) => {
 				let dataScriptModels = response && response.status === 'success' && response.data;

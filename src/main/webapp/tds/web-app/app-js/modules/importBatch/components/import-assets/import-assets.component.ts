@@ -20,7 +20,6 @@ import {ImportBatchStates} from '../../import-batch-routing.states';
 
 declare var jQuery: any;
 
-
 @Component({
 	selector: 'import-assets',
 	templateUrl: 'import-assets.component.html'
@@ -224,23 +223,22 @@ export class ImportAssetsComponent implements OnInit {
 	 * Calls Import process on endpoint.
 	 */
 	public onImport(): void {
-		let service, filename;
+		let service: any, filename: any;
 		this.importInProcess = true;
 		this.importResult = null;
-		
-		if(this.selectedScriptOption.isAutoProcess){
+		if (this.selectedScriptOption.isAutoProcess) {
 			filename = this.fetchResult.filename;
 			service = this.importAssetsService.postTransform(this.selectedScriptOption, filename, this.uiConfig.sendNotification);
-		}else {
+		} else {
 			filename = this.transformResult.data.filename;
 			service = this.importAssetsService.postImport(filename);
-		} 
+		}
 
-		service.subscribe( (result) => {
+		service.subscribe(( result: any ) => {
 			this.importResult = result;
 			this.postImportResult();
 			this.importInProcess = false;
-			if (this.uiConfig.showAutoProcessElements){
+			if (this.uiConfig.showAutoProcessElements) {
 				this.onClear();
 				this.notifier.broadcast({
 					name: AlertType.SUCCESS,
@@ -338,7 +336,7 @@ export class ImportAssetsComponent implements OnInit {
 		return (
 			!this.selectedScriptOption ||
 			this.selectedScriptOption.id === this.dataScriptOptionsInitial.id ||
-			!this.fetchResult|| 
+			!this.fetchResult ||
 			!this.fetchResult.filename ||
 			this.fetchResult.status === ApiResponseModel.API_ERROR
 		);
@@ -370,8 +368,7 @@ export class ImportAssetsComponent implements OnInit {
 		}
 
 		// get the coma separated file names to delete
-		e.data = { filename: tempServerFilesToDelete.join(',') };	
-		
+		e.data = { filename: tempServerFilesToDelete.join(',') };
 		this.fetchResult = null;
 		this.fetchFileContent = null;
 		this.transformResult = null;
@@ -430,7 +427,6 @@ export class ImportAssetsComponent implements OnInit {
 			showManuaProcesslElements: true,
 			sendNotification: false,
 			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM'
-			
 		};
 	}
 }
