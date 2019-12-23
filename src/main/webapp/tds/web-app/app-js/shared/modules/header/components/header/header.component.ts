@@ -86,8 +86,12 @@ export class HeaderComponent {
 	public getUserIconText(fullName: string): string {
 		return fullName.split(' ').map(x => x.charAt(0)).join('').substring(0, 3).toUpperCase();
 	}
+
+	/**
+	 * Opens the user preferences modal.
+	 */
 	public openPrefModal(): void {
-		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+		this.dialogService.extra(UserPreferencesComponent, [], true, true).catch(result => {
 			//
 		});
 	}
