@@ -53,7 +53,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	ngOnInit(): void {
 		if (this.urlParams && this.urlParams.assetId) {
 			console.log('params', this.urlParams);
-			this.loadDiagramData(this.urlParams)
+			this.loadDiagramData(this.urlParams);
 		} else {
 			this.architectureGraphService.getArchitectureGraphPreferences().subscribe( (res: any) => {
 				console.log('res', res);
@@ -97,6 +97,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	loadDiagramData(params?: IArchitectureGraphParams): void {
 		this.architectureGraphService.getAssetDetails(params.assetId, this.levelsUp, this.levelsDown)
 			.subscribe(res => {
+				console.log('response assets details', res);
 				const diagramHelper = new ArchitectureGraphDiagramHelper();
 				this.data$.next(diagramHelper.diagramData({
 					rootAsset: params.assetId,
