@@ -388,6 +388,7 @@ export class ImportAssetsComponent implements OnInit {
 
 	private clearFileList(): void {
 		this.kendoUploadInstance.fileList.clear();
+		this.fetchResult = null;
 	}
 
 	private removeFileByUID(): void {
