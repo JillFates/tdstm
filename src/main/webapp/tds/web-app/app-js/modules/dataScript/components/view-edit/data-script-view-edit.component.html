@@ -105,7 +105,7 @@
 		</tds-button-save>
 
 		<tds-button-edit *ngIf="modalType === actionTypes.VIEW"
-			(click)="changeToEditDataScript()" [disabled]="!isUpdateAvailable()" class="btn-primary pull-left" title="Edit Name">
+			(click)="changeToEditDataScript()" [disabled]="!isUpdateAvailable()" class="btn-primary pull-left" title="Edit Info">
 		</tds-button-edit>
 
 		<tds-button-custom *ngIf="modalType === actionTypes.VIEW" [icon]="'file-code-o'"

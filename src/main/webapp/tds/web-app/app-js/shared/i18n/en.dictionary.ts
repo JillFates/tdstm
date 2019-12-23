@@ -345,7 +345,7 @@ export const en_DICTIONARY: Object = {
 	'IMPORT_ASSETS': {
 		'AUTO_IMPORT': {
 			'HEADLINE': 'The results will be automatically loaded into Imported Batch(es) and posted',
-			'INITIATE_IMPORT': 'Import',
+			'INITIATE_IMPORT': 'Schedule Job',
 			'CHECKBOX_LABEL': 'Email me the results of the Import process'
 		},
 		'MANUAL_IMPORT': {
