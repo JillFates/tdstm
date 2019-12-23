@@ -54,7 +54,7 @@ export class ChangePasswordComponent implements OnInit {
 			} else if (res.errors && res.errors.length > 0) {
 				this.error = res.errors[0];
 			} else {
-				this.disableGlobalNotification(false);
+				this.disableGlobalNotification(true);
 				this.router.navigate(['project', 'list'], { queryParams: { show: this.userContext.project.id }});
 			}
 		});

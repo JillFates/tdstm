@@ -6,7 +6,7 @@ import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
-import {SetUserContext} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
 import {Store} from '@ngxs/store';
 import {NotifierService} from '../../../../services/notifier.service';
 
@@ -154,7 +154,7 @@ export class UserEditPersonComponent {
 				(result: any) => {
 					this.savedPersonModel = this.personModel;
 					// update user context state to show updated initials icon
-					this.store.dispatch(new SetUserContext())
+					this.store.dispatch(new SetUserContextPerson())
 						.subscribe(() => this.notifierService.broadcast('userDetailsUpdated'));
 					this.cancelCloseDialog();
 				},
