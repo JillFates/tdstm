@@ -3,6 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 import {pathOr} from 'ramda';
 import {
 	CellClickEvent,
@@ -342,31 +343,52 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.loadTaskActionInfoModel($event.dataItem.id).subscribe(() => {
-			// loaded.
-		});
-		this.rowsExpandedMap[$event.index] = true;
-	}
-
-	/**
 	 * Responsible for fetching the latest data for the action bar
 	 * @param taskId
 	 */
 	refreshActionBar(taskId: any): void {
-		this.loadTaskActionInfoModel(taskId).subscribe(() => {
-			// loaded.
-		});
+		this.getInfoModelAndUpdateTaskActions([taskId])
+			.subscribe(() => {
+				// updated action bar row
+			});
 	}
+
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
-		this.rowsExpandedMap[$event.index] = false;
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onCollapseRow($event.index);
+			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onExpandRow($event.index);
+			});
+	}
+
+	/**
+	 * Set the flag to Collapse of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onCollapseRow(index: number) {
+		this.rowsExpandedMap[index] = false;
+	}
+
+	/**
+	 * Set the flag to Expand of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onExpandRow(index: number) {
+		this.rowsExpandedMap[index] = true;
 	}
 
 	/**
@@ -447,27 +469,24 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			let taskIds = taskRows.map(task => task.id);
-			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
-				for (const taskId in result) {
-					if (result.hasOwnProperty(taskId)) {
-						const taskActionInfoModel = result[taskId];
-						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+			this.getInfoModelAndUpdateTaskActions(taskIds)
+				.subscribe(() => {
+					// take into account that grid could been filtered
+					const rowCounter = pathOr(0, ['gridData', 'data', 'length'], this.grid);
+					for (let i = 0; i < rowCounter; i++ ) {
+						if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+							this.gridComponent.expandRow(i);
+							this.rowsExpandedMap[i] = true;
+						}
 					}
-				}
-				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
-					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
-						this.gridComponent.expandRow(i);
-						this.rowsExpandedMap[i] = true;
-					}
-				}
-			});
-			this.rowsExpanded = true;
+					this.rowsExpanded = true;
+				});
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(index);
 			});
 			this.rowsExpanded = false;
@@ -486,14 +505,31 @@ export class TaskListComponent {
 			expandedEvent.dataItem = $event.dataItem;
 			// collapse
 			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow($event.rowIndex);
 				// expand
 			} else {
-				this.onRowDetailExpandHandler(expandedEvent);
+				this.onExpandRow(expandedEvent.index);
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	/**
+	 * Ge the task actions of the selected task and updates is model
+	 * @param taskIds
+	 */
+	getInfoModelAndUpdateTaskActions(taskIds: number[]): Observable<void> {
+		return this.taskService.getBulkTaskActionInfo(taskIds)
+			.pipe(map((result: any) => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				return;
+			}));
 	}
 
 	/**
@@ -716,7 +752,7 @@ export class TaskListComponent {
 			if (rowIndex) {
 				let rowNum = parseInt(rowIndex, 0);
 				expandedEvent.index = rowNum;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(rowNum);
 			}
 		}
