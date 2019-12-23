@@ -12,26 +12,22 @@
 	>
 		<div class="tds-modal-content" tds-ui-modal-decorator="">
 			<div class="modal-header">
-				<tds-button-custom
-					class="close"
-					[icon]="'close'"
-					(click)="cancelCloseDialog($event)"
-					[displayLabel]="false"
-					[flat]="true"
-				></tds-button-custom>
-				<div class="modal-title-container">
-					<div *ngIf="!shouldReturnData" class="modal-title">
+				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
+					<clr-icon aria-hidden="true" shape="close"></clr-icon>
+				</button>
+				<h4 class="modal-title">
+					<div *ngIf="!shouldReturnData">
 						{{ 'GLOBAL.DATE_TIMEZONE' | translate }}
 					</div>
-					<div *ngIf="shouldReturnData" class="modal-title">
+					<div *ngIf="shouldReturnData">
 						{{ 'GLOBAL.TIMEZONE' | translate }}
 					</div>
-				</div>
+				</h4>
 			</div>
 			<div class="modal-body">
 				<form id="userTimezoneForm">
-					<div style="padding: 5px">
-						<b>Time Zone:</b>
+					<div class="filters">
+						<label>Time Zone:</label>
 						<kendo-dropdownlist
 							id="dateTimezone"
 							name="timezone"
@@ -42,9 +38,9 @@
 							(valueChange)="onTimezoneSelected($event)"
 						>
 						</kendo-dropdownlist>
-						<b *ngIf="!shouldReturnData" style="padding-left: 30px"
-							>{{ 'GLOBAL.DATE_FORMAT' | translate }}:</b
-						>
+						<label *ngIf="!shouldReturnData">
+							{{ 'GLOBAL.DATE_FORMAT' | translate }}:
+						</label>
 						<kendo-dropdownlist
 							*ngIf="!shouldReturnData"
 							id="dateTimeFormat"
