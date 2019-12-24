@@ -13,14 +13,12 @@ import groovy.transform.CompileStatic
  * <br>
  * Every part of the results are covered in formatter functions.
  */
-@ConfigureMarshalling
 class ETLProcessorResult {
 
 	static final Integer CURRENT_VERSION = 2
 	/**
 	 * ETL Processor used to collect results in a ETL Procesor Result instance.
 	 */
-	@DoNotMarshall
 	ETLProcessor processor
 	/**
 	 * Defines JSON version for the import the process.
@@ -34,17 +32,15 @@ class ETLProcessorResult {
 	/**
 	 * Current reference for the domain instance and its contents
 	 */
-	@DoNotMarshall
 	DomainResult reference
 	/**
 	 * Collection of results with their data fields map
 	 */
-	List<Map<String, DomainResult>> domains = []
+	List<DomainResult> domains = (List<DomainResult>)[]
 	/**
 	 * Result row index position in the reference.data list
 	 * @see DomainResult#data
 	 */
-	@DoNotMarshall
 	Integer resultIndex = -1
 
 	/**
@@ -477,7 +473,6 @@ class ETLProcessorResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class DomainResult {
 
 	/**
@@ -555,7 +550,6 @@ class DomainResult {
  * </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class RowResult {
 
 	String op = ImportOperationEnum.INSERT
@@ -564,12 +558,9 @@ class RowResult {
 	Boolean warn = false
 	Boolean duplicate = false
 	List<String> errors = []
-	@DoNotMarshall
 	Boolean ignore = true
 	Map<String, FieldResult> fields = [:]
-	@DoNotMarshall
 	String domain
-	@DoNotMarshall
 	ETLFieldsValidator fieldsValidator
 	List<String> comments = []
 	TagResults tags
@@ -793,10 +784,7 @@ class RowResult {
  *}* </pre>
  */
 @CompileStatic
-@ConfigureMarshalling
 class FieldResult {
-
-	@DoNotMarshall
 	ETLFieldDefinition fieldDefinition
 	Object originalValue
 	Object value
@@ -881,7 +869,6 @@ class FieldResult {
 }
 
 @CompileStatic
-@ConfigureMarshalling
 class FindResult {
 
 	List<QueryResult> query = []
@@ -960,7 +947,6 @@ class FindResult {
  * @return
  */
 @CompileStatic
-@ConfigureMarshalling
 class QueryResult {
 
 	String domain
@@ -1006,9 +992,6 @@ class QueryResult {
  * @see com.tdsops.etl.ETLProcessor#tagRemove(java.lang.String)
  * @see com.tdsops.etl.ETLProcessor#tagReplace(java.lang.String, java.lang.String)
  */
-
-@CompileStatic
-@ConfigureMarshalling
 class TagResults {
 
 	Set<String> add = [] as Set
