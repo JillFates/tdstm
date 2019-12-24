@@ -2181,9 +2181,7 @@ tds.cookbook.controller.RecipeVersionsController = function(scope, rootScope, st
 				var versionToDelete = item.entity.versionNumber?item.entity.versionNumber:0;
 				cookbookService.discardWIP({details:scope.editor.selectedRecipe.recipeId,
 					moreDetails: versionToDelete}, function(data){
-					if (data.status == 'fail') {
-						alerts.addAlert({type: 'danger', msg: data.data});
-					} else {
+					if (data.status != 'fail' && data.status != 'error') {
 						log.info('Success on removing Recipe Version');
 						alerts.addAlert({type: 'success', msg: 'Recipe Version Removed', closeIn: 1500});
 						rootScope.$broadcast("refreshRecipes");
