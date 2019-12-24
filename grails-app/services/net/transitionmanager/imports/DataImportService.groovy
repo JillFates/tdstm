@@ -3,9 +3,12 @@ package net.transitionmanager.imports
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.etl.DataImportHelper
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.ProgressCallback
+import com.tdsops.etl.RowResult
+import com.tdsops.event.ImportBatchJobSchedulerEventDetails
 import com.tdsops.tm.enums.domain.AssetCommentType
+import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.FileSystemUtil
@@ -14,6 +17,8 @@ import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
 import com.tdssrc.grails.StringUtil
 import com.tdssrc.grails.TimeUtil
+import grails.converters.JSON
+import grails.events.EventPublisher
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -21,6 +26,8 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetService
 import net.transitionmanager.common.CustomDomainService
+import net.transitionmanager.common.EmailDispatch
+import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.dataImport.SearchQueryHelper
@@ -65,12 +72,14 @@ import org.springframework.transaction.support.DefaultTransactionStatus
  */
 @Slf4j(value='log', category='net.transitionmanager.service.DataImportService')
 @Transactional(propagation=Propagation.MANDATORY)
-class DataImportService implements ServiceMethods {
+class DataImportService implements ServiceMethods, EventPublisher {
 
 	// IOC
 	AssetService             assetService
 	CustomDomainService      customDomainService
+	EmailDispatchService 	 emailDispatchService
 	FileSystemService        fileSystemService
+	ImportBatchService		 importBatchService
 	PartyRelationshipService partyRelationshipService
 	PersonService            personService
 	ProgressService          progressService
@@ -84,7 +93,7 @@ class DataImportService implements ServiceMethods {
 	static final String PROPERTY_NAME_CANNOT_BE_SET_MSG = "Field {propertyName} can not be set by 'whenNotFound create' statement"
 
 	// The property name that will be set on the fieldsInfo of any field that the value is changed during the posting process
-	static final String PREVIOUS_VALUE_PROPERTY='previousValue'
+	static final String PREVIOUS_VALUE_PROPERTY = 'previousValue'
 
 	// The property in the fieldsInfo for each field that has the 'whenNotFound create' mapping
 	static final WHEN_NOT_FOUND_CREATE_PROPERTY = 'create'
@@ -101,10 +110,28 @@ class DataImportService implements ServiceMethods {
 	//    ignore - fields may appear in ETL import but not directly updated (e.g. Room Locations)
 	static final Map DOMAIN_FIELD_EXCEPTIONS = [
 		'AssetEntity': [
-			'locationSource': [ ignore:true ],
-			'locationTarget': [ ignore:true ],
+			'locationSource': [ignore: true],
+			'locationTarget': [ignore: true],
 		]
 	]
+
+	/**
+	 * Used to kick of ETL process that does auto posting
+	 * @param project
+	 * @param userLogin
+	 * @param etlProcessorResult
+	 * @param sendResultByEmail
+	 * @return
+	 */
+	@NotTransactional()
+	Map loadETLResultsIntoAutoProcessImportBatch(
+			Project project,
+			UserLogin userLogin,
+			ETLProcessorResult etlProcessorResult,
+			Boolean sendResultByEmail
+	) {
+		return loadETLJsonIntoImportBatch(project, userLogin, etlProcessorResult.properties, true, sendResultByEmail)
+	}
 
 	/**
 	 * loadETLJsonIntoImportBatch - the entry point for the initial loading of data into the Import batches.
@@ -123,13 +150,16 @@ class DataImportService implements ServiceMethods {
 	 *      domains <List><Map> - a list of each domain that records were created
 	 *          domainClass <String> - name of the domain
 	 *          rowsCreated <Integer> - the count of the records created
-	 *			rowsSkipped <Integer> - the count of rows that were skipped due to errors
+	 * 			rowsSkipped <Integer> - the count of rows that were skipped due to errors
 	 */
 	@NotTransactional()
-	Map loadETLJsonIntoImportBatch(Project project, UserLogin userLogin, JSONObject importJsonData) {
-		// 	return localFunction(project, userLogin, importJsonData)
-		// }
-
+	Map loadETLJsonIntoImportBatch(
+			Project project,
+			UserLogin userLogin,
+			Map importJsonData,
+			Boolean isAutoProcess = false,
+			Boolean sendResultsByEmail = false
+	) {
 		// // TODO : JPM 2/2018 : Delete this closure declaration and the following code will just be part of the above function
 		// // This was done because it allows you to save the code repeatedly without having to restart the application every time. It appears
 		// // that the @NotTransactional annotation causes issues. This was a neat trick to get around that since the loadETLJsonIntoImportBatch
@@ -137,26 +167,28 @@ class DataImportService implements ServiceMethods {
 		// def localFunction = { Project project, UserLogin userLogin, JSONObject importJsonData ->
 
 		// Map which summarizes the results from the import process.
-		Map importResults = [ batchesCreated: 0, domains:[], errors: [] ]
+		Map importResults = [batchesCreated: 0, domains: [], errors: []]
 
 		// A map that contains various objects used throughout the import process
 		Map importContext = [
-			project: project,
-			userLogin: userLogin,
-			etlInfo: importJsonData.ETLInfo,
-
+			project           : project,
+			userLogin         : userLogin,
+			etlInfo           : importJsonData.ETLInfo,
+			status            : isAutoProcess ? ImportBatchStatusEnum.QUEUED : ImportBatchStatusEnum.PENDING,
+			guid              : StringUtil.generateGuid(),
+			sendResultsByEmail: sendResultsByEmail,
 			// The cache will be used to hold on to domain entity references when found or a String if there
 			// was an error when looking up the domain object. The key will be the md5hex of the query element
 			// of the field.
-			cache: new DataImportEntityCache(),
+			cache             : new DataImportEntityCache(),
 
 			// The following are reset per domain
-			domainClass: null,
-			fieldNames: [],
-			rowsCreated: 0,
-			rowsSkipped: 0,
-			rowNumber: 0,
-			errors:[]
+			domainClass       : null,
+			fieldNames        : [],
+			rowsCreated       : 0,
+			rowsSkipped       : 0,
+			rowNumber         : 0,
+			errors            : []
 		]
 
 		// Iterate over the domains and create batches for each
@@ -166,9 +198,9 @@ class DataImportService implements ServiceMethods {
 			log.debug "localFunction() in for loop: importContext=$importContext"
 
 			List<JSONObject> importRows = domainJson.data
-			if (! importRows) {
+			if (!importRows) {
 				importResults.errors << "Domain ${importContext.domainClass} contained no data"
-				importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0 ]
+				importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0, rowsSkipped: 0]
 			} else {
 
 				// Process each batch in a separate transaction to help with performance and memory
@@ -193,7 +225,7 @@ class DataImportService implements ServiceMethods {
 					if (batch == null) {
 						// Creating the batch failed so record the error and metrics for endpoint consumer
 						importResults.errors << importContext.errors
-						importResults.domains << [ domainClass: importContext.domainClass, rowsCreated: 0 ]
+						importResults.domains << [domainClass: importContext.domainClass, rowsCreated: 0]
 
 					} else {
 						//
@@ -208,7 +240,7 @@ class DataImportService implements ServiceMethods {
 
 						// Update the reporting
 						importResults.batchesCreated++
-						importResults.domains << [ domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated ]
+						importResults.domains << [domainClass: importContext.domainClass, batchId: batch.id, rowsCreated: importContext.rowsCreated]
 					}
 				}
 			}
@@ -225,7 +257,7 @@ class DataImportService implements ServiceMethods {
 	 * @return a newly created ImportBatch object
 	 */
 	//@CompileStatic
-	private ImportBatch createImportBatch( Map importContext ) {
+	private ImportBatch createImportBatch(Map importContext) {
 
 		Date warnOnChangesAfter
 		if (importContext.etlInfo.warnOnChangesAfter) {
@@ -238,24 +270,28 @@ class DataImportService implements ServiceMethods {
 
 		ImportBatch batch = new ImportBatch(
 			project: importContext.project,
-			status: ImportBatchStatusEnum.PENDING,
+			status: importContext.status,
+			groupGuid: importContext.guid,
+			queuedAt: new Date(),
+			queuedBy: importContext.userLogin.username,
+			sendNotification: importContext.sendResultsByEmail,
 			dataScript: dataScript,
 			provider: dataScript?.provider,
 			domainClassName: importContext.domainClass,
 			createdBy: importContext.userLogin.person,
-			autoProcess: ( importContext.etlInfo.autoProcess ?: 0 ),
-			dateFormat: ( importContext.etlInfo.dataFormat ?: ''),
+			autoProcess: (importContext.etlInfo.autoProcess ?: 0),
+			dateFormat: (importContext.etlInfo.dataFormat ?: ''),
 			fieldNameList: JsonUtil.toJson(importContext.fieldNames),
 			fieldLabelMap: JsonUtil.toJson(importContext.fieldLabelMap),
 			nullIndicator: (importContext.etlInfo.nullIndicator ?: ''),
 			originalFilename: (importContext.etlInfo.originalFilename ?: ''),
 			overwriteWithBlanks: (importContext.etlInfo.overwriteWithBlanks ?: 1),
-			timezone: ( importContext.etlInfo.timezone ?: 'GMT' ),
+			timezone: (importContext.etlInfo.timezone ?: 'GMT'),
 			warnOnChangesAfter: warnOnChangesAfter
 		)
 
 		// Check if the transfer batch is valid, report the error if not.
-		if (!batch.save(failOnError:false)) {
+		if (!batch.save(failOnError: false)) {
 			importContext.errors << "There was an error when creating the import batch for ${importContext.domainClass}"
 			log.error 'DataImportService.createImportBatch() failed save: {}', GormUtil.allErrorsString(batch)
 			batch.discard()
@@ -280,13 +316,17 @@ class DataImportService implements ServiceMethods {
 			importContext.rowNumber++
 
 			// Do some initialization of the rowData object if necessary
-			if (! rowData.containsKey('errors')) {
+			if (rowData.errors == null) {
 				rowData.errors = []
 			}
 
 			// Process the fields for this row
 			importRow(session, batch, rowData, importContext)
 		}
+	}
+
+	private void importRow(session, ImportBatch batch, RowResult rowData, Map importContext) {
+		importRow(session, batch, rowData.properties, importContext)
 	}
 
 	/**
@@ -297,7 +337,7 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - additional parameters required for logging
 	 */
 	// @CompileStatic
-	private void importRow(session, ImportBatch batch, JSONObject rowData, Map importContext ) {
+	private void importRow(session, ImportBatch batch, Map rowData, Map importContext ) {
 		boolean importOfRowOkay = false
 		Long domainId = getAndValidateDomainId(rowData, importContext)
 		log.debug "importRow() id={}", domainId
@@ -321,16 +361,13 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - Map of the import context objects
 	 * @return true if all of the fields were successfully added to the ImportBatchRecord table or false if there was an error
 	 */
-	private boolean insertRowDataIntoImportBatchRecord(session, ImportBatch batch, JSONObject rowData, Long domainId, Map importContext ) {
+	private boolean insertRowDataIntoImportBatchRecord(session, ImportBatch batch, Map rowData, Long domainId, Map importContext ) {
 
 		int rowNum = importContext.rowNumber - 1
 		// Detemine if there were duplicates found
 		// TODO : JPM 2/2018 : the dupsFound logic is questionable (need to compare against latest JSON). Also this will be
 		// good to move to the command object.
-		Integer dupsFound = 0
-		if (rowData.fields.containsKey('id') && rowData.fields.id.containsKey('find')) {
-			dupsFound = ( rowData.fields.id.size() > 1 ? 1 : 0)
-		}
+		Integer dupsFound = ( rowData.fields?.id?.find?.results?.size() > 1 ? 1 : 0 )
 
 		ImportOperationEnum OpValue = ImportOperationEnum.lookup(rowData.op)
 
@@ -343,7 +380,7 @@ class DataImportService implements ServiceMethods {
 			errorList: JsonUtil.toJson( (rowData.errors ?: []) ),
 			warn: (rowData.warn ? 1 : 0),
 			duplicateReferences: dupsFound,
-			fieldsInfo: JsonUtil.toJson(rowData.fields),
+			fieldsInfo: (rowData.fields as JSON).toString(),
 			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
@@ -392,7 +429,7 @@ class DataImportService implements ServiceMethods {
 	 * @param importContext - Map of the import context objects
 	 * @return the id of the domain, null if not specified or -1 if there was an error
 	 */
-	private static Long getAndValidateDomainId(JSONObject rowData, Map importContext) {
+	private static Long getAndValidateDomainId(Map rowData, Map importContext) {
 		return DataImportHelper.getAndValidateDomainId(rowData, importContext)
 	}
 
@@ -701,6 +738,11 @@ class DataImportService implements ServiceMethods {
 		ImportBatchStatusEnum status = (remaining > 0 ? ImportBatchStatusEnum.PENDING : ImportBatchStatusEnum.COMPLETED)
 		updateBatchProgress(batchId, 1, 1, status)
 
+		batch.refresh()
+		if (batch.sendNotification) {
+			sendNotification(batch, context)
+		}
+
 		//log.info "processBatch({}) finished in {} and processed {} records", batchId, stopwatch.endDuration(), rowsProcessed
 
 		// TODO : JPM 3/2018 : Fix the batch status update after processing
@@ -929,6 +971,89 @@ class DataImportService implements ServiceMethods {
 			String domainUpdateErrorMsg = GormUtil.allErrorsString(record)
 			log.warn 'processEntityRecord() Failed to save ImportBatchRecord changes: {}', domainUpdateErrorMsg
 			throw new DomainUpdateException("Unable to update row $recordCount due to " + domainUpdateErrorMsg)
+		}
+	}
+
+	@Transactional(noRollbackFor=[Throwable])
+	void sendNotification(ImportBatch batch, Map context) {
+
+		try {
+			// Check if all the ImportBatch records created together in the auto-process
+			// are already finished
+			int count = ImportBatch.where {
+				groupGuid == batch.groupGuid
+				id != batch.id
+				status in [ImportBatchStatusEnum.QUEUED, ImportBatchStatusEnum.RUNNING]
+			}.count()
+
+			if (count == 0){
+
+				Map<String, ?> batchesWithSummary = importBatchService.findBatchesWithSummary(batch.project, null, null, batch.groupGuid)
+				List<Map<String, ?>> batchesModel = batchesWithSummary.values().collect { Map<String, ?> batchSummary ->
+					[
+						id       : batchSummary.id,
+						status   : batchSummary.status.label,
+						domain   : batchSummary.domainClassName,
+						records  : batchSummary.recordsSummary.count,
+						processed: batchSummary.recordsSummary.processed,
+						pending  : batchSummary.recordsSummary.pending,
+						erred    : batchSummary.recordsSummary.erred,
+						ignored  : batchSummary.recordsSummary.ignored,
+						inserted : batchSummary.recordsSummary.inserted,
+						updated  : batchSummary.recordsSummary.updated,
+						deleted  : batchSummary.recordsSummary.deleted,
+						unchanged: batchSummary.recordsSummary.unchanged,
+						tbd      : batchSummary.recordsSummary.tbd
+					]
+				}
+
+				String paramsJson = ([batches: batchesModel] as JSON).toString()
+				EmailDispatch ed = new EmailDispatch()
+				ed.origin = EmailDispatchOrigin.TASK
+				ed.subject = 'TransitionManager Import Batch Summary'
+				ed.bodyTemplate = 'batchPostingResults'
+				ed.paramsJson = paramsJson
+				ed.fromAddress = context.whom.email
+				ed.toAddress = context.whom.email
+				ed.toPerson = context.whom
+				ed.createdBy = context.whom
+
+				if (ed.validate()){
+					ed.save()
+					emailDispatchService.createEmailJob(ed, [
+						person : context.whom.email,
+					])
+				}
+			}
+
+		} catch(Throwable throwable){
+
+			log.error ExceptionUtil.stackTraceToString("Failed to send email notification for import batch processing for batchId: ${batch.id} and groupGuid: ${batch.groupGuid}", throwable), throwable
+		}
+
+	}
+
+	/**
+	 * This is used record any coinstraints violation erros on a domain object and will save the errors back into the
+	 * fieldsInfo map appropriately or into the ImportBatchRecord if the constraint failure was on a property
+	 * that is not in the fieldsInfo.
+	 *
+	 * @param domain - the domain that is being created or updated
+	 * @param record - the import record being processed (errors can be logged to this object)
+	 * @param fieldsInfo - the Map of the fields that came from the ETL process
+	 */
+	@Transactional(noRollbackFor=[Throwable])
+	private void recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
+		for (error in  domain.errors.allErrors) {
+			log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
+			String property = error.getField()
+			String errorMsg = i18nMessage(error)
+				fieldsInfo[property].errors << errorMsg
+			if (fieldsInfo[property]) {
+			} else {
+				// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
+				record.addError(errorMsg)
+			}
 		}
 	}
 
@@ -1538,30 +1663,6 @@ class DataImportService implements ServiceMethods {
 	}
 
 	/**
-	 * This is used record any coinstraints violation erros on a domain object and will save the errors back into the
-	 * fieldsInfo map appropriately or into the ImportBatchRecord if the constraint failure was on a property
-	 * that is not in the fieldsInfo.
-	 *
-	 * @param domain - the domain that is being created or updated
-	 * @param record - the import record being processed (errors can be logged to this object)
-	 * @param fieldsInfo - the Map of the fields that came from the ETL process
-	 */
-	@Transactional(noRollbackFor=[Throwable])
-	private void recordDomainConstraintErrorsToFieldsInfoOrRecord(Object domain, ImportBatchRecord record, Map fieldsInfo) {
-		for (error in  domain.errors.allErrors) {
-			log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
-			String property = error.getField()
-			String errorMsg = i18nMessage(error)
-			if (fieldsInfo[property]) {
-				fieldsInfo[property].errors << errorMsg
-			} else {
-				// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
-				record.addError(errorMsg)
-			}
-		}
-	}
-
-	/**
 	 * Used to add error message to either the fieldsInfo or directly to the record. The error will be added to the fieldsInfo if the
 	 * property name exists otherwise the message is stuffed into the record directly
 	 *
@@ -1800,7 +1901,7 @@ class DataImportService implements ServiceMethods {
 	 * @return
 	 */
 	@NotTransactional()
-	Map transformEtlData(Long projectId, Long dataScriptId, String filename, String progressKey = null) {
+	Map transformEtlData(Long projectId, UserLogin userLogin, Long dataScriptId, String filename, Boolean sendResultsByEmail, String progressKey = null) {
 		Map result = [filename: '']
 		Project project = Project.get(projectId)
 
@@ -1812,7 +1913,7 @@ class DataImportService implements ServiceMethods {
 		if (!dataScriptId) {
 			errorMsg = 'Missing required dataScriptId parameter'
 		} else if (!filename) {
-			errorMsg = 'Missing filename parameter'
+			errorMsg = 'Missing filename par	ameter'
 		} else if (!fileSystemService.temporaryFileExists(filename)) {
 			errorMsg = 'Specified input file not found'
 		} else {
@@ -1835,30 +1936,44 @@ class DataImportService implements ServiceMethods {
 		}
 
 		// The progress closure that will be used by the ETL process to report back to this service the overall progress
-		ProgressCallback updateProgressClosure = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
+		ProgressCallback updateProgressCallback = { Integer percentComp, Boolean forceReport, ProgressCallback.ProgressStatus status, String detail ->
 			// if progress key is not provided, then just skip updating progress service
 			// this is useful during integration test invocation
 			if (progressKey) {
-				// log.debug "updateProgressClosure() ${percentComp}%, forceReport=$forceReport, status=$status, detail=$detail"
+				// log.debug "updateProgressCallback() ${percentComp}%, forceReport=$forceReport, status=$status, detail=$detail"
 				progressService.update(progressKey, percentComp, status.name(), detail)
 			}
 		} as ProgressCallback
 
 		// get full path of the temporary file containing data
 		String inputFilename = fileSystemService.getTemporaryFullFilename(filename)
-
-		// TODO : JPM 6/2018 : TM-11017 This call fails silently in one of the DataImportServiceIntegrationSpec tests
-		log.debug "transformEtlData() calling scriptProcessorService.executeAndSaveResultsInFile"
-		def (ETLProcessor etlProcessor, String outputFilename) = scriptProcessorService.executeAndSaveResultsInFile(
+		log.debug "transformEtlData() calling scriptProcessorService.executeAndRetrieveResults"
+		ETLProcessorResult processorResult = scriptProcessorService.executeAndRetrieveResults(
 			project,
 			dataScript?.id,
 			dataScript.etlSourceCode,
 			inputFilename,
-			updateProgressClosure)
+			updateProgressCallback)
 
-		log.debug "transformEtlData() returned from call"
+		if (!dataScript.isAutoProcess) {
+			result.filename = scriptProcessorService.saveResultsInFile(processorResult)
 
-		result.filename = outputFilename
+		} else {
+			Map importResults = loadETLResultsIntoAutoProcessImportBatch(project, userLogin, processorResult, sendResultsByEmail)
+
+			if (importResults.batchesCreated > 0) {
+				log.debug "Notify ImportBatchJon with importResults:$importResults"
+				notify('NEXT_BATCH_READY', new ImportBatchJobSchedulerEventDetails(project.id, importResults.domains.first()?.batchId, userLogin.username))
+			}
+
+			result.filename = null
+		}
+
+		updateProgressCallback.reportProgress(
+			100,
+			true,
+			ProgressCallback.ProgressStatus.COMPLETED,
+			result.filename)
 
 		return result
 	}
@@ -1868,10 +1983,11 @@ class DataImportService implements ServiceMethods {
 	 * @param project
 	 * @param dataScriptId
 	 * @param filename
+	 * @param sendNotification
 	 * @return Map - containing the progress key created to monitor the job execution progress
 	 */
 	@NotTransactional()
-	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename) {
+	Map<String, String> scheduleETLTransformDataJob(Project project, Long dataScriptId, String filename, Boolean sendNotification = false) {
 		DataScript dataScript = null
 		String errorMsg = null
 
@@ -1912,6 +2028,8 @@ class DataImportService implements ServiceMethods {
 		trigger.jobDataMap.dataScriptId = dataScriptId
 		trigger.jobDataMap.filename = filename
 		trigger.jobDataMap.progressKey = key
+		trigger.jobDataMap.sendNotification = sendNotification
+		trigger.jobDataMap.userLogin = securityService.loadCurrentPerson().userLogin
 		trigger.setJobName('ETLTransformDataJob')
 		trigger.setJobGroup('tdstm-etl-transform-data')
 		quartzScheduler.scheduleJob(trigger)
