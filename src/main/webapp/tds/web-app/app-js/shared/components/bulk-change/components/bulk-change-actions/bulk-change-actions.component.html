@@ -35,7 +35,7 @@
 										<label>
 											<input type="radio" [value]="ACTION.Run" name="operation" [(ngModel)]="selectedAction">Apply ETL to {{itemType}}
 										</label>
-										<div class="row" *ngIf="selectedAction === ACTION.Run">
+										<div class="row sub-panel" *ngIf="selectedAction === ACTION.Run">
 											<div class="col-sm-9">
 												<select [(ngModel)]="selectedScriptOption"
 														name="dataScriptOptions"
@@ -55,7 +55,10 @@
 																		name="sendEmailNotification"
 																		type="checkbox"
 																		[(ngModel)]="sendEmailNotification" />
-																	Email results to me
+																		<span class ="checkbox-label">
+																			Email results to me
+																		</span>
+																	
 																</label>
 															</div>
 														</div>
@@ -63,11 +66,6 @@
 												</div>
 											</div>
 										</div>
-									</div>
-									<div class="form-group" *ngIf="showDelete">
-										<label>
-											<input type="radio" [value]="ACTION.Delete" name="operation" [(ngModel)]="selectedAction">Delete {{itemType}}
-										</label>
 									</div>
 								</div>
 							</div>
