@@ -114,14 +114,14 @@
                                                     <td class="valueNW"><span>{{model.durationText}}</span>
 
                                                     <td class="label N" nowrap="nowrap">
-                                                        <label><span>Estimated Start</span></label>
+                                                        <label><span>Earliest Start</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedStart || '' | tdsDateTime: userTimeZone}}</span></td>
+                                                    <td class="valueNW"><span>{{model.etStart || ''}}</span></td>
 
                                                     <td class="label N" nowrap="nowrap">
-                                                        <label><span>Estimated Finish</span></label>
+                                                        <label><span>Earliest Finish</span></label>
                                                     </td>
-                                                    <td class="valueNW"><span>{{model.estimatedFinish || '' | tdsDateTime: userTimeZone}}</span></td>
+                                                    <td class="valueNW"><span>{{model.etFinish || ''}}</span></td>
 
                                                 </tr>
 
@@ -190,10 +190,10 @@
                                     <table class="dates-info">
                                         <tbody>
                                             <tr>
-                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | date:dateFormatTime}}
+                                                <td class="date-created">Created by {{model.personCreateObj}} at {{model.dateCreated | tdsDateTime:userTimeZone:dateFormatTime}}
                                                     {{(model.taskSpecId)? ' with spec id ' + model.taskSpecId: ''}}
                                                     <span *ngIf="model.recipe && hasCookbookPermission"> in recipe <a href="./../cookbook/index#/recipes/{{model.recipe?.id}}/gentasks/start"> {{model.recipe?.name}}</a></span>
-                                                <td class="last-updated">Last updated: {{model.lastUpdated | date:dateFormatTime}}</td>
+                                                <td class="last-updated">Last updated: {{model.lastUpdated | tdsDateTime:userTimeZone:dateFormatTime}}</td>
                                             </tr>
                                         </tbody>
                                     </table>

@@ -190,6 +190,7 @@
 
                                             <td class="valueNW">
                                                 <kendo-datepicker
+                                                        #dueDatePicker (open)="onOpenDueDatePicker($event)"
                                                         name="dueDate"
                                                         #dueDate
                                                         [format]="getDateFormat()"
@@ -228,7 +229,7 @@
                                                     </div>
                                                     <label data-toggle="popover"
                                                            data-trigger="hover"
-                                                           data-content="Click to toggle the lock. When locked, changes to the Estimated Start/Finish will preserve the Duration">
+                                                           data-content="Click to toggle the lock. When locked, changes to the Earliest Start/Finish will preserve the Duration">
                                                         <i class="fa fa-fw  lock-state"
                                                            [ngClass]="model.locked ? 'fa-lock' : 'fa-unlock'"
                                                            (click)="toggleLocked()">
@@ -237,7 +238,7 @@
                                                 </div>
                                             </td>
                                             <td class="label N edge-cell" nowrap="nowrap">
-                                                <label><span>Estimated Start</span></label>
+                                                <label><span>Earliest Start</span></label>
                                             </td>
                                             <td class="valueNW">
                                                 <kendo-dateinput
@@ -250,7 +251,7 @@
                                             </td>
 
                                             <td class="label N edge-cell" nowrap="nowrap">
-                                                <label><span>Estimated Finish</span></label>
+                                                <label><span>Earliest Finish</span></label>
                                             </td>
 
                                             <td class="valueNW estimated-finish">

@@ -3,7 +3,7 @@
 # 
 # Usage
 # ./runapp.sh
-# ./runapp.sh test-app -unit RunbookService
+# ./runapp.sh test-app -unit PersonService
 # ./runapp.sh test-app -integration GormUtil
 #
 

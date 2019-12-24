@@ -789,9 +789,13 @@ div.graphContainer {
     padding: 0px !important;
     margin: 0px !important;
     overflow: hidden;
-    font-size: 0; }
+    font-size: 0;
+    position: relative;
+    top: 30px; }
     div.graphContainer div#svgContainerId svg {
       border: none !important; }
+  div.graphContainer button.baseline-btn {
+    margin: 0 10px; }
 
 div.graphContainer.fullscreen {
   background-color: #ffffff;
@@ -1855,6 +1859,10 @@ div.content-wrapper div.container .dependencyConsoleForm {
 
 #personHighlightSelectId_listbox * {
   cursor: pointer; }
+
+div #dependecy-control {
+  height: calc(100% - 30px);
+  overflow: auto; }
 
 #levelsUpId, #levelsDownId {
   width: 20px;

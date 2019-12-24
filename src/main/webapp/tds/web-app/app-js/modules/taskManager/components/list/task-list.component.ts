@@ -66,13 +66,17 @@ export class TaskListComponent {
 	private readonly allEventsOption: any = { id: 0, name: 'All Events' };
 	private readonly gridDefaultSort: Array<SortDescriptor>;
 	private urlParams: any;
+	private dashboardFilters = ['filter', 'status', 'role', 'category'];
 	private pageSize: number;
 	private currentPage: number;
 	private currentCustomColumns: any;
 	private allAvailableCustomColumns: Array<any>;
 	private userContext: UserContextModel;
+	// Flag that indicates that one or more rows have been expanded
 	private rowsExpanded: boolean;
+	// Tracks the expansion of individual rows
 	private rowsExpandedMap: any;
+	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
 
 	constructor(
@@ -319,7 +323,7 @@ export class TaskListComponent {
 	updateTaskStatus(id: string, status: string): void {
 		this.taskService.updateStatus(id, status)
 			.subscribe(() => {
-				this.search(parseInt(id, 0));
+				this.refreshActionBar(id);
 			});
 	}
 
@@ -330,7 +334,7 @@ export class TaskListComponent {
 	invokeActionHandler(taskRow: any): void {
 		this.taskService.invokeAction(taskRow.id)
 			.subscribe(result => {
-				this.search(parseInt(taskRow.id, 0));
+				this.refreshActionBar(taskRow.id);
 			});
 	}
 
@@ -339,11 +343,20 @@ export class TaskListComponent {
 	 * @param $event: any
 	 */
 	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.loadTaskInfoModel($event.dataItem.id).subscribe(() => {
+		this.loadTaskActionInfoModel($event.dataItem.id).subscribe(() => {
 			// loaded.
 		});
 		this.rowsExpandedMap[$event.index] = true;
 	}
+
+	/**
+	 * Responsible for fetching the latest data for the action bar
+	 * @param taskId
+	 */
+	refreshActionBar(taskId: any): void {
+		this.loadTaskActionInfoModel(taskId).subscribe(() => {
+			// loaded.
+		});	}
 
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
@@ -365,7 +378,7 @@ export class TaskListComponent {
 		this.taskService.assignToMe(request)
 			.subscribe(result => {
 				taskRow.assignedTo = this.userContext.person.id;
-				this.search(parseInt(taskRow.id, 0));
+				this.refreshActionBar(taskRow.id);
 			});
 	}
 
@@ -375,14 +388,33 @@ export class TaskListComponent {
 	 */
 	onResetTaskHandler(taskRow: any): void {
 		this.taskService.resetTaskAction(taskRow.id).subscribe(result => {
-			this.search(parseInt(taskRow.id, 0));
+			this.refreshActionBar(taskRow.id);
 		});
+	}
+
+	/**
+	 * Checks if any filters from the dashboards are applied.
+	 */
+	hasDashboardFilters(): boolean {
+		let hasFilters = false;
+		this.dashboardFilters.forEach(filter => {
+			if (this.urlParams.hasOwnProperty(filter)) {
+				hasFilters = true;
+			}
+		});
+		return hasFilters;
 	}
 
 	/**
 	 * On clear filters button click, clear all available filters.
 	 */
 	onClearFiltersHandler(): void {
+		if (this.hasDashboardFilters()) {
+			this.dashboardFilters.forEach(filter => {
+				delete this.urlParams[filter];
+			});
+			this.search();
+		}
 		this.columnsModel
 			.filter(column => column.filterable)
 			.forEach((column: GridColumnModel) => {
@@ -402,8 +434,8 @@ export class TaskListComponent {
 	 * Determines if current columns has been filtered (contains value).
 	 */
 	areFiltersDirty(): boolean {
-		return this.columnsModel
-			.filter(column => column.filter).length > 0;
+		return (this.columnsModel
+			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
@@ -413,12 +445,20 @@ export class TaskListComponent {
 		const taskRows: Array<any> = (this.gridComponent.data as GridDataResult).data;
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
-			taskRows.forEach((taskRow: any, index: number) => {
-				index = this.grid.getRowPaginatedIndex(index);
-				expandedEvent.dataItem = taskRow;
-				expandedEvent.index = index;
-				this.onRowDetailExpandHandler(expandedEvent);
-				this.gridComponent.expandRow(index);
+			let taskIds = taskRows.map(task => task.id);
+			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
+					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+						this.gridComponent.expandRow(i);
+						this.rowsExpandedMap[i] = true;
+					}
+				}
 			});
 			this.rowsExpanded = true;
 		} else {
@@ -434,7 +474,7 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * On cell click open the task action bar
+	 * On cell click open the task action bar except for when clicking on the assetName
 	 * @param $event: CellClickEvent
 	 */
 	onCellClickHandler($event: CellClickEvent): void {
@@ -620,6 +660,7 @@ export class TaskListComponent {
 				sortColumn = this.currentCustomColumns[sortColumn];
 			}
 		}
+		this.colapseAllExandedRows();
 		const searchParams = {
 			moveEvent: this.selectedEvent.id,
 			justRemaining: this.justRemaining ? 1 : 0,
@@ -644,10 +685,13 @@ export class TaskListComponent {
 			.subscribe(result => {
 				this.reloadGridData(result.rows, result.totalCount);
 				this.loading = false;
-				if (taskId && taskId >= 0) {
-					this.loadTaskInfoModel(taskId.toString(), true).subscribe(() => {/* loaded */});
-				} else {
-					this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+				for (let i = 0; i < result.totalCount; i++) {
+					let info = result.rows[i] ? result.rows[i].actionBarInfo : null;
+					if (info) {
+						let actionBarModel = this.taskService.convertToTaskActionInfoModel(info);
+						this.taskActionInfoModels.set(result.rows[i].id.toString(), actionBarModel);
+					}
 				}
 			});
 		this.loaderService.stopProgress();
@@ -658,6 +702,25 @@ export class TaskListComponent {
 				this.loaderService.toggle();
 			}
 		}, LOADER_IDLE_PERIOD * 10);
+	}
+
+	/**
+	 * Used to colapse all of the rows that were expanded and reset the state used by the action bar
+	 */
+	private colapseAllExandedRows(): void {
+		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
+		for (let rowIndex in this.rowsExpandedMap) {
+			if (rowIndex) {
+				let rowNum = parseInt(rowIndex, 0);
+				expandedEvent.index = rowNum;
+				this.onRowDetailCollapseHandler(expandedEvent);
+				this.gridComponent.collapseRow(rowNum);
+			}
+		}
+		this.rowsExpandedMap = {};
+		// Clear out any expanded rows
+		this.taskActionInfoModels.clear();
+		this.rowsExpanded = false;
 	}
 
 	/**
@@ -683,23 +746,49 @@ export class TaskListComponent {
 	/**
 	 * Loads Task action information model into the Models Map.
 	 */
-	private loadTaskInfoModel(taskId: string, forceReload = false): Observable<TaskActionInfoModel> {
+	private loadTaskActionInfoModel(taskId: string, forceReload = false): Observable<TaskActionInfoModel> {
 		if (!isNaN(taskId as any)) {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			if (!this.taskActionInfoModels.has(taskId) || forceReload) {
-				this.taskService.getTaskActionInfo(parseInt(taskId, 0))
-					.subscribe((result: TaskActionInfoModel) => {
-						const taskActionInfoModel = result;
-						this.taskActionInfoModels.set(taskId, taskActionInfoModel);
-						observer.next(result);
-						observer.complete();
-					});
-			} else {
-				observer.next(this.taskActionInfoModels.get(taskId));
-				observer.complete();
-			}
+			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+				.subscribe((result: TaskActionInfoModel) => {
+					const taskActionInfoModel = result;
+					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					observer.next(result);
+					observer.complete();
+				});
 		});
+	}
+
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
+
+		// Update the grid row with new information from the endpoint (status, assignTo, etc)
+		for (let i = 0; i < this.grid.gridData.data.length; i++) {
+			if (this.grid.gridData.data[i].id === taskId ) {
+				this.grid.gridData.data[i].status = taskActionInfoModel.status;
+				this.grid.gridData.data[i].taskStatus = 'task_' + taskActionInfoModel.status.toLowerCase();
+				this.grid.gridData.data[i].assignedTo = taskActionInfoModel.assignedTo;
+				this.populateAssignedToName(taskActionInfoModel.assignedToName, this.grid.gridData.data[i]);
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Used to push an assignedTo name into the datagrid row if the assignedTo property was selected as one of the
+	 * custom columns.
+	 * @param personName
+	 * @param row
+	 */
+	private populateAssignedToName(personName: string, row: any): void {
+		if (personName) {
+			for (let columnName in this.currentCustomColumns) {
+				if (this.currentCustomColumns[columnName] === 'assignedTo') {
+					row[columnName] = personName;
+				}
+			}
+		}
 	}
 }

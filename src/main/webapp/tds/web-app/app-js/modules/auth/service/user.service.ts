@@ -24,13 +24,17 @@ export class UserService {
 			}).catch((error: any) => error);
 	}
 
-	getLicenseInfo(): Observable<any> {
+	/**
+	 * Get only the license applied to the user
+	 * That helps to show or hide different sections of the app
+	 */
+	getLicense(): Observable<any> {
 		return this.http.get(`${this.licenseUrl}/license/info`)
 			.map((response: any) => {
 				if (response && response.status === 'success') {
-					return response.data;
+					return response.data.license;
 				}
-				return null;
+				return {};
 			}).catch((error: any) => error);
 	}
 }

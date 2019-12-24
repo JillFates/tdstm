@@ -25,6 +25,7 @@ import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.SettingService
 import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.tag.TagService
 import org.apache.poi.ss.usermodel.Cell
 import net.transitionmanager.security.SecurityService
 import org.apache.poi.ss.usermodel.Sheet
@@ -40,6 +41,7 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 	String sixRowsDataSetFileName
 	String applicationDataSetFileName
 	FileSystemService fileSystemService
+	TagService tagService
 
 	static doWithConfig(c) {
 		c.graph.tmpDir = '/tmp/'
@@ -64,9 +66,11 @@ class ScriptProcessorServiceSpec extends Specification implements ServiceUnitTes
 				transactionManager = ref('transactionManager')
 			}
 			settingService(SettingService)
+			tagService(TagService)
 		}
 
 		fileSystemService = grailsApplication.mainContext.getBean(FileSystemService)
+		tagService = grailsApplication.mainContext.getBean(TagService)
 
 		def (String fileName, OutputStream sixRowsDataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
 		sixRowsDataSetFileName = fileName
@@ -537,18 +541,14 @@ application id,vendor name,technology,location
 			ProgressCallback callback = Mock(ProgressCallback)
 
 		when: 'Service executes the script with incorrect syntax'
-			def (ETLProcessor etlProcessor, String outputFilename) = service.executeAndSaveResultsInFile(
+			ETLProcessorResult results = service.executeAndRetrieveResults(
 				GMDEMO,
 				54321l,
 				script,
 				fileSystemService.getTemporaryFullFilename(applicationDataSetFileName),
 				callback)
 
-		then: 'Service result a valid filename with results'
-			outputFilename != null
-
-		and: 'Service result returns the instance of ETLProcessor and its results'
-			def results = etlProcessor.finalResult()
+		then: 'Service result returns the instance of ETLProcessor and its results'
 			results.domains.size() == 1
 
 			results.domains[0].domain == ETLDomain.Application.name()
@@ -609,14 +609,7 @@ application id,vendor name,technology,location
 				1 * reportProgress(50, false, RUNNING, '')
 				1 * reportProgress(100, false, RUNNING, '')
 				1 * reportProgress(100, true, RUNNING, '')
-				1 * reportProgress(100, true, COMPLETED, { it != null })
 			}
-
-		cleanup:
-			if (outputFilename) {
-				fileSystemService.deleteTemporaryFile(outputFilename)
-			}
-
 	}
 
 	static Map fieldSpecsMap = [

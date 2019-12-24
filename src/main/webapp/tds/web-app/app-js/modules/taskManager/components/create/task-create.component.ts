@@ -1,4 +1,4 @@
-import {Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 
 import {TaskEditCreateCommonComponent} from '../common/task-edit-create-common.component';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
@@ -16,7 +16,9 @@ declare var jQuery: any;
 	templateUrl: 'task-create.component.html',
 	styles: []
 })
-export class TaskCreateComponent extends TaskEditCreateCommonComponent  implements OnInit {
+export class TaskCreateComponent extends TaskEditCreateCommonComponent implements OnInit {
+
+	@ViewChild('dueDatePicker') dueDatePicker;
 
 	constructor(
 		taskDetailModel: TaskDetailModel,
@@ -31,4 +33,12 @@ export class TaskCreateComponent extends TaskEditCreateCommonComponent  implemen
 
 	}
 
+	/**
+	 * Forces kendo datepicker to open it's calendar.
+	 * @param event: any
+	 */
+	public onOpenDueDatePicker(event): void {
+		event.preventDefault();
+		this.dueDatePicker.toggle();
+	}
 }

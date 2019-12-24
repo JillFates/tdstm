@@ -74,109 +74,107 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog  implements OnI
 	}
 
 	ngOnInit() {
-		this.userPreferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe(() => {
-			this.userTimeZone = this.userPreferenceService.getUserTimeZone();
-			this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
-			this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
-			this.isEventLocked = false;
+		this.userTimeZone = this.userPreferenceService.getUserTimeZone();
+		this.dateFormat = this.userPreferenceService.getDefaultDateFormatAsKendoFormat();
+		this.dateFormatTime = this.userPreferenceService.getUserDateTimeFormat();
+		this.isEventLocked = false;
 
-			this.modelHelper = new TaskEditCreateModelHelper(
-				this.userTimeZone,
-				this.userPreferenceService.getUserCurrentDateFormatOrDefault(),
-				this.taskManagerService,
-				this.dialogService,
-				this.translatePipe);
+		this.modelHelper = new TaskEditCreateModelHelper(
+			this.userTimeZone,
+			this.userPreferenceService.getUserDateFormat(),
+			this.taskManagerService,
+			this.dialogService,
+			this.translatePipe);
 
-			this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
-				this.modelHelper.getModelForCreate(this.taskDetailModel)
-				:
-				this.modelHelper.getModelForEdit(this.taskDetailModel, this.userTimeZone);
+		this.model = this.taskDetailModel.modal.type === ModalType.CREATE ?
+			this.modelHelper.getModelForCreate(this.taskDetailModel)
+			:
+			this.modelHelper.getModelForEdit(this.taskDetailModel);
 
-			this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
-			this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
-			this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
+		this.getAssetList = this.taskManagerService.getAssetListForComboBox.bind(this.taskManagerService);
+		this.predecessorSuccessorColumns = this.taskSuccessorPredecessorColumnsModel.columns;
+		this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
 
-			const commonCalls = [
-				this.taskManagerService.getStatusList(this.model.id),
-				this.taskManagerService.getAssignedTeam(this.model.id),
-				this.taskManagerService.getStaffRoles(),
-				this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
-				this.taskManagerService.getActionList()
-			];
+		const commonCalls = [
+			this.taskManagerService.getStatusList(this.model.id),
+			this.taskManagerService.getAssignedTeam(this.model.id),
+			this.taskManagerService.getStaffRoles(),
+			this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
+			this.taskManagerService.getActionList()
+		];
 
-			if (this.taskDetailModel.modal.type === ModalType.CREATE) {
-				commonCalls.push(this.taskManagerService.getAssetClasses());
-				commonCalls.push(this.taskManagerService.getAssetCommentCategories());
-				commonCalls.push(this.taskManagerService.getEvents());
-				commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
-				commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
-			}
+		if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+			commonCalls.push(this.taskManagerService.getAssetClasses());
+			commonCalls.push(this.taskManagerService.getAssetCommentCategories());
+			commonCalls.push(this.taskManagerService.getEvents());
+			commonCalls.push(this.taskManagerService.getLastCreatedTaskSessionParams());
+			commonCalls.push(this.taskManagerService.getClassForAsset(this.model.id));
+		}
 
-			this.metaParam = this.getMetaParam();
-			Observable.forkJoin(commonCalls)
-				.subscribe((results: any[]) => {
-					const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
+		this.metaParam = this.getMetaParam();
+		Observable.forkJoin(commonCalls)
+			.subscribe((results: any[]) => {
+				const [status, personList, staffRoles, dateFormat, actions, assetClasses, categories, events, taskDefaults, classForAsset] = results;
 
-					this.model.statusList = status;
-					// Add Unassigned and Auto options to staff list
-					personList.push({id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic'});
-					this.model.personList = personList
-						.sort((a, b) => SortUtils.compareByProperty(a, b, 'sortOn'))
-						.map((item) => ({id: item.id, text: item.nameRole}));
-					this.model.personList.unshift({id: 0, text: 'Unassigned'});
-					// Add Unassigned and Auto options to roles list
-					staffRoles.push({id: 'AUTO', description: 'Automatic'});
-					this.model.teamList = staffRoles
-						.sort((a, b) => SortUtils.compareByProperty(a, b, 'description'))
-						.map((item) => ({id: item.id, text: item.description}));
-					this.model.teamList.unshift({id: null, text: 'Unassigned'});
-					// set defaults
-					if (this.taskDetailModel.modal.type === ModalType.CREATE) {
-						this.model.assignedTo = this.model.personList[0];
-						this.model.assignedTeam = this.model.teamList[0];
-					}
-					this.dateFormat = dateFormat;
-					this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
-					if (categories) {
-						this.model.categoriesList = [''].concat(categories);
-					}
-					if (events) {
-						this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
-					}
-					if (taskDefaults && taskDefaults.preferences) {
-						this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT'] || '', text: ''};
-						this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
-						this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
-						this.metaParam = this.getMetaParam();
-					}
-					if (assetClasses) {
-						this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
-					}
-					// on CREATE mode
-					if (this.taskDetailModel.modal.type === ModalType.CREATE) {
-						this.model.assetClass = (classForAsset && classForAsset.assetClass)
-							? {id: classForAsset.assetClass, text: ''}
-							: {id: this.model.assetClasses[0].id, text: ''};
-						// on EDIT mode and empty assetClass
-					} else if (!this.model.assetClass || !this.model.assetClass.id) {
-						this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
-					} else {
-						// for displaying the existing assetClass
-						const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
-						this.model.assetClass = {id: deCapitilized, text: deCapitilized};
-					}
-					jQuery('[data-toggle="popover"]').popover();
-					this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
-				});
+				this.model.statusList = status;
+				// Add Unassigned and Auto options to staff list
+				personList.push({id: 'AUTO', nameRole: 'Automatic', sortOn: 'Automatic'});
+				this.model.personList = personList
+					.sort((a, b) => SortUtils.compareByProperty(a, b, 'sortOn'))
+					.map((item) => ({id: item.id, text: item.nameRole}));
+				this.model.personList.unshift({id: 0, text: 'Unassigned'});
+				// Add Unassigned and Auto options to roles list
+				staffRoles.push({id: 'AUTO', description: 'Automatic'});
+				this.model.teamList = staffRoles
+					.sort((a, b) => SortUtils.compareByProperty(a, b, 'description'))
+					.map((item) => ({id: item.id, text: item.description}));
+				this.model.teamList.unshift({id: null, text: 'Unassigned'});
+				// set defaults
+				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+					this.model.assignedTo = this.model.personList[0];
+					this.model.assignedTeam = this.model.teamList[0];
+				}
+				this.dateFormat = dateFormat;
+				this.model.apiActionList = actions.map((item) => ({id: item.id, text: item.name}));
+				if (categories) {
+					this.model.categoriesList = [''].concat(categories);
+				}
+				if (events) {
+					this.model.eventList = events.map((item) => ({id: item.id.toString(), text: item.name}));
+				}
+				if (taskDefaults && taskDefaults.preferences) {
+					this.model.event = {id: taskDefaults.preferences['TASK_CREATE_EVENT'] || '', text: ''};
+					this.model.category = taskDefaults.preferences['TASK_CREATE_CATEGORY'] || 'general';
+					this.model.status = taskDefaults.preferences['TASK_CREATE_STATUS'] || TaskStatus.READY;
+					this.metaParam = this.getMetaParam();
+				}
+				if (assetClasses) {
+					this.model.assetClasses = assetClasses.map((item) => ({id: item.key, text: item.label}));
+				}
+				// on CREATE mode
+				if (this.taskDetailModel.modal.type === ModalType.CREATE) {
+					this.model.assetClass = (classForAsset && classForAsset.assetClass)
+						? {id: classForAsset.assetClass, text: ''}
+						: {id: this.model.assetClasses[0].id, text: ''};
+					// on EDIT mode and empty assetClass
+				} else if (!this.model.assetClass || !this.model.assetClass.id) {
+					this.model.assetClass = {id: this.model.assetClasses[0].id, text: ''};
+				} else {
+					// for displaying the existing assetClass
+					const deCapitilized = StringUtils.toCapitalCase(this.model.assetClass.id);
+					this.model.assetClass = {id: deCapitilized, text: deCapitilized};
+				}
+				jQuery('[data-toggle="popover"]').popover();
+				this.taskEditCreateForm.form.controls['percentageComplete'].markAsPristine();
+			});
 
-			this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
-			this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
-			this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
-			this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
+		this.dataGridTaskPredecessorsHelper = new DataGridOperationsHelper(this.model.predecessorList, null, null);
+		this.dataGridTaskSuccessorsHelper = new DataGridOperationsHelper(this.model.successorList, null, null);
+		this.dataGridTaskNotesHelper = new DataGridOperationsHelper(this.modelHelper.generateNotes(this.model.notesList), null, null);
+		this.hasCookbookPermission = this.permissionService.hasPermission(Permission.CookbookView) || this.permissionService.hasPermission(Permission.CookbookEdit);
 
-			this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
-			this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
-		});
+		this.hasDeleteTaskPermission = this.permissionService.hasPermission(Permission.TaskDelete);
+		this.hasEditTaskPermission = this.permissionService.hasPermission(Permission.TaskEdit);
 	}
 
 	// set the handlers on open / on close to set the flags that indicate the state of the

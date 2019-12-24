@@ -7,34 +7,35 @@ import {Observable} from 'rxjs';
 import {PostNoticesService} from './post-notices.service';
 
 import {switchMap} from 'rxjs/operators';
+import {Store} from '@ngxs/store';
+import {PostNoticeRemove} from '../action/notice.actions';
 
 @Injectable()
 export class PostNoticesManagerService {
-	private postNotices: any;
 
-	constructor(private postNoticesService: PostNoticesService) {
-		this.postNotices = null;
+	constructor(
+		private postNoticesService: PostNoticesService,
+		private store: Store) {
 	}
 
-	getNotices(): Observable<any> {
-		// if notices already exists, return the collection
-		if (this.postNotices && this.postNotices !== null  && this.postNotices.length > 0) {
-			return Observable.of(this.postNotices);
-		}
-
-		// otherwise call the endpoint
+	/**
+	 * Get The List of Post Notices
+	 */
+	public getPostNotices(): Observable<any> {
 		return this.postNoticesService
-			.getUserPostNotices()
+			.getPostNotices()
 			.pipe(
 				switchMap((postNotices) => {
-					this.postNotices = postNotices;
 					return Observable.of(postNotices);
 				})
 			);
 	}
 
-	hasNoticesPending(): Observable<any> {
-		return this.getNotices()
+	/**
+	 * Does the Notices is a Pending State?
+	 */
+	public hasNoticesPending(): Observable<any> {
+		return this.getPostNotices()
 			.pipe(
 				switchMap((postNotices) => {
 					const itemsCounter =  (postNotices && postNotices.notices || []).length > 0;
@@ -49,7 +50,7 @@ export class PostNoticesManagerService {
 	 * @param {number} id:  Id of the notice
 	 * @returns NoticeModel
 	 */
-	setAcknowledge(id: number) {
+	public setAcknowledge(id: number) {
 		return this.postNoticesService.setAcknowledge(id)
 		.pipe(
 			switchMap((result) => {
@@ -59,8 +60,12 @@ export class PostNoticesManagerService {
 		);
 	}
 
+	/**
+	 * Remove the Notice from the Storage instead of the local so we have just single source of truth
+	 * @param id
+	 */
 	private removeNoticeFromCollection(id: number) {
-		this.postNotices.notices = this.postNotices.notices.filter((notice) => notice.id !== id);
+		this.store.dispatch(new PostNoticeRemove({id: id}));
 	}
 
 	/**
@@ -71,7 +76,6 @@ export class PostNoticesManagerService {
 		return this.postNoticesService.notifyContinue()
 			.pipe(
 				switchMap((result) => {
-					console.log(this.postNotices);
 					return Observable.of(result);
 				})
 			);
