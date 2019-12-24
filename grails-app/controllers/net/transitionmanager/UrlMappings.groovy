@@ -219,6 +219,13 @@ class UrlMappings {
 				GET: 'actions'
 			]
 		}
+
+		'/ws/bulkChange/etl' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				PUT: 'runETL'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveBundle/list" {
@@ -416,6 +423,11 @@ class UrlMappings {
 		"/ws/assetImport/initiateTransformData" {
 			controller = 'wsAssetImport'
 			action = [POST: 'initiateTransformData']
+		}
+
+		"/ws/assetImport/autoBatchProcessing" {
+			controller = 'wsAssetImport'
+			action = [POST: 'autoBatchProcessing']
 		}
 
 		"/ws/assetImport/viewData" {

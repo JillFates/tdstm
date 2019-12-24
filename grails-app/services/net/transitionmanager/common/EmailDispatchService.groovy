@@ -150,6 +150,13 @@ class EmailDispatchService implements ServiceMethods {
                     expiredTime: emailParams.expiredTime,
                     supportEmail: "support@transitionaldata.com",
                     username: ed.toPerson.userLogin?.username]
+			case "batchPostingResults":
+				return [
+					person: ed.toPerson.firstName,
+					batches: emailParams.batches,
+					serverURL: serverURL
+				]
+
 		}
 	}
 
@@ -163,10 +170,11 @@ class EmailDispatchService implements ServiceMethods {
 	private String getTemplateView(ed) {
 		//TODO: here we should create a model for each. This should be changed to a OOP approach
 		switch (ed.bodyTemplate) {
-			case "passwordReset":      return "/auth/_forgotPasswordEmail"
+			case "passwordReset": return "/auth/"
 			case "passwordResetNotif": return "/auth/_resetPasswordNotificationEmail"
-			case "accountActivation":  return "/auth/_accountActivationNotificationEmail"
+			case "accountActivation": return "/auth/_accountActivationNotificationEmail"
 			case "adminResetPassword": return "/admin/_ResetPasswordNotificationEmail"
+			case "batchPostingResults": return "/auth/_importBatchPostingResultsEmail"
 		}
 	}
 

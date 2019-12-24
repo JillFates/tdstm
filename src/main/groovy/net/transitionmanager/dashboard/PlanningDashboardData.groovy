@@ -449,7 +449,7 @@ class PlanningDashboardData {
 			if (customFieldSetting?.constraints?.values) {
 				Map sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 					if ( ! it ) {
-						result[Application.UNKNOWN] = 0
+						result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 					} else if (metrics[it]) {
 						result[it] = 0
 					}

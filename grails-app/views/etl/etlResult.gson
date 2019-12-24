@@ -1,0 +1,54 @@
+import com.tdsops.etl.DomainResult
+import com.tdsops.etl.ETLProcessorResult
+import com.tdsops.etl.FieldResult
+import com.tdsops.etl.RowResult
+
+model {
+	ETLProcessorResult result
+}
+
+json {
+	'ETLInfo' result.ETLInfo
+	consoleLog result.consoleLog
+	domains(result.domains) { DomainResult result ->
+
+		data(result.data) { RowResult rowResult ->
+			comments rowResult.comments
+			duplicate rowResult.duplicate
+			errorCount rowResult.errorCount
+			errors rowResult.errors
+
+			fields rowResult.fields.collectEntries { String key, FieldResult fieldResult ->
+				[(key): [
+					create       : fieldResult.create,
+					errors       : fieldResult.errors,
+					fieldOrder   : fieldResult.fieldOrder,
+
+					find         : [
+						matchOn: fieldResult.find.matchOn,
+						query  : fieldResult.find.query,
+						results: fieldResult.find.results,
+						size   : fieldResult.find.size
+					],
+
+					init         : fieldResult.init,
+					originalValue: fieldResult.originalValue,
+					update       : fieldResult.update,
+					value        : fieldResult.value,
+					warn         : fieldResult.warn
+				]]
+			}
+
+			op rowResult.op
+			rowNum rowResult.rowNum
+			warn rowResult.warn
+			tags rowResult.tags
+		}
+
+		domain result.domain
+		fieldLabelMap result.fieldLabelMap
+		fieldNames result.fieldNames
+
+	}
+	version result.version
+}
