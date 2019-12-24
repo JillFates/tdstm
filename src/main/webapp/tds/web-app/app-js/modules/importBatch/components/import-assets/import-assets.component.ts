@@ -360,6 +360,7 @@ export class ImportAssetsComponent implements OnInit {
 
 		// delete temporary transformed file
 		if (this.transformResult && this.transformResult.data) {
+		// if (this.transformResult && this.transformResult.status !== 'error') {
 			tempServerFilesToDelete.push(this.transformResult.data.filename)
 		}
 

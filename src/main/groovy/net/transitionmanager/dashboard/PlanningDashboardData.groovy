@@ -449,7 +449,7 @@ class PlanningDashboardData {
 			if (customFieldSetting?.constraints?.values) {
 				Map sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 					if ( ! it ) {
-						result[Application.UNKNOWN] = 0
+						result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 					} else if (metrics[it]) {
 						result[it] = 0
 					}
@@ -595,9 +595,9 @@ class PlanningDashboardData {
 			}
 
 			Map openIssuesParams = [project: project, type: AssetCommentType.TASK, event: moveEvent,
-			                        status : [AssetCommentStatus.READY, AssetCommentStatus.STARTED, AssetCommentStatus.PENDING]]
+			                        statusExcluded : AssetCommentStatus.COMPLETED ]
 			String openIssuesQuery = """SELECT count(*) FROM AssetComment WHERE project=:project
-				AND commentType=:type AND status IN (:status) AND moveEvent=:event AND isPublished=true"""
+				AND commentType=:type AND status <> :statusExcluded AND moveEvent=:event AND isPublished=true"""
 			Long openIssueCount = AssetComment.executeQuery(openIssuesQuery, openIssuesParams)[0]
 
 			metrics['openTasks'] << [moveEvent: moveEvent.id, count: openIssueCount]

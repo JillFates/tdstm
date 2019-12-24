@@ -47,6 +47,7 @@ export const en_DICTIONARY: Object = {
 		'PLEASE_SELECT': 'Please Select..',
 		'PROJECT': 'Project',
 		'PENDING': 'Pending',
+		'CORRUPT': 'Corrupt',
 		'TERMINATED': 'Terminated',
 		'CONTINUE': 'Continue',
 		'PROJECTS': 'Projects',
@@ -441,9 +442,13 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'ERROR_TITLE': 'Oops! Something went wrong.',
 		'ERROR_MESSAGE': 'The TransitionManager team will fix this as soon as possible.',
 		'UNAUTHORIZED_TITLE': 'You don\'t have permission to view this page.',
+		'UNLICENSED_TITLE': 'A license is required in order to enable all features of this application.',
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
-		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.'
+		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'WHY_THIS': 'Why am I seeing this?',
+		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
+		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
 	},
 	'PROVIDER': {
 		'CREATE_PROVIDER': 'Create Provider',
