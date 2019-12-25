@@ -66,6 +66,24 @@ interface ETLDataset {
      * @return an instance of {@code ETLIterator}
      */
     ETLIterator iterator()
+
+    /**
+     * Given a List of values for row values, it creates a map with it.
+     * <pre>
+     *    // given:
+     *    dataset.readColumns()*.label == ['application name', 'application vendor']
+     *    List<String> rowValues = ['Zulu 01', 'ACME']
+     *    // then:
+     *    dataset.convertRowValuesToMap(rowValues) == [
+     *          ['application name': 'Zulu 01'],
+     *          ['application vendor': 'ACME'],
+     *    ]
+     * </pre>
+     * @param List of String with row values
+     *
+     * @return a Map with column name as a key and row value as a Map value
+     */
+    Map<String, ?> convertRowValuesToMap(List<String> rowValues)
 }
 
 /**

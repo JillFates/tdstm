@@ -146,6 +146,22 @@ class CSVDataset implements ETLDataset {
         return iterator
     }
 
+    /**
+     * @inheritDoc
+     */
+    @Override
+    Map<String, ?> convertRowValuesToMap(List<String> rowValues) {
+        Map<String, ?> row = [:]
+        Integer columnSize = this.columnNames.size()
+        Integer rowValuesSize = rowValues.size()
+
+        for (int index; index < columnSize; index++) {
+            row[columnNames.get(index)] = index < rowValuesSize ? rowValues.get(index) : null
+        }
+
+        return row
+    }
+
     class CSVStreamingIterator implements ETLIterator {
 
         LineIterator iterator

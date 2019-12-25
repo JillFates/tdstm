@@ -13,15 +13,6 @@ class DataSetRowFacade {
 
     private Map row = [:]
 
-    DataSetRowFacade(List<Column> columns, List<String> rowValues) {
-        Integer columnSize = columns.size()
-        Integer rowValuesSize = rowValues.size()
-
-        for (int index; index < columnSize; index++) {
-            row[columns.get(index).label] = index < rowValuesSize ? rowValues.get(index) : null
-        }
-    }
-
     DataSetRowFacade(Map row) {
         this.row = row
     }

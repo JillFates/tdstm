@@ -537,7 +537,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
                 bindVariable(ROW_VARNAME, this.currentRowIndex)
                 this.cleanUpBindingAndReleaseLookup()
-                bindVariable(SOURCE_VARNAME, new DataSetRowFacade(this.columns, row))
+                bindVariable(SOURCE_VARNAME, new DataSetRowFacade(this.dataset.convertRowValuesToMap(row)))
                 bindVariable(DOMAIN_VARNAME, new DomainFacade(this.result))
 
                 this.currentRow = new Row(row, this)

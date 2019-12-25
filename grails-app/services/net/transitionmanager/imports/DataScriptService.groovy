@@ -340,18 +340,46 @@ class DataScriptService implements ServiceMethods{
         return [canDelete: !foundReferences, references: foundReferences]
     }
 
+	/**
+	 * <p>It creates a Map result for an instance of {@code ETLDataset}.</p>
+	 * <p>Given the following CSV dataset:</p>
+	 * <pre>
+	 *	application name, application vendor
+	 *	iOS,Apple
+	 *	Windows,Microsoft
+	 *	...
+	 * </pre>
+	 * <p>It creates the following map as response:</p>
+	 * <pre>
+	 * 	[
+	 *		[
+	 *			'application name': 'iOS',
+	 *			'application vendor': 'Apple'
+	 *		],
+	 *		[
+	 *			'application name': 'Windows',
+	 *			'application vendor': 'Microsoft'
+	 *		]
+	 *  ]
+	 * </pre>
+	 * <p></p>
+	 * @param dataset
+	 * @param rootNode
+	 * @param maxRows
+	 * @return
+	 */
 	Map<String, ?> buildMapResultForETLDataset(ETLDataset dataset, String rootNode, Long maxRows) {
 
 		Map<String, ?> results = [
-				config: dataset.readColumns().collect {[property: it.label, type: 'text']},
-				rows: []
+				config: dataset.readColumns().collect { [property: it.label, type: 'text'] },
+				rows  : []
 		]
 
 		ETLIterator iterator = dataset.iterator()
 		Long rowsCount = 0
 		try {
 			while (iterator.hasNext() && rowsCount++ < maxRows) {
-				Map<String, ?> row = iterator.next()
+				Map<String, ?> row = dataset.convertRowValuesToMap(iterator.next())
 				results.rows.add(row)
 			}
 		} finally {
