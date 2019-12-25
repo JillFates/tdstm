@@ -163,4 +163,40 @@ class DatabaseMigrationService implements ServiceMethods {
         List params = [id, name, Project.DEFAULT_PROJECT_ID, true, new Date(), jsonSpec]
         sql.execute 'insert into dataview(id, name, project_id, is_system, date_created, report_schema) values(?,?,?,?,?,?)',  params
 	}
+
+
+	/**
+	 * Retrieve a Foreign Key for table and column.
+	 * @param sql
+	 * @param table
+	 * @param column
+	 * @return
+	 */
+	String getForeignKey(Sql sql, String table, String column) {
+		String fkName = null
+		def foreignKey = sql.firstRow("""
+					SELECT CONSTRAINT_NAME 
+					FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+					WHERE TABLE_NAME = :table AND REFERENCED_COLUMN_NAME = :column""", [table: table, column: column])
+
+		if (foreignKey) {
+			fkName = foreignKey.CONSTRAINT_NAME
+		}
+
+		return fkName
+	}
+
+	/**
+	 * Delete the given foreign key from the table.
+	 * @param sql
+	 * @param table
+	 * @param fk
+	 */
+	void deleteForeignKey(Sql sql, String table, String fk) {
+		if (table && fk) {
+			// Put together the statement beforehand as it doesn't like the table name being a parameter.
+			String statement = "ALTER TABLE ${table} DROP FOREIGN KEY `${fk}`"
+			sql.executeUpdate(statement)
+		}
+	}
 }

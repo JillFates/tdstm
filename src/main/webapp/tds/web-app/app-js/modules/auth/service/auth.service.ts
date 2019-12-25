@@ -14,9 +14,8 @@ import {WindowService} from '../../../shared/services/window.service';
 // Other
 import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {PostNoticesManagerService} from './post-notices-manager.service';
+import {PostNoticesService} from './post-notices.service';
 import {APP_STATE_KEY} from '../../../shared/providers/localstorage.provider';
-// import {Router} from "@angular/router";
 
 export enum AUTH_API_URLS {
 	SIGN_IN = '/tdstm/auth/signIn',
@@ -32,7 +31,7 @@ export class AuthService {
 		private permissionService: PermissionService,
 		private userService: UserService,
 		private windowService: WindowService,
-		private postNoticesManagerService: PostNoticesManagerService,
+		private postNoticesService: PostNoticesService,
 		// private router: Router,
 		private store: Store) {
 	}
@@ -51,14 +50,14 @@ export class AuthService {
 					return observer.complete();
 				}
 				contextPromises.push(from(new Promise(resolve => resolve(userContext))));
-				contextPromises.push(this.userService.getLicenseInfo());
+				contextPromises.push(this.userService.getLicense());
 				contextPromises.push(this.permissionService.getPermissions());
-				contextPromises.push(this.postNoticesManagerService.getNotices());
+				contextPromises.push(this.postNoticesService.getPostNotices());
 
 				Observable.forkJoin(contextPromises)
 					.subscribe((contextResponse: any) => {
-						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
+						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER];
+						userContext.license = contextResponse[USER_CONTEXT_REQUEST.LICENSE];
 						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
 						userContext.postNotices = contextResponse[USER_CONTEXT_REQUEST.NOTICES];
 						observer.next(userContext);

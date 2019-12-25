@@ -108,13 +108,14 @@
                                                         <label><span>Action</span></label>
                                                     </td>
                                                     <td class="valueNW">
-                                                        <kendo-dropdownlist
+                                                        <kendo-combobox
+																																class="api-action-combobox"
                                                                 name="apiActionList"
-                                                                [data]="model.apiActionList"
+																																[data]="model.apiActionList"
                                                                 [textField]="'text'"
                                                                 [valueField]="'id'"
                                                                 [(ngModel)]="model.apiAction">
-                                                        </kendo-dropdownlist>
+                                                        </kendo-combobox>
                                                     </td>
                                                 </tr>
 
@@ -331,7 +332,7 @@
                                                     <td class="label N edge-cell" nowrap="nowrap">
                                                             <label><span>Completion %</span></label>
                                                     </td>
-    
+
                                                     <td class="valueNW completion">
                                                         <tds-number-control
                                                             name="percentageComplete"

@@ -49,7 +49,7 @@ import {ReportComponent} from '../report.component';
 										</div>
 									</div>
 									<div class="form-group row input">
-										<label class="col-sm-2 control-label" for="starstWithList">Start of with</label>
+										<label class="col-sm-2 control-label" for="starstWithList">Begins with</label>
 										<div class="col-sm-3">
 											<kendo-dropdownlist
 												name="startsWithList"

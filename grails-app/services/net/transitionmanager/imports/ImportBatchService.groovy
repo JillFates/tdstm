@@ -3,6 +3,7 @@ package net.transitionmanager.imports
 import com.tdsops.common.lang.ExceptionUtil
 import com.tdsops.tm.enums.domain.ImportBatchRecordStatusEnum
 import com.tdsops.tm.enums.domain.ImportBatchStatusEnum
+import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.JsonUtil
 import com.tdssrc.grails.NumberUtil
@@ -37,9 +38,10 @@ class ImportBatchService implements ServiceMethods {
 	 * @param project - the project to retrieve batches for
 	 * @param batchId - optional parameter to filter results to a single batch
 	 * @param batchStatus - optional parameter to filter results to a specified Status
+	 * @param groupGuid - optional parameter to filter results by an {@code ImportBatch#groupGuid}
 	 * @return a Map a map of each batch where the key is the ordinal position in the query (why not a list???)
 	 */
-	Map findBatchesWithSummary(Project project, Long batchId = null, ImportBatchStatusEnum batchStatus = null) {
+	Map findBatchesWithSummary(Project project, Long batchId = null, ImportBatchStatusEnum batchStatus = null, String groupGuid = null) {
 
 		// Query the info batch and the number of records grouped by status in order to
 		// create a list of [batch, status, number of records]
@@ -53,12 +55,15 @@ class ImportBatchService implements ServiceMethods {
 				eq('batch.id', batchId)
 			}
 
+			if (groupGuid) {
+				eq('batch.groupGuid', groupGuid)
+			}
+
 			eq('batch.project', project)
 			projections{
 				property('importBatch')
 				property('status')
 				count('id', 'statusCount')
-
 			}
 			groupProperty('importBatch')
 			groupProperty('status')
@@ -76,7 +81,18 @@ class ImportBatchService implements ServiceMethods {
 				batchMap = results[batch.id]
 			} else {
 				batchMap = batch.toMap()
-				batchMap['recordsSummary'] = [count:0, erred: 0, ignored:0, pending:0, processed: 0]
+				batchMap['recordsSummary'] = [
+					count:0,
+					erred: 0,
+					ignored:0,
+					pending:0,
+					processed: 0,
+					inserted: 0,
+					updated: 0,
+					unchanged: 0,
+					deleted: 0,
+					tbd: 0
+				]
 
 				results[batch.id] = batchMap
 			}
@@ -110,6 +126,10 @@ class ImportBatchService implements ServiceMethods {
 				eq('batch.id', batchId)
 			}
 
+			if (groupGuid) {
+				eq('batch.groupGuid', groupGuid)
+			}
+
 			gt('errorCount', (long)0)
 			eq('batch.project', project)
 			projections {
@@ -124,6 +144,56 @@ class ImportBatchService implements ServiceMethods {
 			ImportBatch batch = (ImportBatch) batchErrorInfo[0]
 			Map batchMap = results[batch.id]
 			batchMap['recordsSummary']['erred'] = batchErrorInfo[1]
+		}
+
+		// Query for the info about operation records.
+		List batchOperationList = ImportBatchRecord.createCriteria().list {
+			createAlias('importBatch', 'batch')
+			if (batchStatus){
+				eq('batch.status', batchStatus)
+			}
+
+			if (batchId) {
+				eq('batch.id', batchId)
+			}
+
+			if (groupGuid) {
+				eq('batch.groupGuid', groupGuid)
+			}
+			eq('batch.project', project)
+			projections{
+				property('importBatch')
+				property('operation')
+				count('id')
+
+			}
+			groupProperty('importBatch')
+			groupProperty('operation')
+		}
+
+		for (batchOperation in batchOperationList){
+			ImportBatch batch = (ImportBatch) batchOperation[0]
+			Map batchOperationMap = results[batch.id]
+
+			ImportOperationEnum operation = batchOperation[1]
+			Long count = batchOperation[2]
+			switch(operation) {
+				case ImportOperationEnum.INSERT:
+					batchOperationMap['recordsSummary']['inserted'] = count
+					break
+				case ImportOperationEnum.DELETE:
+					batchOperationMap['recordsSummary']['deleted'] = count
+					break
+				case ImportOperationEnum.UPDATE:
+					batchOperationMap['recordsSummary']['updated'] = count
+					break
+				case ImportOperationEnum.UNCHANGED:
+					batchOperationMap['recordsSummary']['unchanged'] = count
+					break
+				case ImportOperationEnum.TBD:
+					batchOperationMap['recordsSummary']['tbd'] = count
+					break
+			}
 		}
 
 		return results

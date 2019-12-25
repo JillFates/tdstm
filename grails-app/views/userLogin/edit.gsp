@@ -200,8 +200,12 @@
 								<label for="lockedOutUntilId">Locked Out Until:</label>
 							</td>
 							<td valign="top" class="value ${hasErrors(bean: userLoginInstance, field: 'lockedOutUntil', 'errors')}">
-								<input type="text" class="dateRange" id="lockedOutUntilId" name="lockedOutUntil" readonly="true"
-									value="<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" formate="12hrs" />"/>
+								<g:if test="${userLoginInstance?.lockedOutUntil}">
+									<span id="lockedOutUntilId" type="text" class="dateRange" name="lockedOutUntil">
+										<tds:convertDateTime date="${userLoginInstance?.lockedOutUntil}" formate="12hrs" />
+									</span>
+								</g:if>
+                            	<g:else>Not Locked Out</g:else>
 								<g:hasErrors bean="${userLoginInstance}" field="lockedOutUntil">
 									<div class="errors">
 										<g:renderErrors bean="${userLoginInstance}" as="list" field="lockedOutUntil"/>

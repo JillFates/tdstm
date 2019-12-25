@@ -1,5 +1,6 @@
 databaseChangeLog = {
 	include file: '20140307-sequence-logic.groovy' // Run on every migration to assure the tdstm_sequencer stored proc exists
+	include file: 'version/v4_7_2/20191219-delete-orphaned-dataviews-and-add-constraints.groovy' // Fix dataview constraints before running 20190930-fix-dataviews.groovy
 	include file: 'version/v4_7_1/20190930-fix-dataviews.groovy' //TM-15976 added to the beginning to fix the ability to upgrade from 4.5, because of a bug in a previous migration
 	include file: '20180508-add-asset-class-to-transferbatch.groovy'
 	include file: '20180508-migrate-and-remove-eav.groovy'
@@ -78,5 +79,7 @@ databaseChangeLog = {
 	include file: 'version/v4_7_1/20191112-fixing-role-prefix-in-asset-comment.groovy'
 	include file: 'version/v4_7_2/20190930-update-dataviews.groovy'
 	include file: 'version/v4_7_2/20191009-drop-tables-move-bundle-step-and-step-snapshot.groovy'
+	include file: 'version/v4_7_2/20191028-batch-management-auto-process-import.groovy'
+	include file: 'version/v4_7_2/20191119-add-use_with_asset_actions.groovy'
 	include file: 'version/v4_7_2/20191120-add-tags-import-batch-record.groovy'
 }
