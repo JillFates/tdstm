@@ -116,7 +116,7 @@ export class TaskEditCreateCommonComponent extends UIExtraDialog implements OnIn
 			this.isEventLocked = this.model.predecessorList.length > 0 || this.model.successorList.length > 0;
 
 			const commonCalls = [
-				this.taskManagerService.getStatusList(this.model.id),
+				this.taskManagerService.getStatusList(),
 				this.taskManagerService.getAssignedTeam(this.model.id),
 				this.taskManagerService.getStaffRoles(),
 				this.userPreferenceService.getUserDatePreferenceAsKendoFormat(),
