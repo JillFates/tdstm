@@ -118,12 +118,8 @@ export class TaskService {
 	 * Get the status list for the asset id provided
 	 * @returns {Observable<any>}
 	 */
-	getStatusList(commentId: any): Observable<any> {
-		if ( !commentId || commentId === null ) {
-			return Observable.of([]);
-		}
-
-		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json&id=${ commentId }`, null)
+	getStatusList(): Observable<any> {
+		return this.http.post(`${ this.baseURL }/assetEntity/updateStatusSelect?format=json`, null)
 			.map((response: any) => {
 				return response && response.status === 'success' && response.data;
 			})
