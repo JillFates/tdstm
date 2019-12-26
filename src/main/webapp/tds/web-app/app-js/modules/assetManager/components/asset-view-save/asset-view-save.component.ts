@@ -227,7 +227,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	private setDisabling(): void {
-		if(this.saveOptions) {
+		if (this.saveOptions) {
 			const options = Object.entries(this.saveAsOptions);
 			for (const [key, value] of options) {
 				value.disabled = !this.saveOptions.saveAsOptions.includes(key);

@@ -44,8 +44,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public saveOptions: any;
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
-	private lastSnapshot;
-	protected navigationSubscription;
+	private lastSnapshot: any;
+	protected navigationSubscription: any;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
@@ -54,7 +54,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
-	private userContext:UserContextModel;
+	private userContext: UserContextModel;
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
@@ -381,9 +381,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public isDefaultProject(): boolean {
 		return (
-			this.userContext && 
+			this.userContext &&
 			this.userContext.project &&
-			this.userContext.defaultProject && 
+			this.userContext.defaultProject &&
 			this.userContext.project.id === this.userContext.defaultProject.id
 		);
 	}

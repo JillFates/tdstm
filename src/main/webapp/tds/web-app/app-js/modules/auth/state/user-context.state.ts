@@ -166,15 +166,11 @@ export class UserContextState {
 
 	@Action(SetDefaultProject)
 	setDefaultProject(ctx: StateContext<UserContextModel>, { payload }: SetDefaultProject) {
-		return this.userService.getLicenseInfo().pipe(
-			tap(result => {
-				const state = ctx.getState();
-				ctx.setState({
-					...state,
-					defaultProject: { id: payload.id, name: payload.name, logoUrl: payload.logoUrl }
-				});
-			}),
-		);
+		const state = ctx.getState();
+		ctx.setState({
+			...state,
+			defaultProject: payload,
+		});
 	}
 
 	@Action(SetProject)
