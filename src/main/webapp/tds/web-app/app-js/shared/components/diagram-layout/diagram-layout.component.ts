@@ -938,6 +938,20 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	}
 
 	/**
+	 * highlight nodes by custom field and value
+	 * @param {number[]} keys
+	 **/
+	highlightNodes(keys: number[]): void {
+		this.diagram.commit(d => {
+			const highlightCollection = d.nodes && d.findNodesByExample(keys);
+			if (highlightCollection && highlightCollection.count > 0) {
+				d.selectCollection(highlightCollection);
+				d.centerRect(highlightCollection.first().actualBounds);
+			}
+		})
+	}
+
+	/**
 	 * Clear highlighted nodes
 	 **/
 	clearHighlights(): void {

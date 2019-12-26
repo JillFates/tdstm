@@ -44,6 +44,7 @@ import {DiagramEventAction} from '../../../../shared/components/diagram-layout/m
 import {DiagramLayoutService} from '../../../../shared/services/diagram-layout.service';
 import {SetEvent} from '../../../event/action/event.actions';
 import {Store} from '@ngxs/store';
+import {IFilterOption, ITaskHighlightOption} from '../../model/task-highlight-filter.model';
 
 @Component({
 	selector: 'tds-neighborhood',
@@ -56,7 +57,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	@ViewChild('graph', {static: false}) graph: DiagramLayoutComponent;
 	@ViewChild('eventsDropdown', {static: false}) eventsDropdown: DropDownListComponent;
 	@ViewChild('teamHighlightDropdown', {static: false}) teamHighlightDropdown: DropDownButtonComponent;
-	@ViewChild('highlightFilterText', {static: false}) highlightFilterText: ElementRef<HTMLElement>;
 	statusTypes = {
 		started: 'start',
 		pause: 'hold',
@@ -69,7 +69,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	};
 	opened: boolean;
 	filterText: string;
-	textFilter: ReplaySubject<string> = new ReplaySubject<string>(1);
 	icons = FA_ICONS;
 	selectedEvent: IMoveEvent;
 	eventList$: Observable<IMoveEvent[]>;
@@ -93,6 +92,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	hasCycles: boolean;
 	showCycles: boolean;
 	rootId: number;
+	highlightOptions$: ReplaySubject<ITaskHighlightOption> = new ReplaySubject<ITaskHighlightOption>(1);
 
 	constructor(
 			private taskService: TaskService,
@@ -121,8 +121,8 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	loadAll(): void {
-		this.subscribeToHighlightFilter();
 		this.loadUserContext();
+		this.loadHighlightOptions();
 		this.loadFilters();
 		this.loadEventList();
 		this.subscribeToEvents();
@@ -153,6 +153,34 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.notifierService
 			.on(TaskActionEvents.SHOW_ASSET_DETAIL, data =>
 				this.showAssetDetail({name: data.name, task: data.node}));
+	}
+
+	loadHighlightOptions(): void {
+		// this.taskService.highlightOptions()
+		// 	.subscribe(res => {
+		// 		const data = res.body && res.body.data;
+		// 		if (data) {
+		// 			this.highlightOptions$.next(data);
+		// 		}
+		// 	});
+		const mock: ITaskHighlightOption = {
+			persons: [
+				{id: 123, name: 'Bill Bord'},
+				{id: 456, name: 'Robin Banks'}
+			],
+			teams: [
+				{id: 'SYS_ADMIN', name: 'System Admin'}
+			],
+			ownerAndSmes: [
+				{id: 123, name: 'Bill Bord'},
+				{id: 456, name: 'Robin Banks'}
+			],
+			environments: [
+				{id: 'PRODUCTION', name: 'PRODUCTION'},
+				{id: 'DEVELOPMENT', name: 'DEVELOPMENT'}
+			],
+		};
+		this.highlightOptions$.next(mock);
 	}
 
 	/**
@@ -588,6 +616,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	highlightTasks(taskIds: any[]): void {
+		this.graph.highlightNodes(taskIds);
+	}
+
 	/**
 	 * Zoom in on the diagram
 	 **/
@@ -603,36 +635,10 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	}
 
 	/**
-	 * When highlight filter change update search
-	 **/
-	highlightFilterChange(): void {
-		this.textFilter.next(this.filterText);
-	}
-
-	/**
-	 * Highlight filter subscription
-	 **/
-	subscribeToHighlightFilter(): void {
-		this.textFilter
-			.pipe(
-				takeUntil(this.unsubscribe$),
-				skip(2),
-				distinctUntilChanged()
-			).subscribe(text => {
-				if (this.selectedTeam && this.selectedTeam.label) {
-					this.graph.highlightNodesByText(text, this.selectedTeam.label);
-				} else {
-					this.graph.highlightNodesByText(text);
-				}
-		});
-	}
-
-	/**
 	 * Reload Diagram data and re-render
 	 */
 	refreshDiagram(): void {
 		this.refreshTriggered = true;
-		this.subscribeToHighlightFilter();
 		this.loadData();
 		this.subscribeToEvents();
 	}
@@ -893,16 +899,6 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 			};
 			this.diagramLayoutService.setFullGraphCache(fullGraph);
 		}
-	}
-
-	/**
-	 * Clear text filter
-	 */
-	clearTextFilter(): void {
-		if (!this.filterText) { return; }
-		this.highlightFilterText.nativeElement.nodeValue = '';
-		this.filterText = '';
-		this.textFilter.next(null);
 	}
 
 	/**

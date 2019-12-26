@@ -27,6 +27,7 @@ import {DialogsModule} from '@progress/kendo-angular-dialog';
 import {TaskViewToggleComponent} from './components/common/task-view-toggle.component';
 import {TooltipModule} from '@progress/kendo-angular-tooltip';
 import {ButtonModule, DropDownButtonModule} from '@progress/kendo-angular-buttons';
+import {TaskHighlightFilter} from './components/common/task-highlight-filter.component';
 
 @NgModule({
 	imports: [
@@ -53,7 +54,8 @@ import {ButtonModule, DropDownButtonModule} from '@progress/kendo-angular-button
 	declarations: [
 		TaskListComponent,
 		NeighborhoodComponent,
-		TaskViewToggleComponent
+		TaskViewToggleComponent,
+		TaskHighlightFilter
 	],
 	providers: [
 		// Resolve
