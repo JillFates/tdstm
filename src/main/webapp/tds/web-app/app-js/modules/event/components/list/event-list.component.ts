@@ -117,10 +117,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
 			let { id, name } = this.resultSet.find((bundle: any) => {
-				return (
-					bundle.id ===
-					parseInt(this.route.snapshot.queryParams['show'], 0)
-				);
+				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0)
 			});
 			setTimeout(() => {
 				this.showEvent(id, name);
