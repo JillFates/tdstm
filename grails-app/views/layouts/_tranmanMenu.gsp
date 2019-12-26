@@ -265,12 +265,9 @@
                     <li class="dropdown menu-parent-tasks">
                         <a onclick="showMegaMenu('#teamMegaMenu')" href="#" class="dropdown-toggle" data-toggle="dropdown">Tasks</a>
                         <ul class="dropdown-menu menu-item-expand" role="menu">
-                                <li class="menu-child-item menu-parent-tasks-my-tasks">
-                                    <a href="/tdstm/task/listUserTasks">My Tasks (<span id="todoCountProjectId"></span>)</a>
-                                </li>
                                 <tds:hasPermission permission="${Permission.TaskManagerView}">
                                     <li class="menu-child-item menu-parent-tasks-task-manager">
-                                    <g:link controller="module" action="taskManager" id="list">Task Manager</g:link>
+                                    <g:link controller="module" action="taskManager" id="list">Task Manager (<span id="todoCountProjectId"></span>)</g:link>
                                 </li>
                                 </tds:hasPermission>
                                 <tds:hasPermission permission="${Permission.TaskGraphView}">
