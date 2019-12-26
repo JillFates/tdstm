@@ -1,17 +1,18 @@
-import net.transitionmanager.asset.AssetEntity
-import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.FileSystemService
 import test.helper.AssetEntityTestHelper
+
 @Integration
 @Rollback
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
