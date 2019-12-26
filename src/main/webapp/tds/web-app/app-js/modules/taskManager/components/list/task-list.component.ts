@@ -43,6 +43,8 @@ import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.help
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
 import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {PermissionService} from '../../../../shared/services/permission.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 @Component({
 	selector: 'task-list',
@@ -80,6 +82,7 @@ export class TaskListComponent {
 	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
 	public isFiltering  = false;
+	public allTasksPermission: boolean;
 
 	constructor(
 		private taskService: TaskService,
@@ -87,12 +90,14 @@ export class TaskListComponent {
 		private userPreferenceService: PreferenceService,
 		private loaderService: UILoaderService,
 		private store: Store,
+		private permissionService: PermissionService,
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
 		private activatedRoute: ActivatedRoute) {
+		this.allTasksPermission = this.permissionService.hasPermission(Permission.TaskManagerAllTasks);
+		this.justMyTasks = !this.allTasksPermission;
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
-		this.justMyTasks = false;
 		this.loading = true;
 		this.hideGrid = true;
 		this.rowsExpanded = false;
