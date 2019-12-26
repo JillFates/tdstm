@@ -204,19 +204,17 @@
 		</div>
 				
 		<div tdsScrollSection class="clr-row">
-			<div  class="clr-col-12">
-				<g:render 
-					template="/angular/common/commentList" 
-					model="[
-						asset:asset, 
-						prefValue: prefValue, 
-						viewUnpublishedValue: viewUnpublishedValue, 
-						currentUserId: currentUserId,
-						showTask:false,
-						showComment:true,
-					]" >
-				</g:render>
-			</div>
+			<g:render
+				template="/angular/common/commentList"
+				model="[
+					asset:asset,
+					prefValue: prefValue,
+					viewUnpublishedValue: viewUnpublishedValue,
+					currentUserId: currentUserId,
+					showTask:false,
+					showComment:true,
+				]" >
+			</g:render>
 		</div>
     </div>
 
