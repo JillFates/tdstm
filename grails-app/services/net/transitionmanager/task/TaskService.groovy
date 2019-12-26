@@ -52,6 +52,7 @@ import net.transitionmanager.exception.RecipeException
 import net.transitionmanager.exception.ServiceException
 import net.transitionmanager.imports.TaskBatch
 import net.transitionmanager.person.Person
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
@@ -112,7 +113,7 @@ class TaskService implements ServiceMethods {
 	LinkGenerator              grailsLinkGenerator
 	CoreService                coreService
 	CredentialService          credentialService
-	UserPreferenceService      userPreferenceService
+	UserPreferenceService	   userPreferenceService
 
 	private static final List<String> runbookCategories = [ACC.MOVEDAY, ACC.SHUTDOWN, ACC.PHYSICAL, ACC.STARTUP].asImmutable()
 	private static final List<String> categoryList = ACC.list
