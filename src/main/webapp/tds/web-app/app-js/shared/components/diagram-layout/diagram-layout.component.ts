@@ -76,9 +76,11 @@ const enum NodeTemplateEnum {
 					 [style.background]="getStatusColor(tooltipData?.status)"
 					 #nodeTooltip>
 					<div class="diagram-card-header"
-							 [style.background]="getStatusColor(tooltipData?.status)"
-							 [style.color]="getStatusTextColor(tooltipData?.status)">
-						<h4 class="k-align-self-center"> {{tooltipData?.name}} </h4>
+							 [style.background]="getStatusColor(tooltipData?.status)">
+						<h4
+								class="k-align-self-center"
+								style="font-weight: bold;"
+						    [style.color]="getStatusTextColor(tooltipData?.status)"> {{tooltipData?.name}}</h4>
 					</div>
 
 					<div class="diagram-card-content">
@@ -983,19 +985,16 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 			if (scale >= 0.6446089162177968
 					&& this.actualNodeTemplate !== NodeTemplateEnum.HIGH_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.HIGH_SCALE;
-				console.log('scale >= 0.6446089162177968');
 				this.highScaleNodeTemplate();
 			}
 			if (scale < 0.6446089162177968 && scale > 0.4581115219913999
 					&& this.actualNodeTemplate !== NodeTemplateEnum.MEDIUM_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.MEDIUM_SCALE;
-				console.log('scale < 0.6446089162177968');
 				this.mediumScaleNodeTemplate();
 			}
 			if (scale <= 0.4581115219913999
 					&& this.actualNodeTemplate !== NodeTemplateEnum.LOW_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.LOW_SCALE;
-				console.log('scale <= 0.4581115219913999');
 				this.lowScaleNodeTemplate();
 			}
 		}
@@ -1020,6 +1019,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		node.toolTip = this.createTooltip();
 		node.contextMenu = this.contextMenu();
 
+		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
+
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
 		node.click = (i, o) => this.onNodeClick(i, o);
@@ -1042,6 +1043,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		node.toolTip = this.createTooltip();
 		node.add(shape);
 		node.contextMenu = this.contextMenu();
+
+		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
