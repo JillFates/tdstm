@@ -132,10 +132,10 @@
                         </td>
                     </tr>
                     <tr *ngIf="planningDashboardModel.analysis.overdueTasks > 0">
-                        <td>
+                        <td class="planning-dashboard-overdue-tasks">
                             <a [routerLink]="['/taskManager', 'list']"
                                [queryParams]="{filter: 'generalOverDue', moveEvent:0,  justRemaining:1, viewUnpublished: 0}">
-                                {{planningDashboardModel.analysis.overdueTasks}}
+                                <span>{{planningDashboardModel.analysis.overdueTasks}}</span>
                             </a>
                         </td>
                         <td>
