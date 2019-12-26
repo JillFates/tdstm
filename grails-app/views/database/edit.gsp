@@ -36,126 +36,117 @@
 	<%-- Used to track dependencies added and deleted --%>
 	<g:render template="/assetEntity/dependentHidden" />
 
-
-<table style="border: 0" class="asset-entities-dialog-table-content">
-	<tr>
-		<td colspan="2">
-			<div class="dialog">
-				<table>
-					<tbody>
-						<tr>
+	<div class="legacy-modal-dialog">
+		<div class="legacy-modal-content">
+			<%-- Header Content Here --%>
+			<g:render template="/assetEntity/showHeader" model="[assetEntity:databaseInstance]"></g:render>
+			<div id="modalBody" class="legacy-modal-body">
+				<div class="legacy-modal-body-content">
+					<div class="grid-form" id="details">
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.assetName}" value="${databaseInstance?.assetName}"/>
-							<td colspan="3" style="font-weight:bold;">
-								<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${databaseInstance.assetName}"/>
-							</td>
-
+							<tds:inputControl field="${standardFieldSpecs.assetName}" tabindex="11" value="${databaseInstance.assetName}"/>
+						</div>
+						
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.description}" value="${databaseInstance?.description}"/>
-							<td colspan="3">
-								<tds:inputControl field="${standardFieldSpecs.description}" size="50" tabindex="12" value="${databaseInstance.description}" tooltipDataPlacement="bottom"/>
-							</td>
-						</tr>
-						<tr>
-							<tds:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}" tabindex="13"/>
+							<tds:inputControl field="${standardFieldSpecs.description}" tabindex="12" value="${databaseInstance.description}" tooltipDataPlacement="bottom"/>
+						</div>
 
-							<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${databaseInstance?.supportType}"/>
+						<tds:inputLabelAndField field="${standardFieldSpecs.dbFormat}" value="${databaseInstance.dbFormat}" tabindex="13"/>
+						<tds:inputLabelAndField field="${standardFieldSpecs.supportType}" value="${databaseInstance?.supportType}"/>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.environment}" value="${databaseInstance?.environment}"/>
-							<td data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.environment.tip}">
-								<tds:tooltipSpan field="${standardFieldSpecs.environment}">
-									<g:select class="${standardFieldSpecs.environment.imp?:''}" id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" />
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tr>
-							<td class="label ${standardFieldSpecs.size.imp?:''}" nowrap="nowrap">
-								<label for="size" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
-									${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
-								</label>
-							</td>
-							<td nowrap="nowrap" class="sizeScale">
-								<tds:inputControl field="${standardFieldSpecs.size}" size="4" tabindex="14" value="${databaseInstance.size}"/>
-								<tds:tooltipSpan field="${standardFieldSpecs.scale}">
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" id="environment" name="environment" from="${environmentOptions}" value="${databaseInstance.environment}" noSelection="${['':' Please Select']}" tabindex="32" />
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
+							<label for="size" class="clr-control-label ${standardFieldSpecs.size.imp?:''}" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.size.tip?:standardFieldSpecs.size.label}">
+								${standardFieldSpecs.size.label}/${standardFieldSpecs.scale.label}
+							</label>
+							<tds:inputControl field="${standardFieldSpecs.size}" tabindex="14" value="${databaseInstance.size}"/>
+
+							<div class="clr-control-container" style="padding-left: 30px;">
+  								<div class="clr-select-wrapper">
 									<g:select from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(databaseInstance.class).scale.inList}" id="scale" name="scale"
-											  value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}"/>
-								</tds:tooltipSpan>
-							</td>
+										value="${databaseInstance.scale}" optionValue="value" tabindex="15" noSelection="${['':'']}" class="clr-select"/>
+								</div>
+							</div>
+						</div>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.retireDate}" value="${databaseInstance?.retireDate}"/>
-							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'retireDate','errors')}">
-							    <script type="text/javascript" charset="utf-8">
-									jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
-					            </script>
-					            <input type="text" class="dateRange" size="15" style="width: 138px;" name="retireDate" id="retireDate"
-									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:standardFieldSpecs.retireDate.label}"
-					                	value="<tds:convertDate date="${databaseInstance?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="22" >
-							</td>
+							<script type="text/javascript" charset="utf-8">
+								jQuery(function($){ $(".dateRange").kendoDatePicker({ animation: false, format:tdsCommon.kendoDateFormat() }); });
+							</script>
+							<input type="text" class="dateRange" name="retireDate" id="retireDate"
+								data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.retireDate.tip?:standardFieldSpecs.retireDate.label}"
+									value="<tds:convertDate date="${databaseInstance?.retireDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="22" >
+						</div>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.moveBundle}" value="${databaseInstance?.moveBundle}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.moveBundle}">
-									<g:select class="${standardFieldSpecs.moveBundle.imp?:''}" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tr>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" from="${moveBundleList}" id="moveBundle" name="moveBundle.id" value="${databaseInstance?.moveBundle?.id}" optionKey="id" optionValue="name" tabindex="33" data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.moveBundle.tip}"/>
+								</div>
+							</div>
+						</div>
+
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.rateOfChange}" value="${databaseInstance?.rateOfChange}"/>
-							<td>
-								<tds:inputControl field="${standardFieldSpecs.rateOfChange}" size="4" tabindex="17" value="${databaseInstance.rateOfChange}"/>
-							</td>
+							<tds:inputControl field="${standardFieldSpecs.rateOfChange}" tabindex="17" value="${databaseInstance.rateOfChange}"/>
+						</div>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.maintExpDate}" value="${databaseInstance?.maintExpDate}"/>
-							<td valign="top" class="value ${hasErrors(bean:databaseInstance,field:'maintExpDate','errors')}">
-					           	<input type="text" class=" ${standardFieldSpecs.maintExpDate.imp?:''} dateRange" size="15" style="width: 138px;" name="maintExpDate" id="maintExpDate"
-									   data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
-					                	value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
-							</td>
+							<input type="text" class=" ${standardFieldSpecs.maintExpDate.imp?:''} dateRange" name="maintExpDate" id="maintExpDate"
+								data-toggle="popover" data-trigger="hover" data-content="${standardFieldSpecs.maintExpDate.tip?:standardFieldSpecs.maintExpDate.label}"
+									value="<tds:convertDate date="${databaseInstance?.maintExpDate}" />" onchange="tdsCommon.isValidDate(this.value);" tabindex="23" >
+						</div>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.planStatus}" value="${databaseInstance?.planStatus}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.planStatus}">
-									<g:select class="${standardFieldSpecs.planStatus.imp?:''}" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34"/>
-								</tds:tooltipSpan>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td></td>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" from="${planStatusOptions}" id="planStatus" name="planStatus" value="${databaseInstance.planStatus}" tabindex="34"/>
+								</div>
+							</div>
+						</div>
 
 							<tds:inputLabelAndField field="${standardFieldSpecs.externalRefId}" value="${databaseInstance.externalRefId}" tabindex="22"/>
 
+						<div class="clr-form-control">
 							<tds:inputLabel field="${standardFieldSpecs.validation}" value="${databaseInstance?.validation}"/>
-							<td>
-								<tds:tooltipSpan field="${standardFieldSpecs.validation}">
-									<g:select class="${standardFieldSpecs.validation.imp?:''}" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(databaseInstance.class).validation.inList}" id="validation" name="validation"
-										   value="${databaseInstance.validation}" tabindex="35"/>
-								</tds:tooltipSpan>
-							</td>
+							<div class="clr-control-container">
+  								<div class="clr-select-wrapper">
+									<g:select class="clr-select" from="${com.tdssrc.grails.GormUtil.getConstrainedProperties(databaseInstance.class).validation.inList}" id="validation" name="validation"
+										value="${databaseInstance.validation}" tabindex="35"/>
+								</div>
+							</div>
+							
+						</div>
+
+						<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>
+					</div>
+
+					<g:render template="/comment/assetTagsEdit"></g:render>
+
+					<table style="border: 0" class="asset-entities-dialog-table-content">
+						<tr id="databaseDependentId" class="assetDependent">
+							<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
 						</tr>
-						<tbody class="customTemplate">
-							<g:render template="/assetEntity/customEdit" model="[assetEntityInstance:databaseInstance]"></g:render>
-						</tbody>
-
-						<g:render template="/comment/assetTagsEdit"></g:render>
-
-					</tbody>
-				</table>
+					</table>
+				</div>
 			</div>
-		</td>
-	</tr>
-
-
-
-	<tr id="databaseDependentId" class="assetDependent">
-		<td class="depSpin"><span><asset:image src="images/processing.gif"/> </span></td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="buttons">
-				<g:render template="/assetEntity/editButtons" model="[assetEntity:databaseInstance]"></g:render>
-			</div>
-		</td>
-	</tr>
-</table>
+		</div>
+		<g:render template="/assetEntity/editButtons" model="[assetEntity:databaseInstance]"></g:render>
+	</div>
 </g:form>
 <script>
 

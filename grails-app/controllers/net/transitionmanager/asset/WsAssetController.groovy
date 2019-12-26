@@ -4,7 +4,6 @@ import com.tdsops.common.lang.CollectionUtils
 import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.tm.enums.FilenameFormat
 import com.tdsops.tm.enums.domain.AssetClass
-import com.tdsops.tm.enums.domain.AssetCommentCategory
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.FilenameUtil
 import com.tdssrc.grails.GormUtil
@@ -19,21 +18,21 @@ import net.transitionmanager.command.BundleChangeCommand
 import net.transitionmanager.command.CloneAssetCommand
 import net.transitionmanager.command.UniqueNameCommand
 import net.transitionmanager.command.assetentity.BulkDeleteDependenciesCommand
+import net.transitionmanager.common.ControllerService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.InvalidParamException
+import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.project.MoveBundleService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.common.ControllerService
-import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.UserLogin
 import net.transitionmanager.task.AssetComment
+import net.transitionmanager.task.TaskService
 import net.transitionmanager.utils.Profiler
 import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.impl.triggers.SimpleTriggerImpl
-
 /**
  * Created by @oluna on 4/5/17.
  */
@@ -42,18 +41,19 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Secured('isAuthenticated()')
 class WsAssetController implements ControllerMethods {
 
-	ApplicationService applicationService
-	AssetEntityService assetEntityService
-	AssetService assetService
-	CommentService commentService
-	ControllerService controllerService
-	DatabaseService databaseService
-	DeviceService deviceService
-	MoveBundleService moveBundleService
-	PageRenderer groovyPageRenderer
-	ProgressService progressService
-	Scheduler quartzScheduler
-	StorageService storageService
+	ApplicationService    applicationService
+	AssetEntityService    assetEntityService
+	AssetService          assetService
+	CommentService        commentService
+	TaskService           taskService
+	ControllerService     controllerService
+	DatabaseService       databaseService
+	DeviceService         deviceService
+	MoveBundleService     moveBundleService
+	PageRenderer          groovyPageRenderer
+	ProgressService       progressService
+	Scheduler             quartzScheduler
+	StorageService        storageService
 	UserPreferenceService userPreferenceService
 
 	/**
@@ -212,6 +212,7 @@ class WsAssetController implements ControllerMethods {
 	@HasPermission(Permission.AssetView)
 	def getTemplate(Long id, String mode) {
 		final List modes = ['edit','show']
+
 		if (! modes.contains(mode) || id == null ) {
 			sendBadRequest()
 			return
@@ -224,8 +225,15 @@ class WsAssetController implements ControllerMethods {
 			return
 		}
 
-		Map model = [ asset: asset ]
+		Map model = [
+			asset           : asset,
+			dependencyBundle: AssetDependencyBundle.findByAsset(asset)?.dependencyBundle,
+			taskCount       : taskService.countByAssetEntity(asset),
+			commentCount    : commentService.countByAssetEntity(asset)
+		]
+
 		String domainName = asset.assetClass.toString()
+
 		switch (domainName) {
 			case "APPLICATION":
 				model << applicationService.getModelForShow(asset.project, asset, params)
@@ -245,14 +253,17 @@ class WsAssetController implements ControllerMethods {
 		}
 
 		domainName=domainName.toLowerCase()
+
 		try {
 			String pageHtml = groovyPageRenderer.render(view: "/angular/$domainName/$mode", model: model)
+
 			if (pageHtml) {
 				render pageHtml
 			} else {
 				log.error "getTemplate() Generate page failed domainName=$domainName, mode=$mode\n  model:$model"
 				sendNotFound()
 			}
+
 		} catch (e) {
 			log.error "getTemplate() Generate page for domainName=$domainName, mode=$mode had an exception: ${e.getMessage()}"
 			sendNotFound()

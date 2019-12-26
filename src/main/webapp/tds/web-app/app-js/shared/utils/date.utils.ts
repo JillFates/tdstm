@@ -89,8 +89,8 @@ export class DateUtils {
 		if (!sourceTime) {
 			return null;
 		}
-		let adjustedTime = new Date ( sourceTime );
-		adjustedTime.setMinutes ( sourceTime.getMinutes() + sourceTime.getTimezoneOffset() );
+		let adjustedTime = new Date(sourceTime);
+		adjustedTime.setMinutes(sourceTime.getMinutes() + sourceTime.getTimezoneOffset());
 		return adjustedTime;
 	}
 
@@ -99,9 +99,19 @@ export class DateUtils {
 	 * @param {sourceTime} The original source in a GMT based timezone
 	 * @returns {string} The formatted day without hh:mm:ss
 	 */
-	public static getDateFromGMT(sourceTime: Date): string {
+	public static getDateFromGMT(sourceTime: Date | String): string {
 		const sourceZonedTime = moment.tz(sourceTime, this.TIMEZONE_GMT);
 		return sourceZonedTime.format('YYYY-MM-DD');
+	}
+
+	/**
+	 * Get the Date without the hh:mm:ss using an specific Date Format
+	 * @param {sourceTime} String Format, no time
+	 * @param {dateFormat} User dateFormat
+	 * @returns {date} The formatted day
+	 */
+	public static getDateFromFormat(sourceTime: Date, dateFormat: string): Date {
+		return new Date(moment(sourceTime, dateFormat));
 	}
 
 	public static getTimestamp(): String {
@@ -214,8 +224,8 @@ export class DateUtils {
 	 * @returns {init, end}
 	 */
 	public static getInitEndFromDate(date: Date): {init: Date, end: Date} {
-		const init = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-		const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+		const init = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+		const end = date ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59) : null;
 
 		return {init, end};
 	}
@@ -394,5 +404,13 @@ export class DateUtils {
 		} else {
 			return true;
 		}
+	}
+
+	/**
+	 * Convert a utc date string to a local date
+	 * @returns Date
+	 */
+	public static utcStringToLocalDate(utcString: string): Date | String {
+		return utcString ? DateUtils.toDateUsingFormat(DateUtils.getDateFromGMT(utcString), DateUtils.SERVER_FORMAT_DATE) : '';
 	}
 }

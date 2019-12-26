@@ -54,8 +54,8 @@ export class ProjectViewEditComponent implements OnInit {
 	private logoOriginalFilename;
 	public retrieveImageTimestamp = (new Date()).getTime(); // Update this to refresh the project logo
 
-	@ViewChild('startDatePicker') startDatePicker;
-	@ViewChild('completionDatePicker') completionDatePicker;
+	@ViewChild('startDatePicker', {static: false}) startDatePicker;
+	@ViewChild('completionDatePicker', {static: false}) completionDatePicker;
 	constructor(
 		private dialogService: UIDialogService,
 		private projectService: ProjectService,

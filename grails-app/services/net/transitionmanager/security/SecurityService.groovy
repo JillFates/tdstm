@@ -987,7 +987,7 @@ class SecurityService implements ServiceMethods, InitializingBean {
 		String currentPassword = userLogin.password
 		userLogin.applyPassword(clearTextPassword)
 
-		if (passwordEncoder.matches(clearTextPassword, currentPassword)) {
+		if (currentPassword && passwordEncoder.matches(clearTextPassword, currentPassword)) {
 			throw new InvalidParamException('New password must be different from the existing one')
 		}
 

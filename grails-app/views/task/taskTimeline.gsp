@@ -51,8 +51,8 @@
 								<input type="submit" name="Submit Button" id="SubmitButtonId" class="pointer graphButton" value="Highlight" />
 							</form>
 						</span>
-						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"></div>
-						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"></div>
+						<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton pointer hasMargin"><i class="fas fa-search-plus"></i></div>
+						<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton pointer"><i class="fas fa-search-minus"></i></div>
 						<span class="controlSpan checkboxContainer">
 							<input type="checkbox" id="highlightCriticalPathId" class="pointer" checked="checked"/>
 							<label for="highlightCriticalPathId" class="pointer">&nbsp;Highlight Critical Path</label>
@@ -65,6 +65,9 @@
 							<button onclick="baseLine()" title="Baseline" class="baseline-btn"><label>Baseline Plan</label></button>
 						</span>
 
+						<div style="float: right;" class="task-timeline-progress-wrapper">
+							<g:render template="/assetEntity/progressTimerControls" model="${[timerValues:[60, 120, 180, 240, 300]]}"/>
+						</div>
 					</div>
 					<!-- control panel -->
 					<div id="controlPanelId" class="graphPanel">

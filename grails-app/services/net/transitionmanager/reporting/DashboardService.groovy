@@ -131,7 +131,7 @@ class DashboardService implements ServiceMethods {
 	 * @param project - the user's current project.
 	 * @param moveEvent - the event selected by the user.
 	 * @param viewUnpublished - whether or not unpublished tasks should be included in the model.
-	 * @return
+	 * @return  A model with Event Dashboard info
 	 */
 	Map getEventDashboardModel(Project project, MoveEvent moveEvent, boolean viewUnpublished) {
 		List<MoveEvent> moveEventsList = MoveEvent.findAllByProject(project,[sort:'name',order:'asc'])

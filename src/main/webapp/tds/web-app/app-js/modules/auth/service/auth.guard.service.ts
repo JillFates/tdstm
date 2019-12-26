@@ -46,7 +46,7 @@ export class AuthGuardService implements CanActivate {
 		let guardResults = Observable.forkJoin(guardRequests).pipe(
 			map(([successToSaveLastPage, permissions]) => {
 				if (!successToSaveLastPage) {
-					// console.info('AuthGuardService:', 'Session has expired');
+					// console.error('AuthGuardService:', 'Session has expired');
 					this.store.dispatch(new Logout());
 					return Observable.of(false);
 				}

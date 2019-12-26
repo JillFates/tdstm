@@ -21,7 +21,7 @@ declare var jQuery: any;
         <div class="modal fade" id="tdsUiDialog" data-backdrop="static"
             style="overflow-y: auto" role="dialog">
             <div class="modal-dialog modal-{{size}}" role="document" #modalDialog>
-                <div class="modal-content">
+                <div class="tds-modal-content">
                     <div #view></div>
                 </div>
             </div>
@@ -31,9 +31,9 @@ declare var jQuery: any;
 })
 export class UIDialogDirective implements OnDestroy, AfterViewInit {
 	@Input('name') name: string;
-	@ViewChild('view', { read: ViewContainerRef }) view: ViewContainerRef;
-	@ViewChild('extraDialog', { read: ViewContainerRef }) extraDialog: ViewContainerRef;
-	@ViewChild('modalDialog') el: ElementRef;
+	@ViewChild('view', { read: ViewContainerRef, static: true }) view: ViewContainerRef;
+	@ViewChild('extraDialog', { read: ViewContainerRef, static: true  }) extraDialog: ViewContainerRef;
+	@ViewChild('modalDialog', {static: false}) el: ElementRef;
 	keyboard = false;
 	size = 'md';
 	tdsUiDialog: any;
@@ -130,7 +130,7 @@ export class UIDialogDirective implements OnDestroy, AfterViewInit {
 				'display': 'block',
 				'visibility': 'hidden'
 			}).css({
-				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 30) + 'px',
+				'top': ((isUIConfirm && isUIConfirm.length > 0) ? 100 : 0) + 'px',
 				'left': (jQuery(window).width() - modalDialog.width()) / 2
 			}).css({
 				'visibility': 'visible'

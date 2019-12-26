@@ -449,7 +449,7 @@ class PlanningDashboardData {
 			if (customFieldSetting?.constraints?.values) {
 				Map sortedMap = customFieldSetting.constraints.values.inject([:]) { result, it ->
 					if ( ! it ) {
-						result[Application.UNKNOWN] = 0
+						result[Application.PLAN_METHODOLOGY_UNKNOWN] = 0
 					} else if (metrics[it]) {
 						result[it] = 0
 					}
@@ -672,7 +672,7 @@ class PlanningDashboardData {
 			confirmedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.confirmedApplicationCount)
 			movedDatabasePerc = NumberUtil.percentage(basicMetrics.databaseCount, movedDbCount)
 			doneAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
-			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.applicationCount)
+			movedAppPerc = NumberUtil.percentage(basicMetrics.applicationCount, basicMetrics.movedApplicationCount)
 			movedOtherPerc = NumberUtil.percentage(deviceMetrics.otherAssetCount, movedOtherCount)
 			physicalServerPerc = NumberUtil.percentage(deviceMetrics.totalPhysicalServerCount, movedPhysicalServerCount)
 			physicalStoragePerc = NumberUtil.percentage(deviceMetrics.phyStorageCount, movedPhyStorageCount)

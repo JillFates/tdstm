@@ -271,7 +271,7 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
-		"/ws/event/taskCategoriesStats/$id" {
+		"/ws/event/taskCategoriesStats/$id?" {
 			controller = 'wsEvent'
 			action = [GET: 'taskCategoriesStats']
 		}
@@ -311,7 +311,7 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/eventData/$id" {
+		"/ws/dashboard/eventData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"eventData"]
 		}
@@ -319,11 +319,6 @@ class UrlMappings {
 		"/ws/dashboard/getPlanningStats" {
 			controller = "wsDashboard"
 			action = [GET:"getDataForPlanningDashboard"]
-		}
-
-		"/ws/dashboard/insight" {
-			controller = "WsInsight"
-			action = [GET: "insightData"]
 		}
 
 		"/ws/dashboard/insight/$action" {
@@ -501,6 +496,11 @@ class UrlMappings {
 		"/ws/task/getInfoForActionBar/$taskId" {
 			controller = "wsTask"
 			action = [GET: "getInfoForActionBar"]
+		}
+
+		"/ws/task/getBulkActionInfo" {
+			controller = "wsTask"
+			action = [POST: "getBulkInfoForActionBar"]
 		}
 
 		"/ws/task/customColumns" {
@@ -745,7 +745,7 @@ class UrlMappings {
 
 		"/ws/user/updateLastPage" {
 			controller = "wsUser"
-			action = [GET:"updateLastPage"]
+			action = [PUT:"updateLastPage"]
 		}
 
 		"/ws/progress" {
@@ -1582,6 +1582,17 @@ class UrlMappings {
                     POST: "generateProjectMetrics"
             ]
         }
+
+		"/ws/architectureGraph/" {
+			controller = "wsArchitectureGraph"
+			action = [
+				GET: "architectureGraph"
+			]
+		}
+
+		"/ws/architectureGraph/$action" {
+			controller = "wsArchitectureGraph"
+		}
 
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )

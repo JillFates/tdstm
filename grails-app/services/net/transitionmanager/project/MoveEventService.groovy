@@ -532,13 +532,11 @@ class MoveEventService implements ServiceMethods {
 	/**
 	 * Find the stats for all the tasks by category for the event
 	 * @param project  The {@code Project} to which the event belongs to.
-	 * @param eventId  The id of the event
+	 * @param moveEvent  The move event
 	 * @param viewUnpublished - flag to indicate if unpublished tasks should be included in the results when true
 	 * @return a list with the task category stats
 	 */
-	List<Map> getTaskCategoriesStats(Project project, Long eventId, Boolean viewUnpublished) {
-		// Fetch the corresponding MoveEvent and throw an exception if not found.
-		MoveEvent moveEvent = get(MoveEvent, eventId, project, true)
+	List<Map> getTaskCategoriesStats(Project project, MoveEvent moveEvent, Boolean viewUnpublished) {
 		// Query the database for the min/max values and counts for the tasks in the event, grouped by category.
 		String hql = """
 				select 
@@ -627,8 +625,8 @@ class MoveEventService implements ServiceMethods {
             }
         }
         // select the most recent MoveEventSnapshot records for the event for both the P)lanned and R)evised types
-        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent = ? AND mes.type = ? ORDER BY mes.dateCreated DESC"
-        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent, MoveEventSnapshot.TYPE_PLANNED] )[0]
+        String query = "FROM MoveEventSnapshot mes WHERE mes.moveEvent =: moveEvent AND mes.type =:type ORDER BY mes.dateCreated DESC"
+        moveEventPlannedSnapshot = MoveEventSnapshot.findAll( query , [moveEvent: moveEvent, type: MoveEventSnapshot.TYPE_PLANNED] )[0]
 
         String eventClock = TimeUtil.formatTimeDuration(dayTime)
 

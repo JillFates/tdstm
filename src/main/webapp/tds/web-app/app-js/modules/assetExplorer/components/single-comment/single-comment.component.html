@@ -1,9 +1,9 @@
 <div tds-handle-escape (escPressed)="cancelCloseDialog()" class="single-comment-component modal fade in" id="single-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
 	<div class="modal-dialog modal-md" role="document">
-		<div class="modal-content resizable" [style.width.px]="500">
+		<div class="tds-modal-content with-box-shadow resizable" [style.width.px]="500">
 			<div class="modal-header">
 				<button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-					<span aria-hidden="true">×</span>
+					<clr-icon aria-hidden="true" shape="close"></clr-icon>
 				</button>
 				<h4 class="modal-title">{{getModalTitle(singleCommentModel.modal.type)}}</h4>
 			</div>
@@ -44,10 +44,10 @@
 								</div>
 								<div class="col-md-12 single-comment-date-container" *ngIf="singleCommentModel.modal.type === modalType.VIEW">
 									<div class="col-md-6 pad-left-0">
-										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize">Date created: {{singleCommentModel.dateCreated | tdsDateTime:userTimeZone:dateFormatTime}}</label>
 									</div>
 									<div class="col-md-6">
-										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{singleCommentModel.lastUpdated | date: dateFormatTime}}</label>
+										<label class="control-label label-detail text-capitalize pull-right">Last updated: {{singleCommentModel.lastUpdated | tdsDateTime:userTimeZone:dateFormatTime}}</label>
 									</div>
 								</div>
 							</div>

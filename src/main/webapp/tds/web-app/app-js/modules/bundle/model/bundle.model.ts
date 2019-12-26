@@ -34,7 +34,7 @@ export class BundleColumnModel {
 				label: 'Planning',
 				property: 'planning',
 				type: 'boolean',
-				width: 100
+				width: 110
 			},
 			{
 				label: 'Asset Quantity',

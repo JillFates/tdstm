@@ -14,26 +14,13 @@ databaseChangeLog = {
         sql('DROP TABLE move_bundle_step')
     }
 
-	/*
-    changeSet(author: 'ecantu', id: '20191009 TM-16017-2') {
-        comment('Drop table step_snapshot')
+    changeSet(author: 'oluna', id: '20191009 TM-16432') {
+        comment('Drop table step_snapshot, this only works with the newest version of TMI_8.0')
 
         preConditions(onFail: 'MARK_RAN') {
             tableExists(tableName: 'step_snapshot')
         }
         sql('DROP TABLE step_snapshot')
     }
-	*/
-
-	changeSet(author: 'oluna', id: '20191119 TM-16431') {
-		comment("Recreate table step_snapshot in case that it doesn't exists")
-
-		preConditions(onFail: 'MARK_RAN') {
-			not {
-				tableExists(tableName: 'step_snapshot')
-			}
-		}
-		sql('CREATE TABLE step_snapshot ( id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY)')
-	}
 
 }

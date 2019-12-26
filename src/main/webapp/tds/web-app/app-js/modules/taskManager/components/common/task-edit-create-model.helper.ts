@@ -41,13 +41,16 @@ export class TaskEditCreateModelHelper {
 	 * @param {any} model Model to set
 	 * @returns {any}
 	 */
-	public getModelForEdit(model: any, userTimeZone: string): any {
+	public getModelForEdit(model: any): any {
 		this.model = model;
-		this.model.estimatedStart = this.model.estimatedStart ?
-			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedStart), userTimeZone).slice(0, -6)) : null; // Slice removes the offset from the date string to ensure correct timezone
-		this.model.estimatedFinish = this.model.estimatedFinish ?
-			new Date(DateUtils.convertFromGMT(new Date(this.model.estimatedFinish), userTimeZone).slice(0, -6)) : null;
-		this.model.dueDate = this.model.dueDate ? new Date(this.model.dueDate) : null;
+		this.model.estimatedStart = this.model.estimatedStart ? new Date(this.model.estimatedStart) : null;
+		this.model.estimatedFinish = this.model.estimatedFinish ? new Date(this.model.estimatedFinish) : null;
+		this.model.dueDate = this.model.dueDate ? DateUtils.getDateFromFormat(this.model.dueDate, this.userCurrentDateFormat) : null;
+
+		// validate null access
+		if (this.model.event && this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 		return model;
 	}
@@ -128,12 +131,20 @@ export class TaskEditCreateModelHelper {
 			asset: {id: detailModel.detail.assetEntity, text: detailModel.detail.assetName},
 			assignedTo: {id : parseInt(detailModel.detail.currentUserId, 10), text: ''},
 			assignedTeam: {id: '', text: ''},
-			event: {id: '', text: ''},
+			event: detailModel.detail.event ||  {id: '', text: ''},
 			category: 'general',
 			apiAction: {id: '', text: ''},
 			deletedPredecessorList: [],
 			deletedSuccessorList: []
 		};
+
+		// validate null access
+		if (this.model.event.id === null || this.model.event.id === undefined) {
+			this.model.event.id = '';
+		}
+
+		// should be an string
+		this.model.event.id = this.model.event.id.toString();
 
 		this.dataSignatureDependencyTasks = JSON.stringify({predecessors: this.model.predecessorList, successors: this.model.successorList});
 
@@ -157,6 +168,8 @@ export class TaskEditCreateModelHelper {
 		const  instructionLink = this.getInstructionsLink(detail);
 
 		this.model = {
+			dtCreated: detail.dtCreated || '',
+			lastUpdated: detail.lastUpdated || '',
 			apiActionInvokedAt: assetComment.apiActionInvokedAt || detail.apiActionInvokedAt,
 			percentageComplete: detail.percentageComplete,
 			apiActionCompletedAt: assetComment.apiActionCompletedAt,
@@ -171,7 +184,7 @@ export class TaskEditCreateModelHelper {
 			actualDuration: detail.actualDuration || '',
 			dateCreated: assetComment.dateCreated,
 			taskSpec: assetComment.taskSpec,
-			lastUpdated: assetComment.lastUpdated,
+			// lastUpdated: assetComment.lastUpdated,
 			taskSpecId: detail.taskSpecId || '',
 			taskNumber: assetComment.taskNumber,
 			hardAssigned: Boolean(assetComment.hardAssigned === 1) ? yes : no,
@@ -181,7 +194,7 @@ export class TaskEditCreateModelHelper {
 			locked: assetComment.durationLocked,
 			actualStart: detail.atStart ? detail.atStart : '',
 			actualFinish: detail.dtResolved ? detail.dtResolved : '',
-			dueDate: assetComment.dueDate ? assetComment.dueDate : '',
+			dueDate: detail.dueDate ? detail.dueDate : '',
 			estimatedStart: assetComment.estStart ? assetComment.estStart : '',
 			estimatedFinish: assetComment.estFinish ? assetComment.estFinish : '',
 			etStart: detail.etStart || '',
@@ -704,16 +717,6 @@ export class TaskEditCreateModelHelper {
 		});
 
 		return noteList;
-	}
-
-	/**
-	 * Change the background color based on the task status
-	 * @param {any} context
-	 * @returns {string}
-	 */
-	public rowStatusColor(context: any) {
-		const status = context.dataItem && context.dataItem.status || '';
-		return 'task-' + status.toLowerCase();
 	}
 
 	/**

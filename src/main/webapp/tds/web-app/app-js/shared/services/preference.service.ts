@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 
@@ -54,11 +54,13 @@ export class PreferenceService {
 	 */
 	private preferencesList = new BehaviorSubject([]);
 
-	constructor(private http: HttpClient, private store: Store) {
+	constructor(
+		private http: HttpClient,
+		private store: Store) {
 	}
 
 	// query a set of user preferences passed as arg variables
-	getPreferences(...preferencesCodes: string[]): Observable <any> {
+	getPreferences(...preferencesCodes: string[]): Observable<any> {
 		return this.getPreference(preferencesCodes.join(','));
 	}
 
@@ -86,7 +88,7 @@ export class PreferenceService {
 	 * @param preferenceCode
 	 * @param value
 	 */
-	setPreference(preferenceCode: string, value: string): Observable<any>  {
+	setPreference(preferenceCode: string, value: string): Observable<any> {
 		const httpOptions = {
 			headers: new HttpHeaders({'Content-Type': 'application/json'})
 		};
@@ -145,7 +147,7 @@ export class PreferenceService {
 	 */
 	public getUserDatePreferenceAsKendoFormat(): Observable<string> {
 		return this.getPreference(PREFERENCES_LIST.CURRENT_DATE_FORMAT)
-			.pipe(map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE ))
+			.pipe(map((preferences: any) => (preferences && preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT]) || DateUtils.DEFAULT_FORMAT_DATE))
 			.pipe(map((dateFormat) => DateUtils.translateDateFormatToKendoFormat(dateFormat)));
 	}
 
@@ -161,7 +163,7 @@ export class PreferenceService {
 	 * Get the user preference datascript designer size (width/height)
 	 * @returns {Observable<{number, number}>}
 	 */
-	public getDataScriptDesignerSize(): Observable<{width: number, height: number}> {
+	public getDataScriptDesignerSize(): Observable<{ width: number, height: number }> {
 		const unitSizeSeparator = 'x';
 		const defaultWidth = 850;
 		const defaultHeight = 680;
@@ -170,20 +172,10 @@ export class PreferenceService {
 			.pipe(map((preferences: any) => preferences[PREFERENCES_LIST.DATA_SCRIPT_SIZE] || ''))
 			.pipe(map((size: string) => {
 				let measure: string[] = (size || '').split(unitSizeSeparator);
-				let	width = Number(measure.length &&  measure.shift()) || defaultWidth;
-				let height = Number(measure.length &&  measure.shift()) || defaultHeight;
-				return { width, height };
+				let width = Number(measure.length && measure.shift()) || defaultWidth;
+				let height = Number(measure.length && measure.shift()) || defaultHeight;
+				return {width, height};
 			}))
-			.filter((size: any) =>  size.width !== null && size.height !== null);
-	}
-
-	/**
-	 * Used to retrieve the user preference current date format
-	 */
-	// TODO: this is doing the same as the method getUserDateFormat on this same class...
-	getUserCurrentDateFormatOrDefault(): string {
-		const userDateFormat = this.preferences[PREFERENCES_LIST.CURRENT_DATE_FORMAT];
-
-		return userDateFormat ? userDateFormat : DateUtils.DEFAULT_FORMAT_DATE;
+			.filter((size: any) => size.width !== null && size.height !== null);
 	}
 }

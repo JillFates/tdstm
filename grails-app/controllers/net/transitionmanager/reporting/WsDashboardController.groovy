@@ -58,7 +58,7 @@ class WsDashboardController implements ControllerMethods {
 
 	@HasPermission(Permission.DashboardMenuView)
 	def getDataForPlanningDashboard() {
-		Project project = securityService.userCurrentProject
+		Project project = getProjectForWs()
 		renderSuccessJson(dashboardService.getDataForPlanningDashboard(project))
 	}
 }

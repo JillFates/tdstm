@@ -15,8 +15,8 @@ import {WindowService} from '../../../../shared/services/window.service';
 import {PageService} from '../../service/page.service';
 import {APP_STATE_KEY} from '../../../../shared/providers/localstorage.provider';
 // Components
-import {MandatoryNoticesComponent} from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
-import {StandardNoticesComponent} from '../../../noticeManager/components/standard-notices/standard-notices.component';
+import { MandatoryNoticesComponent } from '../../../noticeManager/components/mandatory-notices/mandatory-notices.component';
+import { StandardNoticesComponent } from '../../../noticeManager/components/standard-notices/standard-notices.component';
 import {SelectProjectModalComponent} from '../../../project/components/select-project-modal/select-project-modal.component';
 // Models
 import {AuthorityOptions, IFormLoginModel, LoginInfoModel} from '../../model/login-info.model';
@@ -30,7 +30,6 @@ import {map, withLatestFrom} from 'rxjs/operators';
 	selector: 'tds-login',
 	templateUrl: 'login.component.html',
 })
-
 export class LoginComponent implements OnInit {
 	/**
 	 * Prepare the state to be able to auto - unsubscribe
@@ -70,9 +69,16 @@ export class LoginComponent implements OnInit {
 	public onLoginProgress = false;
 
 	/**
+	 * Holds the state of the login Button
+	 */
+	public loginState = 'default';
+
+	/**
 	 * For Auh label to show
 	 */
 	public defaultAuthorityItem: string;
+
+	isSelectPrompt: boolean;
 
 	constructor(
 		private loginService: LoginService,
@@ -132,6 +138,7 @@ export class LoginComponent implements OnInit {
 				if (this.loginInfo.config.authorityPrompt === this.authorityOptions.SELECT) {
 					this.defaultAuthorityItem = `Select ${this.loginInfo.config.authorityLabel}`;
 					this.loginModel.authority = this.defaultAuthorityItem;
+					this.isSelectPrompt = true;
 					selector = '.k-dropdown-wrap';
 				} else if (this.loginInfo.config.authorityPrompt === this.authorityOptions.PROMPT) {
 					selector = '.authority';
@@ -150,9 +157,14 @@ export class LoginComponent implements OnInit {
 	 * Dispatch Action Login
 	 */
 	public onLogin(): void {
+		this.errMessage = '';
 		if (this.loginModel.username === '' || this.loginModel.password === '') {
 			this.errMessage = 'Username and password are required';
 		} else {
+			if (this.isSelectPrompt && this.loginModel.authority === this.defaultAuthorityItem) {
+				this.errMessage = 'Please select a domain';
+				return;
+			}
 			this.onLoginProgress = true;
 			this.store.dispatch(
 				new Login({
@@ -190,18 +202,14 @@ export class LoginComponent implements OnInit {
 					}
 				});
 			});
-		} else if (this.userContextModel && this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
-			if (this.userContextModel.postNotices && this.userContextModel.postNotices.notices && this.userContextModel.postNotices.notices.length > 0) {
-				this.userContextModel.postNotices.notices = this.userContextModel.postNotices.notices.map((notice: NoticeModel) => {
-					notice.sequence = notice.sequence || 0;
-					return notice;
-				});
+		} else if (this.userContextModel.notices && this.userContextModel.notices.redirectUrl) {
+			if (this.userContextModel.postNotices && this.userContextModel.postNotices.length > 0) {
 				this.showNotices();
 			} else {
 				this.navigateTo();
 			}
-
 		} else if (this.userContextModel.error) {
+			this.loginState = 'default';
 			// An error has occurred
 			this.notifierService.broadcast({
 				name: 'stopLoader',
@@ -224,13 +232,21 @@ export class LoginComponent implements OnInit {
 						this.showStandardNotices()
 							.then(() => {
 								this.postNoticesManager.notifyContinue()
-									.subscribe(() => this.navigateTo())
+									.subscribe(
+										() => this.navigateTo(),
+										() => {
+											this.navigateTo();
+										});
 							})
 							.catch((error) => this.navigateTo());
 					}, 600);
 				} else {
 					this.postNoticesManager.notifyContinue()
-						.subscribe(() => this.navigateTo())
+						.subscribe(
+							() => this.navigateTo(),
+							() => {
+								this.navigateTo();
+							});
 				}
 			})
 			.catch(() => {
@@ -267,7 +283,7 @@ export class LoginComponent implements OnInit {
 	 * @param {Boolean} mandatory True for get mandatory, False for get Standard
 	 */
 	private filterPostNotices(mandatory: boolean): any[] {
-		return this.userContextModel.postNotices.notices
+		return this.userContextModel.postNotices
 			.filter((notice) => mandatory ? notice.needAcknowledgement : !notice.needAcknowledgement)
 			.map((notice: NoticeModel) => {
 				return {...notice, notShowAgain: false};

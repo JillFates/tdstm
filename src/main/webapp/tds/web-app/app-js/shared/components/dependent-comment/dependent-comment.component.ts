@@ -8,11 +8,11 @@ import {AssetComment} from './model/asset-coment.model';
 	template: `
         <div class="modal fade in" id="dependent-comment-component" data-backdrop="static" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-md" role="document">
-                <div class="modal-content resizable" [style.width.px]="500">
+                <div class="tds-modal-content resizable" [style.width.px]="500">
                     <div class="modal-header">
-                        <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+						<button aria-label="Close" class="close" type="button" (click)="cancelCloseDialog()">
+							<clr-icon aria-hidden="true" shape="close"></clr-icon>
+						</button>
                         <h4 class="modal-title">Comment for {{assetCommentModel.dialogTitle}}</h4>
                     </div>
                     <div class="modal-body">
@@ -31,13 +31,8 @@ import {AssetComment} from './model/asset-coment.model';
                         </div>
                     </div>
                     <div class="modal-footer form-group-center">
-                        <button type="button" (click)="onUpdateComment()" class="btn btn-primary pull-left"><span
-                                class="fa fa-fw fa-floppy-o"></span> Save
-                        </button>
-                        <button (click)="cancelCloseDialog()" type="button" class="btn btn-default pull-right">
-                            <span class="glyphicon glyphicon-ban-circle"></span>
-                            <span>Cancel</span>
-                        </button>
+						<tds-button theme="primary" (click)="onUpdateComment()" icon="floppy">Save</tds-button>
+						<tds-button (click)="cancelCloseDialog()" icon="ban" data-dismiss="modal">Cancel</tds-button>
                     </div>
                 </div>
             </div>
