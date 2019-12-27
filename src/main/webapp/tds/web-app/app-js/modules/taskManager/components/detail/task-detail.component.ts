@@ -129,9 +129,12 @@ export class TaskDetailComponent extends UIExtraDialog  implements OnInit {
 						}
 					});
 			});
-		this.taskManagerService.getTaskActionInfo(parseInt(this.taskDetailModel.id, 0))
-			.subscribe((result: TaskActionInfoModel) => {
-			this.taskActionInfoModel = result;
+		const taskId = parseInt(this.taskDetailModel.id, 0);
+		this.taskManagerService.getBulkTaskActionInfo([taskId])
+			.subscribe((result: TaskActionInfoModel[]) => {
+				if (result && result[taskId]) {
+					this.taskActionInfoModel = result[taskId];
+				}
 		});
 	}
 

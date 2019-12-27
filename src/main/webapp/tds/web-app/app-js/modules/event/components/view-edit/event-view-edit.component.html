@@ -121,7 +121,7 @@
 								<td valign="top" class="value">
 									{{
 										savedModel?.estStartTime
-											| tdsDateTime: userTimeZone
+											| tdsDateTime: userTimeZone:userDateTimeFormat
 									}}
 								</td>
 							</tr>
@@ -134,7 +134,7 @@
 								<td valign="top" class="value">
 									{{
 										savedModel?.estCompletionTime
-											| tdsDateTime: userTimeZone
+											| tdsDateTime: userTimeZone:userDateTimeFormat
 									}}
 								</td>
 							</tr>
