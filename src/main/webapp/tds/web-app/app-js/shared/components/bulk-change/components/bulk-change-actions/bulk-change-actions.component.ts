@@ -60,7 +60,6 @@ export class BulkChangeActionsComponent extends UIExtraDialog  implements OnInit
 
 	ngOnInit() {
 		this.apiActionService.getDataScripts({useWithAssetActions: true, isAutoProcess: true}).subscribe(result => {
-			console.log(result);
 			if (Array.isArray(result) && result.length > 0) {
 				this.showRun = true;
 				this.dataScriptOptions = [this.SELECT_DATA_MODEL, ...result];
