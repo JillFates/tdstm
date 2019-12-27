@@ -4,6 +4,8 @@ import com.tdsops.AssetDependencyTypesCache
 import com.tdsops.ETLTagValidator
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.etl.dataset.ETLIterator
+import com.tdsops.etl.etlmap.ETLMap
+import com.tdsops.etl.etlmap.ETLMapBuilder
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import com.tdssrc.grails.TimeUtil
@@ -492,7 +494,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
         iterateIndex = new IterateIndex(rows.size())
         currentRowIndex = 1
-        for(Map row : rows){
+        for (Map row : rows) {
             topOfIterate()
             currentColumnIndex = 0
             bindVariable(ROW_VARNAME, currentRowIndex)
@@ -669,7 +671,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         currentRowIndex += amount
 
         //TODO: dcorrea remove this code after removing completly GETL
-        if (dataset == null){
+        if (dataset == null) {
             return skipUsingGETL(amount)
         }
 
@@ -734,12 +736,12 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
     @Deprecated
     @CompileStatic
-    private Element extractWithGETL(String columnName){
+    private Element extractWithGETL(String columnName) {
         String rootColumnName = columnName
         String columnNamePath = null
 
         if (dataSetFacade?.isJson) {
-            List columnNameParts  = extractColumnNameParts(columnName)
+            List columnNameParts = extractColumnNameParts(columnName)
             rootColumnName = columnNameParts[0]
             columnNamePath = columnNameParts[1]
         }
@@ -767,7 +769,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
         checkReadLabelCommandAlreadyInvoked()
 
-        if (dataset == null){
+        if (dataset == null) {
             return extractWithGETL(columnName)
         }
 
@@ -1011,11 +1013,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     /**
      * Initialize a fieldName using a default value
      * <pre>
-     * 	iterate {
-     * 		domain Application
+     * 	iterate {* 		domain Application
      * 		init 'environment' with 'Production'
-     * }
-     * </pre>
+     *}* </pre>
      * @param field
      * @return
      * @see ETLProcessor#initialize(java.lang.String)
@@ -1357,6 +1357,20 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return this
     }
     /**
+     *
+     * @param mapName
+     * @param closure
+     * @return
+     */
+    @CompileStatic
+    ETLProcessor defineETLMap(String mapName, Closure closure) {
+
+        ETLMap etlMap = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator).build(closure)
+
+        return this
+    }
+
+    /**
      * <b>Cache ETL command.</b><br>
      * ETL Script evaluation is using internally a findCache of find command results.
      * This commands enables user to define the initial size of that findCache.
@@ -1432,7 +1446,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * 		fieldSpec Application each { //
      * 			if (SOURCE.contains(it.label)) { //
      * 				extract it.label load it.fieldName
-     *			....
+     * 			....
      * </pre>
      */
     List<Map<String, ?>> fieldSpec(ETLDomain domain) {
