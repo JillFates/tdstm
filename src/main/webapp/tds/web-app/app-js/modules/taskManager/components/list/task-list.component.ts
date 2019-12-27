@@ -118,7 +118,7 @@ export class TaskListComponent {
 	 */
 	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
 		service.close();
-		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 10) + 1;
 		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
 			.subscribe(result => {
 				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
@@ -130,7 +130,7 @@ export class TaskListComponent {
 	 * On Event select change.
 	 */
 	onEventSelect(selected: any): void {
-		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 0));
+		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 10));
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 		this.onFiltersChange();
 	}
@@ -211,12 +211,12 @@ export class TaskListComponent {
 				} else if (result.shouldEdit) {
 					this.onOpenTaskEditHandler(result.id);
 				} else {
-					this.search(parseInt(taskRow.id, 0));
+					this.search(parseInt(taskRow.id, 10));
 				}
 			}
 		}).catch(result => {
 			if (result) {
-				this.search(parseInt(taskRow.id, 0));
+				this.search(parseInt(taskRow.id, 10));
 			}
 		});
 	}
@@ -250,7 +250,7 @@ export class TaskListComponent {
 									this.search();
 								});
 							} else {
-								this.search(parseInt(taskRow.id, 0));
+								this.search(parseInt(taskRow.id, 10));
 							}
 						}
 					}).catch(result => {
@@ -623,7 +623,7 @@ export class TaskListComponent {
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
 					// Task list size
-					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
 					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
@@ -650,7 +650,7 @@ export class TaskListComponent {
 	private loadEventListAndSearch(currentEventId: any): void {
 		this.reportService.getEventList().subscribe(result => {
 			this.eventList = [this.allEventsOption].concat(result.data);
-			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 0));
+			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 10));
 			if (match) {
 				this.selectedEvent = match;
 			} else {
@@ -750,7 +750,7 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
 			if (rowIndex) {
-				let rowNum = parseInt(rowIndex, 0);
+				let rowNum = parseInt(rowIndex, 10);
 				expandedEvent.index = rowNum;
 				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(rowNum);
@@ -790,7 +790,7 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+			this.taskService.getTaskActionInfo(parseInt(taskId, 10))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
 					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
