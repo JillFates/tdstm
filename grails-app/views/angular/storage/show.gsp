@@ -97,7 +97,7 @@
 					<div id="messageDivId" class="message">${errors}</div>
 				</g:if>
 				<table class="tdr-detail-list" [ngClass]="{'all-details':showDetails}">
-					<tbody [ngClass]="{'one-column':!showDetails, 'two-column':showDetails}">
+					<tbody [ngClass]="{'one-column':!showDetails, 'three-column':showDetails}">
 						<tds:clrRowDetail style="order: 15" field="${standardFieldSpecs.fileFormat}" value="${asset.fileFormat}" />
 						<tds:clrRowDetail style="order: 20" field="${standardFieldSpecs.LUN}" value="${asset.LUN}" />
 						<tds:clrRowDetail style="order: 25" field="${standardFieldSpecs.supportType}" value="${asset.supportType}" />
