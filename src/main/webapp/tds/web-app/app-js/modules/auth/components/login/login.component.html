@@ -7,7 +7,7 @@
 						<img src="/tdstm/tds/web-app/assets/images/transitionLargeLogo.svg" alt="Transition Manager Logo" />
 					</a>
 				</h1>
-				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" >
+				<form clrForm action="signIn" name="loginForm" class="login-form is-fullwidth" #loginForm="ngForm" clrLayout="vertical" (keyup.enter)="onLogin()">
 					<clr-select-container class="clr-col-12" *ngIf="loginInfo.config?.authorityPrompt === authorityOptions.SELECT">
 						<select clrSelect
 								name="authority"
