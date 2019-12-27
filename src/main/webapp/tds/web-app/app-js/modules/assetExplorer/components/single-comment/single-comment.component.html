@@ -14,7 +14,12 @@
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group single-component">
-										<textarea rows="8" id="singleComment" name="singleComment" class="form-control" [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" tds-autofocus></textarea>
+										<textarea rows="8"
+												  id="singleComment"
+												  required
+												  name="singleComment"
+												  class="form-control"
+												  [(ngModel)]="singleCommentModel.comment" *ngIf="singleCommentModel.modal.type !== modalType.VIEW" tds-autofocus></textarea>
 										<div *ngIf="singleCommentModel.modal.type === modalType.VIEW">{{singleCommentModel.comment}}</div>
 									</div>
 								</div>
@@ -58,7 +63,7 @@
 			<div class="modal-footer form-group-center">
 				<tds-button-save (click)="onSave()" class="btn-primary pull-left"
 				                 *ngIf="singleCommentModel.modal.type !== modalType.VIEW"
-				                 [disabled]="singleCommentModel.asset?.id === '' || singleCommentModel.comment === ''">
+				                 [disabled]="!dependentForm.dirty || !dependentForm.valid">
 				</tds-button-save>
 
 				<tds-button-edit (click)="onEdit()" class="btn-primary pull-left" [disabled]="!isCommentEditAvailable()"
