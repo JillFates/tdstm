@@ -310,7 +310,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	onMyTasksFilterChange(): void {
 		if (this.myTasks) {
-			this.graph.highlightBy('isMyTask', true);
+			this.graph.highlightBy('myTask', true);
 		} else {
 			this.graph.clearHighlights();
 		}

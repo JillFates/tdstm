@@ -6,7 +6,7 @@ import {UIPromptService} from '../../../../directives/ui-prompt.directive';
 import {PasswordChangeModel} from '../../model/password-change.model';
 import {PermissionService} from '../../../../services/permission.service';
 import {TranslatePipe} from '../../../../pipes/translate.pipe';
-import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
 import {Store} from '@ngxs/store';
 import {NotifierService} from '../../../../services/notifier.service';
 

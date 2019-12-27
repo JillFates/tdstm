@@ -20,7 +20,7 @@ import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
 import {ReplaySubject} from 'rxjs';
-import {SetUserContextPerson} from '../../../../../modules/user/actions/user-context.actions';
+import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
 
 declare var jQuery: any;
 
