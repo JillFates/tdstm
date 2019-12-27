@@ -379,7 +379,7 @@ export class TaskListComponent {
 	 * Set the flag to Collapse of the current row matched by the index
 	 * @param index Index of the row to be setup
 	 */
-	onCollapseRow(index: number) {
+	onCollapseRow(index: number): void {
 		this.rowsExpandedMap[index] = false;
 	}
 
@@ -387,7 +387,7 @@ export class TaskListComponent {
 	 * Set the flag to Expand of the current row matched by the index
 	 * @param index Index of the row to be setup
 	 */
-	onExpandRow(index: number) {
+	onExpandRow(index: number): void {
 		this.rowsExpandedMap[index] = true;
 	}
 
@@ -800,7 +800,7 @@ export class TaskListComponent {
 		});
 	}
 
-	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel): void {
 		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
 
 		// Update the grid row with new information from the endpoint (status, assignTo, etc)
@@ -834,7 +834,7 @@ export class TaskListComponent {
 	/**
 	 * Toggle the flag to show/hide grid filters
 	 */
-	public toggleFiltering() {
+	public toggleFiltering(): void {
 		this.isFiltering = !this.isFiltering;
 	}
 
