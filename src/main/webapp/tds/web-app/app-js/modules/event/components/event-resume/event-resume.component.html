@@ -10,7 +10,7 @@
     </div>
     <div *ngIf="event.clockMode!=='none'; else notEventStartBlock" class="event-daytime">{{event.dayTime}}</div>
     <ng-template #notEventStartBlock>
-        <h5 style="color:red;">The event start time has not be set</h5>
+        <h5 style="color:red;">The event start time has not been set</h5>
     </ng-template>
     <div class="after-results">
         <div *ngIf="event.startDate" class="event-units">
