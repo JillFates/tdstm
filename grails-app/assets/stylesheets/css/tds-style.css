@@ -1607,6 +1607,8 @@ div.dates-info-container {
         color: black; }
       .asset-tag-selector-component .k-widget li span {
         margin-right: unset; }
+        .asset-tag-selector-component .k-widget li span div {
+          border-radius: 2px; }
       .asset-tag-selector-component .k-widget li span:not(.k-select) div {
         padding-left: 10px !important;
         padding-right: 22px !important; }
@@ -1719,12 +1721,10 @@ div.dates-info-container {
     line-height-font-size: 11px;
     line-height-color: #333 !important; }
   .asset-tag-selector-component-content .label.tag {
-    display: inline-block;
-    margin-right: 2px;
-    margin-bottom: 2px;
-    vertical-align: baseline;
-    text-align: center;
-    width: inherit; }
+    border-radius: 2px;
+    border: 0;
+    width: unset;
+    font-weight: 500; }
 
 .main-header.header-component {
   display: block;
