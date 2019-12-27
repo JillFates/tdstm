@@ -21,7 +21,7 @@ import {of} from 'rxjs';
 import {SetTimeZoneAndDateFormat} from '../action/timezone-dateformat.actions';
 import {PostNoticesService} from '../service/post-notices.service';
 import {NoticeModel} from '../../noticeManager/model/notice.model';
-import {SetUserContextPerson} from '../../user/actions/user-context.actions';
+import {SetUserContextPerson} from '../action/user-context-person.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
@@ -232,6 +232,12 @@ export class UserContextState {
 					});
 					return of(err);
 				}))
-			.subscribe(result => ctx.patchState({ person: result.person }));
+			.subscribe(result => {
+				const oldPerson = state && state.person;
+				const update = result && result.person;
+				if (oldPerson && update && (oldPerson.fullName !== update.fullName)) {
+					ctx.patchState({ person: update});
+				}
+			});
 	}
 }
