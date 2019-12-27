@@ -249,6 +249,20 @@ tds-ui-dialog {
                 display: flex;
               }
             }
+
+            &.device-grid.all-details {
+              .static-width {
+                width: 49%;
+              }
+            }
+
+            .header-label {
+              margin-top: 5px;
+              margin-bottom: 5px;
+              td {
+                border-bottom: 0;
+              }
+            }
           }
 
           // tds-diagram-layout styling in body
