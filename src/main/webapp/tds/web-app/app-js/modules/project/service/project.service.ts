@@ -18,7 +18,6 @@ export class ProjectService {
 
 	constructor(private http: HttpClient, private preferenceService: PreferenceService, private store: Store) {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
-		this.getDefaultProject();
 	}
 
 	getDefaultProject(): Observable<any> {
