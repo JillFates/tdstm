@@ -384,12 +384,11 @@
 						*ngIf="column.property === 'updatedTime'"
 						let-dataItem
 					>
-						<span
-							class="task-updated-cell {{
-								dataItem.updatedClass
-							}} overflow-ellipsis"
-							>{{ dataItem.updatedTime }}</span
-						>
+						<div class="updated-status">
+							<div class="task-updated-cell {{ dataItem.updatedClass }} overflow-ellipsis">
+								{{ dataItem.updatedTime }}
+							</div>
+						</div>
 					</ng-template>
 
 					<ng-template
