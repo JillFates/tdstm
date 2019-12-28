@@ -106,22 +106,67 @@ class DataviewService implements ServiceMethods {
     }
 
     /**
-	 * Returns a Dataview by id after validating that the user has proper access
+	 * Returns a Dataview, validating that the user has proper access
+	 * if it's a system view it will look for ny overriden view that needs to be shown instead of the default using
+	 * the following logic:
+	 * 		1st. from the current project and created by the current user and not shared(myViews)
+	 * 		2nd. from the same project and shared from other user
+	 * 		3rd. from the DEFAULT Project and is shared
 	 * @param id
+	 * @param override true by default, we serve those views overriding the default one, if set to false,
+	 * serve the actual requested view
 	 * @return
 	 */
-	Dataview fetch(Long id) throws InvalidParamException, EmptyResultException {
+	Dataview fetch(Long id, boolean override = true) throws InvalidParamException, EmptyResultException {
 		if (! id || id < 1) {
 			throw MISSING_ID_EXCEPTION
 		}
-
-		Dataview dataview = Dataview.get(id)
-		if (!dataview) {
+		Dataview dataview = Dataview.read(id)
+		if ( ! dataview ) {
 			throw VIEW_NOT_FOUND_EXCEPTION
-		} else {
-			validateDataviewViewAccessOrException(id, dataview)
 		}
+		if ( override && dataview.isSystem ) {
+			Person currentPerson = securityService.loadCurrentPerson()
+			Project currentProject = securityService.userCurrentProject
+			Project defaultProject = Project.defaultProject
 
+			/*
+			 * Lets look for those relevant views:
+			 * those overriden from the requested one,
+			 * 		1st. from the current project and created by the current user and not shared(myViews)
+			 * 		2nd. from the same project and shared from other user
+			 * 		3rd. from the DEFAULT Project and is shared
+			 */
+			List<Dataview> overridesDataviews = Dataview.whereAny {
+				overridesView == dataview && project == currentProject && person == currentPerson && isShared == false
+				overridesView == dataview && project == currentProject && isShared == true
+				overridesView == dataview && project == defaultProject && isShared == true
+			}.list()
+
+			if ( overridesDataviews ) {
+				// Lets sort the list to bubble up the correct overriden view (cloaking all others)
+				overridesDataviews.sort {
+					if ( it.project == currentProject ) {
+						if ( it.person == currentPerson && it.isShared == false ) {
+							// if the overriden view is of the same project and current user is the actual view to show, send it to the top
+							return -1
+						} else {
+							// if is the same project different user, is more relevant than from the default project
+							return 0
+						}
+					} else {
+						/*
+						 * due to the fact that we only search in the default project and the current one we can be safe that here
+						 * we are sorting only DefaultProject items
+						 */
+						return 1
+					}
+				}
+
+				dataview = overridesDataviews.first()
+			}
+		}
+		validateDataviewViewAccessOrException(id, dataview);
 		return dataview
 	}
 

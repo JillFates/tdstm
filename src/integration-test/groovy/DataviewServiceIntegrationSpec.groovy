@@ -239,8 +239,14 @@ class DataviewServiceIntegrationSpec extends Specification{
 
 	void '13. test creating override dataview'() {
 		setup:
-			dataviewService.securityService = [hasPermission: { return true },
-											   loadCurrentPerson: {return person}] as SecurityService
+			dataviewService.securityService = [
+					hasPermission: { return true },
+					getUserCurrentProject: { return project },
+					loadCurrentPerson    : { return person },
+					isLoggedIn           : { return true },
+					getCurrentPersonId   : { return person.id }
+			] as SecurityService
+
 			JSONObject dataviewJson = createDataview(null)
 			dataviewJson.isSystem = false
 			dataviewJson.saveAsOption = ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name()
@@ -249,5 +255,173 @@ class DataviewServiceIntegrationSpec extends Specification{
 			dataviewService.create(person, project, dataviewJson)
 		then:
 			Dataview.findAll()
+	}
+
+	def '14. No Overrides of System View'() {
+		setup:
+			String allAssetViewName = 'All Assets'
+		when: 'service is called to get a DataView'
+			Dataview dv = dataviewService.fetch(1)
+		then: 'Since there is no overriden view we get the default original View'
+			dv.name == allAssetViewName
+	}
+
+	def '15. System wide override of System View'() {
+		setup:
+			String overridenSystemWideViewName = 'Overriden All Assets System-Wide Scope'
+			Project defaultProject = Project.defaultProject
+			dataviewService.securityService = [
+					hasPermission        : { return true },
+					getUserCurrentProject: { return project },
+					loadCurrentPerson    : { return person },
+					isLoggedIn           : { return true },
+					getCurrentPersonId   : { return person.id }
+			] as SecurityService
+			Dataview originalSystemView = dataviewService.fetch(1)
+			Dataview.saveAll(
+					new Dataview(
+							name: overridenSystemWideViewName,
+							overridesView: originalSystemView,
+							project: defaultProject,
+							isSystem: true,
+							isShared: true,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					)
+			)
+		when: 'service is called to get a DataView'
+			Dataview dv = dataviewService.fetch(originalSystemView.id)
+		then: 'since there is a Wide system view we retrieve that one'
+			dv.name == overridenSystemWideViewName
+	}
+
+	def '16. Project wide override of System View'() {
+		setup:
+			String overridenSystemWideViewName  = 'Overriden All Assets System-Wide Scope'
+			String overridenProjectWideViewName = 'Overriden All Assets Project-Wide Scope'
+			Project defaultProject = Project.defaultProject
+			dataviewService.securityService = [
+					hasPermission        : { return true },
+					getUserCurrentProject: { return project },
+					loadCurrentPerson    : { return person },
+					isLoggedIn           : { return true },
+					getCurrentPersonId   : { return person.id }
+			] as SecurityService
+			Dataview originalSystemView = dataviewService.fetch(1)
+			Dataview.saveAll(
+					new Dataview(
+							name: overridenSystemWideViewName,
+							overridesView: originalSystemView,
+							project: defaultProject,
+							isSystem: true,
+							isShared: true,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					),
+					new Dataview(
+							name: overridenProjectWideViewName,
+							overridesView: originalSystemView,
+							project: project,
+							isSystem: true,
+							isShared: true,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					),
+			)
+		when: 'service is called to get a DataView'
+			Dataview dv = dataviewService.fetch(originalSystemView.id)
+		then: 'since there is a Wide system view we retrieve that one'
+			dv.name == overridenProjectWideViewName
+	}
+
+	def '17. Individual User override of System View'() {
+		setup:
+			String overridenSystemWideViewName  = 'Overriden All Assets System-Wide Scope'
+			String overridenProjectWideViewName = 'Overriden All Assets Project-Wide Scope'
+			String overridenIndividualViewName  = 'Overriden All Assets Individual Scope'
+			Project defaultProject = Project.defaultProject
+			dataviewService.securityService = [
+					hasPermission        : { return true },
+					getUserCurrentProject: { return project },
+					loadCurrentPerson    : { return person },
+					isLoggedIn           : { return true },
+					getCurrentPersonId   : { return person.id }
+			] as SecurityService
+			Dataview originalSystemView = dataviewService.fetch(1)
+			Dataview.saveAll(
+					new Dataview(
+							name: overridenSystemWideViewName,
+							overridesView: originalSystemView,
+							project: defaultProject,
+							isSystem: true,
+							isShared: true,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					),
+					new Dataview(
+							name: overridenProjectWideViewName,
+							overridesView: originalSystemView,
+							project: project,
+							isSystem: true,
+							isShared: true,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					),
+					new Dataview(
+							name: overridenIndividualViewName,
+							overridesView: originalSystemView,
+							person: person,
+							project: project,
+							isSystem: true,
+							isShared: false,
+							reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+					),
+			)
+		when: 'service is called to get a DataView'
+		Dataview dv = dataviewService.fetch(originalSystemView.id)
+		then: 'since there is a Wide system view we retrieve that one'
+		dv.name == overridenIndividualViewName
+	}
+
+	def '18. Ignore override of System View'() {
+		setup:
+		String overridenSystemWideViewName  = 'Overriden All Assets System-Wide Scope'
+		String overridenProjectWideViewName = 'Overriden All Assets Project-Wide Scope'
+		String overridenIndividualViewName  = 'Overriden All Assets Individual Scope'
+		Project defaultProject = Project.defaultProject
+		dataviewService.securityService = [
+				hasPermission        : { return true },
+				getUserCurrentProject: { return project },
+				loadCurrentPerson    : { return person },
+				isLoggedIn           : { return true },
+				getCurrentPersonId   : { return person.id }
+		] as SecurityService
+		Dataview originalSystemView = dataviewService.fetch(1)
+		Dataview.saveAll(
+				new Dataview(
+						name: overridenSystemWideViewName,
+						overridesView: originalSystemView,
+						project: defaultProject,
+						isSystem: true,
+						isShared: true,
+						reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+				),
+				new Dataview(
+						name: overridenProjectWideViewName,
+						overridesView: originalSystemView,
+						project: project,
+						isSystem: true,
+						isShared: true,
+						reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+				),
+				new Dataview(
+						name: overridenIndividualViewName,
+						overridesView: originalSystemView,
+						person: person,
+						project: project,
+						isSystem: true,
+						isShared: false,
+						reportSchema: '{/*SOME VIEW OBJECT DEF*/}'
+				),
+		)
+		when: 'service is called to get a DataView'
+		Dataview dv = dataviewService.fetch(originalSystemView.id, false)
+		then: 'since there is a Wide system view we retrieve that one'
+		dv.name == originalSystemView.name
 	}
 }

@@ -18,6 +18,7 @@ import net.transitionmanager.project.Project
 import net.transitionmanager.imports.DataviewService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.security.SecurityService
+import org.apache.commons.lang3.BooleanUtils
 import org.grails.web.json.JSONObject
 
 /**
@@ -55,13 +56,21 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 	/**
 	 * Returns an specific Dataview as a map(json) result.
 	 * @param id to search by.
+	 * @param _override (optional) true by default, returns the overriden view of the requested system view
+	 * if set to false returns the requested view directly
 	 * @return
 	 */
 	def getDataview(Integer id) {
+		final String overrideParamName = '_override'
+		boolean override = true
+		if ( params.containsKey(overrideParamName) ) {
+			override = BooleanUtils.toBoolean( params[overrideParamName] )
+		}
+
 		Dataview dataview = dataviewService.fetch(id)
 		Project currentProject = securityService.userCurrentProject
 		Map saveOptions = dataviewService.generateSaveOptions(dataview, currentProject)
-		Map dataviewMap = dataviewService.fetch(id).toMap(securityService.currentPersonId)
+		Map dataviewMap = dataviewService.fetch(id, override).toMap(securityService.currentPersonId)
 		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 
