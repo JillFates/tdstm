@@ -20,7 +20,7 @@ trait RangeChecker {
     /**
      * Checks if the given index is in range.
      * This method does also check if the index is negative
-     * If not, throws an appropriate **ETLProcessorException** exception.
+     * If not, throws an appropriate ETLProcessorException exception.
      */
     def rangeCheck (int index, int size) {
         if (index < 0) {

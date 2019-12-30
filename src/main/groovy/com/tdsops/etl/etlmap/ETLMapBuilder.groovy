@@ -1,33 +1,33 @@
 package com.tdsops.etl.etlmap
 
 import com.tdsops.etl.ETLDomain
-import com.tdsops.etl.ETLFieldsValidator
+import com.tdsops.etl.ETLProcessor
 
 class ETLMapBuilder {
 
     private ETLDomain domain
-    private ETLFieldsValidator fieldsValidator
+    private ETLProcessor processor
     private ETLMap etlMap
-    private ETLMapInstruction currentInstruction
     /**
      * <p>Given the following ETL script example:</p>
      * <pre>
      *  defineETLMap 'verni-devices', { //
      *      add 'zone', uppercase(), left(3)
      * </pre>
-     * <p>An instance of {@code ETLMapBuilder} is going to build the following Map:</p>
-     * <pre>
+     * <p>An instance of {@code ETLMapBuilder} is going to build an instance of {@oce ETLMapInstruction#transformation}:</p>
      *
-     * </pre>
+     * @see ETLMapBuilder#add(java.lang.String, com.tdsops.etl.etlmap.ETLMapTransform [ ])
+     * @see ETLMapBuilder#methodMissing(java.lang.String, java.lang.Object)
      */
-    private Map<String, Object> propertiesMap = [:]
+    private ETLMapInstruction currentInstruction
+
 
     /**
-     * Builder Implemantation for {@code ETLMap} instance creation
+     * Builder Implementation for {@code ETLMap} instance creation
      */
-    ETLMapBuilder(ETLDomain domain, ETLFieldsValidator fieldsValidator) {
+    ETLMapBuilder(ETLDomain domain, ETLProcessor processor) {
         this.domain = domain
-        this.fieldsValidator = fieldsValidator
+        this.processor = processor
         this.etlMap = new ETLMap(domain)
     }
 
@@ -54,18 +54,31 @@ class ETLMapBuilder {
 
     ETLMapBuilder add(Integer sourcePosition, String domainProperty, ETLMapTransform... transformations) {
         checkAndAddCurrentInstruction()
-        currentInstruction.sourcePosition = sourcePosition
+        this.defineSourcePosition(sourcePosition)
+        this.defineDomainProperty(domainProperty)
+        this.addTransformations(transformations)
+        return this
+    }
+    /**
+     * Defines a
+     * @param sourcePosition
+     */
+    private void defineSourcePosition(int sourcePosition) {
+        processor.rangeCheck(sourcePosition - 1, processor.columns.size())
+        currentInstruction.column = processor.columns.get(sourcePosition - 1)
+    }
+
+    ETLMapBuilder add(String sourceName, String domainProperty, ETLMapTransform... transformations) {
+        checkAndAddCurrentInstruction()
+        this.defineSourceName(sourceName)
         this.defineDomainProperty(domainProperty)
         this.addTransformations(transformations)
         return this
     }
 
-    ETLMapBuilder add(String columnName, String domainProperty, ETLMapTransform... transformations) {
-        checkAndAddCurrentInstruction()
-        currentInstruction.sourceName = columnName
-        this.defineDomainProperty(domainProperty)
-        this.addTransformations(transformations)
-        return this
+    private void defineSourceName(String sourceName) {
+        processor.checkColumnName(sourceName)
+        currentInstruction.column = processor.columnsMap[sourceName]
     }
 
     private void addTransformations(ETLMapTransform... transformations) {
@@ -75,7 +88,7 @@ class ETLMapBuilder {
     }
 
     private void defineDomainProperty(String domainProperty) {
-        this.currentInstruction.domainProperty = fieldsValidator.lookup(this.etlMap.domain, domainProperty)
+        this.currentInstruction.domainProperty = processor.lookUpFieldDefinition(this.etlMap.domain, domainProperty)
     }
 
     /**

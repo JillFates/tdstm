@@ -1,13 +1,13 @@
 package com.tdsops.etl.etlmap
 
+import com.tdsops.etl.Column
 import com.tdsops.etl.ETLFieldDefinition
 import groovy.transform.CompileStatic
 
 @CompileStatic
 class ETLMapInstruction {
 
-    Integer sourcePosition = null
-    String sourceName = null
+    Column column
     ETLFieldDefinition domainProperty = null
     List<ETLMapTransform> transformations = []
 }

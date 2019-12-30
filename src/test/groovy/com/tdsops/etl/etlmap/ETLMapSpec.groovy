@@ -1,5 +1,6 @@
 package com.tdsops.etl.etlmap
 
+import com.tdsops.etl.Column
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLAssertTrait
@@ -83,13 +84,17 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
-                    transformations.isEmpty()
+
+                    assertWith(column, Column){
+                        label == 'device-name'
+                        index == 1
+                    }
+
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
                         label == 'Name'
                     }
+                    transformations.isEmpty()
                 }
 		    }
 
@@ -128,13 +133,17 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
-                    transformations.isEmpty()
+
+                    assertWith(column, Column){
+                        label == 'Name'
+                        index == 1
+                    }
+
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
                         label == 'Name'
                     }
+                    transformations.isEmpty()
                 }
 		    }
 
@@ -173,14 +182,17 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == null
-                    sourcePosition == 1
-                    transformations.isEmpty()
+
+                    assertWith(column, Column){
+                        label == 'device-name'
+                        index == 1
+                    }
+
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
                         label == 'Name'
                     }
+                    transformations.isEmpty()
                 }
 		    }
 
@@ -219,8 +231,11 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
+
+                    assertWith(column, Column){
+                        label == 'device-name'
+                        index == 1
+                    }
 
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
@@ -271,8 +286,11 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
+
+                    assertWith(column, Column){
+                        label == 'device-name'
+                        index == 1
+                    }
 
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
@@ -323,8 +341,10 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
+                    assertWith(column, Column){
+                        label == 'Name'
+                        index == 1
+                    }
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'assetName'
                         label == 'Name'
@@ -372,8 +392,11 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
                 domain == ETLDomain.Device
                 instructions.size() == 1
                 assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'environment'
+
+                    assertWith(column, Column){
+                        label == 'environment'
+                        index == 1
+                    }
                     assertWith(domainProperty, ETLFieldDefinition){
                         name == 'environment'
                         label == 'Environment'
@@ -423,6 +446,46 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
 				message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'Unknown').message + ' at line 5'
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+     void 'test can throw an exception when a defined ETL map uses an invalid source name'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 'Unknown', 'assetName'
+				}
+				
+			""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == ETLProcessorException.extractMissingColumn( 'Unknown').message + ' at line 5'
 				startLine == 5
 				endLine == 5
 				startColumn == null

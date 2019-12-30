@@ -43,12 +43,7 @@ class ETLMap {
      */
     private void loadInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
 
-        Element element
-        if (instruction.sourcePosition) {
-            element = processor.extract(instruction.sourcePosition)
-        } else {
-            element = processor.extract(instruction.sourceName)
-        }
+        Element element = processor.extract(instruction.column.label)
 
         if (element) {
             element.load(instruction.domainProperty.name)

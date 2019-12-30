@@ -1380,7 +1380,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     @CompileStatic
     ETLProcessor defineETLMap(String mapName, Closure closure) {
-        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator, this.dataSetFacade, this.dataset).build(closure)
+        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this).build(closure)
         return this
     }
 
@@ -1396,7 +1396,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
     @CompileStatic
     ETLProcessor loadUsingETLMap(String mapName) {
         ETLMap etlMap = etlMaps[mapName]
-        if (!etlMaps){
+        if (!etlMaps) {
             throw ETLProcessorException.unknownETLMapDefinition(mapName)
         }
 
