@@ -1,6 +1,7 @@
 package com.tdsops.etl.etlmap
 
 import com.tdsops.etl.DebugConsole
+import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLAssertTrait
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldDefinition
@@ -8,7 +9,9 @@ import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLFileSystemTrait
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.ETLProcessorException
+import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.FieldSpecValidateableTrait
+import com.tdsops.etl.RowResult
 import com.tdsops.etl.dataset.ETLDataset
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
@@ -419,7 +422,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		then: 'It throws an Exception'
 			ETLProcessorException e = thrown ETLProcessorException
 			with(ETLProcessor.getErrorMessage(e)) {
-				message == 'The domain Device does not have field name: Unknown at line 5'
+				message == ETLProcessorException.unknownDomainFieldName(ETLDomain.Device, 'Unknown').message + ' at line 5'
 				startLine == 5
 				endLine == 5
 				startColumn == null
@@ -435,7 +438,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
     //
     //      LOAD USING ETL MAP command tests
     //
-    void 'test can load a defined a ETL map definition using column name and domain property name'() {
+    void 'test can load a defined ETL map definition using column name and domain property name'() {
 
 		given:
 			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
@@ -458,25 +461,24 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				    add 'device-name', 'Name'
 				}
 				
-				
+				domain Device
+				iterate {
+				    loadUsingETLMap 'verni-devices'
+				}
 				
 			""".stripIndent())
 
 		then: 'Results should contain Application domain results associated'
-		    etlProcessor.etlMaps.size() == 1
-		    assertWith(etlProcessor.etlMaps['verni-devices'], ETLMap){
-                domain == ETLDomain.Device
-                instructions.size() == 1
-                assertWith(instructions[0], ETLMapInstruction){
-                    sourcePosition == null
-                    sourceName == 'device-name'
-                    transformations.isEmpty()
-                    assertWith(domainProperty, ETLFieldDefinition){
-                        name == 'assetName'
-                        label == 'Name'
-                    }
-                }
-		    }
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['assetName'], 'acmevmprod01', 'acmevmprod01')
+					}
+				}
+			}
 
 		cleanup:
 			deleteTemporaryFile(fileName, fileSystemService)

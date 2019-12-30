@@ -1362,14 +1362,46 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         return this
     }
     /**
+     * Defines an instance of {@code ETLMap}
+     * saved in {@code ETLProceesor#etlMaps} field,
+     * associated with {@code mapName} param.
+     * <pre>
+     *  defineETLMap 'verni-devices', { //
+     *      add 'device-name', 'Name'
+     *      add 'description'
+     *      add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV', 'Development'])
+     *      add 'zone', uppercase(), left(3)
+     *} //
+     * </pre>
+     * @param mapName a unique name for saving ETLMap created
+     * @param closure a closure with all the ETLMap parameters
      *
+     * @return current instance of {@code ETLProcessor}
+     */
+    @CompileStatic
+    ETLProcessor defineETLMap(String mapName, Closure closure) {
+        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator, this.dataSetFacade, this.dataset).build(closure)
+        return this
+    }
+
+    /**
+     * Define
+     * <pre>
+     *
+     * </pre>
      * @param mapName
      * @param closure
      * @return
      */
     @CompileStatic
-    ETLProcessor defineETLMap(String mapName, Closure closure) {
-        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator).build(closure)
+    ETLProcessor loadUsingETLMap(String mapName) {
+        ETLMap etlMap = etlMaps[mapName]
+        if (!etlMaps){
+            throw ETLProcessorException.unknownETLMapDefinition(mapName)
+        }
+
+        etlMap.load(this)
+
         return this
     }
 
