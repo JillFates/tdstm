@@ -34,6 +34,7 @@ import {BooleanFilterData, GridColumnModel} from '../../model/data-list-grid.mod
                    class="text-filter"
                    [name]="name"
                    [value]="value"
+                   (change)="onFilter($event.target.value)"
                    [placeholder]="placeholder"
                    input-paste
                    (onPaste)="onPaste($event)"/>
@@ -171,10 +172,10 @@ export class TDSFilterInputComponent implements AfterViewInit, OnDestroy {
 	 */
 	public onClearFilter(): void {
 		if (this.isFilterInputAvailable()) {
-			this.filterInput.nativeElement.value = '';
+			this.filterInput.nativeElement.value = null;
 		}
 		this.previousSearch = '';
-		this.onFilter('');
+		this.onFilter(null);
 	}
 
 	/**
