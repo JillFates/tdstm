@@ -7,6 +7,7 @@ import { DataScriptService } from '../../service/data-script.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
 // Components
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
@@ -92,6 +93,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -101,6 +103,10 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private userContext: UserContextService
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.setDataGrid(this.route.snapshot.data['dataScripts']);
@@ -146,27 +152,34 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilters(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		let filterCount = 0;
-		this.state.filter.filters.forEach((filter: FilterDescriptor) => {
-			if (filter.value !== '') {
-				filterCount++;
-			}
-		});
-		return filterCount;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.filterCount() > 0;
 	}
 
 	protected setFilter(search: string, column: any): void {
-		column.filter = search;
-		this.onFilter(column);
+		if (search === null) {
+			this.clearValue(column);
+		} else {
+			column.filter = search;
+			this.onFilter(column);
+		}
 	}
 
 	protected onFilter(column: any): void {

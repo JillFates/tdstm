@@ -370,7 +370,7 @@ export class TagListComponent implements OnInit, OnDestroy {
 	 * Returns the number of current filters applied.
 	 */
 	public filterCount(): number {
-		return this.gridSettings.state.filter.filters.length;
+		return this.gridSettings.getFilterCounter();
 	}
 
 	protected canCreate(): boolean {
