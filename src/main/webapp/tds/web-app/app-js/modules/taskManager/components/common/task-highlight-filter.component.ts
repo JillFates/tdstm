@@ -27,44 +27,91 @@ import {TaskService} from '../../service/task.service';
               <kendo-popup
                       [anchor]="anchor"
                       (anchorViewportLeave)="show = false"
-                      [popupClass]="'highlight-filter-popup'"
+                      [ngClass]="'highlight-filter-popup'"
                       *ngIf="show">
-		              <label class="popup-label">Persons:</label>
-                  <kendo-combobox
-				                  [data]="highlightOptions?.persons"
-				                  [(value)]="persons"
-				                  [valueField]="'name'"
-				                  [textField]="'name'"
-				                  (valueChange)="tasksByQuery()"
-				                  #personsCombobox>
-                  </kendo-combobox>
-                  <label class="popup-label">Team:</label>
-                  <kendo-combobox
-				                  [data]="highlightOptions?.teams"
-				                  [(value)]="selectedTeam"
-                          [valueField]="'name'"
-                          [textField]="'name'"
-                          (valueChange)="tasksByQuery()"
-				                  #teamCombobox>
-                  </kendo-combobox>
-                  <label class="popup-label">App Owner Or Smes:</label>
-                  <kendo-combobox
-				                  [data]="highlightOptions?.ownerAndSmes"
-				                  [(value)]="appOwner"
-                          [valueField]="'name'"
-                          [textField]="'name'"
-                          (valueChange)="tasksByQuery()"
-				                  #ownerCombobox>
-                  </kendo-combobox>
-                  <label class="popup-label">Environment:</label>
-                  <kendo-combobox
-				                  [data]="highlightOptions?.environments"
-				                  [(value)]="environment"
-                          [valueField]="'name'"
-                          [textField]="'name'"
-                          (valueChange)="tasksByQuery()"
-				                  #environmentCombobox>
-                  </kendo-combobox>
+		              <div class="popup-option">
+                    <label class="popup-label">Assigned Person:</label>
+                    <kendo-combobox
+                            [data]="highlightOptions?.persons"
+                            [(value)]="persons"
+                            [valueField]="'name'"
+                            [textField]="'name'"
+                            (valueChange)="tasksByQuery()"
+                            #personsCombobox>
+                    </kendo-combobox>
+		              </div>
+                  <div class="popup-option">
+	                  <label class="popup-label">Designated Team:</label>
+	                  <kendo-combobox
+					                  [data]="highlightOptions?.teams"
+					                  [(value)]="selectedTeam"
+	                          [valueField]="'name'"
+	                          [textField]="'name'"
+	                          (valueChange)="tasksByQuery()"
+					                  #teamCombobox>
+	                  </kendo-combobox>
+                  </div>
+		              <div class="popup-option">
+	                  <label class="popup-label">Application Owner or SMEs:</label>
+	                  <kendo-combobox
+					                  [data]="highlightOptions?.ownerAndSmes"
+					                  [(value)]="appOwner"
+	                          [valueField]="'name'"
+	                          [textField]="'name'"
+	                          (valueChange)="tasksByQuery()"
+					                  #ownerCombobox>
+	                  </kendo-combobox>
+		              </div>
+                  <div class="popup-option">
+	                  <label class="popup-label">Environment of Assets:</label>
+	                  <kendo-combobox
+					                  [data]="highlightOptions?.environments"
+					                  [(value)]="environment"
+	                          [valueField]="'name'"
+	                          [textField]="'name'"
+	                          (valueChange)="tasksByQuery()"
+					                  #environmentCombobox>
+	                  </kendo-combobox>
+                  </div>
+                  <div class="popup-option">
+	                  <label class="popup-label">Tags assigned to Assets:</label>
+	                  <kendo-combobox
+					                  [data]="highlightOptions?.environments"
+					                  [(value)]="environment"
+	                          [valueField]="'name'"
+	                          [textField]="'name'"
+	                          (valueChange)="tasksByQuery()"
+					                  #environmentCombobox>
+	                  </kendo-combobox>
+                  </div>
+		              <br/>
+
+                  <label class="task-chk-container">
+                      <input
+				                      type="checkbox"
+				                      [(ngModel)]="highlightOptions.showCycles"
+				                      (ngModelChange)="tasksByQuery()" />
+                      <span class="checkmark"></span>
+                      Cyclical Paths
+                  </label>
+
+                  <label class="task-chk-container">
+                      <input
+				                      type="checkbox"
+				                      [(ngModel)]="highlightOptions.withActions"
+				                      (ngModelChange)="tasksByQuery()" />
+                      <span class="checkmark"></span>
+                      With Actions
+                  </label>
+
+                  <label class="task-chk-container">
+                      <input
+				                      type="checkbox"
+				                      [(ngModel)]="highlightOptions.withTmdActions"
+				                      (ngModelChange)="tasksByQuery()" />
+                      <span class="checkmark"></span>
+                      With Actions requiring TMD
+                  </label>
               </kendo-popup>
 		      </div>
           <div class="disp-table-cell">

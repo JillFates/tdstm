@@ -12,6 +12,9 @@ export interface ITaskHighlightOption {
 	teams?: IFilterOption[];
 	ownerAndSmes?: IFilterOption[];
 	environments?: IFilterOption[];
+	showCycles?: boolean;
+	withActions?: boolean;
+	withTmdActions?: boolean;
 }
 
 export interface IFilterOption {
