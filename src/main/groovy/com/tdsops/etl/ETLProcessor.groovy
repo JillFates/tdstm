@@ -133,6 +133,11 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * A cache for column name parts in case of JSON dataSet
      */
     Map<String, Tuple2<String, String>> columnNamePartsCache = [:]
+    /**
+     * ETLMap definitions used by defineETLMap command
+     * @see ETLProcessor#defineETLMap(java.lang.String, groovy.lang.Closure)
+     */
+    Map<String, ETLMap> etlMaps = [:]
 
     List<Column> columns = []
     Map<String, Column> columnsMap = [:]
@@ -1364,9 +1369,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      */
     @CompileStatic
     ETLProcessor defineETLMap(String mapName, Closure closure) {
-
-        ETLMap etlMap = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator).build(closure)
-
+        etlMaps[mapName] = new ETLMapBuilder(this.selectedDomain.domain, this.fieldsValidator).build(closure)
         return this
     }
 

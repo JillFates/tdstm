@@ -47,40 +47,57 @@ class ETLMapBuilder {
 
     }
 
-    ETLMapBuilder add(String fieldName, ETLMapTransform...transformers) {
-        this.add(fieldName, fieldName)
+    ETLMapBuilder add(String domainProperty, ETLMapTransform... transformations) {
+        this.add(domainProperty, domainProperty, transformations)
         return this
     }
 
-    ETLMapBuilder add(Integer sourcePosition, String fieldName, ETLMapTransform...transformers) {
+    ETLMapBuilder add(Integer sourcePosition, String domainProperty, ETLMapTransform... transformations) {
         checkAndAddCurrentInstruction()
-        this.currentInstruction.sourcePosition = sourcePosition
-        this.defineDomainProperty(fieldName)
+        currentInstruction.sourcePosition = sourcePosition
+        this.defineDomainProperty(domainProperty)
+        this.addTransformations(transformations)
         return this
     }
 
-    ETLMapBuilder add(String columnName, String fieldName, ETLMapTransform...transformers) {
+    ETLMapBuilder add(String columnName, String domainProperty, ETLMapTransform... transformations) {
         checkAndAddCurrentInstruction()
-        this.currentInstruction.sourceName = columnName
-        this.defineDomainProperty(fieldName)
+        currentInstruction.sourceName = columnName
+        this.defineDomainProperty(domainProperty)
+        this.addTransformations(transformations)
         return this
     }
 
-    private void defineDomainProperty(String fieldName) {
-        this.currentInstruction.domainProperty = fieldsValidator.lookup(this.etlMap.domain, fieldName)
+    private void addTransformations(ETLMapTransform... transformations) {
+        if (transformations) {
+            currentInstruction.transformations.addAll(transformations)
+        }
+    }
+
+    private void defineDomainProperty(String domainProperty) {
+        this.currentInstruction.domainProperty = fieldsValidator.lookup(this.etlMap.domain, domainProperty)
     }
 
     /**
      * Overriding methodMissing this class collects
      * transformation methods and its params to be invoked later.
-     *
+     * <p>Given the following ETL script example:</p>
+     * <pre>
+     *  defineETLMap 'verni-devices', { //
+     *      add 'zone', uppercase(), left(3)
+     * </pre>
+     * <p>An instance of {@code ETLMapBuilder} is going to convert it
+     * in two instances of {@code ETLMapTransform}:</p>
+     * <pre>
+     *  new ETLMapTransform('uppercase', [])
+     *  new ETLMapTransform('left', [3])
+     * </pre>
      * @param name missing method name
      * @param args an array with method arguments
      * @return the current instance of {@code ETLMapBuilder}
      */
     def methodMissing(String name, def args) {
-        propertiesMap[name] = args
-        this
+        return new ETLMapTransform(name, args?.toList())
     }
 
 }

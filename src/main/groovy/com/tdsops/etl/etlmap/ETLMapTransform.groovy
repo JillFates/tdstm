@@ -4,6 +4,11 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class ETLMapTransform {
-    org.codehaus.groovy.runtime.MethodClosure method
-    List<Object> parameters = []
+    String methodName
+    List<Object> parameters
+
+    ETLMapTransform(String methodName, List<Object> parameters = []) {
+        this.methodName = methodName
+        this.parameters = parameters
+    }
 }
