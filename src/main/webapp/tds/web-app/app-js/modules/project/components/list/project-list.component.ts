@@ -100,7 +100,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			: this.route.snapshot.data['projects'].completedProjects;
 		this.gridData = process(this.resultSet, this.state);
 
-		// use partially the datagrid operations helper, for the moment just to know the number of filters selected
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
 		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
 	}
 
