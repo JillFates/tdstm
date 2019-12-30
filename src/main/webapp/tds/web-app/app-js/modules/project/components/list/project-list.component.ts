@@ -23,6 +23,7 @@ import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import {
 	ActivatedRoute,
 	Event,
@@ -76,6 +77,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	private pageURL: string;
 	private projectOpen = false;
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -97,6 +99,9 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			? this.route.snapshot.data['projects'].activeProjects
 			: this.route.snapshot.data['projects'].completedProjects;
 		this.gridData = process(this.resultSet, this.state);
+
+		// use partially the datagrid operations helper, for the moment just to know the number of filters selected
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
 	}
 
 	ngOnInit() {
@@ -266,14 +271,23 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
