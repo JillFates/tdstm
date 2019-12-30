@@ -21,34 +21,34 @@
 
 	<h3>Memory Usage (Kb):</h3>
 	<br>
-	<pre style="width: 280px;">
+	<pre style="width: 380px;">
        ---- System ----
- Physical Memory: ${String.format("%,10d", sysMemSize)}
-     Used Memory: ${String.format("%,10d", sysMemSize - sysMemFree)}
-     Free Memory: ${String.format("%,10d", sysMemFree)}
-  Virtual Memory: ${String.format("%,10d", virtMemCommit)}
-     Swap Memory: ${String.format("%,10d", swapSize)}
-       Swap Used: ${String.format("%,10d", swapSize - swapFree)}
-       Swap Free: ${String.format("%,10d", swapFree)}
+ Physical Memory: ${sysMemSize}
+     Used Memory: ${sysMemUsed}
+     Free Memory: ${sysMemFree}
+  Virtual Memory: ${virtMemCommit}
+     Swap Memory: ${swapSize}
+       Swap Used: ${swapUsed}
+       Swap Free: ${swapFree}
 
        ---- Heap ----
-             Max: ${String.format("%,10d", heapMax)}
-       Committed: ${String.format("%,10d", heapCommitted)}
-            Used: ${String.format("%,10d", heapUsed)}
-     	    Free: ${String.format("%,10d", freeMemory)}
+             Max: ${heapMax}
+       Committed: ${heapCommitted}
+            Used: ${heapUsed}
+     	    Free: ${freeMemory}
 
        ---- Non-Heap ----
-             Max: ${String.format("%,10d", nonHeapMax)}
-       Committed: ${String.format("%,10d", nonHeapCommitted)}
-            Used: ${String.format("%,10d", nonHeapUsed)}
-            Free: ${String.format("%,10d", nonHeapMax - nonHeapUsed)}
+             Max: ${nonHeapMax}
+       Committed: ${nonHeapCommitted}
+            Used: ${nonHeapUsed}
+            Free: ${nonHeapFree}
 	</pre>
 
 	<h3>Memory Pools:</h3>
 	<table style="border-spacing: 5px; border-collapse: separate; border: 1px solid black;table-layout:fixed;width:auto">
 		<tr>
-			<th>Name</th>
-			<th>Type</th>
+			<th style="text-align: left">Name</th>
+			<th style="text-align: left">Type</th>
 			<th colspan="4">Usage (Mb)</th>
 			<th colspan="4">Peak Usage (Mb)</th>
 			<th colspan="4">Collection Usage (Mb)</th>
@@ -120,10 +120,10 @@
 	<h3>Garbage Collection:</h3>
 	<table style="width: 40%">
 		<tr>
-			<th>Name</th>
-			<th>Count</th>
-			<th>Time (msec)</th>
-			<th>Avg. (Time/Count)</th>
+			<th style="text-align: left">Name</th>
+			<th style="text-align: right">Count</th>
+			<th style="text-align: right">Time (msec)</th>
+			<th style="text-align: right">Avg. (Time/Count)</th>
 		</tr>
 		<g:each in="${java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()}" var="gcitem">
 		<tr>
@@ -141,19 +141,45 @@
 		</g:each>
 	</table>
 
+	<h3>File System:</h3>
+	<table style="width: 40%">
+		<tr>
+			<th style="text-align: left">Name</th>
+			<th style="text-align: right">Free Space</th>
+			<th style="text-align: right">Total Space</th>
+		</tr>
+		<g:each in="${fileSystems}" var="fileSystem">
+		<tr>
+			<td>${fileSystem.name}</td>
+			<td style="text-align: right">
+				${fileSystem.freeSpace}
+			</td>
+			<td style="text-align: right">
+				${fileSystem.totalSpace}
+			</td>
+		</tr>
+		</g:each>
+	</table>
+
 	<br>
 	<b>Note:</b> <i>PS Scavenge is used on the young (eden, survivor) generation and PS MarkSweep is used on the old generation</i>
 	<br>
 
 	<h3>System Information:</h3>
 	<table>
-	<tr><td align=right>OS: </td><td>${osMxBean.getName()} (${osMxBean.getArch()})</td></tr>
-	<tr><td align=right># of CPUs: </td><td>${rt.availableProcessors()}</td></tr>
-	<tr><td align=right>Load Avg: </td><td>${String.format("%3.2f", osMxBean.getSystemLoadAverage() )}</td></tr>
-	<tr><td align=right>VM Vendor: </td><td>${rtMXBean.getVmVendor()}</td></tr>
-	<tr><td align=right>VM Name: </td><td>${rtMXBean.getVmName()}</td></tr>
-	<tr><td align=right>VM Version: </td><td>${sysProps['java.runtime.version']}</td></tr>
+	<tr><td align=right>OS: </td><td>${osName} (${osVersion} ${osArchitecture})</td></tr>
+	<tr><td align=right># of CPUs: </td><td>${availableProcessors}</td></tr>
+	<tr><td align=right>Load Avg: </td><td>${systemLoadAverage}</td></tr>
+	<tr><td align=right>VM Vendor: </td><td>${javaVendor}</td></tr>
+	<tr><td align=right>VM Name: </td><td>${vmName}</td></tr>
+	<tr><td align=right>VM Version: </td><td>${javaVersion}</td></tr>
 	<tr><td align=right>Groovy Version: </td><td>${groovyVersion}</td></tr>
+	<tr><td align=right>Grails Version: </td><td>${grailsVersion}</td></tr>
+	<tr><td align=right>MySQL version: </td><td>${mysqlName} ${myslqVersion}</td></tr>
+	<tr><td align=right>MySQL Innodb Version: </td><td>${mysqlInnodbVersion}</td></tr>
+	<tr><td align=right>MySQL TLS Version: </td><td>${mySQlTlsVersion}</td></tr>
+	<tr><td align=right>Application Version: </td><td>${appVersion}</td></tr>
+	<tr><td align=right>Application Up Time: </td><td>${upTimeApplication}</td></tr>
 
 
 	<tr><td align=right valign=top>
@@ -161,7 +187,7 @@
 		</td>
 		<td>
 			<ul>
-				<g:each in="${rtMXBean.getInputArguments()}" var="arg">
+				<g:each in="${inputArguments}" var="arg">
 				<li>${arg}</li>
 				</g:each>
 			</ul>
@@ -182,6 +208,24 @@
 	</table>
 	<br>
 	<br>
+
+	<h3>Top 10 CPU-Consuming Processes:</h3>
+	<br>
+	<pre style="width: 100%;">
+${cpuProcesses}
+	</pre>
+
+	<h3>Up Time Load:</h3>
+	<br>
+	<pre style="width: 100%;">
+${machineUptime}
+	</pre>
+
+	<h3>SELinux Status:</h3>
+	<br>
+	<pre style="width: 100%;">
+${seLinuxStatus}
+	</pre>
 
 </div>
 </div>

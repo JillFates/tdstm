@@ -26,7 +26,7 @@ import {TagService} from '../../../assetTags/service/tag.service';
 })
 export class AssetEditComponent extends DynamicComponent implements AfterViewInit {
 
-	@ViewChild('view', {read: ViewContainerRef}) view: ViewContainerRef;
+	@ViewChild('view', {read: ViewContainerRef, static: true}) view: ViewContainerRef;
 
 	constructor(
 		inj: Injector,

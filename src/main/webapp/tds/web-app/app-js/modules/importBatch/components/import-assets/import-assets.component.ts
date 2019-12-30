@@ -26,7 +26,7 @@ declare var jQuery: any;
 })
 export class ImportAssetsComponent implements OnInit {
 
-	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 
 	private readonly dataScriptOptionsInitial = {
 		id: -1,

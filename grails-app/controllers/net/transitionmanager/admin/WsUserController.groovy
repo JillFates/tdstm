@@ -298,10 +298,11 @@ class WsUserController implements ControllerMethods {
 	* @param value - the value to set the preference to
 	*/
 	@HasPermission(Permission.UserGeneralAccess)
-	def savePreference(SavePreferenceCommand savePreference) {
+	def savePreference() {
+    	SavePreferenceCommand savePreference = populateCommandObject(SavePreferenceCommand)
 		validateCommandObject(savePreference)
 		userPreferenceService.setPreference(savePreference.code, savePreference.value)
-		renderSuccessJson()
+    	renderSuccessJson()
 	}
 
 	@HasPermission(Permission.UserGeneralAccess)

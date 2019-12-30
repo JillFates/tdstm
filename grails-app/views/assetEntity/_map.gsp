@@ -2,17 +2,19 @@
 <div id="toolsContainerId">
 	<!-- The top bar with various buttons and controls on it -->
 	<div id="graphToolbarId">
-		<div id="controlPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL)"><h4>Control Panel</h4></div>
-		<div id="dependenciesPanelTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY)"><h4>Dependencies</h4></div>
-		<div id="legendTabId" class="graphPanelTab hasBorders" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND)"><h4>Legend</h4></div>
-		<div id="fullscreenButtonId" class="graphButton graphTabButton hasBorders showMenu" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode"><h4>Full Screen</h4></div>
-		<div id="highlightFormId" class="noPadding graphTabButton hasBorders hasMargin newHighlightForm">
+		<div class="btn-group">
+			<button id="controlPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.CONTROL, 'depAnalyzer')">Control Panel</button>
+			<button id="dependenciesPanelTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.DEPENDENCY, 'depAnalyzer')">Dependencies</button>
+			<button id="legendTabId" class="btn" onclick="GraphUtil.togglePanel(GraphUtil.PANELS.LEGEND), 'depAnalyzer'">Legend</button>
+		</div>
+		<button id="fullscreenButtonId" class="btn btn-outline" onclick="GraphUtil.toggleFullscreen()" title="Toggles fullscreen mode">Full Screen</button>
+		<div id="highlightFormId" class="noPadding graphTabButton hasMargin newHighlightForm">
 			<span id="filterOptionsButtonId" class="graphButton" onclick="GraphUtil.toggleHighlightDropdown()" title="Shows additional filtering options">
-				<svg><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+				<svg style="fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 			</span>
-			<input type="text" id="searchBoxId" name="Search Box" class="fullButton" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
-			<span id="filterClearId" class="disabled ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
-			<span id="filterSubmitButtonId" class="graphButton" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"></span>
+			<input class="clr-input" type="text" style="border-bottom:1px solid #999; padding-right: 24px;" id="searchBoxId" name="Search Box" value="" placeholder="Enter highlighting filter" onkeydown="GraphUtil.handleSearchKeyEvent(event)"/>
+			<span id="filterClearId" class="ui-icon ui-icon-closethick" onclick="GraphUtil.clearFilter('text')" title="Clear the current filter"></span>
+			<span style="font-size:18px; color:#0077b8;" onclick="GraphUtil.performSearch()" title="Applies the selected filtering options to the graph"><i class="fas fa-binoculars"></i></span>
 		</div>
 		<div id="filterOptionsMenuId" class="hasBorders">
 			<table>
@@ -47,11 +49,13 @@
 				</tr>
 			</table>
 		</div>
-		<div id="zoomInButtonId" class="graphButton graphTabButton zoomButton hasMargin" onclick="GraphUtil.zoomIn()" title="Zoom in"></div>
-		<div id="zoomOutButtonId" class="graphButton graphTabButton zoomButton" onclick="GraphUtil.zoomOut()" title="Zoom out"></div>
-		<div id="lassoButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"></div>
-		<div id="selectionAddButtonId" class="graphButton graphTabButton toolButton" onclick="GraphUtil.toggleToolState(GraphUtil.SELECTION_ADD_TOOL, $(this))" title="Select multiple nodes in sequence ([ctrl] while selecting, can be combined with the lasso tool)"></div>
-		<div id="refreshButtonId" class="graphButton graphTabButton hasBorders hasMargin" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><h4><i class="fa fa-fw fa-warning"></i> Refresh</h4></div>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin:0 10px 0 20px;" onclick="GraphUtil.zoomIn()" title="Zoom in"><i class="fas fa-search-plus"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin-right:10px;" onclick="GraphUtil.zoomOut()" title="Zoom out"><i class="fas fa-search-minus"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer; display:inline-block; margin-right:10px;" onclick="GraphUtil.toggleToolState(GraphUtil.LASSO_TOOL, $(this))" title="Select a region on the graph ([shift+drag] to do this manually or [shift+ctrl+drag] to add this region to the current selection)"><i class="fas fa-draw-polygon"></i></span>
+		<span style="font-size:18px; color:#0077b8; cursor:pointer;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fas fa-hand-pointer"></i></span>
+
+
+		<button id="refreshButtonId" class="btn btn-outline" style="margin-left:20px;" onclick="getList('graph', ${depGroup == 'onePlus' ? '\'onePlus\'' : depGroup})" title="Refreshes the graph"><i class="fas fa-exclamation-triangle"></i>Refresh</button>
 	</div>
 	<!-- The control panel div containing graph controls and settings -->
 	<div id="controlPanelId" class="graphPanel">
@@ -61,75 +65,83 @@
 				<!-- Miscellaneous settings and controls -->
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="pointer fullButton graphButton" onclick="GraphUtil.toggleFreeze()" title="Pauses or Unpauses the physics of the force graph (can also be done with the [space] key)">
+						<input id="playPauseButtonId" type="button" value="Freeze Graph" class="btn btn-sm fullButton" onclick="GraphUtil.toggleFreeze()" title="Pauses or Unpauses the physics of the force graph (can also be done with the [space] key)">
 					</td>
 				</tr>
 				<tr>
 					<td colspan="3" class="noPadding">
-						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="pointer fullButton graphButton" onclick="setIdealGraphPosition()" title="Adjust the position, zoom, and rotation of the grpah to fit in the window">
+						<input id="OptimizeButtonId" type="button" value="Maximize Graph" class="btn btn-sm fullButton" onclick="setIdealGraphPosition()" title="Adjust the position, zoom, and rotation of the grpah to fit in the window">
 					</td>
 				</tr>
 
 				<!-- Suggest splits controls -->
 				<tr>
-					<td colspan="3" class="noPadding" >
+					<td colspan="3" class="noPadding">
+						<input type="button" id="minCutButtonId" value="Suggest Splits" class="btn btn-sm fullButton" onclick="cutAndRemove()" title="Each time clicked will present a suggested division of the group by least number of cuts">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="noPadding">
 						<!-- The comments between lines prevents the browser from trying to evaluate the whitespace between these divs as a space character -->
-						<input type="button" id="minCutButtonId" value="Suggest Splits" class="pointer halfButton graphButton" onclick="cutAndRemove()" title="Each time clicked will present a suggested division of the group by least number of cuts"><!--
-						-->&nbsp;<input type="button" value="Undo Splits" class="pointer halfButton graphButton" onclick="undoCuts()" title="Undoes any previous cuts">
+						<input type="button" value="Undo Splits" class="btn btn-sm fullButton" onclick="undoCuts()" title="Undoes any previous cuts">
 					</td>
 				</tr>
 				<tr title="Maximum number of edges that can be cut at once">
 					<td colspan="3" class="noPadding">
-						<g:select name="maxEdgeCount" id="maxEdgeCountId" from="${1..20}" value="${graphPrefs.maxEdgeCount ? graphPrefs.maxEdgeCount : defaultPrefs.maxEdgeCount}"></g:select><!--
-						--><label for="maxEdgeCountId" style="vertical-align: text-top;">&nbsp;Max dependencies cut</label>
+						<div class="clr-form-horizontal" style="padding:unset;">
+							<div class="clr-form-control" style="padding:unset; margin:unset; align-items:flex-end;">
+								<label for="maxEdgeCountId" class="clr-control-label" style="width: unset; margin:unset;">Max Dependencies Cut</label>
+								<div class="clr-control-container" style="margin-left: 5px;">
+									<div class="clr-select-wrapper">
+										<g:select name="maxEdgeCount" id="maxEdgeCountId" from="${1..20}" value="${graphPrefs.maxEdgeCount ? graphPrefs.maxEdgeCount : defaultPrefs.maxEdgeCount}"></g:select>
+									</div>
+								</div>
+							</div>
+						</div>
 					</td>
 				</tr>
 
-
-				<!-- Spacer -->
-				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-
-
 				<!-- Color By grouping selector -->
 				<tr title="Sets the criteria used to determine node fill color">
-					<td colspan="3" style="padding-left :0px">
-						<span class="checkboxContainer">
-							<g:select name="colorBy" id="colorBySelectId" from="${colorByGroupLabels?.values()}" keys="${colorByGroupLabels?.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
-							<label for="colorBySelectId">&nbsp;Color By</label>
-						</span>
+					<td colspan="3" style="padding:unset; padding-bottom:5px;">
+						<div class="clr-form-horizontal" style="padding:unset;">
+							<div class="clr-form-control" style="padding:unset; margin:unset; align-items:flex-end;">
+								<label for="colorBySelectId" class="clr-control-label" style="width: unset; margin:unset;">Color By</label>
+								<div class="clr-control-container" style="margin-left: 5px;">
+									<div class="clr-select-wrapper">
+										<g:select class="clr-select" name="colorBy" id="colorBySelectId" from="${colorByGroupLabels?.values()}" keys="${colorByGroupLabels?.keySet()}" value="${graphPrefs.colorBy ? graphPrefs.colorBy : defaultPrefs.colorBy}"></g:select>
+									</div>
+								</div>
+							</div>
+						</div>
 					</td>
 				</tr>
 
 				<!-- More display controls -->
 				<tr title="If checked, bundle conflicts will be highlighted">
-					<td colspan="3" style="padding-left :0px">
-						<span class="checkboxContainer">
-							<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="pointer" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
-							<label for="bundleConflictsId" class="pointer">&nbsp;Show Bundle Conflicts</label>
-						</span>
+					<td colspan="3" style="padding: unset;">
+						<div class="clr-checkbox-wrapper" style="padding: unset;">
+							<input type="checkbox" id="bundleConflictsId" name="bundleConflicts" class="clr-checkbox" value="true" ${(graphPrefs.bundleConflicts) ? 'checked' : ''}>
+							<label for="bundleConflictsId">Show Bundle Conflicts</label>
+						</div>
 
 					</td>
 				</tr>
 				<tr title="Sets the color of the background to black">
-					<td colspan="3" style="padding-left :0px">
-						<span class="checkboxContainer">
-							<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="pointer" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
-							<label for="blackBackgroundId" class="pointer">&nbsp;Black Background</label>
-						</span>
+					<td colspan="3" style="padding: unset;">
+						<div class="clr-checkbox-wrapper" style="padding: unset;">
+							<input type="checkbox" id="blackBackgroundId" name="blackBackground" class="clr-checkbox" value="true" ${(graphPrefs.blackBackground)?('checked="checked"'):('')} onchange="rebuildMap(false)">
+							<label for="blackBackgroundId">Black Background</label>
+						</div>
 					</td>
 				</tr>
-
-
-				<!-- Spacer -->
-				<tr><td colspan="3" class="noPadding"><br /></td></tr>
-
 
 				<!-- The twistie for the hide/show graph labels section -->
 				<tr id="twistieRowId">
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="labelControlContainerId">
 							Show Labels:
-							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+							<svg style="width: 12px; height: 12px; border-width: 0px; fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 						</span>
 					</td>
 				</tr>
@@ -144,9 +156,9 @@
 						<tr class="labelToggleRow">
 							<td colspan="3" class="labelToggleCol">
 								<div style="padding:0px;">
-									<div class="checkboxContainer">
-										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="pointer ${names.labelHandles}" onchange="rebuildMap(false)" />
-										<label for="${type}CheckboxId" class="pointer">
+									<div class="clr-checkbox-wrapper">
+										<input type="checkbox" id="${type}CheckboxId" name="${names.labelPreferenceName}" value="true" ${(graphPrefs[names.labelPreferenceName]) ? 'checked' : ''} class="clr-checkbox ${names.labelHandles}" onchange="rebuildMap(false)" />
+										<label for="${type}CheckboxId">
 											<svg id="${names.internalName}ShapeLeftPanel"><use xlink:href="#${names.internalName}ShapeId" class="node" x="15" y="15" style="fill: #1f77b4;"></use></svg>
 											${names.labelText ?: names.frontEndName}
 										</label>
@@ -168,7 +180,7 @@
 					<td colspan="3" class="noPadding">
 						<span id="twistieSpanId" class="closed pointer" onclick="GraphUtil.toggleGraphTwistie($(this))" for="layoutControlContainerId">
 							Layout:
-							<svg style="width: 12px;height: 12px;border-width: 0px;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
+							<svg style="width: 12px;height: 12px;border-width: 0px; fill: #0077b8;"><g transform="rotate(90 6 6)"><g id="twistieId"><path d="M10 6 L4 10 L4 2 Z" class="link NotApplicable"></g></g></svg>
 						</span>
 					</td>
 				</tr>
@@ -222,13 +234,13 @@
 			<!-- Save preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="pointer fullButton graphButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}')">
+					<input id="updatePrefsButtonId" type="button" value="Save Preferences" class="btn btn-sm fullButton" onclick="GraphUtil.updateUserPrefs('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}')">
 				</td>
 			</tr>
 			<!-- Reset preferences button -->
 			<tr>
 				<td colspan="3" class="noPadding">
-					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="pointer fullButton graphButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}')">
+					<input id="resetPrefsButtonId" type="button" value="Reset Defaults" class="btn btn-sm fullButton" onclick="GraphUtil.resetToDefaults('${com.tdsops.tm.enums.domain.UserPreferenceEnum.DEP_GRAPH.name()}')">
 				</td>
 			</tr>
 		</table>
@@ -254,12 +266,7 @@
 		}
 		div.dependency_panel_action_buttons {
 			position: absolute;
-			bottom: 0;
-			background: white;
-			height: 33px;
-		}
-		div.fullscreen div.dependency_panel_action_buttons {
-			bottom: 1px !important;
+			bottom: 5px;
 		}
 		td.groupingControl {
 			background-color: #dddddd;
@@ -267,7 +274,7 @@
 	</style>
 	<div id="dependenciesPanelId" class="graphPanel">
 		<div id="dependecy-control">
-			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i class="fa fa-fw fa-caret-down"></i></label>
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-type-panel', this)"><span>Connection Type</span><i style="color: #0077b8; cursor:pointer;" class="fa fa-fw fa-caret-down"></i></label>
 			<br />
 			<div class="checkboxdiv_control dependency-type-panel open" >
 				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
@@ -291,7 +298,7 @@
 				</table>
 			</div>
 
-			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i class="fa fa-fw fa-caret-down"></i></label>
+			<label class="dependency-control-title" onclick="GraphUtil.toggleDependencyPanel('dependency-show-panel', this)"><span>Connection Status</span><i style="color: #0077b8; cursor:pointer;" class="fa fa-fw fa-caret-down"></i></label>
 			<div class="checkboxdiv_control dependency-show-panel open">
 				<table class="dependency-control-table" cellpadding="0" cellspacing="0">
 					<tr>
@@ -315,7 +322,7 @@
 			</div>
 		</div>
 		<div class="dependency_panel_action_buttons">
-			<input style="width: 241px;" type="button" value="Apply" class="pointer fullButton graphButton" onclick="GraphUtil.applyShowHideDependencies()">
+			<input style="margin: unset; width: 259px;" type="button" value="Apply" class="btn btn-outline fullButton" onclick="GraphUtil.applyShowHideDependencies()">
 		</div>
 	</div>
 	<!-- The legend div containing information about the shapes and colors used in the graph -->
@@ -329,4 +336,7 @@
 <!-- Call the main graph function as soon as this template is added to the DOM -->
 <script type="text/javascript">
 	buildMap();
+	$('#controlPanelId').addClass('depAnalyzer');
+	$('#dependenciesPanelId').addClass('depAnalyzer');
+	$('#legendDivId').addClass('depAnalyzer');
 </script>

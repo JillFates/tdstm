@@ -28,19 +28,20 @@ import {AssetDependencyEditComponent} from './components/asset-dependency/edit/a
 import {SingleCommentComponent} from './components/single-comment/single-comment.component';
 import {SingleNoteComponent} from './components/single-note/single-note.component';
 import {TaskDetailComponent} from '../taskManager/components/detail/task-detail.component';
-import {TaskEditComponent} from '../taskManager/components/edit/task-edit.component';
 import {ManufacturerShowComponent} from './components/device/manufacturer/components/manufacturer-show/manufacturer-show.component';
 import {ManufacturerEditComponent} from './components/device/manufacturer/components/manufacturer-edit/manufacturer-edit.component';
 import {ModelDeviceShowComponent} from './components/device/model-device/components/model-device-show/model-device-show.component';
 import {AssetCloneComponent} from './components/asset-clone/asset-clone.component';
 import {PopupAssetMessageComponent} from './components/popups/popup-asset-message.component';
 import {TaskCommentDialogComponent} from './components/task-comment/dialog/task-comment-dialog.component';
-import {TaskCreateComponent} from '../taskManager/components/create/task-create.component';
+import {TaskEditCreateComponent} from '../taskManager/components/edit-create/task-edit-create.component';
 import {TaskActionsComponent} from '../taskManager/components/task-actions/task-actions.component';
 import {AssetCreateComponent} from './components/asset/asset-create.component';
 import {TaskNotesComponent} from '../../shared/components/task-notes/task-notes.component';
 import {ModelDeviceEditComponent} from './components/device/model-device/components/model-device-edit/model-device-edit.component';
 import { TaskActionSummaryComponent } from '../taskManager/components/task-actions/task-action-summary.component';
+import {AssetExplorerrRouteModule} from './asset-explorer.route';
+import {ArchitectureGraphComponent} from './components/architecture-graph/architecture-graph.component';
 
 @NgModule({
 	imports: [
@@ -55,6 +56,8 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		SortableModule,
 		IntlModule,
 		DateInputsModule,
+		// Route
+		AssetExplorerrRouteModule
 	],
 	declarations: [
 		AssetShowComponent,
@@ -73,12 +76,12 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		AssetCloneComponent,
 		PopupAssetMessageComponent,
 		TaskCommentDialogComponent,
-		TaskCreateComponent,
-		TaskEditComponent,
+		TaskEditCreateComponent,
 		TaskDetailComponent,
 		TaskActionsComponent,
 		TaskNotesComponent,
-		TaskActionSummaryComponent
+		TaskActionSummaryComponent,
+		ArchitectureGraphComponent
 	],
 	providers: [
 		// Services
@@ -112,8 +115,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		TaskCommentDialogComponent,
 		TaskCommentComponent,
 		TaskDetailComponent,
-		TaskEditComponent,
-		TaskCreateComponent,
+		TaskEditCreateComponent,
 		SingleCommentComponent,
 		SingleNoteComponent,
 		ManufacturerShowComponent,
@@ -122,7 +124,7 @@ import { TaskActionSummaryComponent } from '../taskManager/components/task-actio
 		ModelDeviceShowComponent,
 		AssetCloneComponent,
 		TaskActionSummaryComponent
-	],
+	]
 })
 
 export class AssetExplorerModule {

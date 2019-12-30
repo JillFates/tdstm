@@ -370,9 +370,7 @@ class CustomTagLib implements InitializingBean {
 		if(licenseInfo.banner) {
 			out << """
 				<div class="breadcrumb licensing-banner-message breadcrumb-${crumbs.size}">
-					<div class="callout">
-						<p><strong>${licenseInfo.banner}</strong></p>
-					</div>
+					<div class="callout">${licenseInfo.banner}</div>
 				</div>"""
 		}
 
@@ -568,12 +566,12 @@ class CustomTagLib implements InitializingBean {
 	 */
 	def showDependencyGroup = { attrs ->
 		if (!attrs.groupId) {
-			out << " "
+			out << ""
 		} else {
 			def value = dependencyGroupValueWithTooltip(attrs.groupId)
 			def tabName = attrs.tab ?: 'map'
-			def url = g.link( mapping: "dependencyConsoleMap", params: [subsection: tabName, groupId:attrs.groupId, assetName: attrs.assetName], value)
-			out << ':' + url
+			def url = g.link( mapping: "dependencyConsoleMap", params: [subsection: tabName, groupId:attrs.groupId, assetName: attrs.assetName], value,  target: "_blank")
+			out << '' + url
 		}
 	}
 

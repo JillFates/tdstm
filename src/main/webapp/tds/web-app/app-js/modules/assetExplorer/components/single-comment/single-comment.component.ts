@@ -8,7 +8,7 @@ import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive
 import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {DateUtils} from '../../../../shared/utils/date.utils';
-import {PreferenceService} from '../../../../shared/services/preference.service';
+import {PREFERENCES_LIST, PreferenceService} from '../../../../shared/services/preference.service';
 import {PermissionService} from '../../../../shared/services/permission.service';
 import {Permission} from '../../../../shared/model/permission.model';
 import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';

@@ -1,11 +1,5 @@
 /* GENERAL */
 
-.old-legacy-content .spinner {
-	padding: 5px;
-	position: absolute;
-	right: 0;
-}
-
 .old-legacy-content a:link, .old-legacy-content a:visited, .old-legacy-content a:hover {
 	color: #666;
 	font-weight: bold;

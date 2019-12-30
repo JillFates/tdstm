@@ -1,5 +1,10 @@
 /* Cookbook Styles */
 
+div.cookbook_recipes_editor div.container {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
 .paginationWrapper{
 	text-align: center;
 }
@@ -45,8 +50,6 @@ ul{
 }
 
 .fullWidth{width: 100%}
-
-#gridControls{margin-top:15px;}
 
 .create-recipe-tabs .tab-content {
 	padding: 15px;
@@ -152,6 +155,10 @@ form.groups{
 	overflow-y: auto;
 }
 
+.gridStyleGroups .ngCellText  span {
+	cursor: pointer !important;
+}
+
 .gridIcon{
 	display: table;
 	height: 100%;
@@ -215,6 +222,9 @@ form .error-msg{
 	border-radius: 0;
 }
 
+.code-editor-modal {
+	padding: 0px;
+}
 .code-editor-modal .modal-dialog {
   width: 1060px;
 }
@@ -223,12 +233,8 @@ form .error-msg{
 
 /* Code Diff Stuff */
 
-.code-diff-modal .modal-dialog {
-  width: 1060px;
-}
-
 .codeDiff {
-	height: 430px;
+	height: 480px;
 }
 
 .codeDiffHeaderLeft {
@@ -281,6 +287,8 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 
 .progressWrapper .progress{
 	margin-bottom: 0px;
+    max-height: 20px;
+    margin-top: 26px;
 }
 
 .selectorsHideShow{
@@ -288,8 +296,7 @@ form.taskGeneration label[for="autoPublishTasks"], .completionWrapper, .generate
 	display: inline-block;
 }
 
-a:hover{
+.content-wrapper a:hover {
 	text-decoration: none;
-	font-weight: normal;
 	cursor: pointer;
 }

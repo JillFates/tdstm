@@ -14,6 +14,8 @@ export const en_DICTIONARY: Object = {
 		'ACTIVE': 'Active',
 		'ARCHIVE': 'Archive',
 		'CANCEL': 'Cancel',
+		'CHECK_SYNTAX': 'Check Syntax',
+		'COLLAPSE': 'Collapse',
 		'CONFIGURE': 'Configure',
 		'CREATE': 'Create',
 		'CLOSE': 'Close',
@@ -21,6 +23,7 @@ export const en_DICTIONARY: Object = {
 		'DELETE': 'Delete',
 		'EDIT': 'Edit',
 		'EXPORT': 'Export',
+		'EXPAND': 'Expand',
 		'FILTER': 'Filter',
 		'LIST': 'List',
 		'LEGEND': 'Legend',
@@ -99,6 +102,8 @@ export const en_DICTIONARY: Object = {
 	},
 	'API_ACTION': {
 		'CREATE_ACTION': 'Create Action',
+		'EDIT_ACTION': 'Edit Action',
+		'DELETE_ACTION': 'Delete Action',
 		'API_ACTION': 'Action',
 		'API_ACTIONS': 'Actions',
 	},
@@ -251,6 +256,16 @@ export const en_DICTIONARY: Object = {
 		'TITLE_DASHBOARD': 'Event Dashboard',
 		'DASHBOARD': 'Dashboard',
 		'INCLUDE_UNPUBLISHED': 'Include Unpublished Tasks'
+	},
+	'INSIGHT': {
+		'INSIGHT': 'Insight',
+		'DASHBOARD': 'Dashboard',
+		'TITLE_DASHBOARD': 'Insight Dashboard',
+		'DATA_BY_PROVIDERS': 'Data by Providers',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Application Grouped by Dependencies',
+		'DEVICES_BY_EVENT': 'Devices By Event',
+		'ASSETS_BY_PROVIDERS_AND_ASSET_TYPE': 'Assets by Providers and Asset Type',
+		'ASSETS_BY_OS_AND_ENVIRONMENT': 'Assets by OS and Environment'
 	},
 	'REPORTS': {
 		'REPORTS': 'Reports',
@@ -462,6 +477,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',
+		'EDIT_TASK': 'Edit Task',
 		'TASK': 'Task',
 		'TASK_MANAGER': 'Task Manager',
 		'DELETE_TASK' : 'Are you sure you want to delete this task? There is no undo for this action',
@@ -475,5 +491,12 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 			'SELECT_END_DATE': 'Select an end date'
 		},
 		'MY_TASKS': 'My Tasks',
+	},
+	'DASHBOARD': {
+		'INSIGHT_DATA': 'Insight Data',
+		'ASSETS_BY_VENDOR': 'Assets by Vendor',
+		'APPLICATION_GROUPED_BY_DEPENDENCIES': 'Applications Grouped by Dependencies',
+		'DEPENDENCIES_BY_VENDOR': 'Dependencies by Vendor',
+		'TOP_TAGS': 'Top Tags'
 	}
 };

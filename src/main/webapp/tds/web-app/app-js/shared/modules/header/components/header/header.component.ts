@@ -1,5 +1,6 @@
 // Angular
 import {Component} from '@angular/core';
+import {FormGroup, FormControl} from '@angular/forms';
 // NGXS
 import {Store} from '@ngxs/store';
 // Component
@@ -18,6 +19,8 @@ import {PageMetadataModel} from '../../model/page-metadata.model';
 import {Logout} from '../../../../../modules/auth/action/login.actions';
 import {APP_STATE_KEY} from '../../../../providers/localstorage.provider';
 import {LIC_MANAGER_GRID_PAGINATION_STORAGE_KEY} from '../../../../../shared/model/constants';
+import {ReplaySubject} from 'rxjs';
+import {SetUserContextPerson} from '../../../../../modules/auth/action/user-context-person.actions';
 
 declare var jQuery: any;
 
@@ -25,18 +28,25 @@ declare var jQuery: any;
 	selector: 'tds-header',
 	templateUrl: 'header.component.html',
 })
-
 export class HeaderComponent {
-
 	public userContext: UserContextModel;
 	public pageMetaData: PageMetadataModel = new PageMetadataModel();
+	public searchForm = new FormGroup({
+		search: new FormControl(''),
+	});
+	public fullName: ReplaySubject<string> = new ReplaySubject<string>(1);
+	public iconText: ReplaySubject<string> = new ReplaySubject<string>(1);
 
 	constructor(
 		private userContextService: UserContextService,
 		private dialogService: UIDialogService,
 		private notifierService: NotifierService,
-		private store: Store) {
-		this.getUserContext();
+		private store: Store
+	) {
+		this.pageMetaData.hideTopNav = true;
+		this.notifierService.on('userDetailsUpdated', () => this.getUserContext());
+		this.store.dispatch(new SetUserContextPerson())
+			.subscribe(() => this.getUserContext());
 		this.headerListeners();
 	}
 
@@ -46,27 +56,42 @@ export class HeaderComponent {
 	 */
 	private headerListeners(): void {
 		this.notifierService.on('notificationRouteChange', event => {
-			if (event.event.url.indexOf('/auth/') >= 0) {
-				this.pageMetaData.hideTopNav = true;
-				jQuery('div.content-wrapper').addClass('content-login-wrapper');
-			} else {
-				this.pageMetaData.hideTopNav = false;
-				jQuery('div.content-wrapper').removeClass('content-login-wrapper');
-			}
+			this.pageMetaData.hideTopNav = event.event.url.indexOf('/auth/') >= 0;
 		});
 	}
 
 	protected getUserContext(): void {
-		this.userContextService.getUserContext().subscribe( (userContext: UserContextModel) => {
-			if (!userContext.user) {
-				this.pageMetaData.hideTopNav = true;
-			}
-			this.userContext = userContext;
-		});
+		this.userContextService
+			.getUserContext()
+			.subscribe((userContext: UserContextModel) => {
+				if (!userContext.user) {
+					this.pageMetaData.hideTopNav = true;
+				} else if (!userContext.project.logoUrl) {
+					userContext.project.logoUrl =
+						'/tdstm/tds/web-app/assets/images/transitionLogo.svg';
+				}
+				this.userContext = userContext;
+				const fName = userContext.person && userContext.person.fullName;
+				if (fName) {
+					this.fullName.next(fName);
+					this.iconText.next(this.getUserIconText(fName));
+				}
+			});
 	}
 
+	/**
+	 * transform full name to be only the initials
+	 * @param fullName
+	 */
+	public getUserIconText(fullName: string): string {
+		return fullName.split(' ').map(x => x.charAt(0)).join('').substring(0, 3).toUpperCase();
+	}
+
+	/**
+	 * Opens the user preferences modal.
+	 */
 	public openPrefModal(): void {
-		this.dialogService.open(UserPreferencesComponent, []).catch(result => {
+		this.dialogService.extra(UserPreferencesComponent, [], true, true).catch(result => {
 			//
 		});
 	}

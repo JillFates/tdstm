@@ -1,11 +1,5 @@
 /* GENERAL */
 
-.spinner {
-	padding: 5px;
-	position: absolute;
-	right: 0;
-}
-
 body {
 	background: #fff;
 }
@@ -22,12 +16,6 @@ a:link, a:visited, a:hover {
 }
 .links:hover {
 	text-decoration: underline;
-}
-h1 {
-	color: #214aa0 !important;
-	font-weight: normal !important;
-	font-size: 16px !important;
-	margin: .8em 0 .3em 0 !important;
 }
 h4 {
 	/*font: 12px helvetica,arial,sans-serif !important;*/
@@ -818,10 +806,11 @@ svg {
 }
 .SuffleImage {
 	height: 16px;
-	margin-left: 60px;
-	margin-top: -10px;
-	position: absolute;
+
+	
 	width: 16px;
+	margin-top: 5px;
+	margin-right: -5px;
 	z-index: 1;
 	cursor:pointer;
 }
@@ -850,8 +839,8 @@ svg {
 	max-width: 90vw;
 }
 .ui-dialog th {
-	background: #CCCCCC !important;
-	color: #000 !important;
+	background: #CCCCCC;
+	color: #000;
 }
 th.asc{
 	background-image: url(../../../images/images/skin/sorted_asc.gif);
@@ -944,11 +933,6 @@ br.page-break-after {
 	width: 300px;
 	height: 20px;
 }
-.tabs .tabControls {
-	display: inline;
-	width: 100px;
-	height: 20px;
-}
 
 .disabledButton input{
 	color:gray;
@@ -1004,28 +988,6 @@ a#taskLinkId * {
 }
 a#taskLinkAllId * {
 	vertical-align: middle;
-}
-
-
-.btn {
-	display: inline-block;
-	padding: 6px 12px;
-	margin-bottom: 0;
-	font-size: 14px;
-	font-weight: normal;
-	line-height: 1.428571429;
-	text-align: center;
-	white-space: nowrap;
-	vertical-align: middle;
-	cursor: pointer;
-	background-image: none;
-	border: 1px solid transparent;
-	border-radius: 4px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
 }
 
 .btn:focus {
@@ -1160,4 +1122,10 @@ span#addAkaId.addAkaDisabled {
 }
 span#addAkaId:not(.addAkaDisabled) {
 	cursor: pointer;
+}
+
+
+/** Clarity **/
+.btn img {
+    margin-top: -3px;
 }

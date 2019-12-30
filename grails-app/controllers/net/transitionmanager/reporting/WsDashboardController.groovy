@@ -2,23 +2,18 @@ package net.transitionmanager.reporting
 
 import com.tdsops.common.security.spring.HasPermission
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.project.MoveEvent
+import net.transitionmanager.reporting.DashboardService
 import net.transitionmanager.project.MoveEventService
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.Permission
-import net.transitionmanager.task.TaskService
-import org.springframework.jdbc.core.JdbcTemplate
 
-@Secured('isAuthenticated()') // TODO BB need more fine-grained rules here
+@Secured('isAuthenticated()')
 class WsDashboardController implements ControllerMethods {
 
-	JdbcTemplate jdbcTemplate
-	CustomDomainService customDomainService
-	DashboardService dashboardService
-	MoveEventService moveEventService
-	TaskService taskService
+	DashboardService 	dashboardService
+	MoveEventService    moveEventService
 
 	/**
 	 * Returns data used to render the Event Dashboard
@@ -63,7 +58,7 @@ class WsDashboardController implements ControllerMethods {
 
 	@HasPermission(Permission.DashboardMenuView)
 	def getDataForPlanningDashboard() {
-		Project project = securityService.userCurrentProject
+		Project project = getProjectForWs()
 		renderSuccessJson(dashboardService.getDataForPlanningDashboard(project))
 	}
 }
