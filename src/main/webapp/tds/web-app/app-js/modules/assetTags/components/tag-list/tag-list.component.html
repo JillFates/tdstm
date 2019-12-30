@@ -30,18 +30,6 @@
 				>
 					<!-- Toolbar Template -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="button-bar text-right">
-							<div>
-								<!-- Refresh button -->
-								<tds-button-custom
-									[flat]="true"
-									[icon]="'repeat'"
-									[tooltip]="'Refresh View'"
-									(click)="reloadTagList()"
-								>
-								</tds-button-custom>
-							</div>
-						</div>
 						<div class="button-bar">
 							<div class="inline float-right">
 								<tds-button-create
@@ -60,6 +48,11 @@
 									style="display: none;"
 									type="button"
 								></button>
+								<!-- Refresh button -->
+								<tds-button
+										icon="sync"
+										(click)="reloadTagList()"
+								></tds-button>
 							</div>
 						</div>
 					</ng-template>

@@ -29,12 +29,6 @@
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="button-bar">
 							<div class="inline float-right">
-								<tds-button-custom
-									[icon]="'sync'"
-									[tooltip]="'Refresh'"
-									(click)="reloadDataScripts()"
-								>
-								</tds-button-custom>
 								<tds-button-create
 									[id]="'btnCreateDataScript'"
 									[title]="
@@ -46,6 +40,12 @@
 									(click)="onCreateDataScript()"
 								>
 								</tds-button-create>
+								<tds-button-custom
+										[icon]="'sync'"
+										[tooltip]="'Refresh'"
+										(click)="reloadDataScripts()"
+								>
+								</tds-button-custom>
 							</div>
 						</div>
 					</ng-template>
