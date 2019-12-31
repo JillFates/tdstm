@@ -22,7 +22,6 @@
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
 			<div class="clr-row">
 				<div class="clr-col-12 grid-actions">
-					<tds-button icon="sync" (click)="reloadData()"></tds-button>
 					<tds-bulk-change-button
 						#tdsBulkChangeButton
 						[enabled]="bulkCheckboxService.hasSelectedItems()"
@@ -33,6 +32,7 @@
 						(operationResult)="onBulkOperationResult($event)"
 					>
 					</tds-bulk-change-button>
+					<tds-button icon="sync" (click)="reloadData()"></tds-button>
 				</div>
 			</div>
 		</ng-template>
