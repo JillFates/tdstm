@@ -250,6 +250,7 @@
 								"
 								>{{ 'LICENSE.PRODUCTION' | translate }}</span
 							>
+							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
 						</ng-template>
 					</kendo-grid-column>
 					<!-- PAGER COMPONENT -->

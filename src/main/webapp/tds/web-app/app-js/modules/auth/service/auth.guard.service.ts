@@ -55,8 +55,8 @@ export class AuthGuardService implements CanActivate {
 
 				this.userContext = this.store.selectSnapshot(UserContextState.getUserContext);
 				let requiresLicense: boolean = route.data['requiresLicense'];
-				if (requiresLicense && (!this.userContext.licenseInfo || !this.userContext.licenseInfo.license.isValid)) {
-					this.windowService.getWindow().location.href = '/tdstm/errorHandler/licensing';
+				if (requiresLicense && (!this.userContext.license || !this.userContext.license.isValid)) {
+					this.router.navigate(['/security/licenseNotFound']);
 					return Observable.of(false);
 				}
 

@@ -46,7 +46,6 @@ import static org.codehaus.groovy.syntax.Types.PLUS_EQUAL
 import static org.codehaus.groovy.syntax.Types.PLUS_PLUS
 import static org.codehaus.groovy.syntax.Types.POWER
 import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
-
 /*
  * Class that receives all the ETL initial commands.
  * <pre>
@@ -61,7 +60,6 @@ import static org.codehaus.groovy.syntax.Types.RIGHT_SQUARE_BRACKET
  * @see com.tdsops.etl.ETLProcessor#set
  * @see com.tdsops.etl.ETLProcessor#iterate
  */
-
 class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 
 	/**
@@ -407,7 +405,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param numbers an arrays of ordinal row numbers
 	 * @return
 	 */
-
 	Map<String, ?> from(int[] numbers) {
 		validateStack()
 		return [iterate: { Closure closure ->
@@ -450,6 +447,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Method invoked at the begin within the iterate loop
 	 * @see ETLProcessor#doIterate(java.util.List, groovy.lang.Closure)
 	 */
+	@CompileStatic
 	void topOfIterate() {
 		result.startRow()
 	}
@@ -474,11 +472,13 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return the ETLProcesor instance
 	 * @see ETLBinding#getVariable(java.lang.String)
 	 */
-	ETLProcessor doIterate(List rows, Closure closure) {
+	@CompileStatic
+	ETLProcessor doIterate(List<Map> rows, Closure closure) {
 
 		iterateIndex = new IterateIndex(rows.size())
 		currentRowIndex = 1
-		rows.each { def row ->
+
+		for(Map row : rows){
 			topOfIterate()
 			currentColumnIndex = 0
 			bindVariable(ROW_VARNAME, currentRowIndex)
@@ -505,6 +505,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param closure
 	 * @return
 	 */
+	@CompileStatic
 	ETLProcessor iterate(Closure closure) {
 		validateStack()
 		doIterate(this.dataSetFacade.rows(), closure)
@@ -648,7 +649,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param index
 	 * @return
 	 */
-
+	@CompileStatic
 	Element extract(Integer index) {
 		validateStack()
 		checkReadLabelCommandAlreadyInvoked()
@@ -671,7 +672,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param columnName
 	 * @return an instance of Element
 	 */
-
+	@CompileStatic
 	Element extract(String columnName) {
 		validateStack()
 
@@ -681,7 +682,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 		String columnNamePath = null
 
 		if (dataSetFacade.isJson) {
-			(rootColumnName, columnNamePath) = extractColumnNameParts(columnName)
+			List columnNameParts = extractColumnNameParts(columnName)
+			rootColumnName = columnNameParts[0]
+			columnNamePath = columnNameParts[1]
 		}
 
 		checkColumnName(rootColumnName)
@@ -697,6 +700,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param localVariableDefinition
 	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
+	@CompileStatic
 	Element extract(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
@@ -722,6 +726,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName a field name used to create a load command
 	 * @return an instance of {@code CommentElement} or an instance of {@code Element}
 	 */
+	@CompileStatic
 	ETLCommand load(final String fieldName) {
 		validateStack()
 		if (isCommentsCommand(fieldName)) {
@@ -739,6 +744,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param localVariableDefinition
 	 * @throws ETLProcessorException* @See ETLProcessorException.missingPropertyException
 	 */
+	@CompileStatic
 	Element load(LocalVariableDefinition localVariableDefinition) {
 		throw ETLProcessorException.missingPropertyException(localVariableDefinition.name)
 	}
@@ -748,6 +754,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName a field name used to initialize a load command
 	 * @return an instance of {@code Element}
 	 */
+	@CompileStatic
 	private Element loadElement(final String fieldName) {
 		Element element = findOrCreateCurrentElement(lookUpFieldDefinition(selectedDomain.domain, fieldName))
 		element.loadedElement = true
@@ -758,6 +765,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName a field name used to initialize a load 'comments' command
 	 * @return an instance of {@code CommentElement}
 	 */
+	@CompileStatic
 	private CommentElement loadCommentElement() {
 		return new CommentElement(this, this.selectedDomain.domain)
 	}
@@ -778,7 +786,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param field
 	 * @return
 	 */
-
+	@CompileStatic
 	Map<String, ?> set(LocalVariableDefinition localVariable) {
 		doSet(localVariable.name)
 	}
@@ -798,7 +806,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param field
 	 * @return
 	 */
-
+	@CompileStatic
 	Map<String, ?> set(final Object variableName) {
 		if (!(variableName instanceof String) || hasVariable(variableName)) {
 			throw ETLProcessorException.invalidSetParameter()
@@ -814,6 +822,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @see ETLProcessor#set(LocalVariableDefinition)
 	 * @see ETLProcessor#set(java.lang.Object)
 	 */
+	@CompileStatic
 	private Map<String, ?> doSet(String variableName) {
 		validateStack()
 		return [
@@ -846,7 +855,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * </pre>
 	 * @param fieldNames
 	 */
-
 	LookupElement lookup(final Object fieldName) {
 		validateStack()
 		return new LookupElement(this, [fieldName])
@@ -953,6 +961,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param domain an instance of {@code ETLDomain} class
 	 * @return an instance of {@code ETLFindElement} class
 	 */
+	@CompileStatic
 	ETLFindElement find(ETLDomain domain) {
 		debugConsole.info("find Domain: $domain")
 		validateStack()
@@ -1011,6 +1020,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * it throws an Exception {@code ETLProcessorException.#notCurrentFindElement}
 	 * @return an instance of {@code ETLFindElement} class
 	 */
+	@CompileStatic
 	ETLFindElement elseFind(ETLDomain domain) {
 		validateStack()
 		if (!currentFindElement) {
@@ -1073,6 +1083,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName a
 	 * @return
 	 */
+	@CompileStatic
 	FetchFacade fetch(String fieldName) {
 		validateStack()
 		return new FetchFacade(this, fieldName)
@@ -1090,6 +1101,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName
 	 * @return the current find Element
 	 */
+	@CompileStatic
 	FoundElement whenNotFound(String fieldName) {
 		validateStack()
 		if (!currentFindElement) {
@@ -1106,6 +1118,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldName
 	 * @return the current find Element
 	 */
+	@CompileStatic
 	FoundElement whenFound(String fieldName) {
 		validateStack()
 		if (!currentFindElement) {
@@ -1331,7 +1344,6 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *	}
 	 * </pre>
 	 */
-
 	List<Map<String, ?>> fieldSpec(ETLDomain domain) {
 
 		if (!domain.isAsset()) {
@@ -1367,7 +1379,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Validate that the stack is not in Violation of an object waiting to be completed when other is loaded
 	 * @param expectedObjectOnStack
 	 */
-	private validateStack(ETLStackableCommand expectedObjectOnStack = null) {
+	@CompileStatic
+	void validateStack(ETLStackableCommand expectedObjectOnStack = null) {
 
 		boolean stackViolation = false
 		if (expectedObjectOnStack == null && commandStack.size() > 0) {
@@ -1402,6 +1415,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return an instance of {@link ETLFieldDefinition}
 	 * @see ETLFieldDefinition* @see ETLProcessorResult
 	 */
+	@CompileStatic
 	ETLFieldDefinition lookUpFieldDefinition(ETLDomain domain, String field) {
 
 		ETLFieldDefinition fieldSpec
@@ -1420,6 +1434,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return an instance of {@link ETLFieldDefinition}
 	 * @see ETLProcessor#lookUpFieldDefinition(com.tdsops.etl.ETLDomain, java.lang.String)
 	 */
+	@CompileStatic
 	ETLFieldDefinition lookUpFieldDefinitionForCurrentDomain(String fieldName) {
 		return lookUpFieldDefinition(selectedDomain.domain, fieldName)
 	}
@@ -1448,6 +1463,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Adds a message debug with element content in console
 	 * @param element
 	 */
+	@CompileStatic
 	private def doDebug(Integer columnIndex, Integer rowIndex, Object value) {
 		debugConsole.debug "${[position: [rowIndex, columnIndex], value: value]}"
 	}
@@ -1457,6 +1473,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
 	 */
+	@CompileStatic
 	void addLocalVariableInBinding(String variableName, Object value) {
 		binding.addDynamicVariable(variableName, value)
 	}
@@ -1468,6 +1485,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param variableName binding name for a variable value
 	 * @param value an object to be binding in context
 	 */
+	@CompileStatic
 	void addGlobalVariableInBinding(String variableName, Object value) {
 		binding.addGlobalVariable(variableName, value)
 	}
@@ -1477,6 +1495,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param varName
 	 * @return
 	 */
+	@CompileStatic
 	boolean hasVariable(String varName) {
 		binding.hasVariable(varName)
 	}
@@ -1486,8 +1505,15 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param rowIndex
 	 * @param row
 	 */
+	@CompileStatic
 	private Row addCrudRowData(Map row) {
-		currentRow = new Row(dataSetFacade.fields().collect { row[it.name] }, this)
+		List<?> fields = []
+
+		for (Field subField : dataSetFacade.fields()) {
+			fields << row[subField.name]
+		}
+
+		currentRow = new Row(fields, this)
 		rows.add(currentRow)
 		return currentRow
 	}
@@ -1497,6 +1523,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param path
 	 * @return an instance of Element class
 	 */
+	@CompileStatic
 	private Element doExtract(String path = null) {
 		Element element = bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex, path))
 		element.loadedElement = false
@@ -1510,6 +1537,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param columnName a String with a column name value
 	 * @throw ETLProcessorException in case of extracted column is missing
 	 */
+	@CompileStatic
 	private void checkColumnName(String columnName) {
 		if (!columnsMap.containsKey(labelToFieldName(columnName))) {
 			throw ETLProcessorException.extractMissingColumn(columnName)
@@ -1521,6 +1549,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * {@code ETLProcessor} defines an internal representation
 	 * of the column map in {@code ETLProcessor#columnsMap}.
 	 */
+	@CompileStatic
 	private void checkReadLabelCommandAlreadyInvoked() {
 		if (!columnsMap) {
 			throw ETLProcessorException.extractRequiresNameReadLabelsFirst()
@@ -1532,6 +1561,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * It also removes CE (currentElement) from script context.
 	 * @param element
 	 */
+	@CompileStatic
 	void addElementLoaded(Element element) {
 		result.loadElement(element)
 		debugConsole.info "Adding element ${element.fieldDefinition.getName()}='${element.value}' to domain ${selectedDomain.domain} results"
@@ -1564,6 +1594,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Removes an element instance value from etl results
 	 * @param element ans instance of {@code Element}
 	 */
+	@CompileStatic
 	void removeElement(Element element) {
 		result.removeElement(element)
 	}
@@ -1578,6 +1609,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 *}* </pre>
 	 * @param foundElement
 	 */
+	@CompileStatic
 	void addFoundElement(FoundElement foundElement) {
 		result.addFoundElement(foundElement)
 	}
@@ -1586,6 +1618,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Adds a warn message in the current result
 	 * @param findElement
 	 */
+	@CompileStatic
 	void addFindWarnMessage(ETLFindElement findElement) {
 		result.addFindWarnMessage(findElement)
 	}
@@ -1594,8 +1627,9 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Applies a global transformation for a given element
 	 * @param element
 	 */
+	@CompileStatic
 	void applyGlobalTransformations(Element element) {
-		globalTransformers.each { transformer ->
+		for(Closure transformer: globalTransformers){
 			transformer(element)
 		}
 	}
@@ -1617,6 +1651,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param element a selected Element
 	 * @return the curent element selected in ETLProcessor
 	 */
+	@CompileStatic
 	private Element bindCurrentElement(Element element) {
 		currentElement = element
 		binding.setVariable(CURR_ELEMENT_VARNAME, currentElement)
@@ -1630,6 +1665,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param ETLFindElement a selected findElement
 	 * @return the currentFindElement selected in ETLProcessor
 	 */
+	@CompileStatic
 	private ETLFindElement bindCurrentFindElement(ETLFindElement findElement) {
 		currentFindElement = findElement
 		binding.addDynamicVariable(FINDINGS_VARNAME, findElement ? new FindingsFacade(currentFindElement) : findElement)
@@ -1650,6 +1686,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param name a String name for a variable
 	 * @param value the Object instance to be bound in the ETL context
 	 */
+	@CompileStatic
 	private void bindVariable(String name, Object value) {
 		binding.addDynamicVariable(name, value)
 	}
@@ -1698,6 +1735,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @param fieldDefinition
 	 * @return
 	 */
+	@CompileStatic
 	private Element findOrCreateCurrentElement(ETLFieldDefinition fieldDefinition) {
 		RowResult rr
 		// if there is an element found after a lookup invokation,
@@ -1760,6 +1798,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * @return the field name used to check dataset fields
 	 * @see getl.data.Field#name
 	 */
+	@CompileStatic
 	private String labelToFieldName(String label) {
 		if (dataSetFacade.isCsv) {
 			// TODO - remove toLowerCase once GETL library is fixed - see TM-9268.
@@ -1844,6 +1883,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
 	 * Checks if there is a domain entity being specified within the script
 	 * @return
 	 */
+	@CompileStatic
 	boolean hasSelectedDomain() {
 		return selectedDomain != null
 	}

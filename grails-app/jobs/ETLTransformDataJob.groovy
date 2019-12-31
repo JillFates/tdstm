@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 import net.transitionmanager.imports.DataImportService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.imports.ScriptProcessorService
+import net.transitionmanager.security.UserLogin
 import org.quartz.JobDataMap
 import org.quartz.JobExecutionContext
 /**
@@ -26,14 +27,16 @@ class ETLTransformDataJob {
 		JobDataMap dataMap = context.mergedJobDataMap
 		long projectId = dataMap.getLongValue('projectId')
 		String filename = dataMap.getString('filename')
+		Boolean sendNotification = dataMap.getBooleanValue('sendNotification')
 		String progressKey = dataMap.getString('progressKey')
+		UserLogin userLogin = (UserLogin)dataMap.get('userLogin')
 
 		try {
 			// data script id
 			long dataScriptId = dataMap.getLongValue('dataScriptId')
 
 			log.info('ETLTransformDataJob started for dataScriptId: {}', dataScriptId)
-			Map result = dataImportService.transformEtlData(projectId, dataScriptId, filename, progressKey)
+			Map result = dataImportService.transformEtlData(projectId, userLogin, dataScriptId, filename, sendNotification, progressKey)
 			log.info('ETL transform data execution result: {}', result)
 		} catch (Throwable e) {
 			log.error "execute() received exception ${e.getMessage()}\n${ExceptionUtil.stackTraceToString(e)}"

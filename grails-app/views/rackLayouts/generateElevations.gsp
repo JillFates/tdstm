@@ -11,6 +11,7 @@
 			<asset:stylesheet href="css/ui.datepicker.css" />
 			<asset:stylesheet href="components/comment/comment.css" />
 		</g:if>
+		<asset:link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
 	</head>
 	<body>
 		<g:if test="${generateView}">
