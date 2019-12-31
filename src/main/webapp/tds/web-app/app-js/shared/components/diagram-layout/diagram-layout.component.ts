@@ -113,6 +113,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	@Output() showTaskDetailsClicked: EventEmitter<string | number> = new EventEmitter<string | number>();
 	@Output() backTofullGraph: EventEmitter<void> = new EventEmitter<void>();
 	@Output() nodeUpdated: EventEmitter<any> = new EventEmitter<any>();
+	@Output() diagramClicked: EventEmitter<void> = new EventEmitter<void>();
 	@ViewChild('diagramLayout', {static: false}) diagramLayout: ElementRef;
 	@ViewChild('overviewContainer', {static: false}) overviewContainer: ElementRef;
 	@ViewChild('taskCtxMenu', {static: false}) taskCtxMenu: DiagramContextMenuComponent;
@@ -272,6 +273,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.setDiagramLinksTemplate();
 		this.diagram.allowSelect = true;
 		this.diagram.toolManager.hoverDelay = 200;
+		this.diagram.click = () => this.diagramClicked.emit();
 		this.diagram.commitTransaction('generateDiagram');
 		this.setTreeLayout();
 		this.diagram.model = this.myModel;
