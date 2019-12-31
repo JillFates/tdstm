@@ -915,6 +915,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
 	}
 
+	diagramClicked(): void {
+		if (this.myTasks) {
+			this.myTasks = false;
+			this.onMyTasksFilterChange();
+		}
+	}
+
 	@HostListener('window:beforeunload', ['$event'])
 	ngOnDestroy(): void {
 		this.unsubscribe$.next();
