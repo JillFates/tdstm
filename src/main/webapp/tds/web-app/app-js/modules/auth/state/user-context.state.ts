@@ -3,7 +3,7 @@ import {Action, Selector, State, StateContext} from '@ngxs/store';
 // Models
 import {UserContextModel} from '../model/user-context.model';
 // Actions
-import {LicenseInfo, LoginInfo, Login, Logout, Permissions, SessionExpired} from '../action/login.actions';
+import {GetLicense, LoginInfo, Login, Logout, GetPermissions, SessionExpired} from '../action/login.actions';
 import {PostNoticeRemove, PostNotices} from '../action/notice.actions';
 import {SetEvent} from '../../event/action/event.actions';
 import {SetBundle} from '../../bundle/action/bundle.actions';
@@ -95,11 +95,11 @@ export class UserContextState {
 		ctx.setState({});
 	}
 
-	@Action(Permissions)
-	permissions(ctx: StateContext<UserContextModel>) {
-		const state = ctx.getState();
+	@Action(GetPermissions)
+	getPermissions(ctx: StateContext<UserContextModel>) {
 		return this.permissionService.getPermissions().pipe(
 			tap(result => {
+				const state = ctx.getState();
 				ctx.setState({
 					...state,
 					permissions: result
@@ -108,14 +108,14 @@ export class UserContextState {
 		);
 	}
 
-	@Action(LicenseInfo)
-	licenseInfo(ctx: StateContext<UserContextModel>) {
-		const state = ctx.getState();
-		return this.userService.getLicenseInfo().pipe(
+	@Action(GetLicense)
+	getLicense(ctx: StateContext<UserContextModel>) {
+		return this.userService.getLicense().pipe(
 			tap(result => {
+				const state = ctx.getState();
 				ctx.setState({
 					...state,
-					licenseInfo: result
+					license: result
 				});
 			}),
 		);
@@ -123,9 +123,9 @@ export class UserContextState {
 
 	@Action(PostNotices)
 	postNotices(ctx: StateContext<UserContextModel>) {
-		const state = ctx.getState();
 		return this.postNoticesService.getPostNotices().pipe(
 			tap(result => {
+				const state = ctx.getState();
 				ctx.setState({
 					...state,
 					postNotices: result
@@ -170,12 +170,12 @@ export class UserContextState {
 
 	@Action(SetProject)
 	setProject(ctx: StateContext<UserContextModel>, {payload}: SetProject) {
-		const state = ctx.getState();
-		return this.userService.getLicenseInfo().pipe(
+		return this.userService.getLicense().pipe(
 			tap(result => {
+				const state = ctx.getState();
 				ctx.setState({
 					...state,
-					licenseInfo: result,
+					license: result,
 					project: payload,
 					event: null,
 					bundle: null,

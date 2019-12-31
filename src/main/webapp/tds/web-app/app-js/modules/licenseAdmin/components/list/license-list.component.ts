@@ -12,6 +12,7 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Model
 import {
 	COLUMN_MIN_WIDTH,
@@ -73,6 +74,7 @@ export class LicenseListComponent implements OnInit {
 	public licenseStatus = LicenseStatus;
 	public licenseEnvironment = LicenseEnvironment;
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -83,6 +85,10 @@ export class LicenseListComponent implements OnInit {
 		private route: ActivatedRoute,
 		private userContextService: UserContextService
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.resultSet = this.route.snapshot.data['licenses'];
 		this.gridData = process(this.resultSet, this.state);
 	}
@@ -258,14 +264,23 @@ export class LicenseListComponent implements OnInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}

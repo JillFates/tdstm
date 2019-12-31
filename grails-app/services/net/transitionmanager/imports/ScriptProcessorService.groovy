@@ -7,18 +7,21 @@ import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.ProgressCallback
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdssrc.grails.StringUtil
 import getl.data.Dataset
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import net.transitionmanager.common.CustomDomainService
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.common.ProgressService
 import net.transitionmanager.exception.InvalidParamException
 import net.transitionmanager.project.Project
 import net.transitionmanager.security.SecurityService
+import net.transitionmanager.util.JsonViewRenderService
 import net.transitionmanager.tag.TagService
 import org.apache.commons.io.IOUtils
 import org.codehaus.groovy.control.ErrorCollector
@@ -30,12 +33,13 @@ import org.quartz.impl.triggers.SimpleTriggerImpl
 @Transactional
 class ScriptProcessorService {
 
-	CustomDomainService customDomainService
-	FileSystemService fileSystemService
-	SecurityService securityService
-	ProgressService progressService
-	Scheduler quartzScheduler
-	TagService tagService
+	JsonViewRenderService jsonViewRenderService
+	CustomDomainService   customDomainService
+	FileSystemService     fileSystemService
+	SecurityService       securityService
+	ProgressService       progressService
+	Scheduler             quartzScheduler
+	TagService            tagService
 
 	private static final String PROCESSED_FILE_PREFIX = 'EtlOutputData_'
 	private static final String TEST_SCRIPT_PREFIX = 'testETLScript'
@@ -61,6 +65,24 @@ class ScriptProcessorService {
     }
 
 	/**
+	 * Saves ETL Script execution results {@code ETLProcessorResult} in a temporary file using JSON format
+	 *
+	 * @param processorResult an instance of {@code ETLProcessorResult}
+	 * @return file name created and saved in a temporary directory
+	 * @see FileSystemService#createTemporaryFile(java.lang.String, java.lang.String)
+	 */
+	@CompileStatic
+	String saveResultsInFile(ETLProcessorResult processorResult) {
+
+		List tmpFile = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
+		String outputFilename = tmpFile[0]
+		OutputStream os = (OutputStream) tmpFile[1]
+		jsonViewRenderService.render(JsonViewRenderService.ETL, processorResult, os)
+
+		return outputFilename
+	}
+
+	/**
 	 * Execute a DSL script using an instance of ETLProcessor using a project as a reference
 	 * and a file as an input of the ETL content data
 	 * It also uses an instance of ProgressCallback to notify progress.
@@ -74,13 +96,12 @@ class ScriptProcessorService {
 	 * @throws an Exception in case of error in the ETL script content or
 	 *         in case of it could save the
 	 */
-	def executeAndSaveResultsInFile(
-		Project project,
-		Long dataScriptId,
-		String scriptContent,
-		String filename,
-		ProgressCallback progressCallback = null,
-		Boolean includeConsoleLog=false) {
+	ETLProcessorResult executeAndRetrieveResults(Project project,
+												 Long dataScriptId,
+												 String scriptContent,
+												 String filename,
+												 ProgressCallback progressCallback = null,
+												 Boolean includeConsoleLog = false) {
 
 		ETLProcessor etlProcessor = new ETLProcessor(
 			project,
@@ -96,17 +117,7 @@ class ScriptProcessorService {
 
 		etlProcessor.evaluate(scriptContent, progressCallback)
 
-		def (String outputFilename, OutputStream os) = fileSystemService.createTemporaryFile(PROCESSED_FILE_PREFIX, 'json')
-		os << (etlProcessor.finalResult(includeConsoleLog) as JSON)
-		os.close()
-
-		progressCallback.reportProgress(
-			100,
-			true,
-			ProgressCallback.ProgressStatus.COMPLETED,
-			outputFilename)
-
-		return [etlProcessor, outputFilename]
+		return etlProcessor.finalResult(includeConsoleLog)
 	}
 
 	/**
@@ -210,13 +221,21 @@ class ScriptProcessorService {
 		} as ProgressCallback
 
 		Boolean includeConsoleLog = true
-		def (ETLProcessor etlProcessor, String outputFilename) = executeAndSaveResultsInFile(
+		ETLProcessorResult processorResult = executeAndRetrieveResults(
 			project,
 			null,
 			scriptContent,
 			sampleDataFullFilename,
 			updateProgressClosure,
 			includeConsoleLog)
+
+		String outputFilename = saveResultsInFile(processorResult)
+
+		updateProgressClosure.reportProgress(
+			100,
+			true,
+			ProgressCallback.ProgressStatus.COMPLETED,
+			outputFilename)
 
 		return [filename: outputFilename]
 	}
@@ -314,6 +333,7 @@ class ScriptProcessorService {
 		trigger.jobDataMap.projectId = project.id
 		trigger.jobDataMap.scriptFilename = scriptFilename
 		trigger.jobDataMap.filename = command.filename
+		trigger.jobDataMap.userLoginId = securityService.currentUserLoginId
 		trigger.jobDataMap.progressKey = key
 		trigger.setJobName('ETLTestScriptJob')
 		trigger.setJobGroup('tdstm-etl-test-script')

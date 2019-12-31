@@ -10,6 +10,7 @@ import { DateUtils } from '../../../../shared/utils/date.utils';
 // Components
 import { CredentialViewEditComponent } from '../view-edit/credential-view-edit.component';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Models
 import { Permission } from '../../../../shared/model/permission.model';
 import {
@@ -89,6 +90,7 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -98,6 +100,10 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private userContext: UserContextService
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['credentials'];
@@ -339,14 +345,23 @@ export class CredentialListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}

@@ -7,6 +7,7 @@ import { DataScriptService } from '../../service/data-script.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
 import { DateUtils } from '../../../../shared/utils/date.utils';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
 // Components
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
@@ -37,11 +38,9 @@ import {
 	RowArgs,
 	GridDataResult,
 } from '@progress/kendo-angular-grid';
-import { ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import {
-	COMMON_SHRUNK_COLUMNS,
-	COMMON_SHRUNK_COLUMNS_WIDTH,
+import { Observable, ReplaySubject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH,
 } from '../../../../shared/constants/common-shrunk-columns';
 import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-builder.component';
 
@@ -92,6 +91,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	commonShrunkColumnWidth = COMMON_SHRUNK_COLUMNS_WIDTH;
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -101,6 +101,10 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private userContext: UserContextService
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.setDataGrid(this.route.snapshot.data['dataScripts']);
@@ -146,27 +150,34 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		this.gridData = process(this.resultSet, this.state);
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilters(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		let filterCount = 0;
-		this.state.filter.filters.forEach((filter: FilterDescriptor) => {
-			if (filter.value !== '') {
-				filterCount++;
-			}
-		});
-		return filterCount;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.filterCount() > 0;
 	}
 
 	protected setFilter(search: string, column: any): void {
-		column.filter = search;
-		this.onFilter(column);
+		if (search === null) {
+			this.clearValue(column);
+		} else {
+			column.filter = search;
+			this.onFilter(column);
+		}
 	}
 
 	protected onFilter(column: any): void {
@@ -253,7 +264,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe(
 				result => {
-					this.reloadDataScripts();
+					this.reloadDataScripts().subscribe();
 				},
 				err => console.log(err)
 			);
@@ -273,16 +284,23 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	protected reloadDataScripts(): void {
-		this.dataIngestionService
-			.getDataScripts()
-			.pipe(takeUntil(this.unsubscribeOnDestroy$))
-			.subscribe(
-				(result: DataScriptModel[]) => {
-					this.setDataGrid(result);
-				},
-				err => console.log(err)
-			);
+	protected reloadDataScripts(): Observable<any> {
+		return new Observable( (observer: any) => {
+			this.dataIngestionService
+				.getDataScripts()
+				.pipe(takeUntil(this.unsubscribeOnDestroy$))
+				.subscribe(
+					(result: DataScriptModel[]) => {
+						this.setDataGrid(result);
+						observer.next();
+						observer.complete();
+					},
+					err => {
+						observer.next(err);
+						observer.complete();
+					}
+				);
+		});
 	}
 
 	/**
@@ -290,30 +308,22 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	 * @param {DataScriptModel} dataScriptModel
 	 * @param {number} actionType
 	 */
-	private openDataScriptDialogViewEdit(
-		dataScriptModel: DataScriptModel,
-		actionType: number
-	): void {
-		this.dialogService
-			.open(DataScriptViewEditComponent, [
-				{ provide: DataScriptModel, useValue: dataScriptModel },
-				{ provide: Number, useValue: actionType },
-			])
-			.then(result => {
-				this.reloadDataScripts();
+	private openDataScriptDialogViewEdit(dataScriptModel: DataScriptModel, actionType: number): void {
+		this.dialogService.open(DataScriptViewEditComponent, [
+			{ provide: DataScriptModel, useValue: dataScriptModel },
+			{ provide: Number, useValue: actionType }
+		]).then(result => {
+			return this.reloadDataScripts().subscribe(() => {
 				if (actionType === ActionType.CREATE) {
 					setTimeout(() => {
 						this.selectRow(result.dataScript.id);
-						this.openDataScriptDialogViewEdit(
-							result.dataScript,
-							ActionType.VIEW
-						);
+						this.openDataScriptDialogViewEdit(result.dataScript, ActionType.VIEW);
 					}, 500);
 				}
-			})
-			.catch(result => {
-				// on dialog close, do nothing ..
 			});
+		}).catch(result => {
+			// on dialog close, do nothing ..
+		});
 	}
 
 	/**
@@ -326,7 +336,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 				{ provide: DataScriptModel, useValue: dataScriptModel },
 			])
 			.then(result => {
-				this.reloadDataScripts();
+				this.reloadDataScripts().subscribe();
 			})
 			.catch(result => {
 				// on dialog close, do nothing ..

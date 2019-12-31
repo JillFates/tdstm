@@ -229,8 +229,8 @@ class DataImportHelper {
 	 * @param importContext - the objects related to the import process
 	 * @return the domain id if valid, null if not specified or -1 if there was an error
 	 */
-	static Long getAndValidateDomainId(JSONObject rowData, Map importContext) {
-		Map idField = rowData.fields[ID_FIELD]
+	static Long getAndValidateDomainId(Map rowData, Map importContext) {
+		def idField = rowData.fields[ID_FIELD]
 		Long id = null
 		String msg
 

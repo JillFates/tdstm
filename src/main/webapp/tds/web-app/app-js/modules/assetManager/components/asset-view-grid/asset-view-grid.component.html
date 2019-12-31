@@ -1,3 +1,5 @@
+<tds-ui-floating-header-k-grid></tds-ui-floating-header-k-grid>
+
 <kendo-grid
 	[filterable]="true"
 	[sortable]="{ mode: 'single' }"
@@ -329,7 +331,6 @@
 				[enabled]="hasSelectedItems()"
 				[showDelete]="true"
 				[showEdit]="true"
-				[flat]="true"
 				[bulkChangeType]="bulkChangeType"
 				(clickBulk)="onClickBulkButton()"
 				(operationResult)="onBulkOperationResult($event)">

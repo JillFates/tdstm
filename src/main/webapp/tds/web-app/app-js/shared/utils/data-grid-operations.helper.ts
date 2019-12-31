@@ -406,9 +406,10 @@ export class DataGridOperationsHelper {
 
 	/**
 	 * Returns the number of distinct currently selected filters
+	 * @param state optionally pass the state otherwise use the current state
 	 */
-	public getFilterCounter(): number {
-		const filters = pathOr(0, ['filter', 'filters'], this.state);
+	public getFilterCounter(state: State = null): number {
+		const filters = pathOr(0, ['filter', 'filters'], state || this.state);
 		return uniq(filters.map((filter: any) => filter.field)).length;
 	}
 }

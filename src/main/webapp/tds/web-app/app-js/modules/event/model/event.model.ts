@@ -94,6 +94,7 @@ export class EventPlanStatus {
 	description: string;
 	eventTitle: string;
 	startDate: string;
+	complDate: string;
 	status: string;
 
 	constructor() {

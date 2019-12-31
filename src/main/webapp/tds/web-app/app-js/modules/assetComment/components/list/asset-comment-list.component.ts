@@ -35,6 +35,7 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { AssetCommentViewEditComponent } from '../view-edit/asset-comment-view-edit.component';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import {
 	COMMON_SHRUNK_COLUMNS,
 	COMMON_SHRUNK_COLUMNS_WIDTH,
@@ -48,7 +49,7 @@ declare var jQuery: any;
 })
 export class AssetCommentListComponent implements OnInit, OnDestroy {
 	protected gridColumns: any[];
-
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 	protected state: State = {
 		sort: [
 			{
@@ -85,6 +86,10 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		private elementRef: ElementRef,
 		private renderer: Renderer2
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['assetComments'];
@@ -247,8 +252,11 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	public filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
 	/**
