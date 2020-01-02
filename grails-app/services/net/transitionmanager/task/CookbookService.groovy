@@ -230,19 +230,14 @@ class CookbookService implements ServiceMethods {
 	/**
 	 * Deletes a Recipe version using the information passed
 	 *
-	 * @param recipeId the id of the recipe
-	 * @param recipeVersion the version of the recipeVersion
+	 * @param project - user's current project.
+	 * @param recipeId - the id of the recipe
+	 * @param recipeVersion - the version of the recipeVersion
 	 */
-	def deleteRecipeVersion(recipeId, recipeVersion) {
+	def deleteRecipeVersion(Project project, Long recipeId, Integer recipeVersion) {
 		securityService.requirePermission Permission.RecipeDelete
 
-		if (recipeVersion == null || !recipeVersion.isNumber()) {
-			throw new EmptyResultException()
-		}
-
-		Project project = securityService.getUserCurrentProjectOrException()
-		Recipe recipe = Recipe.get(recipeId)
-		assertProject(recipe, project)
+		Recipe recipe = get(Recipe, recipeId, project, true)
 
 		RecipeVersion rv = RecipeVersion.findByRecipeAndVersionNumber(recipe, recipeVersion)
 		Integer recipeVersionCount = RecipeVersion.countByRecipe(recipe)
@@ -261,7 +256,7 @@ class CookbookService implements ServiceMethods {
 			throw new InvalidParamException('Recipe and version does not have a common recipe')
 		}
 
-		if (recipe?.releasedVersion?.id == rv.id) {
+		if (recipe.releasedVersion?.id == rv.id) {
 			log.warn('Can not delete the currently published version')
 			throw new InvalidParamException('Can not delete the currently published version')
 		}
