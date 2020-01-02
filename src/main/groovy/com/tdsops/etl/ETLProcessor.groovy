@@ -1394,7 +1394,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @return
      */
     @CompileStatic
-    ETLProcessor loadUsingETLMap(String mapName) {
+    ETLProcessor loadETLMap(String mapName) {
         ETLMap etlMap = etlMaps[mapName]
         if (!etlMaps) {
             throw ETLProcessorException.unknownETLMapDefinition(mapName)

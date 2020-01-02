@@ -19,13 +19,13 @@ import org.codehaus.groovy.runtime.InvokerHelper
  * 	    add 'zone', uppercase(), left(3)
  *}//
  * </pre>
- * Once user defines an instance of {@code ETLMap}, it can be used in 'loadUsingETLMap':
+ * Once user defines an instance of {@code ETLMap}, it can be used in 'loadETLMap':
  * <pre>
  *  iterate {//
- *      loadUsingETLMap 'verni-devices'
+ *      loadETLMap 'verni-devices'
  *}//
  * </pre>
- * That 'loadUsingETLMap' command is going to execute the following script:
+ * That 'loadETLMap' command is going to execute the following script:
  * <pre>
  *  iterate {//
  *      extract 'device-name' load 'assetName'

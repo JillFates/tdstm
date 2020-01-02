@@ -73,7 +73,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name'
+				    map 'device-name', 'Name'
 				}
 				
 			""".stripIndent())
@@ -122,7 +122,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'Name'
+				    map 'Name'
 				}
 				
 			""".stripIndent())
@@ -171,7 +171,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 1, 'Name'
+				    map 1, 'Name'
 				}
 				
 			""".stripIndent())
@@ -220,7 +220,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name', uppercase()
+				    map 'device-name', 'Name', uppercase()
 				}
 				
 			""".stripIndent())
@@ -275,7 +275,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name', left(4)
+				    map 'device-name', 'Name', left(4)
 				}
 				
 			""".stripIndent())
@@ -330,7 +330,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'Name', uppercase()
+				    map 'Name', uppercase()
 				}
 				
 			""".stripIndent())
@@ -381,7 +381,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
+				    map 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
 			""".stripIndent())
@@ -440,7 +440,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Unknown'
+				    map 'device-name', 'Unknown'
 				}
 				
 			""".stripIndent())
@@ -480,7 +480,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'Unknown', 'assetName'
+				    map 'Unknown', 'assetName'
 				}
 				
 			""".stripIndent())
@@ -520,7 +520,7 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 4, 'assetName'
+				    map 4, 'assetName'
 				}
 			""".stripIndent())
 
@@ -565,12 +565,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name'
+				    map 'device-name', 'Name'
 				}
 				
 				domain Device
 				iterate {
-				    loadUsingETLMap 'verni-devices'
+				    loadETLMap 'verni-devices'
 				}
 				
 			""".stripIndent())
@@ -611,12 +611,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name', uppercase()
+				    map 'device-name', 'Name', uppercase()
 				}
 				
 				domain Device
 				iterate {
-				    loadUsingETLMap 'verni-devices'
+				    loadETLMap 'verni-devices'
 				}
 				
 			""".stripIndent())
@@ -657,12 +657,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'device-name', 'Name', left(4)
+				    map 'device-name', 'Name', left(4)
 				}
 				
 				domain Device
 				iterate {
-				    loadUsingETLMap 'verni-devices'
+				    loadETLMap 'verni-devices'
 				}
 				
 			""".stripIndent())
@@ -703,12 +703,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
+				    map 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
 				domain Device
 				iterate {
-				    loadUsingETLMap 'verni-devices'
+				    loadETLMap 'verni-devices'
 				}
 				
 			""".stripIndent())
@@ -749,12 +749,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 				read labels
 				domain Device
 				defineETLMap 'verni-devices', {
-				    add 'environment', 'Environment', uppercase(), substitute(['PROD':'Production', 'DEV': 'Development'])
+				    map 'environment', 'Environment', uppercase(), substitute(['PROD':'Production', 'DEV': 'Development'])
 				}
 				
 				domain Device
 				iterate {
-				    loadUsingETLMap 'verni-devices'
+				    loadETLMap 'verni-devices'
 				}
 				
 			""".stripIndent())

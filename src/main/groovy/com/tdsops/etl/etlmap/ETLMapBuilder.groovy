@@ -49,7 +49,7 @@ class ETLMapBuilder {
      * </pre>
      * <p>An instance of {@code ETLMapBuilder} is going to build an instance of {@oce ETLMapInstruction#transformation}</p>
      *
-     * @see ETLMapBuilder#add(java.lang.String, com.tdsops.etl.etlmap.ETLMapTransform [ ])
+     * @see ETLMapBuilder#map(java.lang.String, com.tdsops.etl.etlmap.ETLMapTransform [ ])
      * @see ETLMapBuilder#methodMissing(java.lang.String, java.lang.Object)
      */
     private ETLMapInstruction currentInstruction
@@ -74,7 +74,7 @@ class ETLMapBuilder {
      * @param closure a Closure to be executed
      * @return an instance of {@code ETLMap} based on closure params definition.
      *
-     * @see ETLMapBuilder#add(java.lang.String, com.tdsops.etl.etlmap.ETLMapTransform [ ])
+     * @see ETLMapBuilder#map(java.lang.String, com.tdsops.etl.etlmap.ETLMapTransform [ ])
      * @see ETLMapBuilder#methodMissing(java.lang.String, java.lang.Object)
      */
     ETLMap build(Closure closure) {
@@ -119,8 +119,8 @@ class ETLMapBuilder {
      * @param transformations
      * @return current instance of {@code ETLMapBuilder}
      */
-    ETLMapBuilder add(String domainProperty, ETLMapTransform... transformations) {
-        this.add(domainProperty, domainProperty, transformations)
+    ETLMapBuilder map(String domainProperty, ETLMapTransform... transformations) {
+        this.map(domainProperty, domainProperty, transformations)
         return this
     }
     /**
@@ -142,7 +142,7 @@ class ETLMapBuilder {
      * @param transformations
      * @return current instance of {@code ETLMapBuilder}
      */
-    ETLMapBuilder add(Integer sourcePosition, String domainProperty, ETLMapTransform... transformations) {
+    ETLMapBuilder map(Integer sourcePosition, String domainProperty, ETLMapTransform... transformations) {
         checkAndAddCurrentInstruction()
         this.defineSourcePosition(sourcePosition)
         this.defineDomainProperty(domainProperty)
@@ -168,7 +168,7 @@ class ETLMapBuilder {
      * @param transformations
      * @return current instance of {@code ETLMapBuilder}
      */
-    ETLMapBuilder add(String sourceName, String domainProperty, ETLMapTransform... transformations) {
+    ETLMapBuilder map(String sourceName, String domainProperty, ETLMapTransform... transformations) {
         checkAndAddCurrentInstruction()
         this.defineSourceName(sourceName)
         this.defineDomainProperty(domainProperty)
