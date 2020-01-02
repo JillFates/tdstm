@@ -37,12 +37,16 @@ import { Permission } from '../../../../shared/model/permission.model';
 import { SelectableSettings } from '@progress/kendo-angular-grid';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'provider-list',
 	templateUrl: 'provider-list.component.html'
 })
 export class ProviderListComponent implements OnInit, OnDestroy {
+	public headerActionButtons: HeaderActionButtonData[];
+
 	protected gridColumns: any[];
 	private selectableSettings: SelectableSettings = { mode: 'single', checkboxOnly: true};
 	public dataGridOperationsHelper: DataGridOperationsHelper;
@@ -70,7 +74,8 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
-		private userContext: UserContextService
+		private userContext: UserContextService,
+		private translateService: TranslatePipe
 	) {
 
 		this.dataGridOperationsHelper = new DataGridOperationsHelper(
@@ -82,6 +87,32 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('PROVIDER.CREATE_PROVIDER'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateProvider.bind(this),
+			},
+			{
+				icon: 'times',
+				title: this.translateService.transform('GLOBAL.CLEAR_FILTERS'),
+				disabled: this.disableClearFilter.bind(this),
+				show: true,
+				onClick: this.clearAllFilters.bind(this),
+			},
+			{  // todo remove this button as soon the new grid model is fully implemented
+				icon: 'sync',
+				iconClass: '',
+				title: this.translateService.transform('GLOBAL.REFRESH'),
+				flat: true,
+				show: true,
+				onClick: this.reloadData.bind(this),
+			},
+		];
+
 		this.userContext
 			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -260,4 +291,20 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	protected filterCount(): number {
 		return this.dataGridOperationsHelper.getFilterCounter();
 	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.gridColumns);
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	protected disableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
 }
