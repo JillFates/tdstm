@@ -104,8 +104,7 @@
 					minResizableWidth="{{
 						column.type === 'action' ? column.width : 5
 					}}"
-					[ngClass]="{'commentProp': column.property === 'comment'}"
-					class="{{ column.class }} {{column.property}}"
+					class="{{ column.class }}"
 					[width]="
 						commonShrunkColumns.includes(column.label)
 							? commonShrunkColumnWidth
