@@ -51,16 +51,7 @@
 								</clr-radio-wrapper>
 							</div>
 							<div class="clr-col-9 grid-actions">
-								<tds-button-create
-									[displayLabel]="'false'"
-									*ngIf="canEditProject"
-									(click)="openCreateProject()"
-								></tds-button-create>
-
-								<tds-button
-										icon="sync"
-										(click)="reloadData()"
-								></tds-button>
+								<tds-grid-header-action-buttons [actionButtons]="headerActionButtons"></tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>

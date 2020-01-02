@@ -24,6 +24,8 @@ import { PermissionService } from '../../../../shared/services/permission.servic
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
 	ActivatedRoute,
 	Event,
@@ -40,6 +42,7 @@ import {
 import { ProjectCreateComponent } from '../create/project-create.component';
 import { ProjectViewEditComponent } from '../view-edit/project-view-edit.component';
 import { NotifierService } from '../../../../shared/services/notifier.service';
+import {Permission} from '../../../../shared/model/permission.model';
 
 declare var jQuery: any;
 
@@ -48,6 +51,7 @@ declare var jQuery: any;
 	templateUrl: 'project-list.component.html',
 })
 export class ProjectListComponent implements OnInit, AfterContentInit {
+	public headerActionButtons: HeaderActionButtonData[];
 	protected state: State = {
 		sort: [
 			{
@@ -89,7 +93,8 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 		private router: Router,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2
+		private renderer: Renderer2,
+		private translateService: TranslatePipe,
 	) {
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
@@ -106,6 +111,32 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('PROJECT.CREATE_PROJECT'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.openCreateProject.bind(this),
+			},
+			{
+				icon: 'times',
+				title: this.translateService.transform('GLOBAL.CLEAR_FILTERS'),
+				disabled: this.disableClearFilter.bind(this),
+				show: true,
+				onClick: this.clearAllFilters.bind(this),
+			},
+			{  // todo remove this button as soon the new grid model is fully implemented
+				icon: 'sync',
+				iconClass: '',
+				title: this.translateService.transform('GLOBAL.REFRESH'),
+				flat: true,
+				show: true,
+				onClick: this.reloadData.bind(this),
+			},
+		];
+
 		this.pageURL = this.router.url;
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
@@ -291,5 +322,28 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.projectColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	protected disableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create projects
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectCreate);
 	}
 }

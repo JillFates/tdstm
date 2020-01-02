@@ -288,6 +288,7 @@ export const en_DICTIONARY: Object = {
 	},
 	'PROJECT': {
 		'PROJECTS': 'Projects',
+		'CREATE_PROJECT': 'Create Projects',
 		'SELECT_PROJECT': 'Select a Project',
 		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
 		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
