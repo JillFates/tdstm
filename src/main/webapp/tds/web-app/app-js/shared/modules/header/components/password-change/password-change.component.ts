@@ -17,7 +17,7 @@ import {HeaderService} from '../../services/header.service';
 			        </tr>
 			        <tr class="prop">
 			            <td valign="top" class="name">
-			                <label for="oldPassword">Old Password:</label>
+			                <label for="oldPassword">Current Password:</label>
 			            </td>
 			            <td valign="top" class="value">
 			                <input type="{{hidePasswordFields ? 'password' : 'text'}}" readonly (focus)="onOldPasswordFocus($event)" id="oldPasswordId" name="oldPassword" [(ngModel)]="passwordChangeModel.oldPassword"/>
