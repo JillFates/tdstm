@@ -1153,17 +1153,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				linksPath: this.extractLinks(d.links)
 			});
 		});
-		// this.diagram.model.commit(m => {
-		// 	const update = Object.assign({}, data);
-		// 	if (!update.key) { update.key = data.id; }
-		// 	const node = this.diagram.findNodeForKey(update.key);
-		// 	m.set(node, 'data', update);
-		// 	this.nodeUpdated.
-		// 	emit({
-		// 		data: this.diagram.model.nodeDataArray,
-		// 		linksPath: this.extractLinks(this.diagram.links)
-		// 	});
-		// });
 	}
 
 	/**
