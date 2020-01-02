@@ -414,9 +414,12 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 			deleteTemporaryFile(fileName, fileSystemService)
 	}
 
-    //
-    // Exceptions using defineETLMap
-    //
+    /********************************************************************************************/
+    /********************************************************************************************/
+    /*                              Exceptions using defineETLMap                               */
+    /********************************************************************************************/
+    /********************************************************************************************/
+
      void 'test can throw an exception when a defined ETL map uses an invalid domain property name'() {
 
 		given:
@@ -497,10 +500,51 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 			deleteTemporaryFile(fileName, fileSystemService)
 	}
 
+     void 'test can throw an exception when a defined ETL map uses an invalid source position'() {
 
-    //
-    //      LOAD USING ETL MAP command tests
-    //
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 4, 'assetName'
+				}
+			""".stripIndent())
+
+		then: 'It throws an Exception'
+			ETLProcessorException e = thrown ETLProcessorException
+			with(ETLProcessor.getErrorMessage(e)) {
+				message == 'Invalid index = 4 at line 5'
+				startLine == 5
+				endLine == 5
+				startColumn == null
+				endColumn == null
+				fatal == true
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+    /********************************************************************************************/
+    /********************************************************************************************/
+    /*                         LOAD USING ETL MAP command tests                                 */
+    /********************************************************************************************/
+    /********************************************************************************************/
+
     void 'test can load a defined ETL map definition using column name and domain property name'() {
 
 		given:
@@ -546,4 +590,189 @@ class ETLMapSpec extends Specification implements FieldSpecValidateableTrait, ET
 		cleanup:
 			deleteTemporaryFile(fileName, fileSystemService)
 	}
+
+	    void 'test can load a defined ETL map definition using column name, domain property name and a transformation without arguments'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 'device-name', 'Name', uppercase()
+				}
+				
+				domain Device
+				iterate {
+				    loadUsingETLMap 'verni-devices'
+				}
+				
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['assetName'], 'acmevmprod01', 'ACMEVMPROD01')
+					}
+				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+	    void 'test can load a defined ETL map definition using column name, domain property name and a transformation with a simple argument'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				device-name
+				acmevmprod01
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 'device-name', 'Name', left(4)
+				}
+				
+				domain Device
+				iterate {
+				    loadUsingETLMap 'verni-devices'
+				}
+				
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['assetName'], 'acmevmprod01', 'acme')
+					}
+				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+	void 'test can load a defined ETL map definition using column name, domain property name and a transformation with a Map argument'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				environment
+				PROD
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV': 'Development'])
+				}
+				
+				domain Device
+				iterate {
+				    loadUsingETLMap 'verni-devices'
+				}
+				
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['environment'], 'PROD', 'Production')
+					}
+				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
+		void 'test can load a defined ETL map definition using column name, domain property name and a multiple transformations'() {
+
+		given:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				environment
+				prod
+			""", fileSystemService)
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator)
+
+		when: 'The ETL script is evaluated'
+			etlProcessor.evaluate("""
+				read labels
+				domain Device
+				defineETLMap 'verni-devices', {
+				    add 'environment', 'Environment', uppercase(), substitute(['PROD':'Production', 'DEV': 'Development'])
+				}
+				
+				domain Device
+				iterate {
+				    loadUsingETLMap 'verni-devices'
+				}
+				
+			""".stripIndent())
+
+		then: 'Results should contain Application domain results associated'
+			assertWith(etlProcessor.finalResult(), ETLProcessorResult) {
+				domains.size() == 1
+				assertWith(domains[0], DomainResult) {
+					domain == ETLDomain.Device.name()
+					assertWith(data[0], RowResult) {
+						fields.size() == 1
+						assertFieldResult(fields['environment'], 'prod', 'Production')
+					}
+				}
+			}
+
+		cleanup:
+			deleteTemporaryFile(fileName, fileSystemService)
+	}
+
 }
