@@ -14,8 +14,12 @@
   }
   kendo-grid {
     thead {
+      th {
+        top: 3px;
+      }
       th:not(:first-child) {
         cursor: pointer;
+        text-align: center;
         label {
           cursor: pointer;
         }
@@ -34,7 +38,7 @@
             cursor: pointer;
           }
           td:not(:first-child) {
-            text-align: right;
+            text-align: center;
             padding-right: 8px;
             color: $color--black3;
             font-weight: bold;
@@ -45,9 +49,11 @@
     }
     tfoot {
       tr {
-        td {
+        td:not(:first-child) {
+          text-align: center;
+        }
+        td:first-child {
           text-align: right;
-          padding-right: 8px;
         }
       }
     }
