@@ -384,7 +384,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
-		if (rowData.tags){
+		if (rowData?.tags?.add || rowData?.tags?.remove || rowData?.tags?.replace) {
 			batchRecord.saveTagsAsMap(rowData.tags)
 		}
 
