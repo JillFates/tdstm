@@ -24,7 +24,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.session.SessionContext
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.security.core.Authentication
-import org.springframework.security.web.csrf.CsrfFilter
 import org.springframework.security.web.csrf.CsrfToken
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository
 import org.springframework.security.web.savedrequest.DefaultSavedRequest
@@ -38,13 +37,12 @@ import javax.servlet.http.HttpSession
 @CompileStatic
 class TdsAuthenticationSuccessHandler extends AjaxAwareAuthenticationSuccessHandler implements InitializingBean {
 
-	AuditService          auditService
-	GrailsApplication     grailsApplication
-	SecurityService       securityService
-	UserPreferenceService userPreferenceService
-	UserService           userService
-	NoticeService         noticeService
-	CsrfFilter            csrfFilter
+	AuditService                   auditService
+	GrailsApplication              grailsApplication
+	SecurityService                securityService
+	UserPreferenceService          userPreferenceService
+	UserService                    userService
+	NoticeService                  noticeService
 	HttpSessionCsrfTokenRepository csrfTokenRepository
 
 	// This is a list of the legacy pages that we can allow the user to redirect to after login. Spring Security
