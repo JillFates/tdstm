@@ -65,6 +65,9 @@ kendo-numerictextbox {
 kendo-grid.k-grid {
   .action-button clr-dropdown-menu {
     line-height: 20px !important;
+    .k-button:focus {
+      box-shadow: none;
+    }
   }
 
   // Adding the appropriate class to the grid will fix the issue with the clarity dropdown list action within the kendo-grid
