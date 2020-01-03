@@ -118,11 +118,19 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 							this.redirectUser(error.headers.get('x-login-url'));
 						});
 					}
+				} else if (error && error.status === 403) {
+					if (this.router.url !== '/' + AuthRouteStates.LOGIN.url) {
+						this.router.navigate(['/security/unauthorized']);
+					}
 				} else {
 					errorMessage = 'Bad Request';
 				}
 
-				if (window.location.href.indexOf(error.headers.get('x-login-url')) < 0 && errorMessage !== '') {
+				if (
+					window.location.href.indexOf(error.headers.get('x-login-url')) < 0 &&
+					this.router.url !== '/' + AuthRouteStates.LOGIN.url &&
+					errorMessage !== ''
+				) {
 					this.notifierService.broadcast({
 						name: AlertType.DANGER,
 						message: errorMessage
