@@ -217,6 +217,13 @@ dependencies {
 	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.14.0"
 	testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.14.0"
 	testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+	/*
+		Greenmail Plugin:
+		Provides a wrapper around GreenMail and provides a view that displays sent messages.
+		useful for testing application in the development or test environments.
+	 */
+	compile 'org.grails.plugins:greenmail:2.0.0.RC2'
+
 }
 
 bootRun {

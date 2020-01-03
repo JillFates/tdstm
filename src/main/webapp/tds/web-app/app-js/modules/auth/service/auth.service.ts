@@ -50,14 +50,14 @@ export class AuthService {
 					return observer.complete();
 				}
 				contextPromises.push(from(new Promise(resolve => resolve(userContext))));
-				contextPromises.push(this.userService.getLicenseInfo());
+				contextPromises.push(this.userService.getLicense());
 				contextPromises.push(this.permissionService.getPermissions());
 				contextPromises.push(this.postNoticesService.getPostNotices());
 
 				Observable.forkJoin(contextPromises)
 					.subscribe((contextResponse: any) => {
-						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER_INFO];
-						userContext.licenseInfo = contextResponse[USER_CONTEXT_REQUEST.LICENSE_INFO];
+						let userContext = contextResponse[USER_CONTEXT_REQUEST.USER];
+						userContext.license = contextResponse[USER_CONTEXT_REQUEST.LICENSE];
 						userContext.permissions = contextResponse[USER_CONTEXT_REQUEST.PERMISSIONS];
 						userContext.postNotices = contextResponse[USER_CONTEXT_REQUEST.NOTICES];
 						observer.next(userContext);

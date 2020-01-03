@@ -3,19 +3,6 @@
 		*ngIf="getDynamicConfiguration(); let config"
 		class="page-asset-explorer-config"
 	>
-		<div class="button-bar text-right">
-			<div>
-				<!-- Refresh button -->
-				<tds-button-custom
-					[flat]="true"
-					[icon]="'repeat'"
-					[tooltip]="'Refresh View'"
-					(click)="onQuery()"
-				>
-				</tds-button-custom>
-			</div>
-		</div>
-
 		<div class="button-bar">
 			<div class="inline">
 				<!-- Asset Views dropdown -->
@@ -100,6 +87,14 @@
 					[icon]="'cog'"
 					(click)="onEdit()"
 					[tooltip]="'Configure View'"
+				>
+				</tds-button-custom>
+
+				<!-- Refresh button -->
+				<tds-button-custom
+						[icon]="'sync'"
+						[tooltip]="'Refresh View'"
+						(click)="onQuery()"
 				>
 				</tds-button-custom>
 			</div>

@@ -133,8 +133,8 @@ export class DataScriptViewEditComponent implements OnInit {
 				(result: any) => {
 					this.activeDialog.close(result);
 				},
-				err => console.log(err)
-			);
+				err => err)
+			;
 	}
 
 	ngOnInit(): void {

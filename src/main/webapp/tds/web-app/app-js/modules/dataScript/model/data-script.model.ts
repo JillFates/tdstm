@@ -15,7 +15,8 @@ export class DataScriptColumnModel {
 				label: 'Name',
 				property: 'name',
 				type: 'text',
-				locked: true
+				locked: true,
+				width: 230
 			}, {
 				label: 'Provider',
 				property: 'provider.name',
@@ -29,19 +30,19 @@ export class DataScriptColumnModel {
 				label: 'Mode',
 				property: 'modeFormat',
 				type: 'text',
-				width: 200
+				width: 120
 			}, {
 				label: 'Date Create',
 				property: 'dateCreated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 160
 			}, {
 				label: 'Last Modified',
 				property: 'lastUpdated',
 				type: 'date',
 				format: dateFormat,
-				width: 170
+				width: 160
 			}
 		];
 	}
@@ -61,6 +62,8 @@ export class DataScriptModel {
 	lastUpdated?: Date;
 	sampleFilename?: string;
 	originalSampleFilename?: string;
+	isAutoProcess?: boolean;
+	useWithAssetActions?: boolean;
 }
 
 export const Flatten = filter => {

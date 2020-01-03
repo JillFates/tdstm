@@ -2867,7 +2867,7 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 		}
 
 		if (context.mode == "assetId") {
-			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsDown + 1, assetsList, dependencyList)
+			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsDown, assetsList, dependencyList)
 			architectureGraphService.buildArchitectureGraph([rootAsset.id], context.levelsUp, assetsList, dependencyList, false)
 		}
 

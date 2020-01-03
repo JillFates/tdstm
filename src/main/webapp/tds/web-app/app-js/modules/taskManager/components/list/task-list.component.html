@@ -34,14 +34,6 @@
 						>
 						</tds-pie-countdown>
 					</div>
-					<tds-button-custom
-							icon="repeat"
-							[displayLabel]="false"
-							[flat]="true"
-							(click)="onFiltersChange()"
-							class="flat"
-							tooltip="Refresh"
-					></tds-button-custom>
 				</div>
 			</div>
 		</div>
@@ -126,6 +118,13 @@
 							(click)="onClearFiltersHandler()"
 							[title]="'Clear Filters'"
 					></tds-button>
+					<tds-button-custom
+							icon="sync"
+							[displayLabel]="false"
+							(click)="onFiltersChange()"
+							class="flat"
+							tooltip="Refresh"
+					></tds-button-custom>
 				</div>
 			</div>
 		</div>
@@ -384,12 +383,11 @@
 						*ngIf="column.property === 'updatedTime'"
 						let-dataItem
 					>
-						<span
-							class="task-updated-cell {{
-								dataItem.updatedClass
-							}} overflow-ellipsis"
-							>{{ dataItem.updatedTime }}</span
-						>
+						<div class="updated-status">
+							<div class="task-updated-cell {{ dataItem.updatedClass }} overflow-ellipsis">
+								{{ dataItem.updatedTime }}
+							</div>
+						</div>
 					</ng-template>
 
 					<ng-template

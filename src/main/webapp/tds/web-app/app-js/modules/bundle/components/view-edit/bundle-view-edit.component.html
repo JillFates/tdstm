@@ -90,6 +90,7 @@
 
 							<td valign="top" class="value">
 								<a
+									(click)="cancelCloseDialog()"
 									routerLink="event/list"
 									[queryParams]="{
 										show: savedModel?.moveEvent.id
@@ -280,15 +281,6 @@
 		</div>
 	</div>
 
-	<div class="modal-footer content-end">
-		<tds-button
-			icon="trash"
-			theme="danger"
-			(click)="confirmDeleteBundleAndAssets()"
-			>Delete Bundle & Assets</tds-button
-		>
-	</div>
-
 	<nav class="modal-sidenav btn-link">
 		<tds-button-edit
 			*ngIf="!editing && canEditBundle"
@@ -307,8 +299,8 @@
 			(click)="saveForm()"
 		></tds-button-save>
 		<tds-button-delete
-			tooltip="Delete"
-			(click)="confirmDeleteBundle()"
+			tooltip="Delete Bundle & Assets"
+			(click)="confirmDeleteBundleAndAssets()"
 		></tds-button-delete>
 		<tds-button-close
 			*ngIf="!editing"

@@ -1,9 +1,11 @@
 package com.tdsops.etl
 
 import com.tdssrc.grails.GormUtil
+import groovy.transform.CompileStatic
 import net.transitionmanager.person.Person
 import org.grails.datastore.mapping.model.PersistentProperty
 
+@CompileStatic
 class ETLFieldsValidator {
 
 	Map<ETLDomain, List<Map<String, ?>>> assetClassFieldsSpecMap = [:]
@@ -49,8 +51,11 @@ class ETLFieldsValidator {
 
 		// Try finding the fieldspec for asset classes
 		if (domain.isAsset()) {
-			fieldSpec = assetClassFieldsSpecMap[domain].find {
-				it.field == fieldNameOrLabel || it.label == fieldNameOrLabel
+			if (assetClassFieldsSpecMap) {
+
+				fieldSpec = assetClassFieldsSpecMap[domain].find {
+					it.field == fieldNameOrLabel || it.label == fieldNameOrLabel
+				}
 			}
 
 			if (fieldSpec) {

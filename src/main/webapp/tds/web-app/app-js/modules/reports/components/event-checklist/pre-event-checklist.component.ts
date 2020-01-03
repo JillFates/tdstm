@@ -126,6 +126,7 @@ export class PreEventCheckListSelectorComponent extends ReportComponent implemen
 		this.hideFilters = false;
 		this.generatedReport = false;
 		this.reportResult = null;
+		this.html = null;
 		this.onLoad();
 	}
 

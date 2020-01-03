@@ -329,7 +329,6 @@
 													<label>Status</label>
 												</td>
 												<td class="valueNW task-status vertical-note-status">
-													<!--                                                    [class]="'form-control status task-' + model.status.toLowerCase()"-->
 													<tds-task-status-indicator
 														*ngIf="model.status"
 														[propertyName]="'status'"
@@ -341,7 +340,6 @@
 														[data]="model.statusList"
 														[(ngModel)]="model.status">
 													</kendo-dropdownlist>
-
 												</td>
 												<td colspan="4"></td>
 											</tr>

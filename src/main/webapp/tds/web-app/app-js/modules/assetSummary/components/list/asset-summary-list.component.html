@@ -3,18 +3,44 @@
     <section>
         <div>
             <div class="box-body box-with-empty-header">
+                <div class="button-bar text-right">
+                    <div>
+                        <!-- Refresh button -->
+                        <tds-button-custom
+                                [flat]="true"
+                                [icon]="'repeat'"
+                                [tooltip]="'Refresh View'"
+                                (click)="reloadData()"
+                        >
+                        </tds-button-custom>
+                    </div>
+                </div>
+                <div class="button-bar">
+                    <div class="inline">
+
+                        <!-- Just Planning checkbox -->
+                        <clr-checkbox-wrapper class="inline">
+                            <input
+                                    clrCheckbox
+                                    id="justPlanning"
+                                    type="checkbox"
+                                    name="justPlanning"
+                                    class="component-action-just-planning"
+                                    [(ngModel)]="justPlanning"
+                                    (change)="onChangeJustPlanning($event.currentTarget.checked)"
+                            />
+                            <label
+                                    class="clr-control-label clr-control-label-sm inline"
+                                    for="justPlanning"
+                            >
+                                Just Planning
+                            </label>
+                        </clr-checkbox-wrapper>
+                    </div>
+                </div>
                 <kendo-grid
                         [data]="gridData"
                         [resizable]="true">
-                    <ng-template kendoGridToolbarTemplate [position]="'top'">
-                        <div class="checkbox just-planning">
-                            <input id="justPlanning" type="checkbox" [(ngModel)]="justPlanning" (change)="onChangeJustPlanning($event.currentTarget.checked)" name="justPlanning" class="component-action-just-planning">
-                            <label for="justPlanning" class="just-planing-label">
-                                Just Planning
-                            </label>
-                        </div>
-                        <div (click)="reloadData()" class="kendo-grid-toolbar__refresh-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></div>
-                    </ng-template>
                     <kendo-grid-column *ngFor="let column of assetSummaryColumnModel.columns" field="{{column.property}}" [width]="!column.width ? COLUMN_MIN_WIDTH : column.width">
                         <ng-template kendoGridHeaderTemplate let-columnIndex="columnIndex">
                             <div (click)="onClickHeader($event, column.property)">

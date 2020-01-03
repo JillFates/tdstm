@@ -53,8 +53,15 @@ export class ImportAssetsService {
 	 * @param option
 	 * @returns {Observable<any>} It will return the status including counts, errors, and output filename.
 	 */
-	public postTransform(datascript: any, filename: string): Observable<ApiResponseModel> {
-		let url = this.importEndpointURL + 'initiateTransformData?dataScriptId=' + datascript.id + '&filename=' + filename;
+	public postTransform(datascript: any, filename: string, sendNotification: boolean): Observable<ApiResponseModel> {
+		const params = {
+			dataScriptId: datascript.id,
+			filename,
+			sendNotification
+		};
+		const queryParams = Object.entries(params).map( ([key, value]) => `${key}=${value}`).join('&');
+
+		let url = `${this.importEndpointURL}initiateTransformData?${queryParams}`;
 		return this.http.post(url, null)
 			.map((response: any) => response)
 			.catch((error: any) => error);

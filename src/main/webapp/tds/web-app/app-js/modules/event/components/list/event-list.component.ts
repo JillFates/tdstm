@@ -21,6 +21,7 @@ import {
 } from '../../../../shared/services/preference.service';
 // Components
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 // Models
 import {
 	COLUMN_MIN_WIDTH,
@@ -78,6 +79,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	public dateFormat = '';
 	public canEditEvent = false;
 	protected showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -90,6 +92,10 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		private store: Store,
 		private preferenceService: PreferenceService
 	) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['events'];
@@ -117,10 +123,7 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	ngAfterContentInit() {
 		if (this.route.snapshot.queryParams['show']) {
 			let { id, name } = this.resultSet.find((bundle: any) => {
-				return (
-					bundle.id ===
-					parseInt(this.route.snapshot.queryParams['show'], 0)
-				);
+				return bundle.id === parseInt(this.route.snapshot.queryParams['show'], 0)
 			});
 			setTimeout(() => {
 				this.showEvent(id, name);
@@ -239,14 +242,23 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		jQuery('.k-grid-content-locked').addClass('element-height-100-per-i');
 	}
 
+	/**
+	 * Set on/off the filter icon indicator
+	 */
 	protected toggleFilter(): void {
 		this.showFilters = !this.showFilters;
 	}
 
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
 	protected filterCount(): number {
-		return this.state.filter.filters.length;
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
 	}
 
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
 	}

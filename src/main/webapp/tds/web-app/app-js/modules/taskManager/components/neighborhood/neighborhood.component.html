@@ -90,10 +90,14 @@
         View Unpublished
       </label>
 
-      <label class="task-chk-container" *ngIf="hasCycles">
-        <input  type="checkbox" [(ngModel)]="showCycles" (ngModelChange)="highlightCycles()" />
+      <label class="task-chk-container" [ngClass]="{'disabled': !hasCycles}">
+        <input
+                type="checkbox"
+                [(ngModel)]="showCycles"
+                (ngModelChange)="highlightCycles()"
+                [disabled]="!hasCycles"/>
         <span class="checkmark"></span>
-        Highlight Cycles
+        Cycles
       </label>
     </div>
 
@@ -106,6 +110,7 @@
     (nodeClicked)="onNeighborhood($event)"
     (backTofullGraph)="viewFullGraphFromCache()"
     (nodeUpdated)="updateGraphCache($event)"
+    (diagramClicked)="diagramClicked()"
     #graph></tds-diagram-layout>
   </div>
 </div>

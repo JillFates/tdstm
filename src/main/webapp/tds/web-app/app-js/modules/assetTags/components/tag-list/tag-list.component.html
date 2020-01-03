@@ -30,18 +30,6 @@
 				>
 					<!-- Toolbar Template -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="button-bar text-right">
-							<div>
-								<!-- Refresh button -->
-								<tds-button-custom
-									[flat]="true"
-									[icon]="'repeat'"
-									[tooltip]="'Refresh View'"
-									(click)="reloadTagList()"
-								>
-								</tds-button-custom>
-							</div>
-						</div>
 						<div class="button-bar">
 							<div class="inline float-right">
 								<tds-button-create
@@ -60,6 +48,11 @@
 									style="display: none;"
 									type="button"
 								></button>
+								<!-- Refresh button -->
+								<tds-button
+										icon="sync"
+										(click)="reloadTagList()"
+								></tds-button>
 							</div>
 						</div>
 					</ng-template>
@@ -274,65 +267,17 @@
 
 						<!-- Filter Template -->
 						<ng-template kendoGridFilterCellTemplate let-filter>
-							<div
-								class="has-feedback"
-								*ngIf="
-									column.property &&
-									column.type !== 'action' &&
-									column.type !== 'number' &&
-									column.property !== 'color'
-								"
-							>
-								<div
-									*ngIf="
-										column.type === 'date';
-										then dateFilter;
-										else stringFilter
-									"
-								></div>
-								<ng-template #dateFilter>
-									<kendo-datepicker
-										[format]="dateFormat"
-										[(ngModel)]="column.filter"
-										[ngModelOptions]="{ standalone: true }"
-										(valueChange)="
-											gridSettings.onFilter(column)
-										"
-										style="width: 100%;"
-									></kendo-datepicker>
-									<span
-										*ngIf="column.filter"
-										(click)="
-											gridSettings.clearFilter(column)
-										"
-										style="margin-right: 25px"
-										class="fa fa-times form-control-feedback"
-									></span>
-									<!--<kendo-datepicker (valueChange)="gridSettings.onFilter(column)" [(ngModel)]="column.filter"-->
-									<!--[ngModelOptions]="{standalone: true}"></kendo-datepicker>-->
-									<!--<span *ngIf="column.filter" (click)="gridSettings.clearValue(column)"-->
-									<!--class="fa fa-times form-control-feedback"></span>-->
-								</ng-template>
-								<ng-template #stringFilter>
-									<input
-										clrInput
-										[(ngModel)]="column.filter"
-										(keyup)="gridSettings.onFilter(column)"
-										[ngModelOptions]="{ standalone: true }"
-										type="text"
-										name="{{ column.property }}"
-										placeholder="Filter"
-									/>
-									<span
-										*ngIf="column.filter"
-										(click)="
-											gridSettings.clearValue(column)
-										"
-										class="fa fa-times form-control-feedback"
-									></span>
-								</ng-template>
+							<div class="filter-input" *ngIf="column.property !== 'color'">
+								<tds-filter-input
+										[name]="column.property"
+										[value]="column.filter || ''"
+										[columnType]="column.type"
+										placeholder="{{'GLOBAL.FILTER' | translate}}"
+										(filter)="gridSettings.onFilterWithValue($event, column)">
+								</tds-filter-input>
 							</div>
 						</ng-template>
+
 					</kendo-grid-column>
 
 					<ng-template

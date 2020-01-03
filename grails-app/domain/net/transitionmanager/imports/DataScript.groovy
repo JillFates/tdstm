@@ -33,7 +33,7 @@ enum DataScriptMode {
 
 class DataScript {
 	 static enum PROPS {
-		 id, name, description, target, mode, etlSourceCode, provider, dateCreated,
+		 id, name, description, target, mode, isAutoProcess, useWithAssetActions, etlSourceCode, provider, dateCreated,
 		 lastUpdated, sampleFilename, originalSampleFilename
 	 }
 	 static Set<PROPS> MINIMAL_INFO = [ PROPS.id, PROPS.name ]
@@ -49,7 +49,7 @@ class DataScript {
     // principle domain or list of domains involved in the ETL.
     String target
 
-    DataScriptMode mode
+    DataScriptMode mode = DataScriptMode.IMPORT
 
     // The etl will contain the source code which will be compiled and executed. Eventually the
     // source code will be broken out and revisioned like how it is done in Recipes.
@@ -64,6 +64,12 @@ class DataScript {
     String sampleFilename = ''
     String originalSampleFilename = ''
 
+	// Flag to indicate that the ETL Script when used will automatically Import and Post the transformation results
+	Boolean isAutoProcess = false
+
+	// Flag to indicate that the ETL Script is for running on bulk change of assets.
+	Boolean useWithAssetActions = false
+
     static belongsTo = [project: Project, provider: Provider ]
 
     static constraints = {
@@ -75,6 +81,7 @@ class DataScript {
         etlSourceCode nullable: true
         sampleFilename  blank: true, size: 0..255
         originalSampleFilename  blank: true, size: 0..255
+		isAutoProcess nullable: false
     }
 
     static mapping = {

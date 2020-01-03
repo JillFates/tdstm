@@ -310,7 +310,7 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 	 **/
 	onMyTasksFilterChange(): void {
 		if (this.myTasks) {
-			this.graph.highlightBy('isMyTask', true);
+			this.graph.highlightBy('myTask', true);
 		} else {
 			this.graph.clearHighlights();
 		}
@@ -913,6 +913,13 @@ export class NeighborhoodComponent implements OnInit, OnDestroy {
 		this.isNeighbor = false;
 		this.graph.showFullGraphBtn = false;
 		this.nodeData$.next(this.diagramLayoutService.getFullGraphCache());
+	}
+
+	diagramClicked(): void {
+		if (this.myTasks) {
+			this.myTasks = false;
+			this.onMyTasksFilterChange();
+		}
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

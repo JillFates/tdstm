@@ -606,7 +606,7 @@ class MoveEventService implements ServiceMethods {
 		TimeDuration dayTime
 		String eventString = ""
         Date eventStartTime = moveEvent.estStartTime
-        Date eventComplTime = moveEvent.estCompletionTime
+        Date eventCompletionTime = moveEvent.estCompletionTime
         String clockMode = CLOCK_MODE_NONE
 
         if (eventStartTime) {
@@ -614,12 +614,12 @@ class MoveEventService implements ServiceMethods {
                 dayTime = TimeCategory.minus(eventStartTime, sysTime)
                 eventString = "Countdown Until Event"
                 clockMode = CLOCK_MODE_COUNTDOWN
-            } else if (eventStartTime < sysTime && ( !eventComplTime || eventComplTime > sysTime )) {
+            } else if (eventStartTime < sysTime && ( !eventCompletionTime || eventCompletionTime > sysTime )) {
                 dayTime = TimeCategory.minus(sysTime, eventStartTime)
                 eventString = "Elapsed Event Time"
                 clockMode = CLOCK_MODE_ELAPSED
             } else {
-                dayTime = TimeCategory.minus(sysTime, eventComplTime)
+                dayTime = TimeCategory.minus(sysTime, eventCompletionTime)
                 eventString = "Time since the event finished"
                 clockMode = CLOCK_MODE_FINISHED
             }
@@ -634,7 +634,8 @@ class MoveEventService implements ServiceMethods {
 				revisedComp: moveEvent?.revisedCompletionTime,
 				calcMethod: moveEvent?.calcMethod,
 				systime: TimeUtil.formatDateTime(sysTime, TimeUtil.FORMAT_DATE_TIME_11),
-				eventStartDate: moveEvent.estStartTime,
+				eventStartDate: eventStartTime,
+				eventCompletionDate: eventCompletionTime,
 				planSum: [
 						dialInd: moveEventPlannedSnapshot?.dialIndicator,
 						compTime: moveEvent.estCompletionTime,

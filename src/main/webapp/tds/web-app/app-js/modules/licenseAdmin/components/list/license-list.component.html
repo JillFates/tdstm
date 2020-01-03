@@ -29,16 +29,16 @@
 						<div class="clr-row">
 							<div class="clr-col-12 grid-actions">
 								<tds-button
-									icon="sync"
-									(click)="reloadData()"
-								></tds-button>
-								<tds-button
 									icon="plus"
 									[title]="
 										'LICENSE.CREATE_LICENSE' | translate
 									"
 									(click)="onCreateLicense()"
 									[id]="'btnCreate'"
+								></tds-button>
+								<tds-button
+										icon="sync"
+										(click)="reloadData()"
 								></tds-button>
 							</div>
 						</div>
@@ -250,6 +250,7 @@
 								"
 								>{{ 'LICENSE.PRODUCTION' | translate }}</span
 							>
+							<span *ngIf="dataItem.status === licenseStatus.CORRUPT">{{ 'GLOBAL.CORRUPT' | translate }}</span>
 						</ng-template>
 					</kendo-grid-column>
 					<!-- PAGER COMPONENT -->

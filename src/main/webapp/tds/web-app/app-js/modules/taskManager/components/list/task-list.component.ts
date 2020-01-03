@@ -3,6 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 import {pathOr} from 'ramda';
 import {
 	CellClickEvent,
@@ -117,7 +118,7 @@ export class TaskListComponent {
 	 */
 	onCustomColumnChange(customColumn: string, newColumn: any, service: ColumnMenuService): void {
 		service.close();
-		let index = parseInt(customColumn.charAt(customColumn.length - 1), 0) + 1;
+		let index = parseInt(customColumn.charAt(customColumn.length - 1), 10) + 1;
 		this.taskService.setCustomColumn(this.currentCustomColumns[customColumn], newColumn.property, index)
 			.subscribe(result => {
 				this.buildCustomColumns(result.customColumns, result.assetCommentFields);
@@ -129,7 +130,7 @@ export class TaskListComponent {
 	 * On Event select change.
 	 */
 	onEventSelect(selected: any): void {
-		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 0));
+		this.selectedEvent = this.eventList.find(item => item.id === parseInt(selected, 10));
 		this.store.dispatch(new SetEvent({ id: this.selectedEvent.id, name: this.selectedEvent.name }));
 		this.onFiltersChange();
 	}
@@ -210,12 +211,12 @@ export class TaskListComponent {
 				} else if (result.shouldEdit) {
 					this.onOpenTaskEditHandler(result.id);
 				} else {
-					this.search(parseInt(taskRow.id, 0));
+					this.search(parseInt(taskRow.id, 10));
 				}
 			}
 		}).catch(result => {
 			if (result) {
-				this.search(parseInt(taskRow.id, 0));
+				this.search(parseInt(taskRow.id, 10));
 			}
 		});
 	}
@@ -249,7 +250,7 @@ export class TaskListComponent {
 									this.search();
 								});
 							} else {
-								this.search(parseInt(taskRow.id, 0));
+								this.search(parseInt(taskRow.id, 10));
 							}
 						}
 					}).catch(result => {
@@ -342,31 +343,52 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
-	 * @param $event: any
-	 */
-	onRowDetailExpandHandler($event: DetailExpandEvent): void {
-		this.loadTaskActionInfoModel($event.dataItem.id).subscribe(() => {
-			// loaded.
-		});
-		this.rowsExpandedMap[$event.index] = true;
-	}
-
-	/**
 	 * Responsible for fetching the latest data for the action bar
 	 * @param taskId
 	 */
 	refreshActionBar(taskId: any): void {
-		this.loadTaskActionInfoModel(taskId).subscribe(() => {
-			// loaded.
-		});
+		this.getInfoModelAndUpdateTaskActions([taskId])
+			.subscribe(() => {
+				// updated action bar row
+			});
 	}
+
 	/**
 	 * Row Collapse Event Handler. Gathers extra task info for action buttons logic.
 	 * @param $event: any
 	 */
 	onRowDetailCollapseHandler($event: DetailCollapseEvent): void {
-		this.rowsExpandedMap[$event.index] = false;
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onCollapseRow($event.index);
+			});
+	}
+
+	/**
+	 * Row Expand Event Handler. Gathers extra task info for action buttons logic.
+	 * @param $event: any
+	 */
+	onRowDetailExpandHandler($event: DetailExpandEvent): void {
+		this.getInfoModelAndUpdateTaskActions([$event.dataItem.id])
+			.subscribe(() => {
+				this.onExpandRow($event.index);
+			});
+	}
+
+	/**
+	 * Set the flag to Collapse of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onCollapseRow(index: number): void {
+		this.rowsExpandedMap[index] = false;
+	}
+
+	/**
+	 * Set the flag to Expand of the current row matched by the index
+	 * @param index Index of the row to be setup
+	 */
+	onExpandRow(index: number): void {
+		this.rowsExpandedMap[index] = true;
 	}
 
 	/**
@@ -447,27 +469,24 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		if (!this.rowsExpanded) {
 			let taskIds = taskRows.map(task => task.id);
-			this.taskService.getBulkTaskActionInfo(taskIds).subscribe(result => {
-				for (const taskId in result) {
-					if (result.hasOwnProperty(taskId)) {
-						const taskActionInfoModel = result[taskId];
-						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+			this.getInfoModelAndUpdateTaskActions(taskIds)
+				.subscribe(() => {
+					// take into account that grid could been filtered
+					const rowCounter = pathOr(0, ['gridData', 'data', 'length'], this.grid);
+					for (let i = 0; i < rowCounter; i++ ) {
+						if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
+							this.gridComponent.expandRow(i);
+							this.rowsExpandedMap[i] = true;
+						}
 					}
-				}
-				for (let i = 0; i < this.grid.getPageSize(); i++ ) {
-					if ([TaskStatus.READY, TaskStatus.STARTED].includes(this.grid.gridData.data[i].status)) {
-						this.gridComponent.expandRow(i);
-						this.rowsExpandedMap[i] = true;
-					}
-				}
-			});
-			this.rowsExpanded = true;
+					this.rowsExpanded = true;
+				});
 		} else {
 			taskRows.forEach((taskRow, index) => {
 				index = this.grid.getRowPaginatedIndex(index);
 				expandedEvent.dataItem = taskRow;
 				expandedEvent.index = index;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(index);
 			});
 			this.rowsExpanded = false;
@@ -486,14 +505,31 @@ export class TaskListComponent {
 			expandedEvent.dataItem = $event.dataItem;
 			// collapse
 			if (this.rowsExpandedMap[$event.rowIndex]) {
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow($event.rowIndex);
 				// expand
 			} else {
-				this.onRowDetailExpandHandler(expandedEvent);
+				this.onExpandRow(expandedEvent.index);
 				this.gridComponent.expandRow($event.rowIndex);
 			}
 		}
+	}
+
+	/**
+	 * Ge the task actions of the selected task and updates is model
+	 * @param taskIds
+	 */
+	getInfoModelAndUpdateTaskActions(taskIds: number[]): Observable<void> {
+		return this.taskService.getBulkTaskActionInfo(taskIds)
+			.pipe(map((result: any) => {
+				for (const taskId in result) {
+					if (result.hasOwnProperty(taskId)) {
+						const taskActionInfoModel = result[taskId];
+						this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
+					}
+				}
+				return;
+			}));
 	}
 
 	/**
@@ -587,7 +623,7 @@ export class TaskListComponent {
 					// Custom Columns, TaskPref
 					this.buildCustomColumns(custom.customColumns, custom.assetCommentFields);
 					// Task list size
-					this.pageSize = listSize ? parseInt(listSize, 0) : GRID_DEFAULT_PAGE_SIZE;
+					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
 					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
@@ -614,7 +650,7 @@ export class TaskListComponent {
 	private loadEventListAndSearch(currentEventId: any): void {
 		this.reportService.getEventList().subscribe(result => {
 			this.eventList = [this.allEventsOption].concat(result.data);
-			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 0));
+			const match = this.eventList.find(item => item.id === parseInt(currentEventId, 10));
 			if (match) {
 				this.selectedEvent = match;
 			} else {
@@ -714,9 +750,9 @@ export class TaskListComponent {
 		let expandedEvent: DetailExpandEvent = new DetailExpandEvent({});
 		for (let rowIndex in this.rowsExpandedMap) {
 			if (rowIndex) {
-				let rowNum = parseInt(rowIndex, 0);
+				let rowNum = parseInt(rowIndex, 10);
 				expandedEvent.index = rowNum;
-				this.onRowDetailCollapseHandler(expandedEvent);
+				this.onCollapseRow(expandedEvent.index);
 				this.gridComponent.collapseRow(rowNum);
 			}
 		}
@@ -754,7 +790,7 @@ export class TaskListComponent {
 			taskId = taskId.toString();
 		}
 		return new Observable(observer => {
-			this.taskService.getTaskActionInfo(parseInt(taskId, 0))
+			this.taskService.getTaskActionInfo(parseInt(taskId, 10))
 				.subscribe((result: TaskActionInfoModel) => {
 					const taskActionInfoModel = result;
 					this.updateTaskActionInfoModel(taskId, taskActionInfoModel);
@@ -764,7 +800,7 @@ export class TaskListComponent {
 		});
 	}
 
-	private updateTaskActionInfoModel(taskId, taskActionInfoModel) {
+	private updateTaskActionInfoModel(taskId, taskActionInfoModel): void {
 		this.taskActionInfoModels.set(taskId, taskActionInfoModel);
 
 		// Update the grid row with new information from the endpoint (status, assignTo, etc)
@@ -798,7 +834,7 @@ export class TaskListComponent {
 	/**
 	 * Toggle the flag to show/hide grid filters
 	 */
-	public toggleFiltering() {
+	public toggleFiltering(): void {
 		this.isFiltering = !this.isFiltering;
 	}
 

@@ -740,7 +740,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 			os.close()
 
 		when: 'calling to transform the data with the ETL script'
-			Map transformResults = dataImportService.transformEtlData(project.id, dataScript.id, fileUploadName)
+			Map transformResults = dataImportService.transformEtlData(project.id, Mock(UserLogin), dataScript.id, fileUploadName, false)
 			String transformedFileName = transformResults['filename']
 		then: 'the results should have a filename'
 			transformResults.containsKey('filename')
