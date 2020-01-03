@@ -16,6 +16,7 @@ import {SessionExpired} from '../../modules/auth/action/login.actions';
 // Model
 import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../model/constants';
 import {AlertType} from '../model/alert.model';
+import {CSRF} from '../../modules/auth/model/user-context.model';
 // Service
 import {NotifierService} from '../services/notifier.service';
 import {
@@ -30,9 +31,11 @@ import {WindowService} from '../services/window.service';
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
 import {AuthRouteStates} from '../../modules/auth/auth-route.module';
+import {UserContextState} from '../../modules/auth/state/user-context.state';
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
 export const APPLICATION_JSON = 'application/json';
+export const TOKEN_GUARD = ['POST', 'PUT', 'DELETE'];
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
@@ -74,8 +77,15 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 			contentType = originalRequestType;
 		}
 
-		let authReq = request.clone({
-			setHeaders: {'Content-Type': contentType}
+		const csrfToken = <CSRF>this.store.selectSnapshot(UserContextState.getCSRFToken);
+
+		const headers = {'Content-Type': contentType};
+		if (csrfToken && TOKEN_GUARD.indexOf(request.method) !== -1) {
+			headers[csrfToken.tokenHeaderName] = csrfToken.token;
+		}
+
+		const authReq = request.clone({
+			setHeaders: headers
 		});
 
 		this.notifierService.broadcast({

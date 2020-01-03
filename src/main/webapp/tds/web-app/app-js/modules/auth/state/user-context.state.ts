@@ -44,6 +44,15 @@ export class UserContextState {
 		return state;
 	}
 
+	/**
+	 * Get the current Token for the CSRFT
+	 * @param state
+	 */
+	@Selector()
+	static getCSRFToken(state: UserContextModel) {
+		return state.csrf;
+	}
+
 	constructor(
 		private authService: AuthService,
 		private permissionService: PermissionService,
