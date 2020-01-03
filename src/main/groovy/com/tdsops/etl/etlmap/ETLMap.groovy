@@ -37,8 +37,13 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 @CompileStatic
 class ETLMap {
-    // The name of the domain class that the map was defined for
+    /**
+     * Saves the {@code ETLDomain} with which it was created.
+     */
     ETLDomain domain
+    /**
+     * Saves a List of {@code ETLMapInstruction} created by an instance of {@code ETLMapBuilder}
+     */
     List<ETLMapInstruction> instructions = []
 
     ETLMap(ETLDomain domain) {
@@ -48,38 +53,45 @@ class ETLMap {
     /**
      * Loads current instance of {@code ETLMap}
      * and the list of {@code ETLMapInstruction}.
-     * <p>1) Initially it sets current domain on {@code ETLProcessor} </p>
-     * <p></p>
-     * <p></p>
-     * <p></p>
-     * <p></p>
-     * <p></p>
+     * <p>Initially it sets current domain on {@code ETLProcessor}. See {@code ETLProcessor#domain} method </p>
+     * <p>Then, For each instance of {@code ETLMapInstruction} it calls {@code ETLMap#loadInstruction} method. </p>
      *
-     * @param processor
+     * @param processor an instance of {@code ETLProcessor}
      */
     void load(ETLProcessor processor) {
 
         processor.domain(this.domain)
-
         for (ETLMapInstruction instruction in instructions) {
             loadInstruction(instruction, processor)
         }
     }
 
     /**
+     * <p>This method completes the 3 commands configured in an instance of {ETLMapInstruction}</p>
+     * <p>'extract' command: using defined {@code ETLMapInstruction#column}
+     * it creates an instance of {@code Element} through the {@code ETLProcessor#doExtract} method.</p>
+     * <p>'transform with' command:If there are instances of {@code ETLMapTransform} in {@code ETLMapInstruction#transformations},
+     * it uses that information to invoke transformation through the {@code InvokerHelper}</p>
+     * <p>'load' command: Finally, it load instance of {@code Element} created through the
+     * {@code ETLProcessor#addElementLoaded}. NOTE: Peviously populate {@code Element#fieldDefinition}
+     * to avoid the validation do it by {@code ETLProcessor}. This is to avoid twice invocation
+     * for the loopup of a domain property name.</p>
      *
-     * @param instruction
+     * @param instruction an instance of {@code ETLMapInstruction}
+     * @param processor an instance of {@code ETLProcessor}
      */
     private void loadInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
 
-        Element element = processor.extract(instruction.column.label)
+        // 1) 'extract' command
+        Element element = processor.doExtract(instruction.column.index - 1)
 
-        if (element) {
-            for (ETLMapTransform transformation in instruction.transformations) {
-                element = (Element) InvokerHelper.invokeMethod(element, transformation.methodName, transformation.parameters ?: null)
-            }
-
-            element.load(instruction.domainProperty.name)
+        //2) 'transform with' command
+        for (ETLMapTransform transformation in instruction.transformations) {
+            element = (Element) InvokerHelper.invokeMethod(element, transformation.methodName, transformation.parameters ?: null)
         }
+
+        //3) 'load' command
+        element.fieldDefinition = instruction.domainProperty
+        processor.addElementLoaded(element)
     }
 }

@@ -1112,7 +1112,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissing} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissing('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value
@@ -1130,7 +1130,7 @@ class Element implements RangeChecker, ETLCommand, UndefinedLocalVariableValidat
 	/**
 	 * Perform {@code StringUtils#prependIfMissingIgnoreCase} over {@code Element#value}
 	 * <code>
-	 * extract 'url' transform with appendIfMissing('com')
+	 * extract 'url' transform with prependIfMissingIgnoreCase('com')
 	 * </code>
 	 *
 	 * @param otherValue a {@code String} value

@@ -735,8 +735,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         index--
         rangeCheck(index, currentRow.size())
 
-        currentColumnIndex = index
-        doExtract()
+        doExtract(index)
     }
 
     @Deprecated
@@ -752,8 +751,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         }
 
         checkColumnName(rootColumnName)
-        currentColumnIndex = columnsMap[labelToFieldName(rootColumnName)].index
-        return doExtract(columnNamePath)
+        return doExtract(columnsMap[labelToFieldName(rootColumnName)].index, columnNamePath)
     }
 
     /**
@@ -779,8 +777,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
         }
 
         checkColumnName(columnName)
-        currentColumnIndex = columnsMap[columnName].index
-        doExtract()
+        doExtract(columnsMap[columnName].index)
     }
 
     /**
@@ -1661,7 +1658,8 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * @param path
      * @return an instance of Element class
      */
-    private Element doExtract(String path = null) {
+    Element doExtract(Integer columnIndex, String path = null) {
+        currentColumnIndex = columnIndex
         Element element = bindCurrentElement(currentRow.getDataSetElement(currentColumnIndex, path))
         element.loadedElement = false
         debugConsole.info "Extract element: ${element.value} by column index: ${currentColumnIndex}"

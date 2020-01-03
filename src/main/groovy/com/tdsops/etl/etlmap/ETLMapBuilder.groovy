@@ -10,10 +10,10 @@ import com.tdsops.etl.ETLProcessor
  *  read labels
  *  domain Device
  *  defineETLMap 'verni-devices' { //
- *      add 'device-name', 'Name'
- * 	    add 'description'
- * 	    add 'environment', 'Environment', substitute(['PROD':'Production', 'DEV', 'Development'])
- * 	    add 'zone', uppercase(), left(3)
+ *      map 'device-name', 'Name'
+ * 	    map 'description'
+ * 	    map 'environment', 'Environment', substitute(['PROD':'Production', 'DEV', 'Development'])
+ * 	    map 'zone', uppercase(), left(3)
  *}//
  * </pre>
  * <p>An instance of {@code ETLMapBuilder} can build an instance of {@code ETLMap},
@@ -45,7 +45,7 @@ class ETLMapBuilder {
      * <p>Given the following ETL script example:</p>
      * <pre>
      *  defineETLMap 'verni-devices', { //
-     *      add 'zone', uppercase(), left(3)
+     *      map 'zone', uppercase(), left(3)
      * </pre>
      * <p>An instance of {@code ETLMapBuilder} is going to build an instance of {@oce ETLMapInstruction#transformation}</p>
      *
@@ -95,10 +95,10 @@ class ETLMapBuilder {
      *
      */
     private void checkAndAddCurrentInstruction() {
-        if (this.currentInstruction) {
-            etlMap.instructions.add(this.currentInstruction)
+        if (currentInstruction) {
+            etlMap.instructions.add(currentInstruction)
         }
-        this.currentInstruction = new ETLMapInstruction()
+        currentInstruction = new ETLMapInstruction()
 
     }
     /**
@@ -110,9 +110,9 @@ class ETLMapBuilder {
      * <pre>
      *  domain Device
      *  defineETLMap 'verni-devices' { //
-     *      add 'Name'
-     *      add 'assetName', uppercase()
-     *      add 'Name', uppercase(), left(3)
+     *      map 'Name'
+     *      map 'assetName', uppercase()
+     *      map 'Name', uppercase(), left(3)
      *  ...
      * </pre>
      * @param domainProperty
@@ -132,9 +132,9 @@ class ETLMapBuilder {
      * <pre>
      *  domain Device
      *  defineETLMap 'verni-devices' { //
-     *      add 1, 'Name'
-     *      add 1, 'assetName', uppercase()
-     *      add 1, 'Name', uppercase(), left(3)
+     *      map 1, 'Name'
+     *      map 1, 'assetName', uppercase()
+     *      map 1, 'Name', uppercase(), left(3)
      *  ...
      * </pre>
      * @param sourcePosition
@@ -143,7 +143,7 @@ class ETLMapBuilder {
      * @return current instance of {@code ETLMapBuilder}
      */
     ETLMapBuilder map(Integer sourcePosition, String domainProperty, ETLMapTransform... transformations) {
-        checkAndAddCurrentInstruction()
+        this.checkAndAddCurrentInstruction()
         this.defineSourcePosition(sourcePosition)
         this.defineDomainProperty(domainProperty)
         this.addTransformations(transformations)
@@ -158,9 +158,9 @@ class ETLMapBuilder {
      * <pre>
      *  domain Device
      *  defineETLMap 'verni-devices' { //
-     *      add 'device-name', 'Name'
-     *      add 'device-name', 'assetName', uppercase()
-     *      add 'device-name', 'Name', uppercase(), left(3)
+     *      map 'device-name', 'Name'
+     *      map 'device-name', 'assetName', uppercase()
+     *      map 'device-name', 'Name', uppercase(), left(3)
      *  ...
      * </pre>
      * @param sourcePosition
@@ -169,7 +169,7 @@ class ETLMapBuilder {
      * @return current instance of {@code ETLMapBuilder}
      */
     ETLMapBuilder map(String sourceName, String domainProperty, ETLMapTransform... transformations) {
-        checkAndAddCurrentInstruction()
+        this.checkAndAddCurrentInstruction()
         this.defineSourceName(sourceName)
         this.defineDomainProperty(domainProperty)
         this.addTransformations(transformations)
@@ -213,15 +213,22 @@ class ETLMapBuilder {
      * transformation methods and its params to be invoked later.
      * <p>Given the following ETL script example:</p>
      * <pre>
+     *  ...
      *  defineETLMap 'verni-devices', { //
-     *      add 'zone', uppercase(), left(3)
+     *      map 'name', 'assetName, uppercase(), left(3)
+     *      ...
      * </pre>
      * <p>An instance of {@code ETLMapBuilder} is going to convert it
      * in two instances of {@code ETLMapTransform}:</p>
      * <pre>
-     *  new ETLMapTransform('uppercase', [])
-     *  new ETLMapTransform('left', [3])
+     *  transformation1 = new ETLMapTransform('uppercase', [])
+     *  transformation2 = new ETLMapTransform('left', [3])
      * </pre>
+     * After that, a method of {@code ETLMapBuilder} is call using the following arguments:
+     * <pre>
+     *  map('name', assetName, [transformation1, transformation2])
+     * </pre>
+
      * @param name missing method name
      * @param args an array with method arguments
      * @return the current instance of {@code ETLMapBuilder}
