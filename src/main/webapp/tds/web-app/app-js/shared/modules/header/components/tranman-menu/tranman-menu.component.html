@@ -133,16 +133,14 @@
                         <a [routerLink]="['/asset','views',6,'show']" id="6">Logical Storage</a>
                     </li>
                     <li class="menu-child-item menu-parent-assets-asset-explorer assets-asset-explorer-child">
-                        <a [routerLink]="['/asset','views',1,'show']" id="1">
-                            <img src="/tdstm/assets/icons/magnifier.png" width="16" height="16">All Assets
-                        </a>
+                        <a [routerLink]="['/asset','views',1,'show']" id="1">All Assets</a>
                     </li>
                     <li class="divider"></li>
                     <li class="menu-child-item menu-parent-assets-dependencies-list">
                         <a [routerLink]="['dependencies','list']">Dependencies</a>
                     </li>
                     <li class="menu-child-item menu-parent-assets-comments-list">
-                        <a [routerLink]="['/assetcomment','list']">Comments</a>
+                        <a [routerLink]="['assetcomment','list']">Comments</a>
                     </li>
                     <li class="divider"></li>
                     <li *ngIf="hasPermission(permission.DepAnalyzerView)" class="menu-child-item menu-parent-assets-dependency-analyzer">

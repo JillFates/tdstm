@@ -97,9 +97,9 @@
                                                'fa-check green': transformResult?.status === 'success',
                                                'fa-thumbs-down red': transformResult?.status === 'error'}"></i>
                                 <span>{{uiConfig.transformBtnLabel | translate}}</span>
-                            </button>
+                            </tds-button>
 
-                            <button *ngIf="uiConfig.showAutoProcessElements"
+                            <tds-button *ngIf="uiConfig.showAutoProcessElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onImport()"
                                     class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
