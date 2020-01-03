@@ -484,7 +484,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
-		// node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 		return node;
 	}
 
@@ -505,8 +504,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		const placeholder = new Placeholder();
 
-		// placeholder.background = 'transparent';
-		// placeholder.visible = true;
 		selAdornmentTemplate.add(selAdornmentShape);
 		selAdornmentTemplate.add(placeholder);
 
@@ -552,8 +549,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		const placeholder = new Placeholder();
 
-		// placeholder.background = 'transparent';
-		// placeholder.visible = true;
 		selAdornmentTemplate.add(selAdornmentShape);
 		selAdornmentTemplate.add(placeholder);
 
@@ -715,11 +710,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 					return this.assetIcons.unknown.background;
 				}
 			}));
-		// assetIconShape.bind(new Binding('geometry', 'asset',
-		// 	(val: any) => {
-		// 		if (val && val.assetType) { return this.getIcon(this.assetIcons[val.assetType.toLowerCase()]); }
-		// 		return go.Geometry.parse(this.assetIcons.unknown.icon);
-		// 	}));
 
 		return assetIconShape;
 	}
