@@ -96,13 +96,13 @@ export class LoginComponent implements OnInit {
 	 */
 	ngOnInit(): void {
 		let loginRequests = [
-			this.pageService.updateLastPage(),
+			this.pageService.updateLastPage().catch(e => Observable.of({successful: false})),
 			this.loginService.getLoginInfo()
 		];
 		Observable.forkJoin(loginRequests).pipe(
 			map(([successToSaveLastPage, loginInfo]) => {
 				// If session is still active, redirect user to his last page saved
-				if (successToSaveLastPage) {
+				if (successToSaveLastPage.successful) {
 					this.getCurrentUserSnapshot();
 				} else {
 					// If not, we ensure the session start from scratch
