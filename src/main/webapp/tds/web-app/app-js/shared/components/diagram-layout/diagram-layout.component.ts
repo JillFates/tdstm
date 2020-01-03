@@ -189,12 +189,14 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	loadModel(): void {
 		if (this.nodeData.data.length < 600) {
 			this.myModel = new go.GraphLinksModel(this.nodeData.data, this.nodeData.linksPath);
+			this.myModel.nodeKeyProperty = 'key';
 		} else {
 			this.remainingData = this.nodeData.data.slice();
 			this.remainingLinks = this.nodeData.linksPath.slice();
 			this.myModel = new go.GraphLinksModel(
 				this.remainingData.splice(0, this.DATA_CHUNKS_SIZE),
 				this.remainingLinks.splice(0, this.DATA_CHUNKS_SIZE));
+			this.myModel.nodeKeyProperty = 'key';
 			this.largeArrayRemaining = true;
 		}
 	}
@@ -482,7 +484,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 
-		// node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
 		return node;
 	}
 
@@ -503,8 +504,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		const placeholder = new Placeholder();
 
-		// placeholder.background = 'transparent';
-		// placeholder.visible = true;
 		selAdornmentTemplate.add(selAdornmentShape);
 		selAdornmentTemplate.add(placeholder);
 
@@ -550,8 +549,6 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		const placeholder = new Placeholder();
 
-		// placeholder.background = 'transparent';
-		// placeholder.visible = true;
 		selAdornmentTemplate.add(selAdornmentShape);
 		selAdornmentTemplate.add(placeholder);
 
@@ -667,9 +664,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		if (options) { return options; }
 
 		const  assetIconShape = new go.TextBlock();
-		// assetIconShape.figure = 'RoundedRectangle';
-		// assetIconShape.strokeWidth = 2;
-		// assetIconShape.fill = '#908f8f';
+		assetIconShape.name = 'AssetIconShape';
 		assetIconShape.textAlign = 'center';
 		assetIconShape.verticalAlignment = go.Spot.Center;
 		assetIconShape.margin = new go.Margin(0, 0, 0, 5);
@@ -679,25 +674,42 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		assetIconShape.bind(new Binding('text', 'asset',
 			(val: any) => {
 				if (val) {
-					return this.getIcon(this.assetIcons[val && val.assetType.toLowerCase()]);
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return this.getIcon(this.assetIcons[type]);
 				} else {
 					return this.assetIcons.unknown.iconAlt;
 				}
 			}));
 
 		assetIconShape.bind(new Binding('stroke', 'asset',
-			(val: any) => this.getIconColor(this.assetIcons[val.assetType.toLowerCase()])));
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return this.getIconColor(this.assetIcons[type]);
+				} else {
+					return this.assetIcons.unknown.color;
+				}
+			}));
 
 		assetIconShape.bind(new Binding('fill', 'asset',
-			(val: any) => this.getIconColor(this.assetIcons[val.assetType.toLowerCase()])));
+			(val: any) => {
+				if (val) {
+					const type = !!val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return this.getIconColor(this.assetIcons[type]);
+				} else {
+					return this.assetIcons.unknown.color;
+				}
+			}));
 
 		assetIconShape.bind(new Binding('background', 'asset',
-			(val: any) => this.getBackgroundColor(this.stateIcons[val.assetType.toLowerCase()])));
-		// assetIconShape.bind(new Binding('geometry', 'asset',
-		// 	(val: any) => {
-		// 		if (val && val.assetType) { return this.getIcon(this.assetIcons[val.assetType.toLowerCase()]); }
-		// 		return go.Geometry.parse(this.assetIcons.unknown.icon);
-		// 	}));
+			(val: any) => {
+				if (val) {
+					const type = val.assetType ? val.assetType.toLowerCase() : val.type && val.type.toLowerCase();
+					return this.getBackgroundColor(this.assetIcons[type]);
+				} else {
+					return this.assetIcons.unknown.background;
+				}
+			}));
 
 		return assetIconShape;
 	}
@@ -1123,9 +1135,8 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.diagram.commit(d => {
 			const update = Object.assign({}, data);
 			if (!update.key) { update.key = data.id; }
-			const node = d.nodes.filter(f => f.part.data.key === update.key).first();
-			node.part.data = update;
-			node.updateAdornments();
+			const node = d.nodes.filter(n => n.data.key === update.key || n.data.id === update.id).first();
+			node.data = update;
 			this.nodeUpdated.
 			emit({
 				data: d.model.nodeDataArray,
