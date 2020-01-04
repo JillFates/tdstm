@@ -51,7 +51,12 @@
 								</clr-radio-wrapper>
 							</div>
 							<div class="clr-col-9 grid-actions">
-								<tds-grid-header-action-buttons [actionButtons]="headerActionButtons"></tds-grid-header-action-buttons>
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+                                        (clearFilters)="clearAllFilters()"
+                                        [disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>

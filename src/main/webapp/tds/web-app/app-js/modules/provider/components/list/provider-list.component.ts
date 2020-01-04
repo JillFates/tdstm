@@ -65,6 +65,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	public dateFormat = '';
 	unsubscribeOnDestroy$: ReplaySubject<void> = new ReplaySubject(1);
 	protected showFilters = false;
+	public disabledClearFilters: any;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -87,6 +88,8 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disabledClearFilters = this.onDisableClearFilter.bind(this);
+
 		this.headerActionButtons = [
 			{
 				icon: 'plus-circle',
@@ -95,21 +98,6 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.onCreateProvider.bind(this),
-			},
-			{
-				icon: 'times',
-				title: this.translateService.transform('GLOBAL.CLEAR_FILTERS'),
-				disabled: this.disableClearFilter.bind(this),
-				show: true,
-				onClick: this.clearAllFilters.bind(this),
-			},
-			{  // todo remove this button as soon the new grid model is fully implemented
-				icon: 'sync',
-				iconClass: '',
-				title: this.translateService.transform('GLOBAL.REFRESH'),
-				flat: true,
-				show: true,
-				onClick: this.reloadData.bind(this),
 			},
 		];
 
@@ -303,7 +291,7 @@ export class ProviderListComponent implements OnInit, OnDestroy {
 	/**
 	 * Disable clear filters
 	 */
-	protected disableClearFilter(): boolean {
+	protected onDisableClearFilter(): boolean {
 		return this.filterCount() === 0;
 	}
 

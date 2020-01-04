@@ -24,7 +24,12 @@
 						<div class="clr-row">
 							<div class="clr-col-12">
 								<div class="pull-right">
-									<tds-grid-header-action-buttons [actionButtons]="headerActionButtons"></tds-grid-header-action-buttons>
+									<tds-grid-header-action-buttons
+											[actionButtons]="headerActionButtons"
+											(clearFilters)="clearAllFilters()"
+											[disableClearFilters]="disabledClearFilters"
+											(refresh)="reloadData()">
+									</tds-grid-header-action-buttons>
 								</div>
 							</div>
 						</div>

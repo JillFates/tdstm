@@ -51,6 +51,7 @@ declare var jQuery: any;
 	templateUrl: 'project-list.component.html',
 })
 export class ProjectListComponent implements OnInit, AfterContentInit {
+	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 	protected state: State = {
 		sort: [
@@ -111,6 +112,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
 				icon: 'plus-circle',
@@ -119,21 +121,6 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 				disabled: !this.isCreateAvailable(),
 				show: true,
 				onClick: this.openCreateProject.bind(this),
-			},
-			{
-				icon: 'times',
-				title: this.translateService.transform('GLOBAL.CLEAR_FILTERS'),
-				disabled: this.disableClearFilter.bind(this),
-				show: true,
-				onClick: this.clearAllFilters.bind(this),
-			},
-			{  // todo remove this button as soon the new grid model is fully implemented
-				icon: 'sync',
-				iconClass: '',
-				title: this.translateService.transform('GLOBAL.REFRESH'),
-				flat: true,
-				show: true,
-				onClick: this.reloadData.bind(this),
 			},
 		];
 
@@ -336,7 +323,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	/**
 	 * Disable clear filters
 	 */
-	protected disableClearFilter(): boolean {
+	private onDisableClearFilter(): boolean {
 		return this.filterCount() === 0;
 	}
 
