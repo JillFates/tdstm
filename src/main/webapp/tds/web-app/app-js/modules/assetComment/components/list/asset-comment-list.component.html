@@ -25,14 +25,12 @@
 				class="page-height row-actions-1-children"
 			>
 				<ng-template kendoGridToolbarTemplate [position]="'top'">
-					<div class="clr-row">
-						<div class="clr-col-12 grid-actions">
-							<tds-button
-								icon="sync"
-								(click)="reloadData()"
-							></tds-button>
-						</div>
-					</div>
+					<tds-grid-header-action-buttons
+							(refresh)="reloadData()"
+							[actionButtons]="headerActionButtons"
+							(clearFilters)="onClearFilters()"
+							[disableClearFilters]="disableClearFilters">
+					</tds-grid-header-action-buttons>
 				</ng-template>
 
 				<!-- Show Filters / Actions column -->
