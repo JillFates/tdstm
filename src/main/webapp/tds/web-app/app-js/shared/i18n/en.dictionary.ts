@@ -242,6 +242,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project'
 	},
 	'DEPENDENCIES': {
+		'CREATE_DEPENDENCY': 'Create Dependency',
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',

@@ -21,18 +21,25 @@
 	>
 		<ng-template kendoGridToolbarTemplate [position]="'top'">
 			<div class="clr-row">
-				<div class="clr-col-12 grid-actions">
-					<tds-bulk-change-button
-						#tdsBulkChangeButton
-						[enabled]="bulkCheckboxService.hasSelectedItems()"
-						[showDelete]="true"
-						[showEdit]="false"
-						[bulkChangeType]="bulkChangeType"
-						(clickBulk)="onClickBulkButton()"
-						(operationResult)="onBulkOperationResult($event)"
-					>
-					</tds-bulk-change-button>
-					<tds-button icon="sync" (click)="reloadData()"></tds-button>
+				<div class="clr-col-12">
+					<div class="pull-right">
+						<tds-bulk-change-button
+								#tdsBulkChangeButton
+								[enabled]="bulkCheckboxService.hasSelectedItems()"
+								[showDelete]="true"
+								[showEdit]="false"
+								[bulkChangeType]="bulkChangeType"
+								(clickBulk)="onClickBulkButton()"
+								(operationResult)="onBulkOperationResult($event)">
+						</tds-bulk-change-button>
+						<tds-grid-header-action-buttons
+								(refresh)="reloadData()"
+								[actionButtons]="headerActionButtons"
+								(clearFilters)="onClearFilters()"
+								[disableClearFilters]="disableClearFilters">
+						</tds-grid-header-action-buttons>
+					</div>
+
 				</div>
 			</div>
 		</ng-template>
