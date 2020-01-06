@@ -92,7 +92,7 @@ class EmailDispatchService implements ServiceMethods {
 
 		mailService.sendMail {
 			from getFrom(ed.fromAddress)
-			to ed.toPerson.email
+			to ed.toAddress
 			subject ed.subject
 			body (
 				view: getTemplateView(ed),
