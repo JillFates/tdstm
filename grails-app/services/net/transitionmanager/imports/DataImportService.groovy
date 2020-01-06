@@ -1013,7 +1013,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				ed.subject = 'TransitionManager Import Batch Summary'
 				ed.bodyTemplate = 'batchPostingResults'
 				ed.paramsJson = paramsJson
-				ed.fromAddress = context.whom.email
 				ed.toAddress = context.whom.email
 				ed.toPerson = context.whom
 				ed.createdBy = context.whom
