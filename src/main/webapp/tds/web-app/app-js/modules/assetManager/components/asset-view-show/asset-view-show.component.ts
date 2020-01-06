@@ -220,6 +220,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			viewName: this.model.name
 		};
 
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(assetExportModel.assetQueryParams, this.globalQueryParams);
+		}
+
 		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
 		]).then(result => {
@@ -271,6 +275,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: model.schema.columns
 			}
 		};
+
 		if (justPlanning) {
 			assetQueryParams['justPlanning'] = justPlanning;
 		}
