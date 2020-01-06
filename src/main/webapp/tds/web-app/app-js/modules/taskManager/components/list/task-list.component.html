@@ -134,11 +134,8 @@
 			<kendo-grid
 				#gridComponent
 				*ngIf="!hideGrid"
-				class="page-height task-grid"
-				[ngClass]="{
-					'hide-filter': !isFiltering,
-					'row-actions-1-children': grid.canSupportColumnMenuDynamic()
-				}"
+				class="page-height task-grid fixed-context-menu row-actions-2-children"
+				[ngClass]="{'hide-filter': !isFiltering}"
 				[data]="grid.gridData"
 				[skip]="grid.state.skip"
 				[pageSize]="grid.state.take"
