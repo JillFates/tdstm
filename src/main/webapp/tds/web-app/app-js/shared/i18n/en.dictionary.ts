@@ -284,6 +284,7 @@ export const en_DICTIONARY: Object = {
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
 			'LIST': 'Bundle List',
+			'CREATE_BUNDLE': 'Create Bundle',
 		}
 	},
 	'PROJECT': {
