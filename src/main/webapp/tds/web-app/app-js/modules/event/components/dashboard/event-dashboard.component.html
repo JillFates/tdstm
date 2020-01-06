@@ -10,8 +10,11 @@
                                     (ngModelChange)="onSelectedEvent($event.id, $event.name)" textField="name" valueField="id">
                                 </kendo-dropdownlist>
                                 <label for="agreement" class="aligned-label dontshow-again">
-                                    <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
-                                        [(ngModel)]="includeUnpublished"> {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                                    <span  *ngIf="hasViewUnpublishedPermission">
+                                        <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
+                                            [(ngModel)]="includeUnpublished" (ngModelChange)="onFiltersChange(this)"> 
+                                            {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                                    </span>
                                 </label>
                             </div>
                         </div>
@@ -158,7 +161,8 @@
                 <tds-task-category
                     #taskCategory
                     *ngIf="taskCategories" 
-                    [taskCategories]="taskCategories">
+                    [taskCategories]="taskCategories"
+                    [scrollPosition]="taskCategoryScrollPosition">
                 </tds-task-category>
             </div>
         </div>

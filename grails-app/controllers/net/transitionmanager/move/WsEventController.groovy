@@ -147,6 +147,12 @@ class WsEventController implements ControllerMethods {
 		renderSuccessJson("Move Event ${moveEvent.name} deleted.")
 	}
 
+	/**
+	 * Find and return various task-related stats per category for the given event.
+	 * @param moveEvent - The event id.
+	 * @param viewUnpublished - Whether or not unpublished tasks should be included in the model.
+	 * @return  A model with Event Dashboard info
+	 */
 	@HasPermission(Permission.DashboardMenuView)
 	def getEventDashboardModel() {
 		Long moveEventId = NumberUtil.toPositiveLong(getParamOrPreference('moveEvent', UserPreferenceEnum.MOVE_EVENT))
@@ -157,12 +163,12 @@ class WsEventController implements ControllerMethods {
 		Project project = getProjectForWs()
 		MoveEvent moveEvent = GormUtil.findInProject(project, MoveEvent, moveEventId, true)
 
+		boolean viewUnpublished = false
 		// handle the view unpublished tasks checkbox
-		if (params.containsKey('viewUnpublished')) {
-			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, params.viewUnpublished == '1')
+		if (params.containsKey('viewUnpublished') && securityService.hasPermission(Permission.TaskViewUnpublished)) {
+			viewUnpublished = params.viewUnpublished == '1'
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
 		}
-
-		boolean viewUnpublished = securityService.viewUnpublished()
 
 		// Save the user's preference for the current move event
 		userPreferenceService.setMoveEventId(moveEvent.id)
@@ -199,10 +205,20 @@ class WsEventController implements ControllerMethods {
 	}
 
 	/**
-	 * Find and return various task-related stats per category for the given event.
-	 */
-	def taskCategoriesStats(Long moveEventId) {
+     * Used to retrieve the list of categories and various metrics for each for a given event. This is used by the
+     * Event Dashboard for the lower category data elements.
+     * @param id - (Long) the id of the event to retrieve metrics from
+     * @param viewUnpublished - a Boolean flag if true will include unpublished tasks in the results
+     */
+	def taskCategoriesStats(Long id) {
 		Project project = getProjectForWs()
-		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEventId))
+		MoveEvent moveEvent = fetchDomain(MoveEvent, [id: id], project)
+		boolean viewUnpublished = false
+		// handle the view unpublished tasks checkbox
+		if (params.containsKey('viewUnpublished') && securityService.hasPermission(Permission.TaskViewUnpublished)) {
+			viewUnpublished = params.viewUnpublished == '1'
+			userPreferenceService.setPreference(UserPreferenceEnum.VIEW_UNPUBLISHED, viewUnpublished)
+		}
+		renderSuccessJson(moveEventService.getTaskCategoriesStats(project, moveEvent, viewUnpublished))
 	}
 }

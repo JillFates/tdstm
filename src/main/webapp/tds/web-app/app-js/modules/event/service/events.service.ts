@@ -33,7 +33,7 @@ export class EventsService {
 	private readonly APP_EVENT_STATUS_DETAILS = `${this.baseURL}/ws/dashboard/eventData`;
 	private readonly APP_EVENT_DETAILS = `${this.baseURL}/ws/moveEvent/dashboardModel`;
 	private readonly APP_EVENT_STATUS_UPDATE = `${this.baseURL}/ws/event/updateEventSummary`;
-	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/moveEvent/taskCategoriesStats`;
+	private readonly APP_EVENT_TASK_CATEGORY = `${this.baseURL}/ws/event/taskCategoriesStats`;
 	private readonly categories = [
 		'Step',
 		'',
@@ -114,6 +114,7 @@ export class EventsService {
 						effortRemainPending: model.effortRemainPending || '',
 						effortRemainReady: model.effortRemainReady || '',
 						effortRemainStarted: model.effortRemainStarted || '',
+						effortRemainHold: model.effortRemainHold || '',
 						percDurationDone: model.percDurationDone || '',
 						percDurationReady: model.percDurationReady || '',
 						percDurationStarted: model.percDurationStarted || '',
@@ -182,9 +183,9 @@ export class EventsService {
 	}
 
 	/**
-	 * Get the event status details for an specific bundle
-	 * @param {string} userTimeZone
- 	 * @param {number} bundleId Bundle id
+	 * Get the event status details
+	 * @param {string} userTimeZone User Time Zone
+ 	 * @param {number} eventId Event id
 	 * @returns {Observable<any>} Event status details
 	*/
 	getEventStatusDetails(userTimeZone: string, eventId: number): Observable<any> {
@@ -378,10 +379,14 @@ export class EventsService {
 	/**
 	 * Get the relationship among categories and tasks
  	 * @param {number} eventId Event id
+	 * @param {string} userTimeZone User Time Zone
+	 * @param {string} plannedStart The Event Estimated Start
+	 * @param {string} plannedCompletion The Event Estimated Completion
+	  *@param {boolean} viewUnpublished Flag to filter unpublished events
 	 * @returns {Observable<any>} Category status details
 	*/
-	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any): Observable<any> {
-		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}`)
+	getTaskCategoriesStats(eventId: number, userTimeZone: string, plannedStart: any, plannedCompletion: any, viewUnpublished: boolean): Observable<any> {
+		return this.http.get(`${this.APP_EVENT_TASK_CATEGORY}/${eventId}?viewUnpublished=${viewUnpublished ? 1 : 0}`)
 			.map((response: any) => this.formatTaskCategoryResults(response && response.data || [], userTimeZone, plannedStart, plannedCompletion))
 			.catch((error: any) => error);
 	}
@@ -414,25 +419,25 @@ export class EventsService {
 			results[CatagoryRowType.Percent][index].compose =   item;
 			results[CatagoryRowType.TaskCompleted][index].compose =   item;
 
-			item.estStart = item.estStart ? item.estStart : plannedStart;
-			item.estFinish = item.estFinish ? item.estFinish : plannedCompletion;
+			item.minEstStart = item.minEstStart ? item.minEstStart : plannedStart;
+			item.maxEstFinish = item.maxEstFinish ? item.maxEstFinish : plannedCompletion;
 
-			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estStart);
+			results[CatagoryRowType.PlannedStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minEstStart);
 
-			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.estFinish);
+			results[CatagoryRowType.PlannedCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxEstFinish);
 
-			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actStart);
+			results[CatagoryRowType.ActualStart][index].text = DateUtils.formatUserDateTime(userTimeZone, item.minActStart);
 
-			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.actFinish);
+			results[CatagoryRowType.ActualCompletion][index].text = DateUtils.formatUserDateTime(userTimeZone, item.maxActFinish);
 
-			if (item.estFinish && (DateUtils.stringDateToDate(item.actFinish) > DateUtils.stringDateToDate(item.estFinish))) {
+			if (item.maxEstFinish && (DateUtils.stringDateToDate(item.maxActFinish) > DateUtils.stringDateToDate(item.maxEstFinish))) {
 				results[CatagoryRowType.ActualStart][index].classes += ' task-overdue ';
 				results[CatagoryRowType.ActualCompletion][index].classes += ' task-overdue ';
 			}
 		});
 
 		const hasInfo = data.find((item: CategoryTask) => {
-			return Boolean(item.estStart || item.estFinish || item.actStart || item.actFinish);
+			return Boolean(item.minEstStart || item.maxEstFinish || item.minActStart || item.maxActFinish);
 		});
 
 		return {tasks: results, columns: columnsLength, hasInfo};

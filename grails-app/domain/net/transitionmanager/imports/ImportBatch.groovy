@@ -90,6 +90,12 @@ class ImportBatch {
 	// is primarily used with the TM Asset Export spreadsheet so that changes are not overwritten accidently.
 	Date warnOnChangesAfter
 
+	// This will be used to group the various import batches that are created in the same ETL import process by sharing the same uuid
+	String groupGuid
+
+	// Flags if the user will be notified of the Import Posting results at the end of the process
+	Boolean sendNotification = false
+
 	Date dateCreated
 	Date lastUpdated
 
@@ -120,6 +126,7 @@ class ImportBatch {
 		provider nullable: true
 		timezone size: 1..255
 		warnOnChangesAfter nullable: true
+		groupGuid nullable: true, maxSize:36
 	}
 
 	static mapping = {

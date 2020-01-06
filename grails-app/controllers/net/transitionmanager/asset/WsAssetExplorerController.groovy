@@ -6,7 +6,6 @@ package net.transitionmanager.asset
 
 import com.tdsops.common.ui.Pagination
 import com.tdsops.tm.enums.domain.UserPreferenceEnum
-import com.tdsops.tm.enums.domain.ViewSaveAsOptionEnum as SaveAsOptionsEnum
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.dataview.DataviewNameValidationCommand
 import net.transitionmanager.command.dataview.DataviewUserParamsCommand
@@ -70,7 +69,7 @@ class WsAssetExplorerController implements ControllerMethods, PaginationMethods 
 		Dataview dataview = dataviewService.fetch(id)
 		Project currentProject = securityService.userCurrentProject
 		Map saveOptions = dataviewService.generateSaveOptions(dataview, currentProject)
-		Map dataviewMap = dataviewService.fetch(id, override).toMap(securityService.currentPersonId)
+		Map dataviewMap = dataview.toMap(securityService.currentPersonId)
 		renderSuccessJson([dataView: dataviewMap, saveOptions: saveOptions])
 	}
 

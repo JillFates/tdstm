@@ -1,6 +1,7 @@
 package net.transitionmanager.tasks
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdsops.tm.enums.domain.UserPreferenceEnum
 import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.TimeUtil
 import grails.plugin.springsecurity.annotation.Secured
@@ -34,8 +35,9 @@ class WsTimelineController implements ControllerMethods {
 		validateCommandObject(commandObject)
 
 		MoveEvent moveEvent = fetchDomain(MoveEvent, commandObject.properties)
-		Boolean recalculate = commandObject.isRecalculate()
+		userPreferenceService.setPreference(UserPreferenceEnum.MOVE_EVENT, moveEvent.id)
 
+		Boolean recalculate = commandObject.isRecalculate()
 		CPAResults cpaResults = timelineService.calculateCPA(moveEvent, commandObject.viewUnpublished)
 
 		TaskTimeLineGraph graph = cpaResults.graph
@@ -50,8 +52,8 @@ class WsTimelineController implements ControllerMethods {
 		} else {
 			List<Task> startTasks = tasks.findAll { it.taskNumber in graph.getStarts()*.taskNumber }
 			List<Task> sinkTasks = tasks.findAll { it.taskNumber in graph.getSinks()*.taskNumber }
-			startDate = findEarliestStartTask(startTasks)?.estStart
-			endDate = findLatestFinishTask(sinkTasks)?.latestFinish
+			startDate = findEarliestTaskStartTime(startTasks)
+			endDate = findLatestTaskFinishTime(sinkTasks)
 		}
 		Integer zeroDurationAdjustment = 60
 
@@ -162,9 +164,16 @@ class WsTimelineController implements ControllerMethods {
 		StringBuilder results = new StringBuilder("<h1>Timeline Data for Event $moveEvent</h1>")
 
 		try {
+
+			Closure buildList = { List<TaskVertex> vertices ->
+				return vertices.collect { TaskVertex v ->
+					"${v.taskNumber}:${v.taskComment}"
+				}
+			}
+
 			results << "Found ${tasks.size()} tasks and ${deps.size()} dependencies<br/>"
-			results << "Start Vertices: " << (graph.starts.size() > 0 ? graph.starts : 'none') << '<br/>'
-			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? graph.sinks : 'none') << '<br/>'
+			results << "Start Vertices: " << (graph.starts.size() > 0 ? buildList(graph.starts) : 'none') << '<br/>'
+			results << "Sink Vertices: " << (graph.sinks.size() > 0 ? buildList(graph.sinks)  : 'none') << '<br/>'
 
 			if (!summary.cycles.isEmpty()) {
 				results << "Cyclical Maps: "
@@ -260,12 +269,12 @@ class WsTimelineController implements ControllerMethods {
 					<td>${task.comment.encodeAsHTML()}</td>
 					<td align="right">${task.durationInMinutes()}</td>
 					$durationExtra
-					<td>${task.estStart}</td>
-					<td>${task.estFinish}</td>
-					<td align="right">${task.slack}</td>
+					<td>${task.estStart?: ''}</td>
+					<td>${task.estFinish?: ''}</td>
+					<td align="right">${task.slack?: ''}</td>
 					<td>$constraintTime</td>
 					$timesExtra
-					<td>$actFinish</td>
+					<td>${actFinish?: ''}</td>
 					<td>$task.priority</td>
 					<td>$criticalPath</td>
 					<td>$team</td>
@@ -348,8 +357,10 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskList list of {@code Task}
 	 * @return lowest estStart from a list of {@code Task}
 	 */
-	private Task findEarliestStartTask(List<Task> taskList) {
-		return taskList.min { it.estStart }
+	private Date findEarliestTaskStartTime(List<Task> taskList) {
+		return taskList.collect { Task task ->
+			[task.actStart, task.estStart, task.actFinish].min()
+		}.min()
 	}
 
 	/**
@@ -358,8 +369,9 @@ class WsTimelineController implements ControllerMethods {
 	 * @param taskList list of {@code Task}
 	 * @return latest estFinish from a list of {@code Task}
 	 */
-	private Task findLatestFinishTask(List<Task> taskList) {
-		return taskList.min { it.latestFinish }
+	private Date findLatestTaskFinishTime(List<Task> taskList) {
+		return taskList.collect { Task task ->
+			[task.actStart, task.actFinish, task.latestFinish].max()
+		}.max()
 	}
-
 }

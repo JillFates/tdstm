@@ -219,6 +219,13 @@ class UrlMappings {
 				GET: 'actions'
 			]
 		}
+
+		'/ws/bulkChange/etl' {
+			controller = 'wsBulkAssetChange'
+			action = [
+				PUT: 'runETL'
+			]
+		}
 		/******************************************************/
 
 		"/ws/moveBundle/list" {
@@ -271,14 +278,14 @@ class UrlMappings {
 			action = [GET: "index"]
 		}
 
+		"/ws/event/taskCategoriesStats/$id?" {
+			controller = 'wsEvent'
+			action = [GET: 'taskCategoriesStats']
+		}
+
 		"/ws/moveEvent/dashboardModel" {
 			controller = "wsEvent"
 			action = [GET: "getEventDashboardModel"]
-		}
-
-		"/ws/moveEvent/taskCategoriesStats/$moveEventId" {
-			controller = 'wsEvent'
-			action = [GET: 'taskCategoriesStats']
 		}
 
 		"/ws/moveEvent/list" {
@@ -311,7 +318,7 @@ class UrlMappings {
 			action = [GET:"list", PUT:"update", DELETE:"delete", POST:"save"]
 		}
 
-		"/ws/dashboard/eventData/$id" {
+		"/ws/dashboard/eventData/$id?" {
 			controller = "wsDashboard"
 			action = [GET:"eventData"]
 		}
@@ -418,6 +425,11 @@ class UrlMappings {
 			action = [POST: 'initiateTransformData']
 		}
 
+		"/ws/assetImport/autoBatchProcessing" {
+			controller = 'wsAssetImport'
+			action = [POST: 'autoBatchProcessing']
+		}
+
 		"/ws/assetImport/viewData" {
 			controller = 'wsAssetImport'
 			action = [GET: 'viewData']
@@ -492,6 +504,11 @@ class UrlMappings {
 		"/ws/task/getInfoForActionBar/$taskId" {
 			controller = "wsTask"
 			action = [GET: "getInfoForActionBar"]
+		}
+
+		"/ws/task/getBulkActionInfo" {
+			controller = "wsTask"
+			action = [POST: "getBulkInfoForActionBar"]
 		}
 
 		"/ws/task/customColumns" {
@@ -736,7 +753,7 @@ class UrlMappings {
 
 		"/ws/user/updateLastPage" {
 			controller = "wsUser"
-			action = [GET:"updateLastPage"]
+			action = [PUT:"updateLastPage"]
 		}
 
 		"/ws/progress" {

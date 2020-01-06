@@ -368,13 +368,14 @@ class WsUserController implements ControllerMethods {
 	 */
 	@Secured('permitAll')
 	def updateLastPage() {
+		Map requestParams = request.JSON
 		if (securityService.isLoggedIn()) {
 			userService.updateLastPageLoad()
 			renderAsJson(successful:true)
 		} else {
 			// Record the page request (path) to the session if the user isn't logged in so that we can redirect
 			// them later after login.
-			String path = params.get('path')
+			String path = requestParams.path
 			if (path) {
 				SessionContext.setLastPageRequested(session, path)
 			}

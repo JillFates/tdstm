@@ -51,7 +51,6 @@ import net.transitionmanager.security.UserLogin
 import net.transitionmanager.service.ServiceMethods
 import net.transitionmanager.tag.TagAssetService
 import net.transitionmanager.task.AssetComment
-import net.transitionmanager.task.RunbookService
 import net.transitionmanager.task.Task
 import net.transitionmanager.task.TaskService
 import net.transitionmanager.task.timeline.CPAResults
@@ -64,6 +63,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.math.NumberUtils
 import org.apache.poi.hssf.usermodel.HSSFSheet
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.tools.ant.util.DateUtils
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -78,7 +78,6 @@ class ReportsService implements ServiceMethods {
     JdbcTemplate jdbcTemplate
 	NamedParameterJdbcTemplate namedParameterJdbcTemplate
     PartyRelationshipService partyRelationshipService
-    RunbookService runbookService
     TaskService taskService
     MoveBundleService moveBundleService
     UserPreferenceService userPreferenceService
@@ -1440,17 +1439,27 @@ class ReportsService implements ServiceMethods {
         applicationList.each {
             Application application = Application.get(it.id)
             Collection<AssetComment> appComments = application.comments
-            List<Date> startTimeList = appComments.findAll { it.category == command.startCategory }.sort {
-                it.actStart
-            }?.actStart
+
+            List<AssetComment> startComments = appComments.findAll { it.category == command.startCategory }
+
             List<Date> finishTimeList = appComments.findAll { it.category == command.stopCategory }.sort {
                 it.actFinish
             }?.actFinish
 
-            startTimeList.removeAll([null])
 
+            List<Date> beginStartTimeList = []
+            List<Date> beginFinishTimeList = []
+            startComments.each {
+                if(it.actStart != null) {
+                    beginStartTimeList.push(it.actStart)
+                }
+                if (it.actFinish != null && it.status == 'Completed') {
+                    beginFinishTimeList.push(it.actFinish)
+                }
+            }
+
+            Date startTime = beginStartTimeList ? beginStartTimeList[0] : (beginFinishTimeList ? beginFinishTimeList[0] : null)
             Date finishTime = finishTimeList ? finishTimeList[-1] : null
-            Date startTime = startTimeList ? startTimeList[0] : null
 
             StringBuilder duration = new StringBuilder()
             def customParam
@@ -1461,10 +1470,13 @@ class ReportsService implements ServiceMethods {
                 def dayTime = TimeCategory.minus(finishTime, startTime)
                 durationHours = (dayTime.days * 24) + dayTime.hours
                 if (durationHours) {
+                    if (durationHours < 10) {
+                        duration.append(0)
+                    }
                     duration.append(durationHours)
                 }
                 if (dayTime.minutes) {
-                    duration.append((durationHours ? ':' : '0:') + dayTime.minutes)
+                    duration.append((durationHours ? ':' : '00:') +  (dayTime.minutes > 9 ? "" : "0") + dayTime.minutes)
                 }
             }
             if (command.outageWindow == 'drRtoDesc') {
@@ -1476,7 +1488,7 @@ class ReportsService implements ServiceMethods {
                 customParam = it[command.outageWindow]
             }
 
-            appList.add(app: application, startTime: startTime, finishTime: finishTime, duration: duration ?: '',
+            appList.add(app: application, startTime: TimeUtil.formatDateTime(startTime), finishTime: TimeUtil.formatDateTime(finishTime), duration: duration ?: '',
                     customParam: customParam ? customParam + (command.outageWindow == 'drRtoDesc' ? 'h' : '') : '',
                     windowColor: windowColor)
         }

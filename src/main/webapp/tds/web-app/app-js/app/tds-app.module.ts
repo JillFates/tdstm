@@ -19,10 +19,11 @@ import {SharedModule} from '../shared/shared.module';
 import {TaskManagerModule} from '../modules/taskManager/task-manager.module';
 import {AuthModule} from '../modules/auth/auth.module';
 import {UserContextState} from '../modules/auth/state/user-context.state';
+import { ProjectService } from '../modules/project/service/project.service';
 
 @NgModule({
 	imports: [
-		NgxsModule.forRoot([TDSAppState, UserContextState]),
+	NgxsModule.forRoot([TDSAppState, UserContextState]),
 		NgxsReduxDevtoolsPluginModule.forRoot(),
 		NgxsLoggerPluginModule.forRoot(),
 		// Angular Modules
@@ -38,6 +39,7 @@ import {UserContextState} from '../modules/auth/state/user-context.state';
 		TDSAppComponent,
 	],
 	providers: [
+		ProjectService,
 		{ provide: NgModuleFactoryLoader, useClass: SystemJsNgModuleLoader }
 	],
 	bootstrap: [

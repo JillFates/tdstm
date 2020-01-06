@@ -293,7 +293,9 @@ export class DataScriptService {
 			description: model.description,
 			mode: model.mode === DataScriptMode.IMPORT ? 'Import' : 'Export',
 			providerId: model.provider.id,
-			etlSourceCode: model.etlSourceCode
+			etlSourceCode: model.etlSourceCode,
+			isAutoProcess: model.isAutoProcess,
+			useWithAssetActions: model.useWithAssetActions
 		};
 		if (!model.id) {
 			return this.http.post(`${this.dataIngestionUrl}/datascript`, JSON.stringify(postRequest))
@@ -301,14 +303,13 @@ export class DataScriptService {
 					let dataItem = (response && response.status === 'success' && response.data);
 					dataItem.dataScript.mode = (dataItem.dataScript.mode === 'Import') ? DataScriptMode.IMPORT : DataScriptMode.EXPORT;
 					return dataItem;
-				})
-				.catch((error: any) => error);
+				}, (error: any) => error);
+
 		} else {
 			return this.http.put(`${this.dataIngestionUrl}/datascript/${model.id}`, JSON.stringify(postRequest))
 				.map((response: any) => {
 					return response && response.status === 'success' && response.data;
-				})
-				.catch((error: any) => error);
+				}, (error: any) => error);
 		}
 	}
 

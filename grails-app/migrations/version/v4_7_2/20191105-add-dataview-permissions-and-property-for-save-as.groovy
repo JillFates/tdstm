@@ -1,5 +1,6 @@
 package version.v4_7_2
 
+import net.transitionmanager.common.DatabaseMigrationService
 import net.transitionmanager.security.Permission
 
 /**
@@ -14,7 +15,7 @@ databaseChangeLog = {
 
         grailsChange {
             change {
-                def perms = [
+                Map perms = [
                         (Permission.AssetExplorerOverrideAllUserGlobal) : [
                                 group      : 'NONE',
                                 description: 'Can override a system view across all projects for all users',
@@ -27,7 +28,7 @@ databaseChangeLog = {
                         ]
                 ]
 
-                def databaseMigrationService = ctx.getBean('databaseMigrationService')
+                DatabaseMigrationService databaseMigrationService = ctx.getBean('databaseMigrationService')
                 databaseMigrationService.addPermissions(sql, perms)
 
             }

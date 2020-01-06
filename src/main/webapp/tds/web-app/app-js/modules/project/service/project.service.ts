@@ -4,22 +4,20 @@ import {Injectable} from '@angular/core';
 import {Store} from '@ngxs/store';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {Observable, Subject} from 'rxjs';
+import {Observable} from 'rxjs';
 import {DefaultBooleanFilterData, Flatten} from '../../../shared/model/data-list-grid.model';
 import {DateUtils} from '../../../shared/utils/date.utils';
 import {ApiResponseModel} from '../../../shared/model/ApiResponseModel';
-import {ProjectModel} from '../model/project.model';
 import {PREFERENCES_LIST, PreferenceService} from '../../../shared/services/preference.service';
-import {SetDefaultProject} from "../actions/project.actions";
+import {SetDefaultProject} from '../actions/project.actions';
 
 @Injectable()
 export class ProjectService {
 
 	private jobProgressUrl = '../ws/progress';
 
-	constructor(private http: HttpClient, private preferenceService: PreferenceService, private store:Store) {
+	constructor(private http: HttpClient, private preferenceService: PreferenceService, private store: Store) {
 		this.preferenceService.getPreference(PREFERENCES_LIST.CURR_TZ).subscribe();
-		this.getDefaultProject();
 	}
 
 	getDefaultProject(): Observable<any> {

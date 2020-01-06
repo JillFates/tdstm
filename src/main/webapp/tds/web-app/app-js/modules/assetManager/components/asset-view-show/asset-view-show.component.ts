@@ -44,8 +44,8 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	public saveOptions: any;
 	protected domains: DomainModel[] = [];
 	public metadata: any = {};
-	private lastSnapshot;
-	protected navigationSubscription;
+	private lastSnapshot: any;
+	protected navigationSubscription: any;
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
@@ -54,7 +54,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
-	private userContext:UserContextModel;
+	private userContext: UserContextModel;
 	protected readonly SAVE_BUTTON_ID = 'btnSave';
 	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
 	// When the URL contains extra parameters we can determinate the form contains hidden filters
@@ -153,35 +153,37 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	public onQuery(): void {
-		let params = {
-			offset: this.gridState.skip,
-			limit: this.gridState.take,
-			sortDomain: this.model.schema.sort.domain,
-			sortProperty: this.model.schema.sort.property,
-			sortOrder: this.model.schema.sort.order,
-			filters: {
-				domains: this.model.schema.domains,
-				columns: this.model.schema.columns
+		setTimeout(() => {
+			let params = {
+				offset: this.gridState.skip,
+				limit: this.gridState.take,
+				sortDomain: this.model.schema.sort.domain,
+				sortProperty: this.model.schema.sort.property,
+				sortOrder: this.model.schema.sort.order,
+				filters: {
+					domains: this.model.schema.domains,
+					columns: this.model.schema.columns
+				}
+			};
+
+			if (this.hiddenFilters) {
+				this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
+
+				let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
+				if (justPlanning !== null) {
+					this.assetExplorerViewGrid.justPlanning = justPlanning;
+				}
 			}
-		};
 
-		if (this.hiddenFilters) {
-			this.assetGlobalFiltersService.prepareFilters(params, this.globalQueryParams);
-
-			let justPlanning = this.assetGlobalFiltersService.getJustPlaningFilter(this.globalQueryParams);
-			if (justPlanning !== null) {
-				this.assetExplorerViewGrid.justPlanning = justPlanning;
+			if (this.justPlanning) {
+				params['justPlanning'] = true;
 			}
-		}
 
-		if (this.justPlanning) {
-			params['justPlanning'] = true;
-		}
-
-		this.assetExplorerService.query(this.model.id, params).subscribe(result => {
-			this.data = result;
-			jQuery('[data-toggle="popover"]').popover();
-		}, err => console.log(err));
+			this.assetExplorerService.query(this.model.id, params).subscribe(result => {
+				this.data = result;
+				jQuery('[data-toggle="popover"]').popover();
+			}, err => console.log(err));
+		}, 2000);
 	}
 
 	public onEdit(): void {
@@ -379,9 +381,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 
 	public isDefaultProject(): boolean {
 		return (
-			this.userContext && 
+			this.userContext &&
 			this.userContext.project &&
-			this.userContext.defaultProject && 
+			this.userContext.defaultProject &&
 			this.userContext.project.id === this.userContext.defaultProject.id
 		);
 	}
