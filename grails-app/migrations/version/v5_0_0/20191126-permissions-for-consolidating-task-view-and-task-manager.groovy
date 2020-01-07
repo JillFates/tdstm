@@ -10,12 +10,12 @@ databaseChangeLog = {
 
         grailsChange {
             change {
-                List<Permission> permissions = [Permission.TaskManagerView, Permission.TaskEdit, Permission.CommentCreate]
+                List<String> permissions = [Permission.TaskManagerView, Permission.TaskEdit, Permission.CommentCreate]
                 String sqlStatement = """
                     INSERT INTO role_permissions (permission_id, role) 
                     VALUES ((SELECT id FROM permissions WHERE permission_item=:item), :role)"""
                 String userRole = "ROLE_USER"
-                permissions.each { Permission permission ->
+                permissions.each { String permission ->
                     Map queryParams = [
                             item: permission,
                             role: userRole
