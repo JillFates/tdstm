@@ -1,23 +1,18 @@
 package net.transitionmanager.command
-
-import com.tdssrc.grails.FileSystemUtil
-import net.transitionmanager.i18n.Message
-import org.springframework.web.multipart.MultipartFile
-
 /**
  * Command class that will be used typically for the following request:
  * <pre>
  * 	POST
- * 	/tdstm/ws/assetImport/autoBatchProcessing?dataScriptId=6&sendNotification=false
+ * 	/tdstm/api/dataScript/11/transform?sendNotification=true
  * </pre>
  */
-class InitiateAutoTransformDataActionCommand extends UploadFileCommand {
+class InitiateTransformAPIActionCommand extends UploadFileCommand {
 	/**
 	 * ID for an instance of {@code Datascript} domain  class.
 	 * This instance contains the ETL script content
 	 * that is going to be executed against filename param content.
 	 */
-	Long dataScriptId
+	Long id
 	/**
 	 * Defines if Transformation results and the auto import process
 	 * should be sent by email after finishing the post step.
@@ -26,7 +21,7 @@ class InitiateAutoTransformDataActionCommand extends UploadFileCommand {
 
 
 	static constraints = {
-		dataScriptId nullable: false
+		id nullable: false
 		sendNotification nullable: false
 	}
 }
