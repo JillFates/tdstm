@@ -88,7 +88,7 @@
                                            [ngValue]="option">{{option.name | translate}}</option>
                                </select>
                             </div>
-                            <tds-button *ngIf="uiConfig.showManuaProcesslElements"
+                            <tds-button *ngIf="uiConfig.showManualProcesslElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onTransform()"
                                     class="col-sm-{{uiConfig.buttonColSize}}">
@@ -133,7 +133,7 @@
                         </div>
 
                         <!-- Progress bar-->
-                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManuaProcesslElements">
+                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcesslElements">
                             <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
                                         col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
                                 <div *ngIf="transformInProcess" class="progress">
@@ -144,7 +144,7 @@
                         </div>
 
                         <!-- Load Data Row -->
-                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManuaProcesslElements">
+                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcesslElements">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>
