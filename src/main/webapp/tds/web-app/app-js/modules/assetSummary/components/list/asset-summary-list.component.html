@@ -5,14 +5,11 @@
             <div class="box-body box-with-empty-header">
                 <div class="button-bar text-right">
                     <div>
-                        <!-- Refresh button -->
-                        <tds-button-custom
-                                [flat]="true"
-                                [icon]="'repeat'"
-                                [tooltip]="'Refresh View'"
-                                (click)="reloadData()"
-                        >
-                        </tds-button-custom>
+                        <tds-grid-header-action-buttons
+                                (refresh)="reloadData()"
+                                [hasClearAllFilters]="false"
+                                [actionButtons]="headerActionButtons">
+                        </tds-grid-header-action-buttons>
                     </div>
                 </div>
                 <div class="button-bar">
