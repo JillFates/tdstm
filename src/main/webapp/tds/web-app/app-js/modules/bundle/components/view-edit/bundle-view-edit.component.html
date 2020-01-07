@@ -139,7 +139,7 @@
 			</div>
 		</div>
 		<div *ngIf="editing">
-			<form clrForm action="save" method="post" name="bundleEditForm">
+			<form clrForm action="save" method="post" name="bundleEditForm" clrLayout="horizontal">
 				<!-- Name -->
 				<clr-input-container>
 					<label>Name</label>
@@ -199,27 +199,25 @@
 				</clr-select-container>
 
 				<!-- Start Time -->
-				<div class="clr-form-control">
-					<div class="clr-control-container">
-						<label for="startTimePicker" class="clr-control-label"
-							>Start Time</label
-						>
+				<div class="clr-form-control clr-row">
+					<div class="clr-col-2 bundle-time-picker">
+						<label for="startTimePicker" class="clr-control-label">Start Time</label>
+					</div>
+					<div class="clr-col-6">
 						<tds-datetime-control
-							#startTimePicker
-							name="startTime"
-							[(ngModel)]="bundleModel.startTime"
+								#startTimePicker
+								name="startTime"
+								[(ngModel)]="bundleModel.startTime"
 						></tds-datetime-control>
 					</div>
 				</div>
 
 				<!-- Completion Time -->
-				<div class="clr-form-control">
-					<div class="clr-control-container">
-						<label
-							for="completionTimePicker"
-							class="clr-control-label"
-							>Completion Time</label
-						>
+				<div class="clr-form-control  clr-row">
+					<div class="clr-col-2 bundle-time-picker">
+						<label for="completionTimePicker" class="clr-control-label">Completion Time</label>
+					</div>
+					<div class="clr-col-6">
 						<tds-datetime-control
 							#completionTimePicker
 							name="completionTime"
