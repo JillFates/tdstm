@@ -7,7 +7,7 @@
 						<span class="glyphicon glyphicon-th-list"></span>
 						<h3 class="box-title box-title-folder-list">{{'ASSET_EXPLORER.INDEX.SAVED_VIEWS' | translate}}</h3>
 					</div>
-					<div class="box-body no-padding">
+					<div class="box-body">
 						<ul class="nav nav-pills nav-stacked">
 							<li *ngFor="let folder of reportGroupModels" [ngClass]="folder.open? 'active': ''">
 								<a (click)="selectFolder(folder, $event)">
@@ -28,18 +28,17 @@
 					<div class="box-header with-border">
 						<h3 class="box-title box-title-grid-list">{{selectedFolder?.name}}</h3>
 						<div class="pull-right">
-							<tds-button *ngIf="isCreateAvailable()"
-													(click)="onCreateReport()"
-													[type]="'button'"
-													[title]="'Create Asset'"
-													[iconClass]="'is-solid'"
-													[icon]="'plus-circle'">
-							</tds-button>
+							<tds-grid-header-action-buttons
+									(refresh)="loadData()"
+									[actionButtons]="headerActionButtons"
+									(clearFilters)="onClearAllFilters()"
+									[disableClearFilters]="disableClearFilters">
+							</tds-grid-header-action-buttons>
 						</div>
 						<!-- /.box-tools -->
 					</div>
 					<!-- /.box-header -->
-					<div class="box-body no-padding">
+					<div class="box-body">
 						<div class="table-responsive">
 							<table class="table clarity-table-grid fixed-header row-actions-2-children">
 								<thead>
@@ -61,10 +60,11 @@
 										</div>
 										<div *ngIf="column.filterable && showAssetsFilter">
 											<div class="filter-input">
+<!--												(filter)="searchText = $event;"-->
 												<tds-filter-input
                                                         [columnType]="column.type"
 														[value]="searchText || ''"
-														(filter)="searchText = $event;"
+														(filter)="onFilter($event, column)"
 														placeholder="{{'GLOBAL.FILTER' | translate}}">
 												</tds-filter-input>
 											</div>

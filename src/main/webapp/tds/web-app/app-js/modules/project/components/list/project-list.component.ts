@@ -123,7 +123,6 @@ export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentIni
 			},
 		];
 
-		// this.pageURL = this.router.url;
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
 			.subscribe(dateFormat => {
