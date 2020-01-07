@@ -4,7 +4,10 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.Element
 import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.codehaus.groovy.runtime.metaclass.MissingMethodExecutionFailed
+import org.codehaus.groovy.runtime.wrappers.PojoWrapper
 
 /**
  * The intent of this class is to maintenance 'defineETLMap' command.<BR>
@@ -80,18 +83,29 @@ class ETLMap {
      * @param instruction an instance of {@code ETLMapInstruction}
      * @param processor an instance of {@code ETLProcessor}
      */
+//    @CompileStatic(TypeCheckingMode.SKIP)
     private void loadInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
 
         // 1) 'extract' command
-        Element element = processor.doExtract(instruction.column.index - 1)
+        Element element = processor.doExtract(instruction.column.index)
 
-        //2) 'transform with' command
+        // 2) 'transform with' command
         for (ETLMapTransform transformation in instruction.transformations) {
+            // Invoking method dynamically eliminates the @CompileStatic - not sure if it is faster than the older code
+            /*
+            if (transformation.parameters) {
+                element = (Element) element."${transformation.methodName}"(transformation.parameters)
+            } else {
+                element = (Element) element."${transformation.methodName}"()
+            }
+            */
             element = (Element) InvokerHelper.invokeMethod(element, transformation.methodName, transformation.parameters ?: null)
+
         }
 
         //3) 'load' command
         element.fieldDefinition = instruction.domainProperty
         processor.addElementLoaded(element)
     }
+
 }

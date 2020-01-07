@@ -301,7 +301,7 @@ class ETLProcessor implements RangeChecker, ProgressIndicator, ETLCommand {
      * Traps ETL expression with undefined variable therefore throws an exception
      * <pre>
      * 	domain aBogusVariableName
-     * </pre>
+     * </pre>`
      * @param localVariableDefinition
      * @throws ETLProcessorException#missingPropertyException
      */
