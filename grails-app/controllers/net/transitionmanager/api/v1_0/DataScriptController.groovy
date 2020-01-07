@@ -31,8 +31,6 @@ class DataScriptController implements ControllerMethods {
      * <p>After validating all request parameters, this method initializes an ETL Script transformation
      * using {@code FileSystemService#.transferFileToFileSystem(actionCommand,FileSystemService.ETL_SOURCE_DATA_PREFIX)}</p>
      *
-     * {@code DataScript#etlSourceCode}
-     *
      * @return JSON results with Job initializing results.
      */
     @HasPermission(Permission.AssetImport)
