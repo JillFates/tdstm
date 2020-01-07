@@ -1047,8 +1047,8 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
 			String property = error.getField()
 			String errorMsg = i18nMessage(error)
-				fieldsInfo[property].errors << errorMsg
 			if (fieldsInfo[property]) {
+				fieldsInfo[property].errors << errorMsg
 			} else {
 				// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
 				record.addError(errorMsg)
