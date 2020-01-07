@@ -525,14 +525,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 	 * reloads data when the user clicks on refresh
 	 */
 	protected reloadData(): void {
-		this.setupGridColumns();
-		this.openAssetsHandler = this.openAssetDependenciesService.getOpenAssetsHandler(
-			this.actionableAssets
-		);
-		this.state = this.getInitialComponentState();
-		this.setupBulkCheckboxService();
-		this.setupComponentStateObservable();
-		this.setupTagsFilterStateObservable();
+		this.changeState({});
 	}
 
 	protected toggleFilter(): void {
