@@ -264,10 +264,12 @@ class PersonController implements ControllerMethods, PaginationMethods {
 		def isAjaxCall = params.forWhom != "person"
 		def companyId
 		if (isAjaxCall) {
-			companyId = project.client.id
+			companyId = personCommand.company ? personCommand.company : project.client.id
 		} else {
 			companyId = NumberUtil.toLong(params.company)
 		}
+
+		personCommand.company = null;
 
 		String errorMessage
 		String duplicateErrorMessage
