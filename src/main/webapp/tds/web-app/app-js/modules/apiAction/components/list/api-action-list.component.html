@@ -14,7 +14,7 @@
                 (sortChange)="sortChange($event)"
                 [pageable]="{pageSizes: GRID_DEFAULT_PAGINATION_OPTIONS, info: true}"
                 (pageChange)="pageChange($event)"
-                class="page-height row-actions-2-children"
+                class="page-height row-actions-2-children fixed-context-menu"
                 [selectable]="true">
             <ng-template kendoGridToolbarTemplate [position]="'top'">
                 <div class="clr-row">
@@ -76,8 +76,10 @@
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.type === 'boolean'" let-dataItem>
-                    <input clrCheckbox type="checkbox" [(ngModel)]="dataItem[column.property]" style="margin-left: 35%;"
-                           disabled/>
+					<div class="checkbox-container">
+						<tds-checkbox [(inputModel)]="dataItem[column.property]" [disabled]="true"> 															 >
+						</tds-checkbox>
+					</div>
                 </ng-template>
 
                 <ng-template kendoGridCellTemplate *ngIf="column.isActionable" let-dataItem>

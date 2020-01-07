@@ -235,6 +235,7 @@ export class DataScriptViewEditComponent implements OnInit {
 				)
 				.then(confirm => {
 					if (confirm) {
+						this.dataScriptModel = Object.assign({}, this.originalModel);
 						this.changeToViewDataScript();
 					} else {
 						this.focusForm();

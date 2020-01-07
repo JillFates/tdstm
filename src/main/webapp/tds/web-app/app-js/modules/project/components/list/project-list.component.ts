@@ -1,7 +1,7 @@
 import {
 	AfterContentInit,
 	Component,
-	ElementRef,
+	ElementRef, OnDestroy,
 	OnInit,
 	Renderer2,
 } from '@angular/core';
@@ -28,7 +28,6 @@ import { HeaderActionButtonData } from 'tds-component-library';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
 	ActivatedRoute,
-	Event,
 	Params,
 	Router,
 	NavigationEnd,
@@ -50,7 +49,7 @@ declare var jQuery: any;
 	selector: `project-list`,
 	templateUrl: 'project-list.component.html',
 })
-export class ProjectListComponent implements OnInit, AfterContentInit {
+export class ProjectListComponent implements OnInit, OnDestroy,  AfterContentInit {
 	public disableClearFilters: Function;
 	public headerActionButtons: HeaderActionButtonData[];
 	protected state: State = {
@@ -73,13 +72,13 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	public actionType = ActionType;
 	public gridData: GridDataResult;
 	public resultSet: ProjectModel[];
+	protected navigationSubscription;
 	public canEditProject;
 	public dateFormat = '';
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
 	public showActive: boolean;
-	private projectToOpen: number;
-	private pageURL: string;
+	private projectToOpen: string;
 	private projectOpen = false;
 	protected showFilters = false;
 	private dataGridOperationsHelper: DataGridOperationsHelper;
@@ -124,7 +123,7 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 			},
 		];
 
-		this.pageURL = this.router.url;
+		// this.pageURL = this.router.url;
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
 			.subscribe(dateFormat => {
@@ -140,26 +139,22 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngAfterContentInit() {
-		this.projectToOpen = +this.route.snapshot.queryParams['show'];
-
-		this.router.events.subscribe(e => {
-			if (this.pageURL === this.router.url) {
-				if (
-					e instanceof NavigationEnd &&
-					this.projectToOpen &&
-					!this.projectOpen
-				) {
-					this.projectToOpen = this.projectToOpen;
-					this.showProject(this.projectToOpen);
-				}
-			} else {
-				this.pageURL = '';
+		this.projectToOpen = this.route.snapshot.queryParams['show'];
+		// The following code Listen to any change made on the route to reload the page
+		this.navigationSubscription = this.router.events.subscribe((event: any) => {
+			if (event && event.state && event.state && event.state.url.indexOf('/project/list') !== -1) {
+				this.projectToOpen = event.state.root.queryParams.show;
+			}
+			if (event instanceof NavigationEnd && this.projectToOpen && this.projectToOpen.length && !this.projectOpen) {
+				this.showProject(this.projectToOpen);
 			}
 		});
 
 		this.route.queryParams.subscribe(params => {
 			if (this.projectToOpen && !this.projectOpen) {
-				this.showProject(this.projectToOpen);
+				setTimeout(() => {
+					this.showProject(this.projectToOpen);
+				});
 			}
 		});
 	}
@@ -332,5 +327,14 @@ export class ProjectListComponent implements OnInit, AfterContentInit {
 	 */
 	protected isCreateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProjectCreate);
+	}
+
+	/**
+	 * Ensure the listener is not available after moving away from this component
+	 */
+	ngOnDestroy(): void {
+		if (this.navigationSubscription) {
+			this.navigationSubscription.unsubscribe();
+		}
 	}
 }

@@ -9,7 +9,7 @@ import {PermissionService} from '../../../../shared/services/permission.service'
 import {PreferenceService} from '../../../../shared/services/preference.service';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
 import {UIActiveDialogService, UIDialogService} from '../../../../shared/services/ui-dialog.service';
-import {ProjectColumnModel, ProjectModel} from '../../model/project.model';
+import {ProjectModel} from '../../model/project.model';
 import {KendoFileUploadBasicConfig} from '../../../../shared/providers/kendo-file-upload.interceptor';
 import {UserDateTimezoneComponent} from '../../../../shared/modules/header/components/date-timezone/user-date-timezone.component';
 import {RemoveEvent, SuccessEvent, UploadEvent} from '@progress/kendo-angular-upload';
