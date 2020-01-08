@@ -1,4 +1,4 @@
-<header class="main-header header-component" *ngIf="!pageMetaData.hideTopNav || !userContext">
+<header class="main-header header-component" *ngIf="(!pageMetaData.hideTopNav || !userContext) && userContext.logged">
     <nav class="navbar navbar-static-top">
         <div class="container menu-top-container" [ngClass]="{'menu-top-container-full-menu': userContext.license && !userContext.license.isManager}">
 			<div class="navbar-header branding">
