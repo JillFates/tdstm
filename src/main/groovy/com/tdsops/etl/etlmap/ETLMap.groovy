@@ -4,10 +4,6 @@ import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.Element
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.codehaus.groovy.runtime.metaclass.MissingMethodExecutionFailed
-import org.codehaus.groovy.runtime.wrappers.PojoWrapper
 
 /**
  * The intent of this class is to maintenance 'defineETLMap' command.<BR>
@@ -83,7 +79,6 @@ class ETLMap {
      * @param instruction an instance of {@code ETLMapInstruction}
      * @param processor an instance of {@code ETLProcessor}
      */
-//    @CompileStatic(TypeCheckingMode.SKIP)
     private void loadInstruction(ETLMapInstruction instruction, ETLProcessor processor) {
 
         // 1) 'extract' command
