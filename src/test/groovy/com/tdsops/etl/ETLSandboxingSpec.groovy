@@ -1,17 +1,19 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.CSVDataset
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.tm.enums.domain.ImportOperationEnum
+import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
-import com.tdsops.tm.enums.domain.ImportOperationEnum
-import grails.test.mixin.Mock
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.model.Model
-import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.customizers.ImportCustomizer
@@ -25,7 +27,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
-	DataSetFacade simpleDataSet
+    CSVDataset simpleDataSet
 	String simpleDataSetFileName
 
 	static doWithSpring = {
@@ -399,7 +401,7 @@ class ETLSandboxingSpec extends ETLBaseSpec {
 	void 'test can use type boolean expressions'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 					name
 					x
 					y

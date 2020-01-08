@@ -1,6 +1,6 @@
 package com.tdsops
 
-import com.tdsops.etl.DataSetFacade
+
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.DomainResult
 import com.tdsops.etl.ETLBaseSpec
@@ -11,6 +11,7 @@ import com.tdsops.etl.ETLProcessorException
 import com.tdsops.etl.ETLProcessorResult
 import com.tdsops.etl.RowResult
 import com.tdsops.etl.TagResults
+import com.tdsops.etl.dataset.ETLDataset
 import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetEntity
@@ -58,7 +59,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 			String tagName = 'Code Blue'
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,tag
 				12345678,$tagName
 			""".stripIndent())
@@ -115,7 +116,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 		given:
 			List<String> tagNames = ['FUBAR', 'SNAFU']
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,tag1,tag2
 				12345678,${tagNames[0]},${tagNames[1]}
 			""".stripIndent())
@@ -174,7 +175,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 			String tagName = 'Code Blue'
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,tag
 				12345678,$tagName
 			""".stripIndent())
@@ -231,7 +232,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 		given:
 			List<String> tagNames = ['FUBAR', 'SNAFU']
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,tag1,tag2
 				12345678,${tagNames[0]},${tagNames[1]}
 			""".stripIndent())
@@ -284,20 +285,21 @@ class ETLTagsSpec extends ETLBaseSpec {
 	}
 
 	@See('TM-11583')
-	void 'test can replace one tag with another tag on an asset if associated'() {
+	void 'test can replace one tag with another tag on an asset if associated using SOURCE'() {
 
 		given:
 			String currentTag = 'Code Blue'
 			String newTag = 'Code Green'
 
+			tagValidator.addTag(currentTag, 105l)
+			tagValidator.addTag(newTag, 106l)
+
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,current tag,new tag
 				12345678,$currentTag,$newTag
 			""".stripIndent())
 
-			tagValidator.addTag(currentTag, 105l)
-			tagValidator.addTag(newTag, 106l)
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -336,6 +338,36 @@ class ETLTagsSpec extends ETLBaseSpec {
 				}
 			}
 
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11583')
+	void 'test can replace one tag with another tag on an asset if associated using simple Map definition'() {
+
+		given:
+			String currentTag = 'Code Blue'
+			String newTag = 'Code Green'
+
+			tagValidator.addTag(currentTag, 105l)
+			tagValidator.addTag(newTag, 106l)
+
+		and:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				application id,current tag,new tag
+				12345678,$currentTag,$newTag
+			""".stripIndent())
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -364,6 +396,38 @@ class ETLTagsSpec extends ETLBaseSpec {
 					}
 				}
 			}
+
+		cleanup:
+			if (fileName) {
+				fileSystemService.deleteTemporaryFile(fileName)
+			}
+	}
+
+	@See('TM-11583')
+	void 'test can replace one tag with another tag on an asset if associated using local variables'() {
+
+		given:
+			String currentTag = 'Code Blue'
+			String newTag = 'Code Green'
+
+			tagValidator.addTag(currentTag, 105l)
+			tagValidator.addTag(newTag, 106l)
+
+		and:
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
+				application id,current tag,new tag
+				12345678,$currentTag,$newTag
+			""".stripIndent())
+
+
+		and:
+			ETLProcessor etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -407,7 +471,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 		given:
 			List<String> tagNames = ['c', 'd', 'g', 'h']
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,current tag1,new tag 1,current tag2,new tag tag2
 				12345678,${tagNames[0]},${tagNames[1]},${tagNames[2]},${tagNames[3]}
 			""".stripIndent())
@@ -467,15 +531,12 @@ class ETLTagsSpec extends ETLBaseSpec {
 	@See('TM-11583')
 	void 'test can throw an ETLProcessorException if a tag used in tag commands does not exists in database'() {
 		given:
+		    String fileName
+		    ETLDataset dataSet
 			String tagA = 'A'
 			String tagB = 'B'
 			String tagC = 'C'
 			String tagD = 'D'
-
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,current tag1,new tag 1,current tag2,new tag tag2
-				12345678,${tagA},${tagB},${tagC},${tagD}
-			""".stripIndent())
 
 			tagValidator.addTag(tagA, 100l)
 			tagValidator.addTag(tagB, 101l)
@@ -483,6 +544,11 @@ class ETLTagsSpec extends ETLBaseSpec {
 			tagValidator.addTag(tagD, 103l)
 
 		and:
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GMDEMO,
 				dataSet,
@@ -508,7 +574,22 @@ class ETLTagsSpec extends ETLBaseSpec {
 				message.startsWith(ETLProcessorException.unknownTag('Code Blue').message)
 			}
 
+
 		when: 'The ETL script is evaluated'
+
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
+		    etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -526,6 +607,20 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
+
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
+            etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -543,6 +638,20 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
+
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
+            etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -560,6 +669,20 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
+
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
+            etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -577,6 +700,20 @@ class ETLTagsSpec extends ETLBaseSpec {
 			}
 
 		when: 'The ETL script is evaluated'
+
+            (fileName, dataSet) = buildCSVDataSet("""
+				application id,current tag1,new tag 1,current tag2,new tag tag2
+				12345678,${tagA},${tagB},${tagC},${tagD}
+			""".stripIndent())
+
+            etlProcessor = new ETLProcessor(
+				GMDEMO,
+				dataSet,
+				debugConsole,
+				validator,
+				tagValidator
+			)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -606,7 +743,7 @@ class ETLTagsSpec extends ETLBaseSpec {
 			String tagName = 'Code Blue'
 
 		and:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,tag
 				12345678,$tagName
 			""".stripIndent())

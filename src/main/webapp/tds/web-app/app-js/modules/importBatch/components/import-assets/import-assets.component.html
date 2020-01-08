@@ -78,12 +78,12 @@
                                        (ngModelChange)="onChangeSelectedScript($event)"
                                        name="transform"
                                        id="transform"
-                                       class="form-control pd-top-5">
+                                       class="form-control pd-top-5">   
                                    <option *ngFor="let option of dataScriptOptions"
                                            [ngValue]="option">{{option.name | translate}}</option>
                                </select>
                             </div>
-                            <button *ngIf="uiConfig.showManuaProcesslElements"
+                            <button *ngIf="uiConfig.showManualProcessElements"
                                     [disabled]="disableTransformButton() || transformInProcess"
                                     (click)="onTransform()"
                                     class="btn btn-default col-sm-{{uiConfig.buttonColSize}}">
@@ -123,7 +123,7 @@
                         </div>
 
                         <!-- Progress bar-->
-                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManuaProcesslElements">
+                        <div class="form-group row progressBar-row" *ngIf="uiConfig.showManualProcessElements">
                             <div class="col-md-{{uiConfig.inputColSize + uiConfig.buttonColSize}}
                                         col-sm-offset-{{uiConfig.labelColSize}} progressBar-container">
                                 <div *ngIf="transformInProcess" class="progress">
@@ -134,7 +134,7 @@
                         </div>
 
                         <!-- Load Data Row -->
-                        <div class="form-group row" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualElements">
+                        <div class="form-group row krka" style="margin-bottom: 20px;" *ngIf="uiConfig.showManualProcessElements">
                            <label class="col-sm-{{uiConfig.labelColSize}} control-label">
                                {{'IMPORT_ASSETS.MANUAL_IMPORT.LOAD_TRANSFORMED_DATA_INTO_IMPORT' | translate}}
                            </label>

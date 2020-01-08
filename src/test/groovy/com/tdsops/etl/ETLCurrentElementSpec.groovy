@@ -1,10 +1,6 @@
 package com.tdsops.etl
 
-import net.transitionmanager.asset.Application
-import net.transitionmanager.asset.AssetDependency
-import net.transitionmanager.asset.AssetEntity
-import net.transitionmanager.asset.Database
-import net.transitionmanager.asset.Files
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import getl.csv.CSVConnection
@@ -15,15 +11,20 @@ import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.test.mixin.Mock
+import net.transitionmanager.asset.Application
+import net.transitionmanager.asset.AssetDependency
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.asset.Database
+import net.transitionmanager.asset.Files
+import net.transitionmanager.asset.Rack
+import net.transitionmanager.asset.Room
+import net.transitionmanager.common.CoreService
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.asset.Rack
-import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import spock.lang.Shared
 
 /**
@@ -160,10 +161,10 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test CE should appear upon extract command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
-				""".stripIndent())
+			""")
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -211,7 +212,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test load command CE contains a field definition'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -281,7 +282,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can define CE using initialize command without extracting previously'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -352,7 +353,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can define CE using find command without extracting previously'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -411,7 +412,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can define CE using load/with command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -454,7 +455,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can change CE after every extract command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -499,7 +500,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can use same CE with init and extract command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -556,7 +557,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can define CE as null at the beginning of every iteration'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				xraysrv02,Dell,PE2951,Server
@@ -600,7 +601,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can define CE after using domain command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -647,7 +648,7 @@ class ETLCurrentElementSpec extends ETLBaseSpec {
 
 	void 'test can release all variables after an iteration'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())

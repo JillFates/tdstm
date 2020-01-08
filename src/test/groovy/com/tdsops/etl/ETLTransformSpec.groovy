@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdsops.tm.enums.domain.ValidationType
@@ -935,7 +936,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 				zulu,A Unknown Model
 			""".stripIndent()
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(sampleData)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(sampleData)
 
 		and: "A DataScript using 'substitute' with and without a default value"
 			String dataScript = """
@@ -1438,14 +1439,14 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can transform a field value using to date transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 					id,retire date
 					1,2018-06-25
 					2,2018/06/25
 					3,06/25/2018
 					4,99/99/2018
-					5,
-					6,
+					5, 
+					6, 
 					7,abc-123
 					""".stripIndent())
 			Date goodDate = new Date(2018 - 1900, 6 - 1, 25)
@@ -1605,7 +1606,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can transform a decimal field value using toInteger transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
 				NGM03,Production,C,,${ValidationType.PLAN_READY},Confirmed
@@ -1675,7 +1676,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can transform a decimal field value using toLong transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				Name,Environment,Group,Size,Validation,Plan Status
 				NGM01,Production,B,10.22,Validated,Unassigned
 				NGM03,Production,C,,${ValidationType.PLAN_READY},Confirmed
@@ -1775,7 +1776,7 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use GroovyCollections, Math, RandomStringUtils, RandomUtils, RegExUtils and StringUtils transformations'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,app version,url
 				12134556,Apple Inc.,1.0.0,www.apple.com
 			""".stripIndent())
@@ -1841,10 +1842,10 @@ class ETLTransformSpec extends ETLBaseSpec {
 	void 'test can use Math and and StringUtils transformations in transform command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,app version,url,reference id
 				12134556,Apple Inc.,1.0.0,www.apple,
-			""".stripIndent())
+			""")
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
