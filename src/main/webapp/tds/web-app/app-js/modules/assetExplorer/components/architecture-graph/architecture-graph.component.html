@@ -1,8 +1,11 @@
-
-<tds-button (click)="toggleControlPanel()">Control Panel</tds-button>
-<tds-button>Legend</tds-button>
-<tds-button>Fullscreen</tds-button>
 <div class="graphContainer">
+	<div id="toolsContainerId">
+		<div id="graphToolbarId">
+			<tds-button (click)="toggleControlPanel()">Control Panel</tds-button>
+			<tds-button>Legend</tds-button>
+			<tds-button>Fullscreen</tds-button>
+		</div>
+	</div>
 	<div class="graph-control-panel" *ngIf="showControlPanel">
 		<p>Select an Asset</p>
 		<kendo-dropdownlist
