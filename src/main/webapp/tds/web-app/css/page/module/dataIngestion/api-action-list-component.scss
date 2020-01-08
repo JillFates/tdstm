@@ -38,6 +38,11 @@
   .button-create-action {
     margin-right: 4px;
   }
+
+  .checkbox-container {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 @media (min-height: 980px)  {

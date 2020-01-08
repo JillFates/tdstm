@@ -96,7 +96,7 @@ export class SingleCommentComponent extends UIExtraDialog implements  OnInit {
 	protected onDelete(): void {
 		this.promptService.open(
 			'Confirmation Required',
-			'Confirm deletion of this record. There is no undo for this action?',
+			'Confirm deletion of this record. There is no undo for this action.',
 			'Confirm', 'Cancel')
 			.then(confirm => {
 				if (confirm) {
