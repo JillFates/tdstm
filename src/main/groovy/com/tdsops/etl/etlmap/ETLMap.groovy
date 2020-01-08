@@ -3,6 +3,7 @@ package com.tdsops.etl.etlmap
 import com.tdsops.etl.ETLDomain
 import com.tdsops.etl.ETLProcessor
 import com.tdsops.etl.Element
+import org.codehaus.groovy.runtime.InvokerHelper
 import groovy.transform.CompileStatic
 
 /**
