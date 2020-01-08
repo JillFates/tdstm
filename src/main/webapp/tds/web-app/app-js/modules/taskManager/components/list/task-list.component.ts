@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
@@ -49,7 +49,7 @@ import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 	selector: 'task-list',
 	templateUrl: './task-list.component.html'
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
 	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
@@ -91,7 +91,7 @@ export class TaskListComponent {
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute) {
+		private activatedRoute: ActivatedRoute, private el: ElementRef, private renderer: Renderer2) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
@@ -108,6 +108,18 @@ export class TaskListComponent {
 		this.currentPage = 1;
 		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 		this.onLoad();
+	}
+
+	/**
+	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+	 */
+	ngOnInit(): void {
+		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+		if (contentWrapper) {
+			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+			// 45px is the header height, 31px is the footer height
+			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
+		}
 	}
 
 	/**
