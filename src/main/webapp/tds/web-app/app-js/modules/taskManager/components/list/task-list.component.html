@@ -101,30 +101,12 @@
 			</div>
 			<div class="clr-col-3 pull-right">
 				<div class="header-controls pull-right">
-					<tds-button
-							[icon]="'plus-circle'"
-							(click)="onCreateTaskHandler()"
-							[title]="'Create Task'"
-							[iconClass]="'is-solid'"
-					></tds-button>
-					<tds-button
-							[icon]="'pencil'"
-							(click)="onBulkActionHandler()"
-							[title]="'Bulk Action'"
-					></tds-button>
-					<tds-button
-							[icon]="'times'"
-							[disabled]="!areFiltersDirty()"
-							(click)="onClearFiltersHandler()"
-							[title]="'Clear Filters'"
-					></tds-button>
-					<tds-button-custom
-							icon="sync"
-							[displayLabel]="false"
-							(click)="onFiltersChange()"
-							class="flat"
-							tooltip="Refresh"
-					></tds-button-custom>
+					<tds-grid-header-action-buttons
+							(refresh)="onFiltersChange()"
+							[actionButtons]="headerActionButtons"
+							(clearFilters)="clearAllFilters()"
+							[disableClearFilters]="disableClearFilters">
+					</tds-grid-header-action-buttons>
 				</div>
 			</div>
 		</div>

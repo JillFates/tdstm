@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
@@ -34,6 +34,7 @@ import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -49,7 +50,9 @@ import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 	selector: 'task-list',
 	templateUrl: './task-list.component.html'
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
@@ -108,6 +111,25 @@ export class TaskListComponent {
 		this.currentPage = 1;
 		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
 		this.onLoad();
+	}
+
+	ngOnInit(): void {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translate.transform('TASK_MANAGER.CREATE_TASK'),
+				show: true,
+				onClick: this.onCreateTaskHandler.bind(this),
+			},
+			{
+				icon: 'pencil',
+				title: this.translate.transform('TASK_MANAGER.BULK_ACTION'),
+				show: true,
+				onClick: this.onBulkActionHandler.bind(this),
+			},
+		];
 	}
 
 	/**
@@ -451,14 +473,6 @@ export class TaskListComponent {
 			// reset pagination to be on page 1
 			this.onPageChangeHandler({ skip: 0, take: this.pageSize });
 		}
-	}
-
-	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
 	}
 
 	/**
@@ -851,5 +865,21 @@ export class TaskListComponent {
 	public pageChangeTaskGrid(event: PageChangeEvent): void {
 		// this.tasksPage = event;
 		// this.loadTasksGrid();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.isFiltering = false;
+		this.grid.clearAllFilters(this.columnsModel);
+		this.onFiltersChange();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0 && this.hasDashboardFilters() === false;
 	}
 }
