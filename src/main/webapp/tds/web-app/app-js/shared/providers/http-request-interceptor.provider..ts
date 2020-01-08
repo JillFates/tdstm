@@ -119,6 +119,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 						});
 					}
 				} else if (error && error.status === 403) {
+					errorMessage = '';
 					if (this.router.url !== '/' + AuthRouteStates.LOGIN.url) {
 						this.router.navigate(['/security/unauthorized']);
 					}

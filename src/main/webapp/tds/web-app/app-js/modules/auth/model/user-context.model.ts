@@ -1,4 +1,5 @@
 export class UserContextModel {
+	logged: false;
 	bundle?: any;
 	dateFormat?: string;
 	event?: any;

@@ -25,7 +25,9 @@ import {SetUserContextPerson} from '../action/user-context-person.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
-	defaults: {}
+	defaults: {
+		logged: false
+	}
 })
 export class UserContextState {
 
@@ -76,6 +78,7 @@ export class UserContextState {
 		return this.authService.getUserContext({payload})
 			.pipe(
 				tap(result => {
+					result['logged'] = true;
 					ctx.patchState(result);
 				}),
 				catchError(err => {
@@ -92,7 +95,9 @@ export class UserContextState {
 	logout(ctx: StateContext<UserContextModel>) {
 		const state = ctx.getState();
 		if (state.user) {
-			ctx.setState({});
+			ctx.setState({
+				logged: false
+			});
 			return this.authService.logout().pipe(
 				tap()
 			);
@@ -101,7 +106,9 @@ export class UserContextState {
 
 	@Action(SessionExpired)
 	sessionExpired(ctx: StateContext<UserContextModel>) {
-		ctx.setState({});
+		ctx.setState({
+			logged: false
+		});
 	}
 
 	@Action(GetPermissions)
