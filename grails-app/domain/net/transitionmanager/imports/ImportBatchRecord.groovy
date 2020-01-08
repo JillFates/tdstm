@@ -378,6 +378,6 @@ class ImportBatchRecord {
 	 * @return true if tags contains any value or false if tags is null
 	 */
 	boolean hasTags() {
-		return tags != null
+		return tags != null && tags.trim() != '{"add":[],"remove":[],"replace":{}}'
 	}
 }
