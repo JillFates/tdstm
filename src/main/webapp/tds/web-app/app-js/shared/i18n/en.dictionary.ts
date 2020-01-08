@@ -116,6 +116,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'CONFIGURE_VIEW': 'Configure View',
 		'SHOW_COMMENTS': 'Show Comments',
 		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
@@ -176,7 +177,8 @@ export const en_DICTIONARY: Object = {
 		'RACK': 'Rack',
 		'DEPENDENCY': 'Dependency',
 		'CABLING': 'Cabling',
-		'COMMENT': 'Comment'
+		'COMMENT': 'Comment',
+		'VIEW': 'Export View'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
