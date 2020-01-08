@@ -15,6 +15,12 @@ export class UserContextModel {
 	};
 	error?: string;
 	alternativeProjects?: [];
+	csrf?: CSRF;
+}
+
+export class CSRF {
+	tokenHeaderName: string;
+	token: string;
 }
 
 export enum USER_CONTEXT_REQUEST {
