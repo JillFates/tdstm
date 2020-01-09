@@ -26,6 +26,8 @@ class ProjectCommand implements CommandObject {
 		id nullable: true
 		runbookOn nullable: true
 		defaultBundle nullable: true
+		description nullable: true
+		comment nullable: true
 		projectLogo nullable: true
 		originalFilename nullable: true
 		planMethodology validator: { val, obj, errors ->
