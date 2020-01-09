@@ -1132,17 +1132,19 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * update node on graph
 	 **/
 	updateNode(data: IGraphTask): void {
-		this.diagram.commit(d => {
-			const update = Object.assign({}, data);
-			if (!update.key) { update.key = data.id; }
-			const node = d.nodes.filter(n => n.data.key === update.key || n.data.id === update.id).first();
-			node.data = update;
-			this.nodeUpdated.
-			emit({
-				data: d.model.nodeDataArray,
-				linksPath: this.extractLinks(d.links)
+		if (data && data.id) {
+			this.diagram.commit(d => {
+				const update = Object.assign({}, data);
+				if (!update.key) { update.key = data.id; }
+				const node = d.nodes.filter(n => n.data.key === update.key || n.data.id === update.id).first();
+				node.data = update;
+				this.nodeUpdated.
+				emit({
+					data: d.model.nodeDataArray,
+					linksPath: this.extractLinks(d.links)
+				});
 			});
-		});
+		}
 	}
 
 	/**
