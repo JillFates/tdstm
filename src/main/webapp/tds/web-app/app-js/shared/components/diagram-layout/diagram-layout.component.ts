@@ -74,6 +74,7 @@ const enum NodeTemplateEnum {
 				#overviewContainer></div>
 			<div id="node-tooltip" class="diagram-card"
 					 [style.background]="getStatusColor(tooltipData?.status)"
+           (mouseleave)="hideToolTip()"
 					 #nodeTooltip>
 					<div class="diagram-card-header"
 							 [style.background]="getStatusColor(tooltipData?.status)">
@@ -285,6 +286,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		this.overviewTemplate();
 		this.diagramListeners();
 		this.overrideDoubleClick();
+		this.diagram.zoomToFit();
 	}
 
 	/**
@@ -307,6 +309,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 				}
 
 			});
+
 			if (!this.largeArrayRemaining) {
 				if (this.diagram.linkTemplate.routing !== go.Link.AvoidsNodes) { this.setDiagramLinksTemplate(); }
 				if (!this.diagram.animationManager.isEnabled) { this.diagram.animationManager.isEnabled = true; }
@@ -405,14 +408,13 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Sets the template for each node in the Diagram
 	 **/
 	setDiagramNodeTemplate(): void {
-		// if (this.nodeData.data && this.nodeData.data.length >= 600) {
-		// 	this.diagram.scale = 0.3981115219913000;
-		// 	this.lowScaleNodeTemplate();
-		// } else {
-		// 	this.diagram.scale = 0.8446089162177968;
-		// 	this.diagram.nodeTemplate = this.setNodeTemplate();
-		// }
-		this.setNodeTemplateByScale(this.diagram.scale);
+		if (this.nodeData.data && this.nodeData.data.length >= 600) {
+			this.lowScaleNodeTemplate();
+		} else if (this.nodeData.data && this.nodeData.data.length >= 300) {
+			this.mediumScaleNodeTemplate();
+		} else {
+			this.diagram.nodeTemplate = this.setNodeTemplate();
+		}
 	}
 
 	/**
@@ -437,14 +439,15 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		const linkTemplate = new go.Link();
 		linkTemplate.routing = this.largeArrayRemaining ? go.Link.Orthogonal : go.Link.AvoidsNodes;
-		linkTemplate.corner = 5;
+		linkTemplate.curve = Link.Bezier;
 
 		const linkShape = new go.Shape();
 		linkShape.strokeWidth = 3;
 		linkShape.stroke = '#ddd';
 		const arrowHead = new Shape();
-		arrowHead.strokeWidth = 4;
+		arrowHead.strokeWidth = 2;
 		arrowHead.stroke = '#afafaf';
+		arrowHead.fill = '#afafaf';
 		arrowHead.toArrow = 'Standard';
 
 		linkTemplate.add(linkShape);
@@ -479,6 +482,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		node.padding = new go.Margin(0, 0, 0, 0);
 		node.add(this.containerPanel());
 		node.contextMenu = this.contextMenu();
+		node.toolTip = this.createTooltip();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -995,6 +999,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * update node templates depending on the actual scale
 	 * @param {number} scale > actual zooming scale
 	 * @param {InputEvent} inputEvent > triggered event object
+	 * @param {number} initialScale > initial scale when diagram is generated
 	 **/
 	setNodeTemplateByScale(scale?: number, inputEvent?: go.InputEvent, initialScale?: number): void {
 		if ((inputEvent && inputEvent.control) || initialScale) {
