@@ -18,7 +18,6 @@ class Dataview {
 	String  name
 	Boolean isSystem
 	Boolean isShared
-	Boolean isOverride
 	String  reportSchema
 	Date    dateCreated
 	Date    lastModified
