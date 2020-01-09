@@ -266,8 +266,9 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	generateDiagram(): void {
 		this.diagram.model.nodeDataArray = [];
 		this.diagram.startTransaction('generateDiagram');
-		this.diagram.initialDocumentSpot = Spot.TopLeft;
-		this.diagram.initialViewportSpot = Spot.TopLeft;
+		this.diagram.initialAutoScale = Diagram.Uniform;
+		this.diagram.initialDocumentSpot = Spot.Center;
+		this.diagram.initialViewportSpot = Spot.Center;
 		this.diagram.hasHorizontalScrollbar = false;
 		this.diagram.hasVerticalScrollbar = false;
 		this.diagram.allowZoom = true;
@@ -404,13 +405,14 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * Sets the template for each node in the Diagram
 	 **/
 	setDiagramNodeTemplate(): void {
-		if (this.nodeData.data && this.nodeData.data.length >= 600) {
-			this.diagram.scale = 0.3981115219913000;
-			this.lowScaleNodeTemplate();
-		} else {
-			this.diagram.scale = 0.8446089162177968;
-			this.diagram.nodeTemplate = this.setNodeTemplate();
-		}
+		// if (this.nodeData.data && this.nodeData.data.length >= 600) {
+		// 	this.diagram.scale = 0.3981115219913000;
+		// 	this.lowScaleNodeTemplate();
+		// } else {
+		// 	this.diagram.scale = 0.8446089162177968;
+		// 	this.diagram.nodeTemplate = this.setNodeTemplate();
+		// }
+		this.setNodeTemplateByScale(this.diagram.scale);
 	}
 
 	/**
@@ -994,19 +996,19 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 	 * @param {number} scale > actual zooming scale
 	 * @param {InputEvent} inputEvent > triggered event object
 	 **/
-	setNodeTemplateByScale(scale?: number, inputEvent?: go.InputEvent): void {
-		if (inputEvent.control) {
-			if (scale >= 0.6446089162177968
+	setNodeTemplateByScale(scale?: number, inputEvent?: go.InputEvent, initialScale?: number): void {
+		if ((inputEvent && inputEvent.control) || initialScale) {
+			if ((scale || initialScale) >= 0.6446089162177968
 					&& this.actualNodeTemplate !== NodeTemplateEnum.HIGH_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.HIGH_SCALE;
 				this.highScaleNodeTemplate();
 			}
-			if (scale < 0.6446089162177968 && scale > 0.4581115219913999
+			if ((scale || initialScale) < 0.6446089162177968 && scale > 0.4581115219913999
 					&& this.actualNodeTemplate !== NodeTemplateEnum.MEDIUM_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.MEDIUM_SCALE;
 				this.mediumScaleNodeTemplate();
 			}
-			if (scale <= 0.4581115219913999
+			if ((scale || initialScale) <= 0.4581115219913999
 					&& this.actualNodeTemplate !== NodeTemplateEnum.LOW_SCALE) {
 				this.actualNodeTemplate = NodeTemplateEnum.LOW_SCALE;
 				this.lowScaleNodeTemplate();
