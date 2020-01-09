@@ -11,6 +11,7 @@ import {ErrorPageComponent} from './components/error-page/error-page.component';
 import {UnauthorizedPageComponent} from './components/unauthorized-page/unauthorized-page.component';
 import {NotFoundPageComponent} from './components/not-found-page/not-found-page.component';
 import {ErrorLicensePageComponent} from './components/error-license-page/error-license-page.component';
+import {TokenInvalidPageComponent} from './components/token-invalid/token-invalid-page.component';
 
 @NgModule({
 	imports: [
@@ -25,14 +26,16 @@ import {ErrorLicensePageComponent} from './components/error-license-page/error-l
 		ErrorPageComponent,
 		UnauthorizedPageComponent,
 		NotFoundPageComponent,
-		ErrorLicensePageComponent
+		ErrorLicensePageComponent,
+		TokenInvalidPageComponent
 	],
 	providers: [],
 	exports: [
 		ErrorPageComponent,
 		UnauthorizedPageComponent,
 		NotFoundPageComponent,
-		ErrorLicensePageComponent
+		ErrorLicensePageComponent,
+		TokenInvalidPageComponent
 	],
 })
 export class SecurityModule {

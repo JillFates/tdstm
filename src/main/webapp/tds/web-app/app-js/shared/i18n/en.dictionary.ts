@@ -466,6 +466,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
 		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'CSRF_UNAUTHORIZED_MESSAGE': 'CSRF Verification failed.',
+		'CSRF_INVALID': 'CSRF Token missing or incorrect.',
 		'WHY_THIS': 'Why am I seeing this?',
 		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
 		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
