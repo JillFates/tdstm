@@ -30,13 +30,18 @@ import { Store } from '@ngxs/store';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 
 declare var jQuery: any;
+interface OverrideState {
+	icon?: string;
+	isOverride?: boolean;
+	offLabel?: string;
+	onLabel?: string;
+}
 
 @Component({
 	selector: 'tds-asset-view-show',
 	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
-
 	private currentId;
 	private dataSignature: string;
 	public fields: DomainModel[] = [];
@@ -49,16 +54,32 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	protected justPlanning: boolean;
 	protected globalQueryParams = {};
 	public data: any;
+	private userContext: UserContextModel;
+	protected readonly SAVE_BUTTON_ID = 'btnSave';
+	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
+	public currentOverrideState: OverrideState;
+	// When the URL contains extra parameters we can determinate the form contains hidden filters
+	public hiddenFilters = false;
 	public gridState: State = {
 		skip: 0,
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
-	private userContext: UserContextModel;
-	protected readonly SAVE_BUTTON_ID = 'btnSave';
-	protected readonly SAVEAS_BUTTON_ID = 'btnSaveAs';
-	// When the URL contains extra parameters we can determinate the form contains hidden filters
-	public hiddenFilters = false;
+	private readonly overrideAssetViews: any = {
+		IS_OVERRIDE: {
+			icon: 'times',
+			isOverride: true,
+			offLabel: 'Revert to Project View',
+			onLabel: 'Display Personal System View'
+
+		},
+		IS_NOT_OVERRIDE: {
+			icon: 'refresh',
+			isOverride: false,
+			offLabel: 'Revert to Project View',
+			onLabel: 'Display Personal System View'
+		}
+	};
 
 	@ViewChild('select') select: AssetViewSelectorComponent;
 	@ViewChild('assetExplorerViewGrid') assetExplorerViewGrid: AssetViewGridComponent
@@ -82,6 +103,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
+		this.currentOverrideState = this.overrideAssetViews.IS_NOT_OVERRIDE;
 	}
 
 	ngOnInit(): void {
@@ -302,6 +324,14 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		let modelCopy = {...model};
 		delete modelCopy.isFavorite;
 		return JSON.stringify(modelCopy);
+	}
+
+/**
+	 * Determines if show we can show Save/Save All buttons at all.
+	 * @returns {boolean}
+	 */
+	public isOverrideView(): boolean {
+		return this.model.isOverride;
 	}
 
 	/**

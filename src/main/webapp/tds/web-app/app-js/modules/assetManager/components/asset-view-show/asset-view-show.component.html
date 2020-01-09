@@ -51,7 +51,16 @@
                         icon="cog"
                         tooltip="Configure"
                         class="pull-right"
-                        (click)="onEdit()">
+                        (click)="onEdit()"
+                        >
+            </tds-button-custom>
+
+            <tds-button-custom *ngIf="currentOverrideState"
+                        class="pull-right no-action-button"
+                        isIconButton="true"
+                        [icon]="currentOverrideState.icon"
+                        [tooltip]="currentOverrideState.offLabel"
+                        >
             </tds-button-custom>
         </div>
         <div class="box-body">

@@ -162,8 +162,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
 			this.startModel();
 		}
-
-		this.assetExpService.saveReport(this.model)
+		const tmpModel = Object.assign({}, this.model);
+		tmpModel.id = null;
+		this.assetExpService.saveReport(tmpModel)
 			.subscribe(result => result && this.activeDialog.close(result),
 				error => this.activeDialog.dismiss(error));
 	}

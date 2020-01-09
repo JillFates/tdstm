@@ -18,6 +18,7 @@ class Dataview {
 	String  name
 	Boolean isSystem
 	Boolean isShared
+	Boolean isOverride
 	String  reportSchema
 	Date    dateCreated
 	Date    lastModified
@@ -48,6 +49,7 @@ class Dataview {
 			isShared  : isShared,
 			isOwner   : isOwner(currentPersonId),
 			isFavorite: isFavorite(currentPersonId),
+			isOverride: isOverrideView(),
 			schema    : JsonUtil.parseJson(reportSchema),
 			createdBy : getOwnerName(),
 			createdOn : TimeUtil.formatDate(dateCreated),
@@ -80,6 +82,14 @@ class Dataview {
 			person.id == currentPersonId
 		}.count()
 		return favCount > 0
+	}
+
+	/**
+	 * Determine if the dataview has an override view
+	 * @return
+	 */
+	boolean isOverrideView() {
+		return overridesView != null
 	}
 
 	/**
