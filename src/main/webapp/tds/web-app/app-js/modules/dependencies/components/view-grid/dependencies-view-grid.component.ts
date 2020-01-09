@@ -423,6 +423,7 @@ export class DependenciesViewGridComponent implements OnInit, OnDestroy {
 		this.dependenciesColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
+		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
