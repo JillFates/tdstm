@@ -138,6 +138,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.assetCommentColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
+		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
