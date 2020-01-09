@@ -162,6 +162,7 @@ export class APIActionViewEditComponent implements OnInit, OnDestroy {
 		uId: '0',
 		dictionaryMethodName: this.translatePipe.transform('GLOBAL.SELECT_PLACEHOLDER')
 	};
+	disableRemoteInvocationCbx = true;
 	private savedApiAction = false;
 	private defaultDictionaryModel = { name: '', id: 0 };
 	protected EnumAPIActionType = APIActionType;
