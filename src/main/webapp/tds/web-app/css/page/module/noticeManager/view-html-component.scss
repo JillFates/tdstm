@@ -9,8 +9,17 @@
 }
 
 .notice-view-html-content {
-  .tds-modal-content {
-    border-style: groove;
+  .modal-dialog {
+    left: 0 !important;
+    .tds-modal-content {
+      width: 517px;
+      border: solid 1px #0077b8;
+      margin: 0 auto;
+      left: 0 !important;
+      top: 1rem !important;
+      position: relative !important;
+      margin-left: auto !important;
+    }
   }
   
   .modal-body {
@@ -18,4 +27,12 @@
     max-height: 282px;
     overflow-y: auto;
   }
+
+  .modal-header {
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+
+.modal {
+  padding: 0 !important;
 }
