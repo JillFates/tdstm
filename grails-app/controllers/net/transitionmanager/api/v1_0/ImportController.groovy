@@ -1,9 +1,10 @@
 package net.transitionmanager.api.v1_0
 
 import com.tdsops.common.security.spring.HasPermission
+import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import grails.plugin.springsecurity.annotation.Secured
-import net.transitionmanager.command.InitiateTransformAPIActionCommand
+import net.transitionmanager.command.ScheduleImportAPIActionCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.imports.DataImportService
@@ -12,12 +13,12 @@ import net.transitionmanager.security.Permission
 
 
 @Secured('isAuthenticated()')
-class DataScriptController implements ControllerMethods {
+class ImportController implements ControllerMethods {
 
     static namespace = 'v1'
 
     static allowedMethods = [
-            transform: 'POST',
+            processFile: 'POST',
     ]
 
     DataImportService dataImportService
@@ -34,11 +35,11 @@ class DataScriptController implements ControllerMethods {
      * @return JSON results with Job initializing results.
      */
     @HasPermission(Permission.AssetImport)
-    def transform() {
+    def processFile() {
         def stopwatch = new StopWatch()
         stopwatch.start()
 
-        InitiateTransformAPIActionCommand actionCommand = populateCommandObject(InitiateTransformAPIActionCommand)
+        ScheduleImportAPIActionCommand actionCommand = populateCommandObject(ScheduleImportAPIActionCommand)
         String fileName = fileSystemService.transferFileToFileSystem(actionCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX)
 
         validateCommandObject(actionCommand)
@@ -46,7 +47,7 @@ class DataScriptController implements ControllerMethods {
         Project project = getProjectForWs()
         Map result = dataImportService.scheduleETLTransformDataJob(
                 project,
-                actionCommand.id,
+                actionCommand.dataScriptId,
                 fileName,
                 actionCommand.sendNotification
         )
