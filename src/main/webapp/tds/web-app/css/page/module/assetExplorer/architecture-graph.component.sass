@@ -1,3 +1,18 @@
+div.graph-control-panel
+  float: left
+  border: 1px solid #0077b8
+  margin-left: 22px
+  margin-top: 15px
+  padding: 10px 5px 5px 5px
+  background-color: white
+  position: absolute
+  z-index: 1
+  overflow-y: scroll
+  min-height: 125px
+  max-height: 530px
+  top: 190px
+  width: 250px
+
 div.graphContainer
   background-color: unset
   position: relative
@@ -177,19 +192,20 @@ div.graphContainer
           font-size: 12px
         input, select
           height: 22px
-    div.graphPanel
+    div.graph-control-panel.graphPanel
       float: left
       border: 1px solid #0077b8
-      margin-left: 15px
+      margin-left: 22px
       margin-top: 15px
       padding: 10px 5px 5px 5px
       background-color: white
       position: absolute
       z-index: 1
       overflow-y: scroll
-      min-height: 90px
-      max-height: 430px
-      top: 50px
+      min-height: 125px
+      max-height: 530px
+      top: 190px
+      width: 250px
       &::-webkit-scrollbar
         width: 0
       &.openPanel

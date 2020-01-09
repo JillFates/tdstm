@@ -9,6 +9,7 @@ import {UserContextService} from '../../../auth/service/user-context.service';
 import {UserContextModel} from '../../../auth/model/user-context.model';
 import {ActivatedRoute} from '@angular/router';
 import {IArchitectureGraphParams} from '../../model/url-params.model';
+import {AssetCommonDiagramHelper} from '../asset/asset-common-diagram.helper';
 
 // import {ArchitectureGraphService} from './service/architecture-graph.service';
 
@@ -31,7 +32,7 @@ export class ArchitectureGraphComponent implements OnInit {
 	public dataForSelect;
 	public dataForSelect2;
 	public levelsUp = 0;
-	public levelsDown = 3;
+	public levelsDown = 1;
 	public showCycles;
 	public appLbl;
 	public labelOffset;
@@ -75,22 +76,36 @@ export class ArchitectureGraphComponent implements OnInit {
 		console.log('asset selected', event);
 		this.architectureGraphService.getArchitectureGraphData(this.assetId, this.levelsUp, this.levelsDown, this.mode)
 			.subscribe( (res: any) => {
-				this.dataForGraph = res;
-				console.log('graph data', res);
-				const diagramHelper = new ArchitectureGraphDiagramHelper();
-				const n = diagramHelper.diagramData({
+				const diagramHelper = new AssetCommonDiagramHelper();
+				this.data$.next(diagramHelper.diagramData({
 					rootAsset: this.assetId,
-					currentUserId: this.userContext.user.id,
+					currentUserId: 1,
 					data: res,
+					iconsOnly: true,
 					extras: {
 						diagramOpts: {
-							allowZoom: true
+							autoScale: Diagram.Uniform,
+							allowZoom: false
 						},
-						isExpandable: true,
-						initialExpandLevel: 2
+						isExpandable: false
 					}
-				});
-				this.data$.next(n);
+				}));
+				// this.dataForGraph = res;
+				// console.log('graph data', res);
+				// const diagramHelper = new ArchitectureGraphDiagramHelper();
+				// const n = diagramHelper.diagramData({
+				// 	rootAsset: this.assetId,
+				// 	currentUserId: this.userContext.user.id,
+				// 	data: res,
+				// 	extras: {
+				// 		diagramOpts: {
+				// 			allowZoom: true
+				// 		},
+				// 		isExpandable: true,
+				// 		initialExpandLevel: 2
+				// 	}
+				// });
+				// this.data$.next(n);
 		});
 	}
 
@@ -98,16 +113,18 @@ export class ArchitectureGraphComponent implements OnInit {
 		this.architectureGraphService.getAssetDetails(params.assetId, this.levelsUp, this.levelsDown)
 			.subscribe(res => {
 				console.log('response assets details', res);
-				const diagramHelper = new ArchitectureGraphDiagramHelper();
+				const diagramHelper = new AssetCommonDiagramHelper();
 				this.data$.next(diagramHelper.diagramData({
-					rootAsset: params.assetId,
-					currentUserId: this.userContext.user.id,
+					rootAsset: this.assetId,
+					currentUserId: 1,
 					data: res,
+					iconsOnly: true,
 					extras: {
 						diagramOpts: {
-							allowZoom: true
+							autoScale: Diagram.Uniform,
+							allowZoom: false
 						},
-						isExpandable: true,
+						isExpandable: false,
 						initialExpandLevel: 2
 					}
 				}));

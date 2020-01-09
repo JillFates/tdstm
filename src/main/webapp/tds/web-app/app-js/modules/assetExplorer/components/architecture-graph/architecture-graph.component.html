@@ -6,7 +6,7 @@
 			<tds-button>Fullscreen</tds-button>
 		</div>
 	</div>
-	<div class="graph-control-panel" *ngIf="showControlPanel">
+	<div class="graph-control-panel graphPanel" id="controlPanelId" *ngIf="showControlPanel">
 		<p>Select an Asset</p>
 		<kendo-dropdownlist
 			[defaultItem]="'Select an Asset...'"
