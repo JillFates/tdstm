@@ -483,6 +483,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		node.add(this.containerPanel());
 		node.contextMenu = this.contextMenu();
 		node.toolTip = this.createTooltip();
+		node.mouseLeave = () => this.hideToolTip();
 
 		// if onNodeClick function is assigned directly to click handler
 		// 'this' loses the binding to the component with onNodeClicked function
@@ -1038,6 +1039,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 
 		node.add(this.assetIconShape());
 		node.toolTip = this.createTooltip();
+		node.mouseLeave = () => this.hideToolTip();
 		node.contextMenu = this.contextMenu();
 
 		node.selectionAdornmentTemplate = this.selectionAdornmentTemplate();
@@ -1062,6 +1064,7 @@ export class DiagramLayoutComponent implements AfterViewInit, OnChanges, OnDestr
 		shape.bind(new go.Binding('fill', 'status',
 			(status: string) => this.getStatusColor(status)));
 		node.toolTip = this.createTooltip();
+		node.mouseLeave = () => this.hideToolTip();
 		node.add(shape);
 		node.contextMenu = this.contextMenu();
 
