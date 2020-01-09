@@ -422,7 +422,6 @@ export class ImportAssetsComponent implements OnInit {
 		}
 	}
 
-
 	private setManualProcessScript() {
 		this.uiConfig = {
 			...this.uiConfig,
