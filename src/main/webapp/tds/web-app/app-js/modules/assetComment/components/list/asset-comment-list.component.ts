@@ -40,7 +40,8 @@ import {
 	COMMON_SHRUNK_COLUMNS,
 	COMMON_SHRUNK_COLUMNS_WIDTH,
 } from '../../../../shared/constants/common-shrunk-columns';
-
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 declare var jQuery: any;
 
 @Component({
@@ -48,6 +49,8 @@ declare var jQuery: any;
 	templateUrl: 'asset-comment-list.component.html',
 })
 export class AssetCommentListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
 	private dataGridOperationsHelper: DataGridOperationsHelper;
 	protected state: State = {
@@ -84,7 +87,8 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		private preferenceService: PreferenceService,
 		private route: ActivatedRoute,
 		private elementRef: ElementRef,
-		private renderer: Renderer2
+		private renderer: Renderer2,
+		private translateService: TranslatePipe,
 	) {
 		// use partially datagrid operations helper, for the moment just to know the number of filters selected
 		// in the future this view should be refactored to use the data grid operations helper
@@ -97,6 +101,9 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [];
+
 		this.preferenceService
 			.getUserDatePreferenceAsKendoFormat()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -131,6 +138,7 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.assetCommentColumnModel.columns.forEach((column) => {
 			delete column.filter;
 		});
+		this.showFilters = false;
 		this.onFilter({filter: ''});
 	}
 
@@ -281,7 +289,17 @@ export class AssetCommentListComponent implements OnInit, OnDestroy {
 		this.unsubscribeOnDestroy$.complete();
 	}
 
+	/**
+	 * Determines if user has permission to edit comments
+	 */
 	protected isCommentEditAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.CommentEdit);
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return !this.hasFilterApplied();
 	}
 }

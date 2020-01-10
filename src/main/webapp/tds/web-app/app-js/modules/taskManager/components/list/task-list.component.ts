@@ -34,6 +34,7 @@ import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -50,6 +51,8 @@ import {UILoaderService} from '../../../../shared/services/ui-loader.service';
 	templateUrl: './task-list.component.html'
 })
 export class TaskListComponent implements OnInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
@@ -120,6 +123,22 @@ export class TaskListComponent implements OnInit {
 			// 45px is the header height, 31px is the footer height
 			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
 		}
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translate.transform('TASK_MANAGER.CREATE_TASK'),
+				show: true,
+				onClick: this.onCreateTaskHandler.bind(this),
+			},
+			{
+				icon: 'pencil',
+				title: this.translate.transform('TASK_MANAGER.BULK_ACTION'),
+				show: true,
+				onClick: this.onBulkActionHandler.bind(this),
+			},
+		];
 	}
 
 	/**
@@ -466,14 +485,6 @@ export class TaskListComponent implements OnInit {
 	}
 
 	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
-	}
-
-	/**
 	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
 	 */
 	onBulkActionHandler(): void {
@@ -586,6 +597,9 @@ export class TaskListComponent implements OnInit {
 		}
 		const filterColumn = { ...column };
 		if (filterColumn.property.startsWith('userSelectedCol')) {
+			// save the reference to the custom property name
+			column.customPropertyName =  this.currentCustomColumns[filterColumn.property];
+			// use the new property name
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
 		const result = this.grid.getFilter(filterColumn);
@@ -863,5 +877,21 @@ export class TaskListComponent implements OnInit {
 	public pageChangeTaskGrid(event: PageChangeEvent): void {
 		// this.tasksPage = event;
 		// this.loadTasksGrid();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.isFiltering = false;
+		this.grid.clearAllFilters(this.columnsModel);
+		this.onFiltersChange();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0 && this.hasDashboardFilters() === false;
 	}
 }

@@ -30,34 +30,26 @@
 				>
 					<!-- Toolbar Template -->
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
-						<div class="button-bar">
-							<div class="inline float-right">
-								<tds-button-create
-									[displayLabel]="false"
-									(click)="clickAddButton()"
-									title="{{ 'GLOBAL.CREATE' | translate }}"
-									[type]="button"
-									*ngIf="canCreate()"
-								>
-								</tds-button-create>
+						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadTagList()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 								<!-- Use a hidden button so that we don't have to override kendo's button styles -->
-								<button
-									id="addButton"
-									kendoGridAddCommand
-									*ngIf="canCreate()"
-									style="display: none;"
-									type="button"
-								></button>
-								<!-- Refresh button -->
-								<tds-button
-										icon="sync"
-										(click)="reloadTagList()"
-								></tds-button>
+								<button id="addButton"
+										kendoGridAddCommand
+										*ngIf="canCreate()"
+										style="display: none;"
+										type="button">
+								</button>
 							</div>
 						</div>
-					</ng-template>
+                    </ng-template>
 
-					<!-- Action -->
+                    <!-- Action -->
 					<kendo-grid-column
 						[width]="60"
 						[class]="{ 'k-custom-command-column': true }"
