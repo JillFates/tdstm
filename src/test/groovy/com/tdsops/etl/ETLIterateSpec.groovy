@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import getl.csv.CSVConnection
 import getl.csv.CSVDataset
@@ -23,6 +24,7 @@ import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
 import org.junit.Ignore
 import spock.lang.Shared
+
 /**
  * Test about ETLProcessor commands:
  * <ul>
@@ -287,7 +289,7 @@ class ETLIterateSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load fields for more than one domain in the same iteration'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location,device id,model name,manufacturer name
 				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
 				152256,Mozilla,NGM,ACME Data Center,1523,ZPHA MODULE,TippingPoint
@@ -371,7 +373,7 @@ class ETLIterateSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load fields with more than one iteration'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				application id,vendor name,technology,location,device id,model name,manufacturer name
 				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
 				152256,Mozilla,NGM,ACME Data Center,1523,ZPHA MODULE,TippingPoint
@@ -458,7 +460,7 @@ class ETLIterateSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load fields using more than one iterator command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				First,Second
 				alphadb01,xraysrv01
 				bravodb01,yankeesrv01
@@ -531,92 +533,4 @@ class ETLIterateSpec extends ETLBaseSpec implements DataTest {
 				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 			}
 	}
-
-	void 'test can load fields combining iterators'() {
-
-		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
-				application id,vendor name,technology,location,device id,model name,manufacturer name
-				152255,Microsoft,(xlsx updated),ACME Data Center,1522,SRW24G1,LINKSYS
-				152256,Mozilla,NGM,ACME Data Center,1523,ZPHA MODULE,TippingPoint
-			""".stripIndent())
-
-		and:
-			ETLProcessor etlProcessor = new ETLProcessor(
-				GroovyMock(Project),
-				dataSet,
-				new DebugConsole(buffer: new StringBuilder()),
-				validator)
-
-		when: 'The ETL script is evaluated'
-			etlProcessor.evaluate("""
-					read labels
-					iterate {
-						domain Application
-						extract 'application id' load 'id'
-						extract 'vendor name' load 'appVendor'
-					}
-
-					from 1 to 2 iterate {
-						domain Device
-						extract 'device id' load 'id'
-						extract 'model name' load 'assetName'
-					}
-				""".stripIndent())
-
-		then: 'Results should contain domain results associated'
-			assertWith(etlProcessor.finalResult()) {
-				domains.size() == 2
-				assertWith(domains[0]) {
-					domain == 'Application'
-					assertWith(data[0].fields.id) {
-						value == '152255'
-						originalValue == '152255'
-					}
-
-					assertWith(data[0].fields.appVendor) {
-						value == 'Microsoft'
-						originalValue == 'Microsoft'
-					}
-
-					assertWith(data[1].fields.id) {
-						value == '152256'
-						originalValue == '152256'
-					}
-
-					assertWith(data[1].fields.appVendor) {
-						value == 'Mozilla'
-						originalValue == 'Mozilla'
-					}
-				}
-				assertWith(domains[1]) {
-					domain == 'Device'
-					assertWith(data[0].fields.id) {
-						value == '1522'
-						originalValue == '1522'
-					}
-
-					assertWith(data[0].fields.assetName) {
-						value == 'SRW24G1'
-						originalValue == 'SRW24G1'
-					}
-
-					assertWith(data[1].fields.id) {
-						value == '1523'
-						originalValue == '1523'
-					}
-
-					assertWith(data[1].fields.assetName) {
-						value == 'ZPHA MODULE'
-						originalValue == 'ZPHA MODULE'
-					}
-				}
-			}
-
-		cleanup:
-			if(fileName){
-				fileSystemServiceTestBean.deleteTemporaryFile(fileName)
-			}
-	}
-
 }

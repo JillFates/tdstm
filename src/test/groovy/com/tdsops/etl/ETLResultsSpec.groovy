@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
@@ -13,6 +14,7 @@ import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
 import org.grails.web.json.JSONObject
 import spock.lang.See
+
 /**
  * Test about ETLProcessorResults and JSON transformation:
  */
@@ -91,7 +93,7 @@ class ETLResultsSpec extends ETLBaseSpec implements DataTest {
 	void 'test can transform to JSON the result of an ETL script evaluation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(applicationDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(applicationDataSetContent)
 
 		and:
 			List<AssetEntity> applications = [
@@ -186,5 +188,4 @@ class ETLResultsSpec extends ETLBaseSpec implements DataTest {
 		cleanup:
 			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
-
 }

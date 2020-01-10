@@ -45,6 +45,8 @@ import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.help
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
 import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'task-list',
@@ -83,6 +85,7 @@ export class TaskListComponent implements OnInit {
 	private rowsExpandedMap: any;
 	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
+	public hasViewUnpublishedPermission = false;
 	public isFiltering  = false;
 
 	constructor(
@@ -94,7 +97,7 @@ export class TaskListComponent implements OnInit {
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute, private el: ElementRef, private renderer: Renderer2) {
+		private activatedRoute: ActivatedRoute, private permissionService: PermissionService, private el: ElementRef, private renderer: Renderer2) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
@@ -110,6 +113,7 @@ export class TaskListComponent implements OnInit {
 		this.rowsExpandedMap = {};
 		this.currentPage = 1;
 		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+		this.hasViewUnpublishedPermission = this.permissionService.hasPermission(Permission.TaskViewUnpublished);
 		this.onLoad();
 	}
 
@@ -652,7 +656,7 @@ export class TaskListComponent implements OnInit {
 					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
-					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
+					this.viewUnpublished = this.hasViewUnpublishedPermission && unpublished ? (unpublished === 'true' || unpublished === '1') : false;
 					// Just Remaining
 					this.justRemaining = justRemaining ? justRemaining === '1' : false;
 					// params were transferred to local properties,

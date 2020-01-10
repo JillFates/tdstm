@@ -1,13 +1,13 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.CSVDataset
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import com.tdssrc.grails.TimeUtil
 import getl.csv.CSVConnection
-import getl.csv.CSVDataset
 import getl.json.JSONConnection
 import getl.json.JSONDataset
-import getl.proc.Flow
 import getl.tfs.TFS
 import getl.utils.FileUtils
 import grails.testing.gorm.DataTest
@@ -49,12 +49,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	@Shared
 	JSONConnection jsonConnection
 
-	DataSetFacade simpleDataSet
+	CSVDataset simpleDataset
 	DataSetFacade jsonDataSet
-	DataSetFacade environmentDataSet
-	DataSetFacade applicationDataSet
-	DataSetFacade nonSanitizedDataSet
-	DataSetFacade sixRowsDataSet
+	CSVDataset environmentDataSet
+	CSVDataset applicationDataSet
+	CSVDataset nonSanitizedDataSet
+	CSVDataset sixRowsDataset
 	DebugConsole debugConsole
 	Project GMDEMO
 	ETLFieldsValidator validator
@@ -76,17 +76,13 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		GMDEMO = Mock(Project)
 		GMDEMO.getId() >> 125612l
 
-		simpleDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isNull: false, isKey: true)
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
-		simpleDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
-
-		new Flow().writeTo(dest: simpleDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN'])
-		}
+		simpleDataset = new CSVDataset(createCSVFIle("""
+				device id,model name,manufacturer name
+				152254,SRW24G1,LINKSYS
+				152255,ZPHA MODULE,TippingPoint
+				152256,Slideaway,ATEN
+			""")
+		)
 
 		File jsonFile = new File("${conParams.path}/${UUID.randomUUID()}.json".toString())
 		jsonFile << """[
@@ -100,66 +96,52 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING", isNull: false)
 		jsonDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING", isNull: false)
 
-		environmentDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
-		environmentDataSet.getDataSet().field << new getl.data.Field(name: 'environment', alias: 'ENVIRONMENT', type: "STRING")
+		environmentDataSet = new CSVDataset(createCSVFIle("""
+				device id,model name,manufacturer name,environment
+				152254,SRW24G1,LINKSYS,Prod
+				152255,ZPHA MODULE,TippingPoint,Prod
+				152256,Slideaway,ATEN,Dev
+			""")
+		)
 
-		new Flow().writeTo(dest: environmentDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': '152254', 'model name': 'SRW24G1', 'manufacturer name': 'LINKSYS', 'environment': 'Prod'])
-			updater(['device id': '152255', 'model name': 'ZPHA MODULE', 'manufacturer name': 'TippingPoint', 'environment': 'Prod'])
-			updater(['device id': '152256', 'model name': 'Slideaway', 'manufacturer name': 'ATEN', 'environment': 'Dev'])
-		}
+		sixRowsDataset = new CSVDataset(createCSVFIle("""
+				device id,model name,manufacturer name
+				152251,SRW24G1,LINKSYS
+				152252,SRW24G2,LINKSYS
+				152253,SRW24G3,LINKSYS
+				152254,SRW24G4,LINKSYS
+				152255,SRW24G5,LINKSYS
+				152256,ZPHA MODULE,TippingPoint
+			""")
+		)
 
-		sixRowsDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'device id', alias: 'DEVICE ID', type: "STRING", isKey: true)
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'model name', alias: 'MODEL NAME', type: "STRING")
-		sixRowsDataSet.getDataSet().field << new getl.data.Field(name: 'manufacturer name', alias: 'MANUFACTURER NAME', type: "STRING")
+		applicationDataSet = new CSVDataset(createCSVFIle("""
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+				152255,Mozilla,NGM,ACME Data Center
+			""")
+		)
 
-		new Flow().writeTo(dest: sixRowsDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['device id': "152251", 'model name': "SRW24G1", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152252", 'model name': "SRW24G2", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152253", 'model name': "SRW24G3", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152254", 'model name': "SRW24G4", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152255", 'model name': "SRW24G5", 'manufacturer name': "LINKSYS"])
-			updater(['device id': "152256", 'model name': "ZPHA MODULE", 'manufacturer name': "TippingPoint"])
-		}
-
-		applicationDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		applicationDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
-
-		new Flow().writeTo(dest: applicationDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': 152254, 'vendor name': 'Microsoft', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': 152255, 'vendor name': 'Mozilla', 'technology': 'NGM', 'location': 'ACME Data Center'])
-		}
+		nonSanitizedDataSet = new CSVDataset(createCSVFIle("""
+				application id,vendor name,technology,location
+				152254,\r\n\tMicrosoft\b\nInc\r\n\t,(xlsx updated),ACME Data Center
+				152255,\r\n\tMozilla\t\t\0Inc\r\n\t,NGM,ACME Data Center
+			""")
+		)
 
 		debugConsole = new DebugConsole(buffer: new StringBuilder())
-
-		nonSanitizedDataSet = new DataSetFacade(new CSVDataset(connection: csvConnection, fileName: "${UUID.randomUUID()}.csv", autoSchema: true))
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'application id', alias: 'APPLICATION ID', type: "STRING", isKey: true)
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'vendor name', alias: 'VENDOR NAME', type: "STRING")
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'technology', alias: 'TECHNOLOGY', type: "STRING")
-		nonSanitizedDataSet.getDataSet().field << new getl.data.Field(name: 'location', alias: 'LOCATION', type: "STRING")
-
-		new Flow().writeTo(dest: nonSanitizedDataSet.getDataSet(), dest_append: true) { updater ->
-			updater(['application id': '152254', 'vendor name': '\r\n\tMicrosoft\b\nInc\r\n\t', 'technology': '(xlsx updated)', 'location': 'ACME Data Center'])
-			updater(['application id': '152255', 'vendor name': '\r\n\tMozilla\t\t\0Inc\r\n\t', 'technology': 'NGM', 'location': 'ACME Data Center'])
-		}
-
 		validator = createDomainClassFieldsValidator()
 	}
 
 	void 'test can define a the primary domain'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project),
-				GroovyMock(DataSetFacade),
-				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -186,7 +168,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				GroovyMock(Project),
 				GroovyMock(DataSetFacade),
 				GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+				GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -213,8 +196,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an exception if an invalid domain is defined'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -229,8 +216,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can define a several domains in an ETL script'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -265,8 +256,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can define a domain more than once in an ETL script'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), GroovyMock(DataSetFacade), GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					GroovyMock(DataSetFacade),
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("""
@@ -297,8 +292,12 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if the script command is not recognized'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), sixRowsDataSet, GroovyMock(DebugConsole),
-				GroovyMock(ETLFieldsValidator))
+			ETLProcessor etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					sixRowsDataset,
+					GroovyMock(DebugConsole),
+					GroovyMock(ETLFieldsValidator)
+			)
 
 		when: 'The ETL script is evaluated'
 			etlProcessor.evaluate("invalid on")
@@ -313,7 +312,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				sixRowsDataSet,
+				sixRowsDataset,
 				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator)
 			)
@@ -348,7 +347,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can extract a field value over all rows based on column ordinal position'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataset, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -378,7 +377,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can extract a field value over all rows based on column name'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataset, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -406,7 +405,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				simpleDataSet,
+				simpleDataset,
 				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
@@ -430,7 +429,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				simpleDataSet,
+				simpleDataset,
 				GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
@@ -451,7 +450,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if a column name is invalid'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataset, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -472,7 +471,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if a column position is zero'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataset, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -492,7 +491,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if a column index is not between row elements range'() {
 
 		given:
-			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataSet, GroovyMock(DebugConsole),
+			ETLProcessor etlProcessor = new ETLProcessor(GroovyMock(Project), simpleDataset, GroovyMock(DebugConsole),
 				GroovyMock(ETLFieldsValidator))
 
 		when: 'The ETL script is evaluated'
@@ -825,6 +824,20 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('environment').message
 
 		when: 'The ETL script is evaluated'
+
+			applicationDataSet = new CSVDataset(createCSVFIle("""
+				application id,vendor name,technology,location
+				152254,Microsoft,(xlsx updated),ACME Data Center
+				152255,Mozilla,NGM,ACME Data Center
+			""")
+			)
+
+			etlProcessor = new ETLProcessor(
+					GroovyMock(Project),
+					applicationDataSet,
+					new DebugConsole(buffer: new StringBuilder()),
+					validator)
+
 			etlProcessor.evaluate("""
 				read labels
 				domain Application
@@ -1160,7 +1173,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test correct trimming of spaces in column names'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 			name , mfg, model
 			xraysrv01,Dell,PE2950
 			oradbsrv02,HP,DL8150
@@ -1389,7 +1402,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	@ConfineMetaClassChanges([Room])
 	void 'test can load Room domain instances'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				roomId,Name,Location,Depth,Width,Source,Address,City,Country,StateProv,Postal Code
 				673,DC1,ACME Data Center,26.00,40.00,Source,112 Main St ,Cumberland,,IA,50843
 				674,ACME Room 1,New Colo Provider,4.00,42.00,Target,411 Elm St,Dallas,,TX,75202""".stripIndent())
@@ -1437,7 +1450,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load Rack domain instances'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
 				13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
 				13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
@@ -1557,7 +1570,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 
 	void 'test can throw an exception if an domain is not specified'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				rackId,Tag,Location,Model,Room,Source,RoomX,RoomY,PowerA,PowerB,PowerC,Type,Front
 				13144,D7,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,500,235,3300,3300,0,Rack,R
 				13145,C8,ACME Data Center,48U Rack,ACME Data Center / DC1,Source,280,252,3300,3300,0,Rack,L
@@ -1945,7 +1958,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 		given:
 			ETLProcessor etlProcessor = new ETLProcessor(
 				GroovyMock(Project),
-				sixRowsDataSet,
+				sixRowsDataset,
 				GroovyMock(DebugConsole),
 				validator
 			)
@@ -1991,7 +2004,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can set a local variable with a string literal'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -2050,11 +2063,11 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can set a local variable with a SOURCE.property'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
-				""".stripIndent())
+			""")
 
 		and:
 			ETLProcessor etlProcessor = new ETLProcessor(
@@ -2110,7 +2123,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can set a local variable with a DOMAIN.property'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -2179,7 +2192,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can set a multiple local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade""".stripIndent())
@@ -2274,7 +2287,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				name
 				fubar
 			""".stripIndent().trim()
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(dataSetCSV)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(dataSetCSV)
 
 		and:
 			def scriptContent = """
@@ -2330,7 +2343,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can declare local variables outside the iteration command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -2390,7 +2403,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can not throw an Exception if variable names is used incorrectly in second time'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -2428,7 +2441,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load a new row using twice the domain command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				""".stripIndent())
@@ -2492,7 +2505,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load current element with a blank content from an ETL Script'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,,PE2950,Server
 				""".stripIndent())
@@ -2543,7 +2556,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can init current element with a blank content from an ETL Script'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,,PE2950,Server
 				""".stripIndent())
@@ -2593,7 +2606,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can init and load with a blank content from an ETL Script'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,,PE2950,Server
 				""".stripIndent())
@@ -2745,7 +2758,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can load with append transformation'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 					srv,ip
 					x,1.2.3.4
 					y,4.5.4.2
@@ -2861,7 +2874,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can use set command with local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				FirstName,LastName
 				Tony,Baker
 			""".stripIndent())
@@ -2879,16 +2892,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				read labels
 				domain Application
 				iterate {
-					extract 'firstname' set firstName
-					//assert firstName == 'Tony'
-					
-					extract 'lastname' set lastName
-					//assert lastName == 'Baker'
+					extract 'FirstName' set firstName
+					extract 'LastName' set lastName
 					
 					set fullName with firstName + ' ' + lastName
-					//assert firstName == 'Tony'
-					//assert lastName == 'Baker'
-					//assert fullName == 'Tony Baker'
 					
 					load 'description' with fullName
 				}
@@ -2922,7 +2929,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can use use when populated qualifier command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description,nothingThere,retire date
 				xraysrv01,2,,,2018-06-25
 				zuludb01,,Some description,,
@@ -3011,7 +3018,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can use use when populated qualifier with a closure definition'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description,nothingThere
 				xraysrv01,100,,
 				zuludb01,10,Some description,
@@ -3081,7 +3088,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception when populated qualifier is configured incorrectly'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description,nothingThere
 				xraysrv01,100,,
 				zuludb01,10,Some description,
@@ -3125,7 +3132,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can enable console and log SOURCE variable'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,XRay SRV
 			""".stripIndent())
@@ -3164,7 +3171,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can enable console and log DOMAIN variable'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,XRay SRV
 			""".stripIndent())
@@ -3203,7 +3210,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can define variables without ending in Var'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 					name
 					ACME
 			'''.stripIndent())
@@ -3251,7 +3258,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can define variables without ending in Var for Element'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 					name
 					ACME
 			'''.stripIndent())
@@ -3300,7 +3307,10 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if variable names does exists in several scenarios'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			String fileName
+			ETLDataset dataSet
+
+			(fileName, dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -3327,6 +3337,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		when: 'The ETL script is evaluated'
+
+			(fileName, dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+			""".stripIndent())
+
+			etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -3341,6 +3364,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		when: 'The ETL script is evaluated'
+
+			(fileName, dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+			""".stripIndent())
+
+			etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -3355,6 +3391,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		when: 'The ETL script is evaluated'
+
+			(fileName, dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+			""".stripIndent())
+
+			etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -3369,6 +3418,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		when: 'The ETL script is evaluated'
+
+			(fileName, dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+			""".stripIndent())
+
+			etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -3383,6 +3445,19 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 			e.message == ETLProcessorException.missingPropertyException('variable').message
 
 		when: 'The ETL script is evaluated'
+
+			(fileName, dataSet) = buildCSVDataSet("""
+				name,mfg,model,type
+				xraysrv01,Dell,PE2950,Server
+				zuludb01,HP,BL380,Blade
+			""".stripIndent())
+
+			etlProcessor = new ETLProcessor(
+					GMDEMO,
+					dataSet,
+					GroovyMock(DebugConsole),
+					validator)
+
 			etlProcessor.evaluate("""
 				console on
 				read labels
@@ -3407,7 +3482,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can use fieldSpec command in an ETL scripts to retrieve asset field specs for specific asset domain'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -3484,7 +3559,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can throw an Exception if use fieldSpec command with a non asset domain'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,mfg,model,type
 				xraysrv01,Dell,PE2950,Server
 				zuludb01,HP,BL380,Blade
@@ -3525,7 +3600,7 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 	void 'test can verify if SOURCE contains a particular property'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				Application Id,Vendor Name,Technology,Location
 				152254,Microsoft,(xlsx updated),ACME Data Center
 				152255,Mozilla,NGM,ACME Data Center
@@ -3543,8 +3618,8 @@ class ETLExtractLoadSpec extends ETLBaseSpec implements DataTest {
 				read labels
 				domain Application
 				iterate {
-					extract 'vendor name' load 'appVendor'
-					extract 'location' load 'environment'
+					extract 'Vendor Name' load 'appVendor'
+					extract 'Location' load 'environment'
 
 					if ( CE == 'Microsoft'){
 						if (SOURCE.containsKey('Vendor Name')){

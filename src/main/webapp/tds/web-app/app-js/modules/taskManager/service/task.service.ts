@@ -487,7 +487,7 @@ export class TaskService {
 	getTaskActionInfo(taskId: number): Observable<any> {
 		return this.http.get(this.TASK_ACTION_INFO_URL.replace('{taskId}', taskId.toString()))
 			.pipe(map((response: any) => {
-				return this.convertToTaskActionInfoModel(response);
+				return this.convertToTaskActionInfoModel(response.data || response);
 				}),
 				catchError(error => {
 					console.error(error);

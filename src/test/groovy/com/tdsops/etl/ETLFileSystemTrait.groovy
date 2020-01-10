@@ -1,8 +1,6 @@
 package com.tdsops.etl
 
-import getl.csv.CSVConnection
-import getl.csv.CSVDataset
-import getl.utils.FileUtils
+import com.tdsops.etl.dataset.CSVDataset
 import net.transitionmanager.common.FileSystemService
 
 /**
@@ -12,33 +10,31 @@ import net.transitionmanager.common.FileSystemService
  */
 trait ETLFileSystemTrait {
 
-	/**
-	 * It deletes a a temporary file in test cases using an instance of filesystem service
-	 * @param fileName
-	 * @param fileSystemService an instance of {@code FileSystemService}
-	 */
-	void deleteTemporaryFile(String fileName, FileSystemService fileSystemService) {
-		if (fileName) {
-			fileSystemService.deleteTemporaryFile(fileName)
-		}
-	}
+    /**
+     * It deletes a a temporary file in test cases using an instance of filesystem service
+     * @param fileName
+     * @param fileSystemService an instance of {@code FileSystemService}
+     */
+    void deleteTemporaryFile(String fileName, FileSystemService fileSystemService) {
+        if (fileName) {
+            fileSystemService.deleteTemporaryFile(fileName)
+        }
+    }
 
-	/**
-	 * Builds a CSV dataSet from a csv content using an instance of filesystem service
-	 * @param csvContent a CSV String content
-	 * @param fileSystemService an instance of {@code FileSystemService}
-	 * @return
-	 */
-	List buildCSVDataSet(String csvContent, FileSystemService fileSystemService) {
-		def (String fileName, OutputStream dataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
-		dataSetOS << csvContent
-		dataSetOS.close()
+    /**
+     * Builds a CSV dataSet from a csv content using an instance of filesystem service
+     * @param csvContent a CSV String content
+     * @param fileSystemService an instance of {@code FileSystemService}
+     * @return
+     */
+    List buildCSVDataSet(String csvContent, FileSystemService fileSystemService) {
 
-		String fullName = fileSystemService.getTemporaryFullFilename(fileName)
+        def (String filename, OutputStream dataSetOS) = fileSystemService.createTemporaryFile('unit-test-', 'csv')
+        dataSetOS << csvContent.stripIndent().trim()
+        dataSetOS.close()
 
-		CSVConnection csvCon = new CSVConnection(config: "csv", path: FileUtils.PathFromFile(fullName))
-		CSVDataset dataSet = new CSVDataset(connection: csvCon, fileName: FileUtils.FileName(fullName), header: true)
+        String fullname = fileSystemService.getTemporaryFullFilename(filename)
 
-		return [fileName, new DataSetFacade(dataSet)]
-	}
+        return [fullname, new CSVDataset(fullname)]
+    }
 }
