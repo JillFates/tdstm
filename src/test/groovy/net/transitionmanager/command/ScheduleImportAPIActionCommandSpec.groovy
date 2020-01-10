@@ -47,24 +47,32 @@ class ScheduleImportAPIActionCommandSpec extends Specification implements Grails
             command.errors.getErrorCount() == 0
     }
 
-    @Unroll('ScheduleImportAPIActionCommand.validate() with dataScriptId: #dataScriptId and dataScriptName: #dataScriptName should have returned #expected with errorCode: #expectedErrorCode')
-    void 'test dataScriptId and dataScriptName fields constraints'() {
+    @Unroll('ScheduleImportAPIActionCommand.validate() with dataScriptId: #id, dataScriptName: #name and dataScriptProvider: #provider should have returned #expected with errorCode: #expectedErrorCode')
+    void 'test dataScriptId, dataScriptName and dataScriptProvider fields constraints'() {
         setup:
             ScheduleImportAPIActionCommand command = new ScheduleImportAPIActionCommand()
 
         when:
-            command.dataScriptId = dataScriptId
-            command.dataScriptName = dataScriptName
+            command.dataScriptId = id
+            command.dataScriptName = name
+            command.dataScriptProvider = provider
 
         then:
-            expected == command.validate(['dataScriptId', 'dataScriptName'])
-            command.errors['dataScriptName']?.code == expectedErrorCode
+            expected == command.validate(['dataScriptId', 'dataScriptName', 'dataScriptProvider'])
+            command.errors['dataScriptProvider']?.code == expectedErrorCode
             command.errors.getErrorCount() == expectedErrorCount
         where:
-            dataScriptId | dataScriptName | expected | expectedErrorCount | expectedErrorCode
-            1233l        | 'TM-16291'     | false    | 1                  | 'api.import.must.be.one'
-            null         | null           | false    | 1                  | 'api.import.must.be.one'
-            null         | 'TM-16291'     | true     | 0                  | null
-            1233l        | null           | true     | 0                  | null
+            id    | name       | provider | expected | expectedErrorCount | expectedErrorCode
+            /* Valid combinations */
+            1233l | null       | null     | true     | 0                  | null
+            null  | 'TM-16291' | 'VMWare' | true     | 0                  | null
+            /* Invalid combinations based on dataScriptId field */
+            1233l | 'TM-16291' | 'VMWare' | false    | 1                  | 'api.import.must.be.one'
+            1233l | 'TM-16291' | null     | false    | 1                  | 'api.import.must.be.one'
+            1233l | null       | 'VMWare' | false    | 1                  | 'api.import.must.be.one'
+            /* Invalid combinations based on dataScriptName and dataScriptProvider combination */
+            null  | 'TM-16291' | null     | false    | 1                  | 'api.import.must.be.one'
+            null  | null       | 'VMWare' | false    | 1                  | 'api.import.must.be.one'
+            null  | null       | null     | false    | 1                  | 'api.import.must.be.one'
     }
 }

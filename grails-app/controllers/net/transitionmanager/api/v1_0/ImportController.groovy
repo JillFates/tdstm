@@ -1,16 +1,14 @@
 package net.transitionmanager.api.v1_0
 
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import com.tdssrc.grails.StopWatch
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.ScheduleImportAPIActionCommand
 import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.imports.DataImportService
-import net.transitionmanager.project.Project
+import net.transitionmanager.imports.DataScript
 import net.transitionmanager.security.Permission
-
 
 @Secured('isAuthenticated()')
 class ImportController implements ControllerMethods {
@@ -45,9 +43,26 @@ class ImportController implements ControllerMethods {
         validateCommandObject(actionCommand)
         validateProject(actionCommand.project)
 
+        DataScript dataScript = null
+        if (actionCommand.dataScriptId) {
+
+            dataScript = DataScript.where {
+                id == actionCommand.dataScriptId
+                project == actionCommand.project
+            }.get()
+
+        } else {
+
+            dataScript = DataScript.where {
+                name == actionCommand.dataScriptName
+                'provider.name' == actionCommand.dataScriptProvider
+                project == actionCommand.project
+            }.get()
+        }
+
         Map result = dataImportService.scheduleETLTransformDataJob(
                 actionCommand.project,
-                actionCommand.dataScriptId,
+                dataScript.id,
                 fileName,
                 actionCommand.sendNotification
         )

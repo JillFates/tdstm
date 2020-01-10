@@ -44,12 +44,15 @@ class ScheduleImportAPIActionCommand extends UploadFileCommand {
 
     static constraints = {
         dataScriptId nullable: true
-        dataScriptName nullable: true, validator: { String val, ScheduleImportAPIActionCommand obj ->
-            if ((!val && !obj.dataScriptId) || (val && obj.dataScriptId)) {
-                return 'api.import.must.be.one'
+        dataScriptName nullable: true
+        dataScriptProvider nullable: true, validator: { val, obj ->
+            if (obj.dataScriptId && !obj.dataScriptName && !val
+                    || !obj.dataScriptId && obj.dataScriptName && val) {
+                return true
             }
+
+            return 'api.import.missing.datascript.reference'
         }
-        dataScriptProvider nullable: true
         sendNotification nullable: false
     }
 }
