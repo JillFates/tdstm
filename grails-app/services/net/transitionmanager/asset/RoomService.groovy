@@ -259,7 +259,7 @@ class RoomService implements ServiceMethods {
 				// Some odd reason I was getting the following error when attemting to directly delete the room but never solved
 				// org.hibernate.hql.ast.tree.IdentNode cannot be cast to org.hibernate.hql.ast.tree.DotNode
 				//room.delete(flush: true)
-				Room.executeUpdate("delete Room r where r.id=?", [roomId.toLong()])
+				Room.executeUpdate("delete Room r where r.id=?0", [roomId.toLong()])
 
 				// Clear out the user's room preference if it was deleted
 				// TODO : JPM 9/2014 : Should delete ALL users CURR_ROOM preference when deleting a room if they exist for the room. Add to Preference service.

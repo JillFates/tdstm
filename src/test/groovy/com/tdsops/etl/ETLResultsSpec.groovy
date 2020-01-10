@@ -2,15 +2,13 @@ package com.tdsops.etl
 
 import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
+import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.Database
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
-import net.transitionmanager.common.CoreService
-import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.imports.DataScript
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.Project
@@ -20,8 +18,7 @@ import spock.lang.See
 /**
  * Test about ETLProcessorResults and JSON transformation:
  */
-@Mock([DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model])
-class ETLResultsSpec extends ETLBaseSpec {
+class ETLResultsSpec extends ETLBaseSpec implements DataTest {
 
 	String assetDependencyDataSetContent
 	String applicationDataSetContent
@@ -32,17 +29,8 @@ class ETLResultsSpec extends ETLBaseSpec {
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
 
-	static doWithSpring = {
-		coreService(CoreService) {
-			grailsApplication = ref('grailsApplication')
-		}
-		fileSystemService(FileSystemService) {
-			coreService = ref('coreService')
-			transactionManager = ref('transactionManager')
-		}
-	}
-
 	def setupSpec() {
+		mockDomains DataScript, AssetDependency, AssetEntity, Application, Database, Rack, Room, Database, Model
 		String.mixin StringAppendElement
 	}
 
@@ -198,7 +186,6 @@ class ETLResultsSpec extends ETLBaseSpec {
 			}
 
 		cleanup:
-			if (fileName) fileSystemService.deleteTemporaryFile(fileName)
+			if (fileName) fileSystemServiceTestBean.deleteTemporaryFile(fileName)
 	}
-
 }

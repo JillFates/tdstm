@@ -1,70 +1,128 @@
-.content-login-wrapper {
-  background: $color--darkgray2 !important;
+body > .wrapper {
+  padding-top: 0 !important;
 }
 
 div.login-component {
-  .login-box-body {
-    border: 1px solid gray;
+  position: fixed;
+  overflow: scroll;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff url('/tdstm/tds/web-app/assets/images/login-background.jpg') no-repeat;
+  background-size: cover;
 
-    .instructions {
-      text-align: justify;
-    }
+  .login-component-form__wrapper {
+    background: #fff;
 
-    div.pre-login-message {
-      border: 1px solid $color-font-disabled--gray;
-      border-left: 3px solid $color-warning--yellow;
-      padding: 0px 14px 26px 13px;
-    }
-
-    h1.message {
-      color: $color-message-error--red !important
-    }
-
-    .login-box-msg {
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .ng-invalid-not-touched {
-      border: 1px solid $color--darkgray2;
-    }
-
-    form.login-form {
-      div.has-authority {
-        kendo-dropdownlist {
-          width: 100%;
+    .login-component-form__section {
+      h1 {
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        img {
+          width: 90%;
+          height: auto;
+          margin: 3.5rem 0 1rem;
         }
       }
+      form.login-form {
+        // To destroy the autofill background color
+        input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0px 1000px white inset;
+        }
 
-      .btn.submit-button {
-        font-size: 14px;
-        background-color: #3c8dbc !important;
+        .login-password__clr-container {
+          .clr-input-group {
+            padding-right: 0px;
+            max-width: inherit;
+            .clr-input-group-icon-action {
+              right: 31px;
+              position: relative;
+            }
+            .clr-input {
+              border-bottom: 1px solid #999;
+            }
+            .clr-input.clr-focus, .clr-input:focus {
+              border-bottom: 1px solid #0092d1;
+            }
+          }
+          .clr-error {
+            .clr-input {
+              border-bottom-color: #c72100 !important;
+            }
+            .clr-validate-icon {
+              margin-left: -3px;
+            }
+          }
+        }
+        .login-button__wrapper,
+        .login-notice__wrapper {
+          margin-top: 1rem;
+        }
+        .login-button__wrapper {
+          .login-button {
+            width: 100%;
+            max-width: 100%;
+          }
+        }
+
+        div.build-info {
+          text-align: center;
+          font-size: 11px;
+          margin-top: 10px;
+        }
       }
-      div.message {
-        color: $color-message-error--red;
+      // Looks is used on Forgot and Change Password, so keep it here
+      .login-box-body {
+        border: 1px solid gray;
+
+        .instructions {
+          text-align: justify;
+        }
+
+        div.pre-login-message {
+          border: 1px solid $color-font-disabled--gray;
+          border-left: 3px solid $color-warning--yellow;
+          padding: 0px 14px 26px 13px;
+        }
+
+        h1.message {
+          color: $color-message-error--red !important
+        }
+
+        .login-box-msg {
+          font-size: 15px;
+          font-weight: bold;
+        }
+
+        .ng-invalid-not-touched {
+          border: 1px solid $color--darkgray2;
+        }
+
+        div.login-forgot-password-link {
+          margin-top: 14px;
+        }
+
+        div.build-info {
+          font-size: 11px;
+        }
+
+        div.loginErrorMsg {
+          margin: 2px;
+        }
+
+        div#postLoginMessages {
+          div.modal-footer {
+            margin-top: 15px;
+          }
+        }
+
+        a#forgot-your-password {
+          font-weight: normal;
+        }
       }
-    }
-
-    div.login-forgot-password-link {
-      margin-top: 14px;
-    }
-
-    div.build-info {
-      font-size: 11px;
-    }
-
-    div.loginErrorMsg {
-      margin: 2px;
-    }
-
-    div#postLoginMessages {
-      div.modal-footer {
-        margin-top: 15px;
-      }
-    }
-
-    a#forgot-your-password {
-      font-weight: normal;
+      // ENDS
     }
   }
 

@@ -71,10 +71,10 @@ class SqlUtil {
 	 * assert SqlUtil.matchWords('a', ['x','y','z'], true, false) == '(a like ? and a like ? and a like ?)'
 	 * assert SqlUtil.matchWords('a', ['x','y','z'], false, true) == '(a=? or a=? or a=?)'
 	 */
-	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false) {
+	static String matchWords(String property, List words, boolean matchAll=false, boolean exact=false, int index) {
 		String andOr = matchAll ? 'and' : 'or'
 		StringBuilder query = new StringBuilder()
-		String criteria = exact ? property + '=?' : property + ' like ?'
+		String criteria = exact ? property + "=?$index" : property + " like ?$index"
 		int size = words.size()
 		if (size) {
 			query << criteria

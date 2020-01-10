@@ -1,11 +1,41 @@
+// Active Palette
+$color-active: #3c8dbc;
+$color-active-light4: #c4d0dc;
+$color-active-light3: #a4bdd4;
+$color-active-light2: #84abcb;
+$color-active-light1: #649bc4;
+$color-active-dark1: #307197;
+$color-active-dark2: #245571;
+$color-active-dark3: #18394b;
+$color-active-dark4: #0c1c26;
+
+// Text and Icons
+$color-text-inverse: #fff;
+$color-text: #333;
+$color-border: #ccc;
+$color-icon: #808080;
+$color-header: #E5E5E5;
+// More Color
+$color-border: #d9e4ea;
+
+// Alerts
+$color-success: #01ab08;
+$color-success-screen: #dff0d0;
+$color-info: #3c8dbc;
+$color-info-screen: #e1f1f6;
+$color-danger: #f81414;
+$color-danger-screen: #f5dbd9;
+$color-warning: #f6c440;
+$color-warning-screen: #feecb5;
+
 $color-base--blue: #3c8dbc;
 
 // BLUE
-$color-url-element--blue: #2C61AA;
+$color-url-element--blue: #2c61aa;
 $color-material--blue1: #5f9fcf;
 $color-material--blue2: #3c8dbc;
 $color-material--blue3: #3f51b5;
-$color-action-toolbar--blue: #2C61AA;
+$color-action-toolbar--blue: #2c61aa;
 $color-header-text--blue: #1c94c4;
 $color-info--blue: #5f9fcf;
 $color-success--blue: #00a7d0;
@@ -13,11 +43,11 @@ $color-success--blue: #00a7d0;
 // GRAY
 $color--grey: #ddd;
 $color--grey2: #ebebeb;
-$color--grey3: #F4F4F4;
-$color--grey4: #EEE;
-$color--darkgray : darkgray;
+$color--grey3: #f4f4f4;
+$color--grey4: #eee;
+$color--darkgray: darkgray;
 $color--darkgray2: #d2d6de;
-$color-main--dark: #ecf0f5;
+$color-main--dark: #e5e5e5;
 $color-font-disabled--gray: #ccc;
 $color-menuSelected: #e1e3e9;
 $color--grey-kendo-header: #f6f6f6;
@@ -50,44 +80,28 @@ $color-lightpink: LightPink;
 
 // YELLOW
 $color-warning--yellow: #c87f0a;
-$color-warning-license--yellow: #FFCC00;
-$color--yellow: #F9FF90;
+$color-warning-license--yellow: #ffcc00;
+$color--yellow: #f9ff90;
 
 // FIELD SETTINGS COLORS
-$color-critical-field: #F9FF90;
-$color-important-field: #D4F8D4;
+$color-critical-field: #f9ff90;
+$color-important-field: #d4f8d4;
 $color-normal-field: $color--grey;
 $color-unimportant-field: $color--grey3;
 $color-hidden-field: $color--white;
 
-// TASK STATUS
-$color-task-hold-bg--yellow: #FFFF33;
-$color-task-hold-bg-overtime--red: #FF0000;
-$color-task-planned-bg--white: #FFFFFF;
-$color-task-pending-bg--white: #FFFFFF;
-$color-task-ready-bg--green: green;
-$color-task-started-bg--darkturquoise: darkturquoise;
-$color-task-completed2-bg--turquoise: #5478BA;
-$color-task-completed5-bg--blue: #4468AA;
-$color-task-completed-bg--blue2: #24488A;
-$color-task-done2-bg--blue3: #5478BA;
-$color-task-done5-bg--blue4: #4468AA;
-$color-task-done-bg--darkblue: #24488A;
-$color-task-na-bg--lightgray: lightgray;
-$color-task-term-bg--black: black;
-$color-task-tardy-bg--mustard: #FFC266;
-$color-task-late-bg--orange: #FF9900;
-$color-task-overdue-bg--red: $color--red;
-
 // NEW FIELD COLORS SCHEMA
-$color-field-yellow: #FAFF9B;
-$color-field-green: #D4F8D4;
-$color-field-blue: #A9D6F2;
-$color-field-pink: #FFA5B4;
-$color-field-orange:#FFC65E;
+$color-field-yellow: #faff9b;
+$color-field-green: #d4f8d4;
+$color-field-blue: #a9d6f2;
+$color-field-pink: #ffa5b4;
+$color-field-orange: #ffc65e;
 $color-field-normal: $color--grey;
 $color-field-unimportant: $color--grey3;
 
 // License Warning
 $warning: #c87f0a;
-$warningLicense: #FFCC00;
+$warningLicense: #ffcc00;
+
+// Clarity
+$primary-text-color: #18394B;

@@ -25,7 +25,7 @@ import {DataScriptModel} from '../../model/data-script.model';
 })
 export class DataScriptSampleDataComponent extends UIExtraDialog {
 
-	@ViewChild('kendoUploadInstance') kendoUploadInstance: UploadComponent;
+	@ViewChild('kendoUploadInstance', {static: false}) kendoUploadInstance: UploadComponent;
 	protected file: KendoFileUploadBasicConfig = new KendoFileUploadBasicConfig();
 	protected originalFileName: any = { temporary: null, fileUploaded: null};
 	public OPTIONS: any = {
@@ -35,7 +35,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		selected: undefined,
 		useFileFrom: undefined
 	};
-	private csv: any = {
+	protected csv: any = {
 		options : [
 			{ text: 'Select a format', value: -1 },
 			{ text: 'csv', value: 0 },
@@ -46,7 +46,7 @@ export class DataScriptSampleDataComponent extends UIExtraDialog {
 		filename: null,
 		state: undefined,
 	};
-	private webService: any = {
+	protected webService: any = {
 		options: [],
 		selected: undefined,
 		state: undefined,

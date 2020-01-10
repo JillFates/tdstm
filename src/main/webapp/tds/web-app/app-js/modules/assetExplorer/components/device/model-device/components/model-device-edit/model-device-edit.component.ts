@@ -30,9 +30,9 @@ import {AkaComponent} from '../../../../../../../shared/components/aka/aka.compo
 	templateUrl: 'model-device-edit.component.html'
 })
 export class ModelDeviceEditComponent extends UIExtraDialog implements OnInit, AfterViewInit {
-	@ViewChild('form') protected form: NgForm;
-	@ViewChild(ConnectorComponent) protected connectors: ConnectorComponent;
-	@ViewChild(AkaComponent) protected akas: AkaComponent;
+	@ViewChild('form', {static: false}) protected form: NgForm;
+	@ViewChild(ConnectorComponent, {static: false}) protected connectors: ConnectorComponent;
+	@ViewChild(AkaComponent, {static: false}) protected akas: AkaComponent;
 	private hasAkaValidationErrors = false;
 	public hasDeleteModelPermission: boolean;
 	public hasEditModelPermission: boolean;

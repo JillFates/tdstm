@@ -21,10 +21,13 @@ import {of} from 'rxjs';
 import {SetTimeZoneAndDateFormat} from '../action/timezone-dateformat.actions';
 import {PostNoticesService} from '../service/post-notices.service';
 import {NoticeModel} from '../../noticeManager/model/notice.model';
+import {SetUserContextPerson} from '../action/user-context-person.actions';
 
 @State<UserContextModel>({
 	name: 'userContext',
-	defaults: {}
+	defaults: {
+		logged: false
+	}
 })
 export class UserContextState {
 
@@ -41,6 +44,15 @@ export class UserContextState {
 	@Selector()
 	static getUserContext(state: UserContextModel) {
 		return state;
+	}
+
+	/**
+	 * Get the current Token for the CSRFT
+	 * @param state
+	 */
+	@Selector()
+	static getCSRFToken(state: UserContextModel) {
+		return state.csrf;
 	}
 
 	constructor(
@@ -66,6 +78,7 @@ export class UserContextState {
 		return this.authService.getUserContext({payload})
 			.pipe(
 				tap(result => {
+					result['logged'] = true;
 					ctx.patchState(result);
 				}),
 				catchError(err => {
@@ -82,7 +95,9 @@ export class UserContextState {
 	logout(ctx: StateContext<UserContextModel>) {
 		const state = ctx.getState();
 		if (state.user) {
-			ctx.setState({});
+			ctx.setState({
+				logged: false
+			});
 			return this.authService.logout().pipe(
 				tap()
 			);
@@ -91,7 +106,9 @@ export class UserContextState {
 
 	@Action(SessionExpired)
 	sessionExpired(ctx: StateContext<UserContextModel>) {
-		ctx.setState({});
+		ctx.setState({
+			logged: false
+		});
 	}
 
 	@Action(GetPermissions)
@@ -213,5 +230,30 @@ export class UserContextState {
 			dateFormat: payload.dateFormat,
 			timezone: payload.timezone
 		});
+	}
+
+	/**
+	 * Set the User Context Person
+	 * @param ctx
+	 */
+	@Action(SetUserContextPerson)
+	setUserContext(ctx: StateContext<UserContextModel>) {
+		const state = ctx.getState();
+		return this.userService.getUserContext()
+			.pipe(
+				catchError(err => {
+					ctx.setState({
+						...state,
+						error: err
+					});
+					return of(err);
+				}))
+			.subscribe(result => {
+				const oldPerson = state && state.person;
+				const update = result && result.person;
+				if (oldPerson && update && (oldPerson.fullName !== update.fullName)) {
+					ctx.patchState({ person: update});
+				}
+			});
 	}
 }

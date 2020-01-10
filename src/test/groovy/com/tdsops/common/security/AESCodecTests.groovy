@@ -70,18 +70,7 @@ class AESCodecTests extends Specification {
 		and: 'Value encoded and original value should not be equal'
 			value != encodedValue
 	}
-
-	/*
-	 * Tests that decoding is not possible if the salt is not equal
-	 */
-	void testEncodeDecodeInvalid() {
-		when: 'Encoding a value and when decoding using a wrong or invalid salt'
-			def encodedValue = AESCodec.instance.encode("testvalue", "1234")
-			AESCodec.instance.decode(encodedValue, "4321")
-		then: 'A general security exception is thrown'
-			thrown GeneralSecurityException
-	}
-
+	
 	/**
 	 * Tests that encoding the same value multiple times generates always different encoded values
 	 */

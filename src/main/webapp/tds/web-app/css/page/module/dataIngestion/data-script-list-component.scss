@@ -1,0 +1,15 @@
+.data-script-list-component {
+	.button-create-data-script {
+		margin-right: 4px;
+	}
+
+	kendo-grid {
+		td {
+			cursor: pointer;
+		}
+	}
+
+	kendo-grid-list {
+		max-height: calc(100vh - 350px);
+	}
+}

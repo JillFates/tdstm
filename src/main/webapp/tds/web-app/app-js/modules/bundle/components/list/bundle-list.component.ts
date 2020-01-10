@@ -17,6 +17,7 @@ import {BundleColumnModel, BundleModel} from '../../model/bundle.model';
 import {BooleanFilterData, DefaultBooleanFilterData} from '../../../../shared/model/data-list-grid.model';
 import {BundleCreateComponent} from '../create/bundle-create.component';
 import {BundleViewEditComponent} from '../view-edit/bundle-view-edit.component';
+import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 
 declare var jQuery: any;
 
@@ -25,7 +26,7 @@ declare var jQuery: any;
 	templateUrl: 'bundle-list.component.html',
 })
 export class BundleListComponent implements OnInit, AfterContentInit {
-	private state: State = {
+	protected state: State = {
 		sort: [{
 			dir: 'asc',
 			field: 'name'
@@ -47,6 +48,8 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 	public dateFormat = '';
 	public booleanFilterData = BooleanFilterData;
 	public defaultBooleanFilterData = DefaultBooleanFilterData;
+	public showFilters = false;
+	private dataGridOperationsHelper: DataGridOperationsHelper;
 
 	constructor(
 		private dialogService: UIDialogService,
@@ -58,6 +61,10 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 		private elementRef: ElementRef,
 		private store: Store,
 		private renderer: Renderer2) {
+		// use partially datagrid operations helper, for the moment just to know the number of filters selected
+		// in the future this view should be refactored to use the data grid operations helper
+		this.dataGridOperationsHelper = new DataGridOperationsHelper([]);
+
 		this.state.take = this.pageSize;
 		this.state.skip = this.skip;
 		this.resultSet = this.route.snapshot.data['bundles'];
@@ -131,6 +138,27 @@ export class BundleListComponent implements OnInit, AfterContentInit {
 				setTimeout(() => this.forceDisplayLastRowAddedToGrid() , 100);
 			},
 			(err) => console.log(err));
+	}
+
+	/**
+	 * Set on/off the filter icon indicator
+	 */
+	protected toggleFilter(): void {
+		this.showFilters = !this.showFilters;
+	}
+
+	/**
+	 * Returns the number of distinct currently selected filters
+	 */
+	protected filterCount(): number {
+		return this.dataGridOperationsHelper.getFilterCounter(this.state);
+	}
+
+	/**
+	 * Determines if there is almost 1 filter selected
+	 */
+	protected hasFilterApplied(): boolean {
+		return this.state.filter.filters.length > 0;
 	}
 
 	/**

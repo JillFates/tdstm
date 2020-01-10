@@ -1,0 +1,215 @@
+/* Exclusive for AngularJS */
+.asset-tag-selector-component {
+  margin: 0 5% 0 0;
+  position: relative;
+  display: inline-block;
+  max-width: 350px;
+
+  .k-multiselect {
+    width: 287px;
+
+    .k-multiselect-wrap {
+      ul {
+        max-width: 222px;
+      }
+    }
+  }
+
+  label {
+    position: relative;
+    top: -12px;
+    right: 9px;
+  }
+
+  .k-widget {
+    max-width: 300px;
+    display: inline-block;
+
+    li {
+      background-color: unset;
+      border: unset;
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+
+      .asset-tag-text {
+        text-transform: initial !important;
+      }
+
+      .k-icon {
+        background-image: unset;
+        padding-top: 10px !important;
+      }
+
+      .k-i-close:before {
+        content: "\D7";
+        font-size: 22px;
+        color: black;
+      }
+
+      span {
+        margin-right: unset;
+        div {
+          border-radius: 2px;
+        }
+      }
+
+      span:not(.k-select) {
+        div {
+          padding-left: 10px !important;
+          padding-right: 22px !important;
+        }
+      }
+
+      .k-select {
+        position: absolute;
+      }
+    }
+  }
+
+  // When switch is On/Off. Note: Kendo use same class as inner and outside
+  .km-switch-off .km-switch-handle {
+    margin-left: 4px !important;
+  }
+
+  // -------------------------------------------------------------------
+  .km-switch {
+    position: absolute;
+    right: 5px;
+    z-index: 2;
+    top: 5px;
+    font-size: 10px;
+    width: 50px;
+    height: 24px;
+    background: unset;
+
+    .km-switch-wrapper {
+      border-radius: 14px;
+      background-color: unset;
+
+      .km-switch-background {
+        background: unset;
+      }
+    }
+
+    .km-switch-container {
+      border-radius: 14px;
+      padding-top: 4px !important;
+
+      .km-switch-handle {
+        width: 1.4em;
+        height: 1.4em;
+        border-radius: 50%;
+        background-color: $baseColor !important;
+        cursor: pointer;
+      }
+
+      .km-switch-handle,
+      .km-switch-off {
+        -webkit-box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important;
+        box-shadow: 0 0px 0 0px $baseColor, 0 0px 0 0px $baseColor !important;
+
+        span {
+          color: $black;
+        }
+      }
+
+      .km-switch-label-on {
+        left: -202%;
+      }
+
+      .km-switch-label-off {
+        left: 138%;
+      }
+
+      .km-switch-label-on,
+      .km-switch-label-off {
+        top: -3px;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+/* Global, since Kendo popup are open outside this context */
+.asset-tag-selector-single-item {
+  padding-left: 18px !important;
+  margin-left: 0px;
+  margin-right: -10px;
+
+  .fa-check {
+    display: none;
+    margin-left: -40px;
+    margin-right: 22px;
+    color: $black;
+  }
+}
+
+.asset-tag-selector-item-selected {
+  .fa-check {
+    display: inline !important;
+  }
+}
+
+.hidden-tag-item {
+  display: none !important;
+}
+
+.striked-tag-item {
+  text-decoration: line-through;
+}
+
+/*Move into colors after merge with David Branch */
+.tag-black {
+  background-color: black !important
+}
+.tag-grey {
+  background-color: #e6e6e6 !important;
+}
+.tag-red {
+  background-color: #f2d9e1 !important;
+}
+.tag-orange {
+  background-color: #f2e8d9 !important;
+}
+.tag-yellow {
+  background-color: #eaf2d9 !important;
+}
+.tag-green {
+  background-color: #d9f2d9 !important;
+}
+.tag-cyan {
+  background-color: #d9f2ec !important;
+}
+.tag-blue {
+  background-color: #d9e8f2 !important;
+}
+.tag-purple {
+  background-color: #dad9f2 !important;
+}
+.tag-pink {
+  background-color: #efd9f2 !important;
+}
+.tag-white {
+  background-color: white !important;
+}
+.tag-unselected {
+  background-color: unset !important;
+}
+
+.asset-tag-selector-component-content {
+  .label.tag {
+    border-radius: 2px;
+    border: 0;
+    width: unset;
+    font-weight: 500;
+  }
+
+  line-height: 21px {
+    height: 21px;
+    font-weight: 600;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 11px;
+    color: $color-text !important;
+  }
+}

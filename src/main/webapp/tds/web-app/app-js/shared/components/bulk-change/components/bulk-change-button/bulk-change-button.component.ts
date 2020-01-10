@@ -8,11 +8,11 @@ import {BulkChangeModel, BulkActionResult, BulkChangeType} from '../../model/bul
 	selector: 'tds-bulk-change-button',
 	template: `
 		<tds-button-custom
-			icon="ellipsis-v"
-			title="Bulk Change"
+			[flat]="flat"
+			[icon]="'pencil'"
+			[tooltip]="'Bulk Edit'"
 			[id]="'btnBulkChange'"
-            (click)="onClick()"
-            class="btnBulkChange pull-left"
+			(click)="onClick()"
 			[disabled]="!enabled">
 		</tds-button-custom>
 	`,
@@ -22,6 +22,7 @@ export class BulkChangeButtonComponent {
 	@Input() enabled: boolean ;
 	@Input() showEdit: boolean;
 	@Input() showDelete: boolean;
+	@Input() flat: boolean;
 	@Input() bulkChangeType: BulkChangeType;
 	@Input() viewId: number;
 	@Output() operationResult = new EventEmitter<BulkActionResult>();

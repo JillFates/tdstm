@@ -6,6 +6,7 @@ import {ModuleResolveService} from '../../shared/resolves/module.resolve.service
 // Services
 import {AuthGuardService} from '../auth/service/auth.guard.service';
 import {TaskListComponent} from './components/list/task-list.component';
+import {NeighborhoodComponent} from './components/neighborhood/neighborhood.component';
 // Components
 
 /**
@@ -17,6 +18,9 @@ const TOP_MENU_PARENT_SECTION = 'menu-parent-tasks';
 export class TaskManagerRoutingStates {
 	public static readonly TASK_MANAGER_LIST = {
 		url: 'list'
+	};
+	public static readonly TASK_NEIGHBORHOOD = {
+		url: 'task-graph'
 	};
 }
 
@@ -35,6 +39,27 @@ export const TaskManagerRoute: Routes = [
 			requiresLicense: true
 		},
 		component: TaskListComponent,
+		canActivate: [
+			AuthGuardService,
+			ModuleResolveService
+		],
+		resolve: {},
+		runGuardsAndResolvers: 'always'
+	},
+	{
+		path: TaskManagerRoutingStates.TASK_NEIGHBORHOOD.url,
+		data: {
+			page: {
+				title: 'Task Graph',
+				titleColor: '#3c8dbc',
+				titleFontWeight: 'bold',
+				instruction: '',
+				menu: ['Task', 'GoJS Task Graph'],
+				topMenu: {parent: TOP_MENU_PARENT_SECTION, child: 'menu-parent-tasks-gojs-task-graph', subMenu: true}
+			},
+			requiresAuth: true,
+		},
+		component: NeighborhoodComponent,
 		canActivate: [
 			AuthGuardService,
 			ModuleResolveService

@@ -11,10 +11,10 @@ import { Permission } from '../../../../../../../shared/model/permission.model';
         <div class="modal fade in manufacturer-show-component" tds-handle-escape (escPressed)="cancelCloseDialog()" id="device-manufacturer-component" data-backdrop="static"
              tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm" role="document">
-                <div class="modal-content">
+                <div class="tds-modal-content">
                     <div class="modal-header">
                         <button (click)="cancelCloseDialog()" type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">×</span>
+                            <clr-icon aria-hidden="true" shape="close"></clr-icon>
                         </button>
                         <h4 class="modal-title">Manufacturer Detail</h4>
                     </div>

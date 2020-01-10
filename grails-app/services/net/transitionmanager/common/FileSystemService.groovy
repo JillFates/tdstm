@@ -154,6 +154,7 @@ class FileSystemService implements ServiceMethods {
 
 		ExcelConnection con = new ExcelConnection(path: FileUtils.PathFromFile(fileName), fileName: FileUtils.FileName(fileName), driver: TDSExcelDriver)
 		ExcelDataset dataset = new ExcelDataset(connection: con, header: true)
+		dataset.params.fileName = FileUtils.FileName(fileName)
 
 		return dataset
 	}

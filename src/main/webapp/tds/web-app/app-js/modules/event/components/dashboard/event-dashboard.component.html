@@ -1,170 +1,248 @@
 <div class="event-dashboard-component">
-    <div class="panel">
-        <div class="panel-body">
-            <div class="row">
-                <div class="box-header">
-                        <div class="col-md-4">
-                            <div class="event-selector">
-                                <span class="event-title">{{'EVENT.EVENT' | translate}}:</span>
-                                <kendo-dropdownlist [data]="eventList" [(ngModel)]="selectedEvent"
-                                    (ngModelChange)="onSelectedEvent($event.id, $event.name)" textField="name" valueField="id">
-                                </kendo-dropdownlist>
-                                <label for="agreement" class="aligned-label dontshow-again">
+	<div class="panel">
+		<div class="panel-body">
+			<div class="row">
+				<div class="box-header">
+					<div class="col-md-5">
+						<div class="event-selector">
+							<span class="event-title"
+								>{{ 'EVENT.EVENT' | translate }}:</span
+							>
+							<kendo-dropdownlist
+								[data]="eventList"
+								[(ngModel)]="selectedEvent"
+								(ngModelChange)="
+									onSelectedEvent($event.id, $event.name)
+								"
+								textField="name"
+								valueField="id"
+							>
+							</kendo-dropdownlist>
+                            <label for="agreement" class="aligned-label dontshow-again">
                                     <span  *ngIf="hasViewUnpublishedPermission">
                                         <input type="checkbox" class="aligned-checkbox" name="agreement" id="agreement"
-                                            [(ngModel)]="includeUnpublished" (ngModelChange)="onFiltersChange(this)"> 
-                                            {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
+                                               [(ngModel)]="includeUnpublished" (ngModelChange)="onFiltersChange(this)">
+                                        {{ 'EVENT.INCLUDE_UNPUBLISHED' | translate }}
                                     </span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-6"></div>
-                        <div class="col-md-2 pull-right">
-                            <tds-pie-countdown (timeout)="onTimeout()"></tds-pie-countdown>
-                        </div>
-                </div>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-2">
-                    <tds-plan-versus-status 
-                        #planVersusStatus
-                        [hasBundleSteps]="hasBundleSteps"
-                        (changeProgress)="onChangeStatus($event)"
-                        [currentProgress]="eventPlanStatus.dialIndicator"
-                        [isDisabled]="!isEventSelected()">
-                    </tds-plan-versus-status>
-                </div>
-                <div class="col-md-4">
-                    <tds-event-resume [event]="eventPlanStatus"></tds-event-resume>
-                </div>
-                <div class="col-md-4">
-                    <tds-news [news]="newsList" [isDisabled]="!isEventSelected()" (create)="onCreateNews()" (selected)="onSelectedNews($event)"></tds-news>
-                </div>
-                <div class="col-md-2"></div>
-            </div>
-        </div>
-    </div>
+                            </label>
+						</div>
+					</div>
+					<div class="col-md-5"></div>
+					<div class="col-md-2 pull-right">
+						<tds-pie-countdown
+							(timeout)="onTimeout()"
+						></tds-pie-countdown>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-2">
+					<tds-plan-versus-status
+						#planVersusStatus
+						[hasBundleSteps]="hasBundleSteps"
+						(changeProgress)="onChangeStatus($event)"
+						[currentProgress]="eventPlanStatus.dialIndicator"
+						[isDisabled]="!isEventSelected()"
+					>
+					</tds-plan-versus-status>
+				</div>
+				<div class="col-md-4">
+					<tds-event-resume
+						[event]="eventPlanStatus"
+					></tds-event-resume>
+				</div>
+				<div class="col-md-4">
+					<tds-news
+						[news]="newsList"
+						[isDisabled]="!isEventSelected()"
+						(create)="onCreateNews()"
+						(selected)="onSelectedNews($event)"
+					></tds-news>
+				</div>
+				<div class="col-md-2"></div>
+			</div>
+		</div>
+	</div>
 
-    <div class="panel" *ngIf="eventDetails">
-        <div class="panel-body">
-            <div class="box-header">
-                <h3 class="box-title">Task Summary</h3>
-            </div>
-            <div class="row task-section">
-                <div class="col-md-2">
-                    <div class="task-count-container">
-                        <span class="task-count">{{eventDetails.remainTaskCount | number}}</span>
-                        <h5>Tasks Remaining</h5>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="task-effort-container">
-                        <div class="task-title"># of<br />
-                            Tasks</div>
-                        <div class="task-graph-section">
-                            <div class="task-graph-container">
-                                <div class="task-done task-item" 
-                                    [style.width.%]="eventDetails.percTaskDone">
-                                    {{eventDetails.percTaskDone < 5 ? '' : eventDetails.percTaskDone + '%'}}
-                                </div>
-                                <div class="task-ready task-item" 
-                                    [style.width.%]="eventDetails.percTaskReady"></div>
-                                <div class="task-started task-item" 
-                                    [style.width.%]="eventDetails.percTaskStarted"></div>
-                            </div>
-                            <div class="fixed-tasks">
-                                <div class="task-done fixed-status">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                       [queryParams]="{status: 'Completed'}">
-                                          <div>Done</div>
-                                          <div>{{eventDetails.countDone}}</div>
-                                    </a>
-                                </div>
-                                <div class="task-started fixed-status">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                       [queryParams]="{status: 'Started'}">
-                                        <div>Started</div>
-                                        <div>{{eventDetails.countStarted}}</div>
-                                    </a>
-                                </div>
-                                <div class="task-ready fixed-status">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                       [queryParams]="{status: 'Ready'}">
-                                        <div>Ready</div>
-                                        <div>{{eventDetails.countReady}}</div>
-                                    </a>
-                                </div>
-                                <div class="task-hold fixed-status">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                       [queryParams]="{status: 'Hold'}">
-                                        <div>Hold</div>
-                                        <div>{{eventDetails.countHold}}</div>
-                                    </a>
-                                </div>
-                                <div class="task-pending fixed-status">
-                                    <a [routerLink]="['/taskManager', 'list']"
-                                       [queryParams]="{status: 'Pending'}">
-                                        <div>Pending</div>
-                                        <div>{{eventDetails.countPending}}</div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="task-effort-container">
-                        <div class="task-title">Level <br />of
-                            Effort</div>
-                        <div class="task-graph-section">
-                            <div class="task-graph-container">
-                                <div class="task-done task-item"
-                                    [style.width.%]="eventDetails.percDurationDone">
-                                    {{eventDetails.percDurationDone < 5 ? '' : eventDetails.percDurationDone + '%'}}
-                                </div>
-                                <div class="task-started task-item" 
-                                    [style.width.%]="eventDetails.percDurationStarted"></div>
-                                <div class="task-ready task-item" 
-                                    [style.width.%]="eventDetails.percDurationReady"></div>
-                            </div>
-                            <div class="fixed-tasks">
-                                <div class="task-done fixed-status">
-                                    <div>Done</div>
-                                    <div>{{eventDetails.effortRemainDone}}</div>
-                                </div>
-                                <div class="task-started fixed-status">
-                                    <div>Started</div>
-                                    <div>{{eventDetails.effortRemainStarted}}</div>
-                                </div>
-                                <div class="task-ready fixed-status">
-                                    <div>Ready</div>
-                                    <div>{{eventDetails.effortRemainReady}}</div>
-                                </div>
-                                <div class="task-hold fixed-status">
-                                    <div>Hold</div>
-                                    <div>{{eventDetails.effortRemainHold}}</div>
-                                </div>
-                                <div class="task-pending fixed-status">
-                                    <div>Pending</div>
-                                    <div>{{eventDetails.effortRemainPending}}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <tds-team-task-percents *ngIf="eventDetails" [teamTaskMatrix]="teamTaskMatrix">
-                    </tds-team-task-percents>
-                </div>
-            </div>
-            <div class="row task-category-container">
-                <tds-task-category
-                    #taskCategory
-                    *ngIf="taskCategories" 
-                    [taskCategories]="taskCategories"
-                    [scrollPosition]="taskCategoryScrollPosition">
-                </tds-task-category>
-            </div>
-        </div>
-    </div>
+	<div class="panel" *ngIf="eventDetails">
+		<div class="panel-body">
+			<div class="box-header">
+				<h3 class="box-title">Task Summary</h3>
+			</div>
+			<div class="row task-section">
+				<div class="col-md-2">
+					<div class="task-count-container">
+						<span class="task-count">{{
+							eventDetails.remainTaskCount | number
+						}}</span>
+						<h5>Tasks Remaining</h5>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="task-effort-container">
+						<div class="task-title">
+							# of<br />
+							Tasks
+						</div>
+						<div class="task-graph-section">
+							<div class="task-graph-container">
+								<div
+									class="task-done task-item"
+									[style.width.%]="eventDetails.percTaskDone"
+								>
+									{{
+										eventDetails.percTaskDone < 5
+											? ''
+											: eventDetails.percTaskDone + '%'
+									}}
+								</div>
+								<div
+									class="task-ready task-item"
+									[style.width.%]="eventDetails.percTaskReady"
+								></div>
+								<div
+									class="task-started task-item"
+									[style.width.%]="
+										eventDetails.percTaskStarted
+									"
+								></div>
+							</div>
+							<div class="fixed-tasks">
+								<div class="task-done fixed-status">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Completed' }"
+									>
+										<div>Done</div>
+										<div>{{ eventDetails.countDone }}</div>
+									</a>
+								</div>
+								<div class="task-started fixed-status">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Started' }"
+									>
+										<div>Started</div>
+										<div>
+											{{ eventDetails.countStarted }}
+										</div>
+									</a>
+								</div>
+								<div class="task-ready fixed-status">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Ready' }"
+									>
+										<div>Ready</div>
+										<div>{{ eventDetails.countReady }}</div>
+									</a>
+								</div>
+								<div class="task-hold fixed-status">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Hold' }"
+									>
+										<div>Hold</div>
+										<div>{{ eventDetails.countHold }}</div>
+									</a>
+								</div>
+								<div class="task-pending fixed-status">
+									<a
+										[routerLink]="['/taskManager', 'list']"
+										[queryParams]="{ status: 'Pending' }"
+									>
+										<div>Pending</div>
+										<div>
+											{{ eventDetails.countPending }}
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="task-effort-container">
+						<div class="task-title">Level <br />of Effort</div>
+						<div class="task-graph-section">
+							<div class="task-graph-container">
+								<div
+									class="task-done task-item"
+									[style.width.%]="
+										eventDetails.percDurationDone
+									"
+								>
+									{{
+										eventDetails.percDurationDone < 5
+											? ''
+											: eventDetails.percDurationDone +
+											  '%'
+									}}
+								</div>
+								<div
+									class="task-started task-item"
+									[style.width.%]="
+										eventDetails.percDurationStarted
+									"
+								></div>
+								<div
+									class="task-ready task-item"
+									[style.width.%]="
+										eventDetails.percDurationReady
+									"
+								></div>
+							</div>
+							<div class="fixed-tasks">
+								<div class="task-done fixed-status">
+									<div>Done</div>
+									<div>
+										{{ eventDetails.effortRemainDone }}
+									</div>
+								</div>
+								<div class="task-started fixed-status">
+									<div>Started</div>
+									<div>
+										{{ eventDetails.effortRemainStarted }}
+									</div>
+								</div>
+								<div class="task-ready fixed-status">
+									<div>Ready</div>
+									<div>
+										{{ eventDetails.effortRemainReady }}
+									</div>
+								</div>
+								<div class="task-hold fixed-status">
+									<div>Hold</div>
+									<div>
+										{{ eventDetails.effortRemainHold }}
+									</div>
+								</div>
+								<div class="task-pending fixed-status">
+									<div>Pending</div>
+									<div>
+										{{ eventDetails.effortRemainPending }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<tds-team-task-percents
+						*ngIf="eventDetails"
+						[teamTaskMatrix]="teamTaskMatrix"
+					>
+					</tds-team-task-percents>
+				</div>
+			</div>
+			<div class="row task-category-container">
+				<tds-task-category
+					#taskCategory
+					*ngIf="taskCategories"
+					[taskCategories]="taskCategories"
+
+				[scrollPosition]="taskCategoryScrollPosition"></tds-task-category>
+			</div>
+		</div>
+	</div>
 </div>

@@ -198,6 +198,7 @@ class AssetService {
     * @param dependencyIds - list of ids for which dependencies are requested to be deleted
     * @return a count of the number of records that are deleted
     */
+	@Transactional
    String bulkDeleteDependencies(Project project, List<String> dependencyIds) {
 
       // if no ids given don't process anything.

@@ -11,7 +11,6 @@ import {AssetExplorerService} from '../../service/asset-explorer.service';
 import {AssetViewSelectorComponent} from '../../../assetManager/components/asset-view-selector/asset-view-selector.component';
 import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
 import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
-import {Permission} from '../../../../shared/model/permission.model';
 import {VIEW_COLUMN_MIN_WIDTH} from '../../../assetExplorer/model/view-spec.model';
 import {AssetQueryParams} from '../../../assetExplorer/model/asset-query-params';
 import {AssetExportModel} from '../../../assetExplorer/model/asset-export-model';
@@ -28,7 +27,7 @@ declare var jQuery: any;
 	templateUrl: 'asset-view-config.component.html'
 })
 export class AssetViewConfigComponent implements OnInit {
-	@ViewChild('select') select: AssetViewSelectorComponent;
+	@ViewChild('select', {static: false}) select: AssetViewSelectorComponent;
 
 	public data: any = null;
 	private dataSignature: string;
@@ -250,33 +249,6 @@ export class AssetViewConfigComponent implements OnInit {
 		return this.isAssetSelected() && this.isColumnSelected() && this.hasAtLeastOneNonLockedColumnOrEmpty();
 	}
 
-	protected isDirty(): boolean {
-		let result = this.dataSignature !== JSON.stringify(this.model);
-		// TODO: hasPendingChanges
-		// if (this.state && this.state.$current && this.state.$current.data) {
-		// 	this.state.$current.data.hasPendingChanges = result && !this.collapsed;
-		// }
-		return result;
-	}
-
-	public isSaveAvailable(): boolean {
-		return this.assetExplorerService.isSaveAvailable(this.model);
-	}
-
-	protected isSaveAsAvailable(): boolean {
-		return this.model.id ?
-			this.model.isSystem ?
-				this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs) :
-				this.permissionService.hasPermission(Permission.AssetExplorerSaveAs) :
-			this.isSaveAvailable();
-	}
-
-	public isSystemSaveAvailable(edit): boolean {
-		return edit ?
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemEdit) :
-			this.permissionService.hasPermission(Permission.AssetExplorerSystemSaveAs);
-	}
-
 	protected isCurrentTab(num: number): boolean {
 		return this.currentTab === num;
 	}
@@ -299,13 +271,6 @@ export class AssetViewConfigComponent implements OnInit {
 	}
 
 	/** Dialog and view Actions methods */
-
-	protected onSaveAs(): void {
-		if (this.isSaveAsAvailable()) {
-			this.openSaveDialog();
-		}
-	}
-
 	public onCancel() {
 		if (this.model && this.model.id) {
 			this.router.navigate(['asset', 'views', this.model.id, 'show']);
@@ -314,17 +279,19 @@ export class AssetViewConfigComponent implements OnInit {
 		}
 	}
 
+	protected onSaveAs(): void {
+		this.openSaveDialog();
+	}
+
 	protected onSave() {
-		if (this.isSaveAvailable()) {
-			if (this.model.id) {
-				this.assetExplorerService.saveReport(this.model)
-					.subscribe(result => {
-						this.dataSignature = JSON.stringify(this.model);
-						this.select.loadData();
-					});
-			} else {
-				this.openSaveDialog();
-			}
+		if (this.model.id) {
+			this.assetExplorerService.saveReport(this.model)
+				.subscribe(result => {
+					this.dataSignature = JSON.stringify(this.model);
+					this.select.loadData();
+				});
+		} else {
+			this.openSaveDialog();
 		}
 	}
 
@@ -422,7 +389,7 @@ export class AssetViewConfigComponent implements OnInit {
 			}
 
 		} else {
-			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].items.length + 1)) {
+			if (this.assetExplorerService.hasMaximumFavorites(this.select.data.filter(x => x.name === 'Favorites')[0].views.length + 1)) {
 				this.notifier.broadcast({
 					name: AlertType.DANGER,
 					message: 'Maximum number of favorite data views reached.'
