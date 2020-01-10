@@ -149,7 +149,8 @@ export class DataGridOperationsHelper {
 		const currentState: State = state || this.state;
 
 		column.filter = '';
-		currentState.filter.filters = this.getFiltersExcluding(column.property);
+		currentState.filter.filters = this.getFiltersExcluding(
+			column.customPropertyName ? column.customPropertyName : column.property);
 		this.filterChange(currentState.filter);
 	}
 

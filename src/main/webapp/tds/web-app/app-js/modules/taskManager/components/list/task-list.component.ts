@@ -113,7 +113,16 @@ export class TaskListComponent implements OnInit {
 		this.onLoad();
 	}
 
+	/**
+	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+	 */
 	ngOnInit(): void {
+		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+		if (contentWrapper) {
+			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+			// 45px is the header height, 31px is the footer height
+			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
+		}
 		this.disableClearFilters = this.onDisableClearFilter.bind(this);
 		this.headerActionButtons = [
 			{
@@ -130,18 +139,6 @@ export class TaskListComponent implements OnInit {
 				onClick: this.onBulkActionHandler.bind(this),
 			},
 		];
-	}
-
-	/**
-	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
-	 */
-	ngOnInit(): void {
-		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
-		if (contentWrapper) {
-			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
-			// 45px is the header height, 31px is the footer height
-			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
-		}
 	}
 
 	/**
@@ -600,6 +597,9 @@ export class TaskListComponent implements OnInit {
 		}
 		const filterColumn = { ...column };
 		if (filterColumn.property.startsWith('userSelectedCol')) {
+			// save the reference to the custom property name
+			column.customPropertyName =  this.currentCustomColumns[filterColumn.property];
+			// use the new property name
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
 		const result = this.grid.getFilter(filterColumn);
