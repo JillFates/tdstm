@@ -10,6 +10,9 @@ import {
 	HttpRequest,
 	HttpResponse
 } from '@angular/common/http';
+import {Router} from '@angular/router';
+// Module
+import {AuthRouteStates} from '../../modules/auth/auth-route.module';
 // NGXS
 import {Store} from '@ngxs/store';
 import {SessionExpired} from '../../modules/auth/action/login.actions';
@@ -17,6 +20,7 @@ import {SessionExpired} from '../../modules/auth/action/login.actions';
 import {ERROR_STATUS, FILE_UPLOAD_REMOVE_URL, FILE_UPLOAD_SAVE_URL} from '../model/constants';
 import {AlertType} from '../model/alert.model';
 import {CSRF} from '../../modules/auth/model/user-context.model';
+import {UserContextState} from '../../modules/auth/state/user-context.state';
 // Service
 import {NotifierService} from '../services/notifier.service';
 import {
@@ -25,13 +29,10 @@ import {
 	ASSET_IMPORT_UPLOAD_URL,
 	IMAGE_UPLOAD_URL
 } from '../services/kendo-file-handler.service';
-import {Router} from '@angular/router';
 import {WindowService} from '../services/window.service';
 // Other
 import {Observable, throwError} from 'rxjs';
 import {map, catchError, finalize} from 'rxjs/operators';
-import {AuthRouteStates} from '../../modules/auth/auth-route.module';
-import {UserContextState} from '../../modules/auth/state/user-context.state';
 
 export const MULTIPART_FORM_DATA = 'multipart/form-data';
 export const APPLICATION_JSON = 'application/json';
@@ -48,7 +49,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
 	}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		// kendo-file-upload.service.ts
+		// kendo-file-upload.interceptor.ts
 		if (
 			request.url === FILE_UPLOAD_SAVE_URL ||
 			request.url === FILE_UPLOAD_REMOVE_URL ||
