@@ -4,16 +4,7 @@
 			<div class="clr-offset-3"></div>
             <div class="clr-col-6">
 				<div class="header-controls">
-					<tds-button
-							[icon]="'organization'"
-							(click)="onViewTaskGraphHandler()"
-							[title]="'View Task Graph'"
-					></tds-button>
-					<tds-button
-							[icon]="'list'"
-							(click)="onViewTimelineHandler()"
-							[title]="'View Timeline'"
-					></tds-button>
+					<tds-task-view-toggle></tds-task-view-toggle>
 				</div>
 			</div>
             <div class="clr-col-3">
