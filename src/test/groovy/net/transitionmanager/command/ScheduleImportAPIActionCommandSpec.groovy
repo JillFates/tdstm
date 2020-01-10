@@ -2,6 +2,7 @@ package net.transitionmanager.command
 
 
 import grails.testing.web.GrailsWebUnitTest
+import net.transitionmanager.project.Project
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -31,15 +32,15 @@ class ScheduleImportAPIActionCommandSpec extends Specification implements Grails
             ScheduleImportAPIActionCommand command = new ScheduleImportAPIActionCommand()
 
         when:
-            command.projectId = null
+            command.project = null
 
         then:
-            !command.validate(['projectId'])
+            !command.validate(['project'])
             command.errors.getErrorCount() == 1
-            command.errors['projectId'].code == 'nullable'
+            command.errors['project'].code == 'nullable'
 
         when:
-            command.projectId = 12345l
+            command.project = new Project()
 
         then:
             command.validate(['projectId'])

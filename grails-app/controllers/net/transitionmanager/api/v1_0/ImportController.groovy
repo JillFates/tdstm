@@ -43,10 +43,10 @@ class ImportController implements ControllerMethods {
         String fileName = fileSystemService.transferFileToFileSystem(actionCommand, FileSystemService.ETL_SOURCE_DATA_PREFIX)
 
         validateCommandObject(actionCommand)
+        validateProject(actionCommand.project)
 
-        Project project = getProjectForWs()
         Map result = dataImportService.scheduleETLTransformDataJob(
-                project,
+                actionCommand.project,
                 actionCommand.dataScriptId,
                 fileName,
                 actionCommand.sendNotification

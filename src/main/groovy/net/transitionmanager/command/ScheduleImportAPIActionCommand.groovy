@@ -1,4 +1,7 @@
 package net.transitionmanager.command
+
+import net.transitionmanager.project.Project
+
 /**
  * Command class that will be used typically for the following request:
  * <pre>
@@ -7,26 +10,32 @@ package net.transitionmanager.command
  * </pre>
  * <pre>
  * 	POST
- * 	/tdstm/api/import/processFile??sendNotification=true&dataScriptName=TM-16291
+ * 	/tdstm/api/import/processFile??sendNotification=true&dataScriptName=TM-16291&dataScriptProvider=VmWare
  * </pre>
  */
 class ScheduleImportAPIActionCommand extends UploadFileCommand {
     /**
      * ID for an instance of {@code Datascript} domain  class.
      * This instance contains the ETL script content
-     * that is going to be executed against filename param content.
+     * that is going to be executed with {@code ScheduleImportAPIActionCommand#filename} field.
      */
     Long dataScriptId
     /**
-     * Name field for an instance of {@code Datascript} domain  class.
+     * {@code DataScript#name} field.
      * This instance contains the ETL script content
-     * that is going to be executed against filename param content.
+     * that is going to be executed with {@code ScheduleImportAPIActionCommand#filename} field.
      */
     String dataScriptName
     /**
+     * {@code DataScript#provider} field for an instance of {@code Datascript} domain  class.
+     * This instance contains the ETL script content
+     * that is going to be executed with {@code ScheduleImportAPIActionCommand#filename} field.
+     */
+    String dataScriptProvider
+    /**
      * Project defined by user to be used in dataScript tenant validation.
      */
-    Long projectId
+    Project project
     /**
      * Defines if Transformation results and the auto import process
      * should be sent by email after finishing the post step.
@@ -39,8 +48,8 @@ class ScheduleImportAPIActionCommand extends UploadFileCommand {
             if ((!val && !obj.dataScriptId) || (val && obj.dataScriptId)) {
                 return 'api.import.must.be.one'
             }
-
         }
+        dataScriptProvider nullable: true
         sendNotification nullable: false
     }
 }

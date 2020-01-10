@@ -454,6 +454,17 @@ trait ControllerMethods {
 			throw new InvalidParamException(msg)
 		}
 	}
+
+	/**
+	 * Validates if a project parameter is accessible for the current userLogin.
+	 *
+	 * @param project an instance of {@code Project}
+	 */
+	void validateProject(Project project){
+		if (!securityService.hasAccessToProject(project, securityService.userLogin)){
+			throw new InvalidParamException('Invalid project')
+		}
+	}
 	/**
 	 * Populates command object using the request.JSON from body in a http request
 	 * <pre>
