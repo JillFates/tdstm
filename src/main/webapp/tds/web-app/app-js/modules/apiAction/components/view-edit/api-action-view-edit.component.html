@@ -150,12 +150,15 @@
 										<div class="form-group">
 											<label for="apiActionDescription" class="col-sm-3 control-label">Description:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea type="text" clrTextarea id="apiActionDescription"
-												          name="apiActionDescription"
-												          class="form-control"
-                                                          tabindex="3"
-                                                          [(ngModel)]="apiActionModel.description">
-												</textarea>
+												<clr-textarea-container>
+													<textarea clrTextarea
+															  [(ngModel)]="apiActionModel.description"
+															  name="apiActionDescription"
+															  id="apiActionDescription"
+															  tabindex="3"
+															  maxlength="255"></textarea>
+													<clr-control-helper>{{apiActionModel.description?.length}}/255</clr-control-helper>
+												</clr-textarea-container>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.description}}</label>
@@ -410,7 +413,7 @@
 					     style="padding-left:15px"
 					     [ngClass]="{'active':isCurrentTab(tabsEnum.Info)}"
 					     id="tab_simpleInfo">
-						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment">
+						<form name="simpleInfoForm" role="form" data-toggle="validator" #simpleInfoForm='ngForm' class="form-horizontal left-alignment" novalidate>
 							<div class="box-body">
 								<div class="row">
 									<div class="col-md-7">
@@ -454,12 +457,15 @@
 										<div class="form-group">
 											<label for="simpleApiActionDescription" class="col-sm-3 control-label">Description:</label>
 											<div class="col-sm-8" *ngIf="modalType !== actionTypes.VIEW">
-												<textarea type="text" clrTextarea
-												          id="simpleApiActionDescription"
-												          name="simpleApiActionDescription"
-												          class="form-control"
-												          tabindex="3"
-												          [(ngModel)]="apiActionModel.description"></textarea>
+												<clr-textarea-container>
+													<textarea clrTextarea
+															  [(ngModel)]="apiActionModel.description"
+															  name="simpleApiActionDescription"
+															  id="simpleApiActionDescription"
+															  tabindex="3"
+															  maxlength="255"></textarea>
+													<clr-control-helper>{{apiActionModel.description?.length}}/255</clr-control-helper>
+												</clr-textarea-container>
 											</div>
 											<div class="col-sm-8" *ngIf="modalType === actionTypes.VIEW">
 												<label class="control-label label-detail">{{apiActionModel.description}}</label>
