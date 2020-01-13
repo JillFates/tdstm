@@ -123,12 +123,10 @@
 							*ngIf="column.type === 'boolean'"
 							let-dataItem
 						>
-							<input
-								type="checkbox"
-								[(ngModel)]="dataItem[column.property]"
-								style="margin-left: 35%;"
-								disabled
-							/>
+							<div class="checkbox-container">
+								<tds-checkbox [(inputModel)]="dataItem[column.property]" [disabled]="true"> 															 >
+								</tds-checkbox>
+							</div>
 						</ng-template>
 						<ng-template kendoGridFilterCellTemplate let-filter>
 							<div
