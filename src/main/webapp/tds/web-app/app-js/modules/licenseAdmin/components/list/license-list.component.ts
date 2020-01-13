@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RequestLicenseComponent } from '../request/request-license.component';
 import { CreatedLicenseComponent } from '../created-license/created-license.component';
 import { LicenseDetailComponent } from '../detail/license-detail.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 // Service
 import { LicenseAdminService } from '../../service/license-admin.service';
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
@@ -13,6 +14,8 @@ import { UIPromptService } from '../../../../shared/directives/ui-prompt.directi
 import { PreferenceService } from '../../../../shared/services/preference.service';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { Permission } from '../../../../shared/model/permission.model';
 // Model
 import {
 	COLUMN_MIN_WIDTH,
@@ -48,6 +51,8 @@ declare var jQuery: any;
 })
 export class LicenseListComponent implements OnInit {
 	protected gridColumns: any[];
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 
 	protected state: State = {
 		sort: [
@@ -83,7 +88,8 @@ export class LicenseListComponent implements OnInit {
 		private preferenceService: PreferenceService,
 		private prompt: UIPromptService,
 		private route: ActivatedRoute,
-		private userContextService: UserContextService
+		private userContextService: UserContextService,
+		private translateService: TranslatePipe,
 	) {
 		// use partially datagrid operations helper, for the moment just to know the number of filters selected
 		// in the future this view should be refactored to use the data grid operations helper
@@ -94,6 +100,17 @@ export class LicenseListComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('LICENSE.CREATE_LICENSE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateLicense.bind(this),
+			},
+		];
 		this.userContextService
 			.getUserContext()
 			.subscribe((userContext: UserContextModel) => {
@@ -283,5 +300,28 @@ export class LicenseListComponent implements OnInit {
 	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.licenseColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create licences
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.LicenseAdministration);
 	}
 }

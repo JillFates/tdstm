@@ -20,6 +20,8 @@ import {AssetGlobalFiltersService} from '../../service/asset-global-filters.serv
 import {AssetViewSelectorComponent} from '../asset-view-selector/asset-view-selector.component';
 import {AssetViewSaveComponent} from '../../../assetManager/components/asset-view-save/asset-view-save.component';
 import {AssetViewExportComponent} from '../../../assetManager/components/asset-view-export/asset-view-export.component';
+import { HeaderActionButtonData } from 'tds-component-library';
+
 // Other
 import {State} from '@progress/kendo-data-query';
 import {AssetViewGridComponent} from '../asset-view-grid/asset-view-grid.component';
@@ -37,6 +39,8 @@ declare var jQuery: any;
 	templateUrl: 'asset-view-show.component.html'
 })
 export class AssetViewShowComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 
 	private currentId;
 	private dataSignature: string;
@@ -82,6 +86,22 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'download-cloud',
+				title: this.translateService.transform('ASSET_EXPORT.VIEW'),
+				show: true,
+				onClick: this.onExport.bind(this),
+			},
+			{
+				icon: 'cog',
+				title: this.translateService.transform('ASSET_EXPLORER.CONFIGURE_VIEW'),
+				show: true,
+				onClick: this.onEdit.bind(this),
+			},
+		];
+
 		// Get all Query Params
 		this.route.queryParams.subscribe(map => map);
 		this.globalQueryParams = this.route.snapshot.queryParams;
@@ -230,6 +250,10 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 			viewName: this.model.name
 		};
 
+		if (this.hiddenFilters) {
+			this.assetGlobalFiltersService.prepareFilters(assetExportModel.assetQueryParams, this.globalQueryParams);
+		}
+
 		this.dialogService.open(AssetViewExportComponent, [
 			{ provide: AssetExportModel, useValue: assetExportModel }
 		]).then(result => {
@@ -281,6 +305,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				columns: model.schema.columns
 			}
 		};
+
 		if (justPlanning) {
 			assetQueryParams['justPlanning'] = justPlanning;
 		}
@@ -440,5 +465,12 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 	 */
 	private getPreferences(): Observable<any> {
 		return this.preferenceService.getPreferences(PREFERENCES_LIST.ASSET_JUST_PLANNING);
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
 	}
 }

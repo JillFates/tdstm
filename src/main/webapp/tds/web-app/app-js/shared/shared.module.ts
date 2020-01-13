@@ -340,7 +340,7 @@ export class SharedModule {
 					provide: HTTP_INTERCEPTORS,
 					useClass: KendoFileUploadInterceptor,
 					useFactory: HTTPKendoFactory,
-					deps: [KendoFileHandlerService],
+					deps: [KendoFileHandlerService, Router, Store, WindowService],
 					multi: true,
 				},
 				{

@@ -1,19 +1,7 @@
-import {
-	Component,
-	ViewChild,
-	ViewChildren,
-	HostListener,
-	QueryList,
-	ElementRef,
-	Inject,
-} from '@angular/core';
+import { Component, ElementRef, HostListener, QueryList, ViewChild, ViewChildren, } from '@angular/core';
 import { DropDownListComponent } from '@progress/kendo-angular-dropdowns';
 import { UIActiveDialogService } from '../../../../shared/services/ui-dialog.service';
-import {
-	CredentialModel,
-	AUTH_METHODS,
-	REQUEST_MODE,
-} from '../../model/credential.model';
+import { AUTH_METHODS, CredentialModel, REQUEST_MODE, } from '../../model/credential.model';
 import { ProviderModel } from '../../../provider/model/provider.model';
 import { CredentialService } from '../../service/credential.service';
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
@@ -29,7 +17,6 @@ import {
 } from '../../../../shared/components/check-action/model/check-action.model';
 import * as R from 'ramda';
 import { Observable } from 'rxjs';
-import { BundleModel } from '../../../bundle/model/bundle.model';
 
 declare var jQuery: any;
 
@@ -119,7 +106,6 @@ export class CredentialViewEditComponent {
 		'name',
 		'provider',
 		'username',
-		'password',
 		'authenticationUrl',
 		'httpMethod',
 		'validationExpression',
@@ -136,13 +122,7 @@ export class CredentialViewEditComponent {
 	) {
 		// Sub Objects are not being created, just copy
 		this.credentialModel = R.clone(this.originalModel);
-
-		if (this.modalType === ActionType.CREATE) {
-			this.credentialModel.requestMode = this.requestMode.BASIC_AUTH;
-		}
-
 		this.dataSignature = JSON.stringify(this.credentialModel);
-
 		this.getProviders();
 		this.getAuthMethods();
 		this.getCredentialEnumsConfig();
@@ -152,6 +132,12 @@ export class CredentialViewEditComponent {
 				: this.modalType === ActionType.EDIT
 				? 'Credential Edit'
 				: 'Credential Detail';
+		// for create initialize the validations different
+		if (this.modalType === ActionType.CREATE) {
+			this.credentialModel.requestMode = this.requestMode.BASIC_AUTH;
+			this.requiredFields.push('password');
+			this.validExpressionResult.valid = false;
+		}
 	}
 
 	/**
@@ -216,6 +202,20 @@ export class CredentialViewEditComponent {
 				}
 			},
 			err => console.log(err)
+		);
+	}
+
+	/**
+	 * TODO: check if valid form should pass even though expression is invalid,
+	 * dontiveros: I will change it to be invalid because the form is not saved if the expression result is not valid.
+	 * @param credentialForm
+	 */
+	isFormInvalid(credentialForm: NgForm): boolean {
+		return (
+			!credentialForm.form.valid ||
+			this.credentialModel.provider.id === 0 ||
+			!this.validExpressionResult.valid ||
+			!this.validateRequiredFields(this.credentialModel)
 		);
 	}
 

@@ -30,6 +30,13 @@
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="button-bar">
 							<div class="inline float-right">
+								<tds-grid-header-action-buttons
+										(refresh)="onReload()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
+								<!--
 								<tds-button-create
 									[id]="'btnCreateDataScript'"
 									[title]="
@@ -47,6 +54,7 @@
 										(click)="reloadDataScripts()"
 								>
 								</tds-button-custom>
+								-->
 							</div>
 						</div>
 					</ng-template>

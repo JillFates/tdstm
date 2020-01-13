@@ -16,12 +16,16 @@ import {PreferenceService, PREFERENCES_LIST} from '../../../../shared/services/p
 import {SortUtils} from '../../../../shared/utils/sort.utils';
 import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 import {AssetViewManagerColumnsHelper} from './asset-view-manager-columns.helper';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 @Component({
 	selector: 'tds-asset-view-manager',
 	templateUrl: 'asset-view-manager.component.html',
 })
 export class AssetViewManagerComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	public reportGroupModels = Array<ViewGroupModel>();
 	public searchText: string;
 	private viewType = ViewType;
@@ -39,10 +43,23 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 		private prompt: UIPromptService,
 		private notifier: NotifierService,
 		private dictionary: DictionaryService,
+		private translateService: TranslatePipe,
 		private preferenceService: PreferenceService) {
 		this.report = this.route.snapshot.data['reports'] as Observable<ViewGroupModel[]>;
 	}
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('GLOBAL.CREATE'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateReport.bind(this),
+			},
+		];
+
 		this.gridColumns = AssetViewManagerColumnsHelper.createColumns();
 		const preferencesCodes = `${PREFERENCES_LIST.CURRENT_DATE_FORMAT},${PREFERENCES_LIST.VIEW_MANAGER_DEFAULT_SORT}`;
 		this.preferenceService.getPreferences(preferencesCodes)
@@ -201,5 +218,36 @@ export class AssetViewManagerComponent implements OnInit, OnDestroy {
 	 */
 	public toggleFilter(): void {
 		this.showAssetsFilter = !this.showAssetsFilter;
+	}
+
+	/**
+	 * Update the view based on the filter changes
+	 * @param value new filter change
+	 * @param column  Column throwing the event
+	 */
+	protected onFilter(value: string , column: GridColumnModel): void {
+		this.searchText = value || '';
+		column.filter = this.searchText;
+		if (!value) {
+			this.showAssetsFilter = false;
+		}
+
+		this.loadData();
+	}
+
+	/**
+	 * Clear the content of all filterable columns
+	 */
+	protected onClearAllFilters(): void {
+		this.gridColumns.forEach((column: GridColumnModel) => {
+			this.onFilter(null, column);
+		})
+	}
+
+	/**
+	 * Determine if we need to disable the clear all filters button
+	 */
+	private onDisableClearFilter(): boolean {
+		return !this.searchText;
 	}
 }

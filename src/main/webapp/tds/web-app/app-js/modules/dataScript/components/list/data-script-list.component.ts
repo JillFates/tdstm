@@ -12,6 +12,8 @@ import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-ope
 // Components
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataScriptViewEditComponent } from '../view-edit/data-script-view-edit.component';
+import { HeaderActionButtonData } from 'tds-component-library';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 // Models
 import {
 	COLUMN_MIN_WIDTH,
@@ -43,6 +45,7 @@ import {takeUntil} from 'rxjs/operators';
 import {COMMON_SHRUNK_COLUMNS, COMMON_SHRUNK_COLUMNS_WIDTH,
 } from '../../../../shared/constants/common-shrunk-columns';
 import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-builder.component';
+import {GridColumnModel} from '../../../../shared/model/data-list-grid.model';
 
 @Component({
 	selector: 'data-script-list',
@@ -60,6 +63,8 @@ import { DataScriptEtlBuilderComponent } from '../etl-builder/data-script-etl-bu
 	],
 })
 export class DataScriptListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
 
 	protected state: State = {
@@ -99,6 +104,7 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 		private permissionService: PermissionService,
 		private dataIngestionService: DataScriptService,
 		private prompt: UIPromptService,
+		private translateService: TranslatePipe,
 		private userContext: UserContextService
 	) {
 		// use partially datagrid operations helper, for the moment just to know the number of filters selected
@@ -124,6 +130,18 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('DATA_INGESTION.CREATE_DATA_SCRIPT'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreateDataScript.bind(this),
+			},
+		];
+
 		this.userContext
 			.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
@@ -387,5 +405,30 @@ export class DataScriptListComponent implements OnInit, OnDestroy {
 
 	protected isUpdateAvailable(): boolean {
 		return this.permissionService.hasPermission(Permission.ProviderUpdate);
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		(this.dataScriptColumnModel.columns || []).forEach((column: GridColumnModel) => {
+			this.clearValue(column);
+		});
+		this.showFilters = false;
+		this.reloadDataScripts();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Reload the datascript list view
+	 */
+	public onReload(): void {
+		this.reloadDataScripts().subscribe(() => console.log('Reloading datascripts'));
 	}
 }

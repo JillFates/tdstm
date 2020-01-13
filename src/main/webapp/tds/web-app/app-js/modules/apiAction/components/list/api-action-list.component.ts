@@ -12,6 +12,7 @@ import {TranslatePipe} from '../../../../shared/pipes/translate.pipe';
 // Components
 import {APIActionViewEditComponent} from '../view-edit/api-action-view-edit.component';
 import {UIPromptService} from '../../../../shared/directives/ui-prompt.directive';
+import { HeaderActionButtonData } from 'tds-component-library';
 // Models
 import {GRID_DEFAULT_PAGINATION_OPTIONS, GRID_DEFAULT_PAGE_SIZE} from '../../../../shared/model/constants';
 import {APIActionColumnModel, APIActionModel} from '../../model/api-action.model';
@@ -43,6 +44,9 @@ import {pathOr} from 'ramda';
 	`]
 })
 export class APIActionListComponent implements OnInit, OnDestroy {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
+	public dataGridOperationsHelpter: DataGridOperationsHelper;
 	protected gridColumns: any[];
 	private state: State = {
 		sort: [{
@@ -94,6 +98,19 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.dataGridOperationsHelpter = new DataGridOperationsHelper([]);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translate.transform('API_ACTION.CREATE_ACTION'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.onCreate.bind(this),
+			},
+		];
+
 		this.userContext.getUserContext()
 			.pipe(takeUntil(this.unsubscribeOnDestroy$))
 			.subscribe((userContext: UserContextModel) => {
@@ -293,6 +310,22 @@ export class APIActionListComponent implements OnInit, OnDestroy {
 	 */
 	public filterCounter(): number {
 		return GridColumnModel.getFilterCounter(this.state);
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.isFiltering = false;
+		this.dataGridOperationsHelpter.clearAllFilters(this.apiActionColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0;
 	}
 
 }

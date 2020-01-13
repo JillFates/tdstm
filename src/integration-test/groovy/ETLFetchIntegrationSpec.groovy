@@ -1,17 +1,18 @@
-import net.transitionmanager.asset.AssetEntity
-import com.tdsops.etl.DataSetFacade
 import com.tdsops.etl.DebugConsole
 import com.tdsops.etl.ETLFieldsValidator
 import com.tdsops.etl.ETLProcessor
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.AssetClass
 import grails.gorm.transactions.Rollback
 import grails.test.mixin.integration.Integration
+import net.transitionmanager.asset.AssetEntity
+import net.transitionmanager.common.FileSystemService
 import net.transitionmanager.manufacturer.Manufacturer
 import net.transitionmanager.model.Model
 import net.transitionmanager.project.MoveBundle
 import net.transitionmanager.project.Project
-import net.transitionmanager.common.FileSystemService
 import test.helper.AssetEntityTestHelper
+
 @Integration
 @Rollback
 class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
@@ -45,7 +46,7 @@ class ETLFetchIntegrationSpec extends ETLBaseIntegrationSpec {
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name
 12323434,A1 PDU1 A
 ${device.id},${device.assetName}""".stripIndent())
@@ -96,7 +97,7 @@ ${device.id},${device.assetName}""".stripIndent())
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,environment
 12323434,A1 PDU1 A,Development
 ${device.id},${device.assetName},${device.environment}""".stripIndent())
@@ -149,7 +150,7 @@ ${device.id},${device.assetName},${device.environment}""".stripIndent())
 			device.ipAddress = '192.168.1.10'
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name
 12323434,A1 PDU1 A
 ${device.id},${device.assetName}""".stripIndent())
@@ -199,7 +200,7 @@ ${device.id},${device.assetName}""".stripIndent())
 		given:
 			Person person = personTestHelper.createPerson()
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 sme
 John Doe
 ${person.toString()}""".stripIndent())
@@ -266,7 +267,7 @@ ${person.toString()}""".stripIndent())
 			device.save(flush: true)
 
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 mfg,model
 Dell 11111,PPPPAAAAA
 ${manufacturer.name},${model.modelName}
@@ -338,7 +339,7 @@ ${manufacturer.name},${model.modelName}
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 model,manufacturer
 Dell 11111,PPAA
 ${model.modelName},${manufacturer.name}""".stripIndent())
@@ -409,7 +410,7 @@ ${model.modelName},${manufacturer.name}""".stripIndent())
 			device.save(flush: true)
 
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,model,manufacturer
 12323434,A1 PDU1 A,Dell 11111,
 ${device.id},${device.assetName},${device.model.modelName},${device.model.manufacturer.name}""".stripIndent())
@@ -464,7 +465,7 @@ ${device.id},${device.assetName},${device.model.modelName},${device.model.manufa
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg
 12323434,A1 PDU1 A,
 ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
@@ -532,7 +533,7 @@ ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())
 			device.manufacturer = manufacturer
 			device.save(flush: true)
 
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 asset id,asset name,mfg
 12323434,A1 PDU1 A,Dell2332
 ${device.id},${device.assetName},${manufacturer.name}""".stripIndent())

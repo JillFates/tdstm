@@ -51,7 +51,7 @@ class ETLProcessorResult {
 	ETLProcessorResult(ETLProcessor processor) {
 		this.processor = processor
 		this.ETLInfo = [
-			originalFilename: processor.dataSetFacade.fileName(),
+			originalFilename: processor.getFilename()
 		]
 	}
 
@@ -263,7 +263,7 @@ class ETLProcessorResult {
 		if (resultIndex == -1) {
 			reference.data.add(new RowResult(
 				fieldsValidator: processor.fieldsValidator,
-				rowNum: processor.iterateIndex.pos,
+				rowNum: processor.currentRowIndex,
 				domain: reference.domain)
 			)
 			resultIndex = reference.data.size() - 1

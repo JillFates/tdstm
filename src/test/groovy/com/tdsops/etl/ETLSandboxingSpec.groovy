@@ -1,5 +1,7 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.CSVDataset
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
@@ -22,7 +24,7 @@ class ETLSandboxingSpec extends ETLBaseSpec implements DataTest {
 	Project TMDEMO
 	DebugConsole debugConsole
 	ETLFieldsValidator validator
-	DataSetFacade simpleDataSet
+    CSVDataset simpleDataSet
 	String simpleDataSetFileName
 
 	def setupSpec() {
@@ -387,7 +389,7 @@ class ETLSandboxingSpec extends ETLBaseSpec implements DataTest {
 	void 'test can use type boolean expressions'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet('''
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet('''
 					name
 					x
 					y

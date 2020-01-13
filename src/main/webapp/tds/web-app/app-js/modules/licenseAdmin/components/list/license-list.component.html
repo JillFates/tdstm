@@ -27,19 +27,13 @@
 				>
 					<ng-template kendoGridToolbarTemplate [position]="'top'">
 						<div class="clr-row">
-							<div class="clr-col-12 grid-actions">
-								<tds-button
-									icon="plus"
-									[title]="
-										'LICENSE.CREATE_LICENSE' | translate
-									"
-									(click)="onCreateLicense()"
-									[id]="'btnCreate'"
-								></tds-button>
-								<tds-button
-										icon="sync"
-										(click)="reloadData()"
-								></tds-button>
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
 							</div>
 						</div>
 					</ng-template>

@@ -750,7 +750,7 @@ class DataImportServiceIntegrationSpec extends Specification {
 		then: 'a JSON object should be created'
 			transformJson != null
 		and: 'the ETLInfo has the name of the temporary file'
-			transformJson.ETLInfo.originalFilename == fileUploadName
+			transformJson.ETLInfo.originalFilename == fileSystemService.getTemporaryFullFilename(fileUploadName)
 		and: 'there is only one domain'
 			transformJson.domains.size() == 1
 		and: 'the Domain is Dependency'
