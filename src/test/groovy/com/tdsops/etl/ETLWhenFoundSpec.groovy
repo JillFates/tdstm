@@ -1,19 +1,20 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
+import com.tdsops.tm.enums.domain.AssetClass
+import grails.test.mixin.Mock
 import net.transitionmanager.asset.Application
 import net.transitionmanager.asset.AssetDependency
 import net.transitionmanager.asset.AssetEntity
 import net.transitionmanager.asset.AssetOptions
 import net.transitionmanager.asset.Database
-import com.tdsops.tm.enums.domain.AssetClass
-import grails.test.mixin.Mock
-import net.transitionmanager.imports.DataScript
-import net.transitionmanager.model.Model
-import net.transitionmanager.project.Project
 import net.transitionmanager.asset.Rack
 import net.transitionmanager.asset.Room
 import net.transitionmanager.common.CoreService
 import net.transitionmanager.common.FileSystemService
+import net.transitionmanager.imports.DataScript
+import net.transitionmanager.model.Model
+import net.transitionmanager.project.Project
 import spock.lang.See
 import spock.util.mop.ConfineMetaClassChanges
 
@@ -90,7 +91,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can create a domain when not found a instance with find command using local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -207,7 +208,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can throw an Exception if whenNotFound command defines an update action using local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -288,7 +289,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can throw an Exception if whenFound command defines a create action using local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -368,7 +369,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can update a domain when found a instance with find command using local variables'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -481,7 +482,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can throw an Exception if whenFound is used without using previously a find command'() {
 
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 		and:
 			List<AssetEntity> assetEntities = [
@@ -557,7 +558,7 @@ class ETLWhenFoundSpec extends ETLBaseSpec {
 	void 'test can create throw an Exception when script tries to use a non existing variable'() {
 
 	    given:
-		    def (String fileName, DataSetFacade dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
+		    def (String fileName, ETLDataset dataSet) = buildCSVDataSet(assetDependencyDataSetContent)
 
 	    and:
 			mockDomain(AssetEntity)

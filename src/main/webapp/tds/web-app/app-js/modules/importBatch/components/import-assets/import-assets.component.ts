@@ -329,6 +329,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.importResult = null;
 		this.importInProcess = false;
 		this.transformInProcess = false;
+		this.transformResult = null;
 		this.importResult = null;
 	}
 
@@ -415,7 +416,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: true,
-			showManuaProcesslElements: false,
+			showManualProcessElements: false,
 			sendNotification: true,
 			transformBtnLabel: 'IMPORT_ASSETS.AUTO_IMPORT.INITIATE_IMPORT'
 		}
@@ -425,7 +426,7 @@ export class ImportAssetsComponent implements OnInit {
 		this.uiConfig = {
 			...this.uiConfig,
 			showAutoProcessElements: false,
-			showManuaProcesslElements: true,
+			showManualProcessElements: true,
 			sendNotification: false,
 			transformBtnLabel: 'IMPORT_ASSETS.MANUAL_IMPORT.TRANSFORM'
 		};

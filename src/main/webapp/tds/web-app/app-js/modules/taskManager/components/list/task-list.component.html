@@ -32,7 +32,7 @@
 							(ngModelChange)="onFiltersChange()">
 						Just Mine
 					</label>
-					<label for="three">
+					<label *ngIf="hasViewUnpublishedPermission" for="three">
 						<input
 							type="checkbox"
 							name="three" id="three"

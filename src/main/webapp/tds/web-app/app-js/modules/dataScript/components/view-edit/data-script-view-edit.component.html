@@ -68,30 +68,32 @@
 							<div></div>
 						</div>
 						<div class="col-sm-9" >
-							<div>
-								<input
+							<span class="checkbox">
+								<label for="isAutoProcess">
+									<input
 										id="isAutoProcess"
 										name="isAutoProcess"
 										type="checkbox"
 										[disabled]="modalType === actionTypes.VIEW"
 										[(ngModel)]="dataScriptModel.isAutoProcess" />
-
-								<label for="isAutoProcess">
-									Used to automatically transform, import and post data into TM
+										<span class="checkbox-label">
+											Used to automatically transform, import and post data into TM
+										</span>
 								</label>
-							</div>
-							<div>
-								<input
+							</span>
+							<span class="checkbox" >
+								<label for="useWithAssetActions">
+									<input
 										id="useWithAssetActions"
 										name="useWithAssetActions"
 										type="checkbox"
 										[disabled]="modalType === actionTypes.VIEW"
 										[(ngModel)]="dataScriptModel.useWithAssetActions" />
-
-								<label for="useWithAssetActions">
-									Use with asset actions
+										<span class="checkbox-label">
+											Use with asset actions
+										</span>
 								</label>
-							</div>
+							</span>
 						</div>
 					</div>
 				</div>

@@ -569,7 +569,6 @@ application id,vendor name,technology,location
 				]
 			)
 
-
 			results.domains[0].data[1].fields.id.value == 152255l
 			results.domains[0].data[1].fields.id.originalValue == '152255'
 			results.domains[0].data[1].fields.id.find.results == [152255l]
@@ -583,21 +582,17 @@ application id,vendor name,technology,location
 				]
 			)
 
-
 			results.domains[0].data[0].fields.appVendor.value == 'Microsoft'
 			results.domains[0].data[0].fields.appVendor.originalValue == 'Microsoft'
 			!results.domains[0].data[0].fields.appVendor.find.query
-
 
 			results.domains[0].data[1].fields.appVendor.value == 'Mozilla'
 			results.domains[0].data[1].fields.appVendor.originalValue == 'Mozilla'
 			!results.domains[0].data[1].fields.appVendor.find.query
 
-
 			results.domains[0].data[0].fields.environment.value == 'Production'
 			results.domains[0].data[0].fields.environment.originalValue == 'Production'
 			!results.domains[0].data[0].fields.environment.find.query
-
 
 			results.domains[0].data[1].fields.environment.value == 'Production'
 			results.domains[0].data[1].fields.environment.originalValue == 'Production'

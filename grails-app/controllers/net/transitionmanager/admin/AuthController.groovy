@@ -2,13 +2,11 @@ package net.transitionmanager.admin
 
 import com.tdsops.common.builder.UserAuditBuilder
 import com.tdsops.common.security.SecurityUtil
-import com.tdsops.common.security.spring.HasPermission
 import com.tdsops.common.security.spring.TdsHttpSessionRequestCache
 import com.tdsops.tm.enums.domain.EmailDispatchOrigin
 import com.tdsops.tm.enums.domain.PasswordResetType
 import com.tdsops.tm.enums.domain.StartPageEnum
 import com.tdsops.tm.enums.domain.UserPreferenceEnum as PREF
-import com.tdssrc.grails.TimeUtil
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.annotation.Secured
@@ -18,18 +16,13 @@ import net.transitionmanager.common.EmailDispatchService
 import net.transitionmanager.common.EnvironmentService
 import net.transitionmanager.controller.ControllerMethods
 import net.transitionmanager.exception.ServiceException
-import net.transitionmanager.notice.Notice
 import net.transitionmanager.notice.NoticeService
 import net.transitionmanager.person.UserPreferenceService
 import net.transitionmanager.person.UserService
-import net.transitionmanager.project.MoveBundle
-import net.transitionmanager.project.MoveEvent
 import net.transitionmanager.project.MoveEventService
-import net.transitionmanager.project.MoveEventSnapshot
 import net.transitionmanager.security.AuditService
 import net.transitionmanager.security.PasswordReset
 import net.transitionmanager.security.Permission
-import net.transitionmanager.security.UserLogin
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 
@@ -234,7 +227,7 @@ class AuthController implements ControllerMethods {
 				'Your TransitionManager password has changed',
 				'passwordResetNotif',
 				[:] as JSON,
-				pr.userLogin.person.email,
+				null,
 				pr.userLogin.person.email,
 				pr.userLogin.person,
 				pr.userLogin.person
