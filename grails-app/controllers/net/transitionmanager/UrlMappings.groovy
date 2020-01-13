@@ -1606,6 +1606,17 @@ class UrlMappings {
 			controller = "wsArchitectureGraph"
 		}
 
+		"/ws/dependencyConsole/" {
+			controller = "wsDependencyConsole"
+			action = [
+				GET: "dependencyConsole"
+			]
+		}
+
+		"/ws/dependencyConsole/$action" {
+			controller = "wsDependencyConsole"
+		}
+
 		// Angular
 		"/module/" ( controller: 'singleApp', action: 'index' )
 		"/module/**" ( controller: 'singleApp', action: 'index' )
