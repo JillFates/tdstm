@@ -18,16 +18,24 @@ class RequireCsrfProtectionMatcher implements RequestMatcher {
 		/^\/tdstm\/reports\/.*$/,
 		/^\/tdstm\/apiCatalog\/.*$/,
 		/^\/tdstm\/team\/.*$/,
+		/^\/tdstm\/person\/.*$/,
 		/^\/tdstm\/admin\/.*$/,
 		/^\/tdstm\/assetEntity\/.*$/,
+		/^\/tdstm\/moveBundle\/.*$/,
+		/^\/tdstm\/moveEvent\/.*$/,
 		/^\/tdstm\/partyGroup\/.*$/,
 		/^\/tdstm\/userLogin\/.*$/,
 		/^\/tdstm\/manufacturer\/.*$/,
+		/^\/tdstm\/newsEditor\/.*$/,
 		/^\/tdstm\/reports\/metricDefinitions\/.*$/,
 		/^\/tdstm\/model\/.*$/,
 		/^\/tdstm\/permissions\/.*$/,
 		/^\/tdstm\/room\/.*$/,
-		/^\/tdstm\/rackLayouts\/.*$/
+		/^\/tdstm\/rackLayouts\/.*$/,
+		/^\/tdstm\/ws\/user\/.*$/,
+		/^\/tdstm\/ws\/cookbook\/.*$/,
+		/^\/tdstm\/task\/.*$/,	 // Remove when My Task get Angularized
+		/^\/tdstm\/ws\/depAnalyzer\/.*$/ // Remove when DA get Angularized
 	]
 
 	/**
