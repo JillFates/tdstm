@@ -198,7 +198,7 @@ class UrlMappings {
 			]
 		}
 
-		"/ws/task" {
+		"/ws/task/saveTask" {
 			controller = "wsTask"
 			action = [
 			        PUT: 'saveTask',
