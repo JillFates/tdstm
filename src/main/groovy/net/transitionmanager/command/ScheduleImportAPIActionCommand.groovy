@@ -1,5 +1,7 @@
 package net.transitionmanager.command
 
+import com.tdssrc.grails.FileSystemUtil
+import net.transitionmanager.i18n.Message
 import net.transitionmanager.project.Project
 
 /**
@@ -34,7 +36,7 @@ class ScheduleImportAPIActionCommand extends UploadFileCommand {
      * This instance contains the ETL script content
      * that is going to be executed with {@code ScheduleImportAPIActionCommand#filename} field.
      */
-    String dataScriptProvider
+    String providerName
     /**
      * Project defined by user to be used in dataScript tenant validation.
      */
@@ -46,19 +48,41 @@ class ScheduleImportAPIActionCommand extends UploadFileCommand {
     Boolean sendNotification = false
 
     static constraints = {
+        project nullable: true, validator: { val, obj ->
+            if (!val) {
+                return 'default.missing.required'
+            }
+        }
+        sendNotification nullable: true, validator: { val, obj ->
+            if (!val) {
+                return 'default.missing.required'
+            }
+        }
+        file nullable: true, validator: { file, cmd ->
+            if (!file) {
+                return 'default.missing.required'
+            }
+            if (!FileSystemUtil.validateExtension(file.getOriginalFilename(), cmd.getValidFileExtension())) {
+                return Message.FileSystemInvalidFileExtension
+            }
+        }
         dataScriptId nullable: true
         dataScriptName nullable: true
-        dataScriptProvider nullable: true, validator: { val, obj ->
+        providerName nullable: true, validator: { val, obj ->
             if (obj.dataScriptId && !obj.dataScriptName && !val
                     || !obj.dataScriptId && obj.dataScriptName && val) {
                 return true
             }
 
-            if (obj.dataScriptName && !val){
-                return 'api.import.missing.datascript.provider'
+            if (obj.dataScriptName && !val && !obj.dataScriptId) {
+                return 'default.missing.required'
             }
+
+            if (!obj.dataScriptId && (val || obj.dataScriptName)) {
+                return 'default.missing.required'
+            }
+
             return 'api.import.missing.datascript.reference'
         }
-        sendNotification nullable: false
     }
 }
