@@ -385,7 +385,7 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			comments: rowData.comments?JsonUtil.toJson(rowData.comments):'[]'
 		)
 
-		if (rowData.tags){
+		if (rowData?.tags?.add || rowData?.tags?.remove || rowData?.tags?.replace) {
 			batchRecord.saveTagsAsMap(rowData.tags)
 		}
 
@@ -1014,7 +1014,6 @@ class DataImportService implements ServiceMethods, EventPublisher {
 				ed.subject = 'TransitionManager Import Batch Summary'
 				ed.bodyTemplate = 'batchPostingResults'
 				ed.paramsJson = paramsJson
-				ed.fromAddress = context.whom.email
 				ed.toAddress = context.whom.email
 				ed.toPerson = context.whom
 				ed.createdBy = context.whom
@@ -1049,8 +1048,8 @@ class DataImportService implements ServiceMethods, EventPublisher {
 			log.debug "recordDomainConstraintErrorsToFieldsInfoOrRecord() error: $error"
 			String property = error.getField()
 			String errorMsg = i18nMessage(error)
-				fieldsInfo[property].errors << errorMsg
 			if (fieldsInfo[property]) {
+				fieldsInfo[property].errors << errorMsg
 			} else {
 				// A contraint failed on a property that wasn't one of the fields in the fields loaded from the ETL
 				record.addError(errorMsg)

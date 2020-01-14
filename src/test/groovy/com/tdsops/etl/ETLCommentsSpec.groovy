@@ -1,5 +1,6 @@
 package com.tdsops.etl
 
+import com.tdsops.etl.dataset.ETLDataset
 import com.tdsops.tm.enums.domain.ImportOperationEnum
 import grails.testing.gorm.DataTest
 import net.transitionmanager.asset.Application
@@ -39,7 +40,7 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 	@See('TM-11482')
 	void 'test can add a comment to a Device'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,Description FOOBAR
 				zuludb01,10,Some description
@@ -99,7 +100,7 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 	@See('TM-11482')
 	void 'test can add a comment using load command'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,Description FOOBAR
 				zuludb01,10,Some description
@@ -160,7 +161,7 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 	@See('TM-11482')
 	void 'test can add a comment using a ETL variable'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,Description FOOBAR
 				zuludb01,10,Some description
@@ -222,7 +223,7 @@ class ETLCommentsSpec extends ETLBaseSpec implements DataTest {
 	@See('TM-11482')
 	void 'test can throw an Exception if it tries to attach a comment in a non Asset Entity domain'() {
 		given:
-			def (String fileName, DataSetFacade dataSet) = buildCSVDataSet("""
+			def (String fileName, ETLDataset dataSet) = buildCSVDataSet("""
 				name,cpu,description
 				xraysrv01,100,Description FOOBAR
 				zuludb01,10,Some description

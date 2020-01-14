@@ -26,8 +26,18 @@
 				>
 					<ng-template kendoGridToolbarTemplate position="top">
 						<div class="clr-row">
+							<div class="clr-col-12 pull-right">
+								<tds-grid-header-action-buttons
+										(refresh)="reloadData()"
+										[actionButtons]="headerActionButtons"
+										(clearFilters)="clearAllFilters()"
+										[disableClearFilters]="disableClearFilters">
+								</tds-grid-header-action-buttons>
+							</div>
+						</div>
+                        <!--
+						<div class="clr-row">
 							<div class="clr-col-4 grid-label">
-								<!-- <strong>Bundle List</strong> -->
 							</div>
 							<div class="clr-col-8 grid-actions">
 								<div *ngIf="canEditBundle">
@@ -42,6 +52,7 @@
 								</div>
 							</div>
 						</div>
+						-->
 					</ng-template>
 
 					<!-- Show Filters / Actions column -->

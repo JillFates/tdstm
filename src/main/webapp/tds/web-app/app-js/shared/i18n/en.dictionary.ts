@@ -116,6 +116,7 @@ export const en_DICTIONARY: Object = {
 		'CREATE_DATABASE': 'Create DB',
 		'CREATE_DEVICE': 'Create Device',
 		'CREATE_STORAGE': 'Create Storage',
+		'CONFIGURE_VIEW': 'Configure View',
 		'SHOW_COMMENTS': 'Show Comments',
 		'SHOW_TASKS': 'Show Tasks',
 		'GRID': {
@@ -176,7 +177,8 @@ export const en_DICTIONARY: Object = {
 		'RACK': 'Rack',
 		'DEPENDENCY': 'Dependency',
 		'CABLING': 'Cabling',
-		'COMMENT': 'Comment'
+		'COMMENT': 'Comment',
+		'VIEW': 'Export View'
 	},
 	'ASSET_SUMMARY': {
 		'ASSET_SUMMARY': 'Asset Summary',
@@ -242,6 +244,7 @@ export const en_DICTIONARY: Object = {
 		'PROJECT': 'Project'
 	},
 	'DEPENDENCIES': {
+		'CREATE_DEPENDENCY': 'Create Dependency',
 		'MENU_TITLE': 'Dependencies',
 		'LIST_TITLE': 'Dependencies List',
 		'SINGLE_NAME': 'Dependency',
@@ -284,10 +287,12 @@ export const en_DICTIONARY: Object = {
 		'BUNDLES': {
 			'BUNDLES': 'Bundles',
 			'LIST': 'Bundle List',
+			'CREATE_BUNDLE': 'Create Bundle',
 		}
 	},
 	'PROJECT': {
 		'PROJECTS': 'Projects',
+		'CREATE_PROJECT': 'Create Projects',
 		'SELECT_PROJECT': 'Select a Project',
 		'MISSING_PROJECT': 'Your account is missing an active project. Please select one in order to proceed.',
 		'NO_ACTIVE_PROJECTS': 'There are currently no active projects to choose from.  Please contact your administrator for assistance.'
@@ -461,6 +466,8 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'UNAUTHORIZED_MESSAGE': 'Please contact the Project Manager to help you resolve this.',
 		'NOT_FOUND_TITLE': 'Oops! Nothing Found.',
 		'NOT_FOUND_MESSAGE': 'We cannot find what you are looking for. Perhaps the page is broken, or has been moved. Please contact the Project Manager to help you resolve this.',
+		'CSRF_UNAUTHORIZED_MESSAGE': 'CSRF Verification failed.',
+		'CSRF_INVALID': 'CSRF Token missing or incorrect.',
 		'WHY_THIS': 'Why am I seeing this?',
 		'LICENSE_EXPIRED': 'Your TransitionManager license is missing, expired or is otherwise no longer valid for this project.',
 		'LICENSE_ADMINISTRATOR': 'Your Administrator can manage the license from the Admin Menu, or if you are the Administrator and need assistance, please open a ticket at:'
@@ -474,6 +481,7 @@ Mandatory Acknowledgement: Appear post login and user must Accept otherwise will
 		'DELETE_MODEL' : 'Are you sure you want to delete this model? There is no undo for this action',
 	},
 	'TASK_MANAGER': {
+		'BULK_ACTION': 'Bulk Action',
 		'CURRENTLY_LIST_OF_AVAILABLE_TASKS': 'Current list of available tasks',
 		'CREATE': 'Create',
 		'CREATE_TASK': 'Create Task',

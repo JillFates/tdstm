@@ -1,5 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
 import { GridColumnModel } from '../../../../shared/model/data-list-grid.model';
 import { Observable } from 'rxjs/Observable';
@@ -34,6 +34,7 @@ import { clone, hasIn } from 'ramda';
 import { AssetShowComponent } from '../../../assetExplorer/components/asset/asset-show.component';
 import { AssetExplorerModule } from '../../../assetExplorer/asset-explorer.module';
 import { TaskEditCreateComponent } from '../edit-create/task-edit-create.component';
+import { HeaderActionButtonData } from 'tds-component-library';
 import { UserContextModel } from '../../../auth/model/user-context.model';
 import { UserContextService } from '../../../auth/service/user-context.service';
 import { Store } from '@ngxs/store';
@@ -44,12 +45,16 @@ import { TaskEditCreateModelHelper } from '../common/task-edit-create-model.help
 import { DateUtils } from '../../../../shared/utils/date.utils';
 import { TaskActionInfoModel } from '../../model/task-action-info.model';
 import {UILoaderService} from '../../../../shared/services/ui-loader.service';
+import {Permission} from '../../../../shared/model/permission.model';
+import {PermissionService} from '../../../../shared/services/permission.service';
 
 @Component({
 	selector: 'task-list',
 	templateUrl: './task-list.component.html'
 })
-export class TaskListComponent {
+export class TaskListComponent implements OnInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	@ViewChild('gridComponent', {static: false}) gridComponent: GridComponent;
 	TASK_MANAGER_REFRESH_TIMER: string = PREFERENCES_LIST.TASK_MANAGER_REFRESH_TIMER;
 	TaskStatus: any = TaskStatus;
@@ -80,6 +85,7 @@ export class TaskListComponent {
 	private rowsExpandedMap: any;
 	// Contains the Action Bar Details for each row
 	private taskActionInfoModels: Map<string, TaskActionInfoModel>;
+	public hasViewUnpublishedPermission = false;
 	public isFiltering  = false;
 
 	constructor(
@@ -91,7 +97,7 @@ export class TaskListComponent {
 		private dialogService: UIDialogService,
 		private userContextService: UserContextService,
 		private translate: TranslatePipe,
-		private activatedRoute: ActivatedRoute) {
+		private activatedRoute: ActivatedRoute, private permissionService: PermissionService, private el: ElementRef, private renderer: Renderer2) {
 		this.gridDefaultSort = [{field: 'score', dir: 'desc'}];
 		this.justMyTasks = false;
 		this.loading = true;
@@ -107,7 +113,36 @@ export class TaskListComponent {
 		this.rowsExpandedMap = {};
 		this.currentPage = 1;
 		this.taskActionInfoModels = new Map<string, TaskActionInfoModel>();
+		this.hasViewUnpublishedPermission = this.permissionService.hasPermission(Permission.TaskViewUnpublished);
 		this.onLoad();
+	}
+
+	/**
+	 * On Init: remove the min-height that TDSTMLayout.min.js randomly calculates wrong.
+	 */
+	ngOnInit(): void {
+		const contentWrapper = document.getElementsByClassName('content-wrapper')[0];
+		if (contentWrapper) {
+			// TODO: we can test this calculation among several pages and if it works correctly we can apply to the general app layout.
+			// 45px is the header height, 31px is the footer height
+			(contentWrapper as any).style.minHeight = 'calc(100vh - (45px + 31px))';
+		}
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translate.transform('TASK_MANAGER.CREATE_TASK'),
+				show: true,
+				onClick: this.onCreateTaskHandler.bind(this),
+			},
+			{
+				icon: 'pencil',
+				title: this.translate.transform('TASK_MANAGER.BULK_ACTION'),
+				show: true,
+				onClick: this.onBulkActionHandler.bind(this),
+			},
+		];
 	}
 
 	/**
@@ -454,14 +489,6 @@ export class TaskListComponent {
 	}
 
 	/**
-	 * Determines if current columns has been filtered (contains value).
-	 */
-	areFiltersDirty(): boolean {
-		return (this.columnsModel
-			.filter(column => column.filter).length > 0) || this.hasDashboardFilters();
-	}
-
-	/**
 	 * On bulk action button click, expand all rows that can be actionable (ready or started status)
 	 */
 	onBulkActionHandler(): void {
@@ -574,6 +601,9 @@ export class TaskListComponent {
 		}
 		const filterColumn = { ...column };
 		if (filterColumn.property.startsWith('userSelectedCol')) {
+			// save the reference to the custom property name
+			column.customPropertyName =  this.currentCustomColumns[filterColumn.property];
+			// use the new property name
 			filterColumn.property = this.currentCustomColumns[filterColumn.property];
 		}
 		const result = this.grid.getFilter(filterColumn);
@@ -626,7 +656,7 @@ export class TaskListComponent {
 					this.pageSize = listSize ? parseInt(listSize, 10) : GRID_DEFAULT_PAGE_SIZE;
 					this.grid.state.take = this.pageSize;
 					// Task View Unpublished
-					this.viewUnpublished = unpublished ? (unpublished === 'true' || unpublished === '1') : false;
+					this.viewUnpublished = this.hasViewUnpublishedPermission && unpublished ? (unpublished === 'true' || unpublished === '1') : false;
 					// Just Remaining
 					this.justRemaining = justRemaining ? justRemaining === '1' : false;
 					// params were transferred to local properties,
@@ -851,5 +881,21 @@ export class TaskListComponent {
 	public pageChangeTaskGrid(event: PageChangeEvent): void {
 		// this.tasksPage = event;
 		// this.loadTasksGrid();
+	}
+
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.isFiltering = false;
+		this.grid.clearAllFilters(this.columnsModel);
+		this.onFiltersChange();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCounter() === 0 && this.hasDashboardFilters() === false;
 	}
 }

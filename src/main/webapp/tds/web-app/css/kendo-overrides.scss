@@ -63,6 +63,11 @@ kendo-numerictextbox {
 }
 
 kendo-grid.k-grid {
+  &.clickable-rows {
+    tr {
+      cursor: pointer;
+    }
+  }
   .action-button clr-dropdown-menu {
     line-height: 20px !important;
     .k-button:focus {
@@ -311,6 +316,13 @@ kendo-dropdownlist {
   .k-select {
     .k-icon {
       color: #0092d1;
+    }
+  }
+
+  &.has-error {
+    border: none !important;
+    .k-dropdown-wrap {
+      border-bottom: 1px #f00 solid !important;
     }
   }
 }

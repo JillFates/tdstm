@@ -14,14 +14,17 @@ import { SetEvent } from '../../action/event.actions';
 // Services
 import { UIDialogService } from '../../../../shared/services/ui-dialog.service';
 import { PermissionService } from '../../../../shared/services/permission.service';
+import { Permission } from '../../../../shared/model/permission.model';
 import { EventsService } from '../../service/events.service';
 import {
 	PreferenceService,
 	PREFERENCES_LIST,
 } from '../../../../shared/services/preference.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 // Components
 import { UIPromptService } from '../../../../shared/directives/ui-prompt.directive';
 import { DataGridOperationsHelper } from '../../../../shared/utils/data-grid-operations.helper';
+import { HeaderActionButtonData } from 'tds-component-library';
 // Models
 import {
 	COLUMN_MIN_WIDTH,
@@ -53,6 +56,8 @@ declare var jQuery: any;
 	templateUrl: 'event-list.component.html',
 })
 export class EventListComponent implements OnInit, AfterContentInit {
+	public disableClearFilters: Function;
+	public headerActionButtons: HeaderActionButtonData[];
 	protected gridColumns: any[];
 
 	protected state: State = {
@@ -90,7 +95,8 @@ export class EventListComponent implements OnInit, AfterContentInit {
 		private elementRef: ElementRef,
 		private renderer: Renderer2,
 		private store: Store,
-		private preferenceService: PreferenceService
+		private preferenceService: PreferenceService,
+		private translateService: TranslatePipe,
 	) {
 		// use partially datagrid operations helper, for the moment just to know the number of filters selected
 		// in the future this view should be refactored to use the data grid operations helper
@@ -103,6 +109,18 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	}
 
 	ngOnInit() {
+		this.disableClearFilters = this.onDisableClearFilter.bind(this);
+		this.headerActionButtons = [
+			{
+				icon: 'plus-circle',
+				iconClass: 'is-solid',
+				title: this.translateService.transform('EVENT.CREATE_EVENT'),
+				disabled: !this.isCreateAvailable(),
+				show: true,
+				onClick: this.openEventDialogCreate.bind(this),
+			},
+		];
+
 		this.preferenceService
 			.getPreference(PREFERENCES_LIST.CURR_TZ)
 			.subscribe();
@@ -261,5 +279,27 @@ export class EventListComponent implements OnInit, AfterContentInit {
 	 */
 	protected hasFilterApplied(): boolean {
 		return this.state.filter.filters.length > 0;
+	}
+	/**
+	 * Clear all filters
+	 */
+	protected clearAllFilters(): void {
+		this.showFilters = false;
+		this.dataGridOperationsHelper.clearAllFilters(this.eventColumnModel.columns, this.state);
+		this.reloadData();
+	}
+
+	/**
+	 * Disable clear filters
+	 */
+	private onDisableClearFilter(): boolean {
+		return this.filterCount() === 0;
+	}
+
+	/**
+	 * Determines if user has the permission to create projects
+	 */
+	protected isCreateAvailable(): boolean {
+		return this.permissionService.hasPermission(Permission.ProjectCreate);
 	}
 }

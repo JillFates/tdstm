@@ -14,13 +14,11 @@ import {
 	template: `
 		<div class="pie-countdown">
 			<div class="pie-countdown-container">
-				<clr-icon
-					style="cursor: pointer; color:#0092d1;"
-					*ngIf="!hideRefresh"
-					aria-hidden="true"
-					(click)="onManualUpdate()"
-					shape="sync"
-				></clr-icon>
+                <tds-button-custom icon="sync"
+                                   *ngIf="!hideRefresh"
+                                   [displayLabel]="false" tooltip="Refresh"
+                                   (click)="onManualUpdate()">
+                </tds-button-custom>
 				<kendo-dropdownlist
 					[(ngModel)]="selectedTimerOption"
 					[data]="timerOptions"

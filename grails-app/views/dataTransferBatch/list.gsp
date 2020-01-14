@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="layout" content="topNav" />
-        <title>Manage Import Batches (Excel)</title>
+        <title>Manage Import Batches (TM Excel)</title>
 
         <asset:stylesheet href="css/progressbar.css" />
         <asset:stylesheet href="css/tds-bootstrap.css" />
@@ -24,7 +24,7 @@
         </style>
     </head>
     <body>
-        <tds:subHeader title="Manage Import Batches (Excel)" crumbs="['Assets','Manage Import Batches (Excel)']"/>
+        <tds:subHeader title="Manage Import Batches (TM Excel)" crumbs="['Assets','Manage Import Batches (TM Excel)']"/>
         <g:if test="${flash.message}">
             <div class="margin">
                 <div class="callout callout-info" style="margin-bottom: 0!important;">
