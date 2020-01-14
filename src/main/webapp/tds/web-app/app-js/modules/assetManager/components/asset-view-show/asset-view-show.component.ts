@@ -103,7 +103,9 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
-		this.currentOverrideState = this.overrideAssetViews.IS_NOT_OVERRIDE;
+		if (this.model.isOverride) {
+			this.currentOverrideState = this.overrideAssetViews.IS_NOT_OVERRIDE;
+		}
 	}
 
 	ngOnInit(): void {

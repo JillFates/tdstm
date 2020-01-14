@@ -52,6 +52,7 @@ class Dataview {
 			schema    : JsonUtil.parseJson(reportSchema),
 			createdBy : getOwnerName(),
 			createdOn : TimeUtil.formatDate(dateCreated),
+			overridesView: overridesView,
 			updatedOn : TimeUtil.formatDate(lastModified)
 		]
 		return data

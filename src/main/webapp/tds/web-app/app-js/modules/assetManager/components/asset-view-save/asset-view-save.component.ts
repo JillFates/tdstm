@@ -162,8 +162,7 @@ export class AssetViewSaveComponent implements AfterViewInit {
 		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
 			this.startModel();
 		}
-		const tmpModel = Object.assign({}, this.model);
-		tmpModel.id = null;
+		const tmpModel = this.extractModel(this.model);
 		this.assetExpService.saveReport(tmpModel)
 			.subscribe(result => result && this.activeDialog.close(result),
 				error => this.activeDialog.dismiss(error));
@@ -274,6 +273,13 @@ export class AssetViewSaveComponent implements AfterViewInit {
 				.subscribe((isUnique: boolean) => this.isUnique = isUnique,
 					(error) => console.log(error.message));
 		}
+	}
+
+	private extractModel(model: ViewModel) {
+		const tmpModel = Object.assign({}, model);
+		tmpModel.id = null;
+		tmpModel.overrideView = model.id;
+		return tmpModel;
 	}
 }
 
