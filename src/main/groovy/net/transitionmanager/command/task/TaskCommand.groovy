@@ -10,7 +10,6 @@ class TaskCommand implements CommandObject {
     String category
     String comment
 //    Long commentFromId
-    String currentStatus
     List deletedPreds
     String displayOption
     Date dueDate

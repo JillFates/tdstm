@@ -5874,7 +5874,7 @@ class TaskService implements ServiceMethods {
 			// Fetch the Task from the database.
 			task = GormUtil.findInProject(project, Task, taskCommand.id, true)
 			// Validate that the status hasn't been updated by someone else. If so, fail accordingly.
-			if (taskCommand.currentStatus && taskCommand.currentStatus != task.status && task.status != READY) {
+			if (taskCommand.status && taskCommand.status != task.status && task.status != READY) {
 				Person responsible = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
 				String errorMsg
 				switch (task.status) {
