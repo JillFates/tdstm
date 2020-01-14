@@ -3,6 +3,8 @@
 		<div class="box-body box-with-empty-header">
 			<kendo-grid
 				*ngIf="dataGridOperationsHelper"
+				class="page-height narrow-rows clickable-rows"
+				[ngClass]="{ 'hide-filter': !showFilters }"
 				[data]="dataGridOperationsHelper.gridData"
 				[filter]="dataGridOperationsHelper.state.filter"
 				[filterable]="true"
@@ -62,27 +64,16 @@
 					</div>
 				</ng-template>
 
-				<!-- Checkbox Template (Select All & Cell Content) -->
-				<kendo-grid-column *ngIf="canBulkDelete() || canBulkArchive()" title="" [locked]="true" [filterable]="false"
-													 [width]="45">
-					<ng-template kendoGridHeaderTemplate>
-						<div class="row">
-							<div class="col-md-12 text-center">
-								<div class="checkbox checkbox-grid">
-									<label>
-										<input type="checkbox" name="selectAll"
-													 [(ngModel)]="dataGridOperationsHelper.selectAllCheckboxes"
-													 (change)="dataGridOperationsHelper.onSelectAllCheckboxes()">
-									</label>
-								</div>
-							</div>
-						</div>
-					</ng-template>
+				<!-- Select All -->
+				<kendo-grid-column *ngIf="canBulkDelete() || canBulkArchive()"
+													 [filterable]="false"
+													 [width]="SELECT_ALL_COLUMN_WIDTH">
 					<ng-template kendoGridCellTemplate let-dataItem>
 						<label
 							*ngIf="dataItem.status.code !== BatchStatus.RUNNING && dataItem.status.code !== BatchStatus.STALLED && dataItem.status.code !== BatchStatus.QUEUED"
 							class="selectall-checkbox-column text-center k-grid-ignore-click">
-							<input type="checkbox"
+							<input clrCheckbox
+										 type="checkbox"
 										 [(ngModel)]="dataGridOperationsHelper.bulkItems[dataItem[checkboxSelectionConfig.useColumn]]"
 										 name="checkbox_{{dataItem[checkboxSelectionConfig.useColumn]}}"
 										 (change)="dataGridOperationsHelper.onCheckboxChange(dataItem[checkboxSelectionConfig.useColumn])">
@@ -90,34 +81,70 @@
 					</ng-template>
 				</kendo-grid-column>
 
-				<!-- Action -->
+				<!-- Show Filters / Actions column -->
 				<kendo-grid-column *ngIf="!viewArchived"
-													 title="Action"
-													 [locked]="true"
-													 [filterable]="false"
 													 [width]="60"
-													 [resizable]="false">
+													 [class]="{ 'k-custom-command-column': true, 'actions-column': true }"
+													 [minResizableWidth]="60">
 					<ng-template kendoGridHeaderTemplate>
-						<label class="action-header"> Action </label>
+						<tds-button [flat]="true" (click)="toggleFilter()">
+							<clr-icon shape="filter" class="grid-filter-button is-solid">
+							<span
+								*ngIf="dataGridOperationsHelper.getFilterCounter()"
+								class="badge badge-warning">
+								{{ dataGridOperationsHelper.getFilterCounter() }}
+							</span>
+							</clr-icon>
+						</tds-button>
 					</ng-template>
 					<ng-template kendoGridCellTemplate let-dataItem>
-						<div class="k-grid-ignore-click text-center tds-action-button-set" style="cursor: default">
-							<tds-button-custom
-								*ngIf="dataItem.status.code === 'PENDING'"
-								(click)="onPlayButton(dataItem)"
-								[tooltip]="'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate"
-								[icon]="'play-circle-o'"></tds-button-custom>
-							<tds-button-custom
-								*ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"
-								(click)="onStopButton(dataItem)"
-								[tooltip]="'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate"
-								[icon]="'stop'"></tds-button-custom>
-							<tds-button-custom
-								*ngIf="dataItem.status.code === 'QUEUED'"
-								(click)="onEjectButton(dataItem)"
-								[tooltip]="'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate"
-								[icon]="'eject'"></tds-button-custom>
+						<div class="k-grid-ignore-click" style="cursor: default;">
+							<tds-button-custom *ngIf="dataItem.status.code === 'PENDING'"
+																 (click)="onPlayButton(dataItem)"
+																 [icon]="'play'"
+																 [flat]="true"
+																 [tooltip]="'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate">
+							</tds-button-custom>
+							<tds-button-custom *ngIf="dataItem.status.code === 'RUNNING'"
+																 (click)="onStopButton(dataItem)"
+																 [icon]="'stop'"
+																 [flat]="true"
+																 [tooltip]="'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate">
+							</tds-button-custom>
+							<tds-button-custom *ngIf="dataItem.status.code === 'QUEUED'"
+																 (click)="onEjectButton(dataItem)"
+																 [icon]="'replay-all'"
+																 [flat]="true"
+																 [tooltip]="'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate">
+							</tds-button-custom>
 						</div>
+						<!--						<div class="action-button btn-link k-grid-ignore-click">-->
+						<!--							<clr-dropdown>-->
+						<!--								<tds-button-->
+						<!--									icon="ellipsis-vertical"-->
+						<!--									clrDropdownTrigger></tds-button>-->
+						<!--								<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">-->
+						<!--									<a clrDropdownItem-->
+						<!--										 *ngIf="dataItem.status.code === 'PENDING'"-->
+						<!--										 [title]="'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate"-->
+						<!--										 (click)="onPlayButton(dataItem)">-->
+						<!--										<clr-icon shape="play"></clr-icon>-->
+						<!--									</a>-->
+						<!--									<a clrDropdownItem-->
+						<!--										 *ngIf="dataItem.status.code === 'RUNNING' || dataItem.status.code === 'STALLED'"-->
+						<!--										 [title]="'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate"-->
+						<!--										 (click)="onStopButton(dataItem)">-->
+						<!--										<clr-icon shape="stop"></clr-icon>-->
+						<!--									</a>-->
+						<!--									<a clrDropdownItem-->
+						<!--										 *ngIf="dataItem.status.code === 'QUEUED'"-->
+						<!--										 [title]="'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate"-->
+						<!--										 (click)="onEjectButton(dataItem)">-->
+						<!--										<clr-icon shape="eject"></clr-icon>-->
+						<!--									</a>-->
+						<!--								</clr-dropdown-menu>-->
+						<!--							</clr-dropdown>-->
+						<!--						</div>-->
 					</ng-template>
 				</kendo-grid-column>
 
@@ -144,30 +171,6 @@
 						{{dataItem[column.property] | tdsDateTime: userTimeZone }}
 					</ng-template>
 
-					<!-- Action -->
-					<ng-template kendoGridCellTemplate *ngIf="column.type === 'action' && !viewArchived" let-dataItem>
-						<div class="k-grid-ignore-click" style="cursor: default;">
-							<button *ngIf="dataItem.status.code === 'PENDING'"
-											(click)="onPlayButton(dataItem)"
-											class="btn btn-action btn-default"
-											title="{{ 'IMPORT_BATCH.LIST.QUEUE_TO_BE_PROCESSED' | translate }}">
-								<i class="fa fa-play-circle-o"></i>
-							</button>
-							<button *ngIf="dataItem.status.code === 'RUNNING'"
-											(click)="onStopButton(dataItem)"
-											class="btn btn-action btn-default"
-											title="{{ 'IMPORT_BATCH.LIST.STOP_PROCESSING' | translate }}">
-								<i class="fa fa-stop"></i>
-							</button>
-							<button *ngIf="dataItem.status.code === 'QUEUED'"
-											(click)="onEjectButton(dataItem)"
-											class="btn btn-action btn-default"
-											title="{{ 'IMPORT_BATCH.LIST.REMOVE_FROM_QUEUE' | translate }}">
-								<i class="fa fa-eject"></i>
-							</button>
-						</div>
-					</ng-template>
-
 					<!-- Status -->
 					<ng-template kendoGridCellTemplate *ngIf="column.property === 'status.label'" let-dataItem>
 						<div
@@ -189,23 +192,15 @@
 
 					<!-- Filter Template -->
 					<ng-template kendoGridFilterCellTemplate let-filter>
-						<div class="has-feedback" *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )"
-								 style="margin-bottom:0px;">
-							<div *ngIf="column.type === 'date'; then dateFilter else stringFilter"></div>
-							<ng-template #dateFilter>
-								<kendo-datepicker (valueChange)="dataGridOperationsHelper.onFilter(column)"
-																	[(ngModel)]="column.filter"></kendo-datepicker>
-								<span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)"
-											style="left:106px;cursor:pointer;color:#656565;pointer-events:all"
-											class="fa fa-times form-control-feedback"></span>
-							</ng-template>
-							<ng-template #stringFilter>
-								<input [(ngModel)]="column.filter" (keyup)="preProcessFilter(column)"
-											 type="text" class="form-control" name="{{column.property}}" placeholder="Filter" value="">
-								<span *ngIf="column.filter" (click)="dataGridOperationsHelper.clearValue(column)"
-											style="cursor:pointer;color:#656565;pointer-events:all"
-											class="fa fa-times form-control-feedback"></span>
-							</ng-template>
+						<div class="filter-input"
+								 *ngIf="column.property && (column.type !== 'action' && column.type !== 'number' )">
+							<tds-filter-input
+								name="{{column.property}}"
+								[value]="column.filter || ''"
+								[columnType]="column.type"
+								placeholder="{{'GLOBAL.FILTER' | translate}}"
+								(filter)="dataGridOperationsHelper.onFilterWithValue($event, column)">
+							</tds-filter-input>
 						</div>
 					</ng-template>
 

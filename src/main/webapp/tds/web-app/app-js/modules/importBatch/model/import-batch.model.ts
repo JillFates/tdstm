@@ -80,7 +80,7 @@ export class ImportBatchColumnsModel {
 				label: 'Records',
 				property: 'recordsSummary.count',
 				type: 'number',
-				width: 80,
+				width: 120,
 				locked: false,
 				cellStyle: { 'text-align': 'right' }
 			},
@@ -88,7 +88,7 @@ export class ImportBatchColumnsModel {
 				label: 'Pending',
 				property: 'recordsSummary.pending',
 				type: 'number',
-				width: 80,
+				width: 120,
 				locked: false,
 				cellStyle: { 'text-align': 'right' }
 			},
@@ -96,7 +96,7 @@ export class ImportBatchColumnsModel {
 				label: 'Processed',
 				property: 'recordsSummary.processed',
 				type: 'number',
-				width: 90,
+				width: 120,
 				locked: false,
 				cellStyle: { 'text-align': 'right' }
 			},
@@ -104,7 +104,7 @@ export class ImportBatchColumnsModel {
 				label: 'Erred',
 				property: 'recordsSummary.erred',
 				type: 'number',
-				width: 80,
+				width: 120,
 				locked: false,
 				cellStyle: { 'text-align': 'right' }
 			},
@@ -112,7 +112,7 @@ export class ImportBatchColumnsModel {
 				label: 'Ignored',
 				property: 'recordsSummary.ignored',
 				type: 'number',
-				width: 80,
+				width: 120,
 				locked: false,
 				cellStyle: { 'text-align': 'right' }
 			},

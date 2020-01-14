@@ -66,17 +66,14 @@
 				[class]="{ 'k-custom-command-column': true, 'actions-column': true }"
 				[minResizableWidth]="60"
 		>
-			<ng-template
-					kendoGridHeaderTemplate
-					let-column
-					let-columnIndex="columnIndex"
-			>
+			<ng-template kendoGridHeaderTemplate
+									 let-column
+									 let-columnIndex="columnIndex">
 				<tds-button [flat]="true" (click)="toggleAssetsFilter()">
 					<clr-icon shape="filter" class="grid-filter-button is-solid">
 					<span
 						*ngIf="hasFilterApplied()"
-						class="badge badge-warning"
-					>
+						class="badge badge-warning">
 						{{ currentStatus.filterCounter }}
 					</span>
 					</clr-icon>
@@ -93,22 +90,19 @@
 					<clr-dropdown>
 						<tds-button
 								icon="ellipsis-vertical"
-								clrDropdownTrigger
-						></tds-button>
+								clrDropdownTrigger></tds-button>
 						<clr-dropdown-menu *clrIfOpen clrPosition="bottom-left">
 							<a
 									clrDropdownItem
 									(click)="showAssetEditView(dataItem, rowIndex)"
-									[disabled]="!isEditAvailable()"
-							>
+									[disabled]="!isEditAvailable()">
 								Edit
 							</a>
 							<a
 									clrDropdownItem
 									(click)="createTask(dataItem, rowIndex)"
 									*ngIf="!isIssue"
-									[disabled]="!isTaskCreateAvailable()"
-							>
+									[disabled]="!isTaskCreateAvailable()">
 								Create Task
 							</a>
 							<a
