@@ -29,6 +29,7 @@ class ProjectCommand implements CommandObject {
 		description nullable: true
 		comment nullable: true
 		projectLogo nullable: true
+		timeZone nullable: true
 		originalFilename nullable: true
 		planMethodology validator: { val, obj, errors ->
 			//The regex is looking for values that start with custom followed by a number 0 through 99
