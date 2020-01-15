@@ -41,6 +41,11 @@ import org.grails.web.json.JSONObject
 
 import java.sql.Timestamp
 
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.QUESTIONED
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.UNKNOWN
+import static com.tdsops.tm.enums.domain.AssetDependencyStatus.VALIDATED
+import static com.tdsops.tm.enums.domain.AssetEntityPlanStatus.UNASSIGNED
+
 /**
  * Service class with main database operations for Dataview.
  * @see Dataview
@@ -1224,6 +1229,37 @@ class DataviewService implements ServiceMethods {
 				}
 			]
 		],
+		'dependencyGroup': [
+			property      : 'ABD.dependencyBundle',
+			type          : Integer,
+			namedParameter: 'dependencyGroup',
+			alias         : 'dependencyGroup',
+			join          : "left outer join AssetDependencyBundle ABD on AE.id = ABD.asset.id AND ABD.dependencySource = 'Dependency'"
+		],
+		'tbd'            : [
+			property      : """
+				(SELECT COUNT(*)
+				FROM AssetDependency AD
+				WHERE status IN ('${UNKNOWN}','${QUESTIONED}') AND (AD.asset=AE OR AD.dependent=AE))
+			""",
+			type          : Integer,
+			namedParameter: 'tbd',
+			alias         : 'tbd',
+			join          : ''
+		],
+		'conflict'       : [
+			property      : """
+				(SELECT COUNT(*)
+				FROM AssetDependency AD
+				WHERE status IN ('${VALIDATED}','${UNKNOWN}','${QUESTIONED}')
+				  AND asset=AE
+				  AND AD.dependent.moveBundle != AE.moveBundle)
+			""",
+			type          : Integer,
+			namedParameter: 'conflict',
+			alias         : 'conflict',
+			join          : ''
+		]
 
     ].withDefault {
         String key -> [property: "AE." + key, type: String, namedParameter: key, join: "", mode:"where", domainAlias: "AE"]
