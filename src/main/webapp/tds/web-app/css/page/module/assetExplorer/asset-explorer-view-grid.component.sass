@@ -106,6 +106,13 @@ asset-explorer-view-grid, .asset-explorer-view-grid-component
       input.form-control[name="common.assetName"]
         width: 98%
 
+    // Hide the vertical column line separator for the first header column of all assets view (TM-16757)
+    th[aria-colindex="1"]
+      position: unset
+      .tds-indeterminate-checkbox
+        position: absolute
+        top: 10px
+
   .kendo-grid-toolbar__refresh-btn
     margin-top: unset!important
 
