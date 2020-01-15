@@ -86,8 +86,8 @@
 					kendoGridCellTemplate
 					let-dataItem
 					let-rowIndex="rowIndex"
-					let-isComment="dataItem.taskAndCommentFlags.comment"
-					let-isIssue="dataItem.taskAndCommentFlags.issue"
+					let-hasComments="dataItem.common_commentCount > 0"
+					let-hasTasks="dataItem.common_taskCount > 0"
 			>
 				<div class="action-button btn-link">
 					<clr-dropdown>
@@ -106,7 +106,7 @@
 							<a
 									clrDropdownItem
 									(click)="createTask(dataItem, rowIndex)"
-									*ngIf="!isIssue"
+									*ngIf="!hasTasks"
 									[disabled]="!isTaskCreateAvailable()"
 							>
 								Create Task
@@ -114,14 +114,14 @@
 							<a
 									clrDropdownItem
 									(click)="showTask(dataItem, rowIndex)"
-									*ngIf="isIssue"
+									*ngIf="hasTasks"
 							>
 								Show Tasks
 							</a>
 							<a
 									clrDropdownItem
 									(click)="createComment(dataItem, rowIndex)"
-									*ngIf="!isComment"
+									*ngIf="!hasComments"
 									[disabled]="!isCommentCreateAvailable()"
 							>
 								Create Comment
@@ -129,7 +129,7 @@
 							<a
 									clrDropdownItem
 									(click)="showComment(dataItem, rowIndex)"
-									*ngIf="isComment"
+									*ngIf="hasComments"
 							>
 								Show Comments
 							</a>
