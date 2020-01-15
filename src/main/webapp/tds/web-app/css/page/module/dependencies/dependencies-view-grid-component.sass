@@ -23,6 +23,15 @@
     margin-top: 10px
     min-height: 100%
     position: relative
+    .k-grid-header
+      // Hide the vertical column line separator for the first header column of all assets view (TM-16757)
+      th[aria-colindex="1"]
+        position: unset
+        .tds-indeterminate-checkbox
+          position: absolute
+          top: -10px
+          left: 16px
+
     tbody tr td
       overflow: hidden
       text-overflow: ellipsis
