@@ -20,6 +20,7 @@ class RequireCsrfProtectionMatcher implements RequestMatcher {
 		/^\/tdstm\/team\/.*$/,
 		/^\/tdstm\/person\/.*$/,
 		/^\/tdstm\/admin\/.*$/,
+		/^\/tdstm\/ws\/admin\/.*$/,
 		/^\/tdstm\/assetEntity\/.*$/,
 		/^\/tdstm\/moveBundle\/.*$/,
 		/^\/tdstm\/moveEvent\/.*$/,
