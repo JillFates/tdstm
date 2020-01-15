@@ -111,6 +111,7 @@ class SettingService implements ServiceMethods {
         } else {
             return null
         }
+
     }
 
     /**
@@ -217,7 +218,7 @@ class SettingService implements ServiceMethods {
         settingMap?.fields?.each { Map<String, Map<String, List<String>>> field ->
             List<String> values = field.constraints?.values
             if ( values ) {
-                values.unique().each { StringUtils.trim(it) }
+                field.constraints.values = values*.trim().unique()
             }
         }
     }
