@@ -5910,10 +5910,11 @@ class TaskService implements ServiceMethods {
 
 		// List of TaskCommand properties that are to be skipped when assigning values to the task domain instance.
 		List<String> ignoreProperties = [ 'apiActionId', 'assetEntity', 'assignedTo', 'currentStatus', 'deletedPreds',
-										  'id', 'moveEvent', 'note', 'override', 'prevAsset', 'taskDependency', 'taskSuccessor' ]
+										  'id', 'isResolved', 'manageDependency', 'moveEvent', 'note', 'override',
+										  'prevAsset', 'taskDependency', 'taskSuccessor' ]
 
 		// Populate the domain object with some basic fields.
-		taskCommand.populateDomain(task, false, ignoreProperties)
+		taskCommand.populateDomain(task, true, ignoreProperties)
 
 		List<Map> references = [
 				[taskField: 'apiAction', commandField: 'apiActionId', domain: ApiAction],
@@ -5988,7 +5989,7 @@ class TaskService implements ServiceMethods {
 			note.save(flush: true)
 		}
 
-		if (commentService.shouldSendNotification(task, userLogin.person, addingNote)) {
+		if (task.assignedTo && commentService.shouldSendNotification(task, task.assignedTo, addingNote)) {
 			String tzId = userPreferenceService.timeZone
 			String userDTFormat = userPreferenceService.dateFormat
 			commentService.dispatchTaskEmail([taskId: task.id, tzId: tzId, isNew: !taskCommand.id , userDTFormat: userDTFormat])

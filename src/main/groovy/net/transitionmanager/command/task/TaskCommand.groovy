@@ -9,7 +9,6 @@ class TaskCommand implements CommandObject {
     String attribute
     String category
     String comment
-//    Long commentFromId
     List deletedPreds
     String displayOption
     Date dueDate
@@ -36,5 +35,38 @@ class TaskCommand implements CommandObject {
     Integer sendNotification
     List taskDependency
     List taskSuccessor
+
+    static constraints = {
+        apiActionId nullable: true
+        assetEntity nullable: true
+        assignedTo nullable: true
+        attribute nullable: true
+        category nullable: true
+        deletedPreds nullable: true
+        displayOption nullable: true
+        dueDate nullable: true
+        duration nullable: true
+        durationLocked nullable: true
+        durationScale nullable: true
+        estFinish nullable: true
+        estStart nullable: true
+        hardAssigned nullable: true
+        id nullable: true
+        instructionsLink nullable: true
+        isResolved nullable: true
+        manageDependency nullable: true
+        moveEvent nullable: true
+        mustVerify nullable: true
+        note nullable: true
+        override nullable: true
+        percentageComplete nullable: true
+        prevAsset nullable: true
+        priority nullable: true
+        resolution nullable: true
+        role nullable: true
+        sendNotification nullable: true
+        taskDependency nullable: true
+        taskSuccessor nullable: true
+    }
 
 }
