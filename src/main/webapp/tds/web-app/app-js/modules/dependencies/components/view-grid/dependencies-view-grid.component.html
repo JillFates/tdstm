@@ -44,33 +44,6 @@
 			</div>
 		</ng-template>
 
-		<!-- Show Filters / Actions column -->
-		<kendo-grid-column
-			[locked]="true"
-			[width]="60"
-			[class]="{ 'k-custom-command-column': true }"
-			[minResizableWidth]="60"
-		>
-			<ng-template
-				kendoGridHeaderTemplate
-				let-column
-				let-columnIndex="columnIndex"
-			>
-				<tds-button [flat]="true" (click)="toggleFilter()">
-					<clr-icon
-						shape="filter"
-						class="grid-filter-button is-solid"
-					>
-						<span
-							*ngIf="hasFilterApplied()"
-							class="badge badge-warning"
-						>
-							{{ filterCount() }}
-						</span>
-					</clr-icon>
-				</tds-button>
-			</ng-template>
-		</kendo-grid-column>
 		<!-- Select All column -->
 		<kendo-grid-column
 			class="grid-selectall-checkbox-column"
@@ -112,6 +85,34 @@
 						name="checkbox_{{ dataItem.id }}"
 					/>
 				</div>
+			</ng-template>
+		</kendo-grid-column>
+
+		<!-- Show Filters / Actions column -->
+		<kendo-grid-column
+				[locked]="true"
+				[width]="50"
+				[class]="{ 'k-custom-command-column': true }"
+				[minResizableWidth]="50"
+		>
+			<ng-template
+					kendoGridHeaderTemplate
+					let-column
+					let-columnIndex="columnIndex"
+			>
+				<tds-button [flat]="true" (click)="toggleFilter()">
+					<clr-icon
+							shape="filter"
+							class="grid-filter-button is-solid"
+					>
+						<span
+								*ngIf="hasFilterApplied()"
+								class="badge badge-warning"
+						>
+							{{ filterCount() }}
+						</span>
+					</clr-icon>
+				</tds-button>
 			</ng-template>
 		</kendo-grid-column>
 
