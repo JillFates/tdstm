@@ -1,7 +1,6 @@
 package net.transitionmanager.tag
 
 import com.tdsops.common.security.spring.HasPermission
-import com.tdssrc.grails.GormUtil
 import grails.plugin.springsecurity.annotation.Secured
 import net.transitionmanager.command.tag.CreateCommand
 import net.transitionmanager.command.tag.ListCommand
@@ -16,12 +15,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagView)
 	def list() {
-		ListCommand filter = populateCommandObject(ListCommand, false)
-
-		if (filter.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
-			return
-		}
+		ListCommand filter = populateCommandObject(ListCommand)
 
 		List<Map> tags = tagService.list(
 			projectForWs,
@@ -38,12 +32,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagView)
 	def search() {
-		SearchCommand filter = populateCommandObject(SearchCommand, false)
-
-		if (filter.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
-			return
-		}
+		SearchCommand filter = populateCommandObject(SearchCommand)
 
 		List<Map> tags = tagService.list(
 			projectForWs,
@@ -60,12 +49,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagCreate)
 	def create() {
-		CreateCommand newTag = populateCommandObject(CreateCommand, false)
-
-		if (newTag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(newTag)))
-			return
-		}
+		CreateCommand newTag = populateCommandObject(CreateCommand)
 
 		Tag tag = tagService.create(projectForWs, newTag.name, newTag.description, newTag.color)
 
@@ -75,12 +59,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagEdit)
 	def update(Long id) {
-		UpdateCommand updatedTag = populateCommandObject(UpdateCommand, false)
-
-		if (updatedTag.hasErrors()) {
-			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(updatedTag)))
-			return
-		}
+		UpdateCommand updatedTag = populateCommandObject(UpdateCommand)
 
 		Tag tag = tagService.update(id, projectForWs, updatedTag.name, updatedTag.description, updatedTag.color)
 
