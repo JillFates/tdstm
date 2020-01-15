@@ -612,8 +612,8 @@ class DataviewService implements ServiceMethods {
 		}.join(", ")
 
 		//Add comment and task counts
-		columns += getCountOfQuery('commentCount', 'Comment Count', dataviewSpec, columns)
-		columns += getCountOfQuery('taskCount', 'Task Count', dataviewSpec, columns)
+		columns += getCountOfQuery('commentCount', 'Comment Count', dataviewSpec)
+		columns += getCountOfQuery('taskCount', 'Task Count', dataviewSpec)
 
 		return columns
 
