@@ -179,16 +179,33 @@ class DataviewService implements ServiceMethods {
 	Map generateSaveOptions(Dataview dataview, Project userProject) {
 		List saveAsOptions = []
 		if (userProject && !userProject.isDefaultProject()) {
-			saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())
+			if(securityService.hasPermission('AssetExplorerSaveAs')){
+				saveAsOptions.push(ViewSaveAsOptionEnum.MY_VIEW.name())	
+			}
+			
+			// TODO: Check to see if user already has an overriden version of this view	
 			if (dataview.isSystem && dataview.overridesView == null) {
-				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
+				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ME.name())
 			}
 		}
-		if ((securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && userProject.isDefaultProject())
-			|| (securityService.hasPermission('AssetExplorerOverrideAllUserProject') && !userProject.isDefaultProject())) {
-			if (dataview.isSystem && dataview.project.isDefaultProject() && dataview.overridesView == null) {
-				saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
-			}
+		if (
+				(
+					securityService.hasPermission('AssetExplorerOverrideAllUserGlobal') && 
+					userProject.isDefaultProject()
+				)
+				|| 
+				(
+					securityService.hasPermission('AssetExplorerOverrideAllUserProject') && 
+					!userProject.isDefaultProject()
+				)
+		){
+				if (
+					dataview.isSystem && 
+					dataview.project.isDefaultProject() && 
+					dataview.overridesView == null
+				) {
+					saveAsOptions.push(ViewSaveAsOptionEnum.OVERRIDE_FOR_ALL.name())
+				}
 		}
 		return [
 			"save": dataview.person == securityService.loadCurrentPerson() && securityService.hasPermission('AssetExplorerEdit'),

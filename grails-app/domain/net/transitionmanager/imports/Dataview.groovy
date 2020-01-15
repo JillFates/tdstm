@@ -24,7 +24,7 @@ class Dataview {
 	Dataview overridesView
 
 	static constraints = {
-		name size: 1..255, unique: 'project', validator: uniqueNameValidator()
+		name size: 1..255, unique: ['project','person', 'isShared'], validator: uniqueNameValidator()
 		person nullable: true
 		lastModified nullable: true
 		overridesView nullable: true
@@ -115,6 +115,7 @@ class Dataview {
 	 * Used to validate that name is unique within the project
 	 */
 	static Closure uniqueNameValidator() {
+		// TODO: Insert constraints: isShared and person
 		return { value, target ->
 			int count = Dataview.where {
 				project == target.project

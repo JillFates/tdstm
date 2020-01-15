@@ -124,9 +124,9 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	private preModel: ViewModel;
 	public isUnique = true;
 	public saveAsOptions = {
-		MY_VIEW: {value: E_SAVE_AS_OPTIONS.MY_VIEW, disabled: false},
-		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false },
-		OVERRIDE_FOR_ALL: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL, disabled: false }
+		MY_VIEW: {value: E_SAVE_AS_OPTIONS.MY_VIEW, disabled: false, isOverride: false},
+		OVERRIDE_FOR_ME: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ME, disabled: false, isOverride: true },
+		OVERRIDE_FOR_ALL: {value: E_SAVE_AS_OPTIONS.OVERRIDE_FOR_ALL, disabled: false, isOverride: true }
 	};
 
 	constructor(
@@ -159,9 +159,6 @@ export class AssetViewSaveComponent implements AfterViewInit {
 	}
 
 	public confirmCloseDialog() {
-		if (this.isOverrideAllUsersMode() || this.isOverrideForMeMode()) {
-			this.startModel();
-		}
 		const tmpModel = this.extractModel(this.model);
 		this.assetExpService.saveReport(tmpModel)
 			.subscribe(result => result && this.activeDialog.close(result),
@@ -277,13 +274,17 @@ export class AssetViewSaveComponent implements AfterViewInit {
 
 	private extractModel(model: ViewModel) {
 		const tmpModel = Object.assign({}, model);
-		tmpModel.id = null;
-		tmpModel.overrideView = model.id;
+		const saveOption = this.saveAsOptions[this.model.saveOptionAs];
+		if (saveOption && saveOption.isOverride) {
+			tmpModel.id = null
+			tmpModel.overridesView = model.id;
+			tmpModel.name = this.preModel.name;
+		}
 		return tmpModel;
 	}
 }
 
-enum E_SAVE_AS_OPTIONS {
+export enum E_SAVE_AS_OPTIONS {
 	MY_VIEW= 'MY_VIEW',
 	OVERRIDE_FOR_ME = 'OVERRIDE_FOR_ME',
 	OVERRIDE_FOR_ALL = 'OVERRIDE_FOR_ALL'

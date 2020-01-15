@@ -65,19 +65,20 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		take: GRID_DEFAULT_PAGE_SIZE,
 		sort: []
 	};
-	private readonly overrideAssetViews: any = {
-		IS_OVERRIDE: {
-			icon: 'times',
+	private readonly overrideAssetViewStates: any = {
+		IS_OVERRIDE_CHILD: {
+			icon: 'layer-minus',
 			isOverride: true,
-			offLabel: 'Revert to Project View',
-			onLabel: 'Display Personal System View'
+			label: 'Revert to Project View',
 
 		},
+		IS_OVERRIDE_PARENT: {
+			icon: 'layer-group',
+			isOverride: true,
+			label: 'Display Personal System View'
+		},
 		IS_NOT_OVERRIDE: {
-			icon: 'refresh',
-			isOverride: false,
-			offLabel: 'Revert to Project View',
-			onLabel: 'Display Personal System View'
+			isOverride: false
 		}
 	};
 
@@ -103,9 +104,7 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 		this.model = dataView;
 		this.saveOptions = saveOptions;
 		this.dataSignature = this.stringifyCopyOfModel(this.model);
-		if (this.model.isOverride) {
-			this.currentOverrideState = this.overrideAssetViews.IS_NOT_OVERRIDE;
-		}
+		this.handleOverrideState(this.model);
 	}
 
 	ngOnInit(): void {
@@ -155,6 +154,18 @@ export class AssetViewShowComponent implements OnInit, OnDestroy {
 				}
 			}
 		});
+	}
+
+	private handleOverrideState(model): void {
+		if (model.isOverride) {
+			if (model.overrideView) {
+				this.currentOverrideState = this.overrideAssetViewStates.IS_OVERRIDE_CHILD;
+			} else {
+				this.currentOverrideState = this.overrideAssetViewStates.IS_OVERRIDE_PARENT;
+			}
+		} else {
+			this.currentOverrideState = this.overrideAssetViewStates.IS_NOT_OVERRIDE;
+		}
 	}
 
 	/**
