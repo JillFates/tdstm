@@ -564,7 +564,6 @@ class MoveBundleController implements ControllerMethods {
 	@NotTransactional()
 	def dependencyConsole() {
 		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
-		validateCommandObject(console)
 		licenseAdminService.checkValidForLicenseOrThrowException()
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
@@ -608,7 +607,6 @@ class MoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.DepAnalyzerView)
 	def dependencyBundleDetails() {
 		DependencyConsoleCommand console = populateCommandObject(DependencyConsoleCommand)
-		validateCommandObject(console)
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return
 
@@ -678,7 +676,6 @@ class MoveBundleController implements ControllerMethods {
 	@HasPermission(Permission.AssetEdit)
 	def assetsAssignment() {
 		AssetsAssignmentCommand assetsAssignment = populateCommandObject(AssetsAssignmentCommand)
-		validateCommandObject(assetsAssignment)
 
 		Project project = controllerService.getProjectForPage(this)
 		if (!project) return

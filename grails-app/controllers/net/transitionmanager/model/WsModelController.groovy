@@ -17,7 +17,7 @@ class WsModelController implements ControllerMethods {
 
 	@HasPermission(Permission.ModelEdit)
 	def save() {
-		ModelCommand modelCommand = populateCommandObject(ModelCommand)
+		ModelCommand modelCommand = populateCommandObject(ModelCommand, false)
 		Project project = securityService.userCurrentProject
 		modelService.createOrUpdateModel(project, modelCommand)
 		renderSuccessJson()

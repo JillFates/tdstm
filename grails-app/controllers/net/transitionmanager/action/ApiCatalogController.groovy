@@ -26,7 +26,6 @@ class ApiCatalogController implements ControllerMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def viewMerged() {
 		ApiCatalogCommand command = populateCommandObject(ApiCatalogCommand.class)
-		validateCommandObject(command)
 
 		ApiCatalogUtil.validateDictionary(command.dictionary)
 		String transformedJson = ApiCatalogUtil.transformDictionary(command)
@@ -40,7 +39,6 @@ class ApiCatalogController implements ControllerMethods {
 	@HasPermission(Permission.AdminUtilitiesAccess)
 	def save() {
 		ApiCatalogCommand command = populateCommandObject(ApiCatalogCommand.class)
-		validateCommandObject(command)
 
 		ApiCatalog apiCatalog = apiCatalogService.saveOrUpdate(command)
 

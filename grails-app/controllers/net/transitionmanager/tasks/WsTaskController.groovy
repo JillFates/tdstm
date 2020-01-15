@@ -83,7 +83,6 @@ class WsTaskController implements ControllerMethods, PaginationMethods {
 	@HasPermission(Permission.RecipeGenerateTasks)
 	def generateTasks() {
 		TaskGenerationCommand context = populateCommandObject(TaskGenerationCommand)
-		validateCommandObject(context)
 		Project project = securityService.userCurrentProject
 
 		def result = taskService.initiateCreateTasksWithRecipe(context, project)

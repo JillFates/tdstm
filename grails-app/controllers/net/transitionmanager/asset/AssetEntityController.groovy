@@ -2850,7 +2850,6 @@ class AssetEntityController implements ControllerMethods, PaginationMethods {
 	def applicationArchitectureGraph() {
 		Project project = securityService.userCurrentProject
 		ArchitectureGraphCommand context = populateCommandObject(ArchitectureGraphCommand)
-		validateCommandObject(context)
 		AssetEntity rootAsset = AssetEntity.get(context.assetId)
 
 		if (rootAsset && rootAsset.project != project) {

@@ -16,7 +16,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagView)
 	def list() {
-		ListCommand filter = populateCommandObject(ListCommand)
+		ListCommand filter = populateCommandObject(ListCommand, false)
 
 		if (filter.hasErrors()) {
 			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
@@ -38,7 +38,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagView)
 	def search() {
-		SearchCommand filter = populateCommandObject(SearchCommand)
+		SearchCommand filter = populateCommandObject(SearchCommand, false)
 
 		if (filter.hasErrors()) {
 			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(filter)))
@@ -60,7 +60,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagCreate)
 	def create() {
-		CreateCommand newTag = populateCommandObject(CreateCommand)
+		CreateCommand newTag = populateCommandObject(CreateCommand, false)
 
 		if (newTag.hasErrors()) {
 			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(newTag)))
@@ -75,7 +75,7 @@ class WsTagController implements ControllerMethods {
 
 	@HasPermission(Permission.TagEdit)
 	def update(Long id) {
-		UpdateCommand updatedTag = populateCommandObject(UpdateCommand)
+		UpdateCommand updatedTag = populateCommandObject(UpdateCommand, false)
 
 		if (updatedTag.hasErrors()) {
 			sendInvalidInput(renderAsJson(GormUtil.validateErrorsI18n(updatedTag)))

@@ -35,7 +35,7 @@ class PartyGroupController implements ControllerMethods, PaginationMethods {
 	 */
 	@HasPermission(Permission.CompanyView)
 	def listJson() {
-		ListCommand list = populateCommandObject(ListCommand)
+		ListCommand list = populateCommandObject(ListCommand, false)
 		Integer maxRows = paginationMaxRowValue('rows', null, false)
 		Integer currentPage = paginationPage()
 		Integer rowOffset = paginationRowOffset(currentPage, maxRows)

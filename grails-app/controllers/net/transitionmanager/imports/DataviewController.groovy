@@ -66,7 +66,6 @@ class DataviewController implements ControllerMethods, PaginationMethods {
 		Project project = getProjectForWs()
 		DataviewApiParamsCommand apiParamsCommand = populateCommandObject(DataviewApiParamsCommand)
 
-		validateCommandObject(apiParamsCommand)
 		Dataview dataview = dataviewService.fetch(id)
 
 		Map queryResult = dataviewService.query(project, dataview, apiParamsCommand)
