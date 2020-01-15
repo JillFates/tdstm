@@ -690,8 +690,6 @@ class MoveBundleService implements ServiceMethods {
 	private void cleanDependencyGroupsStatus(projectId) {
 		// Deleting previously generated dependency bundle table .
 		jdbcTemplate.execute("DELETE FROM asset_dependency_bundle where project_id = $projectId")
-		// TODO: THIS SHOULD NOT BE NECESSARY GOING FORWARD - THIS COLUMN is being dropped.
-		jdbcTemplate.execute("UPDATE asset_entity SET dependency_bundle=NULL WHERE project_id = $projectId")
 
 		// Reset hibernate session since we just cleared out the data directly
 		GormUtil.flushAndClearSession()
