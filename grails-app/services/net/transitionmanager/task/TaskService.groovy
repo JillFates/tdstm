@@ -9,7 +9,6 @@ import com.tdsops.tm.domain.RecipeHelper
 import com.tdsops.tm.enums.domain.AssetClass
 import com.tdsops.tm.enums.domain.AssetCommentCategory as ACC
 import com.tdsops.tm.enums.domain.AssetCommentPropertyEnum
-import com.tdsops.tm.enums.domain.AssetCommentStatus
 import com.tdsops.tm.enums.domain.AssetCommentStatus as ACS
 import com.tdsops.tm.enums.domain.AssetCommentType
 import com.tdsops.tm.enums.domain.TimeConstraintType
@@ -5874,7 +5873,7 @@ class TaskService implements ServiceMethods {
 			// Fetch the Task from the database.
 			task = GormUtil.findInProject(project, Task, taskCommand.id, true)
 			// Validate that the status hasn't been updated by someone else. If so, fail accordingly.
-			if (taskCommand.status && taskCommand.status != task.status && task.status != READY) {
+			if (taskCommand.status && taskCommand.status != task.status && task.status != ACS.READY) {
 				Person responsible = (task.status == COMPLETED) ? task.resolvedBy : task.assignedTo
 				String errorMsg
 				switch (task.status) {
